@@ -75,6 +75,7 @@ public:
     bool isReleaseVersion() const;
     QString clientName() const;
     QString formatClientStartupTime() const;
+    QString dataDir() const;
 
 private:
     OptionsModel* optionsModel;
