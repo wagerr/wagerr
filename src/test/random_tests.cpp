@@ -4,7 +4,7 @@
 
 #include "random.h"
 
-#include "test/test_bitcoin.h"
+#include "test/test_wagerr.h"
 
 #include <boost/test/unit_test.hpp>
 
@@ -33,6 +33,21 @@ BOOST_AUTO_TEST_CASE(fastrandom_tests)
     FastRandomContext ctx3;
     FastRandomContext ctx4;
     BOOST_CHECK(ctx3.rand64() != ctx4.rand64()); // extremely unlikely to be equal
+}
+
+BOOST_AUTO_TEST_CASE(fastrandom_randbits)
+{
+    FastRandomContext ctx1;
+    FastRandomContext ctx2;
+    for (int bits = 0; bits < 63; ++bits) {
+        for (int j = 0; j < 1000; ++j) {
+            uint64_t rangebits = ctx1.randbits(bits);
+            BOOST_CHECK_EQUAL(rangebits >> bits, 0);
+            uint64_t range = ((uint64_t)1) << bits | rangebits;
+            uint64_t rand = ctx2.randrange(range);
+            BOOST_CHECK(rand < range);
+        }
+    }
 }
 
 BOOST_AUTO_TEST_SUITE_END()
