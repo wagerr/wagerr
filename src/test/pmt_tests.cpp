@@ -10,7 +10,6 @@
 #include "uint256.h"
 #include "version.h"
 #include "test/test_wagerr.h"
-#include "test_random.h"
 
 #include <vector>
 
