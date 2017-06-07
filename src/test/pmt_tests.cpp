@@ -21,8 +21,8 @@ class CPartialMerkleTreeTester : public CPartialMerkleTree
 public:
     // flip one bit in one of the hashes - this should break the authentication
     void Damage() {
-        unsigned int n = rand() % vHash.size();
-        int bit = rand() % 256;
+        unsigned int n = insecure_randrange(vHash.size());
+        int bit = insecure_randrange(256);
         uint256 &hash = vHash[n];
         hash ^= ((uint256)1 << bit);
     }
