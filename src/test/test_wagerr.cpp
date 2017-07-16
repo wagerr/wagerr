@@ -130,14 +130,14 @@ TestingSetup::~TestingSetup()
         boost::filesystem::remove_all(pathTemp);
 }
 
-void Shutdown(void* parg)
+[[noreturn]] void Shutdown(void* parg)
 {
-  exit(0);
+    std::exit(0);
 }
 
-void StartShutdown()
+[[noreturn]] void StartShutdown()
 {
-  exit(0);
+    std::exit(0);
 }
 
 bool ShutdownRequested()
