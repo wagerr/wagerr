@@ -7,6 +7,9 @@
 #include "chainparams.h"
 #include "main.h"
 #include "txdb.h"
+#include "../main.h"
+#include "../accumulators.h"
+#include "../key.h"
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 #include <accumulators.h>
@@ -63,6 +66,27 @@ std::vector<std::pair<std::string, std::string> > vecRawMints = {std::make_pair(
 //create a zerocoin mint from vecsend
 BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
 {
+    cout << "generating privkeys\n";
+
+    //generate a privkey
+    CKey key;
+    key.MakeNewKey(true);
+    CPrivKey privkey = key.GetPrivKey();
+
+    //generate pubkey hash/serial
+    CPubKey pubkey = key.GetPubKey();
+    uint256 nSerial = Hash(pubkey.begin(), pubkey.end());
+    CBigNum bnSerial(nSerial);
+
+    //make sure privkey import to new keypair makes the same serial
+    CKey key2;
+    key2.SetPrivKey(privkey, true);
+    CPubKey pubkey2 = key2.GetPubKey();
+    uint256 nSerial2 = Hash(pubkey2.begin(), pubkey2.end());
+    CBigNum bnSerial2(nSerial2);
+    BOOST_CHECK_MESSAGE(bnSerial == bnSerial2, "Serials do not match!");
+
+
     cout << "Running check_zerocoinmint_test...\n";
     CTransaction tx;
     BOOST_CHECK(DecodeHexTx(tx, rawTx1));
@@ -226,7 +250,14 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
 
     //serialize the spend
     CDataStream serializedCoinSpend2(SER_NETWORK, PROTOCOL_VERSION);
-    serializedCoinSpend2 << coinSpend;
+    bool fSerialize = true;
+    try {
+        serializedCoinSpend2 << coinSpend;
+    } catch (...) {
+        fSerialize = false;
+    }
+    BOOST_CHECK_MESSAGE(fSerialize, "failed to serialize coinspend object");
+
     std::vector<unsigned char> data(serializedCoinSpend2.begin(), serializedCoinSpend2.end());
 
     /** Check valid spend */
@@ -261,6 +292,48 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     CheckZerocoinSpendNoDB(txOverSpend, strError);
     string str = "Failed to detect overspend. Error Message: " + strError;
     BOOST_CHECK_MESSAGE(strError == "Transaction spend more than was redeemed in zerocoins", str);
+
+
+    cout << "checking v2 spend\n";
+
+    CMutableTransaction tx;
+    uint256 txHash = 0;
+    CTxIn in(txHash, 0);
+    tx.vin.emplace_back(in);
+
+    // Create a New Zerocoin with specific denomination given by pubCoin
+    PrivateCoin privateCoin_v2(Params().Zerocoin_Params(), CoinDenomination::ZQ_ONE);
+
+    CKey key;
+    key.SetPrivKey(privateCoin.getPrivKey(), false);
+    BOOST_CHECK_MESSAGE(key.IsValid(), "Key is not valid");
+    PublicCoin pubcoin_v2 = privateCoin_v2.getPublicCoin();
+
+    //initialize and Accumulator and AccumulatorWitness
+    Accumulator accumulator_v2(Params().Zerocoin_Params(), CoinDenomination::ZQ_ONE);
+    AccumulatorWitness witness_v2(Params().Zerocoin_Params(), accumulator_v2, pubcoin_v2);
+
+    //populate the witness and accumulators
+    CValidationState state_v2;
+    for(int i = 0; i < 10; i++) {
+        PrivateCoin privTemp(Params().Zerocoin_Params(), CoinDenomination::ZQ_ONE);
+        PublicCoin pubTemp = privTemp.getPublicCoin();
+        accumulator_v2 += pubTemp;
+        witness_v2 += pubTemp;
+    }
+
+    accumulator_v2 += pubcoin_v2;
+
+    //Get the checksum of the accumulator we use for the spend and also add it to our checksum map
+    uint32_t nChecksum_v2 = GetChecksum(accumulator_v2.getValue());
+    AddAccumulatorChecksum(nChecksum_v2, accumulator_v2.getValue(), true);
+    uint256 ptxHash = CBigNum::RandKBitBigum(256).getuint256();
+    CoinSpend coinSpend_v2(Params().Zerocoin_Params(), privateCoin_v2, accumulator_v2, nChecksum_v2, witness_v2, ptxHash);
+
+    BOOST_CHECK_MESSAGE(coinSpend_v2.Verify(accumulator_v2), "coinspend_v2 failed to verify");
+    BOOST_CHECK_MESSAGE(coinSpend_v2.HasValidSignature(), "coinspend_v2 does not have valid signature");
+    BOOST_CHECK_MESSAGE(coinSpend_v2.getVersion() == 2, "coinspend_v2 version is wrong");
+    BOOST_CHECK_MESSAGE(coinSpend_v2.getPubKey() == privateCoin_v2.getPubKey(), "pub keys do not match");
 }
 
 

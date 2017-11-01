@@ -2846,6 +2846,10 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
         objMint.push_back(Pair("t", mint.GetTxHash().GetHex()));
         objMint.push_back(Pair("h", mint.GetHeight()));
         objMint.push_back(Pair("u", mint.IsUsed()));
+        objMint.push_back(Pair("v", mint.GetVersion()));
+        if (mint.GetVersion() >= 2) {
+            objMint.push_back(Pair("pk", HexStr(mint.GetPrivKey())));
+        }
         jsonList.push_back(objMint);
     }
 
@@ -2906,7 +2910,12 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, h must be positive");
 
         bool fUsed = find_value(o, "u").get_bool();
-        CZerocoinMint mint(denom, bnValue, bnRandom, bnSerial, fUsed);
+
+        //todo: v2
+        uint8_t nVersion = 1;
+        CPrivKey* privkey = nullptr;
+
+        CZerocoinMint mint(denom, bnValue, bnRandom, bnSerial, fUsed, nVersion, privkey);
         mint.SetTxHash(txid);
         mint.SetHeight(nHeight);
         walletdb.WriteZerocoinMint(mint);

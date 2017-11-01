@@ -22,6 +22,7 @@
 #include "Params.h"
 #include "SerialNumberSignatureOfKnowledge.h"
 #include "bignum.h"
+#include "pubkey.h"
 #include "serialize.h"
 
 namespace libzerocoin
@@ -63,7 +64,8 @@ public:
 	 * @param a hash of the partial transaction that contains this coin spend
 	 * @throw ZerocoinException if the process fails
 	 */
-    CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulator& a, const uint32_t checksum, const AccumulatorWitness& witness, const uint256& ptxHash);
+    CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulator& a, const uint32_t& checksum,
+              const AccumulatorWitness& witness, const uint256& ptxHash);
 
     /** Returns the serial number of the coin spend by this proof.
 	 *
@@ -90,9 +92,13 @@ public:
     uint256 getTxOutHash() const { return ptxHash; }
     CBigNum getAccCommitment() const { return accCommitmentToCoinValue; }
     CBigNum getSerialComm() const { return serialCommitmentToCoinValue; }
+    uint8_t getVersion() const { return version; }
+    CPubKey getPubKey() const { return pubkey; }
+    std::vector<unsigned char> getSignature() const { return vchSig; }
 
     bool Verify(const Accumulator& a) const;
     bool HasValidSerial(ZerocoinParams* params) const;
+    bool HasValidSignature() const;
     CBigNum CalculateValidSerial(ZerocoinParams* params);
 
     ADD_SERIALIZE_METHODS;
@@ -108,6 +114,14 @@ public:
         READWRITE(accumulatorPoK);
         READWRITE(serialNumberSoK);
         READWRITE(commitmentPoK);
+
+        try {
+            READWRITE(version);
+            READWRITE(pubkey);
+            READWRITE(vchSig);
+        } catch (...) {
+            version = 0;
+        }
     }
 
 private:
@@ -121,6 +135,11 @@ private:
     AccumulatorProofOfKnowledge accumulatorPoK;
     SerialNumberSignatureOfKnowledge serialNumberSoK;
     CommitmentProofOfKnowledge commitmentPoK;
+    uint8_t version;
+
+    //As of version 2
+    CPubKey pubkey;
+    std::vector<unsigned char> vchSig;
 };
 
 } /* namespace libzerocoin */

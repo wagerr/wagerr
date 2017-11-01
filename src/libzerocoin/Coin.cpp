@@ -16,7 +16,7 @@
 #include <iostream>
 #include "Coin.h"
 #include "Commitment.h"
-#include "Denominations.h"
+#include "pubkey.h"
 
 namespace libzerocoin {
 
@@ -66,6 +66,39 @@ PrivateCoin::PrivateCoin(const ZerocoinParams* p, const CoinDenomination denomin
 	
 }
 
+inline void GenerateKeyPair(const CBigNum& bnGroupOrder, CKey& key, CBigNum& bnSerial)
+{
+	// Generate a new key pair, which also has a 256-bit pubkey hash that qualifies as a serial #
+	// This builds off of Tim Ruffing's work on libzerocoin, but has a different implementation
+	while (true) {
+		CKey keyPair;
+		keyPair.MakeNewKey(true);
+		CPubKey pubKey = keyPair.GetPubKey();
+		uint256 hashPubKey = Hash(pubKey.begin(), pubKey.end());
+		CBigNum s(hashPubKey);
+		if (s >= bnGroupOrder)
+			continue;
+
+		key = keyPair;
+		bnSerial = s;
+		break;
+	}
+}
+
+const CPubKey PrivateCoin::getPubKey() const
+{
+	CKey key;
+	key.SetPrivKey(privkey, true);
+	return key.GetPubKey();
+}
+
+bool PrivateCoin::sign(const uint256& hash, vector<unsigned char>& vchSig) const
+{
+	CKey key;
+	key.SetPrivKey(privkey, true);
+	return key.Sign(hash, vchSig);
+}
+
 void PrivateCoin::mintCoin(const CoinDenomination denomination) {
 	// Repeat this process up to MAX_COINMINT_ATTEMPTS times until
 	// we obtain a prime number
@@ -73,7 +106,10 @@ void PrivateCoin::mintCoin(const CoinDenomination denomination) {
 
 		// Generate a random serial number in the range 0...{q-1} where
 		// "q" is the order of the commitment group.
-		CBigNum s = CBigNum::randBignum(this->params->coinCommitmentGroup.groupOrder);
+		// And where the serial also doubles as a public key
+		CKey key;
+		CBigNum s;
+		GenerateKeyPair(this->params->coinCommitmentGroup.groupOrder, key, s);
 
 		// Generate a Pedersen commitment to the serial number "s"
 		Commitment coin(&params->coinCommitmentGroup, s);
@@ -88,6 +124,8 @@ void PrivateCoin::mintCoin(const CoinDenomination denomination) {
 			this->serialNumber = s;
 			this->randomness = coin.getRandomness();
 			this->publicCoin = PublicCoin(params,coin.getCommitmentValue(), denomination);
+			this->privkey = key.GetPrivKey();
+			this->version = 2;
 
 			// Success! We're done.
 			return;
@@ -100,10 +138,13 @@ void PrivateCoin::mintCoin(const CoinDenomination denomination) {
 }
 
 void PrivateCoin::mintCoinFast(const CoinDenomination denomination) {
-	
+
 	// Generate a random serial number in the range 0...{q-1} where
 	// "q" is the order of the commitment group.
-	CBigNum s = CBigNum::randBignum(this->params->coinCommitmentGroup.groupOrder);
+	// And where the serial also doubles as a public key
+	CKey key;
+	CBigNum s;
+	GenerateKeyPair(this->params->coinCommitmentGroup.groupOrder, key, s);
 	
 	// Generate a random number "r" in the range 0...{q-1}
 	CBigNum r = CBigNum::randBignum(this->params->coinCommitmentGroup.groupOrder);
@@ -125,6 +166,8 @@ void PrivateCoin::mintCoinFast(const CoinDenomination denomination) {
 			this->serialNumber = s;
 			this->randomness = r;
 			this->publicCoin = PublicCoin(params, commitmentValue, denomination);
+			this->privkey = key.GetPrivKey();
+			this->version = 2;
 				
 			// Success! We're done.
 			return;

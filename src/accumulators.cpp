@@ -33,6 +33,30 @@ uint32_t GetChecksum(const CBigNum &bnValue)
     return hash.Get32();
 }
 
+// Find the first occurance of a certain accumulator checksum. Return 0 if not found.
+int GetChecksumHeight(uint32_t nChecksum, CoinDenomination denomination)
+{
+    CBlockIndex* pindex = chainActive[Params().Zerocoin_StartHeight()];
+    if (!pindex)
+        return 0;
+
+    //Search through blocks to find the checksum
+    while (pindex) {
+        if (ParseChecksum(pindex->nAccumulatorCheckpoint, denomination) == nChecksum)
+            return pindex->nHeight;
+
+        //Skip forward in groups of 10 blocks since checkpoints only change every 10 blocks
+        if (pindex->nHeight % 10 == 0) {
+            pindex = chainActive[pindex->nHeight + 10];
+            continue;
+        }
+
+        pindex = chainActive.Next(pindex);
+    }
+
+    return 0;
+}
+
 bool GetAccumulatorValueFromChecksum(uint32_t nChecksum, bool fMemoryOnly, CBigNum& bnAccValue)
 {
     if (mapAccumulatorValues.count(nChecksum)) {
@@ -297,7 +321,7 @@ bool ValidateAccumulatorCheckpoint(const CBlock& block, CBlockIndex* pindex, Acc
     return true;
 }
 
-bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator, AccumulatorWitness& witness, int nSecurityLevel, int& nMintsAdded, string& strError)
+bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator, AccumulatorWitness& witness, int nSecurityLevel, int& nMintsAdded, string& strError, CBlockIndex* pindexCheckpoint)
 {
     uint256 txid;
     if (!zerocoinDB->ReadCoinMint(coin.getValue(), txid)) {
@@ -375,6 +399,8 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
     int nChainHeight = chainActive.Height();
     int nHeightStop = nChainHeight % 10;
     nHeightStop = nChainHeight - nHeightStop - 20; // at least two checkpoints deep
+    if (pindexCheckpoint)
+        nHeightStop = pindexCheckpoint->nHeight -10;
     int nCheckpointsAdded = 0;
     nMintsAdded = 0;
     while (pindex->nHeight < nHeightStop + 1) {

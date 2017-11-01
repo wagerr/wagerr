@@ -15,12 +15,15 @@
 #include <iostream>
 namespace libzerocoin
 {
-CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulator& a, const uint32_t checksum, const AccumulatorWitness& witness, const uint256& ptxHash) : accChecksum(checksum),
-                                                                                                                                                                             ptxHash(ptxHash),
-                                                                                                                                                                             coinSerialNumber((coin.getSerialNumber())),
-                                                                                                                                                                             accumulatorPoK(&p->accumulatorParams),
-                                                                                                                                                                             serialNumberSoK(p),
-                                                                                                                                                                             commitmentPoK(&p->serialNumberSoKCommitmentGroup, &p->accumulatorParams.accumulatorPoKCommitmentGroup)
+
+CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulator& a, const uint32_t& checksum,
+                     const AccumulatorWitness& witness, const uint256& ptxHash) : accChecksum(checksum),
+                                                                                  ptxHash(ptxHash),
+                                                                                  coinSerialNumber((coin.getSerialNumber())),
+                                                                                  accumulatorPoK(&p->accumulatorParams),
+                                                                                  serialNumberSoK(p),
+                                                                                  commitmentPoK(&p->serialNumberSoKCommitmentGroup,
+                                                                                                &p->accumulatorParams.accumulatorPoKCommitmentGroup)
 {
     denomination = coin.getPublicCoin().getDenomination();
     // Sanity check: let's verify that the Witness is valid with respect to
@@ -52,13 +55,25 @@ CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulat
 
     // 4. Proves that the coin is correct w.r.t. serial number and hidden coin secret
     // (This proof is bound to the coin 'metadata', i.e., transaction hash)
+    uint256 hashSig = signatureHash();
     this->serialNumberSoK = SerialNumberSignatureOfKnowledge(p, coin, fullCommitmentToCoinUnderSerialParams, signatureHash());
+
+    // 5. Sign the transaction using the private key associated with the serial number
+    version = coin.getVersion();
+    if (version >= 2) {
+        this->pubkey = coin.getPubKey();
+        if (!coin.sign(hashSig, this->vchSig))
+            throw std::runtime_error("Coinspend failed to sign signature hash");
+    }
 }
 
 bool CoinSpend::Verify(const Accumulator& a) const
 {
     // Verify both of the sub-proofs using the given meta-data
-    return (a.getDenomination() == this->denomination) && commitmentPoK.Verify(serialCommitmentToCoinValue, accCommitmentToCoinValue) && accumulatorPoK.Verify(a, accCommitmentToCoinValue) && serialNumberSoK.Verify(coinSerialNumber, serialCommitmentToCoinValue, signatureHash());
+    return (a.getDenomination() == this->denomination) &&
+            commitmentPoK.Verify(serialCommitmentToCoinValue, accCommitmentToCoinValue) &&
+            accumulatorPoK.Verify(a, accCommitmentToCoinValue) &&
+            serialNumberSoK.Verify(coinSerialNumber, serialCommitmentToCoinValue, signatureHash());
 }
 
 const uint256 CoinSpend::signatureHash() const
@@ -72,6 +87,19 @@ const uint256 CoinSpend::signatureHash() const
 bool CoinSpend::HasValidSerial(ZerocoinParams* params) const
 {
     return coinSerialNumber > 0 && coinSerialNumber < params->coinCommitmentGroup.groupOrder;
+}
+
+//Additional verification layer that requires the spend be signed by the private key associated with the serial
+bool CoinSpend::HasValidSignature() const
+{
+    if (version < PrivateCoin::PUBKEY_VERSION)
+        return true;
+
+    uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end());
+    if (CBigNum(hashedPubkey) != coinSerialNumber)
+        return false;
+
+    return pubkey.Verify(signatureHash(), vchSig);
 }
 
 CBigNum CoinSpend::CalculateValidSerial(ZerocoinParams* params)

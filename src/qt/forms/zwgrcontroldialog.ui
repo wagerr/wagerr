@@ -101,6 +101,11 @@
        </column>
        <column>
         <property name="text">
+         <string notr="true">zWgr Version</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
          <string notr="true">Confirmations</string>
         </property>
        </column>

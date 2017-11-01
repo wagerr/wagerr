@@ -165,6 +165,7 @@ public:
     bool WriteZerocoinSpendSerialEntry(const CZerocoinSpend& zerocoinSpend);
     bool EraseZerocoinSpendSerialEntry(const CBigNum& serialEntry);
     bool ReadZerocoinSpendSerialEntry(const CBigNum& bnSerial);
+    bool ReadZerocoinMintFromSerial(const CBigNum& bnSerial, CZerocoinMint& mint);
 
 private:
     CWalletDB(const CWalletDB&);

@@ -44,6 +44,7 @@ private:
         COLUMN_CHECKBOX,
         COLUMN_DENOMINATION,
         COLUMN_PUBCOIN,
+        COLUMN_VERSION,
         COLUMN_CONFIRMATIONS,
         COLUMN_ISSPENDABLE
     };
