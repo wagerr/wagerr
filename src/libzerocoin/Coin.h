@@ -24,6 +24,9 @@
 namespace libzerocoin
 {
     int ExtractVersionFromSerial(const CBigNum& bnSerial);
+    bool IsValidSerial(const ZerocoinParams* params, const CBigNum& bnSerial);
+    CBigNum GetAdjustedSerial(const CBigNum& bnSerial);
+    bool GenerateKeyPair(const CBigNum& bnGroupOrder, const uint256& nPrivkey, CKey& key, CBigNum& bnSerial);
 
 /** A Public coin is the part of a coin that
  * is published to the network and what is handled
@@ -60,9 +63,7 @@ public:
     /** Checks that coin is prime and in the appropriate range given the parameters
      * @return true if valid
      */
-    bool validate() const {
-        return (this->params->accumulatorParams.minCoinValue < value) && (value < this->params->accumulatorParams.maxCoinValue) && value.isPrime(params->zkp_iterations);
-    }
+    bool validate() const;
 
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>
@@ -100,7 +101,8 @@ public:
     {
         strm >> *this;
     }
-    PrivateCoin(const ZerocoinParams* p, const CoinDenomination denomination);
+    PrivateCoin(const ZerocoinParams* p, const CoinDenomination denomination, bool fMintNew = true);
+    PrivateCoin(const ZerocoinParams* p, const CoinDenomination denomination, const CBigNum& bnSerial, const CBigNum& bnRandomness);
     const PublicCoin& getPublicCoin() const { return this->publicCoin; }
     // @return the coins serial number
     const CBigNum& getSerialNumber() const { return this->serialNumber; }
@@ -115,6 +117,7 @@ public:
     void setVersion(uint8_t nVersion) { this->version = nVersion; }
     void setPrivKey(const CPrivKey& privkey) { this->privkey = privkey; }
     bool sign(const uint256& hash, std::vector<unsigned char>& vchSig) const;
+    bool IsValid();
 
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>

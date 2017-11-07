@@ -3,6 +3,7 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include <streams.h>
 #include "primitives/zerocoin.h"
 #include "hash.h"
 #include "util.h"
@@ -12,6 +13,13 @@ uint256 GetSerialHash(const CBigNum& bnSerial)
 {
     uint256 nSerial = bnSerial.getuint256();
     return Hash(nSerial.begin(), nSerial.end());
+}
+
+uint256 GetPubCoinHash(const CBigNum& bnValue)
+{
+    CDataStream ss(SER_GETHASH, 0);
+    ss << bnValue;
+    return Hash(ss.begin(), ss.end());
 }
 
 bool CZerocoinMint::GetKeyPair(CKey &key) const

@@ -47,54 +47,102 @@ PublicCoin::PublicCoin(const ZerocoinParams* p, const CBigNum& coin, const CoinD
 	}
 };
 
+bool PublicCoin::validate() const
+{
+    if (this->params->accumulatorParams.minCoinValue >= value) {
+        cout << "PublicCoin::validate value is too low\n";
+        return false;
+    }
+
+    if (value > this->params->accumulatorParams.maxCoinValue) {
+        cout << "PublicCoin::validate value is too high\n";
+        return false;
+    }
+
+    if (!value.isPrime(params->zkp_iterations)) {
+        cout << "PublicCoin::validate value is not prime\n";
+        return false;
+    }
+
+    return true;
+}
+
 //PrivateCoin class
-PrivateCoin::PrivateCoin(const ZerocoinParams* p, const CoinDenomination denomination): params(p), publicCoin(p) {
+PrivateCoin::PrivateCoin(const ZerocoinParams* p, const CoinDenomination denomination, bool fMintNew): params(p), publicCoin(p) {
 	// Verify that the parameters are valid
 	if(this->params->initialized == false) {
 		throw std::runtime_error("Params are not initialized");
 	}
 
+    if (fMintNew) {
 #ifdef ZEROCOIN_FAST_MINT
-	// Mint a new coin with a random serial number using the fast process.
-	// This is more vulnerable to timing attacks so don't mint coins when
-	// somebody could be timing you.
-	this->mintCoinFast(denomination);
+        // Mint a new coin with a random serial number using the fast process.
+        // This is more vulnerable to timing attacks so don't mint coins when
+        // somebody could be timing you.
+        this->mintCoinFast(denomination);
 #else
-	// Mint a new coin with a random serial number using the standard process.
-	this->mintCoin(denomination);
+        // Mint a new coin with a random serial number using the standard process.
+        this->mintCoin(denomination);
 #endif
+    }
 
     this->version = CURRENT_VERSION;
 }
 
-inline void GenerateKeyPair(const CBigNum& bnGroupOrder, CKey& key, CBigNum& bnSerial)
+PrivateCoin::PrivateCoin(const ZerocoinParams* p, const CoinDenomination denomination, const CBigNum& bnSerial,
+                         const CBigNum& bnRandomness): params(p), publicCoin(p)
 {
-	// Generate a new key pair, which also has a 256-bit pubkey hash that qualifies as a serial #
-	// This builds off of Tim Ruffing's work on libzerocoin, but has a different implementation
-	while (true) {
-		CKey keyPair;
-		keyPair.MakeNewKey(true);
-		CPubKey pubKey = keyPair.GetPubKey();
-		uint256 hashPubKey = Hash(pubKey.begin(), pubKey.end());
+        // Verify that the parameters are valid
+    if(!this->params->initialized)
+        throw std::runtime_error("Params are not initialized");
 
-        // Make the first half byte 0 which will distinctly mark v2 serials
-        hashPubKey >>= PrivateCoin::V2_BITSHIFT;
+    this->serialNumber = bnSerial;
+    this->randomness = bnRandomness;
 
-		CBigNum s(hashPubKey);
-        uint256 nBits = hashPubKey >> 248; // must be less than 0x0D to be valid serial range
-		if (nBits > 12)
-            continue;
+    Commitment commitment(&p->coinCommitmentGroup, bnSerial, bnRandomness);
+    this->publicCoin = PublicCoin(p, commitment.getCommitmentValue(), denomination);
+}
 
-        //Mark this as v2 by starting with 0xF
-        uint256 nMark = 0xF;
-        nMark <<= 252;
-        hashPubKey |= nMark;
-        s = CBigNum(hashPubKey);
+bool PrivateCoin::IsValid()
+{
+    if (!IsValidSerial(params, serialNumber)) {
+        cout << "Serial not valid\n";
+        return false;
+    }
 
-		key = keyPair;
-		bnSerial = s;
-		break;
-	}
+    return getPublicCoin().validate();
+}
+
+bool GenerateKeyPair(const CBigNum& bnGroupOrder, const uint256& nPrivkey, CKey& key, CBigNum& bnSerial)
+{
+    // Generate a new key pair, which also has a 256-bit pubkey hash that qualifies as a serial #
+    // This builds off of Tim Ruffing's work on libzerocoin, but has a different implementation
+    CKey keyPair;
+    if (nPrivkey == 0)
+        keyPair.MakeNewKey(true);
+    else
+        keyPair.Set(nPrivkey.begin(), nPrivkey.end(), true);
+
+    CPubKey pubKey = keyPair.GetPubKey();
+    uint256 hashPubKey = Hash(pubKey.begin(), pubKey.end());
+
+    // Make the first half byte 0 which will distinctly mark v2 serials
+    hashPubKey >>= libzerocoin::PrivateCoin::V2_BITSHIFT;
+
+    CBigNum s(hashPubKey);
+    uint256 nBits = hashPubKey >> 248; // must be less than 0x0D to be valid serial range
+    if (nBits > 12)
+        return false;
+
+    //Mark this as v2 by starting with 0xF
+    uint256 nMark = 0xF;
+    nMark <<= 252;
+    hashPubKey |= nMark;
+    s = CBigNum(hashPubKey);
+
+    key = keyPair;
+    bnSerial = s;
+    return true;
 }
 
 const CPubKey PrivateCoin::getPubKey() const
@@ -121,7 +169,10 @@ void PrivateCoin::mintCoin(const CoinDenomination denomination) {
 		// And where the serial also doubles as a public key
 		CKey key;
 		CBigNum s;
-		GenerateKeyPair(this->params->coinCommitmentGroup.groupOrder, key, s);
+        bool isValid = false;
+        while (!isValid) {
+            isValid = GenerateKeyPair(this->params->coinCommitmentGroup.groupOrder, uint256(0), key, s);
+        }
 
 		// Generate a Pedersen commitment to the serial number "s"
 		Commitment coin(&params->coinCommitmentGroup, s);
@@ -156,8 +207,10 @@ void PrivateCoin::mintCoinFast(const CoinDenomination denomination) {
 	// And where the serial also doubles as a public key
 	CKey key;
 	CBigNum s;
-	GenerateKeyPair(this->params->coinCommitmentGroup.groupOrder, key, s);
-	
+    bool isValid = false;
+    while (!isValid) {
+        isValid = GenerateKeyPair(this->params->coinCommitmentGroup.groupOrder, uint256(0), key, s);
+    }
 	// Generate a random number "r" in the range 0...{q-1}
 	CBigNum r = CBigNum::randBignum(this->params->coinCommitmentGroup.groupOrder);
 	
@@ -180,7 +233,7 @@ void PrivateCoin::mintCoinFast(const CoinDenomination denomination) {
 			this->publicCoin = PublicCoin(params, commitmentValue, denomination);
 			this->privkey = key.GetPrivKey();
 			this->version = 2;
-				
+
 			// Success! We're done.
 			return;
 		}
@@ -209,5 +262,29 @@ int ExtractVersionFromSerial(const CBigNum& bnSerial)
 
 	return 1;
 }
-	
+
+//Remove the first four bits for V2 serials
+CBigNum GetAdjustedSerial(const CBigNum& bnSerial)
+{
+    uint256 serial = bnSerial.getuint256();
+    serial &= ~uint256(0) >> PrivateCoin::V2_BITSHIFT;
+    CBigNum bnSerialAdjusted;
+    bnSerialAdjusted.setuint256(serial);
+    return bnSerialAdjusted;
+}
+
+
+bool IsValidSerial(const ZerocoinParams* params, const CBigNum& bnSerial)
+{
+    if (bnSerial <= 0)
+        return false;
+
+    if (ExtractVersionFromSerial(bnSerial) < PrivateCoin::PUBKEY_VERSION)
+        return bnSerial < params->coinCommitmentGroup.groupOrder;
+
+    //If V2, the serial is marked with 0xF in the first 4 bits. This is removed for the actual serial.
+    CBigNum bnAdjustedSerial = GetAdjustedSerial(bnSerial);
+    return bnAdjustedSerial > 0 && bnAdjustedSerial < params->coinCommitmentGroup.groupOrder;
+}
+
 } /* namespace libzerocoin */

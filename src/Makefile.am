@@ -145,6 +145,7 @@ BITCOIN_CORE_H = \
   masternodeconfig.h \
   merkleblock.h \
   miner.h \
+  mintpool.h \
   mruset.h \
   netbase.h \
   net.h \
@@ -189,6 +190,7 @@ BITCOIN_CORE_H = \
   wallet.h \
   wallet_ismine.h \
   walletdb.h \
+  zwgrwallet.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h \
   zmq/zmqnotificationinterface.h \
@@ -266,6 +268,7 @@ libbitcoin_wallet_a_SOURCES = \
   masternode-sync.cpp \
   masternodeconfig.cpp \
   masternodeman.cpp \
+  mintpool.cpp \
   rpcdump.cpp \
   primitives/zerocoin.cpp \
   rpcwallet.cpp \
@@ -273,6 +276,7 @@ libbitcoin_wallet_a_SOURCES = \
   wallet.cpp \
   wallet_ismine.cpp \
   walletdb.cpp \
+  zwgrwallet.cpp \
   stakeinput.cpp \
   $(BITCOIN_CORE_H)
 

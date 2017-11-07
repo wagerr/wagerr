@@ -412,6 +412,16 @@ bool GetAccumulatorValue(int& nHeight, const libzerocoin::CoinDenomination denom
 
 bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator, AccumulatorWitness& witness, int nSecurityLevel, int& nMintsAdded, string& strError, CBlockIndex* pindexCheckpoint)
 {
+    LogPrintf("%s: generating\n", __func__);
+    while (true) {
+        TRY_LOCK(cs_main, lockMain);
+        if(!lockMain) {
+            MilliSleep(50);
+            continue;
+        }
+        break;
+    }
+    LogPrintf("%s: after lock\n", __func__);
     uint256 txid;
     if (!zerocoinDB->ReadCoinMint(coin.getValue(), txid))
         return error("%s failed to read mint from db", __func__);

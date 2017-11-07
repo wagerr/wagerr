@@ -24,6 +24,7 @@ struct CMintMeta
 };
 
 uint256 GetSerialHash(const CBigNum& bnSerial);
+uint256 GetPubCoinHash(const CBigNum& bnValue);
 
 class CZerocoinMint
 {
@@ -90,8 +91,9 @@ public:
     uint256 GetTxHash() const { return this->txid; }
     void SetTxHash(uint256 txid) { this->txid = txid; }
     uint8_t GetVersion() const { return this->version; }
-    void SetVersion(uint8_t nVersion) {this->version = nVersion; }
+    void SetVersion(const uint8_t nVersion) { this->version = nVersion; }
     CPrivKey GetPrivKey() const { return this->privkey; }
+    void SetPrivKey(const CPrivKey& privkey) { this->privkey = privkey; }
     bool GetKeyPair(CKey& key) const;
 
     inline bool operator <(const CZerocoinMint& a) const { return GetHeight() < a.GetHeight(); }

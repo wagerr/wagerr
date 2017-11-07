@@ -121,7 +121,6 @@ public:
     bool HasValidSignature() const;
     CBigNum CalculateValidSerial(ZerocoinParams* params);
     std::string ToString() const;
-    CBigNum GetAdjustedSerial() const;
 
     ADD_SERIALIZE_METHODS;
     template <typename Stream, typename Operation>

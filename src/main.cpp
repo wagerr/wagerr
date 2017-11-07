@@ -1085,7 +1085,7 @@ bool RecordMintToDB(PublicCoin publicZerocoin, const uint256& txHash)
         if(hashFromDB == txHash)
             return true;
 
-        LogPrintf("RecordMintToDB: failed, we already have this public coin recorded\n");
+        LogPrintf("RecordMintToDB: failed: public coin %s already exists in db\n", publicZerocoin.getValue().GetHex().substr(0,6));
         return false;
     }
 
@@ -1262,7 +1262,7 @@ bool CheckZerocoinMint(const uint256& txHash, const CTxOut& txout, CValidationSt
     if (!pubCoin.validate())
         return state.DoS(100, error("CheckZerocoinMint() : PubCoin does not validate"));
 
-    if(!fCheckOnly && !RecordMintToDB(pubCoin, txHash))
+    if (!fCheckOnly && !RecordMintToDB(pubCoin, txHash))
         return state.DoS(100, error("CheckZerocoinMint(): RecordMintToDB() failed"));
 
     return true;
@@ -1392,13 +1392,9 @@ bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidati
     // Send signal to wallet if this is ours
     if (pwalletMain) {
         for (const auto& newSpend : vSpends) {
-            uint256 nSerial = newSpend.getCoinSerialNumber().getuint256();
-            uint256 hashSerial = Hash(nSerial.begin(), nSerial.end());
-            auto it = pwalletMain->mapSerialHashes.find(hashSerial);
-            if (it != pwalletMain->mapSerialHashes.end()) {
-                LogPrintf("%s: %s detected spent zerocoin mint in transaction %s \n", __func__, it->second.hashSerial.GetHex(), tx.GetHash().GetHex());
-                pwalletMain->NotifyZerocoinChanged(pwalletMain, it->second.hashPubcoin.GetHex(), "Used", CT_UPDATED);
-
+            if (pwalletMain->IsMyZerocoinSpend(newSpend.getCoinSerialNumber())) {
+                LogPrintf("%s: %s detected spent zerocoin mint in transaction %s \n", __func__, newSpend.getCoinSerialNumber().GetHex(), tx.GetHash().GetHex());
+                pwalletMain->NotifyZerocoinChanged(pwalletMain, newSpend.getCoinSerialNumber().GetHex(), "Used", CT_UPDATED);
             }
         }
     }
@@ -2709,7 +2705,16 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
                         CoinSpend spend = TxInToZerocoinSpend(txin);
                         if (!zerocoinDB->EraseCoinSpend(spend.getCoinSerialNumber()))
                             return error("failed to erase spent zerocoin in block");
+
+                        //if this was our spend, then mark it unspent now
+                        if (pwalletMain) {
+                            if (pwalletMain->IsMyZerocoinSpend(spend.getCoinSerialNumber())) {
+                                if (!pwalletMain->SetMintUnspent(spend.getCoinSerialNumber()))
+                                    LogPrintf("%s: failed to automatically reset mint", __func__);
+                            }
+                        }
                     }
+
                 }
             }
             if (tx.IsZerocoinMint()) {
@@ -3037,6 +3042,14 @@ bool UpdatezWgrSupply(const CBlock& block, CBlockIndex* pindex)
             libzerocoin::CoinDenomination denom = m.GetDenomination();
             pindex->vMintDenominationsInBlock.push_back(m.GetDenomination());
             pindex->mapZerocoinSupply.at(denom)++;
+
+            //Remove any of our own mints from the mintpool
+            if (pwalletMain) {
+                if (pwalletMain->IsMyMint(m.GetValue())) {
+                    pwalletMain->UpdateMint(m.GetValue(), pindex->nHeight, m.GetTxHash(), m.GetDenomination());
+                    LogPrintf("%s updated mint\n", __func__);
+                }
+            }
         }
 
         for (auto& denom : listSpends) {

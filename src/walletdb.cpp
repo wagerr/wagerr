@@ -1126,6 +1126,26 @@ bool CWalletDB::UnarchiveZerocoin(const CZerocoinMint& mint)
     return WriteZerocoinMint(mint);
 }
 
+bool CWalletDB::WriteZWGRSeed(const uint256& seed)
+{
+    return Write(string("dzs"), seed);
+}
+
+bool CWalletDB::ReadZWGRSeed(uint256& seed)
+{
+    return Read(string("dzs"), seed);
+}
+
+bool CWalletDB::WriteZWGRCount(const uint32_t& nCount)
+{
+    return Write(string("dzc"), nCount);
+}
+
+bool CWalletDB::ReadZWGRCount(uint32_t& nCount)
+{
+    return Read(string("dzc"), nCount);
+}
+
 std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, std::map<uint256, CMintMeta>* mapSerialHashes)
 {
     std::list<CZerocoinMint> listPubCoin;
@@ -1206,7 +1226,6 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMatu
                 uint256 hashBlock;
                 if(!GetTransaction(mint.GetTxHash(), tx, hashBlock, true)) {
                     LogPrintf("%s failed to find tx for mint txid=%s\n", __func__, mint.GetTxHash().GetHex());
-                    vArchive.emplace_back(mint);
                     continue;
                 }
 

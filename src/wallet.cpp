@@ -27,6 +27,7 @@
 
 #include "denomination_functions.h"
 #include "libzerocoin/Denominations.h"
+#include "zwgrwallet.h"
 #include <assert.h>
 
 #include <boost/algorithm/string/replace.hpp>
@@ -1565,8 +1566,11 @@ CAmount CWallet::GetBalance() const
         LOCK2(cs_main, cs_wallet);
         for (map<uint256, CWalletTx>::const_iterator it = mapWallet.begin(); it != mapWallet.end(); ++it) {
             const CWalletTx* pcoin = &(*it).second;
+
             if (pcoin->IsTrusted())
                 nTotal += pcoin->GetAvailableCredit();
+            else if (Params().NetworkID() == CBaseChainParams::UNITTEST)
+                nTotal += pcoin->GetValueOut();
         }
     }
 
@@ -1583,13 +1587,15 @@ CAmount CWallet::GetZerocoinBalance(bool fMatureOnly) const
     }
 
     {
-        LOCK2(cs_main, cs_wallet);
+        LOCK(cs_wallet);
         // Get Unused coins
-        list<CZerocoinMint> listPubCoin = CWalletDB(strWalletFile).ListMintedCoins(true, fMatureOnly, true);
-        for (auto& mint : listPubCoin) {
-            libzerocoin::CoinDenomination denom = mint.GetDenomination();
-            nTotal += libzerocoin::ZerocoinDenominationToAmount(denom);
-            myZerocoinSupply.at(denom)++;
+        for (auto& it : mapSerialHashes) {
+            CMintMeta meta = it.second;
+            if (meta.isUsed || !meta.nHeight)
+                continue;
+
+            nTotal += libzerocoin::ZerocoinDenominationToAmount(meta.denom);
+            myZerocoinSupply.at(meta.denom)++;
         }
     }
     for (auto& denom : libzerocoin::zerocoinDenomList) {
@@ -1611,7 +1617,6 @@ CAmount CWallet::GetUnconfirmedZerocoinBalance() const
 {
     CAmount nUnconfirmed = 0;
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListMintedCoins(true, false, true);
  
     std::map<libzerocoin::CoinDenomination, int> mapUnconfirmed;
     for (const auto& denom : libzerocoin::zerocoinDenomList){
@@ -1619,13 +1624,18 @@ CAmount CWallet::GetUnconfirmedZerocoinBalance() const
     }
 
     {
-        LOCK2(cs_main, cs_wallet);
-        for (auto& mint : listMints){
-            if (!mint.GetHeight() || mint.GetHeight() > chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations()) {
-                libzerocoin::CoinDenomination denom = mint.GetDenomination();
-                nUnconfirmed += libzerocoin::ZerocoinDenominationToAmount(denom);
-                mapUnconfirmed.at(denom)++;
-            }
+        LOCK(cs_wallet);
+        // Get Unused coins that are not confirmed yet
+        for (auto& it : mapSerialHashes) {
+            CMintMeta meta = it.second;
+            if (meta.isUsed)
+                continue;
+
+            if (!meta.nHeight || meta.nHeight > chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations())
+                continue;
+
+            nUnconfirmed += libzerocoin::ZerocoinDenominationToAmount(meta.denom);
+            mapUnconfirmed.at(meta.denom)++;
         }
     }
 
@@ -1904,6 +1914,10 @@ void CWallet::AvailableCoins(vector<COutput>& vCoins, bool fOnlyConfirmed, const
             const uint256& wtxid = it->first;
             const CWalletTx* pcoin = &(*it).second;
 
+            //For unit tests, consider anything as valid
+            if (Params().NetworkID() == CBaseChainParams::UNITTEST)
+                vCoins.emplace_back(COutput(pcoin, 0, 10, true));
+
             if (!CheckFinalTx(*pcoin))
                 continue;
 
@@ -2088,10 +2102,8 @@ bool CWallet::SelectStakeCoins(std::list<CStakeInput*>& listInputs, CAmount nTar
     //zWGR
     if (GetBoolArg("-zwgrstake", true) && chainActive.Height() > Params().Zerocoin_Block_V2_Start() && !IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
         //Add zWGR
-        if (mapSerialHashes.empty()) {
-            CWalletDB walletdb(strWalletFile);
-            list<CZerocoinMint> listMints = walletdb.ListMintedCoins(true, true, true, &mapSerialHashes);
-        }
+        CWalletDB walletdb(strWalletFile);
+        list<CZerocoinMint> listMints = walletdb.ListMintedCoins(true, true, true, &mapSerialHashes);
 
         for (auto it : mapSerialHashes) {
             CMintMeta meta = it.second;
@@ -2931,6 +2943,8 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         //iterates each utxo inside of CheckStakeKernelHash()
         nAttempts++;
         if (Stake(stakeInput, nBits, block.GetBlockTime(), nTxNewTime, hashProofOfStake)) {
+            LOCK(cs_wallet);
+
             //Double check that this will pass time requirements
             if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
                 LogPrintf("CreateCoinStake() : kernel found, but it is too far in the past \n");
@@ -3040,6 +3054,8 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
  */
 bool CWallet::CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std::string strCommand)
 {
+    if (Params().NetworkID() == CBaseChainParams::UNITTEST)
+        return true;
     {
         LOCK2(cs_main, cs_wallet);
         LogPrintf("CommitTransaction:\n%s", wtxNew.ToString());
@@ -4390,7 +4406,9 @@ bool CWallet::GetZerocoinKey(const CBigNum& bnSerial, CKey& key)
 bool CWallet::CreateZWGROutPut(libzerocoin::CoinDenomination denomination, libzerocoin::PrivateCoin& coin, CTxOut& outMint)
 {
     // mint a new coin (create Pedersen Commitment) and extract PublicCoin that is shareable from it
-    coin = libzerocoin::PrivateCoin(Params().Zerocoin_Params(chainActive.Height() < Params().Zerocoin_Block_V2_Start()), denomination);
+    coin = libzerocoin::PrivateCoin(Params().Zerocoin_Params(false), denomination, false);
+    zwalletMain->GenerateDeterministicZWGR(denomination, coin);
+
     libzerocoin::PublicCoin pubCoin = coin.getPublicCoin();
 
     // Validate
@@ -4431,7 +4449,7 @@ bool CWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransa
         nMintingValue += nValueNewMint;
 
         CTxOut outMint;
-        libzerocoin::PrivateCoin coin(Params().Zerocoin_Params(chainActive.Height() < Params().Zerocoin_Block_V2_Start()), denomination);
+        libzerocoin::PrivateCoin coin(Params().Zerocoin_Params(false), denomination, false);
         if (!CreateZWGROutPut(denomination, coin, outMint)) {
             strFailReason = strprintf("%s: failed to create new zwgr output", __func__);
             return error(strFailReason.c_str());
@@ -5041,8 +5059,8 @@ string CWallet::MintZerocoin(CAmount nValue, CWalletTx& wtxNew, vector<CZerocoin
     }
 
     //Create a backup of the wallet
-    if (fBackupMints)
-        ZWgrBackupWallet();
+   // if (fBackupMints)
+     //   ZWgrBackupWallet();
 
     return "";
 }
@@ -5141,6 +5159,55 @@ bool CWallet::GetMint(const uint256& hashSerial, CZerocoinMint& mint)
         return false;
 
     return CWalletDB(strWalletFile).ReadZerocoinMint(it->second.hashPubcoin, mint);
+}
+
+
+bool CWallet::IsMyMint(const CBigNum& bnValue) const
+{
+    // Check if this mint's pubcoin value belongs to our mapSerialHashes (which includes hashpubcoin values)
+    uint256 hashValue = GetPubCoinHash(bnValue);
+    for (auto it : this->mapSerialHashes) {
+        CMintMeta meta = it.second;
+        if (meta.hashPubcoin == hashValue)
+            return true;
+    }
+
+    return zwalletMain->IsInMintPool(bnValue);
+}
+
+bool CWallet::UpdateMint(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom)
+{
+    uint256 hashValue = GetPubCoinHash(bnValue);
+    CZerocoinMint mint;
+    if (GetMint(hashValue, mint)) {
+        mint.SetHeight(nHeight);
+        mint.SetTxHash(txid);
+        return CWalletDB(strWalletFile).WriteZerocoinMint(mint);
+    } else {
+        //Check if this mint is one that is in our mintpool (a potential future mint from our deterministic generation)
+        if (zwalletMain->IsInMintPool(bnValue)) {
+            if (zwalletMain->SetMintSeen(bnValue, nHeight, txid, denom))
+                return true;
+        }
+    }
+
+    return false;
+}
+
+//! Primarily for the scenario that a mint was confirmed and added to the chain and then that block orphaned
+bool CWallet::SetMintUnspent(const CBigNum& bnSerial)
+{
+    CZerocoinMint mint;
+    uint256 hashSerial = GetSerialHash(bnSerial);
+    if (!GetMint(hashSerial, mint))
+        return error("%s: did not find mint", __func__);
+
+    mint.SetUsed(false);
+    if (!CWalletDB(strWalletFile).WriteZerocoinMint(mint))
+        return error("%s: failed to database mint", __func__);
+
+    mapSerialHashes.at(hashSerial).isUsed = false;
+    return true;
 }
 
 bool CWallet::DatabaseMint(libzerocoin::PrivateCoin* coin)

@@ -123,27 +123,9 @@ std::string CoinSpend::ToString() const
     return ss.str();
 }
 
-//Remove the first four bits for V2 serials
-CBigNum CoinSpend::GetAdjustedSerial() const
-{
-    uint256 serial = coinSerialNumber.getuint256();
-    serial &= ~uint256(0) >> PrivateCoin::V2_BITSHIFT;
-    CBigNum bnSerial;
-    bnSerial.setuint256(serial);
-    return bnSerial;
-}
-
 bool CoinSpend::HasValidSerial(ZerocoinParams* params) const
 {
-    if (coinSerialNumber <= 0)
-        return false;
-
-    if (version < PrivateCoin::PUBKEY_VERSION)
-        return coinSerialNumber < params->coinCommitmentGroup.groupOrder;
-
-    //If V2, the serial is marked with 0xF in the first 4 bits. This is removed for the actual serial.
-    CBigNum bnAdjustedSerial = GetAdjustedSerial();
-    return bnAdjustedSerial > 0 && bnAdjustedSerial < params->coinCommitmentGroup.groupOrder;
+    return IsValidSerial(params, coinSerialNumber);
 }
 
 //Additional verification layer that requires the spend be signed by the private key associated with the serial
@@ -155,7 +137,7 @@ bool CoinSpend::HasValidSignature() const
 
     //V2 serial requires that the signature hash be signed by the public key associated with the serial
     uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end()) >> PrivateCoin::V2_BITSHIFT;
-    if (hashedPubkey != GetAdjustedSerial().getuint256()) {
+    if (hashedPubkey != GetAdjustedSerial(coinSerialNumber).getuint256()) {
         cout << "CoinSpend::HasValidSignature() hashedpubkey is not equal to the serial!\n";
         return false;
     }

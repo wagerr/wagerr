@@ -578,7 +578,6 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
                                const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance,
                                const CAmount& watchOnlyBalance, const CAmount& watchUnconfBalance, const CAmount& watchImmatureBalance)
 {
-
     currentBalance = balance;
     currentUnconfirmedBalance = unconfirmedBalance;
     currentImmatureBalance = immatureBalance;
@@ -589,9 +588,7 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
     currentWatchUnconfBalance = watchUnconfBalance;
     currentWatchImmatureBalance = watchImmatureBalance;
 
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListMintedCoins(true, false, true);
-
+    std::map<uint256, CMintMeta> mapMintMeta = pwalletMain->mapSerialHashes; //copy so that we don't modify
     std::map<libzerocoin::CoinDenomination, CAmount> mapDenomBalances;
     std::map<libzerocoin::CoinDenomination, int> mapUnconfirmed;
     std::map<libzerocoin::CoinDenomination, int> mapImmature;
@@ -602,28 +599,28 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
     }
 
     int nBestHeight = chainActive.Height();
-    for (auto& mint : listMints){
+    for (auto& it : mapMintMeta){
+        CMintMeta meta = it.second;
         // All denominations
-        mapDenomBalances.at(mint.GetDenomination())++;
+        mapDenomBalances.at(meta.denom)++;
 
-        if (!mint.GetHeight() || chainActive.Height() - mint.GetHeight() <= Params().Zerocoin_MintRequiredConfirmations()) {
+        if (!meta.nHeight || chainActive.Height() - meta.nHeight <= Params().Zerocoin_MintRequiredConfirmations()) {
             // All unconfirmed denominations
-            mapUnconfirmed.at(mint.GetDenomination())++;
-        }
-        else {
+            mapUnconfirmed.at(meta.denom)++;
+        } else {
             // After a denomination is confirmed it might still be immature because < 3 of the same denomination were minted after it
-            CBlockIndex *pindex = chainActive[mint.GetHeight() + 1];
+            CBlockIndex *pindex = chainActive[meta.nHeight + 1];
             int nHeight2CheckpointsDeep = nBestHeight - (nBestHeight % 10) - 20;
             int nMintsAdded = 0;
             while (pindex->nHeight < nHeight2CheckpointsDeep) { //at least 2 checkpoints from the top block
-                nMintsAdded += count(pindex->vMintDenominationsInBlock.begin(), pindex->vMintDenominationsInBlock.end(), mint.GetDenomination());
+                nMintsAdded += count(pindex->vMintDenominationsInBlock.begin(), pindex->vMintDenominationsInBlock.end(), meta.denom);
                 if (nMintsAdded >= Params().Zerocoin_RequiredAccumulation())
                     break;
                 pindex = chainActive[pindex->nHeight + 1];
             }
             if (nMintsAdded < Params().Zerocoin_RequiredAccumulation()){
                 // Immature denominations
-                mapImmature.at(mint.GetDenomination())++;
+                mapImmature.at(meta.denom)++;
             }
         }
     }
