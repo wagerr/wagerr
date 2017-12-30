@@ -89,6 +89,7 @@ UniValue getnetworkhashps(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getnetworkhashps", "") + HelpExampleRpc("getnetworkhashps", ""));
 
+    LOCK(cs_main);
     return GetNetworkHashPS(params.size() > 0 ? params[0].get_int() : 120, params.size() > 1 ? params[1].get_int() : -1);
 }
 
@@ -106,6 +107,7 @@ UniValue getgenerate(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getgenerate", "") + HelpExampleRpc("getgenerate", ""));
 
+    LOCK(cs_main);
     return GetBoolArg("-gen", false);
 }
 
@@ -234,6 +236,8 @@ UniValue getmininginfo(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getmininginfo", "") + HelpExampleRpc("getmininginfo", ""));
 
+    LOCK(cs_main);
+
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("blocks", (int)chainActive.Height()));
     obj.push_back(Pair("currentblocksize", (uint64_t)nLastBlockSize));
@@ -273,8 +277,9 @@ UniValue prioritisetransaction(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("prioritisetransaction", "\"txid\" 0.0 10000") + HelpExampleRpc("prioritisetransaction", "\"txid\", 0.0, 10000"));
 
-    uint256 hash = ParseHashStr(params[0].get_str(), "txid");
+    LOCK(cs_main);
 
+    uint256 hash = ParseHashStr(params[0].get_str(), "txid");
     CAmount nAmount = params[2].get_int64();
 
     mempool.PrioritiseTransaction(hash, params[0].get_str(), params[1].get_real(), nAmount);
@@ -367,6 +372,8 @@ UniValue getblocktemplate(const UniValue& params, bool fHelp)
 
             "\nExamples:\n" +
             HelpExampleCli("getblocktemplate", "") + HelpExampleRpc("getblocktemplate", ""));
+
+    LOCK(cs_main);
 
     std::string strMode = "template";
     UniValue lpval = NullUniValue;

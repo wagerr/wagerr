@@ -11,8 +11,11 @@
 #include "base58.h"
 #include "init.h"
 #include "main.h"
+#include "random.h"
+#include "sync.h"
 #include "ui_interface.h"
 #include "util.h"
+#include "utilstrencodings.h"
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
@@ -20,10 +23,13 @@
 #include <boost/iostreams/concepts.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>
+#include <boost/signals2/signal.hpp>
 #include <boost/thread.hpp>
+#include <boost/algorithm/string/case_conv.hpp> // for to_upper()
 
 #include <univalue.h>
 
+using namespace RPCServer;
 using namespace std;
 
 static bool fRPCRunning = false;
@@ -36,6 +42,34 @@ static std::vector<RPCTimerInterface*> timerInterfaces;
 /* Map of name to timer.
  * @note Can be changed to std::unique_ptr when C++11 */
 static std::map<std::string, boost::shared_ptr<RPCTimerBase> > deadlineTimers;
+
+static struct CRPCSignals
+{
+    boost::signals2::signal<void ()> Started;
+    boost::signals2::signal<void ()> Stopped;
+    boost::signals2::signal<void (const CRPCCommand&)> PreCommand;
+    boost::signals2::signal<void (const CRPCCommand&)> PostCommand;
+} g_rpcSignals;
+
+void RPCServer::OnStarted(boost::function<void ()> slot)
+{
+    g_rpcSignals.Started.connect(slot);
+}
+
+void RPCServer::OnStopped(boost::function<void ()> slot)
+{
+    g_rpcSignals.Stopped.connect(slot);
+}
+
+void RPCServer::OnPreCommand(boost::function<void (const CRPCCommand&)> slot)
+{
+    g_rpcSignals.PreCommand.connect(boost::bind(slot, _1));
+}
+
+void RPCServer::OnPostCommand(boost::function<void (const CRPCCommand&)> slot)
+{
+    g_rpcSignals.PostCommand.connect(boost::bind(slot, _1));
+}
 
 void RPCTypeCheck(const UniValue& params,
                   const list<UniValue::VType>& typesExpected,
@@ -438,6 +472,7 @@ bool StartRPC()
 {
     LogPrint("rpc", "Starting RPC\n");
     fRPCRunning = true;
+    g_rpcSignals.Started();
     return true;
 }
 
@@ -452,6 +487,7 @@ void StopRPC()
 {
     LogPrint("rpc", "Stopping RPC\n");
     deadlineTimers.clear();
+    g_rpcSignals.Stopped();
 }
 
 bool IsRPCRunning()
@@ -547,12 +583,16 @@ UniValue CRPCTable::execute(const std::string &strMethod, const UniValue &params
     if (!pcmd)
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "Method not found");
 
+    g_rpcSignals.PreCommand(*pcmd);
 
     try {
         // Execute
+        return pcmd->actor(params, false);
     } catch (std::exception& e) {
         throw JSONRPCError(RPC_MISC_ERROR, e.what());
     }
+
+    g_rpcSignals.PostCommand(*pcmd);
 }
 
 std::vector<std::string> CRPCTable::listCommands() const
