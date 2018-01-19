@@ -5,7 +5,7 @@ etc.
 
 There are currently two sets of tests in this directory:
 
-- [functional](/test/functional) which test the functionality of
+- [functional](/test/functional) which test the functionality of 
 wagerrd and wagerr-qt by interacting with them through the RPC and P2P
 interfaces.
 - [util](/test/util) which tests the wagerr utilities, currently only

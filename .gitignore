@@ -117,6 +117,7 @@ qa/pull-tester/run-bitcoind-for-test.sh
 qa/pull-tester/tests-config.sh
 qa/pull-tester/cache/*
 qa/pull-tester/test.*/*
+cache/*
 
 !src/leveldb*/Makefile
 
