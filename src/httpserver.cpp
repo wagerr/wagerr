@@ -475,6 +475,7 @@ void StopHTTPServer()
         workQueue->WaitExit();
         delete workQueue;
     }
+    MilliSleep(500); // Avoid race condition while the last HTTP-thread is exiting
     if (eventBase) {
         LogPrint("http", "Waiting for HTTP event thread to exit\n");
         // Give event loop a few seconds to exit (to send back last RPC responses), then break it

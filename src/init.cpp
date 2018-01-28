@@ -197,7 +197,6 @@ void PrepareShutdown()
     StopREST();
     StopRPC();
     StopHTTPServer();
-    StopTorControl();
 #ifdef ENABLE_WALLET
     if (pwalletMain)
         bitdb.Flush(false);
@@ -254,7 +253,11 @@ void PrepareShutdown()
 #endif
 
 #ifndef WIN32
-    boost::filesystem::remove(GetPidFile());
+    try {
+        boost::filesystem::remove(GetPidFile());
+    } catch (const boost::filesystem::filesystem_error& e) {
+        LogPrintf("%s: Unable to remove pidfile: %s\n", __func__, e.what());
+    }
 #endif
     UnregisterAllValidationInterfaces();
 }
@@ -274,8 +277,8 @@ void Shutdown()
     if (!fRestartRequested) {
         PrepareShutdown();
     }
-
-// Shutdown part 2: delete wallet instance
+    // Shutdown part 2: Stop TOR thread and delete wallet instance
+    StopTorControl();
 #ifdef ENABLE_WALLET
     delete pwalletMain;
     pwalletMain = NULL;
