@@ -3790,6 +3790,12 @@ bool ActivateBestChain(CValidationState& state, CBlock* pblock, bool fAlreadyChe
             // Note: uiInterface, should switch main signals.
             uiInterface.NotifyBlockTip(hashNewTip);
             GetMainSignals().UpdatedBlockTip(pindexNewTip);
+
+            unsigned size = GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION);
+            // If the size is over 1 MB notify external listeners, and it is within the last 5 minutes
+            if (size > MAX_BLOCK_SIZE_LEGACY && pblock->GetBlockTime() > GetAdjustedTime() - 300) {
+                uiInterface.NotifyBlockSize(static_cast<int>(size), hashNewTip);
+            }
         }
     } while (pindexMostWork != chainActive.Tip());
     CheckBlockIndex();
