@@ -30,6 +30,12 @@
 
   <key>CFBundleExecutable</key>
   <string>Wagerr-Qt</string>
+  
+  <key>CFBundleName</key>
+  <string>Wagerr-Qt</string>
+
+  <key>LSHasLocalizedDisplayName</key>
+  <true/>
 
   <key>CFBundleIdentifier</key>
   <string>io.wagerr.Wagerr-Qt</string>
