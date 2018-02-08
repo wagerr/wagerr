@@ -107,6 +107,8 @@ static inline bool error(const char* format)
     return false;
 }
 
+double double_safe_addition(double fValue, double fIncrement);
+double double_safe_multiplication(double fValue, double fmultiplicator);
 void PrintExceptionContinue(std::exception* pex, const char* pszThread);
 void ParseParameters(int argc, const char* const argv[]);
 void FileCommit(FILE* fileout);
