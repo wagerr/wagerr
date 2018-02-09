@@ -42,11 +42,17 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_1_ENC">
-         <property name="spacing">
-          <number>0</number>
-         </property>
          <item>
           <widget class="QLabel" name="label_5">
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>85</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Address:</string>
            </property>
@@ -80,7 +86,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="pasteButton_ENC">
+          <widget class="QToolButton" name="pasteButton_ENC">
            <property name="toolTip">
             <string>Paste address from clipboard</string>
            </property>
@@ -105,6 +111,15 @@
         <layout class="QHBoxLayout" name="horizontalLayout_5">
          <item>
           <widget class="QLabel" name="label_6">
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>85</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Passphrase: </string>
            </property>
@@ -121,11 +136,17 @@
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_2_ENC">
-         <property name="spacing">
-          <number>0</number>
-         </property>
          <item>
           <widget class="QLabel" name="encryptedKeyLabel_ENC">
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>85</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Encrypted Key:</string>
            </property>
@@ -147,7 +168,7 @@
           </widget>
          </item>
          <item>
-          <widget class="QPushButton" name="copyKeyButton_ENC">
+          <widget class="QToolButton" name="copyKeyButton_ENC">
            <property name="toolTip">
             <string>Copy the current signature to the system clipboard</string>
            </property>
@@ -260,9 +281,6 @@
          <property name="textFormat">
           <enum>Qt::PlainText</enum>
          </property>
-         <property name="alignment">
-          <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
          <property name="wordWrap">
           <bool>true</bool>
          </property>
@@ -272,6 +290,15 @@
         <layout class="QHBoxLayout" name="horizontalLayout_3">
          <item>
           <widget class="QLabel" name="label_2">
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>85</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Encrypted Key:</string>
            </property>
@@ -290,6 +317,15 @@
         <layout class="QHBoxLayout" name="horizontalLayout">
          <item>
           <widget class="QLabel" name="label">
+           <property name="alignment">
+            <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>85</width>
+             <height>0</height>
+            </size>
+           </property>
            <property name="text">
             <string>Passphrase: </string>
            </property>
