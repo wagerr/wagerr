@@ -10,7 +10,7 @@ Wagerr is a cutting edge cryptocurrency, with many features not available in mos
   technology used to secure the network and provide the above features, each Masternode is secured
   with a collateral of 25K WGR.
 
-More information at [wagerr.com](http://www.wagerr.com/) Visit our ANN thread at [BitcoinTalk](http://www.bitcointalk.org/index.php?topic=1262920)
+More information at [wagerr.com](http://www.wagerr.com/) Visit our ANN thread at [BitcoinTalk](https://bitcointalk.org/index.php?topic=1911583.0)
 
 ### Coin Specs
 <table>
@@ -23,8 +23,6 @@ More information at [wagerr.com](http://www.wagerr.com/) Visit our ANN thread at
 <tr><td>Premine in blocks 2-101</td><td>25,000,000 WGR*</td></tr>
 <tr><td>Full Premine</td><td>198,360,471 WGR*</td></tr>
 </table>
-
-*173,360,471 WGR Premine was burned in block [2000](_link will be posted as soon as we reach block 2000)
 
 ### Reward Distribution
 
@@ -39,16 +37,10 @@ More information at [wagerr.com](http://www.wagerr.com/) Visit our ANN thread at
 <tr><td>1002-Infinite</td><td colspan=3>Variable based on <a href="https://pivx.org/knowledge-base/see-saw-rewards-mechanism/">SeeSaw Reward Mechanism</a></td></tr>
 </table>
 
-### PoW Rewards Breakdown
-
-<table>
-<th>Block Height</th><th>Masternodes</th><th>Miner</th><th>Budget</th>
-<tr><td>1002-Infinite</td><td>75% (2.85 WGR)</td><td>25% (0.95 WGR)</td><td>N/A</td></tr>
-</table>
-
 ### PoS Rewards Breakdown
 
 <table>
 <th>Phase</th><th>Block Height</th><th>Reward</th><th>Masternodes & Stakers</th><th>Budget</th>
-<tr><td>Phase 1</td><td>1002-ToBeSet</td><td>3.8 WGR</td><td>100% (3.8 WGR)</td><td>0% (0 WGR)</td></tr>
+<tr><td>Phase 1</td><td>1002-10000</td><td>0 WGR</td><td>75% (0 WGR) & 25% (0 WGR) respectively</td><td>0% (0 WGR)</td></tr>
+<tr><td>Phase 2</td><td>10001-ToBeSet</td><td>3.8 WGR</td><td>75% (2.85 WGR) & 25% (0.95 WGR) respectively</td><td>0% (0 WGR)</td></tr>
 </table>
