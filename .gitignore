@@ -143,3 +143,6 @@ cmake-build-debug
 
 # dont add release folder
 release/
+
+# ignore build_config.mk
+src/leveldb/build_config.mk
