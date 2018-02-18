@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Name=Wagerr
+Comment=Wagerr P2P Cryptocurrency
+Comment[fr]=Wagerr, monnaie virtuelle cryptographique pair à pair
+Comment[tr]=Wagerr, eşten eşe kriptografik sanal para birimi
+Exec=wagerr-qt %u
+Terminal=false
+Type=Application
+Icon=wagerr128
+MimeType=x-scheme-handler/wagerr;
+Categories=Office;Finance;

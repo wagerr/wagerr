@@ -156,7 +156,7 @@
              <item row="6" column="0">
               <widget class="QLabel" name="label_3">
                <property name="toolTip">
-                <string>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the PIVX network.</string>
+                <string>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</string>
                </property>
                <property name="text">
                 <string>&amp;Message:</string>
@@ -179,7 +179,7 @@
              <item row="6" column="2">
               <widget class="QLineEdit" name="reqMessage">
                <property name="toolTip">
-                <string>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the PIVX network.</string>
+                <string>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</string>
                </property>
               </widget>
              </item>
@@ -256,7 +256,7 @@
                   <string>&amp;Request payment</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="../pivx.qrc">
+                  <iconset resource="../wagerr.qrc">
                    <normaloff>:/icons/receiving_addresses</normaloff>:/icons/receiving_addresses</iconset>
                  </property>
                 </widget>
@@ -276,7 +276,7 @@
                   <string>Clear</string>
                  </property>
                  <property name="icon">
-                  <iconset resource="../pivx.qrc">
+                  <iconset resource="../wagerr.qrc">
                    <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
                  </property>
                  <property name="autoDefault">
@@ -409,7 +409,7 @@
                 <string>Show</string>
                </property>
                <property name="icon">
-                <iconset resource="../pivx.qrc">
+                <iconset resource="../wagerr.qrc">
                  <normaloff>:/icons/edit</normaloff>:/icons/edit</iconset>
                </property>
                <property name="autoDefault">
@@ -429,7 +429,7 @@
                 <string>Remove</string>
                </property>
                <property name="icon">
-                <iconset resource="../pivx.qrc">
+                <iconset resource="../wagerr.qrc">
                  <normaloff>:/icons/remove</normaloff>:/icons/remove</iconset>
                </property>
                <property name="autoDefault">
@@ -482,7 +482,7 @@
   <tabstop>removeRequestButton</tabstop>
  </tabstops>
  <resources>
-  <include location="../pivx.qrc"/>
+  <include location="../wagerr.qrc"/>
  </resources>
  <connections/>
 </ui>

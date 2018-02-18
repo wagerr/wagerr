@@ -1,7 +1,7 @@
-Contributing to PIVX Core
+Contributing to Wagerr Core
 ============================
 
-The PIVX Core project operates an open contributor model where anyone is
+The Wagerr Core project operates an open contributor model where anyone is
 welcome to contribute towards development in the form of peer review, testing
 and patches. This document explains the practical process and guidelines for
 contributing.
@@ -57,12 +57,12 @@ the pull request affects. Valid areas as:
 
   - *Consensus* for changes to consensus critical code
   - *Docs* for changes to the documentation
-  - *Qt* for changes to pivx-qt
+  - *Qt* for changes to wagerr-qt
   - *Minting* for changes to the minting code
   - *Net* or *P2P* for changes to the peer-to-peer network code
   - *RPC/REST* for changes to the RPC or REST APIs
   - *Scripts and tools* for changes to the scripts and tools
-  - *Tests* for changes to the pivx unit tests or QA tests
+  - *Tests* for changes to the wagerr unit tests or QA tests
   - *Trivial* should **only** be used for PRs that do not change generated
     executable code. Notably, refactors (change of function arguments and code
     reorganization) and changes in behavior should **not** be marked as trivial.
@@ -157,10 +157,10 @@ where possible keep them short, un-complex and easy to verify.
 "Decision Making" Process
 -------------------------
 
-The following applies to code changes to the PIVX Core project, and is not to be
-confused with overall PIVX Network Protocol consensus changes.
+The following applies to code changes to the Wagerr Core project, and is not to be
+confused with overall Wagerr Network Protocol consensus changes.
 
-Whether a pull request is merged into PIVX Core rests with the project merge
+Whether a pull request is merged into Wagerr Core rests with the project merge
 maintainers and ultimately the project lead.
 
 Maintainers will take into consideration if a patch is in line with the general
@@ -174,7 +174,7 @@ In general, all pull requests must:
   - be well peer reviewed;
   - follow code style guidelines;
 
-Patches that change PIVX consensus rules are considerably more involved than
+Patches that change Wagerr consensus rules are considerably more involved than
 normal because they affect the entire ecosystem and so must be preceded by
 extensive discussions and clear detailing. While each case will be different,
 one should be prepared to expend more time and effort than for other kinds of
@@ -188,7 +188,7 @@ request. Typically reviewers will review the code for obvious errors, as well as
 test out the patch set and opine on the technical merits of the patch. Project
 maintainers take into account the peer review when determining if there is
 consensus to merge a pull request (remember that discussions may have been
-spread out over GitHub, forums, email, and Slack discussions). The following
+spread out over GitHub, forums, email, and Discord discussions). The following
 language is used within pull-request comments:
 
   - ACK means "I have tested the code and I agree it should be merged";
@@ -214,8 +214,8 @@ higher in terms of discussion and peer review requirements, keeping in mind that
 mistakes could be very costly to the wider community. This includes refactoring
 of consensus critical code.
 
-Where a patch set proposes to change the PIVX consensus, it must have been
-discussed extensively on the forums and Slack, be accompanied by a widely
+Where a patch set proposes to change the Wagerr consensus, it must have been
+discussed extensively on the forums and Discord, be accompanied by a widely
 discussed Proposal and have a generally widely perceived technical consensus of being
 a worthwhile change based on the judgement of the maintainers.
 
@@ -237,7 +237,7 @@ about:
     that personally, though! Instead, take another critical look at what you are suggesting
     and see if it: changes too much, is too broad, doesn't adhere to the
     [developer notes](doc/developer-notes.md), is dangerous or insecure, is messily written, etc.
-    Identify and address any of the issues you find. Then ask e.g. on Slack if someone could give
+    Identify and address any of the issues you find. Then ask e.g. on Discord if someone could give
     their opinion on the concept itself.
   - It may be because your code is too complex for all but a few people. And those people
     may not have realized your pull request even exists. A great way to find people who
@@ -245,7 +245,7 @@ about:
     [Git Blame feature](https://help.github.com/articles/tracing-changes-in-a-file/). Simply
     find the person touching the code you are touching before you and see if you can find
     them and give them a nudge. Don't be incessant about the nudging though.
-  - Finally, if all else fails, ask on Slack or elsewhere for someone to give your pull request
+  - Finally, if all else fails, ask on Discord or elsewhere for someone to give your pull request
     a look. If you think you've been waiting an unreasonably long amount of time (month+) for
     no particular reason (few lines changed, etc), this is totally fine. Try to return the favor
     when someone else is asking for feedback on their code, and universe balances out.
@@ -254,7 +254,7 @@ about:
 Release Policy
 --------------
 
-The project leader is the release manager for each PIVX Core release.
+The project leader is the release manager for each Wagerr Core release.
 
 Copyright
 ---------

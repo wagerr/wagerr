@@ -1,6 +1,7 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,8 +9,10 @@
 #define BITCOIN_QT_CLIENTMODEL_H
 
 #include <QObject>
+#include <QDateTime>
 
 class AddressTableModel;
+class BanTableModel;
 class OptionsModel;
 class PeerTableModel;
 class TransactionTableModel;
@@ -35,7 +38,7 @@ enum NumConnections {
     CONNECTIONS_ALL = (CONNECTIONS_IN | CONNECTIONS_OUT),
 };
 
-/** Model for PIVX network client. */
+/** Model for Wagerr network client. */
 class ClientModel : public QObject
 {
     Q_OBJECT
@@ -46,6 +49,7 @@ public:
 
     OptionsModel* getOptionsModel();
     PeerTableModel* getPeerTableModel();
+    BanTableModel *getBanTableModel();
 
     //! Return number of connections, default is in- and outbound (total)
     int getNumConnections(unsigned int flags = CONNECTIONS_ALL) const;
@@ -75,6 +79,7 @@ public:
 private:
     OptionsModel* optionsModel;
     PeerTableModel* peerTableModel;
+    BanTableModel *banTableModel;
 
     int cachedNumBlocks;
     QString cachedMasternodeCountString;
@@ -107,6 +112,7 @@ public slots:
     void updateMnTimer();
     void updateNumConnections(int numConnections);
     void updateAlert(const QString& hash, int status);
+    void updateBanlist();
 };
 
 #endif // BITCOIN_QT_CLIENTMODEL_H

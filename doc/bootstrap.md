@@ -1,10 +1,10 @@
 ### Bootstrap the Blockchain Synchronization
 
-Normally the Bitcoin client will download the transaction and network information, called the blockchain, from the network by syncing with the other clients. This process can take quite some time as the [Bitcoin blockchain](https://blockchain.info/charts/blocks-size) is growing bigger and bigger for each day. Luckily there is a safe and fast way to speed up this process. We'll show you how to bootstrap your blockchain to bring your client up to speed in just a few simple steps.
+Normally the Wagerr client will download the transaction and network information, called the blockchain, from the network by syncing with the other clients. This process can take quite some time as the [Wagerr blockchain](https://blockchain.info/charts/blocks-size) is growing bigger and bigger for each day. Luckily there is a safe and fast way to speed up this process. We'll show you how to bootstrap your blockchain to bring your client up to speed in just a few simple steps.
 
 ### Requirements
 
-- A fresh install of the Bitcoin client software.
+- A fresh install of the Wagerr client software.
 
 ### Download the blockchain via BitTorrent
 
@@ -25,12 +25,12 @@ The torrent client installed will recognize the download of the torrent file. Sa
 ![Fig2](img/bootstrap2.png)
 
 ### Importing the blockchain
-Exit the Bitcoin client software if you have it running. Be sure not to have an actively used wallet in use. We are going to copy the download of the blockchain to the Bitcoin client data directory. You should run the client software at least once so it can generate the data directory. Copy the downloaded bootstrap.dat file into the Bitcoin data folder.
+Exit the Wagerr client software if you have it running. Be sure not to have an actively used wallet in use. We are going to copy the download of the blockchain to the Wagerr client data directory. You should run the client software at least once so it can generate the data directory. Copy the downloaded bootstrap.dat file into the Wagerr data folder.
 
 **For Windows users:**
 Open explorer, and type into the address bar:
 
-	%APPDATA%\Bitcoin
+	%APPDATA%\Wagerr
     
 This will open up the data folder. It should look like the image below. Copy over the bootstrap.dat from your download folder to this directory.
 ![Fig4](img/bootstrap4.png)
@@ -38,7 +38,7 @@ This will open up the data folder. It should look like the image below. Copy ove
 **For OSX users:**
 Open Finder by pressing Press [shift] + [cmd] + [g] and enter:
 
-	~/Library/Application Support/Bitcoin/
+	~/Library/Application Support/Wagerr/
     
 **For Linux users:**
 The directory is hidden in your User folder. Go to:
@@ -46,7 +46,7 @@ The directory is hidden in your User folder. Go to:
 	~/.bitcoin/
     
 ### Importing the blockchain
-Now start the Bitcoin client software. It should show "Importing blocks from disk" like the image below. 
+Now start the Wagerr client software. It should show "Importing blocks from disk" like the image below. 
 ![Fig5](img/bootstrap5.png)
 
 Wait until the import finishes. The client will download the last days not covered by the import. Congratulations you have successfully imported the blockchain!

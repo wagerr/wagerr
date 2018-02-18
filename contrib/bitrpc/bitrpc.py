@@ -1,3 +1,5 @@
+# Copyright (c) 2018 The Wagerr developers
+
 from jsonrpc import ServiceProxy
 import sys
 import string
@@ -11,9 +13,9 @@ rpcpass = ""
 
 
 if rpcpass == "":
-    access = ServiceProxy("http://127.0.0.1:51473")
+    access = ServiceProxy("http://127.0.0.1:55003")
 else:
-    access = ServiceProxy("http://"+rpcuser+":"+rpcpass+"@127.0.0.1:51473")
+    access = ServiceProxy("http://"+rpcuser+":"+rpcpass+"@127.0.0.1:55003")
 cmd = sys.argv[1].lower()
 
 if cmd == "backupwallet":

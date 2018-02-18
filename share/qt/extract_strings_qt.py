@@ -1,3 +1,5 @@
+
+# Copyright (c) 2018 The Wagerr developers
 #!/usr/bin/python
 '''
 Extract _("...") strings for translation and convert to Qt stringdefs so that
@@ -10,7 +12,7 @@ import operator
 import os
 import sys
 
-OUT_CPP="qt/pivxstrings.cpp"
+OUT_CPP="qt/wagerrstrings.cpp"
 EMPTY=['""']
 
 def parse_po(text):
@@ -74,10 +76,10 @@ f.write("""
 #define UNUSED
 #endif
 """)
-f.write('static const char UNUSED *pivx_strings[] = {\n')
+f.write('static const char UNUSED *wagerr_strings[] = {\n')
 messages.sort(key=operator.itemgetter(0))
 for (msgid, msgstr) in messages:
     if msgid != EMPTY:
-        f.write('QT_TRANSLATE_NOOP("pivx-core", %s),\n' % ('\n'.join(msgid)))
+        f.write('QT_TRANSLATE_NOOP("wagerr-core", %s),\n' % ('\n'.join(msgid)))
 f.write('};\n')
 f.close()

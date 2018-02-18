@@ -2,6 +2,7 @@
 from __future__ import division, print_function, unicode_literals
 #
 # Copyright (C) 2011  Patrick "p2k" Schneider <me@p2k-network.org>
+# Copyright (c) 2018 The Wagerr developers
 #
 # This program is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
@@ -155,7 +156,7 @@ class FrameworkInfo(object):
 class ApplicationBundleInfo(object):
     def __init__(self, path):
         self.path = path
-        appName = "PIVX-Qt"
+        appName = "Wagerr-Qt"
         self.binaryPath = os.path.join(path, "Contents", "MacOS", appName)
         if not os.path.exists(self.binaryPath):
             raise RuntimeError("Could not find bundle binary for " + path)
@@ -604,7 +605,7 @@ else:
 
 # ------------------------------------------------
 
-target = os.path.join("dist", "PIVX-Qt.app")
+target = os.path.join("dist", "Wagerr-Qt.app")
 
 if verbose >= 2:
     print("+ Copying source bundle +")

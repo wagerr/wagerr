@@ -1,17 +1,19 @@
 #!/usr/bin/env python
+# Copyright (c) 2014-2018 The Bitcoin developers
+# Copyright (c) 2018 The Wagerr developers
 '''
 Run this script inside of src/ and it will look for all the files
 that were changed this year that still have the last year in the
 copyright headers, and it will fix the headers on that file using
 a perl regex one liner.
 
-For example: if it finds something like this and we're in 2014
+For example: if it finds something like this and we're in 2017
 
-// Copyright (c) 2009-2013 The Bitcoin developers
+// Copyright (c) 2017-2018 The Wagerr developers
 
 it will change it to
 
-// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2017-2019 The Wagerr developers
 
 It will do this for all the files in the folder and its children.
 
@@ -22,7 +24,7 @@ import time
 
 year = time.gmtime()[0]
 last_year = year - 1
-command = "perl -pi -e 's/%s The Bitcoin/%s The Bitcoin/' %s"
+command = "perl -pi -e 's/%s The Wagerr/%s The Wagerr/' %s"
 listFilesCommand = "find . | grep %s"
 
 extensions = [".cpp",".h"]

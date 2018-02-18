@@ -1,10 +1,10 @@
 Sample configuration files for:
 
-SystemD: pivxd.service
-Upstart: pivxd.conf
-OpenRC:  pivxd.openrc
-         pivxd.openrcconf
-CentOS:  pivxd.init
+SystemD: wagerrd.service
+Upstart: wagerrd.conf
+OpenRC:  wagerrd.openrc
+         wagerrd.openrcconf
+CentOS:  wagerrd.init
 
 have been made available to assist packagers in creating node packages here.
 

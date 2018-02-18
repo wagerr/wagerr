@@ -3,18 +3,28 @@ Release Process
 
 Before every release candidate:
 
-* Update translations (ping Fuzzbawls on Slack) see [translation_process.md](https://github.com/PIVX-Project/PIVX/blob/master/doc/translation_process.md#synchronising-translations).
+* Update translations (ping wumpus on IRC) see [translation_process.md](https://github.com/wagerr/wagerr/blob/master/doc/translation_process.md#synchronising-translations).
+
+* Update manpages, see [gen-manpages.sh](https://github.com/wagerr/wagerr/blob/master/contrib/devtools/README.md#gen-manpagessh).
 
 Before every minor and major release:
 
+* Update [bips.md](bips.md) to account for changes since the last release.
 * Update version in `configure.ac` (don't forget to set `CLIENT_VERSION_IS_RELEASE` to `true`)
 * Write release notes (see below)
+* Update `src/chainparams.cpp` nMinimumChainWork with information from the getblockchaininfo rpc.
+* Update `src/chainparams.cpp` defaultAssumeValid with information from the getblockhash rpc.
+  - The selected value must not be orphaned so it may be useful to set the value two blocks back from the tip.
+  - Testnet should be set some tens of thousands back from the tip due to reorgs there.
+  - This update should be reviewed with a reindex-chainstate with assumevalid=0 to catch any defect
+     that causes rejection of blocks in the past history.
 
 Before every major release:
 
 * Update hardcoded [seeds](/contrib/seeds/README.md), see [this pull request](https://github.com/bitcoin/bitcoin/pull/7415) for an example.
 * Update [`BLOCK_CHAIN_SIZE`](/src/qt/intro.cpp) to the current size plus some overhead.
-* Update `src/chainparams.cpp` with statistics about the transaction count and rate.
+* Update `src/chainparams.cpp` chainTxData with statistics about the transaction count and rate. Use the output of the RPC `getchaintxstats`, see
+  [this pull request](https://github.com/bitcoin/bitcoin/pull/12270) for an example. Reviewers can verify the results by running `getchaintxstats <window_block_count> <window_last_block_hash>` with the `window_block_count` and `window_last_block_hash` from your output.
 * Update version of `contrib/gitian-descriptors/*.yml`: usually one'd want to do this on master after branching off the release - but be sure to at least do it before a new major release
 
 ### First time / New builders
@@ -24,17 +34,19 @@ If you're using the automated script (found in [contrib/gitian-build.sh](/contri
 Check out the source code in the following directory hierarchy.
 
     cd /path/to/your/toplevel/build
-    git clone https://github.com/pivx-project/gitian.sigs.git
-    git clone https://github.com/pivx-project/pivx-detached-sigs.git
+    git clone https://github.com/wagerr/gitian.sigs.git
+    git clone https://github.com/wagerr/wagerr-detached-sigs.git
     git clone https://github.com/devrandom/gitian-builder.git
-    git clone https://github.com/pivx-project/pivx.git
+    git clone https://github.com/wagerr/wagerr.git
 
-### PIVX maintainers/release engineers, suggestion for writing release notes
+### Bitcoin maintainers/release engineers, suggestion for writing release notes
 
 Write release notes. git shortlog helps a lot, for example:
 
-    git shortlog --no-merges v(current version, e.g. 0.7.2)..v(new version, e.g. 0.8.0)
+    git shortlog --no-merges v(current version, e.g. 1.3.99)..v(new version, e.g. 1.4.02)
 
+(or ping @wumpus on IRC, he has specific tooling to generate the list of merged pulls
+and sort them into categories based on labels)
 
 Generate list of authors:
 
@@ -42,7 +54,7 @@ Generate list of authors:
 
 Tag version (or release candidate) in git
 
-    git tag -s v(new version, e.g. 0.8.0)
+    git tag -s v(new version, e.g. 1.4.02)
 
 ### Setup and perform Gitian builds
 
@@ -50,9 +62,9 @@ If you're using the automated script (found in [contrib/gitian-build.sh](/contri
 
 Setup Gitian descriptors:
 
-    pushd ./pivx
-    export SIGNER=(your Gitian key, ie bluematt, sipa, etc)
-    export VERSION=(new version, e.g. 0.8.0)
+    pushd ./wagerr
+    export SIGNER=(your Gitian key, ie WagerrTor, etc)
+    export VERSION=(new version, e.g. 1.4.02)
     git fetch
     git checkout v${VERSION}
     popd
@@ -84,7 +96,7 @@ Create the OS X SDK tarball, see the [OS X readme](README_osx.md) for details, a
 By default, Gitian will fetch source files as needed. To cache them ahead of time:
 
     pushd ./gitian-builder
-    make -C ../pivx/depends download SOURCES_PATH=`pwd`/cache/common
+    make -C ../wagerr/depends download SOURCES_PATH=`pwd`/cache/common
     popd
 
 Only missing files will be fetched, so this is safe to re-run for each build.
@@ -92,55 +104,47 @@ Only missing files will be fetched, so this is safe to re-run for each build.
 NOTE: Offline builds must use the --url flag to ensure Gitian fetches only from local URLs. For example:
 
     pushd ./gitian-builder
-    ./bin/gbuild --url pivx=/path/to/pivx,signature=/path/to/sigs {rest of arguments}
+    ./bin/gbuild --url wagerr=/path/to/wagerr,signature=/path/to/sigs {rest of arguments}
     popd
 
 The gbuild invocations below <b>DO NOT DO THIS</b> by default.
 
-### Build and sign PIVX Core for Linux, Windows, and OS X:
+### Build and sign Bitcoin Core for Linux, Windows, and OS X:
 
     pushd ./gitian-builder
-    ./bin/gbuild --memory 3000 --commit pivx=v${VERSION} ../pivx/contrib/gitian-descriptors/gitian-linux.yml
-    ./bin/gsign --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../pivx/contrib/gitian-descriptors/gitian-linux.yml
-    mv build/out/pivx-*.tar.gz build/out/src/pivx-*.tar.gz ../
+    ./bin/gbuild --num-make 2 --memory 3000 --commit wagerr=v${VERSION} ../wagerr/contrib/gitian-descriptors/gitian-linux.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../wagerr/contrib/gitian-descriptors/gitian-linux.yml
+    mv build/out/wagerr-*.tar.gz build/out/src/wagerr-*.tar.gz ../
 
-    ./bin/gbuild --memory 3000 --commit pivx=v${VERSION} ../pivx/contrib/gitian-descriptors/gitian-win.yml
-    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../pivx/contrib/gitian-descriptors/gitian-win.yml
-    mv build/out/pivx-*-win-unsigned.tar.gz inputs/pivx-win-unsigned.tar.gz
-    mv build/out/pivx-*.zip build/out/pivx-*.exe ../
+    ./bin/gbuild --num-make 2 --memory 3000 --commit wagerr=v${VERSION} ../wagerr/contrib/gitian-descriptors/gitian-win.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-unsigned --destination ../gitian.sigs/ ../wagerr/contrib/gitian-descriptors/gitian-win.yml
+    mv build/out/wagerr-*-win-unsigned.tar.gz inputs/wagerr-win-unsigned.tar.gz
+    mv build/out/wagerr-*.zip build/out/wagerr-*.exe ../
 
-    ./bin/gbuild --memory 3000 --commit pivx=v${VERSION} ../pivx/contrib/gitian-descriptors/gitian-osx.yml
-    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../pivx/contrib/gitian-descriptors/gitian-osx.yml
-    mv build/out/pivx-*-osx-unsigned.tar.gz inputs/pivx-osx-unsigned.tar.gz
-    mv build/out/pivx-*.tar.gz build/out/pivx-*.dmg ../
-
-    ./bin/gbuild --memory 3000 --commit pivx=v${VERSION} ../pivx/contrib/gitian-descriptors/gitian-aarch64.yml
-    ./bin/gsign --signer $SIGNER --release ${VERSION}-linux --destination ../gitian.sigs/ ../pivx/contrib/gitian-descriptors/gitian-aarch64.yml
-    mv build/out/pivx-*.tar.gz build/out/src/pivx-*.tar.gz ../
+    ./bin/gbuild --num-make 2 --memory 3000 --commit wagerr=v${VERSION} ../wagerr/contrib/gitian-descriptors/gitian-osx.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-unsigned --destination ../gitian.sigs/ ../wagerr/contrib/gitian-descriptors/gitian-osx.yml
+    mv build/out/wagerr-*-osx-unsigned.tar.gz inputs/wagerr-osx-unsigned.tar.gz
+    mv build/out/wagerr-*.tar.gz build/out/wagerr-*.dmg ../
     popd
 
 Build output expected:
 
-  1. source tarball (`pivx-${VERSION}.tar.gz`)
-  2. linux 32-bit and 64-bit dist tarballs (`pivx-${VERSION}-linux[32|64].tar.gz`)
-  3. windows 32-bit and 64-bit unsigned installers and dist zips (`pivx-${VERSION}-win[32|64]-setup-unsigned.exe`, `pivx-${VERSION}-win[32|64].zip`)
-  4. OS X unsigned installer and dist tarball (`pivx-${VERSION}-osx-unsigned.dmg`, `pivx-${VERSION}-osx64.tar.gz`)
+  1. source tarball (`wagerr-${VERSION}.tar.gz`)
+  2. linux 32-bit and 64-bit dist tarballs (`wagerr-${VERSION}-linux[32|64].tar.gz`)
+  3. windows 32-bit and 64-bit unsigned installers and dist zips (`wagerr-${VERSION}-win[32|64]-setup-unsigned.exe`, `wagerr-${VERSION}-win[32|64].zip`)
+  4. OS X unsigned installer and dist tarball (`wagerr-${VERSION}-osx-unsigned.dmg`, `wagerr-${VERSION}-osx64.tar.gz`)
   5. Gitian signatures (in `gitian.sigs/${VERSION}-<linux|{win,osx}-unsigned>/(your Gitian key)/`)
 
 ### Verify other gitian builders signatures to your own. (Optional)
 
-Add other gitian builders keys to your gpg keyring, and/or refresh keys.
-
-    gpg --import pivx/contrib/gitian-keys/*.pgp
-    gpg --refresh-keys
+Add other gitian builders keys to your gpg keyring, and/or refresh keys: See `../wagerr/contrib/gitian-keys/README.md`.
 
 Verify the signatures
 
     pushd ./gitian-builder
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-linux ../pivx/contrib/gitian-descriptors/gitian-linux.yml
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-win-unsigned ../pivx/contrib/gitian-descriptors/gitian-win.yml
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-unsigned ../pivx/contrib/gitian-descriptors/gitian-osx.yml
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-aarch64 ../pivx/contrib/gitian-descriptors/gitian-aarch64.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-linux ../wagerr/contrib/gitian-descriptors/gitian-linux.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-win-unsigned ../wagerr/contrib/gitian-descriptors/gitian-win.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-unsigned ../wagerr/contrib/gitian-descriptors/gitian-osx.yml
     popd
 
 ### Next steps:
@@ -151,7 +155,6 @@ Commit your signature to gitian.sigs:
     git add ${VERSION}-linux/${SIGNER}
     git add ${VERSION}-win-unsigned/${SIGNER}
     git add ${VERSION}-osx-unsigned/${SIGNER}
-    git add ${VERSION}-aarch64/${SIGNER}
     git commit -a
     git push  # Assuming you can push to the gitian.sigs tree
     popd
@@ -162,22 +165,22 @@ Codesigner only: Create Windows/OS X detached signatures:
 
 Codesigner only: Sign the osx binary:
 
-    transfer pivx-osx-unsigned.tar.gz to osx for signing
-    tar xf pivx-osx-unsigned.tar.gz
+    transfer wagerr-osx-unsigned.tar.gz to osx for signing
+    tar xf wagerr-osx-unsigned.tar.gz
     ./detached-sig-create.sh -s "Key ID"
     Enter the keychain password and authorize the signature
     Move signature-osx.tar.gz back to the gitian host
 
 Codesigner only: Sign the windows binaries:
 
-    tar xf pivx-win-unsigned.tar.gz
+    tar xf wagerr-win-unsigned.tar.gz
     ./detached-sig-create.sh -key /path/to/codesign.key
     Enter the passphrase for the key when prompted
     signature-win.tar.gz will be created
 
 Codesigner only: Commit the detached codesign payloads:
 
-    cd ~/pivx-detached-sigs
+    cd ~/wagerr-detached-sigs
     checkout the appropriate branch for this release series
     rm -rf *
     tar xf signature-osx.tar.gz
@@ -190,25 +193,25 @@ Codesigner only: Commit the detached codesign payloads:
 Non-codesigners: wait for Windows/OS X detached signatures:
 
 - Once the Windows/OS X builds each have 3 matching signatures, they will be signed with their respective release keys.
-- Detached signatures will then be committed to the [pivx-detached-sigs](https://github.com/PIVX-Project/pivx-detached-sigs) repository, which can be combined with the unsigned apps to create signed binaries.
+- Detached signatures will then be committed to the [wagerr-detached-sigs](https://github.com/wagerr/wagerr-detached-sigs) repository, which can be combined with the unsigned apps to create signed binaries.
 
 Create (and optionally verify) the signed OS X binary:
 
     pushd ./gitian-builder
-    ./bin/gbuild -i --commit signature=v${VERSION} ../pivx/contrib/gitian-descriptors/gitian-osx-signer.yml
-    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-signed --destination ../gitian.sigs/ ../pivx/contrib/gitian-descriptors/gitian-osx-signer.yml
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-signed ../pivx/contrib/gitian-descriptors/gitian-osx-signer.yml
-    mv build/out/pivx-osx-signed.dmg ../pivx-${VERSION}-osx.dmg
+    ./bin/gbuild -i --commit signature=v${VERSION} ../wagerr/contrib/gitian-descriptors/gitian-osx-signer.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-osx-signed --destination ../gitian.sigs/ ../wagerr/contrib/gitian-descriptors/gitian-osx-signer.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-osx-signed ../wagerr/contrib/gitian-descriptors/gitian-osx-signer.yml
+    mv build/out/wagerr-osx-signed.dmg ../wagerr-${VERSION}-osx.dmg
     popd
 
 Create (and optionally verify) the signed Windows binaries:
 
     pushd ./gitian-builder
-    ./bin/gbuild -i --commit signature=v${VERSION} ../pivx/contrib/gitian-descriptors/gitian-win-signer.yml
-    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-signed --destination ../gitian.sigs/ ../pivx/contrib/gitian-descriptors/gitian-win-signer.yml
-    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-win-signed ../pivx/contrib/gitian-descriptors/gitian-win-signer.yml
-    mv build/out/pivx-*win64-setup.exe ../pivx-${VERSION}-win64-setup.exe
-    mv build/out/pivx-*win32-setup.exe ../pivx-${VERSION}-win32-setup.exe
+    ./bin/gbuild -i --commit signature=v${VERSION} ../wagerr/contrib/gitian-descriptors/gitian-win-signer.yml
+    ./bin/gsign --signer $SIGNER --release ${VERSION}-win-signed --destination ../gitian.sigs/ ../wagerr/contrib/gitian-descriptors/gitian-win-signer.yml
+    ./bin/gverify -v -d ../gitian.sigs/ -r ${VERSION}-win-signed ../wagerr/contrib/gitian-descriptors/gitian-win-signer.yml
+    mv build/out/wagerr-*win64-setup.exe ../wagerr-${VERSION}-win64-setup.exe
+    mv build/out/wagerr-*win32-setup.exe ../wagerr-${VERSION}-win32-setup.exe
     popd
 
 Commit your signature for the signed OS X/Windows binaries:
@@ -230,23 +233,23 @@ sha256sum * > SHA256SUMS
 
 The list of files should be:
 ```
-pivx-${VERSION}-aarch64-linux-gnu.tar.gz
-pivx-${VERSION}-arm-linux-gnueabihf.tar.gz
-pivx-${VERSION}-i686-pc-linux-gnu.tar.gz
-pivx-${VERSION}-x86_64-linux-gnu.tar.gz
-pivx-${VERSION}-osx64.tar.gz
-pivx-${VERSION}-osx.dmg
-pivx-${VERSION}.tar.gz
-pivx-${VERSION}-win32-setup.exe
-pivx-${VERSION}-win32.zip
-pivx-${VERSION}-win64-setup.exe
-pivx-${VERSION}-win64.zip
+wagerr-${VERSION}-aarch64-linux-gnu.tar.gz
+wagerr-${VERSION}-arm-linux-gnueabihf.tar.gz
+wagerr-${VERSION}-i686-pc-linux-gnu.tar.gz
+wagerr-${VERSION}-x86_64-linux-gnu.tar.gz
+wagerr-${VERSION}-osx64.tar.gz
+wagerr-${VERSION}-osx.dmg
+wagerr-${VERSION}.tar.gz
+wagerr-${VERSION}-win32-setup.exe
+wagerr-${VERSION}-win32.zip
+wagerr-${VERSION}-win64-setup.exe
+wagerr-${VERSION}-win64.zip
 ```
 The `*-debug*` files generated by the gitian build contain debug symbols
 for troubleshooting by developers. It is assumed that anyone that is interested
 in debugging can run gitian to generate the files for themselves. To avoid
 end-user confusion about which file to pick, as well as save storage
-space *do not upload these to the pivx.org server*.
+space *do not upload these to the wagerr.org server, nor put them in the torrent*.
 
 - GPG-sign it, delete the unsigned file:
 ```
@@ -256,16 +259,49 @@ rm SHA256SUMS
 (the digest algorithm is forced to sha256 to avoid confusion of the `Hash:` header that GPG adds with the SHA256 used for the files)
 Note: check that SHA256SUMS itself doesn't end up in SHA256SUMS, which is a spurious/nonsensical entry.
 
-- Upload zips and installers, as well as `SHA256SUMS.asc` from last step, to the GitHub release (see below)
+- Upload zips and installers, as well as `SHA256SUMS.asc` from last step, to the wagerr.org server
+  into `/var/www/bin/wagerr-${VERSION}`
+
+- A `.torrent` will appear in the directory after a few minutes. Optionally help seed this torrent. To get the `magnet:` URI use:
+```bash
+transmission-show -m <torrent file>
+```
+Insert the magnet URI into the announcement sent to mailing lists. This permits
+people without access to `wagerr.org` to download the binary distribution.
+Also put it into the `optional_magnetlink:` slot in the YAML file for
+wagerr.org (see below for wagerr.org update instructions).
+
+- Update wagerr.org version
+
+  - First, check to see if the Bitcoin.org maintainers have prepared a
+    release: https://github.com/wagerr-dot-org/wagerr.org/labels/Releases
+
+      - If they have, it will have previously failed their Travis CI
+        checks because the final release files weren't uploaded.
+        Trigger a Travis CI rebuild---if it passes, merge.
+
+  - If they have not prepared a release, follow the Bitcoin.org release
+    instructions: https://github.com/wagerr-dot-org/wagerr.org#release-notes
+
+  - After the pull request is merged, the website will automatically show the newest version within 15 minutes, as well
+    as update the OS download links. Ping @saivann/@harding (saivann/harding on Freenode) in case anything goes wrong
 
 - Announce the release:
 
-  - bitcointalk announcement thread
+  - wagerr-dev and wagerr-dev mailing list
 
-  - Optionally twitter, reddit /r/pivx, ... but this will usually sort out itself
+  - Bitcoin Core announcements list https://wagerrcore.org/en/list/announcements/join/
+
+  - wagerrcore.org blog post
+
+  - Update title of #wagerr on Freenode IRC
+
+  - Optionally twitter, reddit /r/Bitcoin, ... but this will usually sort out itself
+
+  - Notify BlueMatt so that he can start building [the PPAs](https://launchpad.net/~wagerr/+archive/ubuntu/wagerr)
 
   - Archive release notes for the new version to `doc/release-notes/` (branch `master` and branch of the release)
 
-  - Create a [new GitHub release](https://github.com/PIVX-Project/PIVX/releases/new) with a link to the archived release notes.
+  - Create a [new GitHub release](https://github.com/wagerr/wagerr/releases/new) with a link to the archived release notes.
 
   - Celebrate
