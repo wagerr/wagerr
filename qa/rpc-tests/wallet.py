@@ -1,5 +1,6 @@
 #!/usr/bin/env python2
-# Copyright (c) 2014 The Bitcoin Core developers
+# Copyright (c) 2014-2018 The Bitcoin Core developers
+# Copyright (c) 2018 The Wagerr developers
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -8,8 +9,8 @@
 # Does the following:
 #   a) creates 3 nodes, with an empty chain (no blocks).
 #   b) node0 mines a block
-#   c) node1 mines 32 blocks, so now node 0 has 60001piv, node 1 has 4250piv, node2 has none.
-#   d) node0 sends 601 piv to node2, in two transactions (301 piv, then 300 piv).
+#   c) node1 mines 32 blocks, so now node 0 has 60001wgr, node 1 has 4250wgr, node2 has none.
+#   d) node0 sends 601 wgr to node2, in two transactions (301 wgr, then 300 wgr).
 #   e) node0 mines a block, collects the fee on the second transaction
 #   f) node1 mines 16 blocks, to mature node0's just-mined block
 #   g) check that node0 has 100-21, node2 has 21

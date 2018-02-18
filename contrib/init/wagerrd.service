@@ -1,0 +1,26 @@
+[Unit]
+Description=Wagerr's distributed currency daemon
+After=network.target
+
+[Service]
+User=wagerr
+Group=wagerr
+
+Type=forking
+PIDFile=/var/lib/wagerrd/wagerrd.pid
+
+ExecStart=/usr/bin/wagerrd -daemon -pid=/var/lib/wagerrd/wagerrd.pid \
+          -conf=/etc/wagerr/wagerr.conf -datadir=/var/lib/wagerrd
+
+ExecStop=-/usr/bin/wagerr-cli -conf=/etc/wagerr/wagerr.conf \
+         -datadir=/var/lib/wagerrd stop
+
+Restart=always
+PrivateTmp=true
+TimeoutStopSec=60s
+TimeoutStartSec=2s
+StartLimitInterval=120s
+StartLimitBurst=5
+
+[Install]
+WantedBy=multi-user.target

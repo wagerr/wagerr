@@ -6,6 +6,7 @@
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #
+# Copyright (c) 2018 The Wagerr developers
 
 from __future__ import print_function, division
 import json
@@ -262,9 +263,8 @@ if __name__ == '__main__':
 			continue
 		settings[m.group(1)] = m.group(2)
 	f.close()
-
 	if 'netmagic' not in settings:
-		settings['netmagic'] = 'f9beb4d9'
+		settings['netmagic'] = '842d61fd'
 	if 'input' not in settings:
 		settings['input'] = 'input'
 	if 'hashlist' not in settings:
@@ -291,7 +291,7 @@ if __name__ == '__main__':
 	blkindex = get_block_hashes(settings)
 	blkmap = mkblockmap(blkindex)
 
-	if not "0000041e482b9b9691d98eefb48473405c0b8ec31b76df3797c74a78680ef818" in blkmap:
+	if not "000007b9191bc7a17bfb6cedf96a8dacebb5730b498361bf26d44a9f9dcc1079" in blkmap:
 		print("not found")
 	else:
 		BlockDataCopier(settings, blkindex, blkmap).run()

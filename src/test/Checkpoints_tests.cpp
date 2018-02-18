@@ -1,4 +1,5 @@
-// Copyright (c) 2011-2013 The Bitcoin Core developers
+// Copyright (c) 2011-2018 The Bitcoin Core developers
+// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -18,21 +19,28 @@ BOOST_AUTO_TEST_SUITE(Checkpoints_tests)
 
 BOOST_AUTO_TEST_CASE(sanity)
 {
-    uint256 p259201 = uint256("0x1c9121bf9329a6234bfd1ea2d91515f19cd96990725265253f4b164283ade5dd");
-    uint256 p623933 = uint256("0xc7aafa648a0f1450157dc93bd4d7448913a85b7448f803b4ab970d91fc2a7da7");
-    BOOST_CHECK(Checkpoints::CheckBlock(259201, p259201));
-    BOOST_CHECK(Checkpoints::CheckBlock(623933, p623933));
+    // WagerrDevs - RELEASE CHANGE - if required, sanity checks
+    uint256 p0 = uint256("0x000007b9191bc7a17bfb6cedf96a8dacebb5730b498361bf26d44a9f9dcc1079");     // Genesis block
+    /*
+    uint256 p1499 = uint256("0x96bbf9ef28aca64e940444bc54e61d69fbb22c6dfbff445f3230ee613f5204aa");  // Last block
 
+    BOOST_CHECK(Checkpoints::CheckBlock(0, p0));
+    BOOST_CHECK(Checkpoints::CheckBlock(1499, p1499));
 
     // Wrong hashes at checkpoints should fail:
-    BOOST_CHECK(!Checkpoints::CheckBlock(259201, p623933));
-    BOOST_CHECK(!Checkpoints::CheckBlock(623933, p259201));
+    BOOST_CHECK(!Checkpoints::CheckBlock(0, p1499));
+    BOOST_CHECK(!Checkpoints::CheckBlock(1499, p0));
 
     // ... but any hash not at a checkpoint should succeed:
-    BOOST_CHECK(Checkpoints::CheckBlock(259201+1, p623933));
-    BOOST_CHECK(Checkpoints::CheckBlock(623933+1, p259201));
+    BOOST_CHECK(Checkpoints::CheckBlock(0+3, p1499));
+    BOOST_CHECK(Checkpoints::CheckBlock(1499+3, p0));
 
-    BOOST_CHECK(Checkpoints::GetTotalBlocksEstimate() >= 623933);
+    // remove this later
+    BOOST_CHECK(Checkpoints::GetTotalBlocksEstimate() >= 1499);
+    */
+
+    BOOST_CHECK(Checkpoints::CheckBlock(0, p0));
+    BOOST_CHECK(Checkpoints::GetTotalBlocksEstimate() >= 0);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

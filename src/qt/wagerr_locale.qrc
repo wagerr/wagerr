@@ -1,0 +1,29 @@
+<!DOCTYPE RCC><RCC version="1.0">
+    <qresource prefix="/translations">
+        <file alias="bg">locale/wagerr_bg.qm</file>
+        <file alias="ca">locale/wagerr_ca.qm</file>
+        <file alias="cs">locale/wagerr_cs.qm</file>
+        <file alias="da">locale/wagerr_da.qm</file>
+        <file alias="de">locale/wagerr_de.qm</file>
+        <file alias="en">locale/wagerr_en.qm</file>
+        <file alias="en_US">locale/wagerr_en_US.qm</file>
+        <file alias="es">locale/wagerr_es.qm</file>
+        <file alias="fi">locale/wagerr_fi.qm</file>
+        <file alias="fr_FR">locale/wagerr_fr_FR.qm</file>
+        <file alias="it">locale/wagerr_it.qm</file>
+        <file alias="ja">locale/wagerr_ja.qm</file>
+        <file alias="ko_KR">locale/wagerr_ko_KR.qm</file>
+        <file alias="nl">locale/wagerr_nl.qm</file>
+        <file alias="pl">locale/wagerr_pl.qm</file>
+        <file alias="pt">locale/wagerr_pt.qm</file>
+        <file alias="pt_BR">locale/wagerr_pt_BR.qm</file>
+        <file alias="ro_RO">locale/wagerr_ro_RO.qm</file>
+        <file alias="ru">locale/wagerr_ru.qm</file>
+        <file alias="sk">locale/wagerr_sk.qm</file>
+        <file alias="sv">locale/wagerr_sv.qm</file>
+        <file alias="tr">locale/wagerr_tr.qm</file>
+        <file alias="uk">locale/wagerr_uk.qm</file>
+        <file alias="zh_CN">locale/wagerr_zh_CN.qm</file>
+        <file alias="zh_TW">locale/wagerr_zh_TW.qm</file>
+    </qresource>
+</RCC>

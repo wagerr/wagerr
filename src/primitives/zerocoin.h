@@ -1,8 +1,9 @@
 // Copyright (c) 2017 The PIVX developers
+// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-#ifndef PIVX_ZEROCOIN_H
-#define PIVX_ZEROCOIN_H
+#ifndef WAGERR_ZEROCOIN_H
+#define WAGERR_ZEROCOIN_H
 
 #include <amount.h>
 #include <limits.h>
@@ -189,4 +190,4 @@ public:
     int GetNeededSpends();
 };
 
-#endif //PIVX_ZEROCOIN_H
+#endif //WAGERR_ZEROCOIN_H

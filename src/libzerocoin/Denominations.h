@@ -6,6 +6,7 @@
  * @copyright  Copyright 2017 PIVX Developers
  * @license    This project is released under the MIT license.
  **/
+// Copyright (c) 2018 The Wagerr developers
 
 #ifndef DENOMINATIONS_H_
 #define DENOMINATIONS_H_
