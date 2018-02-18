@@ -64,12 +64,14 @@ static const Checkpoints::CCheckpointData data = {
 };
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
-    boost::assign::map_list_of(0, uint256("0x00000fdc268f54ff1368703792dc046b1356e60914c2b5b6348032144bcb2de5"));
+    boost::assign::map_list_of(1, uint256("0x00000385558ec1b9af7f939e1626a3116b9fb988c86c2f915e6451e8efcd0521"))
+    (200, uint256("0x0000015bef4f6677a5055b7b35fa0791d4df50c2a887c39aaf6ec42e2aab13fa"));
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1518696182,
-    0,
+    1518933884,
+    218,
     250};
+
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
     boost::assign::map_list_of(0, uint256("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec"));
@@ -238,12 +240,12 @@ public:
         nMinerThreads = 0;
         nTargetTimespan = 1 * 60; // Wagerr: 1 day
         nTargetSpacing = 1 * 60;  // Wagerr: 1 minute
-        nLastPOWBlock = 200;
+        nLastPOWBlock = 300;
         nMaturity = 15;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
-        nZerocoinStartHeight = 250;
+        nZerocoinStartHeight = 350;
         nZerocoinStartTime = 1518696183; // Saturday, February 3, 2018 3:31:02 AM (GMT)
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 1500; //Trigger a recalculation of accumulators
