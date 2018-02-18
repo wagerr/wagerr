@@ -10,7 +10,6 @@
  * @license    This project is released under the MIT license.
  **/
 // Copyright (c) 2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 
 #ifndef COIN_H_
 #define COIN_H_

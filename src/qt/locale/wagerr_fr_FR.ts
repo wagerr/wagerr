@@ -152,8 +152,8 @@
         <translation>Confirmer le cryptage du portefeuille</translation>
     </message>
     <message>
-        <source>Wagerr will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>Wagerr va maintenant se fermer pour finir le processus cryptage. Notez que le cryptage de votre portefeuille ne peut pas complètement protéger vos WGRs d'un vol par un malware ayant infecté votre ordinateur. </translation>
+        <source>WAGERR will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
+        <translation>WAGERR va maintenant se fermer pour finir le processus cryptage. Notez que le cryptage de votre portefeuille ne peut pas complètement protéger vos WGRs d'un vol par un malware ayant infecté votre ordinateur. </translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -219,8 +219,8 @@
         <translation>Adresse :</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>L'adresse Wagerr avec laquelle signer le message</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>L'adresse WAGERR avec laquelle signer le message</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -251,8 +251,8 @@
         <translation>Copier la signature actuelle dans le presse-papier</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Signer le message pour prouver que vous possédez cette adresse Wagerr</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Signer le message pour prouver que vous possédez cette adresse WAGERR</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
@@ -271,12 +271,12 @@
         <translation>BIP 38 Décrypter</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>L'adresse Wagerr avec laquelle le message a été signé</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>L'adresse WAGERR avec laquelle le message a été signé</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Vérifiez le message afin de vous assurer qu'il a été signé avec l'adresse Wagerr renseignée</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Vérifiez le message afin de vous assurer qu'il a été signé avec l'adresse WAGERR renseignée</translation>
     </message>
     <message>
         <source>Decrypt &amp;Key</source>
@@ -534,8 +534,8 @@
         <translation>&amp;Aide</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Envoyer des pièces à une adresse Wagerr</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Envoyer des pièces à une adresse WAGERR</translation>
     </message>
     <message>
         <source>&amp;Masternodes</source>
@@ -546,16 +546,16 @@
         <translation>Afficher les masternodes</translation>
     </message>
     <message>
-        <source>Modify configuration options for Wagerr</source>
-        <translation>Modifier les options de configuration pour Wagerr</translation>
+        <source>Modify configuration options for WAGERR</source>
+        <translation>Modifier les options de configuration pour WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Signer les messages avec votre adresse Wagerr pour prouver qu'elles sont bien à vous.</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Signer les messages avec votre adresse WAGERR pour prouver qu'elles sont bien à vous.</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Vérifier les messages afin de s'assurer qu'ils sont signés avec l'adresse Wagerr spécifié</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Vérifier les messages afin de s'assurer qu'ils sont signés avec l'adresse WAGERR spécifié</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -854,8 +854,8 @@ Adresse : %4
         <translation>Modifier l'adresse d'envoi</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>L'adresse entrée "%1" n'est pas une adresse Wagerr valide</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>L'adresse entrée "%1" n'est pas une adresse WAGERR valide</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1524,8 +1524,8 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <translation>Payer à :</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
-        <translation>L'adresse Wagerr à laquelle envoyer le paiement</translation>
+        <source>The WAGERR address to send the payment to</source>
+        <translation>L'adresse WAGERR à laquelle envoyer le paiement</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -1570,8 +1570,8 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <translation>Signer le message</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>L'adresse Wagerr avec laquelle signer le message</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>L'adresse WAGERR avec laquelle signer le message</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -1598,16 +1598,16 @@ Veuillez vérifier l'adresse et réessayer.</translation>
         <translation>Copier la signature actuelle dans le presse-papier</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Signer le message pour prouver que vous possédez cette adresse Wagerr</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Signer le message pour prouver que vous possédez cette adresse WAGERR</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>L'adresse Wagerr avec laquelle le message a été signé</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>L'adresse WAGERR avec laquelle le message a été signé</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Vérifiez le message afin de vous assurer qu'il a été signé avec l'adresse Wagerr renseignée</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Vérifiez le message afin de vous assurer qu'il a été signé avec l'adresse WAGERR renseignée</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -1801,7 +1801,7 @@ Veuillez vérifier l'adresse et réessayer.</translation>
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>ZPivControlDialog</name>
     <message>
         <source>0</source>
         <translation>0</translation>

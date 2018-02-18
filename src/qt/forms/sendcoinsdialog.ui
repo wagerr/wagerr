@@ -1242,7 +1242,7 @@
                       <item>
                        <widget class="QCheckBox" name="checkBoxMinimumFee">
                         <property name="toolTip">
-                         <string>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for Wagerr transactions than the network can process.</string>
+                         <string>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for WAGERR transactions than the network can process.</string>
                         </property>
                         <property name="text">
                          <string/>
@@ -1255,7 +1255,7 @@
                          <bool>true</bool>
                         </property>
                         <property name="toolTip">
-                         <string>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for Wagerr transactions than the network can process.</string>
+                         <string>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for WAGERR transactions than the network can process.</string>
                         </property>
                         <property name="text">
                          <string>(read the tooltip)</string>
@@ -1702,7 +1702,7 @@
                 </size>
                </property>
                <property name="text">
-                <string>SwiftX</string>
+                <string>SwiftTX</string>
                </property>
               </widget>
              </item>
@@ -1762,7 +1762,7 @@
  </resources>
  <connections/>
  <buttongroups>
-  <buttongroup name="groupCustomFee"/>
   <buttongroup name="groupFee"/>
+  <buttongroup name="groupCustomFee"/>
  </buttongroups>
 </ui>

@@ -16,8 +16,8 @@ BITCOIND_USER=${BITCOIND_USER:-wagerr}
 BITCOIND_GROUP=${BITCOIND_GROUP:-wagerr}
 BITCOIND_BIN=${BITCOIND_BIN:-/usr/bin/wagerrd}
 
-name="Wagerr Core Daemon"
-description="Wagerr crypto-currency p2p network daemon"
+name="WAGERR Core Daemon"
+description="WAGERR crypto-currency p2p network daemon"
 
 command="/usr/bin/wagerrd"
 command_args="-pid=\"${BITCOIND_PIDFILE}\" \

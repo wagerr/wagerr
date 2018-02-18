@@ -10,7 +10,6 @@
 * @license    This project is released under the MIT license.
 **/
 // Copyright (c) 2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 
 #ifndef ZEROCOIN_DEFINES_H_
 #define ZEROCOIN_DEFINES_H_

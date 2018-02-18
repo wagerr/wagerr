@@ -1,6 +1,5 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -21,7 +20,7 @@
 
 /** 
 
-    ****Note - for Wagerr we added fCoinStake to the 2nd bit. Keep in mind when reading the following and adjust as needed.
+    ****Note - for WAGERR we added fCoinStake to the 2nd bit. Keep in mind when reading the following and adjust as needed.
  * Pruned version of CTransaction: only retains metadata and unspent transaction outputs
  *
  * Serialized format:

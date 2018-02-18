@@ -1,6 +1,5 @@
 #!/usr/bin/env python2
-# Copyright (c) 2015-2018 The Bitcoin Core developers
-# Copyright (c) 2018 The Wagerr developers
+# Copyright (c) 2015 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 import socket
@@ -101,11 +100,11 @@ class ProxyTest(BitcoinTestFramework):
         rv.append(cmd)
 
         # Test: outgoing onion connection through node
-        node.addnode("wagerrsomeaddr.onion:55002", "onetry")
+        node.addnode("wagerrvj7kcklujarx.onion:55002", "onetry")
         cmd = proxies[2].queue.get()
         assert(isinstance(cmd, Socks5Command))
         assert_equal(cmd.atyp, AddressType.DOMAINNAME)
-        assert_equal(cmd.addr, "wagerrsomeaddr.onion")
+        assert_equal(cmd.addr, "wagerrvj7kcklujarx.onion")
         assert_equal(cmd.port, 55002)
         if not auth:
             assert_equal(cmd.username, None)

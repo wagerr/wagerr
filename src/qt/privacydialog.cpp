@@ -1,5 +1,4 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -15,7 +14,7 @@
 #include "sendcoinsentry.h"
 #include "walletmodel.h"
 #include "coincontrol.h"
-#include "zwgrcontroldialog.h"
+#include "zpivcontroldialog.h"
 #include "spork.h"
 
 #include <QClipboard>
@@ -32,7 +31,7 @@ PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent),
     ui->setupUi(this);
 
     // "Spending 999999 zWGR ought to be enough for anybody." - Bill Gates, 2017
-    ui->zWGRpayAmount->setValidator( new QDoubleValidator(0.0, 398360470.0, 20, this) );
+    ui->zWGRpayAmount->setValidator( new QDoubleValidator(0.0, 21000000.0, 20, this) );
     ui->labelMintAmountValue->setValidator( new QIntValidator(0, 999999, this) );
 
     // Default texts for (mini-) coincontrol
@@ -80,7 +79,7 @@ PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent),
     ui->labelZsupplyText1000->setText(tr("Denom. <b>1000</b>:"));
     ui->labelZsupplyText5000->setText(tr("Denom. <b>5000</b>:"));
     
-    // Wagerr settings
+    // WAGERR settings
     QSettings settings;
     if (!settings.contains("nSecurityLevel")){
         nSecurityLevel = 42;
@@ -145,9 +144,8 @@ void PrivacyDialog::on_pasteButton_clicked()
 
 void PrivacyDialog::on_addressBookButton_clicked()
 {
-    if (!walletModel || !walletModel->getOptionsModel())
+    if (!walletModel)
         return;
-
     AddressBookPage dlg(AddressBookPage::ForSelection, AddressBookPage::SendingTab, this);
     dlg.setModel(walletModel->getAddressTableModel());
     if (dlg.exec()) {
@@ -226,8 +224,6 @@ void PrivacyDialog::on_pushButtonMintzWGR_clicked()
 
     }
 
-    ui->TEMintStatus->verticalScrollBar()->setValue(ui->TEMintStatus->verticalScrollBar()->maximum()); // Automatically scroll to end of text
-
     // Available balance isn't always updated, so force it.
     setBalance(walletModel->getBalance(), walletModel->getUnconfirmedBalance(), walletModel->getImmatureBalance(),
                walletModel->getZerocoinBalance(), walletModel->getUnconfirmedZerocoinBalance(), walletModel->getImmatureZerocoinBalance(),
@@ -239,6 +235,9 @@ void PrivacyDialog::on_pushButtonMintzWGR_clicked()
 
 void PrivacyDialog::on_pushButtonMintReset_clicked()
 {
+    if (!walletModel || !walletModel->getOptionsModel())
+        return;
+
     ui->TEMintStatus->setPlainText(tr("Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware. \nPlease be patient..."));
     ui->TEMintStatus->repaint ();
 
@@ -247,13 +246,15 @@ void PrivacyDialog::on_pushButtonMintReset_clicked()
     double fDuration = (double)(GetTimeMillis() - nTime)/1000.0;
     ui->TEMintStatus->setPlainText(QString::fromStdString(strResetMintResult) + tr("Duration: ") + QString::number(fDuration) + tr(" sec.\n"));
     ui->TEMintStatus->repaint ();
-    ui->TEMintStatus->verticalScrollBar()->setValue(ui->TEMintStatus->verticalScrollBar()->maximum()); // Automatically scroll to end of text
 
     return;
 }
 
 void PrivacyDialog::on_pushButtonSpentReset_clicked()
 {
+    if (!walletModel || !walletModel->getOptionsModel())
+        return;
+
     ui->TEMintStatus->setPlainText(tr("Starting ResetSpentZerocoin: "));
     ui->TEMintStatus->repaint ();
     int64_t nTime = GetTimeMillis();
@@ -261,7 +262,6 @@ void PrivacyDialog::on_pushButtonSpentReset_clicked()
     double fDuration = (double)(GetTimeMillis() - nTime)/1000.0;
     ui->TEMintStatus->setPlainText(QString::fromStdString(strResetSpentResult) + tr("Duration: ") + QString::number(fDuration) + tr(" sec.\n"));
     ui->TEMintStatus->repaint ();
-    ui->TEMintStatus->verticalScrollBar()->setValue(ui->TEMintStatus->verticalScrollBar()->maximum()); // Automatically scroll to end of text
 
     return;
 }
@@ -294,19 +294,16 @@ void PrivacyDialog::on_pushButtonSpendzWGR_clicked()
     sendzWGR();
 }
 
-void PrivacyDialog::on_pushButtonZWgrControl_clicked()
+void PrivacyDialog::on_pushButtonZPivControl_clicked()
 {
-    if (!walletModel || !walletModel->getOptionsModel())
-        return;
-
-    ZWgrControlDialog* zWgrControl = new ZWgrControlDialog(this);
-    zWgrControl->setModel(walletModel);
-    zWgrControl->exec();
+    ZPivControlDialog* zPivControl = new ZPivControlDialog(this);
+    zPivControl->setModel(walletModel);
+    zPivControl->exec();
 }
 
-void PrivacyDialog::setZWgrControlLabels(int64_t nAmount, int nQuantity)
+void PrivacyDialog::setZPivControlLabels(int64_t nAmount, int nQuantity)
 {
-    ui->labelzWgrSelected_int->setText(QString::number(nAmount));
+    ui->labelzPivSelected_int->setText(QString::number(nAmount));
     ui->labelQuantitySelected_int->setText(QString::number(nQuantity));
 }
 
@@ -412,10 +409,10 @@ void PrivacyDialog::sendzWGR()
     ui->TEMintStatus->setPlainText(tr("Spending Zerocoin.\nComputationally expensive, might need several minutes depending on the selected Security Level and your hardware. \nPlease be patient..."));
     ui->TEMintStatus->repaint();
 
-    // use mints from zWgr selector if applicable
+    // use mints from zPiv selector if applicable
     vector<CZerocoinMint> vMintsSelected;
-    if (!ZWgrControlDialog::listSelectedMints.empty()) {
-        vMintsSelected = ZWgrControlDialog::GetSelectedMints();
+    if (!ZPivControlDialog::listSelectedMints.empty()) {
+        vMintsSelected = ZPivControlDialog::GetSelectedMints();
     }
 
     // Spend zWGR
@@ -447,22 +444,12 @@ void PrivacyDialog::sendzWGR()
         }
         ui->zWGRpayAmount->setFocus();
         ui->TEMintStatus->repaint();
-        ui->TEMintStatus->verticalScrollBar()->setValue(ui->TEMintStatus->verticalScrollBar()->maximum()); // Automatically scroll to end of text
         return;
     }
 
-    if (walletModel && walletModel->getAddressTableModel()) {
-        // If zWgr was spent successfully update the addressbook with the label
-        std::string labelText = ui->addAsLabel->text().toStdString();
-        if (!labelText.empty())
-            walletModel->updateAddressBookLabels(address.Get(), labelText, "send");
-        else
-            walletModel->updateAddressBookLabels(address.Get(), "(no label)", "send");
-    }
-
-    // Clear zwgr selector in case it was used
-    ZWgrControlDialog::listSelectedMints.clear();
-    ui->labelzWgrSelected_int->setText(QString("0"));
+    // Clear zpiv selector in case it was used
+    ZPivControlDialog::listSelectedMints.clear();
+    ui->labelzPivSelected_int->setText(QString("0"));
     ui->labelQuantitySelected_int->setText(QString("0"));
 
     // Some statistics for entertainment
@@ -470,7 +457,7 @@ void PrivacyDialog::sendzWGR()
     CAmount nValueIn = 0;
     int nCount = 0;
     for (CZerocoinSpend spend : receipt.GetSpends()) {
-        strStats += tr("zWgr Spend #: ") + QString::number(nCount) + ", ";
+        strStats += tr("zPiv Spend #: ") + QString::number(nCount) + ", ";
         strStats += tr("denomination: ") + QString::number(spend.GetDenomination()) + ", ";
         strStats += tr("serial: ") + spend.GetSerial().ToString().c_str() + "\n";
         strStats += tr("Spend is 1 of : ") + QString::number(spend.GetMintCount()) + " mints in the accumulator\n";
@@ -479,13 +466,13 @@ void PrivacyDialog::sendzWGR()
 
     CAmount nValueOut = 0;
     for (const CTxOut& txout: wtxNew.vout) {
-        strStats += tr("value out: ") + FormatMoney(txout.nValue).c_str() + " Wgr, ";
+        strStats += tr("value out: ") + FormatMoney(txout.nValue).c_str() + " Piv, ";
         nValueOut += txout.nValue;
 
         strStats += tr("address: ");
         CTxDestination dest;
         if(txout.scriptPubKey.IsZerocoinMint())
-            strStats += tr("zWgr Mint");
+            strStats += tr("zPiv Mint");
         else if(ExtractDestination(txout.scriptPubKey, dest))
             strStats += tr(CBitcoinAddress(dest).ToString().c_str());
         strStats += "\n";
@@ -504,7 +491,6 @@ void PrivacyDialog::sendzWGR()
 
     ui->TEMintStatus->setPlainText(strReturn);
     ui->TEMintStatus->repaint();
-    ui->TEMintStatus->verticalScrollBar()->setValue(ui->TEMintStatus->verticalScrollBar()->maximum()); // Automatically scroll to end of text
 }
 
 void PrivacyDialog::on_payTo_textChanged(const QString& address)
@@ -527,9 +513,6 @@ void PrivacyDialog::coinControlClipboardAmount()
 // Coin Control: button inputs -> show actual coin control dialog
 void PrivacyDialog::coinControlButtonClicked()
 {
-    if (!walletModel || !walletModel->getOptionsModel())
-        return;
-
     CoinControlDialog dlg;
     dlg.setModel(walletModel);
     dlg.exec();

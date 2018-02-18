@@ -62,12 +62,12 @@
         <translation>Prijímacia adresa</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Toto sú vaše Wagerr adresy na odosielanie platieb. Pred odoslaním vždy skontrolujte výšku a adresu prijemcu.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Toto sú vaše WAGERR adresy na odosielanie platieb. Pred odoslaním vždy skontrolujte výšku a adresu prijemcu.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Toto sú vaše Wagerr adresy na prijímanie platieb. Pre každú transakciu sa odporúča použiť novú prijímaciu adresu.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Toto sú vaše WAGERR adresy na prijímanie platieb. Pre každú transakciu sa odporúča použiť novú prijímaciu adresu.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -176,8 +176,8 @@
         <translation>Potvrďte šifrovanie peňaženky</translation>
     </message>
     <message>
-        <source>Wagerr will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>Wagerr sa teraz ukončí, aby dokončil proces šifrovania. Nezabudnite, že šifrovanie peňaženky nemôže úplne ochrániť vaše WGR pred odcudzením škodlivým softvérom, ktorý infikuje váš počítač.</translation>
+        <source>WAGERR will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
+        <translation>WAGERR sa teraz ukončí, aby dokončil proces šifrovania. Nezabudnite, že šifrovanie peňaženky nemôže úplne ochrániť vaše WGR pred odcudzením škodlivým softvérom, ktorý infikuje váš počítač.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -247,8 +247,8 @@
         <translation>Adresa:</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Adresa Wagerr, ktorou chcete správu podpísať</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Adresa WAGERR, ktorou chcete správu podpísať</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -279,8 +279,8 @@
         <translation>Skopírujte aktuálny podpis do schránky</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Podpíšte správu, aby ste preukázali, že ste vlastníkom tejto Wagerr adresy</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Podpíšte správu, aby ste preukázali, že ste vlastníkom tejto WAGERR adresy</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
@@ -303,12 +303,12 @@
         <translation>Zadajte súkromný kľúč zašifrovaný BIP 38. Zadajte prístupovú frázu do stredného poľa. Kliknite na Dešifrovať kľúč, ak chcete vypočítať privátny kľúč. Po dešifrovaní kľúča pridáte do peňaženky tento súkromný kľúč kliknutím na položku 'Importovať adresu'.</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>Wagerr adresa, ktorou bola správa podpísaná</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>WAGERR adresa, ktorou bola správa podpísaná</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Skontrolujte správu, aby ste sa uistili, že bola podpísaná zadanou Wagerr adresou</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Skontrolujte správu, aby ste sa uistili, že bola podpísaná zadanou WAGERR adresou</translation>
     </message>
     <message>
         <source>Decrypt &amp;Key</source>
@@ -598,12 +598,12 @@
         <translation>Panel nástrojov Záložky</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Odoslať mince na adresu Wagerr</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Odoslať mince na adresu WAGERR</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -618,24 +618,24 @@
         <translation>Prezrieť masternody</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>O Wagerr Core</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>O WAGERR Core</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Zobraziť informácie o Wagerr Core</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Zobraziť informácie o WAGERR Core</translation>
     </message>
     <message>
-        <source>Modify configuration options for Wagerr</source>
-        <translation>Zmeňte možnosti konfigurácie pre Wagerr</translation>
+        <source>Modify configuration options for WAGERR</source>
+        <translation>Zmeňte možnosti konfigurácie pre WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Podpíšte správy pomocou adresy Wagerr, aby ste preukázali, že ich vlastníte</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Podpíšte správy pomocou adresy WAGERR, aby ste preukázali, že ich vlastníte</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Overte správy, aby sa zabezpečilo, že boli podpísané zadanými Wagerr adresami</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Overte správy, aby sa zabezpečilo, že boli podpísané zadanými WAGERR adresami</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -666,8 +666,8 @@
         <translation>Otvoriť konfiguračný súbor masternodu</translation>
     </message>
     <message>
-        <source>Open a Wagerr: URI or payment request</source>
-        <translation>Otvorte Wagerr: URI alebo žiadosť o platbu</translation>
+        <source>Open a WAGERR: URI or payment request</source>
+        <translation>Otvorte WAGERR: URI alebo žiadosť o platbu</translation>
     </message>
     <message>
         <source>&amp;Blockchain explorer</source>
@@ -678,12 +678,12 @@
         <translation>Okno blockchain prehliadača</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Zobraziť pomocnú správu programu Wagerr Core a získajte zoznam možností príkazového riadka Wagerr</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Zobraziť pomocnú správu programu WAGERR Core a získajte zoznam možností príkazového riadka WAGERR</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Wagerr Core klient</translation>
+        <source>WAGERR Core client</source>
+        <translation>WAGERR Core klient</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -908,15 +908,15 @@ MultiSend: %1</translation>
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
     <name>Intro</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1140,8 +1140,8 @@ MultiSend: %1</translation>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Adresa Wagerr, ktorou chcete správu podpísať</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Adresa WAGERR, ktorou chcete správu podpísať</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -1164,16 +1164,16 @@ MultiSend: %1</translation>
         <translation>Skopírujte aktuálny podpis do schránky</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Podpíšte správu, aby ste preukázali, že ste vlastníkom tejto Wagerr adresy</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Podpíšte správu, aby ste preukázali, že ste vlastníkom tejto WAGERR adresy</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>Wagerr adresa, ktorou bola správa podpísaná</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>WAGERR adresa, ktorou bola správa podpísaná</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Skontrolujte správu, aby ste sa uistili, že bola podpísaná zadanou Wagerr adresou</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Skontrolujte správu, aby ste sa uistili, že bola podpísaná zadanou WAGERR adresou</translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
@@ -1211,8 +1211,8 @@ MultiSend: %1</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
@@ -1307,7 +1307,7 @@ MultiSend: %1</translation>
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>ZPivControlDialog</name>
     </context>
 <context>
     <name>wagerr-core</name>

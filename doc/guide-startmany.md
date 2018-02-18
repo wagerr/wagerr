@@ -4,7 +4,7 @@
 There are many ways to setup a wallet to support start-many. This guide will walk through two of them.
 
 1. [Importing an existing wallet (recommended if you are consolidating wallets).](#option1)
-2. [Sending 10,000 Wagerr to new wallet addresses.](#option2)
+2. [Sending 10,000 WAGERR to new wallet addresses.](#option2)
 
 ## <a name="option1"></a>Option 1. Importing an existing wallet
 
@@ -56,9 +56,9 @@ Create a new wallet address for each MasterNode.
 
 Close your QT Wallet.
 
-### Send 10,000 Wagerr to New Addresses
+### Send 10,000 WAGERR to New Addresses
 
-Just like setting up a standard MN. Send exactly 10,000 Wagerr to each new address created above.
+Just like setting up a standard MN. Send exactly 10,000 WAGERR to each new address created above.
 
 ### Create New Masternode Private Keys
 
@@ -78,11 +78,11 @@ Remember... this is local. Make sure your QT is not running.
 
 Create the masternode.conf file in the same directory as your wallet.dat.
 
-Copy the masternode private key and correspondig collateral output transaction that holds the 1K Wagerr.
+Copy the masternode private key and correspondig collateral output transaction that holds the 1K WAGERR.
 
 The masternode private key may be an existing key from [Option 1](#option1), or a newly generated key from [Option 2](#option2). 
 
-*Please note, the masternode priviate key is not the same as a wallet private key. Never put your wallet private key in the masternode.conf file. That is equivalent to putting your 10,000 Wagerr on the remote server and defeats the purpose of a hot/cold setup.*
+*Please note, the masternode priviate key is not the same as a wallet private key. Never put your wallet private key in the masternode.conf file. That is equivalent to putting your 10,000 WAGERR on the remote server and defeats the purpose of a hot/cold setup.*
 
 ### Get the collateral output
 
@@ -108,8 +108,8 @@ alias ipaddress:port masternode_private_key collateral_output collateral_output_
 Example:
 
 ```
-mn01 127.0.0.1:55002 7gb6HNz8gRwVwKZLMGQ6XEaLjzPoxUNK4ui3Pig6mXA6RZ8xhsn 49012766543cac37369cf3813d6216bdddc1b9a8ed03ac690221be10aa5edd6c 0
-mn02 127.0.0.2:55002 7gHrUV5JFdKF8cYLxAhfzDsj5RkRzebkHuHTG7pErCgaYGxT2vn 49012766543cac37369cf3813d6216bdddc1b9a8ed03ac690221be10aa5edd6c 0 TKa5kuygkJcMDmwsEP1aRawyXPUjbNKxqJ:25
+mn01 127.0.0.1:55002 7g7pNk8owLxa55oKdvGoCvtPruYyjqPkKkJHrfTcCGpZWVbXAqS 9ad313bfefe0a7e76852727f93fee2abe1c6f8fac3993b0f9608c1905e2f9077 0
+mn02 127.0.0.2:55002 93WaAb3htPJEV8E9aQcN23Jt97bPex7YvWfgMDTUdWJvzmrMqey aa9f1034d973377a5e733272c3d0eced1de22555ad45d6b24abadff8087948d4 0 7gnwGHt17heGpG9Crfeh4KGpYNFugPhJdh:25
 ```
 
 ## What about the wagerr.conf file?

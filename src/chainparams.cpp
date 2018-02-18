@@ -2,7 +2,6 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -54,10 +53,8 @@ static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data
 // + Contains no strange transactions
 static Checkpoints::MapCheckpoints mapCheckpoints =
     boost::assign::map_list_of
-    
-    // WagerrDevs - RELEASE CHANGE - Checkpoins, timestamp of last checkpoint, total nr. of transactions
+    (0, uint256("000007b9191bc7a17bfb6cedf96a8dacebb5730b498361bf26d44a9f9dcc1079")); // Genesis block
 
-    (0, uint256("000007b9191bc7a17bfb6cedf96a8dacebb5730b498361bf26d44a9f9dcc1079"));         // Genesis block
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
     1518696181, // * UNIX timestamp of last checkpoint block
@@ -102,12 +99,11 @@ public:
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 4-byte int at any alignment.
-         */ 
-        /* 842d61fd */
-        pchMessageStart[0] = 0x84;              
-        pchMessageStart[1] = 0x2d;              
-        pchMessageStart[2] = 0x61;              
-        pchMessageStart[3] = 0xfd;              
+         */
+        pchMessageStart[0] = 0x84;
+        pchMessageStart[1] = 0x2d;
+        pchMessageStart[2] = 0x61;
+        pchMessageStart[3] = 0xfd;
         vAlertPubKey = ParseHex("04a6254e2ff57f433b3afa2764d8fffec82899a22fd14de054123f5f6d5dc4c9d011d6b03e35f9b093f1529cfe8324cf516838ff90fa8824be6ceea8fdf856bd64");
         nDefaultPort = 55002;                   
         bnProofOfWorkLimit = ~uint256(0) >> 20; // Wagerr starting difficulty is 1 / 2^12
@@ -127,7 +123,7 @@ public:
         nLastPOWBlock = 1001;                   // PoW Phase 3 End
         nModifierUpdateBlock = 1100;            // Modify block on height
         nZerocoinStartHeight = 1500;            // Zerocoin start height
-        nZerocoinStartTime = 1518696182;        // GMT: Thursday, 15. February 2018 12:03:02
+        nZerocoinStartTime = 1518696182;        // GMT: Monday, 5. February 2018 17:55:48
         nBlockEnforceSerialRange = 1;           // Enforce serial range starting this block
         nBlockRecalculateAccumulators = 100000; // Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 1110;           // 1110; //First block that bad serials emerged (currently we do not have any) *** TODO ***
@@ -155,7 +151,7 @@ public:
         genesis.hashPrevBlock = 0;
         genesis.hashMerkleRoot = genesis.BuildMerkleTree();
         genesis.nVersion = 1;
-        genesis.nTime = 1518696181;                                         // GMT: Thursday, 15. February 2018 12:03:01
+        genesis.nTime = 1518696181; // Friday, February 2, 2018 11:21:01 PM (GMT)
         genesis.nBits = 0x1e0ffff0;
         genesis.nNonce = 96620932;
 
@@ -192,8 +188,10 @@ public:
 
         nPoolMaxTransactions = 3;
         strSporkKey = "040f00b37452d6e7ac00b4a2e2699bab35b5ed3c8d3e1ecaf63317900fd7b52324f4243d11cc70c40dde54bdbc1e9a732ee63b1eec60ca45e6d529ad2b43d4d614";
+
         strObfuscationPoolDummyAddress = "WWqou25edpCatoZgSxhd3dpNbhn3dxh21D";
-        nStartMasternodePayments = 1518696182; // GMT: Thursday, 15. February 2018 12:03:02
+
+        nStartMasternodePayments = 1517625661; //Saturday, January 27, 2018 10:02:02 AM
 
         /** Zerocoin */
         zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
@@ -206,7 +204,7 @@ public:
         nMinZerocoinMintFee = 1 * CENT; //high fee required for zerocoin mints
         nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         nRequiredAccumulation = 1;
-        nDefaultSecurityLevel = 100; //full security level for accumulators
+        nDefaultSecurityLevel = 100; //full security level for accumulators  
         nZerocoinHeaderVersion = 4; //Block headers must be this version once zerocoin is active
         nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
     }
@@ -228,7 +226,6 @@ public:
     {
         networkID = CBaseChainParams::TESTNET;
         strNetworkID = "test";
-        /* 879ed199 */
         pchMessageStart[0] = 0x87;
         pchMessageStart[1] = 0x9e;
         pchMessageStart[2] = 0xd1;
@@ -247,7 +244,7 @@ public:
         nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
         nZerocoinStartHeight = 250;
-        nZerocoinStartTime = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
+        nZerocoinStartTime = 1518696183; // Saturday, February 3, 2018 3:31:02 AM (GMT)
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 1500; //Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 891737; //First block that bad serials emerged (currently we do not have any) *** TODO ***
@@ -263,10 +260,12 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
+
         vSeeds.push_back(CDNSSeedData("1", "test.testseederv1.wgr.host")); // Wagerr's official testseed 1
         vSeeds.push_back(CDNSSeedData("2", "test.testseederv2.wgr.host")); // Wagerr's official testseed 2
         vSeeds.push_back(CDNSSeedData("3", "test.devseeder1.wgr.host"));   // Wagerr's dev1 testseed
         vSeeds.push_back(CDNSSeedData("4", "test.devseeder2.wgr.host"));   // Wagerr's dev2 testseed
+
         // Testnet Wagerr addresses start with 'y'
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 65);
         // Testnet Wagerr script addresses start with '8' or '9'
@@ -289,12 +288,14 @@ public:
         fMineBlocksOnDemand = false;
         fTestnetToBeDeprecatedFieldRPC = true;
 
+        // we enable for test purpose low dif mining on main
         nPoolMaxTransactions = 2;
         strSporkKey = "04b2d1b19607edcca2fbf1d3238a0200a434900593f7e5e38102e7681465e5785ddcf1a105ee595c51ef3be1bfc8ea9dc14c8c30b2e0edaa5f5d3f57b77f272046";
         strObfuscationPoolDummyAddress = "TMPUBzcsHZawA32XYYDF9FHQp6icv492CV";
-        nStartMasternodePayments = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
+        nStartMasternodePayments = 1518696183; //Saturday, January 27, 2018 10:02:02 AM
         nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
                                        // here because we only have a 8 block finalization window on testnet
+
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
@@ -314,7 +315,6 @@ public:
         networkID = CBaseChainParams::REGTEST;
         strNetworkID = "regtest";
         strNetworkID = "regtest";
-        /* 1276a1fa */
         pchMessageStart[0] = 0x12;
         pchMessageStart[1] = 0x76;
         pchMessageStart[2] = 0xa1;
@@ -324,19 +324,19 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
-        nTargetTimespan = 24 * 60 * 60;         // Wagerr: 1 day
-        nTargetSpacing = 1 * 60;                // Wagerr: 1 minutes
+        nTargetTimespan = 24 * 60 * 60; // Wagerr: 1 day
+        nTargetSpacing = 1 * 60;        // Wagerr: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
-        genesis.nTime = 1518696183;             // GMT: Thursday, 15. February 2018 12:03:03
+        genesis.nTime = 1518696183;
         genesis.nBits = 0x207fffff;
-        genesis.nNonce = 574752;                // hex 57 47 52 in text = WGR
+        genesis.nNonce = 574752;
 
         hashGenesisBlock = genesis.GetHash();
         nDefaultPort = 55006;
         assert(hashGenesisBlock == uint256("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec"));
 
-        vFixedSeeds.clear();                    //! Testnet mode doesn't have any fixed seeds.
-        vSeeds.clear();                         //! Testnet mode doesn't have any DNS seeds.
+        vFixedSeeds.clear(); //! Testnet mode doesn't have any fixed seeds.
+        vSeeds.clear();      //! Testnet mode doesn't have any DNS seeds.
 
         fMiningRequiresPeers = false;
         fAllowMinDifficultyBlocks = true;

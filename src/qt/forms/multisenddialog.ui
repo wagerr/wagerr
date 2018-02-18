@@ -10,7 +10,7 @@
     <x>0</x>
     <y>0</y>
     <width>594</width>
-    <height>526</height>
+    <height>523</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -30,15 +30,15 @@
     <number>6</number>
    </property>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_Main" stretch="1,1,1,0,1,1,1">
+    <layout class="QVBoxLayout" name="verticalLayout_Main" stretch="1,1,1,1,1,1">
      <item>
       <widget class="QLabel" name="label_2">
        <property name="lineWidth">
         <number>1</number>
        </property>
        <property name="text">
-        <string>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Wagerr addresses after it matures.
-To Add: enter percentage to give and Wagerr address to add to the MultiSend vector.
+        <string>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other WAGERR addresses after it matures.
+To Add: enter percentage to give and WAGERR address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</string>
        </property>
@@ -174,30 +174,6 @@ MultiSend will not be activated unless you have clicked Activate</string>
           </widget>
          </item>
         </layout>
-       </item>
-      </layout>
-     </item>
-     <item>
-      <layout class="QHBoxLayout" name="horizontalLayout_3">
-       <item>
-        <widget class="QLabel" name="label_3">
-         <property name="minimumSize">
-          <size>
-           <width>100</width>
-           <height>0</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Label:</string>
-         </property>
-        </widget>
-       </item>
-       <item>
-        <widget class="QLineEdit" name="labelAddressLabelEdit">
-         <property name="placeholderText">
-          <string>Enter a label for this address to add it to your address book</string>
-         </property>
-        </widget>
        </item>
       </layout>
      </item>

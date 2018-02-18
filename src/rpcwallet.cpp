@@ -2,7 +2,6 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -83,7 +82,7 @@ UniValue getnewaddress(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getnewaddress ( \"account\" )\n"
-            "\nReturns a new Wagerr address for receiving payments.\n"
+            "\nReturns a new WAGERR address for receiving payments.\n"
             "If 'account' is specified (recommended), it is added to the address book \n"
             "so payments received with the address will be credited to 'account'.\n"
             "\nArguments:\n"
@@ -152,7 +151,7 @@ UniValue getaccountaddress(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaccountaddress \"account\"\n"
-            "\nReturns the current Wagerr address for receiving payments to this account.\n"
+            "\nReturns the current WAGERR address for receiving payments to this account.\n"
             "\nArguments:\n"
             "1. \"account\"       (string, required) The account name for the address. It can also be set to the empty string \"\" to represent the default account. The account does not need to exist, it will be created and a new address created  if there is no account by the given name.\n"
             "\nResult:\n"
@@ -176,7 +175,7 @@ UniValue getrawchangeaddress(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getrawchangeaddress\n"
-            "\nReturns a new Wagerr address, for receiving change.\n"
+            "\nReturns a new WAGERR address, for receiving change.\n"
             "This is for use with raw transactions, NOT normal use.\n"
             "\nResult:\n"
             "\"address\"    (string) The address\n"
@@ -213,7 +212,7 @@ UniValue setaccount(const UniValue& params, bool fHelp)
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
 
 
     string strAccount;
@@ -251,7 +250,7 @@ UniValue getaccount(const UniValue& params, bool fHelp)
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
 
     string strAccount;
     map<CTxDestination, CAddressBookData>::iterator mi = pwalletMain->mapAddressBook.find(address.Get());
@@ -306,7 +305,7 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
 
-    // Parse Wagerr address
+    // Parse WAGERR address
     CScript scriptPubKey = GetScriptForDestination(address);
 
     // Create and send the transaction
@@ -344,7 +343,7 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
 
     // Amount
     CAmount nAmount = AmountFromValue(params[1]);
@@ -385,7 +384,7 @@ UniValue sendtoaddressix(const UniValue& params, bool fHelp)
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
 
     // Amount
     CAmount nAmount = AmountFromValue(params[1]);
@@ -515,7 +514,7 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp)
     // wagerr address
     CBitcoinAddress address = CBitcoinAddress(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
     CScript scriptPubKey = GetScriptForDestination(address.Get());
     if (!IsMine(*pwalletMain, scriptPubKey))
         return (double)0.0;
@@ -739,7 +738,7 @@ UniValue movecmd(const UniValue& params, bool fHelp)
     debit.nTime = nNow;
     debit.strOtherAccount = strTo;
     debit.strComment = strComment;
-    pwalletMain->AddAccountingEntry(debit, walletdb);
+    walletdb.WriteAccountingEntry(debit);
 
     // Credit
     CAccountingEntry credit;
@@ -749,7 +748,7 @@ UniValue movecmd(const UniValue& params, bool fHelp)
     credit.nTime = nNow;
     credit.strOtherAccount = strFrom;
     credit.strComment = strComment;
-    pwalletMain->AddAccountingEntry(credit, walletdb);
+    walletdb.WriteAccountingEntry(credit);
 
     if (!walletdb.TxnCommit())
         throw JSONRPCError(RPC_DATABASE_ERROR, "database error");
@@ -787,7 +786,7 @@ UniValue sendfrom(const UniValue& params, bool fHelp)
     string strAccount = AccountFromValue(params[0]);
     CBitcoinAddress address(params[1].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
     CAmount nAmount = AmountFromValue(params[2]);
     int nMinDepth = 1;
     if (params.size() > 3)
@@ -857,7 +856,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
     BOOST_FOREACH(const string& name_, keys) {
         CBitcoinAddress address(name_);
         if (!address.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid Wagerr address: ")+name_);
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid WAGERR address: ")+name_);
 
         if (setAddress.count(address))
             throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ")+name_);
@@ -898,7 +897,7 @@ UniValue addmultisigaddress(const UniValue& params, bool fHelp)
     if (fHelp || params.size() < 2 || params.size() > 3) {
         string msg = "addmultisigaddress nrequired [\"key\",...] ( \"account\" )\n"
                      "\nAdd a nrequired-to-sign multisignature address to the wallet.\n"
-                     "Each key is a Wagerr address or hex-encoded public key.\n"
+                     "Each key is a WAGERR address or hex-encoded public key.\n"
                      "If 'account' is specified, assign address to that account.\n"
 
                      "\nArguments:\n"
@@ -1285,10 +1284,11 @@ UniValue listtransactions(const UniValue& params, bool fHelp)
 
     UniValue ret(UniValue::VARR);
 
-    const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
+    std::list<CAccountingEntry> acentries;
+    CWallet::TxItems txOrdered = pwalletMain->OrderedTxItems(acentries, strAccount);
 
     // iterate backwards until we have nCount items to return:
-    for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
+    for (CWallet::TxItems::reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
         CWalletTx* const pwtx = (*it).second.first;
         if (pwtx != 0)
             ListTransactions(*pwtx, strAccount, 0, true, ret, filter);
@@ -1381,7 +1381,8 @@ UniValue listaccounts(const UniValue& params, bool fHelp)
         }
     }
 
-    const list<CAccountingEntry> & acentries = pwalletMain->laccentries;
+    list<CAccountingEntry> acentries;
+    CWalletDB(pwalletMain->strWalletFile).ListAccountCreditDebit("*", acentries);
     BOOST_FOREACH (const CAccountingEntry& entry, acentries)
         mapAccountBalances[entry.strAccount] += entry.nCreditDebit;
 
@@ -1618,7 +1619,7 @@ UniValue walletpassphrase(const UniValue& params, bool fHelp)
             "\nExamples:\n"
             "\nUnlock the wallet for 60 seconds\n" +
             HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60") +
-            "\nUnlock the wallet for 60 seconds but allow anonymization, automint, and staking only\n" + HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60 true") +
+            "\nUnlock the wallet for 60 seconds but allow Obfuscation only\n" + HelpExampleCli("walletpassphrase", "\"my pass phrase\" 60 true") +
             "\nLock the wallet again (before 60 seconds)\n" + HelpExampleCli("walletlock", "") +
             "\nAs json rpc call\n" + HelpExampleRpc("walletpassphrase", "\"my pass phrase\", 60"));
 
@@ -2048,7 +2049,7 @@ UniValue autocombinerewards(const UniValue& params, bool fHelp)
     if (fHelp || params.size() < 1 || (fEnable && params.size() != 2) || params.size() > 2)
         throw runtime_error(
             "autocombinerewards true|false ( threshold )\n"
-            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same Wagerr address\n"
+            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same WAGERR address\n"
             "When autocombinerewards runs it will create a transaction, and therefore will be subject to transaction fees.\n"
 
             "\nArguments:\n"
@@ -2256,7 +2257,7 @@ UniValue multisend(const UniValue& params, bool fHelp)
             "The MultiSend transaction is sent when the staked coins mature (100 confirmations)\n"
             "****************************************************************\n"
             "TO CREATE OR ADD TO THE MULTISEND VECTOR:\n"
-            "multisend <Wagerr Address> <percent>\n"
+            "multisend <WAGERR Address> <percent>\n"
             "This will add a new address to the MultiSend vector\n"
             "Percent is a whole number 1 to 100.\n"
             "****************************************************************\n"
@@ -2409,7 +2410,7 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "mintzerocoin <amount>\n"
-            "Usage: Enter an amount of Wgr to convert to zWgr"
+            "Usage: Enter an amount of Piv to convert to zPiv"
             + HelpRequiringPassphrase());
 
     int64_t nTime = GetTimeMillis();
@@ -2478,7 +2479,7 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
         // to avoid type confusion from the JSON interpreter
         address = CBitcoinAddress(params[4].get_str());
         if(!address.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
     }
 
     CWalletTx wtx;
@@ -2663,7 +2664,7 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
 
                 "\nArguments:\n"
                 "1. \"include_spent\"        (bool, required) Include mints that have already been spent\n"
-                "2. \"denomination\"         (integer, optional) Export a specific denomination of zWgr\n"
+                "2. \"denomination\"         (integer, optional) Export a specific denomination of zPiv\n"
 
                 "\nResult\n"
                 "[                   (array of json object)\n"
@@ -2727,7 +2728,7 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
 
                 "\nResult:\n"
                 "\"added\"            (int) the quantity of zerocoin mints that were added\n"
-                "\"value\"            (string) the total zWgr value of zerocoin mints that were added\n"
+                "\"value\"            (string) the total zPiv value of zerocoin mints that were added\n"
 
                 "\nExamples\n" +
             HelpExampleCli("importzerocoins", "\'[{\"d\":100,\"p\":\"mypubcoin\",\"s\":\"myserial\",\"r\":\"randomness_hex\",\"t\":\"mytxid\",\"h\":104923, \"u\":false},{\"d\":5,...}]\'") +
@@ -2783,7 +2784,7 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
     if(fHelp || !params.empty())
         throw runtime_error(
             "reconsiderzerocoins\n"
-                "\nCheck archived zWgr list to see if any mints were added to the blockchain.\n"
+                "\nCheck archived zPiv list to see if any mints were added to the blockchain.\n"
 
                 "\nResult\n"
                 "[                                 (array of json objects)\n"

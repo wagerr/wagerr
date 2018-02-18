@@ -227,8 +227,8 @@
         <translation>Zakodowany klucz:</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Zatwierdź wiadomość, aby udowodnić, że podany adres Wagerr jest w twoim posiadaniu</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Zatwierdź wiadomość, aby udowodnić, że podany adres WAGERR jest w twoim posiadaniu</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
@@ -518,12 +518,12 @@
         <translation>&amp;Pomoc</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>&amp;Rdzeń Wagerr</translation>
+        <source>WAGERR Core</source>
+        <translation>&amp;Rdzeń WAGERR</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Wyślij monety do adresu Wagerr</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Wyślij monety do adresu WAGERR</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -538,24 +538,24 @@
         <translation>Przeglądaj masternodes</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
+        <source>&amp;About WAGERR Core</source>
         <translation>&amp;O rdzeniu bitcoina</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
+        <source>Show information about WAGERR Core</source>
         <translation>Pokaż informacje o rdzeniu bitcoina</translation>
     </message>
     <message>
-        <source>Modify configuration options for Wagerr</source>
-        <translation>Modyfikuj opcje konfiguracji Wagerr</translation>
+        <source>Modify configuration options for WAGERR</source>
+        <translation>Modyfikuj opcje konfiguracji WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Zatwierdź wiadomość z twoimi adresami Wagerr, by udowodnić, że jesteś w ich posiadaniu</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Zatwierdź wiadomość z twoimi adresami WAGERR, by udowodnić, że jesteś w ich posiadaniu</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Zweryfikuj wiadomości by upewnić się, że zostały zatwierdzone z podanego adresu Wagerr</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Zweryfikuj wiadomości by upewnić się, że zostały zatwierdzone z podanego adresu WAGERR</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -582,8 +582,8 @@
         <translation>Otwórz &amp;Plik konfiguracji Masternode</translation>
     </message>
     <message>
-        <source>Open a Wagerr: URI or payment request</source>
-        <translation>Otwórz Wagerr: URI i żądanie zapłaty</translation>
+        <source>Open a WAGERR: URI or payment request</source>
+        <translation>Otwórz WAGERR: URI i żądanie zapłaty</translation>
     </message>
     <message>
         <source>&amp;Blockchain explorer</source>
@@ -594,12 +594,12 @@
         <translation>Okno eksplorera bloków</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Pokaż wiadomość pomocy rdzenia Wagerr, aby dostać listę możliwych opcji Wagerr command-line</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Pokaż wiadomość pomocy rdzenia WAGERR, aby dostać listę możliwych opcji WAGERR command-line</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Rdzeń Wagerr klient</translation>
+        <source>WAGERR Core client</source>
+        <translation>Rdzeń WAGERR klient</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -912,8 +912,8 @@ MultiWysyłlka: %1</translation>
 <context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>&amp;Rdzeń Wagerr</translation>
+        <source>WAGERR Core</source>
+        <translation>&amp;Rdzeń WAGERR</translation>
     </message>
     </context>
 <context>
@@ -927,8 +927,8 @@ MultiWysyłlka: %1</translation>
         <translation>Użyj niestandardowej ścieżki danych</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>&amp;Rdzeń Wagerr</translation>
+        <source>WAGERR Core</source>
+        <translation>&amp;Rdzeń WAGERR</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1188,12 +1188,12 @@ Proszę sprawdzić adres i spróbować ponownie</translation>
         <translation>Zezwól na przychodzące połączenia</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
-        <translation>Automatycznie uruchom Wagerr po zalogowaniu do systemu</translation>
+        <source>Automatically start WAGERR after logging in to the system.</source>
+        <translation>Automatycznie uruchom WAGERR po zalogowaniu do systemu</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;Uruchom Wagerr podczas logowania do systemu</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;Uruchom WAGERR podczas logowania do systemu</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1212,18 +1212,18 @@ Proszę sprawdzić adres i spróbować ponownie</translation>
         <translation>&amp;Sieć</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Wagerr.</source>
-        <translation>Język interfejsu użytkownika może być wybrany tutaj. Ustawienia ulegną zmianie po restarcie Wagerr</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting WAGERR.</source>
+        <translation>Język interfejsu użytkownika może być wybrany tutaj. Ustawienia ulegną zmianie po restarcie WAGERR</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr-project/wagerr-project-translations</source>
         <translation>Brakuje języka bądź nieukończona pełnego tłumaczenia? Pomóż w tłumaczeniu tutaj:
-https://www.transifex.com/wagerr/wagerr-translations </translation>
+https://www.transifex.com/wagerr-project/wagerr-project-translations </translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Połącz z siecią Wagerr poprzez SOCKS5 proxy.</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Połącz z siecią WAGERR poprzez SOCKS5 proxy.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -1461,8 +1461,8 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
         <translation>Liczba</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Wprowadź adres Wagerr (np. %1)</translation>
+        <source>Enter a WAGERR address (e.g. %1)</source>
+        <translation>Wprowadź adres WAGERR (np. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -1900,8 +1900,8 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
         <translation>Alt+P</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Zatwierdź wiadomość, aby udowodnić, że podany adres Wagerr jest w twoim posiadaniu</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Zatwierdź wiadomość, aby udowodnić, że podany adres WAGERR jest w twoim posiadaniu</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
@@ -1935,8 +1935,8 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>&amp;Rdzeń Wagerr</translation>
+        <source>WAGERR Core</source>
+        <translation>&amp;Rdzeń WAGERR</translation>
     </message>
     </context>
 <context>
@@ -2027,7 +2027,7 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>ZPivControlDialog</name>
     <message>
         <source>0</source>
         <translation>0</translation>

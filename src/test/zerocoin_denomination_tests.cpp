@@ -1,5 +1,4 @@
-// Copyright (c) 2012-2018 The Bitcoin Core developers
-// Copyright (c) 2018 The Wagerr developers
+// Copyright (c) 2012-2014 The Bitcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -101,7 +100,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test241)
         j++;
     }
     CoinsHeld = nTotalAmount / COIN;
-    std::cout << "Current Amount held = " << CoinsHeld << ": ";
+    std::cout << "Curremt Amount held = " << CoinsHeld << ": ";
 
     // Show what we have
     j = 0;
@@ -180,7 +179,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test115)
         j++;
     }
     CoinsHeld = nTotalAmount / COIN;
-    std::cout << "Current Amount held = " << CoinsHeld << ": ";
+    std::cout << "Curremt Amount held = " << CoinsHeld << ": ";
 
     // Show what we have
     j = 0;
@@ -259,7 +258,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test_from_245)
         j++;
     }
     CoinsHeld = nTotalAmount / COIN;
-    std::cout << "Current Amount held = " << CoinsHeld << ": ";
+    std::cout << "Curremt Amount held = " << CoinsHeld << ": ";
 
     // Show what we have
     j = 0;
@@ -356,7 +355,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test_from_145)
         j++;
     }
     CoinsHeld = nTotalAmount / COIN;
-    std::cout << "Current Amount held = " << CoinsHeld << ": ";
+    std::cout << "Curremt Amount held = " << CoinsHeld << ": ";
     // We can spend up to this amount for above set for less 6 spends
     // Otherwise, 6 spends are required
     const int nMaxSpendAmount = 130;
@@ -457,7 +456,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test99)
         j++;
     }
     CoinsHeld = nTotalAmount / COIN;
-    std::cout << "Current Amount held = " << CoinsHeld << ": ";
+    std::cout << "Curremt Amount held = " << CoinsHeld << ": ";
 
     // Show what we have
     j = 0;

@@ -1,5 +1,4 @@
 // Copyright (c) 2011-2013 The Bitcoin developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -47,7 +46,6 @@ public:
         ZeromintEnable,      // bool
         ZeromintPercentage,  // int
         ZeromintPrefDenom,   // int
-        HideZeroBalances,    // bool
         AnonymizeWagerrAmount, //int
         ShowMasternodesTab,  // bool
         Listen,              // bool
@@ -88,7 +86,6 @@ private:
     int nDisplayUnit;
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
-    bool fHideZeroBalances;
     /* settings that were overriden by command-line */
     QString strOverriddenByCommandLine;
 
@@ -102,7 +99,6 @@ signals:
     void preferredDenomChanged(int);
     void anonymizeWagerrAmountChanged(int);
     void coinControlFeaturesChanged(bool);
-    void hideZeroBalancesChanged(bool);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H

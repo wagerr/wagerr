@@ -62,12 +62,12 @@
         <translation>Ontvangstadressen</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Dit zijn uw Wagerradressen om betalingen mee te verzenden. Controleer altijd zowel het bedrag als het ontvangstadres voor het verzenden.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Dit zijn uw WAGERRadressen om betalingen mee te verzenden. Controleer altijd zowel het bedrag als het ontvangstadres voor het verzenden.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Dit zijn uw Wagerradressen waarop betalingen kunnen worden ontvangen. Het wordt aangeraden om een nieuw ontvangstadres voor elke transactie te gebruiken.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Dit zijn uw WAGERRadressen waarop betalingen kunnen worden ontvangen. Het wordt aangeraden om een nieuw ontvangstadres voor elke transactie te gebruiken.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -172,8 +172,8 @@
         <translation>Bevestig versleuteling van de portemonnee</translation>
     </message>
     <message>
-        <source>Wagerr will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>Wagerr zal nu afsluiten om het versleutelingsproces te voltooien. Onthoud dat het versleutelen van uw portemonnee u niet volledig kan beschermen: Malware kan uw computer infecteren en uw WGRs stelen.</translation>
+        <source>WAGERR will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
+        <translation>WAGERR zal nu afsluiten om het versleutelingsproces te voltooien. Onthoud dat het versleutelen van uw portemonnee u niet volledig kan beschermen: Malware kan uw computer infecteren en uw WGRs stelen.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -236,15 +236,15 @@
     </message>
     <message>
         <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Voer een Wagerr adres in dat u wilt versleutelen met BIP 38. Voer een wachtwoord in, in het middelste veld. Druk op versleutelen om de versleutelde geheime sleutel te berekenen.</translation>
+        <translation>Voer een WAGERR adres in dat u wilt versleutelen met BIP 38. Voer een wachtwoord in, in het middelste veld. Druk op versleutelen om de versleutelde geheime sleutel te berekenen.</translation>
     </message>
     <message>
         <source>Address:</source>
         <translation>Adres:</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Het Wagerr adres om het bericht met te ondertekenen</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Het WAGERR adres om het bericht met te ondertekenen</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -275,8 +275,8 @@
         <translation>Kopieer de huidige handtekening naar het systeemklembord</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Onderteken het bericht om te bewijzen dat u het Wagerr adres bezit</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Onderteken het bericht om te bewijzen dat u het WAGERR adres bezit</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
@@ -299,12 +299,12 @@
         <translation>Voer de BIP 38 versleutelde geheime sleutel in. Voer het wachtwoord in, in het middelste veld. Druk op Ontsleutelen Sleutel om de geheime sleutel te berekenen.  Nadat de geheime sleutel is ontsleuteld, zal het klikken op 'Adres Importeren' de geheime sleutel toevoegen aan de portemonnee.</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>Het Wagerr adres waarmee het bericht was ondertekend</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>Het WAGERR adres waarmee het bericht was ondertekend</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Controleer een bericht om te verifiëren dat het ondertekend is door het gespecificeerde Wagerr adres</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Controleer een bericht om te verifiëren dat het ondertekend is door het gespecificeerde WAGERR adres</translation>
     </message>
     <message>
         <source>Decrypt &amp;Key</source>
@@ -594,16 +594,16 @@
         <translation>Tabblad werkbalk</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Kern</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Kern</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Verstuur munten naar een Wagerr adres</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Verstuur munten naar een WAGERR adres</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
-        <translation>Vraag betaling aan (genereert QR-codes en Wagerr: URI's)</translation>
+        <translation>Vraag betaling aan (genereert QR-codes en WAGERR: URI's)</translation>
     </message>
     <message>
         <source>&amp;Masternodes</source>
@@ -614,24 +614,24 @@
         <translation>Bekijk masternodes</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;Over Wagerr Kern</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;Over WAGERR Kern</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Toon informatie over Wagerr Kern</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Toon informatie over WAGERR Kern</translation>
     </message>
     <message>
-        <source>Modify configuration options for Wagerr</source>
-        <translation>Wijzig Wagerr configuratie opties</translation>
+        <source>Modify configuration options for WAGERR</source>
+        <translation>Wijzig WAGERR configuratie opties</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Onderteken berichten met uw Wagerr adressen om te bewijzen dat u deze adressen bezit</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Onderteken berichten met uw WAGERR adressen om te bewijzen dat u deze adressen bezit</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Controleer berichten om te verifiëren dat deze ondertekend zijn met de gespecificeerde Wagerr adressen</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Controleer berichten om te verifiëren dat deze ondertekend zijn met de gespecificeerde WAGERR adressen</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -662,8 +662,8 @@
         <translation>Open Masternode configuratiebestand</translation>
     </message>
     <message>
-        <source>Open a Wagerr: URI or payment request</source>
-        <translation>Open een Wagerr: URI of betaalverzoek</translation>
+        <source>Open a WAGERR: URI or payment request</source>
+        <translation>Open een WAGERR: URI of betaalverzoek</translation>
     </message>
     <message>
         <source>&amp;Blockchain explorer</source>
@@ -674,12 +674,12 @@
         <translation>Block verkenner venster</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Wagerr Core client</translation>
+        <source>WAGERR Core client</source>
+        <translation>WAGERR Core client</translation>
     </message>
     <message numerus="yes">
-        <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform>%n actieve verbinding(en) naar het Wagerr netwerk</numerusform><numerusform>%n actieve verbinding(en) naar het Wagerr netwerk</numerusform></translation>
+        <source>%n active connection(s) to WAGERR network</source>
+        <translation><numerusform>%n actieve verbinding(en) naar het WAGERR netwerk</numerusform><numerusform>%n actieve verbinding(en) naar het WAGERR netwerk</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -1042,8 +1042,8 @@ MultiSend: %1</translation>
         <translation>Wijzig verzendadres</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>Het ingevoerde adres: "%1" is geen geldig Wagerr adres.</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>Het ingevoerde adres: "%1" is geen geldig WAGERR adres.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1072,16 +1072,16 @@ MultiSend: %1</translation>
         <translation>versie</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Kern</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Kern</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>Over Wagerr Core</translation>
+        <source>About WAGERR Core</source>
+        <translation>Over WAGERR Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1111,16 +1111,16 @@ MultiSend: %1</translation>
         <translation>Welkom</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Welkom bij Wagerr Core</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Welkom bij WAGERR Core</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
         <translation>Gebruik de standaard datafolder </translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Kern</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Kern</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1336,20 +1336,20 @@ MultiSend: %1</translation>
         <translation>Expert</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
-        <translation>Wagerr automatisch opstarten na inloggen op het systeem.</translation>
+        <source>Automatically start WAGERR after logging in to the system.</source>
+        <translation>WAGERR automatisch opstarten na inloggen op het systeem.</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;Wagerr starten bij systeemlogin</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;WAGERR starten bij systeemlogin</translation>
     </message>
     <message>
         <source>&amp;Network</source>
         <translation>&amp;Netwerk</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Wagerr.</source>
-        <translation>De gebruikersinterface taal kan hier ingesteld worden. Deze instelling zal uitgevoerd na herstart van Wagerr.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting WAGERR.</source>
+        <translation>De gebruikersinterface taal kan hier ingesteld worden. Deze instelling zal uitgevoerd na herstart van WAGERR.</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1500,8 +1500,8 @@ MultiSend: %1</translation>
 <context>
     <name>PrivacyDialog</name>
     <message>
-        <source>Enter an amount of Wgr to convert to zWgr</source>
-        <translation>Vul de hoeveleheid in om Wgr te converteren naar zWgr</translation>
+        <source>Enter an amount of Piv to convert to zPiv</source>
+        <translation>Vul de hoeveleheid in om Piv te converteren naar zPiv</translation>
     </message>
     <message>
         <source>0</source>
@@ -1619,8 +1619,8 @@ MultiSend: %1</translation>
         <translation>Hoeveelheid</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Voer een Wagerr adres in (b.v. %1)</translation>
+        <source>Enter a WAGERR address (e.g. %1)</source>
+        <translation>Voer een WAGERR adres in (b.v. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -1821,8 +1821,8 @@ MultiSend: %1</translation>
         <translation>Uit:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
-        <translation>Welkom bij de Wagerr RPC console.</translation>
+        <source>Welcome to the WAGERR RPC console.</source>
+        <translation>Welkom bij de WAGERR RPC console.</translation>
     </message>
     <message>
         <source>%1 B</source>
@@ -2121,8 +2121,8 @@ MultiSend: %1</translation>
         <translation>anonieme financiën</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
-        <translation>Waarschuwing: Ongeldig Wagerr adres</translation>
+        <source>Warning: Invalid WAGERR address</source>
+        <translation>Waarschuwing: Ongeldig WAGERR adres</translation>
     </message>
     <message>
         <source>any available funds (not recommended)</source>
@@ -2176,8 +2176,8 @@ MultiSend: %1</translation>
         <translation>Betaal &amp;Naar:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
-        <translation>Het Wagerr adres om de betaling naar te verzenden</translation>
+        <source>The WAGERR address to send the payment to</source>
+        <translation>Het WAGERR adres om de betaling naar te verzenden</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2231,8 +2231,8 @@ MultiSend: %1</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
-        <translation>Wagerr Core is aan het afsluiten...</translation>
+        <source>WAGERR Core is shutting down...</source>
+        <translation>WAGERR Core is aan het afsluiten...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -2250,8 +2250,8 @@ MultiSend: %1</translation>
         <translation>&amp;Onderteken Bericht</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Het Wagerr adres om het bericht met te ondertekenen</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Het WAGERR adres om het bericht met te ondertekenen</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2282,16 +2282,16 @@ MultiSend: %1</translation>
         <translation>Kopieer de huidige handtekening naar het systeemklembord</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Onderteken het bericht om te bewijzen dat u het Wagerr adres bezit</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Onderteken het bericht om te bewijzen dat u het WAGERR adres bezit</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>Het Wagerr adres waarmee het bericht was ondertekend</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>Het WAGERR adres waarmee het bericht was ondertekend</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Controleer een bericht om te verifiëren dat het ondertekend is door het gespecificeerde Wagerr adres</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Controleer een bericht om te verifiëren dat het ondertekend is door het gespecificeerde WAGERR adres</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -2361,8 +2361,8 @@ MultiSend: %1</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Kern</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Kern</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -2377,8 +2377,8 @@ MultiSend: %1</translation>
         <translation>De Dash Core ontwikkelaars</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
-        <translation>De Wagerr Core ontwikkelaars</translation>
+        <source>The WAGERR Core developers</source>
+        <translation>De WAGERR Core ontwikkelaars</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -2737,10 +2737,10 @@ MultiSend: %1</translation>
     </message>
 </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>ZPivControlDialog</name>
     <message>
-        <source>Select zWgr to Spend</source>
-        <translation>Selecteer zWgr om te spenderen</translation>
+        <source>Select zPiv to Spend</source>
+        <translation>Selecteer zPiv om te spenderen</translation>
     </message>
     <message>
         <source>Quantity</source>
@@ -2751,8 +2751,8 @@ MultiSend: %1</translation>
         <translation>0</translation>
     </message>
     <message>
-        <source>zWgr</source>
-        <translation>zWgr</translation>
+        <source>zPiv</source>
+        <translation>zPiv</translation>
     </message>
     <message>
         <source>Select/Deselect All</source>
@@ -2804,14 +2804,6 @@ MultiSend: %1</translation>
     <message>
         <source>Copyright (C) 2015-%i The PIVX Core Developers</source>
         <translation>Copyright (C) 2015-%i The PIVX Core Ontwikkelaars</translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2018-%i The Wagerr Core Developers</source>
-        <translation>Copyright (C) 2018-%i The Wagerr Core Ontwikkelaars</translation>
-    </message>
-    <message>
-        <source>Copyright (C) %i The Wagerr Core Developers</source>
-        <translation>Copyright (C) %i The Wagerr Core Ontwikkelaars</translation>
     </message>
     <message>
         <source>Debugging/Testing options:</source>

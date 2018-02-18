@@ -23,8 +23,8 @@ Build-Depends: debhelper,
  libprotobuf-dev, protobuf-compiler
 Standards-Version: 3.9.2
 Homepage: http://www.wagerr.com
-Vcs-Git: git://github.com/wagerr/wagerr.git
-Vcs-Browser: http://github.com/wagerr/wagerr
+Vcs-Git: git://github.com/WAGERR-Project/WAGERR.git
+Vcs-Browser: http://github.com/WAGERR-Project/WAGERR
 
 Package: wagerrd
 Architecture: any

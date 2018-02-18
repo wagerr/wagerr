@@ -62,12 +62,12 @@
         <translation>Indirizzi di ricezione</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Questi sono gli indirizzi Wagerr per l'invio di pagamenti. Controlla sempre l'importo e l'indirizzo di ricezione prima di inviare valuta.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Questi sono gli indirizzi WAGERR per l'invio di pagamenti. Controlla sempre l'importo e l'indirizzo di ricezione prima di inviare valuta.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Questi sono gli indirizzi Wagerr per la ricezione di pagamenti. Si raccomanda di utilizzare un indirizzo diverso per ogni transazione.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Questi sono gli indirizzi WAGERR per la ricezione di pagamenti. Si raccomanda di utilizzare un indirizzo diverso per ogni transazione.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -176,8 +176,8 @@
         <translation>Conferma cifratura portafoglio</translation>
     </message>
     <message>
-        <source>Wagerr will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>Wagerr verrà ora chiuso per completare il processo di cifratura. Ricorda che crittografare il tuo portafoglio non protegge completamente i tuoi WGR dal furto da parte di software malevoli che potrebbero infettare il tuo computer.</translation>
+        <source>WAGERR will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
+        <translation>WAGERR verrà ora chiuso per completare il processo di cifratura. Ricorda che crittografare il tuo portafoglio non protegge completamente i tuoi WGR dal furto da parte di software malevoli che potrebbero infettare il tuo computer.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -247,8 +247,8 @@
         <translation>Indirizzo:</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>L'indirizzo Wagerr per firmare il messaggio con</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>L'indirizzo WAGERR per firmare il messaggio con</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -279,8 +279,8 @@
         <translation>Copiare la firma corrente negli Appunti di sistema</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Firmare il messaggio per dimostrare di possedere questo indirizzo Wagerr</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Firmare il messaggio per dimostrare di possedere questo indirizzo WAGERR</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
@@ -303,12 +303,12 @@
         <translation>Immettere la chiave privata codificata BIP 38. Inserire la passphrase nella casella centrale. Fare clic su Decripta Chiave per calcolare la chiave privata. Dopo che la chiave viene decrittata, cliccando su "Importa indirizzo" verrà aggiunta questa chiave privata al portafoglio.</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>L'indirizzo Wagerr con cui è stato firmato il messaggio</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>L'indirizzo WAGERR con cui è stato firmato il messaggio</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Verificare il messaggio per assicurarsi che sia stato firmato con l'indirizzo Wagerr specificato </translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Verificare il messaggio per assicurarsi che sia stato firmato con l'indirizzo WAGERR specificato </translation>
     </message>
     <message>
         <source>Decrypt &amp;Key</source>
@@ -590,12 +590,12 @@
         <translation>Schede degli strumenti</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Invia monete all' indirizzo Wagerr</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Invia monete all' indirizzo WAGERR</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -610,24 +610,24 @@
         <translation>Esplora i masternodes</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;Informazioni Wagerr Core</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;Informazioni WAGERR Core</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Visualizza informazioni su Wagerr Core</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Visualizza informazioni su WAGERR Core</translation>
     </message>
     <message>
-        <source>Modify configuration options for Wagerr</source>
-        <translation>Modifica le opzioni di configurazione per Wagerr</translation>
+        <source>Modify configuration options for WAGERR</source>
+        <translation>Modifica le opzioni di configurazione per WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Firma i messaggi con i tuoi indirizzi Wagerr per dimostrare di essere il proprietario </translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Firma i messaggi con i tuoi indirizzi WAGERR per dimostrare di essere il proprietario </translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Verifica i messaggi per assicurarsi che siano stati firmati con indirizzi Wagerr specifici</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Verifica i messaggi per assicurarsi che siano stati firmati con indirizzi WAGERR specifici</translation>
     </message>
     <message>
         <source>Encrypt and decrypt private keys using a passphrase</source>
@@ -638,16 +638,16 @@
         <translation>Impostazioni MultiSend</translation>
     </message>
     <message>
-        <source>Open a Wagerr: URI or payment request</source>
-        <translation>Apri un Wagerr: URI o richiesta di pagamento</translation>
+        <source>Open a WAGERR: URI or payment request</source>
+        <translation>Apri un WAGERR: URI o richiesta di pagamento</translation>
     </message>
     <message>
         <source>Block explorer window</source>
         <translation>Finestra Block Explorer</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Mostra il messaggio di aiuto Wagerr Core per ottenere un elenco con le possibili opzioni di riga di comando Wagerr</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Mostra il messaggio di aiuto WAGERR Core per ottenere un elenco con le possibili opzioni di riga di comando WAGERR</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -888,8 +888,8 @@ MultiSend: %1</translation>
         <translation>versione</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
@@ -915,8 +915,8 @@ MultiSend: %1</translation>
         <translation>Benvenuto</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1144,8 +1144,8 @@ MultiSend: %1</translation>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>L'indirizzo Wagerr per firmare il messaggio con</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>L'indirizzo WAGERR per firmare il messaggio con</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -1168,16 +1168,16 @@ MultiSend: %1</translation>
         <translation>Copiare la firma corrente negli Appunti di sistema</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Firmare il messaggio per dimostrare di possedere questo indirizzo Wagerr</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Firmare il messaggio per dimostrare di possedere questo indirizzo WAGERR</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>L'indirizzo Wagerr con cui è stato firmato il messaggio</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>L'indirizzo WAGERR con cui è stato firmato il messaggio</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Verificare il messaggio per assicurarsi che sia stato firmato con l'indirizzo Wagerr specificato </translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Verificare il messaggio per assicurarsi che sia stato firmato con l'indirizzo WAGERR specificato </translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
@@ -1215,8 +1215,8 @@ MultiSend: %1</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
@@ -1311,7 +1311,7 @@ MultiSend: %1</translation>
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>ZPivControlDialog</name>
     </context>
 <context>
     <name>wagerr-core</name>

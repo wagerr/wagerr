@@ -2,7 +2,6 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -33,7 +32,7 @@ using namespace std;
 
 //////////////////////////////////////////////////////////////////////////////
 //
-// WagerrMiner
+// WAGERRMiner
 //
 
 //
@@ -119,6 +118,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     CMutableTransaction txNew;
     txNew.vin.resize(1);
     txNew.vin[0].prevout.SetNull();
+    txNew.vin[0].scriptSig.clear();
     txNew.vout.resize(1);
     txNew.vout[0].scriptPubKey = scriptPubKeyIn;
     pblock->vtx.push_back(txNew);
@@ -319,7 +319,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             if (!view.HaveInputs(tx))
                 continue;
 
-            // double check that there are no double spent zWgr spends in this block or tx
+            // double check that there are no double spent zPiv spends in this block or tx
             if (tx.IsZerocoinSpend()) {
                 int nHeightTx = 0;
                 if (IsTransactionInChain(tx.GetHash(), nHeightTx))
@@ -340,7 +340,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                         vTxSerials.emplace_back(spend.getCoinSerialNumber());
                     }
                 }
-                //This zWgr serial has already been included in the block, do not add this tx.
+                //This zPiv serial has already been included in the block, do not add this tx.
                 if (fDoubleSerial)
                     continue;
             }
@@ -433,7 +433,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             return NULL;
         }
     }
-
     return pblocktemplate.release();
 }
 
@@ -473,16 +472,25 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, CWallet* pwallet,
     return CreateNewBlock(scriptPubKey, pwallet, fProofOfStake);
 }
 
-bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
+bool CheckWork(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
 {
-    LogPrintf("%s\n", pblock->ToString());
+    uint256 hash = pblock->GetHash();
+    uint256 hashTarget = uint256().SetCompact(pblock->nBits);
+
+    if (hash > hashTarget)
+        return false;
+
+    //// debug print
+    LogPrintf("BitcoinMiner:\n");
+    LogPrintf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex(), hashTarget.GetHex());
+    pblock->print();
     LogPrintf("generated %s\n", FormatMoney(pblock->vtx[0].vout[0].nValue));
 
     // Found a solution
     {
         LOCK(cs_main);
         if (pblock->hashPrevBlock != chainActive.Tip()->GetBlockHash())
-            return error("WagerrMiner : generated block is stale");
+            return error("BitcoinMiner : generated block is stale");
     }
 
     // Remove key from key pool
@@ -497,12 +505,11 @@ bool ProcessBlockFound(CBlock* pblock, CWallet& wallet, CReserveKey& reservekey)
     // Process this block the same as if we had received it from another node
     CValidationState state;
     if (!ProcessNewBlock(state, NULL, pblock))
-        return error("WagerrMiner : ProcessNewBlock, block not accepted");
+        return error("WAGERRMiner : ProcessBlock, block not accepted");
 
     for (CNode* node : vNodes) {
         node->PushInventory(CInv(MSG_BLOCK, pblock->GetHash()));
     }
-
     return true;
 }
 
@@ -512,7 +519,7 @@ bool fGenerateBitcoins = false;
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
 {
-    LogPrintf("WagerrMiner started\n");
+    LogPrintf("WAGERRMiner started\n");
     SetThreadPriority(THREAD_PRIORITY_LOWEST);
     RenameThread("wagerr-miner");
 
@@ -581,13 +588,13 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
 
             LogPrintf("CPUMiner : proof-of-stake block was signed %s \n", pblock->GetHash().ToString().c_str());
             SetThreadPriority(THREAD_PRIORITY_NORMAL);
-            ProcessBlockFound(pblock, *pwallet, reservekey);
+            CheckWork(pblock, *pwallet, reservekey);
             SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
             continue;
         }
 
-        LogPrintf("Running WagerrMiner with %u transactions in block (%u bytes)\n", pblock->vtx.size(),
+        LogPrintf("Running WAGERRMiner with %u transactions in block (%u bytes)\n", pblock->vtx.size(),
             ::GetSerializeSize(*pblock, SER_NETWORK, PROTOCOL_VERSION));
 
         //
@@ -606,7 +613,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                     SetThreadPriority(THREAD_PRIORITY_NORMAL);
                     LogPrintf("BitcoinMiner:\n");
                     LogPrintf("proof-of-work found  \n  hash: %s  \ntarget: %s\n", hash.GetHex(), hashTarget.GetHex());
-                    ProcessBlockFound(pblock, *pwallet, reservekey);
+                    CheckWork(pblock, *pwallet, reservekey);
                     SetThreadPriority(THREAD_PRIORITY_LOWEST);
 
                     // In regression test mode, stop mining after a block is found. This
@@ -676,9 +683,9 @@ void static ThreadBitcoinMiner(void* parg)
         BitcoinMiner(pwallet, false);
         boost::this_thread::interruption_point();
     } catch (std::exception& e) {
-        LogPrintf("ThreadBitcoinMiner() exception");
+        LogPrintf("ThreadBitcoinMiner() exception - %s \n", e.what());
     } catch (...) {
-        LogPrintf("ThreadBitcoinMiner() exception");
+        LogPrintf("ThreadBitcoinMiner() exception\n");
     }
 
     LogPrintf("ThreadBitcoinMiner exiting\n");

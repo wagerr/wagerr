@@ -62,12 +62,12 @@
         <translation>Endereços de recebimento</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Esses são seus endereços Wagerr para enviar pagamentos. Sempre confira a quantidade e os endereços de destino antes de enviar moedas.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Esses são seus endereços WAGERR para enviar pagamentos. Sempre confira a quantidade e os endereços de destino antes de enviar moedas.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Esses são seus endereços Wagerr para receber pagamentos. É recomendado usar um novo endereço para cada transação.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Esses são seus endereços WAGERR para receber pagamentos. É recomendado usar um novo endereço para cada transação.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -176,8 +176,8 @@
         <translation>Confirmar encriptação da carteira</translation>
     </message>
     <message>
-        <source>Wagerr will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>Wagerr encerrará para terminar o processo de encriptação. Lembre-se que encriptar sua carteira não protege completamente suas WGRs contra roubo por malware infectando seu computador.</translation>
+        <source>WAGERR will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
+        <translation>WAGERR encerrará para terminar o processo de encriptação. Lembre-se que encriptar sua carteira não protege completamente suas WGRs contra roubo por malware infectando seu computador.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -247,8 +247,8 @@
         <translation>Endereço:</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Um endereço Wagerr para assinar a mensagem</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Um endereço WAGERR para assinar a mensagem</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -279,8 +279,8 @@
         <translation>Copiar a assinatura para a area de trabalho</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Assinar a Mensagem para provar que você e dono desse endereço Wagerr.</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Assinar a Mensagem para provar que você e dono desse endereço WAGERR.</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
@@ -299,8 +299,8 @@
         <translation>Criptografia BIP 38</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>O endereço Wagerr que foi assinado com</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>O endereço WAGERR que foi assinado com</translation>
     </message>
     <message>
         <source>Decrypted Key:</source>
@@ -668,8 +668,8 @@
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Um endereço Wagerr para assinar a mensagem</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Um endereço WAGERR para assinar a mensagem</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -700,12 +700,12 @@
         <translation>Copiar a assinatura para a area de trabalho</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Assinar a Mensagem para provar que você e dono desse endereço Wagerr.</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Assinar a Mensagem para provar que você e dono desse endereço WAGERR.</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>O endereço Wagerr que foi assinado com</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>O endereço WAGERR que foi assinado com</translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
@@ -903,7 +903,7 @@
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>ZPivControlDialog</name>
     </context>
 <context>
     <name>wagerr-core</name>
@@ -912,8 +912,8 @@
         <translation>Deletar todas as transações da carteira e somente recuperar aquelas partes do blockchain através de -rescan na inicialização</translation>
     </message>
     <message>
-        <source>Disable all Wagerr specific functionality (Masternodes, Obfuscation, SwiftTX, Budgeting) (0-1, default: %u)</source>
-        <translation>Desabilitar todas as funcionacilidades específicas da Wagerr (Masternodes, Ofuscação, SwiftTX, Budgeting) (0-1, default %u)</translation>
+        <source>Disable all WAGERR specific functionality (Masternodes, Obfuscation, SwiftTX, Budgeting) (0-1, default: %u)</source>
+        <translation>Desabilitar todas as funcionacilidades específicas da WAGERR (Masternodes, Ofuscação, SwiftTX, Budgeting) (0-1, default %u)</translation>
     </message>
     <message>
         <source>Connect through SOCKS5 proxy</source>
@@ -1272,8 +1272,8 @@
         <translation>Carteira esta bloqueada.</translation>
     </message>
     <message>
-        <source>Wallet needed to be rewritten: restart Wagerr Core to complete</source>
-        <translation>Carteira precisa ser reescrita: reinicie o Wagerr Core para completar.</translation>
+        <source>Wallet needed to be rewritten: restart WAGERR Core to complete</source>
+        <translation>Carteira precisa ser reescrita: reinicie o WAGERR Core para completar.</translation>
     </message>
     <message>
         <source>Wallet options:</source>

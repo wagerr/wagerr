@@ -89,7 +89,7 @@ use old versions of Upstart and do not supply the start-stop-daemon uitility.
 Copy wagerrd.init to /etc/init.d/wagerrd. Test by running "service wagerrd start".
 
 Using this script, you can adjust the path and flags to the wagerrd program by
-setting the WagerrD and FLAGS environment variables in the file
+setting the WAGERRD and FLAGS environment variables in the file
 /etc/sysconfig/wagerrd. You can also use the DAEMONOPTS environment variable here.
 
 5. Auto-respawn

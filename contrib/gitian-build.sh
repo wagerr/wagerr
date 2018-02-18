@@ -1,5 +1,4 @@
 # Copyright (c) 2016 The Bitcoin Core developers
-# Copyright (c) 2018 The Wagerr developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -245,9 +244,9 @@ then
     if [[ -n "$USE_LXC" ]]
     then
         sudo apt-get install lxc
-        bin/make-base-vm --suite trusty --arch amd64 --lxc
+        bin/make-base-vm --suite xenial --arch amd64 --lxc
     else
-        bin/make-base-vm --suite trusty --arch amd64
+        bin/make-base-vm --suite xenial --arch amd64
     fi
     popd
 fi

@@ -354,12 +354,12 @@
         <translation>A&amp;juda</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;Sobre Wagerr Core</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;Sobre WAGERR Core</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -552,12 +552,12 @@
         <translation>versió</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>Sobre Wagerr Core</translation>
+        <source>About WAGERR Core</source>
+        <translation>Sobre WAGERR Core</translation>
     </message>
     <message>
         <source>Usage:</source>
@@ -575,12 +575,12 @@
         <translation>Benvingut</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Benvingut a Wagerr Core.</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Benvingut a WAGERR Core.</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1147,8 +1147,8 @@
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -1307,7 +1307,7 @@
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>ZPivControlDialog</name>
     </context>
 <context>
     <name>wagerr-core</name>

@@ -191,7 +191,7 @@
                         <item>
                          <widget class="QLabel" name="labelzWGRSyncStatus">
                           <property name="toolTip">
-                           <string>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</string>
+                           <string>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</string>
                           </property>
                           <property name="styleSheet">
                            <string notr="true">QLabel { color: red; }</string>
@@ -252,7 +252,7 @@
                            </size>
                           </property>
                           <property name="toolTip">
-                           <string>Enter an amount of Wgr to convert to zWgr</string>
+                           <string>Enter an amount of Piv to convert to zPiv</string>
                           </property>
                           <property name="text">
                            <string>Mint Zerocoin</string>
@@ -304,7 +304,7 @@
                            </font>
                           </property>
                           <property name="toolTip">
-                           <string>Enter an amount of Wgr to convert to zWgr</string>
+                           <string>Enter an amount of Piv to convert to zPiv</string>
                           </property>
                           <property name="text">
                            <string>0.000 000 00 WGR</string>
@@ -606,21 +606,21 @@
                          <number>0</number>
                         </property>
                         <item>
-                         <widget class="QPushButton" name="pushButtonZWgrControl">
+                         <widget class="QPushButton" name="pushButtonZPivControl">
                           <property name="text">
-                           <string>zWgr Control</string>
+                           <string>zPiv Control</string>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QLabel" name="labelzWgrSelected">
+                         <widget class="QLabel" name="labelzPivSelected">
                           <property name="text">
-                           <string>zWgr Selected:</string>
+                           <string>zPiv Selected:</string>
                           </property>
                          </widget>
                         </item>
                         <item>
-                         <widget class="QLabel" name="labelzWgrSelected_int">
+                         <widget class="QLabel" name="labelzPivSelected_int">
                           <property name="text">
                            <string>0</string>
                           </property>
@@ -827,7 +827,7 @@ zWGR are mature when they have more than 20 confirmations AND more than 2 mints 
                              </size>
                             </property>
                             <property name="toolTip">
-                             <string>The Wagerr address to send the payment to. Creates local payment to yourself when empty.</string>
+                             <string>The WAGERR address to send the payment to. Creates local payment to yourself when empty.</string>
                             </property>
                            </widget>
                           </item>

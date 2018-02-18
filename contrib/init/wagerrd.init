@@ -1,6 +1,6 @@
 #!/bin/bash
 #
-#  wagerrd The Wagerr core server.
+#  wagerrd The WAGERR core server.
 #
 #
 # chkconfig: 345 80 20

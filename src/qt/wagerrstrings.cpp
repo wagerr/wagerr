@@ -1,4 +1,4 @@
-// Copyright (c) 2018 The Wagerr developers
+
 
 #include <QtGlobal>
 
@@ -35,7 +35,7 @@ QT_TRANSLATE_NOOP("wagerr-core", ""
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Calculated accumulator checkpoint is not what is recorded by block index"),
 QT_TRANSLATE_NOOP("wagerr-core", ""
-"Cannot obtain a lock on data directory %s. Wagerr Core is probably already "
+"Cannot obtain a lock on data directory %s. WAGERR Core is probably already "
 "running."),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Change automatic finalized budget voting behavior. mode=auto: Vote for only "
@@ -50,7 +50,7 @@ QT_TRANSLATE_NOOP("wagerr-core", ""
 "Delete all wallet transactions and only recover those parts of the "
 "blockchain through -rescan on startup"),
 QT_TRANSLATE_NOOP("wagerr-core", ""
-"Disable all Wagerr specific functionality (Masternodes, Zerocoin, SwiftX, "
+"Disable all WAGERR specific functionality (Masternodes, Zerocoin, SwiftX, "
 "Budgeting) (0-1, default: %u)"),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Distributed under the MIT software license, see the accompanying file "
@@ -58,7 +58,7 @@ QT_TRANSLATE_NOOP("wagerr-core", ""
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Enable SwiftX, show confirmations for locked transactions (bool, default: %s)"),
 QT_TRANSLATE_NOOP("wagerr-core", ""
-"Enable automatic wallet backups triggered after each zWgr minting (0-1, "
+"Enable automatic wallet backups triggered after each zPiv minting (0-1, "
 "default: %u)"),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Enable spork administration functionality with the appropriate private key."),
@@ -180,16 +180,16 @@ QT_TRANSLATE_NOOP("wagerr-core", ""
 "If the file does not exist, create it with owner-readable-only file "
 "permissions.\n"
 "It is also recommended to set alertnotify so you are notified of problems;\n"
-"for example: alertnotify=echo %%s | mail -s \"Wagerr Alert\" admin@foo.com\n"),
+"for example: alertnotify=echo %%s | mail -s \"WAGERR Alert\" admin@foo.com\n"),
 QT_TRANSLATE_NOOP("wagerr-core", ""
-"Unable to bind to %s on this computer. Wagerr Core is probably already running."),
+"Unable to bind to %s on this computer. WAGERR Core is probably already running."),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Unable to locate enough Obfuscation denominated funds for this transaction."),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Unable to locate enough Obfuscation non-denominated funds for this "
 "transaction that are not equal 25000 WGR."),
 QT_TRANSLATE_NOOP("wagerr-core", ""
-"Unable to locate enough funds for this transaction that are not equal 10000 "
+"Unable to locate enough funds for this transaction that are not equal 25000 "
 "WGR."),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: "
@@ -202,7 +202,7 @@ QT_TRANSLATE_NOOP("wagerr-core", ""
 "pay if you send a transaction."),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Warning: Please check that your computer's date and time are correct! If "
-"your clock is wrong Wagerr Core will not work properly."),
+"your clock is wrong WAGERR Core will not work properly."),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Warning: The network does not appear to fully agree! Some miners appear to "
 "be experiencing issues."),
@@ -259,6 +259,7 @@ QT_TRANSLATE_NOOP("wagerr-core", "Connection options:"),
 QT_TRANSLATE_NOOP("pivx-core", "Copyright (C) 2009-%i The Bitcoin Core Developers"),
 QT_TRANSLATE_NOOP("pivx-core", "Copyright (C) 2014-%i The Dash Core Developers"),
 QT_TRANSLATE_NOOP("pivx-core", "Copyright (C) 2015-%i The PIVX Core Developers"),
+QT_TRANSLATE_NOOP("pivx-core", "Copyright (C) 2017-%i The Wagerr Core Developers"),
 QT_TRANSLATE_NOOP("wagerr-core", "Corrupted block database detected"),
 QT_TRANSLATE_NOOP("wagerr-core", "Could not parse -rpcbind value %s as network address"),
 QT_TRANSLATE_NOOP("wagerr-core", "Could not parse masternode.conf"),
@@ -288,7 +289,7 @@ QT_TRANSLATE_NOOP("wagerr-core", "Error initializing wallet database environment
 QT_TRANSLATE_NOOP("wagerr-core", "Error loading block database"),
 QT_TRANSLATE_NOOP("wagerr-core", "Error loading wallet.dat"),
 QT_TRANSLATE_NOOP("wagerr-core", "Error loading wallet.dat: Wallet corrupted"),
-QT_TRANSLATE_NOOP("wagerr-core", "Error loading wallet.dat: Wallet requires newer version of Wagerr Core"),
+QT_TRANSLATE_NOOP("wagerr-core", "Error loading wallet.dat: Wallet requires newer version of WAGERR Core"),
 QT_TRANSLATE_NOOP("wagerr-core", "Error opening block database"),
 QT_TRANSLATE_NOOP("wagerr-core", "Error reading from database, shutting down."),
 QT_TRANSLATE_NOOP("wagerr-core", "Error recovering public key."),
@@ -319,7 +320,7 @@ QT_TRANSLATE_NOOP("wagerr-core", "Incompatible mode."),
 QT_TRANSLATE_NOOP("wagerr-core", "Incompatible version."),
 QT_TRANSLATE_NOOP("wagerr-core", "Incorrect or no genesis block found. Wrong datadir for network?"),
 QT_TRANSLATE_NOOP("wagerr-core", "Information"),
-QT_TRANSLATE_NOOP("wagerr-core", "Initialization sanity check failed. Wagerr Core is shutting down."),
+QT_TRANSLATE_NOOP("wagerr-core", "Initialization sanity check failed. WAGERR Core is shutting down."),
 QT_TRANSLATE_NOOP("wagerr-core", "Input is not valid."),
 QT_TRANSLATE_NOOP("wagerr-core", "Insufficient funds"),
 QT_TRANSLATE_NOOP("wagerr-core", "Insufficient funds."),
@@ -473,7 +474,7 @@ QT_TRANSLATE_NOOP("wagerr-core", "Verifying blocks..."),
 QT_TRANSLATE_NOOP("wagerr-core", "Verifying wallet..."),
 QT_TRANSLATE_NOOP("wagerr-core", "Wallet %s resides outside data directory %s"),
 QT_TRANSLATE_NOOP("wagerr-core", "Wallet is locked."),
-QT_TRANSLATE_NOOP("wagerr-core", "Wallet needed to be rewritten: restart Wagerr Core to complete"),
+QT_TRANSLATE_NOOP("wagerr-core", "Wallet needed to be rewritten: restart WAGERR Core to complete"),
 QT_TRANSLATE_NOOP("wagerr-core", "Wallet options:"),
 QT_TRANSLATE_NOOP("wagerr-core", "Wallet window title"),
 QT_TRANSLATE_NOOP("wagerr-core", "Warning"),

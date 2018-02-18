@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2018 The Bitcoin Core developers
+// Copyright (c) 2012-2013 The Bitcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -93,33 +93,19 @@ BOOST_AUTO_TEST_CASE(rpc_rawparams)
 BOOST_AUTO_TEST_CASE(rpc_rawsign)
 {
     UniValue r;
-    /*
-     * Address1: WkuX4uxc1gKzgvate21cUvQYyTKoePwQdZ
-     * PublicKey1: 03f97b647340e9632717f807d1670c630c54fa1b57512518e258fa8bb3a5d59a97
-     * PrivateKey1: WaYX7XwyhDrpfWUZQzauYS4LtzC1cfcaPG6gEThXubderQqygaRH
-     * 
-     * Address2: WUFjGMr3WR2pWATNsyuWmCtjRT4yoYmhTk
-     * PublicKey2: 03cd907d6c40edae41047f2b7cbe1f1ba4414a10e0e8a78d9ff2ed516df3edffa2
-     * PrivateKey2: WT2TTL9jMF1BmdUjLR4G9gYdGrh1jRMbVGMXSZHXnGExygmKerVA
-     */
-
     // input is a 1-of-2 multisig (so is output):
     string prevout =
-      "[{\"txid\":\"48b7292f6a2a1cd2f4db2c74ffd85dce5a9b82abe1d67429dea174c81616d520\","
-      "\"vout\":0,\"scriptPubKey\":\"a91426c749b9d725387c2c1e7e766947eed6157aa63a87\","
-      "\"redeemScript\":\"512103b9203a0abe492d78d988ab9643bac9267afee84391c38e2de333f3db958c9a8e2102a672cf358b693e03733ded21ce4939a6da172d88baff6d462732c71542c0122c52ae\"}]";
-    string tocreate = string("createrawtransaction ")+prevout+" "+"{\"We1cxnVbJixNbkDFPRseDCq4dVs9Ua4c9W\":1.399}";
-    r = CallRPC(tocreate);
-    // wagerr-cli createrawtransaction '[{"txid":"48b7292f6a2a1cd2f4db2c74ffd85dce5a9b82abe1d67429dea174c81616d520","vout":0,"scriptPubKey":"a91426c749b9d725387c2c1e7e766947eed6157aa63a87","redeemScript":"512103b9203a0abe492d78d988ab9643bac9267afee84391c38e2de333f3db958c9a8e2102a672cf358b693e03733ded21ce4939a6da172d88baff6d462732c71542c0122c52ae"}]' '{"We1cxnVbJixNbkDFPRseDCq4dVs9Ua4c9W":1.399}'
+      "[{\"txid\":\"dd2888870cdc3f6e92661f6b0829667ee4bb07ed086c44205e726bbf3338f726\","
+      "\"vout\":1,\"scriptPubKey\":\"a914f5404a39a4799d8710e15db4c4512c5e06f97fed87\","
+      "\"redeemScript\":\"5121021431a18c7039660cd9e3612a2a47dc53b69cb38ea4ad743b7df8245fd0438f8e21029bbeff390ce736bd396af43b52a1c14ed52c086b1e5585c15931f68725772bac52ae\"}]";
+    r = CallRPC(string("createrawtransaction ")+prevout+" "+
+      "{\"6ckcNMWRYgTnPcrTXCdwhDnMLwj3zwseej\":1}");
     string notsigned = r.get_str();
-    string privkey1 = "\"WaMkFrveirRCBqAA4duGMUz3F7t4MQQcjBbv4XJVu8ozYhN287rY\"";
-    string privkey2 = "\"WTL993ayknTZdgp2n1Dv9kudhWt2JVkaH8fiHaVfuMccUaabWHNV\"";
-    string tosign1 = string("signrawtransaction ")+notsigned+" "+prevout+" "+"[]";
-    r = CallRPC(tosign1);
+    string privkey1 = "\"YVobcS47fr6kceZy9LzLJR8WQ6YRpUwYKoJhrnEXepebMxaSpbnn\"";
+    string privkey2 = "\"YRyMjG8hbm8jHeDMAfrzSeHq5GgAj7kuHFvJtMudCUH3sCkq1WtA\"";
+    r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"[]");
     BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == false);
-    string tosign2 = string("signrawtransaction ")+notsigned+" "+prevout+" "+"["+privkey1+","+privkey2+"]";
-    r = CallRPC(tosign2);
-    // wagerr-cli signrawtransaction 010000000120d51616c874a1de2974d6e1ab829b5ace5dd8ff742cdbf4d21c2a6a2f29b7480000000000ffffffff0160b45608000000001976a914a83e3de0d72ba944fd637a646cf4848a13c55af888ac00000000 '[{"txid":"48b7292f6a2a1cd2f4db2c74ffd85dce5a9b82abe1d67429dea174c81616d520","vout":0,"scriptPubKey":"a91426c749b9d725387c2c1e7e766947eed6157aa63a87","redeemScript":"512103b9203a0abe492d78d988ab9643bac9267afee84391c38e2de333f3db958c9a8e2102a672cf358b693e03733ded21ce4939a6da172d88baff6d462732c71542c0122c52ae"}]' '["WaMkFrveirRCBqAA4duGMUz3F7t4MQQcjBbv4XJVu8ozYhN287rY","WTL993ayknTZdgp2n1Dv9kudhWt2JVkaH8fiHaVfuMccUaabWHNV"]'
+    r = CallRPC(string("signrawtransaction ")+notsigned+" "+prevout+" "+"["+privkey1+","+privkey2+"]");
     BOOST_CHECK(find_value(r.get_obj(), "complete").get_bool() == true);
 }
 
@@ -221,7 +207,7 @@ BOOST_AUTO_TEST_CASE(rpc_ban)
     UniValue ar = r.get_array();
     UniValue o1 = ar[0].get_obj();
     UniValue adr = find_value(o1, "address");
-    BOOST_CHECK_EQUAL(adr.get_str(), "127.0.0.0/32");
+    BOOST_CHECK_EQUAL(adr.get_str(), "127.0.0.0/255.255.255.255");
     BOOST_CHECK_NO_THROW(CallRPC(string("setban 127.0.0.0 remove")));;
     BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
     ar = r.get_array();
@@ -233,7 +219,7 @@ BOOST_AUTO_TEST_CASE(rpc_ban)
     o1 = ar[0].get_obj();
     adr = find_value(o1, "address");
     UniValue banned_until = find_value(o1, "banned_until");
-    BOOST_CHECK_EQUAL(adr.get_str(), "127.0.0.0/24");
+    BOOST_CHECK_EQUAL(adr.get_str(), "127.0.0.0/255.255.255.0");
     BOOST_CHECK_EQUAL(banned_until.get_int64(), 1607731200); // absolute time check
 
     BOOST_CHECK_NO_THROW(CallRPC(string("clearbanned")));
@@ -244,7 +230,7 @@ BOOST_AUTO_TEST_CASE(rpc_ban)
     o1 = ar[0].get_obj();
     adr = find_value(o1, "address");
     banned_until = find_value(o1, "banned_until");
-    BOOST_CHECK_EQUAL(adr.get_str(), "127.0.0.0/24");
+    BOOST_CHECK_EQUAL(adr.get_str(), "127.0.0.0/255.255.255.0");
     int64_t now = GetTime();
     BOOST_CHECK(banned_until.get_int64() > now);
     BOOST_CHECK(banned_until.get_int64()-now <= 200);
@@ -264,32 +250,6 @@ BOOST_AUTO_TEST_CASE(rpc_ban)
     BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
     ar = r.get_array();
     BOOST_CHECK_EQUAL(ar.size(), 0);
-
-    BOOST_CHECK_THROW(r = CallRPC(string("setban test add")), runtime_error); //invalid IP
-
-    //IPv6 tests
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("setban FE80:0000:0000:0000:0202:B3FF:FE1E:8329 add")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
-    ar = r.get_array();
-    o1 = ar[0].get_obj();
-    adr = find_value(o1, "address");
-    BOOST_CHECK_EQUAL(adr.get_str(), "fe80::202:b3ff:fe1e:8329/128");
-
-    BOOST_CHECK_NO_THROW(CallRPC(string("clearbanned")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("setban 2001:db8::/ffff:fffc:0:0:0:0:0:0 add")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
-    ar = r.get_array();
-    o1 = ar[0].get_obj();
-    adr = find_value(o1, "address");
-    BOOST_CHECK_EQUAL(adr.get_str(), "2001:db8::/30");
-
-    BOOST_CHECK_NO_THROW(CallRPC(string("clearbanned")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("setban 2001:4d48:ac57:400:cacf:e9ff:fe1d:9c63/128 add")));
-    BOOST_CHECK_NO_THROW(r = CallRPC(string("listbanned")));
-    ar = r.get_array();
-    o1 = ar[0].get_obj();
-    adr = find_value(o1, "address");
-    BOOST_CHECK_EQUAL(adr.get_str(), "2001:4d48:ac57:400:cacf:e9ff:fe1d:9c63/128");
 }
 
 

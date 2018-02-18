@@ -1,7 +1,7 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
+// Copyright (c) 2017-2018 The PIVX developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -141,7 +141,7 @@ public:
             break;
         }
     }
-    
+
     void updateEntry(const QString &pubCoin, const QString &isUsed, int status)
     {
         // Find address / label in model
@@ -152,7 +152,7 @@ public:
         int lowerIndex = (lower - cachedAddressTable.begin());
         bool inModel = (lower != upper);
         AddressTableEntry::Type newEntryType = AddressTableEntry::Zerocoin;
-        
+
         switch(status)
         {
             case CT_NEW:
@@ -175,7 +175,7 @@ public:
                 parent->emitDataChanged(lowerIndex);
                 break;
         }
-        
+
     }
 
 

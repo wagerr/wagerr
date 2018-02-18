@@ -62,12 +62,12 @@
         <translation>Адреса получения</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Это ваши Wagerr-адреса для отправки платежей. Перед отправкой монет всегда проверяйте сумму и адрес получателя.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Это ваши WAGERR-адреса для отправки платежей. Перед отправкой монет всегда проверяйте сумму и адрес получателя.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Это ваши Wagerr-адреса для получения платежей. Для каждой транзакции рекомендуется использовать новый адрес получения.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Это ваши WAGERR-адреса для получения платежей. Для каждой транзакции рекомендуется использовать новый адрес получения.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -172,8 +172,8 @@
         <translation>Подтверждение шифрования кошелька</translation>
     </message>
     <message>
-        <source>Wagerr will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>Wagerr сейчас закроется, чтобы завершить процесс шифрования. Помните, что шифрование вашего кошелька не может полностью защитить ваши Wagerr от кражи с использованием вредоносного ПО.</translation>
+        <source>WAGERR will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
+        <translation>WAGERR сейчас закроется, чтобы завершить процесс шифрования. Помните, что шифрование вашего кошелька не может полностью защитить ваши WAGERR от кражи с использованием вредоносного ПО.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -236,15 +236,15 @@
     </message>
     <message>
         <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Введите Wagerr адрес, которым вы хотите зашифровать, используя BIP 38. Введите пароль в среднем поле. Нажмите "Зашифровать", чтобы создать зашиврованный секретный ключ.</translation>
+        <translation>Введите WAGERR адрес, которым вы хотите зашифровать, используя BIP 38. Введите пароль в среднем поле. Нажмите "Зашифровать", чтобы создать зашиврованный секретный ключ.</translation>
     </message>
     <message>
         <source>Address:</source>
         <translation>Адрес:</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Адрес Wagerr для подписи сообщения с помощью</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Адрес WAGERR для подписи сообщения с помощью</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -275,8 +275,8 @@
         <translation>Копировать текущую подпись в системный буфер обмена</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Подпишите сообщение, чтобы подтвердить свой адрес Wagerr</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Подпишите сообщение, чтобы подтвердить свой адрес WAGERR</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
@@ -299,12 +299,12 @@
         <translation>Введите зашифрованный с помощью BIP 38 секретный ключ. Введите секретную фразу в среднем окне. Нажмите Дешифровать Ключ чтобы создать секретный ключ. Нажав на Импортировать Адрес после дешифровки, вы добавите секретный ключ к кошельку.</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>Адрес Wagerr, которым подписано сообщение</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>Адрес WAGERR, которым подписано сообщение</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Проверте сообщение, чтобы убедиться, что оно было подписано указанным Wagerr адресом </translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Проверте сообщение, чтобы убедиться, что оно было подписано указанным WAGERR адресом </translation>
     </message>
     <message>
         <source>Decrypt &amp;Key</source>
@@ -594,16 +594,16 @@
         <translation>Панель вкладок</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Отправить монеты на Wagerr адрес</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Отправить монеты на WAGERR адрес</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
-        <translation>Запросить платежи (генерирует QR-код и Wagerr: URI)</translation>
+        <translation>Запросить платежи (генерирует QR-код и WAGERR: URI)</translation>
     </message>
     <message>
         <source>&amp;Masternodes</source>
@@ -614,24 +614,24 @@
         <translation>Обзор мастернод</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;О Wagerr Core</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;О WAGERR Core</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Показать информацию о Wagerr Core</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Показать информацию о WAGERR Core</translation>
     </message>
     <message>
-        <source>Modify configuration options for Wagerr</source>
-        <translation>Изменение параметров конфигурации Wagerr</translation>
+        <source>Modify configuration options for WAGERR</source>
+        <translation>Изменение параметров конфигурации WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Подписывайте сообщения вашими Wagerr адресами, чтобы доказать, что вы их владелец</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Подписывайте сообщения вашими WAGERR адресами, чтобы доказать, что вы их владелец</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Проверте сообщения, чтобы убедиться, что они были подписаны указанным Wagerr адресом </translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Проверте сообщения, чтобы убедиться, что они были подписаны указанным WAGERR адресом </translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -662,8 +662,8 @@
         <translation>Открыть файл настроек мастернод</translation>
     </message>
     <message>
-        <source>Open a Wagerr: URI or payment request</source>
-        <translation>Открыть Wagerr: URI или запрос платежа</translation>
+        <source>Open a WAGERR: URI or payment request</source>
+        <translation>Открыть WAGERR: URI или запрос платежа</translation>
     </message>
     <message>
         <source>&amp;Blockchain explorer</source>
@@ -674,12 +674,12 @@
         <translation>Окно обзора блока</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Смотрите помощь к программе, чтобы получить документацию ко всем возможным опциям комманды Wagerr</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Смотрите помощь к программе, чтобы получить документацию ко всем возможным опциям комманды WAGERR</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Клиент Wagerr Core</translation>
+        <source>WAGERR Core client</source>
+        <translation>Клиент WAGERR Core</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -1098,8 +1098,8 @@ MultiSend: %1</translation>
         <translation>Изменить адрес отправки</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>Введенный адрес "%1" не является Wagerr адресом.</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>Введенный адрес "%1" не является WAGERR адресом.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1144,16 +1144,16 @@ MultiSend: %1</translation>
         <translation>версия</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-бит)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>О Wagerr Core</translation>
+        <source>About WAGERR Core</source>
+        <translation>О WAGERR Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1199,16 +1199,16 @@ MultiSend: %1</translation>
         <translation>Добро пожаловать</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Добро пожаловать в Wagerr Core.</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Добро пожаловать в WAGERR Core.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>Поскольку это первый запуск программы, вы можете выбрать, где будут храниться данные Wagerr Core.</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>Поскольку это первый запуск программы, вы можете выбрать, где будут храниться данные WAGERR Core.</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Wagerr Core загрузит и сохранит копию цепочки блоков Wagerr. Каталог будет занимать около %1GB и со временем размер будет увеличиваться. Кроме того, в этом каталоге будет храниться кошелек.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR Core загрузит и сохранит копию цепочки блоков WAGERR. Каталог будет занимать около %1GB и со временем размер будет увеличиваться. Кроме того, в этом каталоге будет храниться кошелек.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1219,8 +1219,8 @@ MultiSend: %1</translation>
         <translation>Использовать другой каталог данных:</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1361,12 +1361,12 @@ MultiSend: %1</translation>
         <translation>Введите адрес для отправки</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Wagerr addresses after it matures.
-To Add: enter percentage to give and Wagerr address to add to the MultiSend vector.
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other WAGERR addresses after it matures.
+To Add: enter percentage to give and WAGERR address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>MultiSend позволяет вам автоматически отправлять до 100% вознаграждения за мастерноды и хранение, после их созревания, на другие Wagerr адреса.
-Для добавления: введите передаваемый процент и Wagerr адрес для добавления к вектору MultiSend.
+        <translation>MultiSend позволяет вам автоматически отправлять до 100% вознаграждения за мастерноды и хранение, после их созревания, на другие WAGERR адреса.
+Для добавления: введите передаваемый процент и WAGERR адрес для добавления к вектору MultiSend.
 Для удаления: введите удаляемый адрес и нажмите удалить.
 MultiSend будет неактивен до тех пор, пока вы не нажмете Включить</translation>
     </message>
@@ -1536,16 +1536,16 @@ Please check the address and try again.</source>
         <translation>Настройка Перемешивания</translation>
     </message>
     <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening Wagerr's configuration screen.</source>
-        <translation>Перемешивание было успешно выставлено на стандартные значения (%1 и 2 цикла). Вы в любой момент можете это изменить, открыв окно настройки Wagerr.</translation>
+        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
+        <translation>Перемешивание было успешно выставлено на стандартные значения (%1 и 2 цикла). Вы в любой момент можете это изменить, открыв окно настройки WAGERR.</translation>
     </message>
     <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening Wagerr's configuration screen.</source>
-        <translation>Перемешивание было успешно выбрано как высокое (%1 и 8 циклов). Вы в любой момент можете это изменить, открыв окно настройки Wagerr.</translation>
+        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
+        <translation>Перемешивание было успешно выбрано как высокое (%1 и 8 циклов). Вы в любой момент можете это изменить, открыв окно настройки WAGERR.</translation>
     </message>
     <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening Wagerr's configuration screen.</source>
-        <translation>Перемешивание было успешно выставлено на максимальное (%1 и 16 циклов). Вы в любой момент можете это изменить, открыв окно настройки Wagerr.</translation>
+        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
+        <translation>Перемешивание было успешно выставлено на максимальное (%1 и 16 циклов). Вы в любой момент можете это изменить, открыв окно настройки WAGERR.</translation>
     </message>
 </context>
 <context>
@@ -1606,8 +1606,8 @@ Please check the address and try again.</source>
         <translation>Отключив проведение неподтвержденных изменений все изменения о транзакции &lt;br/&gt;не будут использованы пока транзакция не получит хотя бы одно подтверждение.&lt;br/&gt;Также это влияет на расчет вашего баланса.</translation>
     </message>
     <message>
-        <source>Automatically open the Wagerr client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Автоматически открыть клиентский порт Wagerr через роутер. Ваш роутер должен поддерживать UPnP, а сам сервис должен быть включен.</translation>
+        <source>Automatically open the WAGERR client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Автоматически открыть клиентский порт WAGERR через роутер. Ваш роутер должен поддерживать UPnP, а сам сервис должен быть включен.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1626,12 +1626,12 @@ Please check the address and try again.</source>
         <translation>Эксперт</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
-        <translation>Автоматически запускать Wagerr после входа в систему.</translation>
+        <source>Automatically start WAGERR after logging in to the system.</source>
+        <translation>Автоматически запускать WAGERR после входа в систему.</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;Запускать Wagerr при входе в систему</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;Запускать WAGERR при входе в систему</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1658,22 +1658,22 @@ Please check the address and try again.</source>
         <translation>&amp;Сеть</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Wagerr.</source>
-        <translation>Здесь можно выставить язык интерфейса. Изменения вступят в силу после перезапуска Wagerr.</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting WAGERR.</source>
+        <translation>Здесь можно выставить язык интерфейса. Изменения вступят в силу после перезапуска WAGERR.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr-project/wagerr-project-translations</source>
         <translation>Отсутствует ваш язык или заметили незавершенный перевод? Вы можете помочь нам стать лучше:
-https://www.transifex.com/wagerr/wagerr-translations</translation>
+https://www.transifex.com/wagerr-project/wagerr-project-translations</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
         <translation>Карта порта, использующего &amp;UPnP</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Подключиться к сети Wagerr через SOCKS5 прокси.</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Подключиться к сети WAGERR через SOCKS5 прокси.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -1823,8 +1823,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Награды за хранение и мастерноды, которые еще не *созрели*</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Возможно отображаемая информация устарела. Ваш кошелек автоматически синхронизируется с сетью Wagerr после установки соединения, но этот процесс еще не завершен. </translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Возможно отображаемая информация устарела. Ваш кошелек автоматически синхронизируется с сетью WAGERR после установки соединения, но этот процесс еще не завершен. </translation>
     </message>
     <message>
         <source>Unconfirmed transactions to watch-only addresses</source>
@@ -1890,8 +1890,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Не удалось запустить wagerr: обработчик click-to-pay </translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid Wagerr address or malformed URI parameters.</source>
-        <translation>URI не интерпретируется! Причиной этому может быть неверный Wagerr адрес или неверные параметеры URI.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid WAGERR address or malformed URI parameters.</source>
+        <translation>URI не интерпретируется! Причиной этому может быть неверный WAGERR адрес или неверные параметеры URI.</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
@@ -1972,8 +1972,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
 <context>
     <name>PrivacyDialog</name>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Возможно отображаемая информация устарела. Ваш кошелек автоматически синхронизируется с сетью Wagerr после установки соединения, но этот процесс еще не завершен. </translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Возможно отображаемая информация устарела. Ваш кошелек автоматически синхронизируется с сетью WAGERR после установки соединения, но этот процесс еще не завершен. </translation>
     </message>
     <message>
         <source>0</source>
@@ -2055,8 +2055,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Сумма</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Введите адрес Wagerr (например %1)</translation>
+        <source>Enter a WAGERR address (e.g. %1)</source>
+        <translation>Введите адрес WAGERR (например %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2189,8 +2189,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Блокчейн</translation>
     </message>
     <message>
-        <source>Open the Wagerr debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Открыть протокол отладки Wagerr. Это может занять некоторе время, если файл протокола очень большой.</translation>
+        <source>Open the WAGERR debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Открыть протокол отладки WAGERR. Это может занять некоторе время, если файл протокола очень большой.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -2350,8 +2350,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Вывод:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
-        <translation>Добро пожаловать в окружение Wagerr RPC.</translation>
+        <source>Welcome to the WAGERR RPC console.</source>
+        <translation>Добро пожаловать в окружение WAGERR RPC.</translation>
     </message>
     <message>
         <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
@@ -2650,8 +2650,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Копировать изменение</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
-        <translation>Предупреждение: неправильный Wagerr адрес</translation>
+        <source>Warning: Invalid WAGERR address</source>
+        <translation>Предупреждение: неправильный WAGERR адрес</translation>
     </message>
     <message>
         <source>and SwiftTX</source>
@@ -2704,8 +2704,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
-        <translation>Wagerr Core выключается...</translation>
+        <source>WAGERR Core is shutting down...</source>
+        <translation>WAGERR Core выключается...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -2715,8 +2715,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Адрес Wagerr для подписи сообщения с помощью</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Адрес WAGERR для подписи сообщения с помощью</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2739,16 +2739,16 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Копировать текущую подпись в системный буфер обмена</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Подпишите сообщение, чтобы подтвердить свой адрес Wagerr</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Подпишите сообщение, чтобы подтвердить свой адрес WAGERR</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>Адрес Wagerr, которым подписано сообщение</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>Адрес WAGERR, которым подписано сообщение</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Проверте сообщение, чтобы убедиться, что оно было подписано указанным Wagerr адресом </translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Проверте сообщение, чтобы убедиться, что оно было подписано указанным WAGERR адресом </translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
@@ -2794,8 +2794,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -2810,8 +2810,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Разработчики Dash Core</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
-        <translation>Разработчики Wagerr Core</translation>
+        <source>The WAGERR Core developers</source>
+        <translation>Разработчики WAGERR Core</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -3062,7 +3062,7 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>ZPivControlDialog</name>
     <message>
         <source>0</source>
         <translation>0</translation>
@@ -3105,14 +3105,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Copyright (C) 2015-%i The PIVX Core Developers</source>
         <translation>Copyright (C) 2015-%i Разработчики PIVX Core</translation>
-    </message>
-    <message>
-        <source>Copyright (C) 2018-%i The Wagerr Core Developers</source>
-        <translation>Copyright (C) 2018-%i Разработчики Wagerr Core</translation>
-    </message>
-    <message>
-        <source>Copyright (C) %i The Wagerr Core Developers</source>
-        <translation>Copyright (C) %i Разработчики Wagerr Core</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>

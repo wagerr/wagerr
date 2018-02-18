@@ -1,6 +1,5 @@
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -136,10 +135,36 @@ bool CMasternodeSync::IsBudgetFinEmpty()
 
 void CMasternodeSync::GetNextAsset()
 {
+
     switch (RequestedMasternodeAssets) {
     case (MASTERNODE_SYNC_INITIAL):
     case (MASTERNODE_SYNC_FAILED): // should never be used here actually, use Reset() instead
         ClearFulfilledRequest();
+/*
+// Wagerr FornaxA - temporarily disable sync sequence
+//        RequestedMasternodeAssets = MASTERNODE_SYNC_SPORKS;
+        RequestedMasternodeAssets = MASTERNODE_SYNC_FINISHED;
+        break;
+    case (MASTERNODE_SYNC_SPORKS):
+        RequestedMasternodeAssets = MASTERNODE_SYNC_LIST;
+        break;
+    case (MASTERNODE_SYNC_LIST):
+        RequestedMasternodeAssets = MASTERNODE_SYNC_MNW;
+        break;
+    case (MASTERNODE_SYNC_MNW):
+        RequestedMasternodeAssets = MASTERNODE_SYNC_BUDGET;
+        break;
+    case (MASTERNODE_SYNC_BUDGET):
+        LogPrintf("CMasternodeSync::GetNextAsset - Sync has finished\n");
+        RequestedMasternodeAssets = MASTERNODE_SYNC_FINISHED;
+        break;
+    }
+    RequestedMasternodeAttempt = 0;
+    nAssetSyncStarted = GetTime();
+*/
+
+    // wagerrDevs - tor - reenabled
+    // original:
         RequestedMasternodeAssets = MASTERNODE_SYNC_SPORKS;
         break;
     case (MASTERNODE_SYNC_SPORKS):
@@ -158,6 +183,7 @@ void CMasternodeSync::GetNextAsset()
     }
     RequestedMasternodeAttempt = 0;
     nAssetSyncStarted = GetTime();
+
 }
 
 std::string CMasternodeSync::GetSyncStatus()

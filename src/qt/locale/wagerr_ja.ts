@@ -263,7 +263,7 @@
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>ZPivControlDialog</name>
     </context>
 <context>
     <name>wagerr-core</name>

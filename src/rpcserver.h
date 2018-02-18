@@ -1,7 +1,6 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -97,7 +96,7 @@ public:
 };
 
 /**
- * Wagerr RPC command dispatcher.
+ * WAGERR RPC command dispatcher.
  */
 class CRPCTable
 {
@@ -137,9 +136,6 @@ extern std::vector<unsigned char> ParseHexV(const UniValue& v, std::string strNa
 extern std::vector<unsigned char> ParseHexO(const UniValue& o, std::string strKey);
 extern int ParseInt(const UniValue& o, std::string strKey);
 extern bool ParseBool(const UniValue& o, std::string strKey);
-
-extern void InitRPCMining();
-extern void ShutdownRPCMining();
 
 extern int64_t nWalletUnlockTime;
 extern CAmount AmountFromValue(const UniValue& value);

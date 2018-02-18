@@ -53,13 +53,12 @@ QT_FORMS_UI = \
   qt/forms/sendcoinsentry.ui \
   qt/forms/signverifymessagedialog.ui \
   qt/forms/transactiondescdialog.ui \
-  qt/forms/zwgrcontroldialog.ui
+  qt/forms/zpivcontroldialog.ui
 
 QT_MOC_CPP = \
   qt/moc_addressbookpage.cpp \
   qt/moc_addresstablemodel.cpp \
   qt/moc_askpassphrasedialog.cpp \
-  qt/moc_bantablemodel.cpp \
   qt/moc_bip38tooldialog.cpp \
   qt/moc_bitcoinaddressvalidator.cpp \
   qt/moc_bitcoinamountfield.cpp \
@@ -107,7 +106,7 @@ QT_MOC_CPP = \
   qt/moc_walletframe.cpp \
   qt/moc_walletmodel.cpp \
   qt/moc_walletview.cpp \
-  qt/moc_zwgrcontroldialog.cpp
+  qt/moc_zpivcontroldialog.cpp
 
 BITCOIN_MM = \
   qt/macdockiconhandler.mm \
@@ -133,7 +132,6 @@ BITCOIN_QT_H = \
   qt/addressbookpage.h \
   qt/addresstablemodel.h \
   qt/askpassphrasedialog.h \
-  qt/bantablemodel.h \
   qt/bip38tooldialog.h \
   qt/bitcoinaddressvalidator.h \
   qt/bitcoinamountfield.h \
@@ -188,7 +186,7 @@ BITCOIN_QT_H = \
   qt/walletmodeltransaction.h \
   qt/walletview.h \
   qt/winshutdownmonitor.h \
-  qt/zwgrcontroldialog.h
+  qt/zpivcontroldialog.h
 
 RES_ICONS = \
   qt/res/icons/add.png \
@@ -252,7 +250,6 @@ RES_ICONS = \
   qt/res/icons/unit_tuwagerr.png
 
 BITCOIN_QT_CPP = \
-  qt/bantablemodel.cpp \
   qt/bitcoinaddressvalidator.cpp \
   qt/bitcoinamountfield.cpp \
   qt/bitcoingui.cpp \
@@ -274,11 +271,8 @@ BITCOIN_QT_CPP = \
   qt/rpcconsole.cpp \
   qt/splashscreen.cpp \
   qt/trafficgraphwidget.cpp \
-  qt/utilitydialog.cpp
-
-if TARGET_WINDOWS
-BITCOIN_QT_CPP += qt/winshutdownmonitor.cpp
-endif
+  qt/utilitydialog.cpp \
+  qt/winshutdownmonitor.cpp
 
 if ENABLE_WALLET
 BITCOIN_QT_CPP += \
@@ -315,7 +309,7 @@ BITCOIN_QT_CPP += \
   qt/walletmodel.cpp \
   qt/walletmodeltransaction.cpp \
   qt/walletview.cpp \
-  qt/zwgrcontroldialog.cpp
+  qt/zpivcontroldialog.cpp
 
 endif
 

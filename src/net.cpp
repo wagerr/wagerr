@@ -2,7 +2,6 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -504,13 +503,9 @@ bool CNode::setBannedIsDirty;
 
 void CNode::ClearBanned()
 {
-    {
-        LOCK(cs_setBanned);
-        setBanned.clear();
-        setBannedIsDirty = true;
-    }
-    DumpBanlist(); // store banlist to Disk
-    uiInterface.BannedListChanged();
+    LOCK(cs_setBanned);
+    setBanned.clear();
+    setBannedIsDirty = true;
 }
 
 bool CNode::IsBanned(CNetAddr ip)
@@ -562,25 +557,11 @@ void CNode::Ban(const CSubNet& subNet, const BanReason &banReason, int64_t banti
     }
     banEntry.nBanUntil = (sinceUnixEpoch ? 0 : GetTime() )+bantimeoffset;
 
-    {
-        LOCK(cs_setBanned);
-        if (setBanned[subNet].nBanUntil < banEntry.nBanUntil) {
-            setBanned[subNet] = banEntry;
-            setBannedIsDirty = true;
-        }
-        else
-            return;
-    }
-    uiInterface.BannedListChanged();
-    {
-        LOCK(cs_vNodes);
-        BOOST_FOREACH(CNode* pnode, vNodes) {
-            if (subNet.Match((CNetAddr)pnode->addr))
-                pnode->fDisconnect = true;
-        }
-    }
-    if(banReason == BanReasonManuallyAdded)
-        DumpBanlist(); //store banlist to disk immediately if user requested ban
+    LOCK(cs_setBanned);
+    if (setBanned[subNet].nBanUntil < banEntry.nBanUntil)
+        setBanned[subNet] = banEntry;
+
+    setBannedIsDirty = true;
 }
 
 bool CNode::Unban(const CNetAddr &addr)
@@ -591,15 +572,13 @@ bool CNode::Unban(const CNetAddr &addr)
 
 bool CNode::Unban(const CSubNet &subNet)
 {
+    LOCK(cs_setBanned);
+    if (setBanned.erase(subNet))
     {
-        LOCK(cs_setBanned);
-        if (!setBanned.erase(subNet))
-            return false;
         setBannedIsDirty = true;
+        return true;
     }
-    uiInterface.BannedListChanged();
-    DumpBanlist(); //store banlist to disk immediately
-    return true;
+    return false;
 }
 
 void CNode::GetBanned(banmap_t &banMap)
@@ -619,28 +598,18 @@ void CNode::SweepBanned()
 {
     int64_t now = GetTime();
 
-    bool notifyUI = false;
+    LOCK(cs_setBanned);
+    banmap_t::iterator it = setBanned.begin();
+    while(it != setBanned.end())
     {
-        LOCK(cs_setBanned);
-        banmap_t::iterator it = setBanned.begin();
-        while(it != setBanned.end())
+        CBanEntry banEntry = (*it).second;
+        if(now > banEntry.nBanUntil)
         {
-            CSubNet subNet = (*it).first;
-            CBanEntry banEntry = (*it).second;
-            if(now > banEntry.nBanUntil)
-            {
-                setBanned.erase(it++);
-                setBannedIsDirty = true;
-                notifyUI = true;
-                LogPrint("net", "%s: Removed banned node ip/subnet from banlist.dat: %s\n", __func__, subNet.ToString());
-            }
-            else
-                ++it;
+            setBanned.erase(it++);
+            setBannedIsDirty = true;
         }
-    }
-    // update UI
-    if(notifyUI) {
-        uiInterface.BannedListChanged();
+        else
+            ++it;
     }
 }
 
@@ -685,7 +654,6 @@ void CNode::copyStats(CNodeStats& stats)
     X(nLastSend);
     X(nLastRecv);
     X(nTimeConnected);
-    X(nTimeOffset);
     X(addrName);
     X(nVersion);
     X(cleanSubVer);
@@ -706,7 +674,7 @@ void CNode::copyStats(CNodeStats& stats)
         nPingUsecWait = GetTimeMicros() - nPingUsecStart;
     }
 
-    // Raw ping time is in microseconds, but show it to user as whole seconds (Wagerr users should be well used to small numbers with many decimal places by now :)
+    // Raw ping time is in microseconds, but show it to user as whole seconds (WAGERR users should be well used to small numbers with many decimal places by now :)
     stats.dPingTime = (((double)nPingUsecTime) / 1e6);
     stats.dPingWait = (((double)nPingUsecWait) / 1e6);
 
@@ -1168,7 +1136,7 @@ void ThreadMapPort()
             }
         }
 
-        string strDesc = "Wagerr " + FormatFullVersion();
+        string strDesc = "WAGERR " + FormatFullVersion();
 
         try {
             while (true) {
@@ -1291,7 +1259,12 @@ void DumpAddresses()
 void DumpData()
 {
     DumpAddresses();
-    DumpBanlist();
+
+    if (CNode::BannedSetIsDirty())
+    {
+        DumpBanlist();
+        CNode::SetBannedSetDirty(false);
+    }
 }
 
 void static ProcessOneShot()
@@ -1646,7 +1619,7 @@ bool BindListenPort(const CService& addrBind, string& strError, bool fWhiteliste
     if (::bind(hListenSocket, (struct sockaddr*)&sockaddr, len) == SOCKET_ERROR) {
         int nErr = WSAGetLastError();
         if (nErr == WSAEADDRINUSE)
-            strError = strprintf(_("Unable to bind to %s on this computer. Wagerr Core is probably already running."), addrBind.ToString());
+            strError = strprintf(_("Unable to bind to %s on this computer. WAGERR Core is probably already running."), addrBind.ToString());
         else
             strError = strprintf(_("Unable to bind to %s on this computer (bind returned error %s)"), addrBind.ToString(), NetworkErrorString(nErr));
         LogPrintf("%s\n", strError);
@@ -2067,7 +2040,6 @@ CNode::CNode(SOCKET hSocketIn, CAddress addrIn, std::string addrNameIn, bool fIn
     nSendBytes = 0;
     nRecvBytes = 0;
     nTimeConnected = GetTime();
-    nTimeOffset = 0;
     addr = addrIn;
     addrName = addrNameIn == "" ? addr.ToStringIPPort() : addrNameIn;
     nVersion = 0;
@@ -2311,20 +2283,15 @@ bool CBanDB::Read(banmap_t& banSet)
 
 void DumpBanlist()
 {
-    CNode::SweepBanned(); // clean unused entries (if bantime has expired)
-
-    if (!CNode::BannedSetIsDirty())
-        return;
-
     int64_t nStart = GetTimeMillis();
+
+    CNode::SweepBanned(); //clean unused entires (if bantime has expired)
 
     CBanDB bandb;
     banmap_t banmap;
     CNode::GetBanned(banmap);
-    if (bandb.Write(banmap)) {
-        CNode::SetBannedSetDirty(false);
-    }
+    bandb.Write(banmap);
 
     LogPrint("net", "Flushed %d banned node ips/subnets to banlist.dat  %dms\n",
-        banmap.size(), GetTimeMillis() - nStart);
+             banmap.size(), GetTimeMillis() - nStart);
 }

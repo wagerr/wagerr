@@ -1,4 +1,3 @@
-// Copyright (c) 2018 The Wagerr developers
 #include "blockexplorer.h"
 #include "bitcoinunits.h"
 #include "chainparams.h"
@@ -435,7 +434,7 @@ BlockExplorer::BlockExplorer(QWidget* parent) : QMainWindow(parent),
     ui->setupUi(this);
 
     this->setStyleSheet(GUIUtil::loadStyleSheet());
-    
+
     connect(ui->pushSearch, SIGNAL(released()), this, SLOT(onSearch()));
     connect(ui->content, SIGNAL(linkActivated(const QString&)), this, SLOT(goTo(const QString&)));
     connect(ui->back, SIGNAL(released()), this, SLOT(back()));
@@ -475,7 +474,7 @@ void BlockExplorer::showEvent(QShowEvent*)
 
         if (!GetBoolArg("-txindex", false)) {
             QString Warning = tr("Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (wagerr.conf).");
-            QMessageBox::warning(this, "Wagerr Core Blockchain Explorer", Warning, QMessageBox::Ok);
+            QMessageBox::warning(this, "WAGERR Core Blockchain Explorer", Warning, QMessageBox::Ok);
         }
     }
 }
@@ -551,7 +550,7 @@ void BlockExplorer::setBlock(CBlockIndex* pBlock)
 
 void BlockExplorer::setContent(const std::string& Content)
 {
-    QString CSS = "body {font-size:12px; color:#f8f6f6; bgcolor:#6D6D6D;}\n a, span { font-family: monospace; }\n span.addr {color:#6D6D6D; font-weight: bold;}\n table tr td {padding: 3px; border: 1px solid black; background-color: #6D6D6D;}\n td.d0 {font-weight: bold; color:#f8f6f6;}\n h2, h3 { white-space:nowrap; color:#6D6D6D;}\n a { color:#88f6f6; text-decoration:none; }\n a.nav {color:#6D6D6D;}\n";
+    QString CSS = "body {font-size:12px; color:#f8f6f6; bgcolor:#B40000;}\n a, span { font-family: monospace; }\n span.addr {color:#B40000; font-weight: bold;}\n table tr td {padding: 3px; border: 1px solid black; background-color: #B40000;}\n td.d0 {font-weight: bold; color:#f8f6f6;}\n h2, h3 { white-space:nowrap; color:#B40000;}\n a { color:#88f6f6; text-decoration:none; }\n a.nav {color:#B40000;}\n";
     QString FullContent = "<html><head><style type=\"text/css\">" + CSS + "</style></head>" + "<body>" + Content.c_str() + "</body></html>";
     // printf(FullContent.toUtf8());
 

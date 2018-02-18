@@ -1,4 +1,4 @@
-// Copyright (c) 2012-2018 The Bitcoin Core developers
+// Copyright (c) 2012-2014 The Bitcoin Core developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -43,7 +43,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
     ae.nTime = 1333333333;
     ae.strOtherAccount = "b";
     ae.strComment = "";
-    pwalletMain->AddAccountingEntry(ae, walletdb);
+    walletdb.WriteAccountingEntry(ae);
 
     wtx.mapValue["comment"] = "z";
     pwalletMain->AddToWallet(wtx);
@@ -53,7 +53,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
 
     ae.nTime = 1333333336;
     ae.strOtherAccount = "c";
-    pwalletMain->AddAccountingEntry(ae, walletdb);
+    walletdb.WriteAccountingEntry(ae);
 
     GetResults(walletdb, results);
 
@@ -69,7 +69,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
     ae.nTime = 1333333330;
     ae.strOtherAccount = "d";
     ae.nOrderPos = pwalletMain->IncOrderPosNext();
-    pwalletMain->AddAccountingEntry(ae, walletdb);
+    walletdb.WriteAccountingEntry(ae);
 
     GetResults(walletdb, results);
 
@@ -119,7 +119,7 @@ BOOST_AUTO_TEST_CASE(acc_orderupgrade)
     ae.nTime = 1333333334;
     ae.strOtherAccount = "e";
     ae.nOrderPos = -1;
-    pwalletMain->AddAccountingEntry(ae, walletdb);
+    walletdb.WriteAccountingEntry(ae);
 
     GetResults(walletdb, results);
 
