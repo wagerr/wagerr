@@ -17,8 +17,8 @@
 //! These need to be macros, as clientversion.cpp's and wagerr*-res.rc's voodoo requires it
 #define CLIENT_VERSION_MAJOR 1
 #define CLIENT_VERSION_MINOR 4
-#define CLIENT_VERSION_REVISION 32
-#define CLIENT_VERSION_BUILD 7
+#define CLIENT_VERSION_REVISION 34
+#define CLIENT_VERSION_BUILD 0
 
 //! Set to true for release, false for prerelease or test build
 #define CLIENT_VERSION_IS_RELEASE true
