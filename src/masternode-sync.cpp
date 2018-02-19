@@ -36,7 +36,9 @@ bool CMasternodeSync::IsBlockchainSynced()
     static int64_t lastProcess = GetTime();
 
     // if the last call to this function was more than 60 minutes ago (client was in sleep mode) reset the sync process
-    if (GetTime() - lastProcess > 60 * 60) {
+    // WagerrDev - Kokary - temporarily extended to 24h
+//    if (GetTime() - lastProcess > 60 * 60) {
+    if (GetTime() - lastProcess > 24 * 60 * 60) {
         Reset();
         fBlockchainSynced = false;
     }
@@ -53,7 +55,9 @@ bool CMasternodeSync::IsBlockchainSynced()
     if (pindex == NULL) return false;
 
 
-    if (pindex->nTime + 60 * 60 < GetTime())
+    // WagerrDev - Kokary - temporarily extended to 24h
+    // if (pindex->nTime + 60 * 60 < GetTime())
+    if (pindex->nTime + 24 * 60 * 60 < GetTime())
         return false;
 
     fBlockchainSynced = true;
@@ -140,7 +144,9 @@ void CMasternodeSync::GetNextAsset()
     case (MASTERNODE_SYNC_INITIAL):
     case (MASTERNODE_SYNC_FAILED): // should never be used here actually, use Reset() instead
         ClearFulfilledRequest();
-        RequestedMasternodeAssets = MASTERNODE_SYNC_SPORKS;
+// WagerrDev - Kokary - Temporarily disable
+    RequestedMasternodeAssets = MASTERNODE_SYNC_SPORKS;
+//	RequestedMasternodeAssets = MASTERNODE_SYNC_FINISHED;
         break;
     case (MASTERNODE_SYNC_SPORKS):
         RequestedMasternodeAssets = MASTERNODE_SYNC_LIST;
