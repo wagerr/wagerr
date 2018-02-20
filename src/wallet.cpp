@@ -1188,13 +1188,8 @@ CAmount CWalletTx::GetLockedCredit() const
         // Skip spent coins
         if (pwallet->IsSpent(hashTx, i)) continue;
 
-        // Add locked coins
-        if (pwallet->IsLockedCoin(hashTx, i)) {
-            nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
-        }
-
-        // Add masternode collaterals which are handled likc locked coins
-        if (fMasterNode && vout[i].nValue == 25000 * COIN) {
+        // Add locked coins and add masternode collaterals which are handled like locked coins
+            if (pwallet->IsLockedCoin(hashTx, i) || (fMasterNode && vout[i].nValue == 25000 * COIN)) {
             nCredit += pwallet->GetCredit(txout, ISMINE_SPENDABLE);
         }
 
