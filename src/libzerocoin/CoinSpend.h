@@ -21,6 +21,8 @@
 #include "Commitment.h"
 #include "Params.h"
 #include "SerialNumberSignatureOfKnowledge.h"
+#include "SpendType.h"
+
 #include "bignum.h"
 #include "pubkey.h"
 #include "serialize.h"
@@ -65,7 +67,7 @@ public:
 	 * @throw ZerocoinException if the process fails
 	 */
     CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulator& a, const uint32_t& checksum,
-              const AccumulatorWitness& witness, const uint256& ptxHash);
+              const AccumulatorWitness& witness, const uint256& ptxHash, const SpendType& spendType);
 
     /** Returns the serial number of the coin spend by this proof.
 	 *
@@ -119,6 +121,7 @@ public:
             READWRITE(version);
             READWRITE(pubkey);
             READWRITE(vchSig);
+            READWRITE(spendType);
         } catch (...) {
             version = 0;
         }
@@ -140,6 +143,7 @@ private:
     //As of version 2
     CPubKey pubkey;
     std::vector<unsigned char> vchSig;
+    SpendType spendType;
 };
 
 } /* namespace libzerocoin */

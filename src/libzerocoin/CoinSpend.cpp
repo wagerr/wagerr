@@ -17,7 +17,7 @@ namespace libzerocoin
 {
 
 CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulator& a, const uint32_t& checksum,
-                     const AccumulatorWitness& witness, const uint256& ptxHash) : accChecksum(checksum),
+                     const AccumulatorWitness& witness, const uint256& ptxHash, const SpendType& spendType) : accChecksum(checksum),
                                                                                   ptxHash(ptxHash),
                                                                                   coinSerialNumber((coin.getSerialNumber())),
                                                                                   accumulatorPoK(&p->accumulatorParams),
@@ -60,7 +60,8 @@ CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulat
 
     // 5. Sign the transaction using the private key associated with the serial number
     version = coin.getVersion();
-    if (version >= 2) {
+    if (version >= PrivateCoin::PUBKEY_VERSION) {
+        this->spendType = spendType;
         this->pubkey = coin.getPubKey();
         if (!coin.sign(hashSig, this->vchSig))
             throw std::runtime_error("Coinspend failed to sign signature hash");
@@ -81,6 +82,10 @@ const uint256 CoinSpend::signatureHash() const
     CHashWriter h(0, 0);
     h << serialCommitmentToCoinValue << accCommitmentToCoinValue << commitmentPoK << accumulatorPoK << ptxHash
       << coinSerialNumber << accChecksum << denomination;
+
+    if (version >= PrivateCoin::PUBKEY_VERSION)
+        h << spendType;
+
     return h.GetHash();
 }
 

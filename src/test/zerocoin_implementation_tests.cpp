@@ -239,7 +239,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     //Get the checksum of the accumulator we use for the spend and also add it to our checksum map
     uint32_t nChecksum = GetChecksum(accumulator.getValue());
     AddAccumulatorChecksum(nChecksum, accumulator.getValue(), true);
-    CoinSpend coinSpend(Params().Zerocoin_Params(), privateCoin, accumulator, nChecksum, witness, 0);
+    CoinSpend coinSpend(Params().Zerocoin_Params(), privateCoin, accumulator, nChecksum, witness, 0, SpendType::SPEND);
 
     CBigNum serial = coinSpend.getCoinSerialNumber();
     BOOST_CHECK_MESSAGE(serial, "Serial Number can't be 0");
@@ -328,7 +328,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     uint32_t nChecksum_v2 = GetChecksum(accumulator_v2.getValue());
     AddAccumulatorChecksum(nChecksum_v2, accumulator_v2.getValue(), true);
     uint256 ptxHash = CBigNum::RandKBitBigum(256).getuint256();
-    CoinSpend coinSpend_v2(Params().Zerocoin_Params(), privateCoin_v2, accumulator_v2, nChecksum_v2, witness_v2, ptxHash);
+    CoinSpend coinSpend_v2(Params().Zerocoin_Params(), privateCoin_v2, accumulator_v2, nChecksum_v2, witness_v2, ptxHash, SpendType::SPEND);
 
     BOOST_CHECK_MESSAGE(coinSpend_v2.Verify(accumulator_v2), "coinspend_v2 failed to verify");
     BOOST_CHECK_MESSAGE(coinSpend_v2.HasValidSignature(), "coinspend_v2 does not have valid signature");
