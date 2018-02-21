@@ -96,7 +96,7 @@ bool CZWgrStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
     LogPrintf("%s\n", __func__);
     CZerocoinSpendReceipt receipt;
     int nSecurityLevel = 100;
-    if (!pwallet->MintToTxIn(mint, nSecurityLevel, hashTxOut, txIn, receipt))
+    if (!pwallet->MintToTxIn(mint, nSecurityLevel, hashTxOut, txIn, receipt, libzerocoin::SpendType::STAKE))
         return error("%s\n", receipt.GetStatusMessage());
 
     return true;

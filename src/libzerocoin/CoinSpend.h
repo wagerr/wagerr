@@ -96,6 +96,7 @@ public:
     CBigNum getSerialComm() const { return serialCommitmentToCoinValue; }
     uint8_t getVersion() const { return version; }
     CPubKey getPubKey() const { return pubkey; }
+    SpendType getSpendType() const { return spendType; }
     std::vector<unsigned char> getSignature() const { return vchSig; }
 
     bool Verify(const Accumulator& a) const;

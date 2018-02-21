@@ -360,6 +360,9 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, CStakeInpu
     //Construct the stakeinput object
     if (tx.IsZerocoinSpend()) {
         libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txin);
+        if (spend.getSpendType() != libzerocoin::SpendType::STAKE)
+            return error("%s: spend is using the wrong SpendType", __func__);
+
         CZWgrStake* zwgrInput = new CZWgrStake(spend);
         stake = zwgrInput;
     } else {
