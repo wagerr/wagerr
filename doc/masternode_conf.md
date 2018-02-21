@@ -1,7 +1,7 @@
 Multi masternode config
 =======================
 
-The multi masternode config allows you to control multiple masternodes from a single wallet. The wallet needs to have a valid collateral output of 10000 coins for each masternode. To use this, place a file named masternode.conf in the data directory of your install:
+The multi masternode config allows you to control multiple masternodes from a single wallet. The wallet needs to have a valid collateral output of 25000 coins for each masternode. To use this, place a file named masternode.conf in the data directory of your install:
  * Windows: %APPDATA%\wagerr\
  * Mac OS: ~/Library/Application Support/wagerr/
  * Unix/Linux: ~/.wagerr/
