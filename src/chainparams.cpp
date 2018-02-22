@@ -137,10 +137,10 @@ public:
         nZerocoinStartHeight = 1500;            // Zerocoin start height
         nZerocoinStartTime = 1518696182;        // GMT: Thursday, 15. February 2018 12:03:02
         nBlockEnforceSerialRange = 1;           // Enforce serial range starting this block
-        nBlockRecalculateAccumulators = 1585; // Trigger a recalculation of accumulators
-        nBlockFirstFraudulent = 1110;           // 1110; //First block that bad serials emerged (currently we do not have any) *** TODO ***
-        nBlockLastGoodCheckpoint = 1583;        // Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
-        nBlockEnforceInvalidUTXO = 1110;        // Start enforcing the invalid UTXO's
+        nBlockRecalculateAccumulators = 1650; // Trigger a recalculation of accumulators
+        nBlockFirstFraudulent = 99999999;           // 1110; //First block that bad serials emerged (currently we do not have any) *** TODO ***
+        nBlockLastGoodCheckpoint = 1648;        // Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
+        nBlockEnforceInvalidUTXO = 1850;        // Start enforcing the invalid UTXO's
         
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot
