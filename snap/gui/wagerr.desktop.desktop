@@ -1,0 +1,15 @@
+# http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.0.html
+
+[Desktop Entry]
+Type=Application
+Version=1.4.35
+Encoding=UTF-8
+Name=Wagerr
+Icon=${SNAP}/wagerr128.png
+MimeType=x-scheme-handler/wagerr;
+Exec=wagerr %u
+Terminal=false
+Categories=Office;Finance;
+Comment=Wagerr P2P Cryptocurrency
+Keywords=internet;wagerr;
+Name[de_AT]=wagerr.desktop
