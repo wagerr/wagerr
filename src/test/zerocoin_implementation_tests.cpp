@@ -314,6 +314,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     AccumulatorWitness witness_v2(Params().Zerocoin_Params(), accumulator_v2, pubcoin_v2);
 
     //populate the witness and accumulators
+    int64_t nTimeStart = GetTimeMillis();
     CValidationState state_v2;
     for(int i = 0; i < 10; i++) {
         PrivateCoin privTemp(Params().Zerocoin_Params(), CoinDenomination::ZQ_ONE);
@@ -321,6 +322,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
         accumulator_v2 += pubTemp;
         witness_v2 += pubTemp;
     }
+    cout << (GetTimeMillis() - nTimeStart)/10 << "ms per mint\n";
 
     accumulator_v2 += pubcoin_v2;
 
@@ -330,6 +332,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     uint256 ptxHash = CBigNum::RandKBitBigum(256).getuint256();
     CoinSpend coinSpend_v2(Params().Zerocoin_Params(), privateCoin_v2, accumulator_v2, nChecksum_v2, witness_v2, ptxHash, SpendType::SPEND);
 
+    BOOST_CHECK_MESSAGE(coinSpend_v2.HasValidSerial(Params().Zerocoin_Params()), "coinspend_v2 does not have a valid serial");
     BOOST_CHECK_MESSAGE(coinSpend_v2.Verify(accumulator_v2), "coinspend_v2 failed to verify");
     BOOST_CHECK_MESSAGE(coinSpend_v2.HasValidSignature(), "coinspend_v2 does not have valid signature");
     BOOST_CHECK_MESSAGE(coinSpend_v2.getVersion() == 2, "coinspend_v2 version is wrong");

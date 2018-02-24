@@ -75,6 +75,9 @@ inline void GenerateKeyPair(const CBigNum& bnGroupOrder, CKey& key, CBigNum& bnS
 		keyPair.MakeNewKey(true);
 		CPubKey pubKey = keyPair.GetPubKey();
 		uint256 hashPubKey = Hash(pubKey.begin(), pubKey.end());
+
+        // Make the first byte 0's which will destinctly mark v2 serials
+        hashPubKey >>= PrivateCoin::V2_BITSHIFT;
 		CBigNum s(hashPubKey);
 		if (s >= bnGroupOrder)
 			continue;

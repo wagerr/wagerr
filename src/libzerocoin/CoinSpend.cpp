@@ -23,9 +23,12 @@ CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulat
                                                                                   accumulatorPoK(&p->accumulatorParams),
                                                                                   serialNumberSoK(p),
                                                                                   commitmentPoK(&p->serialNumberSoKCommitmentGroup,
-                                                                                                &p->accumulatorParams.accumulatorPoKCommitmentGroup)
+                                                                                                &p->accumulatorParams.accumulatorPoKCommitmentGroup),
+                                                                                  spendType(spendType)
 {
     denomination = coin.getPublicCoin().getDenomination();
+    version = coin.getVersion();
+
     // Sanity check: let's verify that the Witness is valid with respect to
     // the coin and Accumulator provided.
     if (!(witness.VerifyWitness(a, coin.getPublicCoin()))) {
@@ -56,12 +59,10 @@ CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulat
     // 4. Proves that the coin is correct w.r.t. serial number and hidden coin secret
     // (This proof is bound to the coin 'metadata', i.e., transaction hash)
     uint256 hashSig = signatureHash();
-    this->serialNumberSoK = SerialNumberSignatureOfKnowledge(p, coin, fullCommitmentToCoinUnderSerialParams, signatureHash());
+    this->serialNumberSoK = SerialNumberSignatureOfKnowledge(p, coin, fullCommitmentToCoinUnderSerialParams, hashSig);
 
     // 5. Sign the transaction using the private key associated with the serial number
-    version = coin.getVersion();
     if (version >= PrivateCoin::PUBKEY_VERSION) {
-        this->spendType = spendType;
         this->pubkey = coin.getPubKey();
         if (!coin.sign(hashSig, this->vchSig))
             throw std::runtime_error("Coinspend failed to sign signature hash");
@@ -97,10 +98,16 @@ bool CoinSpend::HasValidSerial(ZerocoinParams* params) const
 //Additional verification layer that requires the spend be signed by the private key associated with the serial
 bool CoinSpend::HasValidSignature() const
 {
-    if (version < PrivateCoin::PUBKEY_VERSION)
+    uint256 nSerial = coinSerialNumber.getuint256();
+
+    //Serial is marked as v2 only if the first byte is 00
+    uint256 nSerialAdjusted = nSerial >> PrivateCoin::V2_BITSHIFT;
+    if (nSerialAdjusted > 0)
         return true;
 
+    //v2 serial requires that the signature hash be signed by the public key associated with the serial
     uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end());
+    hashedPubkey >>= PrivateCoin::V2_BITSHIFT;
     if (CBigNum(hashedPubkey) != coinSerialNumber)
         return false;
 
