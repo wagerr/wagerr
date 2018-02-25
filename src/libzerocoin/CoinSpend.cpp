@@ -69,8 +69,22 @@ CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulat
     }
 }
 
+int ExtractVersionFromSerial(const CBigNum& bnSerial)
+{
+    //Serial is marked as v2 only if the first byte is 0xF
+    uint256 nMark = bnSerial.getuint256() >> (256 - PrivateCoin::V2_BITSHIFT);
+    if (nMark == 0xf)
+        return PrivateCoin::PUBKEY_VERSION;
+
+    return 1;
+}
+
 bool CoinSpend::Verify(const Accumulator& a) const
 {
+    // Double check that the version is the same as marked in the serial
+    if (ExtractVersionFromSerial(coinSerialNumber) != version)
+        return false;
+
     // Verify both of the sub-proofs using the given meta-data
     return (a.getDenomination() == this->denomination) &&
             commitmentPoK.Verify(serialCommitmentToCoinValue, accCommitmentToCoinValue) &&
@@ -92,23 +106,32 @@ const uint256 CoinSpend::signatureHash() const
 
 bool CoinSpend::HasValidSerial(ZerocoinParams* params) const
 {
-    return coinSerialNumber > 0 && coinSerialNumber < params->coinCommitmentGroup.groupOrder;
+    if (coinSerialNumber <= 0)
+        return false;
+
+    if (version < PrivateCoin::PUBKEY_VERSION)
+        return coinSerialNumber < params->coinCommitmentGroup.groupOrder;
+
+    uint256 n =  ~uint256(0);
+    n <<= (256 - PrivateCoin::V2_BITSHIFT);
+    uint256 nGroupOrderLimit = params->coinCommitmentGroup.groupOrder.getuint256() | n;
+    return coinSerialNumber.getuint256() < nGroupOrderLimit;
 }
 
 //Additional verification layer that requires the spend be signed by the private key associated with the serial
 bool CoinSpend::HasValidSignature() const
 {
     uint256 nSerial = coinSerialNumber.getuint256();
-
-    //Serial is marked as v2 only if the first byte is 00
-    uint256 nSerialAdjusted = nSerial >> PrivateCoin::V2_BITSHIFT;
-    if (nSerialAdjusted > 0)
+    if (version < PrivateCoin::PUBKEY_VERSION)
         return true;
 
+    //Adjust the serial to drop the first 4 bits
+    uint256 nMask = ~uint256(0) >> PrivateCoin::V2_BITSHIFT;
+    nSerial &= nMask;
+
     //v2 serial requires that the signature hash be signed by the public key associated with the serial
-    uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end());
-    hashedPubkey >>= PrivateCoin::V2_BITSHIFT;
-    if (CBigNum(hashedPubkey) != coinSerialNumber)
+    uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end()) >> PrivateCoin::V2_BITSHIFT;
+    if (hashedPubkey != nSerial)
         return false;
 
     return pubkey.Verify(signatureHash(), vchSig);

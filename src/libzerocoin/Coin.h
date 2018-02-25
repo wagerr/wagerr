@@ -92,7 +92,7 @@ class PrivateCoin
 public:
     static int const PUBKEY_VERSION = 2;
     static int const CURRENT_VERSION = 2;
-    static int const V2_BITSHIFT = 8;
+    static int const V2_BITSHIFT = 4;
     template <typename Stream>
     PrivateCoin(const ZerocoinParams* p, Stream& strm) : params(p), publicCoin(p)
     {
@@ -132,7 +132,7 @@ private:
     PublicCoin publicCoin;
     CBigNum randomness;
     CBigNum serialNumber;
-    uint8_t version = 0;
+    uint8_t version = 1;
     CPrivKey privkey;
 
     /**

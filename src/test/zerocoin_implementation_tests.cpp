@@ -235,6 +235,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     privateCoin.setPublicCoin(pubCoin);
     privateCoin.setRandomness(zerocoinMint.GetRandomness());
     privateCoin.setSerialNumber(zerocoinMint.GetSerialNumber());
+    privateCoin.setVersion(1);
 
     //Get the checksum of the accumulator we use for the spend and also add it to our checksum map
     uint32_t nChecksum = GetChecksum(accumulator.getValue());
@@ -316,13 +317,13 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     //populate the witness and accumulators
     int64_t nTimeStart = GetTimeMillis();
     CValidationState state_v2;
-    for(int i = 0; i < 10; i++) {
+    for(int i = 0; i < 5; i++) {
         PrivateCoin privTemp(Params().Zerocoin_Params(), CoinDenomination::ZQ_ONE);
         PublicCoin pubTemp = privTemp.getPublicCoin();
         accumulator_v2 += pubTemp;
         witness_v2 += pubTemp;
     }
-    cout << (GetTimeMillis() - nTimeStart)/10 << "ms per mint\n";
+    cout << (GetTimeMillis() - nTimeStart)/5 << "ms per mint\n";
 
     accumulator_v2 += pubcoin_v2;
 

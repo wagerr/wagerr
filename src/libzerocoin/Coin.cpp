@@ -82,6 +82,12 @@ inline void GenerateKeyPair(const CBigNum& bnGroupOrder, CKey& key, CBigNum& bnS
 		if (s >= bnGroupOrder)
 			continue;
 
+        //Mark this as v2 by starting with 0xF
+        uint256 nMark = 0xF;
+        nMark <<= 252;
+        hashPubKey |= nMark;
+        s = CBigNum(hashPubKey);
+
 		key = keyPair;
 		bnSerial = s;
 		break;
