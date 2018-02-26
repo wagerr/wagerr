@@ -146,3 +146,8 @@ release/
 
 # ignore build_config.mk
 src/leveldb/build_config.mk
+
+# snapcraft
+stage/
+parts/
+prime/

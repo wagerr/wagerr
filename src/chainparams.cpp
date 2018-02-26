@@ -54,33 +54,36 @@ static void convertSeed6(std::vector<CAddress>& vSeedsOut, const SeedSpec6* data
 // + Contains no strange transactions
 static Checkpoints::MapCheckpoints mapCheckpoints =
     boost::assign::map_list_of
-    
     // WagerrDevs - RELEASE CHANGE - Checkpoins, timestamp of last checkpoint, total nr. of transactions
-    (1, uint256("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b"))             // First PoW premine block
-    (101, uint256("0000005e89a1fab52bf996e7eb7d653962a0eb064c16c09887504797deb7feaf"))           // Last premine block
-    (1001, uint256("0000002a314058a8f61293e18ddbef5664a2097ac0178005f593444549dd5b8c"))          // Last PoW block
-    (4559, uint256("f26ac8c87c21ab26e34340c54b2a16c0f1b1c1cce2202e0eb6e79ca9579e2022"))          // 
-    (5530, uint256("b3a8e6eb90085394c1af916d5690fd5b83d53c43cf60c7b6dd1e904e0ede8e88"))          // Block on which switch off happened, 5531, 5532 differed
-    (6160, uint256("7e7e688ae130d6b0bdfd3f059c6be93ba5e59c0bc28eb13f09e8158092151ad4"));         // Last block
+    (       1, uint256("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b"))          // First PoW premine block
+    (     101, uint256("0000005e89a1fab52bf996e7eb7d653962a0eb064c16c09887504797deb7feaf"))          // Last premine block
+    (    1001, uint256("0000002a314058a8f61293e18ddbef5664a2097ac0178005f593444549dd5b8c"))          // Last PoW block
+    (    4559, uint256("f26ac8c87c21ab26e34340c54b2a16c0f1b1c1cce2202e0eb6e79ca9579e2022"))          // 
+    (    5530, uint256("b3a8e6eb90085394c1af916d5690fd5b83d53c43cf60c7b6dd1e904e0ede8e88"))          // Block on which switch off happened, 5531, 5532 differed
+    (    6160, uint256("7e7e688ae130d6b0bdfd3f059c6be93ba5e59c0bc28eb13f09e8158092151ad4"))          
+    (   12588, uint256("d9d1da49888f0d6febbdb02f79dde7fdc20d72a20e6f0d672e9543085cb70ca7"))          
+    (   14374, uint256("61dc2dbb225de3146bc59ab96dedf48047ece84d004acaf8f386ae7a7d074983"));         // Last block
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-    1519155533, // * UNIX timestamp of last checkpoint block
-    11985,      // * total number of transactions between genesis and last checkpoint
+    1519653932, // * UNIX timestamp of last checkpoint block
+    36190,      // * total number of transactions between genesis and last checkpoint
                 //   (the tx=... number in the SetBestChain debug.log lines)
-    2000        // * estimated number of transactions per day after checkpoint
+    5000        // * estimated number of transactions per day after checkpoint
 };
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
     boost::assign::map_list_of
-    (1, uint256("0x00000385558ec1b9af7f939e1626a3116b9fb988c86c2f915e6451e8efcd0521"))          // First PoW block
-    (200, uint256("0x0000015bef4f6677a5055b7b35fa0791d4df50c2a887c39aaf6ec42e2aab13fa"))
-    (300, uint256("0x00000020e9647debfcf5a2c2b0b43d24eef32646a7b1b3e78d82879080a07366"))        // Last PoW block
-    (941, uint256("0xb40633bf2a3b4c4ecc5a784233287ba7a74a17b58dc40c29d3886ef34c10181a"));  
+    (       1, uint256("0x00000385558ec1b9af7f939e1626a3116b9fb988c86c2f915e6451e8efcd0521"))        // First PoW block
+    (     200, uint256("0x0000015bef4f6677a5055b7b35fa0791d4df50c2a887c39aaf6ec42e2aab13fa"))
+    (     300, uint256("0x00000020e9647debfcf5a2c2b0b43d24eef32646a7b1b3e78d82879080a07366"))        // Last PoW block
+    (     941, uint256("0xb40633bf2a3b4c4ecc5a784233287ba7a74a17b58dc40c29d3886ef34c10181a"))
+    (    1500, uint256("0x63bc2ca1c9d0fab31fc05868a231c165823c61d5621a81630aadbf5fd79a1e15"))        // First stop
+    (    2075, uint256("0x8ddcd1c685dd70b84fb4de5a5235f2f50382dec2fcddf1c507661944c48658a8"));       // Last block  
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1519060029,
-    1609,
-    250};
+    1519242034,
+    3917,
+    300};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
     boost::assign::map_list_of(0, uint256("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec"));
@@ -258,7 +261,7 @@ public:
         nZerocoinStartTime = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 1400; //Trigger a recalculation of accumulators
-        nBlockFirstFraudulent = 891737; //First block that bad serials emerged (currently we do not have any) *** TODO ***
+        nBlockFirstFraudulent = 99999999; //First block that bad serials emerged (currently we do not have any) *** TODO ***
         nBlockLastGoodCheckpoint = 1398; //Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
         nBlockEnforceInvalidUTXO = 1600; //Start enforcing the invalid UTXO's
         

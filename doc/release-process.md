@@ -43,7 +43,7 @@ Check out the source code in the following directory hierarchy.
 
 Write release notes. git shortlog helps a lot, for example:
 
-    git shortlog --no-merges v(current version, e.g. 1.3.99)..v(new version, e.g. 1.4.02)
+    git shortlog --no-merges v(current version, e.g. 1.3.99)..v(new version, e.g. 1.4.34)
 
 (or ping @wumpus on IRC, he has specific tooling to generate the list of merged pulls
 and sort them into categories based on labels)
@@ -54,7 +54,7 @@ Generate list of authors:
 
 Tag version (or release candidate) in git
 
-    git tag -s v(new version, e.g. 1.4.02)
+    git tag -s v(new version, e.g. 1.4.34)
 
 ### Setup and perform Gitian builds
 
@@ -63,8 +63,8 @@ If you're using the automated script (found in [contrib/gitian-build.sh](/contri
 Setup Gitian descriptors:
 
     pushd ./wagerr
-    export SIGNER=(your Gitian key, ie WagerrTor, etc)
-    export VERSION=(new version, e.g. 1.4.02)
+    export SIGNER=(your Gitian key, ie WagerrTor, etc) (_Here is GPG ID meant, not username_)
+    export VERSION=(new version, e.g. 1.4.34)
     git fetch
     git checkout v${VERSION}
     popd
