@@ -36,7 +36,7 @@ parts:
     # XXX We don't want to copy the full blockchain every time that the snap is
     # updated, but there's no way to define a default data dir in bitcoin-qt.
     # Also, it would be better if we could split the wallet from the blockchain
-    prepare: git apply $SNAPCRAFT_STAGE/default_data_dir.patch
+    # prepare git apply $SNAPCRAFT_STAGE/default_data_dir.patch
     build-packages:
       - g++
       - pkg-config
