@@ -13,21 +13,24 @@
 // Copyright (c) 2018 The Wagerr developers
 #include "CoinSpend.h"
 #include <iostream>
+#include <sstream>
+
 namespace libzerocoin
 {
-
-CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulator& a, const uint32_t& checksum,
+    CoinSpend::CoinSpend(const ZerocoinParams* paramsCoin, const ZerocoinParams* paramsAcc, const PrivateCoin& coin, Accumulator& a, const uint32_t& checksum,
                      const AccumulatorWitness& witness, const uint256& ptxHash, const SpendType& spendType) : accChecksum(checksum),
                                                                                   ptxHash(ptxHash),
                                                                                   coinSerialNumber((coin.getSerialNumber())),
-                                                                                  accumulatorPoK(&p->accumulatorParams),
-                                                                                  serialNumberSoK(p),
-                                                                                  commitmentPoK(&p->serialNumberSoKCommitmentGroup,
-                                                                                                &p->accumulatorParams.accumulatorPoKCommitmentGroup),
+                                                                                  accumulatorPoK(&paramsAcc->accumulatorParams),
+                                                                                  serialNumberSoK(paramsCoin),
+                                                                                  commitmentPoK(&paramsCoin->serialNumberSoKCommitmentGroup,
+                                                                                                &paramsAcc->accumulatorParams.accumulatorPoKCommitmentGroup),
                                                                                   spendType(spendType)
 {
     denomination = coin.getPublicCoin().getDenomination();
     version = coin.getVersion();
+    if (!static_cast<int>(version)) //todo: figure out why version does not make it here
+        version = 1;
 
     // Sanity check: let's verify that the Witness is valid with respect to
     // the coin and Accumulator provided.
@@ -43,23 +46,23 @@ CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulat
     // Specifically, our serial number proof requires the order of the commitment group
     // to be the same as the modulus of the upper group. The Accumulator proof requires a
     // group with a significantly larger order.
-    const Commitment fullCommitmentToCoinUnderSerialParams(&p->serialNumberSoKCommitmentGroup, coin.getPublicCoin().getValue());
+    const Commitment fullCommitmentToCoinUnderSerialParams(&paramsCoin->serialNumberSoKCommitmentGroup, coin.getPublicCoin().getValue());
     this->serialCommitmentToCoinValue = fullCommitmentToCoinUnderSerialParams.getCommitmentValue();
 
-    const Commitment fullCommitmentToCoinUnderAccParams(&p->accumulatorParams.accumulatorPoKCommitmentGroup, coin.getPublicCoin().getValue());
+    const Commitment fullCommitmentToCoinUnderAccParams(&paramsAcc->accumulatorParams.accumulatorPoKCommitmentGroup, coin.getPublicCoin().getValue());
     this->accCommitmentToCoinValue = fullCommitmentToCoinUnderAccParams.getCommitmentValue();
 
     // 2. Generate a ZK proof that the two commitments contain the same public coin.
-    this->commitmentPoK = CommitmentProofOfKnowledge(&p->serialNumberSoKCommitmentGroup, &p->accumulatorParams.accumulatorPoKCommitmentGroup, fullCommitmentToCoinUnderSerialParams, fullCommitmentToCoinUnderAccParams);
+    this->commitmentPoK = CommitmentProofOfKnowledge(&paramsCoin->serialNumberSoKCommitmentGroup, &paramsAcc->accumulatorParams.accumulatorPoKCommitmentGroup, fullCommitmentToCoinUnderSerialParams, fullCommitmentToCoinUnderAccParams);
 
     // Now generate the two core ZK proofs:
     // 3. Proves that the committed public coin is in the Accumulator (PoK of "witness")
-    this->accumulatorPoK = AccumulatorProofOfKnowledge(&p->accumulatorParams, fullCommitmentToCoinUnderAccParams, witness, a);
+    this->accumulatorPoK = AccumulatorProofOfKnowledge(&paramsAcc->accumulatorParams, fullCommitmentToCoinUnderAccParams, witness, a);
 
     // 4. Proves that the coin is correct w.r.t. serial number and hidden coin secret
     // (This proof is bound to the coin 'metadata', i.e., transaction hash)
     uint256 hashSig = signatureHash();
-    this->serialNumberSoK = SerialNumberSignatureOfKnowledge(p, coin, fullCommitmentToCoinUnderSerialParams, hashSig);
+    this->serialNumberSoK = SerialNumberSignatureOfKnowledge(paramsCoin, coin, fullCommitmentToCoinUnderSerialParams, hashSig);
 
     // 5. Sign the transaction using the private key associated with the serial number
     if (version >= PrivateCoin::PUBKEY_VERSION) {
@@ -69,27 +72,36 @@ CoinSpend::CoinSpend(const ZerocoinParams* p, const PrivateCoin& coin, Accumulat
     }
 }
 
-int ExtractVersionFromSerial(const CBigNum& bnSerial)
-{
-    //Serial is marked as v2 only if the first byte is 0xF
-    uint256 nMark = bnSerial.getuint256() >> (256 - PrivateCoin::V2_BITSHIFT);
-    if (nMark == 0xf)
-        return PrivateCoin::PUBKEY_VERSION;
-
-    return 1;
-}
-
 bool CoinSpend::Verify(const Accumulator& a) const
 {
     // Double check that the version is the same as marked in the serial
-    if (ExtractVersionFromSerial(coinSerialNumber) != version)
+    if (ExtractVersionFromSerial(coinSerialNumber) != version) {
+        cout << "CoinSpend::Verify: version does not match serial=" << (int)ExtractVersionFromSerial(coinSerialNumber) << " actual=" << (int)version << endl;
         return false;
+    }
+
+    if (a.getDenomination() != this->denomination) {
+        std::cout << "CoinsSpend::Verify: failed, denominations do not match\n";
+        return false;
+    }
 
     // Verify both of the sub-proofs using the given meta-data
-    return (a.getDenomination() == this->denomination) &&
-            commitmentPoK.Verify(serialCommitmentToCoinValue, accCommitmentToCoinValue) &&
-            accumulatorPoK.Verify(a, accCommitmentToCoinValue) &&
-            serialNumberSoK.Verify(coinSerialNumber, serialCommitmentToCoinValue, signatureHash());
+    if (!commitmentPoK.Verify(serialCommitmentToCoinValue, accCommitmentToCoinValue)) {
+        std::cout << "CoinsSpend::Verify: commitmentPoK failed\n";
+        return false;
+    }
+
+    if (!accumulatorPoK.Verify(a, accCommitmentToCoinValue)) {
+        std::cout << "CoinsSpend::Verify: accumulatorPoK failed\n";
+        return false;
+    }
+
+    if (!serialNumberSoK.Verify(coinSerialNumber, serialCommitmentToCoinValue, signatureHash())) {
+        std::cout << "CoinsSpend::Verify: serialNumberSoK failed. sighash:" << signatureHash().GetHex() << "\n";
+        return false;
+    }
+
+    return true;
 }
 
 const uint256 CoinSpend::signatureHash() const
@@ -104,6 +116,23 @@ const uint256 CoinSpend::signatureHash() const
     return h.GetHash();
 }
 
+std::string CoinSpend::ToString() const
+{
+    std::stringstream ss;
+    ss << "CoinSpend:\n version=" << (int)version << " signatureHash=" << signatureHash().GetHex() << " spendtype=" << spendType << "\n";
+    return ss.str();
+}
+
+//Remove the first four bits for V2 serials
+CBigNum CoinSpend::GetAdjustedSerial() const
+{
+    uint256 serial = coinSerialNumber.getuint256();
+    serial &= ~uint256(0) >> PrivateCoin::V2_BITSHIFT;
+    CBigNum bnSerial;
+    bnSerial.setuint256(serial);
+    return bnSerial;
+}
+
 bool CoinSpend::HasValidSerial(ZerocoinParams* params) const
 {
     if (coinSerialNumber <= 0)
@@ -112,27 +141,24 @@ bool CoinSpend::HasValidSerial(ZerocoinParams* params) const
     if (version < PrivateCoin::PUBKEY_VERSION)
         return coinSerialNumber < params->coinCommitmentGroup.groupOrder;
 
-    uint256 n =  ~uint256(0);
-    n <<= (256 - PrivateCoin::V2_BITSHIFT);
-    uint256 nGroupOrderLimit = params->coinCommitmentGroup.groupOrder.getuint256() | n;
-    return coinSerialNumber.getuint256() < nGroupOrderLimit;
+    //If V2, the serial is marked with 0xF in the first 4 bits. This is removed for the actual serial.
+    CBigNum bnAdjustedSerial = GetAdjustedSerial();
+    return bnAdjustedSerial > 0 && bnAdjustedSerial < params->coinCommitmentGroup.groupOrder;
 }
 
 //Additional verification layer that requires the spend be signed by the private key associated with the serial
 bool CoinSpend::HasValidSignature() const
 {
-    uint256 nSerial = coinSerialNumber.getuint256();
+    //No private key for V1
     if (version < PrivateCoin::PUBKEY_VERSION)
         return true;
 
-    //Adjust the serial to drop the first 4 bits
-    uint256 nMask = ~uint256(0) >> PrivateCoin::V2_BITSHIFT;
-    nSerial &= nMask;
-
-    //v2 serial requires that the signature hash be signed by the public key associated with the serial
+    //V2 serial requires that the signature hash be signed by the public key associated with the serial
     uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end()) >> PrivateCoin::V2_BITSHIFT;
-    if (hashedPubkey != nSerial)
+    if (hashedPubkey != GetAdjustedSerial().getuint256()) {
+        cout << "CoinSpend::HasValidSignature() hashedpubkey is not equal to the serial!\n";
         return false;
+    }
 
     return pubkey.Verify(signatureHash(), vchSig);
 }

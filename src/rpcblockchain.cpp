@@ -15,6 +15,7 @@
 #include "txdb.h"
 #include "util.h"
 #include "utilmoneystr.h"
+#include "accumulatormap.h"
 
 #include <stdint.h>
 #include <univalue.h>
@@ -977,29 +978,75 @@ UniValue getinvalid (const UniValue& params, bool fHelp)
 
 UniValue findserial(const UniValue& params, bool fHelp)
 {
-    if(fHelp || params.size() != 1)
-        throw runtime_error(
-            "findserial \"serial\"\n"
-                "\nSearches the zerocoin database for a zerocoin spend transaction that contains the specified serial\n"
-                "\nArguments:\n"
-                "1. serial   (string, required) the serial of a zerocoin spend to search for.\n"
-                "\nResult:\n"
-                "{\n"
-                "  \"success\": true/false        (boolean) Whether the serial was found\n"
-                "  \"txid\": xxxxx                (numeric) The transaction that contains the spent serial\n"
-                "}\n"
-                "\nExamples:\n" +
-            HelpExampleCli("findserial", "\"serial\"") + HelpExampleRpc("findserial", "\"serial\""));
+//    if(fHelp || params.size() != 1)
+//        throw runtime_error(
+//            "findserial \"serial\"\n"
+//                "\nSearches the zerocoin database for a zerocoin spend transaction that contains the specified serial\n"
+//                "\nArguments:\n"
+//                "1. serial   (string, required) the serial of a zerocoin spend to search for.\n"
+//                "\nResult:\n"
+//                "{\n"
+//                "  \"success\": true/false        (boolean) Whether the serial was found\n"
+//                "  \"txid\": xxxxx                (numeric) The transaction that contains the spent serial\n"
+//                "}\n"
+//                "\nExamples:\n" +
+//            HelpExampleCli("findserial", "\"serial\"") + HelpExampleRpc("findserial", "\"serial\""));
+//
+//    std::string strSerial = params[0].get_str();
+//    CBigNum bnSerial(strSerial);
+//
+//    uint256 txid = 0;
+//    bool fSuccess = zerocoinDB->ReadCoinSpend(bnSerial, txid);
+//
+//    UniValue ret(UniValue::VOBJ);
+//    ret.push_back(Pair("success", fSuccess));
+//    ret.push_back(Pair("txid", txid.GetHex()));
+//
+//    return ret;
 
-    std::string strSerial = params[0].get_str();
-    CBigNum bnSerial(strSerial);
+    UniValue ret(UniValue::VARR);
+    AccumulatorMap mapAccumulators(Params().Zerocoin_Params(false));
+    AccumulatorMap mapAccumulatorsOld(Params().Zerocoin_Params(true));
+    CBlockIndex* pindex = chainActive[Params().Zerocoin_StartHeight()];
+    uint256 nCheckpointPrev  = 0;
+    while (pindex) {
+        CBlock block;
+        if (!ReadBlockFromDisk(block, pindex))
+            throw JSONRPCError(RPC_DATABASE_ERROR, "failed to read block");
 
-    uint256 txid = 0;
-    bool fSuccess = zerocoinDB->ReadCoinSpend(bnSerial, txid);
+        list<libzerocoin::PublicCoin> listCoins;
+        BlockToPubcoinList(block, listCoins, true);
+        for (const libzerocoin::PublicCoin& coin : listCoins) {
+            mapAccumulators.Accumulate(coin, true);
+            mapAccumulatorsOld.Accumulate(coin, true);
+        }
 
-    UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("success", fSuccess));
-    ret.push_back(Pair("txid", txid.GetHex()));
+        uint256 nCheckpoint = mapAccumulatorsOld.GetCheckpoint();
+        if (pindex->nHeight % 10 == 0) {
+            uint256 nCheckpointBlock = chainActive[pindex->nHeight+10]->nAccumulatorCheckpoint;
+            if (nCheckpointBlock != nCheckpointPrev) {
+                LogPrintf("height=%d checkpointprev=%s\n", pindex->nHeight - 1, nCheckpointPrev.GetHex());
+                LogPrintf("***checkpoint does not match!!!! block=%d checkpoint=%s\n", (pindex->nHeight+10), chainActive[pindex->nHeight+10]->nAccumulatorCheckpoint.GetHex());
+            }
+
+
+
+        } else if (pindex->nHeight % 10000 == 9) {
+            UniValue obj(UniValue::VOBJ);
+            obj.push_back(Pair(std::to_string(pindex->nHeight), ""));
+            for (auto denom : libzerocoin::zerocoinDenomList)
+                obj.push_back(Pair(std::to_string(denom), mapAccumulators.GetValue(denom).GetHex()));
+
+            ret.push_back(obj);
+        } else if (pindex->nHeight > chainActive.Height() - 20)
+            break;
+
+//        LogPrintf("height=%d existing=%s\n", pindex->nHeight, nCheckpoint.GetHex());
+//        LogPrintf("height=%d new=%s\n", pindex->nHeight, mapAccumulators.GetCheckpoint().GetHex());
+
+        nCheckpointPrev = nCheckpoint;
+        pindex = chainActive.Next(pindex);
+    }
 
     return ret;
 }

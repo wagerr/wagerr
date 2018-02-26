@@ -63,7 +63,8 @@ PrivateCoin::PrivateCoin(const ZerocoinParams* p, const CoinDenomination denomin
 	// Mint a new coin with a random serial number using the standard process.
 	this->mintCoin(denomination);
 #endif
-	
+
+    this->version = CURRENT_VERSION;
 }
 
 inline void GenerateKeyPair(const CBigNum& bnGroupOrder, CKey& key, CBigNum& bnSerial)
@@ -76,11 +77,13 @@ inline void GenerateKeyPair(const CBigNum& bnGroupOrder, CKey& key, CBigNum& bnS
 		CPubKey pubKey = keyPair.GetPubKey();
 		uint256 hashPubKey = Hash(pubKey.begin(), pubKey.end());
 
-        // Make the first byte 0's which will destinctly mark v2 serials
+        // Make the first half byte 0 which will distinctly mark v2 serials
         hashPubKey >>= PrivateCoin::V2_BITSHIFT;
+
 		CBigNum s(hashPubKey);
-		if (s >= bnGroupOrder)
-			continue;
+        uint256 nBits = hashPubKey >> 248; // must be less than 0x0D to be valid serial range
+		if (nBits > 12)
+            continue;
 
         //Mark this as v2 by starting with 0xF
         uint256 nMark = 0xF;
@@ -195,6 +198,16 @@ void PrivateCoin::mintCoinFast(const CoinDenomination denomination) {
 	// We only get here if we did not find a coin within
 	// MAX_COINMINT_ATTEMPTS. Throw an exception.
 	throw std::runtime_error("Unable to mint a new Zerocoin (too many attempts)");
+}
+
+int ExtractVersionFromSerial(const CBigNum& bnSerial)
+{
+	//Serial is marked as v2 only if the first byte is 0xF
+	uint256 nMark = bnSerial.getuint256() >> (256 - PrivateCoin::V2_BITSHIFT);
+	if (nMark == 0xf)
+		return PrivateCoin::PUBKEY_VERSION;
+
+	return 1;
 }
 	
 } /* namespace libzerocoin */

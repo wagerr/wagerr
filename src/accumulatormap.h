@@ -7,18 +7,22 @@
 
 #include "libzerocoin/Accumulator.h"
 #include "libzerocoin/Coin.h"
+#include "accumulatorcheckpoints.h"
 
 //A map with an accumulator for each denomination
 class AccumulatorMap
 {
 private:
+    libzerocoin::ZerocoinParams* params;
     std::map<libzerocoin::CoinDenomination, std::unique_ptr<libzerocoin::Accumulator> > mapAccumulators;
 public:
-    AccumulatorMap();
+    explicit AccumulatorMap(libzerocoin::ZerocoinParams* params);
     bool Load(uint256 nCheckpoint);
-    bool Accumulate(libzerocoin::PublicCoin pubCoin, bool fSkipValidation = false);
+    void Load(const AccumulatorCheckpoints::Checkpoint& checkpoint);
+    bool Accumulate(const libzerocoin::PublicCoin& pubCoin, bool fSkipValidation = false);
     CBigNum GetValue(libzerocoin::CoinDenomination denom);
     uint256 GetCheckpoint();
     void Reset();
+    void Reset(libzerocoin::ZerocoinParams* params2);
 };
 #endif //WAGERR_ACCUMULATORMAP_H

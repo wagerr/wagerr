@@ -23,6 +23,8 @@
 
 namespace libzerocoin
 {
+    int ExtractVersionFromSerial(const CBigNum& bnSerial);
+
 /** A Public coin is the part of a coin that
  * is published to the network and what is handled
  * by other clients. It contains only the value
@@ -121,6 +123,7 @@ public:
         READWRITE(publicCoin);
         READWRITE(randomness);
         READWRITE(serialNumber);
+        version = (uint8_t )ExtractVersionFromSerial(serialNumber);
         if (version == 2) {
             READWRITE(version);
             READWRITE(privkey);

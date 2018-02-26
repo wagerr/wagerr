@@ -375,6 +375,12 @@ public:
         return nCompact;
     }
 
+    void SetDec(const std::string& str)
+    {
+        BIGNUM* bn = this;
+        BN_dec2bn(&bn, str.c_str());
+    }
+
     void SetHex(const std::string& str)
     {
         // skip 0x

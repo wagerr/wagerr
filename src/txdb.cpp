@@ -272,8 +272,8 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
 
                 //populate accumulator checksum map in memory
                 if(pindexNew->nAccumulatorCheckpoint != 0 && pindexNew->nAccumulatorCheckpoint != nPreviousCheckpoint) {
-                    //Don't load any invalid checkpoints
-                    if (!InvalidCheckpointRange(pindexNew->nHeight))
+                    //Don't load any checkpoints that exist before v2 zwgr. The accumulator is invalid for v1 and not used.
+                    if (pindexNew->nHeight >= Params().Zerocoin_Block_V2_Start())
                         LoadAccumulatorValuesFromDB(pindexNew->nAccumulatorCheckpoint);
 
                     nPreviousCheckpoint = pindexNew->nAccumulatorCheckpoint;
@@ -353,16 +353,16 @@ bool CZerocoinDB::EraseCoinSpend(const CBigNum& bnSerial)
 bool CZerocoinDB::WriteAccumulatorValue(const uint32_t& nChecksum, const CBigNum& bnValue)
 {
     LogPrint("zero","%s : checksum:%d val:%s\n", __func__, nChecksum, bnValue.GetHex());
-    return Write(make_pair('a', nChecksum), bnValue);
+    return Write(make_pair('2', nChecksum), bnValue);
 }
 
 bool CZerocoinDB::ReadAccumulatorValue(const uint32_t& nChecksum, CBigNum& bnValue)
 {
-    return Read(make_pair('a', nChecksum), bnValue);
+    return Read(make_pair('2', nChecksum), bnValue);
 }
 
 bool CZerocoinDB::EraseAccumulatorValue(const uint32_t& nChecksum)
 {
     LogPrint("zero", "%s : checksum:%d\n", __func__, nChecksum);
-    return Erase(make_pair('a', nChecksum));
+    return Erase(make_pair('2', nChecksum));
 }

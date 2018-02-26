@@ -13,10 +13,11 @@ using namespace libzerocoin;
 using namespace std;
 
 //Construct accumulators for all denominations
-AccumulatorMap::AccumulatorMap()
+AccumulatorMap::AccumulatorMap(libzerocoin::ZerocoinParams* params)
 {
+    this->params = params;
     for (auto& denom : zerocoinDenomList) {
-        unique_ptr<Accumulator> uptr(new Accumulator(Params().Zerocoin_Params(), denom));
+        unique_ptr<Accumulator> uptr(new Accumulator(params, denom));
         mapAccumulators.insert(make_pair(denom, std::move(uptr)));
     }
 }
@@ -24,9 +25,15 @@ AccumulatorMap::AccumulatorMap()
 //Reset each accumulator to its default state
 void AccumulatorMap::Reset()
 {
+    Reset(params);
+}
+
+void AccumulatorMap::Reset(libzerocoin::ZerocoinParams* params2)
+{
+    this->params = params2;
     mapAccumulators.clear();
     for (auto& denom : zerocoinDenomList) {
-        unique_ptr<Accumulator> uptr(new Accumulator(Params().Zerocoin_Params(), denom));
+        unique_ptr<Accumulator> uptr(new Accumulator(params2, denom));
         mapAccumulators.insert(make_pair(denom, std::move(uptr)));
     }
 }
@@ -38,18 +45,23 @@ bool AccumulatorMap::Load(uint256 nCheckpoint)
         uint32_t nChecksum = ParseChecksum(nCheckpoint, denom);
 
         CBigNum bnValue;
-        if (!zerocoinDB->ReadAccumulatorValue(nChecksum, bnValue)) {
-            LogPrintf("%s : cannot find checksum %d", __func__, nChecksum);
-            return false;
-        }
+        if (!zerocoinDB->ReadAccumulatorValue(nChecksum, bnValue))
+            return error("%s : cannot find checksum %d", __func__, nChecksum);
 
         mapAccumulators.at(denom)->setValue(bnValue);
     }
     return true;
 }
 
+//Load accumulator map from a hard-checkpoint
+void AccumulatorMap::Load(const AccumulatorCheckpoints::Checkpoint& checkpoint)
+{
+     for (auto it : checkpoint)
+         mapAccumulators.at(it.first)->setValue(it.second);
+}
+
 //Add a zerocoin to the accumulator of its denomination.
-bool AccumulatorMap::Accumulate(PublicCoin pubCoin, bool fSkipValidation)
+bool AccumulatorMap::Accumulate(const PublicCoin& pubCoin, bool fSkipValidation)
 {
     CoinDenomination denom = pubCoin.getDenomination();
     if (denom == CoinDenomination::ZQ_ERROR)

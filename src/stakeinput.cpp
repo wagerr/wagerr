@@ -96,7 +96,10 @@ bool CZWgrStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
     LogPrintf("%s\n", __func__);
     CZerocoinSpendReceipt receipt;
     int nSecurityLevel = 100;
-    if (!pwallet->MintToTxIn(mint, nSecurityLevel, hashTxOut, txIn, receipt, libzerocoin::SpendType::STAKE))
+    CBlockIndex* pindexCheckpoint = GetIndexFrom();
+    if (!pindexCheckpoint)
+        return error("%s: failed to find checkpoint block index", __func__);
+    if (!pwallet->MintToTxIn(mint, nSecurityLevel, hashTxOut, txIn, receipt, libzerocoin::SpendType::STAKE, GetIndexFrom()))
         return error("%s\n", receipt.GetStatusMessage());
 
     return true;
@@ -109,14 +112,14 @@ bool CZWgrStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout)
     //Create an output returning the zWGR that was staked
     CTxOut outReward;
     libzerocoin::CoinDenomination denomStaked = libzerocoin::AmountToZerocoinDenomination(this->GetValue());
-    libzerocoin::PrivateCoin coin(Params().Zerocoin_Params(), denomStaked);
+    libzerocoin::PrivateCoin coin(Params().Zerocoin_Params(false), denomStaked);
     if (!pwallet->CreateZWGROutPut(denomStaked, coin, outReward))
         return error("%s: failed to create zWGR output", __func__);
     vout.emplace_back(outReward);
 
     for (unsigned int i = 0; i < 3; i++) {
         CTxOut outReward;
-        libzerocoin::PrivateCoin coinReward(Params().Zerocoin_Params(), libzerocoin::CoinDenomination::ZQ_ONE);
+        libzerocoin::PrivateCoin coinReward(Params().Zerocoin_Params(false), libzerocoin::CoinDenomination::ZQ_ONE);
         if (!pwallet->CreateZWGROutPut(libzerocoin::CoinDenomination::ZQ_ONE, coinReward, outReward))
             return error("%s: failed to create zWGR output", __func__);
         vout.emplace_back(outReward);

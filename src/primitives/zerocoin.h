@@ -55,7 +55,7 @@ public:
         denomination = libzerocoin::ZQ_ERROR;
         nHeight = 0;
         txid = 0;
-        version = 0;
+        version = 1;
         privkey.clear();
     }
 
@@ -144,7 +144,7 @@ public:
         }
 
         if (version > CURRENT_VERSION) {
-            version = 0;
+            version = 1;
             fVersionedMint = false;
         }
 
