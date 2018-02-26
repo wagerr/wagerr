@@ -1,7 +1,7 @@
 Wagerr Core integration/staging repository
 =====================================
 
-[![Build Status](https://travis-ci.org/wagerr/wagerr.svg?branch=master)](https://travis-ci.org/wagerr/wagerr) [![GitHub version](https://badge.fury.io/gh/wagerr%2Fwagerr.svg)](https://badge.fury.io/gh/wagerr%2Fwagerr)
+[![Build Status](https://travis-ci.org/wagerr/wagerr.svg?branch=master)](https://travis-ci.org/wagerr/wagerr) [![GitHub version](https://badge.fury.io/gh/wagerr%2Fwagerr.svg)](https://badge.fury.io/gh/wagerr%2Fwagerr) [![Snap Status](https://build.snapcraft.io/badge/wagerr/wagerr.svg)](https://build.snapcraft.io/user/wagerr/wagerr)
 
 Wagerr is a cutting edge cryptocurrency, with many features not available in most other cryptocurrencies.
 - Anonymized transactions using the _Zerocoin Protocol_.
