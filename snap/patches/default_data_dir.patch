@@ -1,0 +1,13 @@
+diff --git a/src/util.cpp b/src/util.cpp
+index ad9e7a1..26e2ee3 100644
+--- a/src/util.cpp
++++ b/src/util.cpp
+@@ -434,7 +434,7 @@ boost::filesystem::path GetDefaultDataDir()
+     return GetSpecialFolderPath(CSIDL_APPDATA) / "Wagerr";
+ #else
+     fs::path pathRet;
+-    char* pszHome = getenv("HOME");
++    char* pszHome = getenv("SNAP_USER_COMMON");
+     if (pszHome == NULL || strlen(pszHome) == 0)
+         pathRet = fs::path("/");
+     else
