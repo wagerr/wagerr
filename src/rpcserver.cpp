@@ -357,6 +357,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "listmasternodes", &listmasternodes, true, true, false},
         {"wagerr", "getmasternodecount", &getmasternodecount, true, true, false},
         {"wagerr", "masternodeconnect", &masternodeconnect, true, true, false},
+		{"wagerr", "masternodebroadcast", &masternodebroadcast, true, true, false},
         {"wagerr", "masternodecurrent", &masternodecurrent, true, true, false},
         {"wagerr", "masternodedebug", &masternodedebug, true, true, false},
         {"wagerr", "startmasternode", &startmasternode, true, true, false},

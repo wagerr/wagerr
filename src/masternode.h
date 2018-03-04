@@ -60,8 +60,9 @@ public:
         READWRITE(vchSig);
     }
 
-    bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true);
+    bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true, bool fCheckSigTimeOnly = false);
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
+    bool VerifySignature(CPubKey& pubKeyMasternode, int &nDos);
     void Relay();
 
     uint256 GetHash()
