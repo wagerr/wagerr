@@ -33,7 +33,8 @@ class CTxBudgetPayment;
 #define VOTE_NO 2
 
 static const CAmount PROPOSAL_FEE_TX = (50 * COIN);
-static const CAmount BUDGET_FEE_TX = (50 * COIN);
+static const CAmount BUDGET_FEE_TX_OLD = (50 * COIN);
+static const CAmount BUDGET_FEE_TX = (5 * COIN);
 static const int64_t BUDGET_VOTE_UPDATE_MIN = 60 * 60;
 
 extern std::vector<CBudgetProposalBroadcast> vecImmatureBudgetProposals;
@@ -46,7 +47,7 @@ void DumpBudgets();
 int GetBudgetPaymentCycleBlocks();
 
 //Check the collateral transaction for the budget proposal/finalized budget
-bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, std::string& strError, int64_t& nTime, int& nConf);
+bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, std::string& strError, int64_t& nTime, int& nConf, bool fBudgetFinalization=false);
 
 //
 // CBudgetVote - Allow a masternode node to vote and broadcast throughout the network

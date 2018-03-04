@@ -35,7 +35,7 @@ int GetBudgetPaymentCycleBlocks()
     return 144; //ten times per day
 }
 
-bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, std::string& strError, int64_t& nTime, int& nConf)
+bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, std::string& strError, int64_t& nTime, int& nConf, bool fBudgetFinalization)
 {
     CTransaction txCollateral;
     uint256 nBlockHash;
@@ -58,7 +58,17 @@ bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, s
             LogPrint("masternode","CBudgetProposalBroadcast::IsBudgetCollateralValid - %s\n", strError);
             return false;
         }
-        if (o.scriptPubKey == findScript && o.nValue >= PROPOSAL_FEE_TX) foundOpReturn = true;
+        if (fBudgetFinalization) {
+            // Collateral for budget finalization
+            // Note: there are still old valid budgets out there, but the check for the new 5 WGR finalization collateral
+            //       will also cover the old 50 WGR finalization collateral.
+
+            if (o.scriptPubKey == findScript && o.nValue >= BUDGET_FEE_TX) foundOpReturn = true;
+        }
+        else {
+            // Collateral for normal budget proposal
+            if (o.scriptPubKey == findScript && o.nValue >= PROPOSAL_FEE_TX) foundOpReturn = true;
+        }
     }
     if (!foundOpReturn) {
         strError = strprintf("Couldn't find opReturn %s in %s", nExpectedHash.ToString(), txCollateral.ToString());
@@ -181,7 +191,7 @@ void CBudgetManager::SubmitFinalBudget()
 
     if (!mapCollateralTxids.count(tempBudget.GetHash())) {
         CWalletTx wtx;
-        if (!pwalletMain->GetBudgetSystemCollateralTX(wtx, tempBudget.GetHash(), false)) {
+        if (!pwalletMain->GetBudgetFinalizationCollateralTX(wtx, tempBudget.GetHash(), false)) {
             LogPrint("masternode","CBudgetManager::SubmitFinalBudget - Can't make collateral transaction\n");
             return;
         }
@@ -1973,7 +1983,7 @@ bool CFinalizedBudget::IsValid(std::string& strError, bool fCheckCollateral)
     std::string strError2 = "";
     if (fCheckCollateral) {
         int nConf = 0;
-        if (!IsBudgetCollateralValid(nFeeTXHash, GetHash(), strError2, nTime, nConf)) {
+        if (!IsBudgetCollateralValid(nFeeTXHash, GetHash(), strError2, nTime, nConf, true)) {
             {
                 strError = "Budget " + strBudgetName + " Invalid Collateral : " + strError2;
                 return false;

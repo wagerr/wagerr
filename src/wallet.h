@@ -508,8 +508,8 @@ public:
 
     std::set<CTxDestination> GetAccountAddresses(std::string strAccount) const;
 
-    bool GetBudgetSystemCollateralTX(CTransaction& tx, uint256 hash, bool useIX);
     bool GetBudgetSystemCollateralTX(CWalletTx& tx, uint256 hash, bool useIX);
+    bool GetBudgetFinalizationCollateralTX(CWalletTx& tx, uint256 hash, bool useIX); // Only used for budget finalization
 
     // get the Obfuscation chain depth for a given input
     int GetRealInputObfuscationRounds(CTxIn in, int rounds) const;
