@@ -699,7 +699,7 @@ bool CMasternodeBroadcast::VerifySignature()
 {
     std::string errorMessage;
     std::string strMessage;
-    if(protocolVersion < 70913) {
+    if(protocolVersion < 70911) {
         std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
         std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
         strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) + vchPubKey + vchPubKey2 + boost::lexical_cast<std::string>(protocolVersion);
