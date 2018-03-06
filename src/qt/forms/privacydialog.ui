@@ -573,9 +573,6 @@
                         <property name="backgroundVisible">
                          <bool>true</bool>
                         </property>
-                        <property name="placeholderText">
-                         <string/>
-                        </property>
                        </widget>
                       </item>
                       <item>
