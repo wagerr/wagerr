@@ -170,5 +170,4 @@ script: |
     rm -rf distsrc-${i}
   done
   mkdir -p $OUTDIR/src
-  mkdir -p $OUTDIR/src
   mv $SOURCEDIST $OUTDIR/src
