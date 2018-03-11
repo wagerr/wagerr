@@ -938,6 +938,7 @@ int64_t CWalletTx::GetTxTime() const
 int64_t CWalletTx::GetComputedTxTime() const
 {
     if (IsZerocoinSpend() || IsZerocoinMint()) {
+
         if (IsInMainChain())
             return mapBlockIndex.at(hashBlock)->GetBlockTime();
         else
@@ -2048,30 +2049,35 @@ bool CWallet::SelectStakeCoins(std::set<std::pair<const CWalletTx*, unsigned int
     AvailableCoins(vCoins, true, NULL, false, STAKABLE_COINS);
     CAmount nAmountSelected = 0;
 
-    for (const COutput& out : vCoins) {
-        //make sure not to outrun target amount
-        if (nAmountSelected + out.tx->vout[out.i].nValue > nTargetAmount)
-            continue;
+    
+    {
+        LOCK(cs_main);
 
-        //if zerocoinspend, then use the block time
-        int64_t nTxTime = out.tx->GetTxTime();
-        if (out.tx->IsZerocoinSpend()) {
-            if (!out.tx->IsInMainChain())
+        for (const COutput& out : vCoins) {
+            //make sure not to outrun target amount
+            if (nAmountSelected + out.tx->vout[out.i].nValue > nTargetAmount)
                 continue;
-            nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
+
+            //if zerocoinspend, then use the block time
+            int64_t nTxTime = out.tx->GetTxTime();
+            if (out.tx->IsZerocoinSpend()) {
+                if (!out.tx->IsInMainChain())
+                    continue;
+                nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
+            }
+
+            //check for min age
+            if (GetAdjustedTime() - nTxTime < nStakeMinAge)
+                continue;
+
+            //check that it is matured
+            if (out.nDepth < (out.tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10))
+                continue;
+
+            //add to our stake set
+            setCoins.insert(make_pair(out.tx, out.i));
+            nAmountSelected += out.tx->vout[out.i].nValue;
         }
-
-        //check for min age
-        if (GetAdjustedTime() - nTxTime < nStakeMinAge)
-            continue;
-
-        //check that it is matured
-        if (out.nDepth < (out.tx->IsCoinStake() ? Params().COINBASE_MATURITY() : 10))
-            continue;
-
-        //add to our stake set
-        setCoins.insert(make_pair(out.tx, out.i));
-        nAmountSelected += out.tx->vout[out.i].nValue;
     }
     return true;
 }
@@ -2087,16 +2093,19 @@ bool CWallet::MintableCoins()
     vector<COutput> vCoins;
     AvailableCoins(vCoins, true);
 
-    for (const COutput& out : vCoins) {
-        int64_t nTxTime = out.tx->GetTxTime();
-        if (out.tx->IsZerocoinSpend()) {
-            if (!out.tx->IsInMainChain())
-                continue;
-            nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
-        }
+    {
+        LOCK(cs_main);
+        for (const COutput& out : vCoins) {
+            int64_t nTxTime = out.tx->GetTxTime();
+            if (out.tx->IsZerocoinSpend()) {
+                if (!out.tx->IsInMainChain())
+                    continue;
+                nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
+            }
 
-        if (GetAdjustedTime() - nTxTime > nStakeMinAge)
-            return true;
+            if (GetAdjustedTime() - nTxTime > nStakeMinAge)
+                return true;
+        }
     }
 
     return false;
