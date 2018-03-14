@@ -189,7 +189,7 @@ private:
 
 public:
     bool MintableCoins();
-    bool SelectStakeCoins(std::list<CStakeInput*>& listInputs, CAmount nTargetAmount) const;
+    bool SelectStakeCoins(std::list<CStakeInput*>& listInputs, CAmount nTargetAmount);
     bool SelectCoinsDark(CAmount nValueMin, CAmount nValueMax, std::vector<CTxIn>& setCoinsRet, CAmount& nValueRet, int nObfuscationRoundsMin, int nObfuscationRoundsMax) const;
     bool SelectCoinsByDenominations(int nDenom, CAmount nValueMin, CAmount nValueMax, std::vector<CTxIn>& vCoinsRet, std::vector<COutput>& vCoinsRet2, CAmount& nValueRet, int nObfuscationRoundsMin, int nObfuscationRoundsMax);
     bool SelectCoinsDarkDenominated(CAmount nTargetValue, std::vector<CTxIn>& setCoinsRet, CAmount& nValueRet) const;
@@ -212,6 +212,7 @@ public:
     void ZWgrBackupWallet();
     bool GetZerocoinKey(const CBigNum& bnSerial, CKey& key);
     bool CreateZWGROutPut(libzerocoin::CoinDenomination denomination, libzerocoin::PrivateCoin& coin, CTxOut& outMint);
+    bool GetMint(const uint256& hashSerial, CZerocoinMint& mint);
 
     /** Zerocin entry changed.
     * @note called with lock cs_wallet held.
@@ -230,6 +231,7 @@ public:
     bool fWalletUnlockAnonymizeOnly;
     std::string strWalletFile;
     bool fBackupMints;
+    std::map<uint256, CMintMeta> mapSerialHashes;
 
     std::set<int64_t> setKeyPool;
     std::map<CKeyID, CKeyMetadata> mapKeyMetadata;
@@ -288,6 +290,7 @@ public:
         nTimeFirstKey = 0;
         fWalletUnlockAnonymizeOnly = false;
         fBackupMints = false;
+        mapSerialHashes.clear();
 
         // Stake Settings
         nHashDrift = 45;

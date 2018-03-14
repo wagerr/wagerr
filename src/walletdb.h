@@ -155,9 +155,10 @@ public:
     bool WriteZerocoinMint(const CZerocoinMint& zerocoinMint);
     bool EraseZerocoinMint(const CZerocoinMint& zerocoinMint);
     bool ReadZerocoinMint(const CBigNum &bnSerial, CZerocoinMint& zerocoinMint);
+    bool ReadZerocoinMint(const uint256& hashPubcoin, CZerocoinMint& mint);
     bool ArchiveMintOrphan(const CZerocoinMint& zerocoinMint);
     bool UnarchiveZerocoin(const CZerocoinMint& mint);
-    std::list<CZerocoinMint> ListMintedCoins(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus);
+    std::list<CZerocoinMint> ListMintedCoins(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, std::map<uint256, CMintMeta>* mapSerialHashes = NULL);
     std::list<CZerocoinSpend> ListSpentCoins();
     std::list<CBigNum> ListMintedCoinsSerial();
     std::list<CBigNum> ListSpentCoinsSerial();

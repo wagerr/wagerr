@@ -454,6 +454,11 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             mempool.clear();
             return NULL;
         }
+
+        if (pblock->IsZerocoinStake()) {
+            CWalletTx wtx(pwalletMain, pblock->vtx[1]);
+            pwalletMain->AddToWallet(wtx);
+        }
     }
 
     return pblocktemplate.release();
@@ -562,7 +567,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
                 continue;
             }
 
-            while (pwallet->IsLocked() || !fMintableCoins || nReserveBalance >= pwallet->GetBalance()) {
+            while (vNodes.empty() ||pwallet->IsLocked() || !fMintableCoins || nReserveBalance >= pwallet->GetBalance() || !masternodeSync.IsSynced()) {
                 nLastCoinStakeSearchInterval = 0;
                 MilliSleep(5000);
                 if (!fGenerateBitcoins && !fProofOfStake)

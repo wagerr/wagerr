@@ -1626,6 +1626,9 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
         bool fEnableZWgrBackups = GetBoolArg("-backupzwgr", true);
         pwalletMain->setZWgrAutoBackups(fEnableZWgrBackups);
+
+        //Load zerocoin mint hashes to memory
+        CWalletDB(pwalletMain->strWalletFile).ListMintedCoins(true, true, true, &(pwalletMain->mapSerialHashes));
     }  // (!fDisableWallet)
 #else  // ENABLE_WALLET
     LogPrintf("No wallet compiled in!\n");

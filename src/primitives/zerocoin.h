@@ -12,6 +12,19 @@
 #include "key.h"
 #include "serialize.h"
 
+//struct that is safe to store essential mint data, without holding any information that allows for actual spending (serial, randomness, private key)
+struct CMintMeta
+{
+    int nHeight;
+    uint256 hashSerial;
+    uint256 hashPubcoin;
+    uint8_t nVersion;
+    libzerocoin::CoinDenomination denom;
+    bool isUsed;
+};
+
+uint256 GetSerialHash(const CBigNum& bnSerial);
+
 class CZerocoinMint
 {
 private:

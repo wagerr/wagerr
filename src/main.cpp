@@ -1391,13 +1391,14 @@ bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidati
 
     // Send signal to wallet if this is ours
     if (pwalletMain) {
-        CWalletDB walletdb(pwalletMain->strWalletFile);
-        list <CBigNum> listMySerials = walletdb.ListMintedCoinsSerial();
         for (const auto& newSpend : vSpends) {
-            list<CBigNum>::iterator it = find(listMySerials.begin(), listMySerials.end(), newSpend.getCoinSerialNumber());
-            if (it != listMySerials.end()) {
-                LogPrintf("%s: %s detected spent zerocoin mint in transaction %s \n", __func__, it->GetHex(), tx.GetHash().GetHex());
-                pwalletMain->NotifyZerocoinChanged(pwalletMain, it->GetHex(), "Used", CT_UPDATED);
+            uint256 nSerial = newSpend.getCoinSerialNumber().getuint256();
+            uint256 hashSerial = Hash(nSerial.begin(), nSerial.end());
+            auto it = pwalletMain->mapSerialHashes.find(hashSerial);
+            if (it != pwalletMain->mapSerialHashes.end()) {
+                LogPrintf("%s: %s detected spent zerocoin mint in transaction %s \n", __func__, it->second.hashSerial.GetHex(), tx.GetHash().GetHex());
+                pwalletMain->NotifyZerocoinChanged(pwalletMain, it->second.hashPubcoin.GetHex(), "Used", CT_UPDATED);
+
             }
         }
     }

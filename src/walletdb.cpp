@@ -1064,7 +1064,12 @@ bool CWalletDB::ReadZerocoinMint(const CBigNum &bnPubCoinValue, CZerocoinMint& z
     ss << bnPubCoinValue;
     uint256 hash = Hash(ss.begin(), ss.end());
 
-    return Read(make_pair(string("zerocoin"), hash), zerocoinMint);
+    return ReadZerocoinMint(hash, zerocoinMint);
+}
+
+bool CWalletDB::ReadZerocoinMint(const uint256& hashPubcoin, CZerocoinMint& mint)
+{
+    return Read(make_pair(string("zerocoin"), hashPubcoin), mint);
 }
 
 bool CWalletDB::ReadZerocoinMintFromSerial(const CBigNum& bnSerial, CZerocoinMint& mint)
@@ -1121,7 +1126,7 @@ bool CWalletDB::UnarchiveZerocoin(const CZerocoinMint& mint)
     return WriteZerocoinMint(mint);
 }
 
-std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus)
+std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, std::map<uint256, CMintMeta>* mapSerialHashes)
 {
     std::list<CZerocoinMint> listPubCoin;
     Dbc* pcursor = GetCursor();
@@ -1153,11 +1158,31 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMatu
         if (strType != "zerocoin")
             break;
 
-        uint256 value;
-        ssKey >> value;
+        uint256 hashPubcoin;
+        ssKey >> hashPubcoin;
 
         CZerocoinMint mint;
         ssValue >> mint;
+
+        //Add any unused mints to the wallet's serial map
+        if (mapSerialHashes) {
+            uint256 nSerial = mint.GetSerialNumber().getuint256();
+            uint256 hashSerial = Hash(nSerial.begin(), nSerial.end());
+            if (!mapSerialHashes->count(hashSerial)) {
+                CMintMeta meta;
+                meta.hashSerial = hashSerial;
+
+                CDataStream ss(SER_GETHASH, 0);
+                ss << mint.GetValue();
+                meta.hashPubcoin = Hash(ss.begin(), ss.end());
+
+                meta.denom = mint.GetDenomination();
+                meta.nVersion = (uint8_t)libzerocoin::ExtractVersionFromSerial(mint.GetSerialNumber());
+                meta.nHeight = mint.GetHeight();
+                meta.isUsed = mint.IsUsed();
+                mapSerialHashes->insert(make_pair(hashSerial, meta));
+            }
+        }
 
         if (fUnusedOnly) {
             if (mint.IsUsed())

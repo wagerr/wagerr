@@ -4,8 +4,15 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "primitives/zerocoin.h"
+#include "hash.h"
 #include "util.h"
 #include "utilstrencodings.h"
+
+uint256 GetSerialHash(const CBigNum& bnSerial)
+{
+    uint256 nSerial = bnSerial.getuint256();
+    return Hash(nSerial.begin(), nSerial.end());
+}
 
 bool CZerocoinMint::GetKeyPair(CKey &key) const
 {
