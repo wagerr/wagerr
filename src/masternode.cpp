@@ -543,9 +543,8 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
 	// unless someone is doing something fishy
 	// (mapSeenMasternodeBroadcast in CMasternodeMan::ProcessMessage should filter legit duplicates)
 	if(pmn->sigTime >= sigTime) {
-		LogPrintf("CMasternodeBroadcast::CheckAndUpdate - Bad sigTime %d for Masternode %20s %105s (existing broadcast is at %d)\n",
+		return error("CMasternodeBroadcast::CheckAndUpdate - Bad sigTime %d for Masternode %20s %105s (existing broadcast is at %d)",
 					  sigTime, addr.ToString(), vin.ToString(), pmn->sigTime);
-		return false;
     }
 
     // masternode is not enabled yet/already, nothing to update
@@ -665,13 +664,11 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
     std::string strMessage = GetStrMessage();
 
     if (!obfuScationSigner.SignMessage(strMessage, errorMessage, sig, keyCollateralAddress)) {
-        LogPrintf("CMasternodeBroadcast::Sign() - Error: %s\n", errorMessage);
-        return false;
+        return error("CMasternodeBroadcast::Sign() - Error: %s", errorMessage);
     }
 
     if (!obfuScationSigner.VerifyMessage(pubKeyCollateralAddress, sig, strMessage, errorMessage)) {
-        LogPrintf("CMasternodeBroadcast::Sign() - Error: %s\n", errorMessage);
-        return false;
+        return error("CMasternodeBroadcast::Sign() - Error: %s", errorMessage);
     }
 
     return true;
@@ -683,8 +680,7 @@ bool CMasternodeBroadcast::VerifySignature()
     std::string strMessage = GetStrMessage();
 
     if(!obfuScationSigner.VerifyMessage(pubKeyCollateralAddress, sig, strMessage, errorMessage)) {
-        LogPrintf("CMasternodeBroadcast::VerifySignature() - Error: %s\n", errorMessage);
-        return false;
+        return error("CMasternodeBroadcast::VerifySignature() - Error: %s", errorMessage);
     }
 
     return true;
@@ -747,9 +743,8 @@ bool CMasternodePing::VerifySignature(CPubKey& pubKeyMasternode, int &nDos) {
 	std::string errorMessage = "";
 
 	if(!obfuScationSigner.VerifyMessage(pubKeyMasternode, vchSig, strMessage, errorMessage)){
-		LogPrintf("CMasternodePing::VerifySignature - Got bad Masternode ping signature %s Error: %s\n", vin.ToString(), errorMessage);
 		nDos = 33;
-		return false;
+		return error("CMasternodePing::VerifySignature - Got bad Masternode ping signature %s Error: %s", vin.ToString(), errorMessage);
 	}
 	return true;
 }
