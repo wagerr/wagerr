@@ -490,16 +490,8 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
     if(lastPing == CMasternodePing() || !lastPing.CheckAndUpdate(nDos, false, true))
     return false;
 
-    std::string strMessage;
-	if(protocolVersion < 70913) {
-		std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
-		std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
-		strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) + vchPubKey + vchPubKey2 + boost::lexical_cast<std::string>(protocolVersion);
-	} else {
-		strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) +
-				pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() +
-				boost::lexical_cast<std::string>(protocolVersion);
-	}
+    std::string strMessage = GetStrMessage();
+
     if (protocolVersion < masternodePayments.GetMinMasternodePaymentsProto()) {
         LogPrint("masternode","mnb - ignoring outdated Masternode %s protocol version %d\n", vin.prevout.hash.ToString(), protocolVersion);
         return false;
@@ -532,7 +524,7 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
     if (!obfuScationSigner.VerifyMessage(pubKeyCollateralAddress, sig, strMessage, errorMessage)) {
         LogPrint("masternode","mnb - Got bad Masternode address signature\n");
         // don't ban for old masternodes, their sigs could be broken because of the bug
-        nDos = protocolVersion < 70913 ? 0 : 100;
+        nDos = protocolVersion < MIN_PEER_MNANNOUNCE ? 0 : 100;
         return false;
     }
 
@@ -670,17 +662,7 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
 {
     std::string errorMessage;
     sigTime = GetAdjustedTime();
-    std::string strMessage;
-
-    if(protocolVersion < 70913) {
-        std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
-        std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
-        strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) + vchPubKey + vchPubKey2 + boost::lexical_cast<std::string>(protocolVersion);
-    } else {
-        strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) +
-            pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() +
-			 boost::lexical_cast<std::string>(protocolVersion);
-    }
+    std::string strMessage = GetStrMessage();
 
     if (!obfuScationSigner.SignMessage(strMessage, errorMessage, sig, keyCollateralAddress)) {
         LogPrintf("CMasternodeBroadcast::Sign() - Error: %s\n", errorMessage);
@@ -698,20 +680,27 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
 bool CMasternodeBroadcast::VerifySignature()
 {
     std::string errorMessage;
-    std::string strMessage;
-    if(protocolVersion < 70911) {
-        std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
-        std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
-        strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) + vchPubKey + vchPubKey2 + boost::lexical_cast<std::string>(protocolVersion);
-    } else {
-        strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) + pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() + boost::lexical_cast<std::string>(protocolVersion);
-    }
+    std::string strMessage = GetStrMessage();
+
     if(!obfuScationSigner.VerifyMessage(pubKeyCollateralAddress, sig, strMessage, errorMessage)) {
         LogPrintf("CMasternodeBroadcast::VerifySignature() - Error: %s\n", errorMessage);
         return false;
     }
 
     return true;
+}
+
+std::string CMasternodeBroadcast::GetStrMessage()
+{
+    std::string strMessage;
+    if(protocolVersion < MIN_PEER_MNANNOUNCE) {
+        std::string vchPubKey(pubKeyCollateralAddress.begin(), pubKeyCollateralAddress.end());
+        std::string vchPubKey2(pubKeyMasternode.begin(), pubKeyMasternode.end());
+        strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) + vchPubKey + vchPubKey2 + boost::lexical_cast<std::string>(protocolVersion);
+    } else {
+        strMessage = addr.ToString() + boost::lexical_cast<std::string>(sigTime) + pubKeyCollateralAddress.GetID().ToString() + pubKeyMasternode.GetID().ToString() + boost::lexical_cast<std::string>(protocolVersion);
+    }
+    return strMessage;
 }
 
 
