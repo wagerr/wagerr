@@ -152,7 +152,9 @@ public:
         nBlockLastGoodCheckpoint = 1648;        // Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
         nBlockEnforceInvalidUTXO = 1850;        // Start enforcing the invalid UTXO's
         nBlockZerocoinV2 = 99999999; //The block that zerocoin v2 becomes active
-        
+        nEnforceNewSporkKey = 1522454400; //!> Sporks signed after Saturday, March 31, 2018 12:00:00 AM GMT must use the new spork key
+        nRejectOldSporkKey = 1523923200; //!> Fully reject old spork key after Tuesday, April 17, 2018 12:00:00 AM GMT
+
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot
          * be spent as it did not originally exist in the database.
@@ -211,6 +213,7 @@ public:
 
         nPoolMaxTransactions = 3;
         strSporkKey = "040f00b37452d6e7ac00b4a2e2699bab35b5ed3c8d3e1ecaf63317900fd7b52324f4243d11cc70c40dde54bdbc1e9a732ee63b1eec60ca45e6d529ad2b43d4d614";
+        strSporkKeyOld = "040f00b37452d6e7ac00b4a2e2699bab35b5ed3c8d3e1ecaf63317900fd7b52324f4243d11cc70c40dde54bdbc1e9a732ee63b1eec60ca45e6d529ad2b43d4d614";
         strObfuscationPoolDummyAddress = "WWqou25edpCatoZgSxhd3dpNbhn3dxh21D";
         nStartMasternodePayments = 1518696182; // GMT: Thursday, 15. February 2018 12:03:02
 
@@ -275,7 +278,9 @@ public:
         nBlockLastGoodCheckpoint = 1398; //Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
         nBlockEnforceInvalidUTXO = 1600; //Start enforcing the invalid UTXO's
         nBlockZerocoinV2 = 99999999; //The block that zerocoin v2 becomes active
-        
+        nEnforceNewSporkKey = 1521604800; //!> Sporks signed after Wednesday, March 21, 2018 4:00:00 AM GMT must use the new spork key
+        nRejectOldSporkKey = 1522454400; //!> Reject old spork key after Saturday, March 31, 2018 12:00:00 AM GMT
+
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696182;
         genesis.nNonce = 75183976;
@@ -313,6 +318,7 @@ public:
 
         nPoolMaxTransactions = 2;
         strSporkKey = "04b2d1b19607edcca2fbf1d3238a0200a434900593f7e5e38102e7681465e5785ddcf1a105ee595c51ef3be1bfc8ea9dc14c8c30b2e0edaa5f5d3f57b77f272046";
+        strSporkKeyOld = "04b2d1b19607edcca2fbf1d3238a0200a434900593f7e5e38102e7681465e5785ddcf1a105ee595c51ef3be1bfc8ea9dc14c8c30b2e0edaa5f5d3f57b77f272046";
         strObfuscationPoolDummyAddress = "TMPUBzcsHZawA32XYYDF9FHQp6icv492CV";
         nStartMasternodePayments = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
 
