@@ -2811,8 +2811,10 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
                 "    \"s\" : \"serial\",  (string) The secret serial number\n"
                 "    \"r\" : \"random\",  (string) The secret random number\n"
                 "    \"t\" : \"txid\",    (string) The txid that the coin was minted in\n"
-                "    \"h\" : n,         (numeric) The height the tx was added to the blockchain\n"
-                "    \"u\" : used       (boolean) Whether the mint has been spent\n"
+                "    \"h\" : n,           (numeric) The height the tx was added to the blockchain\n"
+                "    \"u\" : used,        (boolean) Whether the mint has been spent\n"
+                "    \"v\" : version,     (numeric) The version of the zWGR\n"
+                "    \"k\" : \"privkey\"  (string) The zWGR private key (V2+ zWGR only)\n"
                 "  }\n"
                 "  ,...\n"
                 "]\n"
@@ -2848,7 +2850,7 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
         objMint.push_back(Pair("u", mint.IsUsed()));
         objMint.push_back(Pair("v", mint.GetVersion()));
         if (mint.GetVersion() >= 2) {
-            objMint.push_back(Pair("pk", HexStr(mint.GetPrivKey())));
+            objMint.push_back(Pair("k", HexStr(mint.GetPrivKey())));
         }
         jsonList.push_back(objMint);
     }
@@ -2911,9 +2913,23 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
 
         bool fUsed = find_value(o, "u").get_bool();
 
-        //todo: v2
+        //Assume coin is version 1 unless it has the version actually set
         uint8_t nVersion = 1;
+        const UniValue& vVersion = find_value(o, "v");
+        if (vVersion.isNum())
+            nVersion = static_cast<uint8_t>(vVersion.get_int());
+
+        //Set the privkey if applicable
         CPrivKey* privkey = nullptr;
+        if (nVersion >= libzerocoin::PrivateCoin::PUBKEY_VERSION) {
+            std::string strPrivkey = find_value(o, "k").get_str();
+            CKey key;
+            uint256 nPrivKey(strPrivkey);
+            key.Set(nPrivKey.begin(), nPrivKey.end(), true);
+            if (!key.IsValid())
+                return JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "privkey is not valid");
+            *privkey = key.GetPrivKey();
+        }
 
         CZerocoinMint mint(denom, bnValue, bnRandom, bnSerial, fUsed, nVersion, privkey);
         mint.SetTxHash(txid);
