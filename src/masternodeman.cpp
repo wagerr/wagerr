@@ -1153,7 +1153,7 @@ void CMasternodeMan::UpdateMasternodeList(CMasternodeBroadcast mnb)
 	mapSeenMasternodeBroadcast.insert(make_pair(mnb.GetHash(), mnb));
 	masternodeSync.AddedMasternodeList(mnb.GetHash());
 
-    LogPrint("masternode","CMasternodeMan::UpdateMasternodeList() - addr: %s\n    vin: %s\n", mnb.addr.ToString(), mnb.vin.ToString());
+    LogPrint("masternode","CMasternodeMan::UpdateMasternodeList() -- masternode=%s\n", mnb.vin.prevout.ToString());
 
     CMasternode* pmn = Find(mnb.vin);
     if (pmn == NULL) {

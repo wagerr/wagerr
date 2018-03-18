@@ -969,16 +969,13 @@ UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
     string strCommand;
     if (params.size() >= 1)
         strCommand = params[0].get_str();
-    if (fHelp  ||
-        (strCommand != "alias" && strCommand != "all"))
+    if (fHelp || (strCommand != "alias" && strCommand != "all") || (strCommand == "alias" && params.size() < 2))
         throw runtime_error(
-                "createmasternodebroadcast \"command\""
-                "Set of commands to create masternode broadcast messages for masternodes configured in masternode.conf\n"
+                "createmasternodebroadcast \"command\" ( \"alias\")\n"
+                "Creates a masternode broadcast message for one or all masternodes configured in masternode.conf\n"
                 "\nArguments:\n"
-               "1. \"command\"        (string or set of strings, required) The command to execute\n"
-                "\nAvailable commands:\n"
-                "  alias  - Create single remote masternode broadcast message by assigned alias configured in masternode.conf\n"
-                "  all    - Create remote masternode broadcast messages for all masternodes configured in masternode.conf\n"
+                "1. \"command\"      (string, required) \"alias\" for single masternode, \"all\" for all masternodes\n"
+                "2. \"alias\"        (string, required if command is \"alias\") Alias of the masternode\n"
                 + HelpRequiringPassphrase());
 
     if (strCommand == "alias")
@@ -986,9 +983,6 @@ UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
         // wait for reindex and/or import to finish
         if (fImporting || fReindex)
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Wait for reindex and/or import to finish");
-
-        if (params.size() < 2)
-            throw JSONRPCError(RPC_INVALID_PARAMETER, "Command needs at least 2 parameters");
 
         std::string alias = params[1].get_str();
 
@@ -1006,23 +1000,23 @@ UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
                 std::string errorMessage;
                 CMasternodeBroadcast mnb;
 
-                bool result = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, true);
+                bool success = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, true);
 
-                statusObj.push_back(Pair("result", result ? "successful" : "failed"));
-                if(result) {
+                statusObj.push_back(Pair("success", success));
+                if(success) {
                     CDataStream ssMnb(SER_NETWORK, PROTOCOL_VERSION);
                     ssMnb << mnb;
                     statusObj.push_back(Pair("hex", HexStr(ssMnb.begin(), ssMnb.end())));
                 } else {
-                    statusObj.push_back(Pair("errorMessage", errorMessage));
+                    statusObj.push_back(Pair("error_message", errorMessage));
                 }
                 break;
             }
         }
 
         if(!found) {
-            statusObj.push_back(Pair("result", "failed"));
-            statusObj.push_back(Pair("errorMessage", "Could not find alias in config. Verify with list-conf."));
+            statusObj.push_back(Pair("success", false));
+            statusObj.push_back(Pair("error_message", "Could not find alias in config. Verify with list-conf."));
         }
 
         pwalletMain->Lock();
@@ -1045,7 +1039,7 @@ UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
         int successful = 0;
         int failed = 0;
 
-        UniValue resultsObj(UniValue::VOBJ);
+        UniValue resultsObj(UniValue::VARR);
 
         BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
             std::string errorMessage;
@@ -1053,23 +1047,23 @@ UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
             CTxIn vin = CTxIn(uint256S(mne.getTxHash()), uint32_t(atoi(mne.getOutputIndex().c_str())));
             CMasternodeBroadcast mnb;
 
-            bool result = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, true);
+            bool success = activeMasternode.CreateBroadcast(mne.getIp(), mne.getPrivKey(), mne.getTxHash(), mne.getOutputIndex(), errorMessage, mnb, true);
 
             UniValue statusObj(UniValue::VOBJ);
             statusObj.push_back(Pair("alias", mne.getAlias()));
-            statusObj.push_back(Pair("result", result ? "successful" : "failed"));
+            statusObj.push_back(Pair("success", success));
 
-            if(result) {
+            if(success) {
                 successful++;
                 CDataStream ssMnb(SER_NETWORK, PROTOCOL_VERSION);
                 ssMnb << mnb;
                 statusObj.push_back(Pair("hex", HexStr(ssMnb.begin(), ssMnb.end())));
             } else {
                 failed++;
-                statusObj.push_back(Pair("errorMessage", errorMessage));
+                statusObj.push_back(Pair("error_message", errorMessage));
             }
 
-            resultsObj.push_back(Pair("status", statusObj));
+            resultsObj.push_back(statusObj);
         }
         pwalletMain->Lock();
 
@@ -1086,15 +1080,31 @@ UniValue createmasternodebroadcast(const UniValue& params, bool fHelp)
 
 UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
 {
-    if (fHelp)
+    if (fHelp || params.size() != 1)
         throw runtime_error(
         "decodemasternodebroadcast \"hexstring\"\n"
         "Command to decode masternode broadcast messages\n"
         "\nArgument:\n"
-        "1. \"hexstring\"        (hex string) The masternode broadcast message\n");
-
-    if (params.size() != 1)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Correct usage is 'decodemasternodebroadcast \"hexstring\"'");
+        "1. \"hexstring\"        (hex string) The masternode broadcast message\n"
+            "\nResult:\n"
+        "{\n"
+        "  \"vin\": \"xxxx\"                (COutPoint) The unspent output which is holding the masternode collateral\n"
+        "  \"addr\": \"xxxx\"               (string) IP address of the masternode\n"
+        "  \"pubkeycollateral\": \"xxxx\"   (string) Collateral address's public key\n"
+        "  \"pubkeymasternode\": \"xxxx\"   (string) Masternode's public key\n"
+        "  \"vchsig\": \"xxxx\"             (string) Base64-encoded signature of this message (verifiable via pubkeycollateral)\n"
+        "  \"sigtime\": \"nnn\"             (numeric) Signature timestamp\n"
+        "  \"protocolversion\": \"nnn\"     (numeric) Masternode's protocol version\n"
+        "  \"nlastdsq\": \"nnn\"            (numeric) The last time the masternode sent a DSQ message (for mixing) (DEPRECATED)\n"
+        "  \"lastping\" : {                 (json object) information about the masternode's last ping\n"
+        "      \"vin\": \"xxxx\"            (COutPoint) The unspent output of the masternode which is signing the message\n"
+        "      \"blockhash\": \"xxxx\"      (string) Current chaintip blockhash minus 12\n"
+        "      \"sigtime\": \"nnn\"         (numeric) Signature time for this ping\n"
+        "      \"vchsig\": \"xxxx\"         (string) Base64-encoded signature of this ping (verifiable via pubkeymasternode)\n"
+        "}\n"
+        "\nExamples:\n" +
+        HelpExampleCli("decodemasternodebroadcast", "hexstring") +
+        HelpExampleRpc("decodemasternodebroadcast", "hexstring"));
 
     CMasternodeBroadcast mnb;
 
@@ -1106,37 +1116,37 @@ UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
 
     UniValue resultObj(UniValue::VOBJ);
 
-    resultObj.push_back(Pair("vin", mnb.vin.ToString()));
+    resultObj.push_back(Pair("vin", mnb.vin.prevout.ToString()));
     resultObj.push_back(Pair("addr", mnb.addr.ToString()));
-    resultObj.push_back(Pair("pubkey", CBitcoinAddress(mnb.pubKeyCollateralAddress.GetID()).ToString()));
-    resultObj.push_back(Pair("pubkey2", CBitcoinAddress(mnb.pubKeyMasternode.GetID()).ToString()));
-    resultObj.push_back(Pair("vchSig", EncodeBase64(&mnb.sig[0], mnb.sig.size())));
-    resultObj.push_back(Pair("sigTime", mnb.sigTime));
-    resultObj.push_back(Pair("protocolVersion", mnb.protocolVersion));
-    resultObj.push_back(Pair("nLastDsq", mnb.nLastDsq));
+    resultObj.push_back(Pair("pubkeycollateral", CBitcoinAddress(mnb.pubKeyCollateralAddress.GetID()).ToString()));
+    resultObj.push_back(Pair("pubkeymasternode", CBitcoinAddress(mnb.pubKeyMasternode.GetID()).ToString()));
+    resultObj.push_back(Pair("vchsig", EncodeBase64(&mnb.sig[0], mnb.sig.size())));
+    resultObj.push_back(Pair("sigtime", mnb.sigTime));
+    resultObj.push_back(Pair("protocolversion", mnb.protocolVersion));
+    resultObj.push_back(Pair("nlastdsq", mnb.nLastDsq));
 
     UniValue lastPingObj(UniValue::VOBJ);
-    lastPingObj.push_back(Pair("vin", mnb.lastPing.vin.ToString()));
-    lastPingObj.push_back(Pair("blockHash", mnb.lastPing.blockHash.ToString()));
-    lastPingObj.push_back(Pair("sigTime", mnb.lastPing.sigTime));
-    lastPingObj.push_back(Pair("vchSig", EncodeBase64(&mnb.lastPing.vchSig[0], mnb.lastPing.vchSig.size())));
+    lastPingObj.push_back(Pair("vin", mnb.lastPing.vin.prevout.ToString()));
+    lastPingObj.push_back(Pair("blockhash", mnb.lastPing.blockHash.ToString()));
+    lastPingObj.push_back(Pair("sigtime", mnb.lastPing.sigTime));
+    lastPingObj.push_back(Pair("vchsig", EncodeBase64(&mnb.lastPing.vchSig[0], mnb.lastPing.vchSig.size())));
 
-    resultObj.push_back(Pair("lastPing", lastPingObj));
+    resultObj.push_back(Pair("lastping", lastPingObj));
 
     return resultObj;
 }
 
 UniValue relaymasternodebroadcast(const UniValue& params, bool fHelp)
 {
-    if (fHelp)
+    if (fHelp || params.size() != 1)
         throw runtime_error(
                 "relaymasternodebroadcast \"hexstring\"\n"
                 "Command to relay masternode broadcast messages\n"
-                "\nArguments:\n"
-                "1. \"hexstring\"        (hex string) The masternode broadcast message\n");
+                "1. \"hexstring\"        (hex string) The masternode broadcast message\n"
+                "\nExamples:\n" +
+                HelpExampleCli("relaymasternodebroadcast", "hexstring") +
+                HelpExampleRpc("relaymasternodebroadcast", "hexstring"));
 
-    if (params.size() != 1)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Correct usage is 'relaymasternodebroadcast \"hexstring\"'");
 
     CMasternodeBroadcast mnb;
 
