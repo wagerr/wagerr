@@ -93,7 +93,7 @@ BerkeleyDB is required for the wallet.
 You can add the repository and install using the following commands:
 
     sudo apt-get install software-properties-common
-    sudo add-apt-repository ppa:wagerr/ppa
+    sudo add-apt-repository ppa:wagerr/wagerr
     sudo apt-get update
     sudo apt-get install libdb4.8-dev libdb4.8++-dev
 
