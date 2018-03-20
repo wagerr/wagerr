@@ -57,7 +57,7 @@ public:
     bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = 0) override;
     bool CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout) override;
     bool MarkSpent(CWallet* pwallet);
-    bool IsZWGR() { return true; }
+    bool IsZWGR() override { return true; }
     int GetChecksumHeightFromMint();
     int GetChecksumHeightFromSpend();
     uint32_t GetChecksum();
@@ -83,7 +83,7 @@ public:
     CDataStream GetUniqueness() override;
     bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = 0) override;
     bool CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout) override;
-    bool IsZWGR() { return false; }
+    bool IsZWGR() override { return false; }
 };
 
 

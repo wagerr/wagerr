@@ -377,7 +377,6 @@ public:
 
     void SetDec(const std::string& str)
     {
-        BIGNUM* bn = this;
         BN_dec2bn(&bn, str.c_str());
     }
 
