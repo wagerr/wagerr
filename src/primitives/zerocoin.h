@@ -90,6 +90,7 @@ public:
     uint256 GetTxHash() const { return this->txid; }
     void SetTxHash(uint256 txid) { this->txid = txid; }
     uint8_t GetVersion() const { return this->version; }
+    void SetVersion(uint8_t nVersion) {this->version = nVersion; }
     CPrivKey GetPrivKey() const { return this->privkey; }
     bool GetKeyPair(CKey& key) const;
 

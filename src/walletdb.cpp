@@ -1164,6 +1164,9 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMatu
         CZerocoinMint mint;
         ssValue >> mint;
 
+        uint8_t nVersion = (uint8_t)libzerocoin::ExtractVersionFromSerial(mint.GetSerialNumber());
+        mint.SetVersion(nVersion);
+
         //Add any unused mints to the wallet's serial map
         if (mapSerialHashes) {
             uint256 nSerial = mint.GetSerialNumber().getuint256();
@@ -1177,7 +1180,7 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMatu
                 meta.hashPubcoin = Hash(ss.begin(), ss.end());
 
                 meta.denom = mint.GetDenomination();
-                meta.nVersion = (uint8_t)libzerocoin::ExtractVersionFromSerial(mint.GetSerialNumber());
+                meta.nVersion = nVersion;
                 meta.nHeight = mint.GetHeight();
                 meta.isUsed = mint.IsUsed();
                 mapSerialHashes->insert(make_pair(hashSerial, meta));
