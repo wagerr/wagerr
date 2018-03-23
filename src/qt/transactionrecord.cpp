@@ -40,6 +40,13 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
     CAmount nNet = nCredit - nDebit;
     uint256 hash = wtx.GetHash();
     std::map<std::string, std::string> mapValue = wtx.mapValue;
+    bool fZSpendFromMe = false;
+
+    if (wtx.IsZerocoinSpend()) {
+        // a zerocoin spend that was created by this wallet
+        libzerocoin::CoinSpend zcspend = TxInToZerocoinSpend(wtx.vin[0]);
+        fZSpendFromMe = wallet->IsMyZerocoinSpend(zcspend.getCoinSerialNumber());
+    }
 
     if (wtx.IsCoinStake()) {
         TransactionRecord sub(hash, nTime);
@@ -47,7 +54,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         if (!wtx.IsZerocoinSpend() && !ExtractDestination(wtx.vout[1].scriptPubKey, address))
             return parts;
 
-        if (!wtx.IsZerocoinSpend() && !IsMine(*wallet, address)) {
+        if (!IsMine(*wallet, address) && !fZSpendFromMe) {
             //if the address is not yours then it means you have a tx sent to you in someone elses coinstake tx
             for (unsigned int i = 1; i < wtx.vout.size(); i++) {
                 CTxDestination outAddress;
@@ -85,17 +92,13 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         }
         parts.append(sub);
     } else if (wtx.IsZerocoinSpend()) {
-        // a zerocoin spend that was created by this wallet
-        libzerocoin::CoinSpend zcspend = TxInToZerocoinSpend(wtx.vin[0]);
-        bool fSpendFromMe = wallet->IsMyZerocoinSpend(zcspend.getCoinSerialNumber());
-
         //zerocoin spend outputs
         bool fFeeAssigned = false;
         for (const CTxOut txout : wtx.vout) {
             // change that was reminted as zerocoins
             if (txout.IsZerocoinMint()) {
                 // do not display record if this isn't from our wallet
-                if (!fSpendFromMe)
+                if (!fZSpendFromMe)
                     continue;
 
                 TransactionRecord sub(hash, nTime);
@@ -120,7 +123,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             isminetype mine = wallet->IsMine(txout);
             if (mine) {
                 TransactionRecord sub(hash, nTime);
-                sub.type = (fSpendFromMe ? TransactionRecord::ZerocoinSpend_FromMe : TransactionRecord::RecvFromZerocoinSpend);
+                sub.type = (fZSpendFromMe ? TransactionRecord::ZerocoinSpend_FromMe : TransactionRecord::RecvFromZerocoinSpend);
                 sub.debit = txout.nValue;
                 sub.address = mapValue["recvzerocoinspend"];
                 if (strAddress != "")
@@ -131,7 +134,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             }
 
             // spend is not from us, so do not display the spend side of the record
-            if (!fSpendFromMe)
+            if (!fZSpendFromMe)
                 continue;
 
             // zerocoin spend that was sent to someone else
