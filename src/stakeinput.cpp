@@ -133,12 +133,20 @@ bool CZWgrStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout)
         return error("%s: failed to create zWGR output", __func__);
     vout.emplace_back(outReward);
 
+    //Add new staked denom to our wallet
+    if (!pwallet->DatabaseMint(&coin))
+        return error("%s: failed to database the staked zWGR", __func__);
+
     for (unsigned int i = 0; i < 3; i++) {
-        CTxOut outReward;
+        CTxOut out;
         libzerocoin::PrivateCoin coinReward(Params().Zerocoin_Params(false), libzerocoin::CoinDenomination::ZQ_ONE);
-        if (!pwallet->CreateZWGROutPut(libzerocoin::CoinDenomination::ZQ_ONE, coinReward, outReward))
+        if (!pwallet->CreateZWGROutPut(libzerocoin::CoinDenomination::ZQ_ONE, coinReward, out))
             return error("%s: failed to create zWGR output", __func__);
-        vout.emplace_back(outReward);
+        vout.emplace_back(out);
+
+        if (!pwallet->DatabaseMint(&coinReward))
+            return error("%s: failed to database mint reward", __func__);
+
     }
 
     return true;

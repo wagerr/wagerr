@@ -213,6 +213,7 @@ public:
     bool GetZerocoinKey(const CBigNum& bnSerial, CKey& key);
     bool CreateZWGROutPut(libzerocoin::CoinDenomination denomination, libzerocoin::PrivateCoin& coin, CTxOut& outMint);
     bool GetMint(const uint256& hashSerial, CZerocoinMint& mint);
+    bool DatabaseMint(libzerocoin::PrivateCoin* coin);
 
     /** Zerocin entry changed.
     * @note called with lock cs_wallet held.

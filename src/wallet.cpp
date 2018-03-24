@@ -3002,10 +3002,31 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     // Sign for WGR
     int nIn = 0;
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
-        for(CTxIn txIn : txNew.vin) {
+        for (CTxIn txIn : txNew.vin) {
             const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
-            if(!SignSignature(*this, *wtx, txNew, nIn++))
+            if (!SignSignature(*this, *wtx, txNew, nIn++))
                 return error("CreateCoinStake : failed to sign coinstake");
+        }
+    } else {
+        //Update the mint database with tx hash and height
+        for (const CTxOut& out : txNew.vout) {
+            if (!out.IsZerocoinMint())
+                continue;
+
+            libzerocoin::PublicCoin pubcoin(Params().Zerocoin_Params(false));
+            CValidationState state;
+            if (!TxOutToPublicCoin(out, pubcoin, state))
+                return error("%s: extracting pubcoin from txout failed", __func__);
+
+            CWalletDB walletdb(strWalletFile);
+            CZerocoinMint mint;
+            if (!walletdb.ReadZerocoinMint(pubcoin.getValue(), mint))
+                return error("%s: could not find pubcoin in db", __func__);
+
+            mint.SetTxHash(txNew.GetHash());
+            mint.SetHeight(chainActive.Height() + 1);
+            if (!walletdb.WriteZerocoinMint(mint))
+                return error("%s: failed to write mint to db", __func__);
         }
     }
 
@@ -5120,4 +5141,18 @@ bool CWallet::GetMint(const uint256& hashSerial, CZerocoinMint& mint)
         return false;
 
     return CWalletDB(strWalletFile).ReadZerocoinMint(it->second.hashPubcoin, mint);
+}
+
+bool CWallet::DatabaseMint(libzerocoin::PrivateCoin* coin)
+{
+    //Add new staked denom to our wallet
+    CPrivKey privkey = coin->getPrivKey();
+    CZerocoinMint mint(coin->getPublicCoin().getDenomination(), coin->getPublicCoin().getValue(), coin->getRandomness(),
+                       coin->getSerialNumber(), false, coin->getVersion(), &privkey);
+
+    CWalletDB walletdb(strWalletFile);
+    if (!walletdb.WriteZerocoinMint(mint))
+        return error("%s: failed to write mint to DB", __func__);
+
+    return true;
 }
