@@ -2139,7 +2139,7 @@ bool CWallet::MintableCoins()
     }
 
     for (auto it : mapSerialHashes) {
-        if (it.second.nVersion < CZerocoinMint::STAKABLE_VERSION)
+        if (it.second.nVersion < CZerocoinMint::STAKABLE_VERSION || it.second.isUsed)
             continue;
         if (it.second.nHeight < chainActive.Height() - Params().Zerocoin_RequiredStakeDepth()) {
             return true;

@@ -156,8 +156,9 @@ bool CZWgrStake::MarkSpent(CWallet *pwallet)
     if (!pwallet->GetMint(hashSerial, mint))
         return error("%s: failed to retrieve mint associated with serial hash", __func__);
 
-    //Remove from database and from the map of serial hashes
-    pwallet->mapSerialHashes.erase(hashSerial);
+    //Remove from database and mark the serial hash as used in the map
+    if (pwallet->mapSerialHashes.count(hashSerial))
+        pwallet->mapSerialHashes.at(hashSerial).isUsed = true;
     mint.SetUsed(true);
     CWalletDB walletdb(pwallet->strWalletFile);
     return walletdb.WriteZerocoinMint(mint);
