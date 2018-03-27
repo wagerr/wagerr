@@ -2386,8 +2386,15 @@ UniValue getzerocoinbalance(const UniValue& params, bool fHelp)
 
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                            "getzerocoinbalance\n"
-                            + HelpRequiringPassphrase());
+            "getzerocoinbalance\n"
+            "\nReturn the wallet's total zWGR balance.\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nResult:\n"
+            "amount         (numeric) Total zWGR balance.\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getzerocoinbalance", "") + HelpExampleRpc("getzerocoinbalance", ""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2407,8 +2414,18 @@ UniValue listmintedzerocoins(const UniValue& params, bool fHelp)
 
     if (fHelp || params.size() != 0)
         throw runtime_error(
-                            "listmintedzerocoins\n"
-                            + HelpRequiringPassphrase());
+            "listmintedzerocoins\n"
+            "\nList all zWGR mints in the wallet.\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  \"xxx\"      (string) Pubcoin in hex format.\n"
+            "  ,...\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("listmintedzerocoins", "") + HelpExampleRpc("listmintedzerocoins", ""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2431,7 +2448,20 @@ UniValue listzerocoinamounts(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 0)
         throw runtime_error(
             "listzerocoinamounts\n"
-            + HelpRequiringPassphrase());
+            "\nGet information about your zerocoin amounts.\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"denomination\": n,   (numeric) Denomination Value.\n"
+            "    \"mints\": n           (numeric) Number of mints.\n"
+            "  }\n"
+            "  ,..."
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("listzerocoinamounts", "") + HelpExampleRpc("listzerocoinamounts", ""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2447,17 +2477,14 @@ UniValue listzerocoinamounts(const UniValue& params, bool fHelp)
     for (auto& meta : setMints) spread.at(meta.denom)++;
 
 
-    UniValue jsonList(UniValue::VARR);
-    UniValue val(UniValue::VOBJ);
+    UniValue ret(UniValue::VARR);
     for (const auto& m : libzerocoin::zerocoinDenomList) {
-        stringstream s1;
-        s1 << "Denomination Value " << libzerocoin::ZerocoinDenominationToInt(m);
-        stringstream s2;
-        s2 << spread.at(m) << " coins";
-        val.push_back(Pair(s1.str(),s2.str()));
+        UniValue val(UniValue::VOBJ);
+        val.push_back(Pair("denomination", libzerocoin::ZerocoinDenominationToInt(m)));
+        val.push_back(Pair("mints", (int64_t)spread.at(m)));
+        ret.push_back(val);
     }
-    jsonList.push_back(val);
-    return jsonList;
+    return ret;
 }
 
 UniValue listspentzerocoins(const UniValue& params, bool fHelp)
@@ -2466,7 +2493,17 @@ UniValue listspentzerocoins(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 0)
         throw runtime_error(
             "listspentzerocoins\n"
-            + HelpRequiringPassphrase());
+            "\nList all the spent zWGR mints in the wallet.\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  \"xxx\"      (string) Pubcoin in hex format.\n"
+            "  ,...\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("listspentzerocoins", "") + HelpExampleRpc("listspentzerocoins", ""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2488,27 +2525,45 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
-            "mintzerocoin amount ( UTXOs )\n"
-            "amount: (numeric, required) Enter an amount of Wgr to convert to zWgr\n"
-            "UTXOs: (string, optional) A json array of objects. Each object needs the txid (string) and vout (numeric)\n"
-            "     [           (json array of json objects)\n"
-            "       {\n"
-            "         \"txid\":\"id\",    (string) The transaction id\n"
-            "         \"vout\": n         (numeric) The output number\n"
-            "       }\n"
-            "       ,...\n"
-            "     ]\n"
+            "mintzerocoin amount ( utxos )\n"
+            "\nMint the specified zWGR amount\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nArguments:\n"
+            "1. amount      (numeric, required) Enter an amount of Wgr to convert to zWgr\n"
+            "2. utxos       (string, optional) A json array of objects.\n"
+            "                   Each object needs the txid (string) and vout (numeric)\n"
+            "  [\n"
+            "    {\n"
+            "      \"txid\":\"txid\",    (string) The transaction id\n"
+            "      \"vout\": n         (numeric) The output number\n"
+            "    }\n"
+            "    ,...\n"
+            "  ]\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"txid\": \"xxx\",         (string) Transaction ID.\n"
+            "    \"value\": amount,       (numeric) Minted amount.\n"
+            "    \"pubcoin\": \"xxx\",      (string) Pubcoin in hex format.\n"
+            "    \"randomness\": \"xxx\",   (string) Hex encoded randomness.\n"
+            "    \"serial\": \"xxx\",       (string) Serial in hex format.\n"
+            "    \"time\": nnn            (numeric) Time to mint this transaction.\n"
+            "  }\n"
+            "  ,...\n"
+            "]\n"
+
             "\nExamples:\n"
             "\nMint 50 from anywhere\n" +
             HelpExampleCli("mintzerocoin", "50") +
-            "\nMint 13 from a specific output\n" + 
+            "\nMint 13 from a specific output\n" +
             HelpExampleCli("mintzerocoin", "13 \"[{\\\"txid\\\":\\\"a08e6907dbbd3d809776dbfc5d82e371b764ed838b5655e72f463568df1aadf0\\\",\\\"vout\\\":1}]\"") +
-            "\nAs a json rpc call\n" + 
-            HelpExampleRpc("mintzerocoin", "13, \"[{\\\"txid\\\":\\\"a08e6907dbbd3d809776dbfc5d82e371b764ed838b5655e72f463568df1aadf0\\\",\\\"vout\\\":1}]\"")
-            + HelpRequiringPassphrase());
+            "\nAs a json rpc call\n" +
+            HelpExampleRpc("mintzerocoin", "13, \"[{\\\"txid\\\":\\\"a08e6907dbbd3d809776dbfc5d82e371b764ed838b5655e72f463568df1aadf0\\\",\\\"vout\\\":1}]\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
-    
+
     if (params.size() == 1)
     {
         RPCTypeCheck(params, boost::assign::list_of(UniValue::VNUM));
@@ -2583,17 +2638,48 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 5 || params.size() < 4)
         throw runtime_error(
-            "spendzerocoin <amount> <mintchange [true|false]> <minimizechange [true|false]>  <securitylevel [1-100]> <address>\n"
-            "Overview: Convert zWGR (zerocoins) into WGR. \n"
-            "amount: amount to spend\n"
-            "mintchange: if there is left over WGR (change), the wallet can convert it automatically back to zerocoins [true]\n"
-            "minimizechange: try to minimize the returning change  [false]\n"
-            "security level: the amount of checkpoints to add to the accumulator. A checkpoint contains 10 blocks worth of zerocoinmints."
-                    "The more checkpoints that are added, the more untraceable the transaction will be. Use [100] to add the maximum amount"
-                    "of checkpoints available. Tip: adding more checkpoints makes the minting process take longer\n"
-            "address: Send straight to an address or leave the address blank and the wallet will send to a change address. If there is change then"
-                    "an address is required"
-            + HelpRequiringPassphrase());
+            "spendzerocoin amount mintchange minimizechange securitylevel ( \"address\" )\n"
+            "\nSpend zWGR to a WGR address.\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nArguments:\n"
+            "1. amount          (numeric, required) Amount to spend.\n"
+            "2. mintchange      (boolean, required) Re-mint any leftover change.\n"
+            "3. minimizechange  (boolean, required) Try to minimize the returning change  [false]\n"
+            "4. securitylevel   (numeric, required) Amount of checkpoints to add to the accumulator.\n"
+            "                       A checkpoint contains 10 blocks worth of zerocoinmints.\n"
+            "                       The more checkpoints that are added, the more untraceable the transaction.\n"
+            "                       Use [100] to add the maximum amount of checkpoints available.\n"
+            "                       Adding more checkpoints makes the minting process take longer\n"
+            "5. \"address\"     (string, optional, default=change) Send to specified address or to a new change address.\n"
+            "                       If there is change then an address is required\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"txid\": \"xxx\",             (string) Transaction hash.\n"
+            "  \"bytes\": nnn,              (numeric) Transaction size.\n"
+            "  \"fee\": amount,             (numeric) Transaction fee (if any).\n"
+            "  \"spends\": [                (array) JSON array of input objects.\n"
+            "    {\n"
+            "      \"denomination\": nnn,   (numeric) Denomination value.\n"
+            "      \"pubcoin\": \"xxx\",      (string) Pubcoin in hex format.\n"
+            "      \"serial\": \"xxx\",       (string) Serial number in hex format.\n"
+            "      \"acc_checksum\": \"xxx\", (string) Accumulator checksum in hex format.\n"
+            "    }\n"
+            "    ,...\n"
+            "  ],\n"
+            "  \"outputs\": [                 (array) JSON array of output objects.\n"
+            "    {\n"
+            "      \"value\": amount,         (numeric) Value in WGR.\n"
+            "      \"address\": \"xxx\"         (string) WGR address or \"zerocoinmint\" for reminted change.\n"
+            "    }\n"
+            "    ,...\n"
+            "  ]\n"
+            "}\n"
+
+            "\nExamples\n" +
+            HelpExampleCli("spendzerocoin", "5000 false true 100 \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\"") +
+            HelpExampleRpc("spendzerocoin", "5000 false true 100 \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2676,11 +2762,29 @@ UniValue resetmintzerocoin(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
         throw runtime_error(
-            "resetmintzerocoin <extended_search>\n"
-            "Scan the blockchain for all of the zerocoins that are held in the wallet.dat. Update any meta-data that is incorrect.\n"
-            "Archive any mints that are not able to be found."
+            "resetmintzerocoin ( fullscan )\n"
+            "\nScan the blockchain for all of the zerocoins that are held in the wallet.dat.\n"
+            "Update any meta-data that is incorrect. Archive any mints that are not able to be found.\n" +
+            + HelpRequiringPassphrase()); + "\n"
 
-            + HelpRequiringPassphrase());
+            "\nArguments:\n"
+            "1. fullscan          (boolean, optional) Rescan each block of the blockchain.\n"
+            "                               WARNING - may take 30+ minutes!\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"updated\": [       (array) JSON array of updated mints.\n"
+            "    \"xxx\"            (string) Hex encoded mint.\n"
+            "    ,...\n"
+            "  ],\n"
+            "  \"archived\": [      (array) JSON array of archived mints.\n"
+            "    \"xxx\"            (string) Hex encoded mint.\n"
+            "    ,...\n"
+            "  ]\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("resetmintzerocoin", "true") + HelpExampleRpc("resetmintzerocoin", "true"));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2719,8 +2823,21 @@ UniValue resetspentzerocoin(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 0)
         throw runtime_error(
             "resetspentzerocoin\n"
-                "Scan the blockchain for all of the zerocoins that are held in the wallet.dat. Reset mints that are considered spent that did not make it into the blockchain."
-            + HelpRequiringPassphrase());
+            "\nScan the blockchain for all of the zerocoins that are held in the wallet.dat.\n"
+            "Reset mints that are considered spent that did not make it into the blockchain.\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"restored\": [        (array) JSON array of restored objects.\n"
+            "    {\n"
+            "      \"serial\": \"xxx\"  (string) Serial in hex format.\n"
+            "    }\n"
+            "    ,...\n"
+            "  ]\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("resetspentzerocoin", "") + HelpExampleRpc("resetspentzerocoin", ""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2768,9 +2885,24 @@ UniValue getarchivedzerocoin(const UniValue& params, bool fHelp)
     if(fHelp || params.size() != 0)
         throw runtime_error(
             "getarchivedzerocoin\n"
-            "Display zerocoins that were archived because they were believed to be orphans."
-            "Provides enough information to recover mint if it was incorrectly archived."
-            + HelpRequiringPassphrase());
+            "\nDisplay zerocoins that were archived because they were believed to be orphans.\n"
+            "Provides enough information to recover mint if it was incorrectly archived.\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"txid\": \"xxx\",           (string) Transaction ID for archived mint.\n"
+            "    \"denomination\": amount,  (numeric) Denomination value.\n"
+            "    \"serial\": \"xxx\",         (string) Serial number in hex format.\n"
+            "    \"randomness\": \"xxx\",     (string) Hex encoded randomness.\n"
+            "    \"pubcoin\": \"xxx\"         (string) Pubcoin in hex format.\n"
+            "  }\n"
+            "  ,...\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getarchivedzerocoin", "") + HelpExampleRpc("getarchivedzerocoin", ""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2781,7 +2913,7 @@ UniValue getarchivedzerocoin(const UniValue& params, bool fHelp)
     for (const CZerocoinMint mint : listMints) {
         UniValue objMint(UniValue::VOBJ);
         objMint.push_back(Pair("txid", mint.GetTxHash().GetHex()));
-        objMint.push_back(Pair("denomination", FormatMoney(mint.GetDenominationAsAmount())));
+        objMint.push_back(Pair("denomination", ValueFromAmount(mint.GetDenominationAsAmount())));
         objMint.push_back(Pair("serial", mint.GetSerialNumber().GetHex()));
         objMint.push_back(Pair("randomness", mint.GetRandomness().GetHex()));
         objMint.push_back(Pair("pubcoin", mint.GetValue().GetHex()));
@@ -2796,29 +2928,30 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
     if(fHelp || params.empty() || params.size() > 2)
         throw runtime_error(
             "exportzerocoins include_spent ( denomination )\n"
-                "Exports zerocoin mints that are held by this wallet.dat\n"
+            "\nExports zerocoin mints that are held by this wallet.dat\n" +
+            HelpRequiringPassphrase() + "\n"
 
-                "\nArguments:\n"
-                "1. \"include_spent\"        (bool, required) Include mints that have already been spent\n"
-                "2. \"denomination\"         (integer, optional) Export a specific denomination of zWgr\n"
+            "\nArguments:\n"
+            "1. \"include_spent\"        (bool, required) Include mints that have already been spent\n"
+            "2. \"denomination\"         (integer, optional) Export a specific denomination of zWgr\n"
 
-                "\nResult\n"
-                "[                   (array of json object)\n"
-                "  {\n"
-                "    \"d\" : n,        (numeric) the mint's zerocoin denomination \n"
-                "    \"p\" : \"pubcoin\", (string) The public coin\n"
-                "    \"s\" : \"serial\",  (string) The secret serial number\n"
-                "    \"r\" : \"random\",  (string) The secret random number\n"
-                "    \"t\" : \"txid\",    (string) The txid that the coin was minted in\n"
-                "    \"h\" : n,           (numeric) The height the tx was added to the blockchain\n"
-                "    \"u\" : used,        (boolean) Whether the mint has been spent\n"
-                "    \"v\" : version,     (numeric) The version of the zWGR\n"
-                "    \"k\" : \"privkey\"  (string) The zWGR private key (V2+ zWGR only)\n"
-                "  }\n"
-                "  ,...\n"
-                "]\n"
+            "\nResult:\n"
+            "[                   (array of json object)\n"
+            "  {\n"
+            "    \"d\": n,         (numeric) the mint's zerocoin denomination \n"
+            "    \"p\": \"pubcoin\", (string) The public coin\n"
+            "    \"s\": \"serial\",  (string) The secret serial number\n"
+            "    \"r\": \"random\",  (string) The secret random number\n"
+            "    \"t\": \"txid\",    (string) The txid that the coin was minted in\n"
+            "    \"h\": n,         (numeric) The height the tx was added to the blockchain\n"
+            "    \"u\": used,      (boolean) Whether the mint has been spent\n"
+            "    \"v\": version,   (numeric) The version of the zWGR\n"
+            "    \"k\": \"privkey\"  (string) The zWGR private key (V2+ zWGR only)\n"
+            "  }\n"
+            "  ,...\n"
+            "]\n"
 
-                "\nExamples\n" +
+            "\nExamples:\n" +
             HelpExampleCli("exportzerocoins", "false 5") + HelpExampleRpc("exportzerocoins", "false 5"));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -2868,21 +3001,24 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
     if(fHelp || params.size() == 0)
         throw runtime_error(
             "importzerocoins importdata \n"
-                "[{\"d\":denomination,\"p\":\"pubcoin_hex\",\"s\":\"serial_hex\",\"r\":\"randomness_hex\",\"t\":\"txid\",\"h\":height, \"u\":used},{\"d\":...}]\n"
-                "\nImport zerocoin mints.\n"
-                "Adds raw zerocoin mints to the wallet.dat\n"
-                "Note it is recommended to use the json export created from the exportzerocoins RPC call\n"
+            "\n[{\"d\":denomination,\"p\":\"pubcoin_hex\",\"s\":\"serial_hex\",\"r\":\"randomness_hex\",\"t\":\"txid\",\"h\":height, \"u\":used},{\"d\":...}]\n"
+            "\nImport zerocoin mints.\n"
+            "Adds raw zerocoin mints to the wallet.dat\n"
+            "Note it is recommended to use the json export created from the exportzerocoins RPC call\n" +
+            HelpRequiringPassphrase() + "\n"
 
-                "\nArguments:\n"
-                "1. \"importdata\"    (string, required) A json array of json objects containing zerocoin mints\n"
+            "\nArguments:\n"
+            "1. \"importdata\"    (string, required) A json array of json objects containing zerocoin mints\n"
 
-                "\nResult:\n"
-                "\"added\"            (int) the quantity of zerocoin mints that were added\n"
-                "\"value\"            (string) the total zWgr value of zerocoin mints that were added\n"
+            "\nResult:\n"
+            "{\n"
+            "  \"added\": n,        (numeric) The quantity of zerocoin mints that were added\n"
+            "  \"value\": amount    (numeric) The total zWgr value of zerocoin mints that were added\n"
+            "}\n"
 
-                "\nExamples\n" +
+            "\nExamples\n" +
             HelpExampleCli("importzerocoins", "\'[{\"d\":100,\"p\":\"mypubcoin\",\"s\":\"myserial\",\"r\":\"randomness_hex\",\"t\":\"mytxid\",\"h\":104923, \"u\":false},{\"d\":5,...}]\'") +
-                HelpExampleRpc("importzerocoins", "[{\"d\":100,\"p\":\"mypubcoin\",\"s\":\"myserial\",\"r\":\"randomness_hex\",\"t\":\"mytxid\",\"h\":104923, \"u\":false},{\"d\":5,...}]"));
+            HelpExampleRpc("importzerocoins", "[{\"d\":100,\"p\":\"mypubcoin\",\"s\":\"myserial\",\"r\":\"randomness_hex\",\"t\":\"mytxid\",\"h\":104923, \"u\":false},{\"d\":5,...}]"));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2946,7 +3082,7 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
 
     UniValue ret(UniValue::VOBJ);
     ret.push_back(Pair("added", count));
-    ret.push_back(Pair("value", FormatMoney(nValue)));
+    ret.push_back(Pair("value", ValueFromAmount(nValue)));
     return ret;
 }
 
@@ -2955,20 +3091,21 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
     if(fHelp || !params.empty())
         throw runtime_error(
             "reconsiderzerocoins\n"
-                "\nCheck archived zWgr list to see if any mints were added to the blockchain.\n"
+            "\nCheck archived zWgr list to see if any mints were added to the blockchain.\n" +
+            HelpRequiringPassphrase() + "\n"
 
-                "\nResult\n"
-                "[                                 (array of json objects)\n"
-                "  {\n"
-                "    \"txid\" : txid,              (numeric) the mint's zerocoin denomination \n"
-                "    \"denomination\" : \"denom\", (numeric) the mint's zerocoin denomination\n"
-                "    \"pubcoin\" : \"pubcoin\",    (string) The mint's public identifier\n"
-                "    \"height\" : n,               (numeric) The height the tx was added to the blockchain\n"
-                "  }\n"
-                "  ,...\n"
-                "]\n"
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"txid\" : \"xxx\",           (string) the mint's zerocoin denomination \n"
+            "    \"denomination\" : amount,  (numeric) the mint's zerocoin denomination\n"
+            "    \"pubcoin\" : \"xxx\",        (string) The mint's public identifier\n"
+            "    \"height\" : n              (numeric) The height the tx was added to the blockchain\n"
+            "  }\n"
+            "  ,...\n"
+            "]\n"
 
-                "\nExamples\n" +
+            "\nExamples\n" +
             HelpExampleCli("reconsiderzerocoins", "") + HelpExampleRpc("reconsiderzerocoins", ""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -2985,7 +3122,7 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
     for (const CZerocoinMint mint : listMints) {
         UniValue objMint(UniValue::VOBJ);
         objMint.push_back(Pair("txid", mint.GetTxHash().GetHex()));
-        objMint.push_back(Pair("denomination", FormatMoney(mint.GetDenominationAsAmount())));
+        objMint.push_back(Pair("denomination", ValueFromAmount(mint.GetDenominationAsAmount())));
         objMint.push_back(Pair("pubcoin", mint.GetValue().GetHex()));
         objMint.push_back(Pair("height", mint.GetHeight()));
         arrRet.push_back(objMint);
