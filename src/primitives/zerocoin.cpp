@@ -35,7 +35,8 @@ bool CZerocoinMint::GetKeyPair(CKey &key) const
 
 std::string CZerocoinMint::ToString() const
 {
-    std::string str = strprintf("version=%d randomness: %s \n serial %s \n privkey %s\n", version, randomness.GetHex(), serialNumber.GetHex(), HexStr(privkey));
+    std::string str = strprintf("\n  ZerocoinMint:\n   version=%d   \ntxfrom=%s   \nheight=%d \n   randomness: %s   \n serial %s   \n privkey %s\n",
+                                version, txid.GetHex(), nHeight, randomness.GetHex(), serialNumber.GetHex(), HexStr(privkey));
     return str;
 }
 

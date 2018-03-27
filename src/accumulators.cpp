@@ -413,14 +413,18 @@ bool GetAccumulatorValue(int& nHeight, const libzerocoin::CoinDenomination denom
 bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator, AccumulatorWitness& witness, int nSecurityLevel, int& nMintsAdded, string& strError, CBlockIndex* pindexCheckpoint)
 {
     LogPrintf("%s: generating\n", __func__);
-    while (true) {
+    int nLockAttempts = 0;
+    while (nLockAttempts < 100) {
         TRY_LOCK(cs_main, lockMain);
         if(!lockMain) {
             MilliSleep(50);
+            nLockAttempts++;
             continue;
         }
         break;
     }
+    if (nLockAttempts == 100)
+        return error("%s: could not get lock on cs_main", __func__);
     LogPrintf("%s: after lock\n", __func__);
     uint256 txid;
     if (!zerocoinDB->ReadCoinMint(coin.getValue(), txid))
@@ -495,6 +499,8 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
         pindex = chainActive.Next(pindex);
     }
     witness.resetValue(witnessAccumulator, coin);
+    if (!witness.VerifyWitness(accumulator, coin))
+        return error("%s: failed to verify witness", __func__);
 
     // A certain amount of accumulated coins are required
     if (nMintsAdded < Params().Zerocoin_RequiredAccumulation()) {
@@ -507,4 +513,44 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
     LogPrintf("%s : %d mints added to witness\n", __func__, nMintsAdded);
 
     return true;
+}
+
+map<CoinDenomination, int> GetMintMaturityHeight()
+{
+    map<CoinDenomination, pair<int, int > > mapDenomMaturity;
+    for (auto denom : libzerocoin::zerocoinDenomList)
+        mapDenomMaturity.insert(make_pair(denom, make_pair(0, 0)));
+
+    int nChainHeight = chainActive.Height();
+    int nHeight2CheckpointsDeep = nChainHeight - (nChainHeight % 10) - 20;
+    CBlockIndex* pindex = chainActive[nHeight2CheckpointsDeep];
+
+    while (pindex->nHeight > Params().Zerocoin_StartHeight()) {
+        bool isFinished = true;
+        for (auto denom : libzerocoin::zerocoinDenomList) {
+            //If the denom has not already had a mint added to it, then see if it has a mint added on this block
+            if (mapDenomMaturity.at(denom).first < Params().Zerocoin_RequiredAccumulation()) {
+                mapDenomMaturity.at(denom).first += count(pindex->vMintDenominationsInBlock.begin(),
+                                                          pindex->vMintDenominationsInBlock.end(), denom);
+
+                //if mint was found then record this block as the first block that maturity occurs.
+                if (mapDenomMaturity.at(denom).first >= Params().Zerocoin_RequiredAccumulation())
+                    mapDenomMaturity.at(denom).second = pindex->nHeight;
+
+                //Signal that we are finished
+                isFinished = false;
+            }
+        }
+
+        if (isFinished)
+            break;
+        pindex = chainActive[pindex->nHeight - 1];
+    }
+
+    //Generate final map
+    map<CoinDenomination, int> mapRet;
+    for (auto denom : libzerocoin::zerocoinDenomList)
+        mapRet.insert(make_pair(denom, mapDenomMaturity.at(denom).second));
+
+    return mapRet;
 }

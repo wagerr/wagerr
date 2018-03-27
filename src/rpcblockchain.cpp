@@ -535,7 +535,11 @@ UniValue verifychain(const UniValue& params, bool fHelp)
     if (params.size() > 0)
         nCheckDepth = params[1].get_int();
 
-    return CVerifyDB().VerifyDB(pcoinsTip, nCheckLevel, nCheckDepth);
+    fVerifyingBlocks = true;
+    bool fVerified = CVerifyDB().VerifyDB(pcoinsTip, nCheckLevel, nCheckDepth);
+    fVerifyingBlocks = false;
+
+    return fVerified;
 }
 
 UniValue getblockchaininfo(const UniValue& params, bool fHelp)

@@ -25,6 +25,7 @@
 #include "wallet_ismine.h"
 #include "walletdb.h"
 #include "zwgrwallet.h"
+#include "zwgrtracker.h"
 
 #include <algorithm>
 #include <map>
@@ -237,7 +238,7 @@ public:
     bool fWalletUnlockAnonymizeOnly;
     std::string strWalletFile;
     bool fBackupMints;
-    std::map<uint256, CMintMeta> mapSerialHashes;
+    CzWGRTracker* zwgrTracker;
 
     std::set<int64_t> setKeyPool;
     std::map<CKeyID, CKeyMetadata> mapKeyMetadata;
@@ -296,7 +297,6 @@ public:
         nTimeFirstKey = 0;
         fWalletUnlockAnonymizeOnly = false;
         fBackupMints = false;
-        mapSerialHashes.clear();
 
         // Stake Settings
         nHashDrift = 45;
@@ -326,6 +326,7 @@ public:
     void setZWallet(CzWGRWallet* zwallet)
     {
         zwalletMain = zwallet;
+        zwgrTracker = new CzWGRTracker(strWalletFile);
     }
 
     CzWGRWallet* getZWallet() { return zwalletMain; }

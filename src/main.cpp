@@ -980,6 +980,19 @@ void FindMints(vector<CZerocoinMint> vMintsToFind, vector<CZerocoinMint>& vMints
             continue;
         }
 
+        // is the denomination correct?
+        for (auto& out : tx.vout) {
+            if (!out.IsZerocoinMint())
+                continue;
+            PublicCoin pubcoin(Params().Zerocoin_Params(mint.GetVersion() < libzerocoin::PrivateCoin::PUBKEY_VERSION));
+            CValidationState state;
+            TxOutToPublicCoin(out, pubcoin, state);
+            if (pubcoin.getValue() == mint.GetValue() && pubcoin.getDenomination() != mint.GetDenomination()) {
+                mint.SetDenomination(pubcoin.getDenomination());
+                vMintsToUpdate.emplace_back(mint);
+            }
+        }
+
         // if meta data is correct, then no need to update
         if (mint.GetTxHash() == txHash && mint.GetHeight() == mapBlockIndex[hashBlock]->nHeight && mint.IsUsed() == fSpent)
             continue;
@@ -1309,6 +1322,18 @@ bool ContextualCheckZerocoinSpend(const CTransaction& tx, const CoinSpend& spend
         !spend.HasValidSerial(Params().Zerocoin_Params(fUseV1Params)))
         return error("%s : zWgr spend with serial %s from tx %s is not in valid range\n", __func__,
                      spend.getCoinSerialNumber().GetHex(), tx.GetHash().GetHex());
+
+    // Send signal to wallet if this is ours
+    if (pwalletMain) {
+        if (pwalletMain->IsMyZerocoinSpend(spend.getCoinSerialNumber())) {
+            LogPrintf("%s: %s detected spent zerocoin mint in transaction %s \n", __func__, spend.getCoinSerialNumber().GetHex(), tx.GetHash().GetHex());
+            pwalletMain->NotifyZerocoinChanged(pwalletMain, spend.getCoinSerialNumber().GetHex(), "Used", CT_UPDATED);
+            CWalletTx wtx(pwalletMain, tx);
+            wtx.nTimeReceived = pindex->GetBlockTime();
+            pwalletMain->AddToWallet(wtx);
+        }
+    }
+
     return true;
 }
 
@@ -1387,16 +1412,6 @@ bool CheckZerocoinSpend(const CTransaction& tx, bool fVerifySignature, CValidati
     if (!tx.IsCoinStake() && nTotalRedeemed < tx.GetValueOut()) {
         LogPrintf("redeemed = %s , spend = %s \n", FormatMoney(nTotalRedeemed), FormatMoney(tx.GetValueOut()));
         return state.DoS(100, error("Transaction spend more than was redeemed in zerocoins"));
-    }
-
-    // Send signal to wallet if this is ours
-    if (pwalletMain) {
-        for (const auto& newSpend : vSpends) {
-            if (pwalletMain->IsMyZerocoinSpend(newSpend.getCoinSerialNumber())) {
-                LogPrintf("%s: %s detected spent zerocoin mint in transaction %s \n", __func__, newSpend.getCoinSerialNumber().GetHex(), tx.GetHash().GetHex());
-                pwalletMain->NotifyZerocoinChanged(pwalletMain, newSpend.getCoinSerialNumber().GetHex(), "Used", CT_UPDATED);
-            }
-        }
     }
 
     return fValidated;
@@ -3048,6 +3063,15 @@ bool UpdatezWgrSupply(const CBlock& block, CBlockIndex* pindex)
                 if (pwalletMain->IsMyMint(m.GetValue())) {
                     pwalletMain->UpdateMint(m.GetValue(), pindex->nHeight, m.GetTxHash(), m.GetDenomination());
                     LogPrintf("%s updated mint\n", __func__);
+
+                    // Add the transaction to the wallet
+                    for (auto& tx : block.vtx) {
+                        if (tx.GetHash() == m.GetTxHash()) {
+                            CWalletTx wtx(pwalletMain, tx);
+                            wtx.nTimeReceived = block.GetBlockTime();
+                            pwalletMain->AddToWallet(wtx);
+                        }
+                    }
                 }
             }
         }

@@ -21,7 +21,8 @@ CMintPool::CMintPool(uint32_t nCount)
 
 void CMintPool::Add(const CBigNum& bnValue, const uint32_t& nCount)
 {
-    insert(make_pair(bnValue, nCount));
+    uint256 hash = GetPubCoinHash(bnValue);
+    insert(make_pair(hash, nCount));
     if (nCount > nCountLastGenerated)
         nCountLastGenerated = nCount;
 
@@ -30,23 +31,23 @@ void CMintPool::Add(const CBigNum& bnValue, const uint32_t& nCount)
 
 bool CMintPool::Has(const CBigNum& bnValue)
 {
-    return static_cast<bool>(count(bnValue));
+    return static_cast<bool>(count(GetPubCoinHash(bnValue)));
 }
 
-std::pair<CBigNum, uint32_t> CMintPool::Get(const CBigNum& bnValue)
+std::pair<uint256, uint32_t> CMintPool::Get(const CBigNum& bnValue)
 {
-    auto it = find(bnValue);
+    auto it = find(GetPubCoinHash(bnValue));
     return *it;
 }
 
-bool SortSmallest(const pair<CBigNum, uint32_t>& a, const pair<CBigNum, uint32_t>& b)
+bool SortSmallest(const pair<uint256, uint32_t>& a, const pair<uint256, uint32_t>& b)
 {
     return a.second < b.second;
 }
 
-std::list<pair<CBigNum, uint32_t> > CMintPool::List()
+std::list<pair<uint256, uint32_t> > CMintPool::List()
 {
-    list<pair<CBigNum, uint32_t> > listMints;
+    list<pair<uint256, uint32_t> > listMints;
     for (auto pMint : *(this)) {
         listMints.emplace_back(pMint);
     }
@@ -63,7 +64,7 @@ void CMintPool::Reset()
     nCountLastRemoved = 0;
 }
 
-bool CMintPool::Front(std::pair<CBigNum, uint32_t>& pMint)
+bool CMintPool::Front(std::pair<uint256, uint32_t>& pMint)
 {
     if (empty())
         return false;
@@ -71,7 +72,7 @@ bool CMintPool::Front(std::pair<CBigNum, uint32_t>& pMint)
     return true;
 }
 
-bool CMintPool::Next(pair<CBigNum, uint32_t>& pMint)
+bool CMintPool::Next(pair<uint256, uint32_t>& pMint)
 {
     auto it = find(pMint.first);
     if (it == end() || ++it == end())
@@ -83,7 +84,7 @@ bool CMintPool::Next(pair<CBigNum, uint32_t>& pMint)
 
 void CMintPool::Remove(const CBigNum& bnValue)
 {
-    auto it = find(bnValue);
+    auto it = find(GetPubCoinHash(bnValue));
     if (it == end())
         return;
 

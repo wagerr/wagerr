@@ -12,6 +12,7 @@
 #include "protocol.h"
 #include "serialize.h"
 #include "sync.h"
+#include "txdb.h"
 #include "util.h"
 #include "utiltime.h"
 #include "wallet.h"
@@ -1146,7 +1147,7 @@ bool CWalletDB::ReadZWGRCount(uint32_t& nCount)
     return Read(string("dzc"), nCount);
 }
 
-std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, std::map<uint256, CMintMeta>* mapSerialHashes)
+std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, CzWGRTracker* zwgrTracker)
 {
     std::list<CZerocoinMint> listPubCoin;
     Dbc* pcursor = GetCursor();
@@ -1184,28 +1185,9 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMatu
         CZerocoinMint mint;
         ssValue >> mint;
 
-        uint8_t nVersion = (uint8_t)libzerocoin::ExtractVersionFromSerial(mint.GetSerialNumber());
-        mint.SetVersion(nVersion);
-
         //Add any unused mints to the wallet's serial map
-        if (mapSerialHashes) {
-            uint256 nSerial = mint.GetSerialNumber().getuint256();
-            uint256 hashSerial = Hash(nSerial.begin(), nSerial.end());
-            if (!mapSerialHashes->count(hashSerial)) {
-                CMintMeta meta;
-                meta.hashSerial = hashSerial;
-
-                CDataStream ss(SER_GETHASH, 0);
-                ss << mint.GetValue();
-                meta.hashPubcoin = Hash(ss.begin(), ss.end());
-
-                meta.denom = mint.GetDenomination();
-                meta.nVersion = nVersion;
-                meta.nHeight = mint.GetHeight();
-                meta.isUsed = mint.IsUsed();
-                mapSerialHashes->insert(make_pair(hashSerial, meta));
-            }
-        }
+        if (zwgrTracker)
+            zwgrTracker->UpdateMint(mint, false);
 
         if (fUnusedOnly) {
             if (mint.IsUsed())
@@ -1224,7 +1206,18 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMatu
             if (!mint.GetHeight()) {
                 CTransaction tx;
                 uint256 hashBlock;
-                if(!GetTransaction(mint.GetTxHash(), tx, hashBlock, true)) {
+
+                if (mint.GetTxHash() == 0) {
+                    uint256 txid;
+                    if (!zerocoinDB->ReadCoinMint(mint.GetValue(), txid)) {
+                        LogPrintf("%s failed to find tx for mint %s\n", __func__,
+                                  mint.GetValue().GetHex().substr(0, 6));
+                        vArchive.emplace_back(mint);
+                    }
+                    mint.SetTxHash(txid);
+                }
+
+                if (!GetTransaction(mint.GetTxHash(), tx, hashBlock, true)) {
                     LogPrintf("%s failed to find tx for mint txid=%s\n", __func__, mint.GetTxHash().GetHex());
                     continue;
                 }
@@ -1270,16 +1263,12 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMatu
     pcursor->close();
 
     //overwrite any updates
-    for (CZerocoinMint mint : vOverWrite) {
-        if(!this->WriteZerocoinMint(mint))
-            LogPrintf("%s failed to update mint from tx %s\n", __func__, mint.GetTxHash().GetHex());
-    }
+    for (CZerocoinMint& mint : vOverWrite)
+        zwgrTracker->UpdateMint(mint);
 
     // archive mints
-    for (CZerocoinMint mint : vArchive) {
-        if (!this->ArchiveMintOrphan(mint))
-            LogPrintf("%s failed to archive mint from %s\n", __func__, mint.GetTxHash().GetHex());
-    }
+    for (CZerocoinMint& mint : vArchive)
+        zwgrTracker->Archive(mint);
 
     return listPubCoin;
 }

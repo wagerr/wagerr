@@ -588,7 +588,6 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
     currentWatchUnconfBalance = watchUnconfBalance;
     currentWatchImmatureBalance = watchImmatureBalance;
 
-    std::map<uint256, CMintMeta> mapMintMeta = pwalletMain->mapSerialHashes; //copy so that we don't modify
     std::map<libzerocoin::CoinDenomination, CAmount> mapDenomBalances;
     std::map<libzerocoin::CoinDenomination, int> mapUnconfirmed;
     std::map<libzerocoin::CoinDenomination, int> mapImmature;
@@ -599,8 +598,8 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
     }
 
     int nBestHeight = chainActive.Height();
-    for (auto& it : mapMintMeta){
-        CMintMeta meta = it.second;
+    std::vector<CMintMeta> vMints = pwalletMain->zwgrTracker->GetMints(false);
+    for (auto& meta : vMints){
         // All denominations
         mapDenomBalances.at(meta.denom)++;
 

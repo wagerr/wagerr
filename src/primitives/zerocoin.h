@@ -21,6 +21,7 @@ struct CMintMeta
     uint8_t nVersion;
     libzerocoin::CoinDenomination denom;
     bool isUsed;
+    bool isArchived;
 };
 
 uint256 GetSerialHash(const CBigNum& bnSerial);

@@ -297,29 +297,23 @@ CZerocoinDB::CZerocoinDB(size_t nCacheSize, bool fMemory, bool fWipe) : CLevelDB
 
 bool CZerocoinDB::WriteCoinMint(const PublicCoin& pubCoin, const uint256& hashTx)
 {
-    CBigNum bnValue = pubCoin.getValue();
-    CDataStream ss(SER_GETHASH, 0);
-    ss << pubCoin.getValue();
-    uint256 hash = Hash(ss.begin(), ss.end());
-
+    uint256 hash = GetPubCoinHash(pubCoin.getValue());
     return Write(make_pair('m', hash), hashTx, true);
 }
 
 bool CZerocoinDB::ReadCoinMint(const CBigNum& bnPubcoin, uint256& hashTx)
 {
-    CDataStream ss(SER_GETHASH, 0);
-    ss << bnPubcoin;
-    uint256 hash = Hash(ss.begin(), ss.end());
+    return ReadCoinMint(GetPubCoinHash(bnPubcoin), hashTx);
+}
 
-    return Read(make_pair('m', hash), hashTx);
+bool CZerocoinDB::ReadCoinMint(const uint256& hashPubcoin, uint256& hashTx)
+{
+    return Read(make_pair('m', hashPubcoin), hashTx);
 }
 
 bool CZerocoinDB::EraseCoinMint(const CBigNum& bnPubcoin)
 {
-    CDataStream ss(SER_GETHASH, 0);
-    ss << bnPubcoin;
-    uint256 hash = Hash(ss.begin(), ss.end());
-
+    uint256 hash = GetPubCoinHash(bnPubcoin);
     return Erase(make_pair('m', hash));
 }
 

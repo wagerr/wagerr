@@ -3047,3 +3047,40 @@ UniValue getzwgrseed(const UniValue& params, bool fHelp)
 
     return ret;
 }
+
+UniValue generatemintlist(const UniValue& params, bool fHelp)
+{
+    if(fHelp || params.size() != 2)
+        throw runtime_error(
+                "generatemintlist\n"
+                        "\nShow mints that are derived from the deterministic zWGR seed.\n"
+
+                        "\nArguments\n"
+                        "1. \"count\"  : n,  (numeric) Which sequential zWGR to start with.\n"
+                        "2. \"range\"  : n,  (numeric) How many zWGR to generate.\n"
+
+                        "\nExamples\n" +
+                HelpExampleCli("generatemintlist", "1, 100") + HelpExampleRpc("generatemintlist", "1, 100"));
+
+    if(pwalletMain->IsLocked())
+        throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED,
+                           "Error: Please enter the wallet passphrase with walletpassphrase first.");
+
+    int nCount = params[0].get_int();
+    int nRange = params[1].get_int();
+    CzWGRWallet* zwallet = pwalletMain->zwalletMain;
+
+    UniValue arrRet(UniValue::VARR);
+    for (int i = nCount; i < nCount + nRange; i++) {
+        libzerocoin::PrivateCoin coin(Params().Zerocoin_Params(false), libzerocoin::CoinDenomination::ZQ_ONE, false);
+        zwallet->GenerateMint(i, coin);
+        UniValue obj(UniValue::VOBJ);
+        obj.push_back(Pair("count", i));
+        obj.push_back(Pair("value", coin.getPublicCoin().getValue().GetHex()));
+        obj.push_back(Pair("randomness", coin.getRandomness().GetHex()));
+        obj.push_back(Pair("serial", coin.getSerialNumber().GetHex()));
+        arrRet.push_back(obj);
+    }
+
+    return arrRet;
+}

@@ -20,7 +20,7 @@
  * The MintPool provides a convenient way to check whether mints in the blockchain belong to a
  * wallet's deterministic seed.
  */
-class CMintPool : public std::map<CBigNum, uint32_t>
+class CMintPool : public std::map<uint256, uint32_t> //pubcoin hash, count
 {
 private:
     uint32_t nCountLastGenerated;
@@ -32,12 +32,12 @@ public:
     void Add(const CBigNum& bnValue, const uint32_t& nCount);
     bool Has(const CBigNum& bnValue);
     void Remove(const CBigNum& bnValue);
-    std::pair<CBigNum, uint32_t> Get(const CBigNum& bnValue);
-    std::list<std::pair<CBigNum, uint32_t> > List();
+    std::pair<uint256, uint32_t> Get(const CBigNum& bnValue);
+    std::list<std::pair<uint256, uint32_t> > List();
     void Reset();
 
-    bool Front(std::pair<CBigNum, uint32_t>& pMint);
-    bool Next(std::pair<CBigNum, uint32_t>& pMint);
+    bool Front(std::pair<uint256, uint32_t>& pMint);
+    bool Next(std::pair<uint256, uint32_t>& pMint);
 
     //The count of the next mint to generate will have be a mint that is already in the pool
     //therefore need to return the next value that has not been removed from the pool yet
