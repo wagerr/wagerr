@@ -75,12 +75,10 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                 sub.type = TransactionRecord::StakeZWGR;
                 sub.address = mapValue["zerocoinmint"];
                 sub.credit = nNet;
-
                 for (const CTxOut& out : wtx.vout) {
                     if (out.IsZerocoinMint())
-                        sub.debit += out.nValue;
+                        sub.credit += out.nValue;
                 }
-
                 sub.debit -= wtx.vin[0].nSequence * COIN;
             } else {
                 isminetype mine = wallet->IsMine(wtx.vout[1]);
@@ -104,7 +102,6 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                 TransactionRecord sub(hash, nTime);
                 sub.type = TransactionRecord::ZerocoinSpend_Change_zWgr;
                 sub.address = mapValue["zerocoinmint"];
-                sub.debit = -txout.nValue;
                 if (!fFeeAssigned) {
                     sub.debit -= (wtx.GetZerocoinSpent() - wtx.GetValueOut());
                     fFeeAssigned = true;
@@ -123,8 +120,12 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             isminetype mine = wallet->IsMine(txout);
             if (mine) {
                 TransactionRecord sub(hash, nTime);
-                sub.type = (fZSpendFromMe ? TransactionRecord::ZerocoinSpend_FromMe : TransactionRecord::RecvFromZerocoinSpend);
-                sub.debit = txout.nValue;
+                if (fZSpendFromMe) {
+                    sub.type = TransactionRecord::ZerocoinSpend_FromMe;
+                } else {
+                    sub.type = TransactionRecord::RecvFromZerocoinSpend;
+                    sub.credit = txout.nValue;
+                }
                 sub.address = mapValue["recvzerocoinspend"];
                 if (strAddress != "")
                     sub.address = strAddress;
@@ -270,6 +271,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                 } else if (txout.IsZerocoinMint()){
                     sub.type = TransactionRecord::ZerocoinMint;
                     sub.address = mapValue["zerocoinmint"];
+                    sub.credit += txout.nValue;
                 } else {
                     // Sent to IP, or other non-address transaction like OP_EVAL
                     sub.type = TransactionRecord::SendToOther;
