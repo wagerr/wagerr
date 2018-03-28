@@ -1326,13 +1326,15 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMatu
 
     //overwrite any updates
     for (CZerocoinMint& mint : vOverWrite) {
-        zwgrTracker->UpdateMint(mint, false);
+        if (zwgrTracker)
+            zwgrTracker->UpdateMint(mint, false);
         WriteZerocoinMint(mint);
     }
 
     // archive mints
     for (CZerocoinMint& mint : vArchive) {
-        zwgrTracker->Archive(mint, false);
+        if (zwgrTracker)
+            zwgrTracker->Archive(mint, false);
         ArchiveMintOrphan(mint);
     }
 

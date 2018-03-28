@@ -69,9 +69,9 @@ public:
 
     void Finalize(unsigned char hash[OUTPUT_SIZE])
     {
-        unsigned char buf[sha.OUTPUT_SIZE];
+        unsigned char buf[CSHA512::OUTPUT_SIZE];
         sha.Finalize(buf);
-        sha.Reset().Write(buf, sha.OUTPUT_SIZE).Finalize(hash);
+        sha.Reset().Write(buf, CSHA512::OUTPUT_SIZE).Finalize(hash);
     }
 
     CHash512& Write(const unsigned char* data, size_t len)

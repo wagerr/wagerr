@@ -17,18 +17,16 @@ private:
     uint256 seedMaster;
     uint32_t nCount;
     std::string strWalletFile;
-    bool fFirstRun;
-    const uint8_t nVersion = 1;
     CMintPool mintPool;
 
 public:
     CzWGRWallet(std::string strWalletFile, bool fFirstRun);
     bool SetMasterSeed(const uint256& seedMaster, bool fResetCount = false);
     uint256 GetMasterSeed() { return seedMaster; }
-    void SyncWithChain();
+    void SyncWithChain(bool fGenerateMintPool = true);
     void GenerateDeterministicZWGR(libzerocoin::CoinDenomination denom, libzerocoin::PrivateCoin& coin, bool fGenerateOnly = false);
     void GenerateMint(uint32_t nCount, libzerocoin::PrivateCoin& coin, libzerocoin::CoinDenomination denom = libzerocoin::CoinDenomination::ZQ_ONE);
-    void GenerateMintPool();
+    void GenerateMintPool(int nCountStart = -1, int nCountEnd = -1);
     bool LoadMintPoolFromDB();
     void RemoveMintsFromPool(const std::vector<uint256>& vPubcoinHashes);
     bool SetMintSeen(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
