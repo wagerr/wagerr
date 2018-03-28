@@ -335,6 +335,11 @@ bool CZerocoinDB::ReadCoinSpend(const CBigNum& bnSerial, uint256& txHash)
     return Read(make_pair('s', hash), txHash);
 }
 
+bool CZerocoinDB::ReadCoinSpend(const uint256& hashSerial, uint256 &txHash)
+{
+    return Read(make_pair('s', hashSerial), txHash);
+}
+
 bool CZerocoinDB::EraseCoinSpend(const CBigNum& bnSerial)
 {
     CDataStream ss(SER_GETHASH, 0);

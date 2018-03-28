@@ -11,8 +11,9 @@
 
 uint256 GetSerialHash(const CBigNum& bnSerial)
 {
-    uint256 nSerial = bnSerial.getuint256();
-    return Hash(nSerial.begin(), nSerial.end());
+    CDataStream ss(SER_GETHASH, 0);
+    ss << bnSerial;
+    return Hash(ss.begin(), ss.end());
 }
 
 uint256 GetPubCoinHash(const CBigNum& bnValue)

@@ -23,6 +23,7 @@
 
 #include "libzerocoin/Coin.h"
 #include "spork.h"
+#include "primitives/deterministicmint.h"
 #include <boost/assign/list_of.hpp>
 
 #include <univalue.h>
@@ -2393,7 +2394,12 @@ UniValue getzerocoinbalance(const UniValue& params, bool fHelp)
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
-    return ValueFromAmount(pwalletMain->GetZerocoinBalance(true));
+    UniValue ret(UniValue::VOBJ);
+    ret.push_back(Pair("Total", ValueFromAmount(pwalletMain->GetZerocoinBalance(false))));
+    ret.push_back(Pair("Mature", ValueFromAmount(pwalletMain->GetZerocoinBalance(true))));
+    ret.push_back(Pair("Unconfirmed", ValueFromAmount(pwalletMain->GetUnconfirmedZerocoinBalance())));
+    ret.push_back(Pair("Immature", ValueFromAmount(pwalletMain->GetImmatureZerocoinBalance())));
+    return ret;
 
 }
 UniValue listmintedzerocoins(const UniValue& params, bool fHelp)
@@ -2410,12 +2416,11 @@ UniValue listmintedzerocoins(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listPubCoin = walletdb.ListMintedCoins(true, false, true);
+    list<CMintMeta> listPubCoin = pwalletMain->zwgrTracker->ListMints(true, false, true);
 
     UniValue jsonList(UniValue::VARR);
-    for (const CZerocoinMint& pubCoinItem : listPubCoin) {
-        jsonList.push_back(pubCoinItem.GetValue().GetHex());
-    }
+    for (const CMintMeta& meta : listPubCoin)
+        jsonList.push_back(meta.hashPubcoin.GetHex());
 
     return jsonList;
 }
@@ -2434,12 +2439,12 @@ UniValue listzerocoinamounts(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listPubCoin = walletdb.ListMintedCoins(true, true, true);
+    list<CMintMeta> listMints = pwalletMain->zwgrTracker->ListMints(true, true, true);
 
     std::map<libzerocoin::CoinDenomination, CAmount> spread;
     for (const auto& denom : libzerocoin::zerocoinDenomList)
         spread.insert(std::pair<libzerocoin::CoinDenomination, CAmount>(denom, 0));
-    for (auto& mint : listPubCoin) spread.at(mint.GetDenomination())++;
+    for (auto& meta : listMints) spread.at(meta.denom)++;
 
 
     UniValue jsonList(UniValue::VARR);
@@ -2523,7 +2528,7 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
     CAmount nAmount = params[0].get_int() * COIN;
 
     CWalletTx wtx;
-    vector<CZerocoinMint> vMints;
+    vector<CDeterministicMint> vDMints;
     string strError;
     vector<COutPoint> vOutpts;
 
@@ -2549,23 +2554,24 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
             COutPoint outpt(uint256(txid), nOutput);
             vOutpts.push_back(outpt);
         }
-        strError = pwalletMain->MintZerocoinFromOutPoint(nAmount, wtx, vMints, vOutpts);
+        strError = pwalletMain->MintZerocoinFromOutPoint(nAmount, wtx, vDMints, vOutpts);
     } else
     {
-        strError = pwalletMain->MintZerocoin(nAmount, wtx, vMints);
+        strError = pwalletMain->MintZerocoin(nAmount, wtx, vDMints);
     }
 
     if (strError != "")
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
 
     UniValue arrMints(UniValue::VARR);
-    for (CZerocoinMint mint : vMints) {
+    for (CDeterministicMint dMint : vDMints) {
         UniValue m(UniValue::VOBJ);
         m.push_back(Pair("txid", wtx.GetHash().ToString()));
-        m.push_back(Pair("value", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(mint.GetDenomination()))));
-        m.push_back(Pair("pubcoin", mint.GetValue().GetHex()));
-        m.push_back(Pair("randomness", mint.GetRandomness().GetHex()));
-        m.push_back(Pair("serial", mint.GetSerialNumber().GetHex()));
+        m.push_back(Pair("value", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination()))));
+        m.push_back(Pair("pubcoinhash", dMint.GetPubcoinHash().GetHex()));
+        m.push_back(Pair("serialhash", dMint.GetSerialHash().GetHex()));
+        m.push_back(Pair("seedhash", dMint.GetSeedHash().GetHex()));
+        m.push_back(Pair("count", (int64_t)dMint.GetCount()));
         m.push_back(Pair("time", GetTimeMillis() - nTime));
         arrMints.push_back(m);
     }
@@ -2674,38 +2680,32 @@ UniValue resetmintzerocoin(const UniValue& params, bool fHelp)
             "Scan the blockchain for all of the zerocoins that are held in the wallet.dat. Update any meta-data that is incorrect.\n"
             "Archive any mints that are not able to be found."
 
-            "\nArguments:\n"
-            "1. \"extended_search\"      (bool, optional) Rescan each block of the blockchain looking for your mints. WARNING - may take 30+ minutes!\n"
-
             + HelpRequiringPassphrase());
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    bool fExtendedSearch = false;
-    if (params.size() == 1)
-        fExtendedSearch = params[0].get_bool();
-
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListMintedCoins(false, false, true);
-    vector<CZerocoinMint> vMintsToFind{ std::make_move_iterator(std::begin(listMints)), std::make_move_iterator(std::end(listMints)) };
-    vector<CZerocoinMint> vMintsMissing;
-    vector<CZerocoinMint> vMintsToUpdate;
+    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
+    list<CMintMeta> listMints = zwgrTracker->ListMints(false, false, true);
+    vector<CMintMeta> vMintsToFind{ std::make_move_iterator(std::begin(listMints)), std::make_move_iterator(std::end(listMints)) };
+    vector<CMintMeta> vMintsMissing;
+    vector<CMintMeta> vMintsToUpdate;
 
     // search all of our available data for these mints
-    FindMints(vMintsToFind, vMintsToUpdate, vMintsMissing, fExtendedSearch);
+    FindMints(vMintsToFind, vMintsToUpdate, vMintsMissing);
 
     // update the meta data of mints that were marked for updating
     UniValue arrUpdated(UniValue::VARR);
-    for (CZerocoinMint mint : vMintsToUpdate) {
-        walletdb.WriteZerocoinMint(mint);
-        arrUpdated.push_back(mint.GetValue().GetHex());
+    for (CMintMeta meta : vMintsToUpdate) {
+        zwgrTracker->UpdateState(meta);
+        arrUpdated.push_back(meta.hashPubcoin.GetHex());
     }
 
     // delete any mints that were unable to be located on the blockchain
     UniValue arrDeleted(UniValue::VARR);
-    for (CZerocoinMint mint : vMintsMissing) {
-        arrDeleted.push_back(mint.GetValue().GetHex());
-        walletdb.ArchiveMintOrphan(mint);
+    for (CMintMeta mint : vMintsMissing) {
+        zwgrTracker->Archive(mint);
+        arrDeleted.push_back(mint.hashPubcoin.GetHex());
     }
 
     UniValue obj(UniValue::VOBJ);
@@ -2725,7 +2725,8 @@ UniValue resetspentzerocoin(const UniValue& params, bool fHelp)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListMintedCoins(false, false, false);
+    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
+    list<CMintMeta> listMints = zwgrTracker->ListMints(false, false, false);
     list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
     list<CZerocoinSpend> listUnconfirmedSpends;
 
@@ -2745,10 +2746,10 @@ UniValue resetspentzerocoin(const UniValue& params, bool fHelp)
     UniValue objRet(UniValue::VOBJ);
     UniValue arrRestored(UniValue::VARR);
     for (CZerocoinSpend spend : listUnconfirmedSpends) {
-        for (CZerocoinMint mint : listMints) {
-            if (mint.GetSerialNumber() == spend.GetSerial()) {
-                mint.SetUsed(false);
-                walletdb.WriteZerocoinMint(mint);
+        for (auto& meta : listMints) {
+            if (meta.hashSerial == GetSerialHash(spend.GetSerial())) {
+                meta.isUsed = false;
+                zwgrTracker->UpdateState(meta);
                 walletdb.EraseZerocoinSpendSerialEntry(spend.GetSerial());
                 RemoveSerialFromDB(spend.GetSerial());
                 UniValue obj(UniValue::VOBJ);
@@ -2832,11 +2833,17 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
     libzerocoin::CoinDenomination denomination = libzerocoin::ZQ_ERROR;
     if (params.size() == 2)
         denomination = libzerocoin::IntToZerocoinDenomination(params[1].get_int());
-    list<CZerocoinMint> listMints = walletdb.ListMintedCoins(!fIncludeSpent, false, false);
+
+    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
+    list<CMintMeta> listMints = zwgrTracker->ListMints(!fIncludeSpent, false, false);
 
     UniValue jsonList(UniValue::VARR);
-    for (const CZerocoinMint mint : listMints) {
-        if (denomination != libzerocoin::ZQ_ERROR && denomination != mint.GetDenomination())
+    for (const CMintMeta& meta : listMints) {
+        if (denomination != libzerocoin::ZQ_ERROR && denomination != meta.denom)
+            continue;
+
+        CZerocoinMint mint;
+        if (!pwalletMain->GetMint(meta.hashSerial, mint))
             continue;
 
         UniValue objMint(UniValue::VOBJ);
@@ -2933,7 +2940,7 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
         CZerocoinMint mint(denom, bnValue, bnRandom, bnSerial, fUsed, nVersion, privkey);
         mint.SetTxHash(txid);
         mint.SetHeight(nHeight);
-        walletdb.WriteZerocoinMint(mint);
+        pwalletMain->zwgrTracker->Add(mint, true);
         count++;
         nValue += libzerocoin::ZerocoinDenominationToAmount(denom);
     }
@@ -2972,7 +2979,8 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
                            "Error: Please enter the wallet passphrase with walletpassphrase first.");
 
     list<CZerocoinMint> listMints;
-    pwalletMain->ReconsiderZerocoins(listMints);
+    list<CDeterministicMint> listDMints;
+    pwalletMain->ReconsiderZerocoins(listMints, listDMints);
 
     UniValue arrRet(UniValue::VARR);
     for (const CZerocoinMint mint : listMints) {
@@ -2981,6 +2989,14 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
         objMint.push_back(Pair("denomination", FormatMoney(mint.GetDenominationAsAmount())));
         objMint.push_back(Pair("pubcoin", mint.GetValue().GetHex()));
         objMint.push_back(Pair("height", mint.GetHeight()));
+        arrRet.push_back(objMint);
+    }
+    for (const CDeterministicMint dMint : listDMints) {
+        UniValue objMint(UniValue::VOBJ);
+        objMint.push_back(Pair("txid", dMint.GetTxHash().GetHex()));
+        objMint.push_back(Pair("denomination", FormatMoney(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination()))));
+        objMint.push_back(Pair("pubcoinhash", dMint.GetPubcoinHash().GetHex()));
+        objMint.push_back(Pair("height", dMint.GetHeight()));
         arrRet.push_back(objMint);
     }
 
@@ -3072,8 +3088,10 @@ UniValue generatemintlist(const UniValue& params, bool fHelp)
 
     UniValue arrRet(UniValue::VARR);
     for (int i = nCount; i < nCount + nRange; i++) {
-        libzerocoin::PrivateCoin coin(Params().Zerocoin_Params(false), libzerocoin::CoinDenomination::ZQ_ONE, false);
-        zwallet->GenerateMint(i, coin);
+        libzerocoin::CoinDenomination denom = libzerocoin::CoinDenomination::ZQ_ONE;
+        libzerocoin::PrivateCoin coin(Params().Zerocoin_Params(false), denom, false);
+        CDeterministicMint dMint;
+        zwallet->GenerateMint(i, denom, coin, dMint);
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair("count", i));
         obj.push_back(Pair("value", coin.getPublicCoin().getValue().GetHex()));

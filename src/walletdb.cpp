@@ -16,6 +16,7 @@
 #include "util.h"
 #include "utiltime.h"
 #include "wallet.h"
+#include <primitives/deterministicmint.h>
 
 #include <boost/filesystem.hpp>
 #include <boost/foreach.hpp>
@@ -1049,6 +1050,22 @@ bool CWalletDB::ReadZerocoinSpendSerialEntry(const CBigNum& bnSerial)
     return Read(make_pair(string("zcserial"), bnSerial), spend);
 }
 
+bool CWalletDB::WriteDeterministicMint(const CDeterministicMint& dMint)
+{
+    uint256 hash = dMint.GetPubcoinHash();
+    return Write(make_pair(string("dzwgr"), hash), dMint, true);
+}
+
+bool CWalletDB::ReadDeterministicMint(const uint256& hashPubcoin, CDeterministicMint& dMint)
+{
+    return Read(make_pair(string("dzwgr"), hashPubcoin), dMint);
+}
+
+bool CWalletDB::EraseDeterministicMint(const uint256& hashPubcoin)
+{
+    return Erase(make_pair(string("dzwgr"), hashPubcoin));
+}
+
 bool CWalletDB::WriteZerocoinMint(const CZerocoinMint& zerocoinMint)
 {
     CDataStream ss(SER_GETHASH, 0);
@@ -1071,18 +1088,6 @@ bool CWalletDB::ReadZerocoinMint(const CBigNum &bnPubCoinValue, CZerocoinMint& z
 bool CWalletDB::ReadZerocoinMint(const uint256& hashPubcoin, CZerocoinMint& mint)
 {
     return Read(make_pair(string("zerocoin"), hashPubcoin), mint);
-}
-
-bool CWalletDB::ReadZerocoinMintFromSerial(const CBigNum& bnSerial, CZerocoinMint& mint)
-{
-    std::list<CZerocoinMint> listMints = ListMintedCoins(false, false, false);
-    for (CZerocoinMint& m : listMints) {
-        if (m.GetSerialNumber() == bnSerial) {
-            mint = m;
-            return true;
-        }
-    }
-    return false;
 }
 
 bool CWalletDB::EraseZerocoinMint(const CZerocoinMint& zerocoinMint)
@@ -1113,18 +1118,46 @@ bool CWalletDB::ArchiveMintOrphan(const CZerocoinMint& zerocoinMint)
     return true;
 }
 
-bool CWalletDB::UnarchiveZerocoin(const CZerocoinMint& mint)
+bool CWalletDB::ArchiveDeterministicOrphan(const CDeterministicMint& dMint)
 {
-    CDataStream ss(SER_GETHASH, 0);
-    ss << mint.GetValue();
-    uint256 hash = Hash(ss.begin(), ss.end());;
+    if (!Write(make_pair(string("dzco"), dMint.GetPubcoinHash()), dMint))
+        return error("%s: write failed", __func__);
 
-    if (!Erase(make_pair(string("zco"), hash))) {
-        LogPrintf("%s : failed to erase archived zerocoin mint\n", __func__);
-        return false;
-    }
+    if (!Erase(make_pair(string("dzwgr"), dMint.GetPubcoinHash())))
+        return error("%s: failed to erase", __func__);
 
-    return WriteZerocoinMint(mint);
+    return true;
+}
+
+bool CWalletDB::UnarchiveDeterministicMint(const uint256& hashPubcoin)
+{
+    CDeterministicMint dMint;
+    if (!Read(make_pair(string("dzco"), hashPubcoin), dMint))
+        return error("%s: failed to retrieve deterministic mint from archive", __func__);
+
+    if (!WriteDeterministicMint(dMint))
+        return error("%s: failed to write deterministic mint", __func__);
+
+    if (!Erase(make_pair(string("dzco"), dMint.GetPubcoinHash())))
+        return error("%s : failed to erase archived deterministic mint", __func__);
+
+    return true;
+}
+
+bool CWalletDB::UnarchiveZerocoinMint(const uint256& hashPubcoin)
+{
+    CZerocoinMint mint;
+    if (!Read(make_pair(string("zco"), hashPubcoin), mint))
+        return error("%s: failed to retrieve zerocoinmint from archive", __func__);
+
+    if (!WriteZerocoinMint(mint))
+        return error("%s: failed to write zerocoinmint", __func__);
+
+    uint256 hash = GetPubCoinHash(mint.GetValue());
+    if (!Erase(make_pair(string("zco"), hash)))
+        return error("%s : failed to erase archived zerocoin mint", __func__);
+
+    return true;
 }
 
 bool CWalletDB::WriteZWGRSeed(const uint256& seed)
@@ -1209,7 +1242,50 @@ std::map<uint256, std::vector<pair<uint256, uint32_t> > > CWalletDB::MapMintPool
     return mapPool;
 }
 
-std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus, CzWGRTracker* zwgrTracker)
+std::list<CDeterministicMint> CWalletDB::ListDeterministicMints()
+{
+    std::list<CDeterministicMint> listMints;
+    Dbc* pcursor = GetCursor();
+    if (!pcursor)
+        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+    unsigned int fFlags = DB_SET_RANGE;
+    for (;;)
+    {
+        // Read next record
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
+        if (fFlags == DB_SET_RANGE)
+            ssKey << make_pair(string("dzwgr"), uint256(0));
+        CDataStream ssValue(SER_DISK, CLIENT_VERSION);
+        int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
+        fFlags = DB_NEXT;
+        if (ret == DB_NOTFOUND)
+            break;
+        else if (ret != 0)
+        {
+            pcursor->close();
+            throw runtime_error(std::string(__func__)+" : error scanning DB");
+        }
+
+        // Unserialize
+        string strType;
+        ssKey >> strType;
+        if (strType != "dzwgr")
+            break;
+
+        uint256 hashPubcoin;
+        ssKey >> hashPubcoin;
+
+        CDeterministicMint mint;
+        ssValue >> mint;
+
+        listMints.emplace_back(mint);
+    }
+
+    pcursor->close();
+    return listMints;
+}
+
+std::list<CZerocoinMint> CWalletDB::ListMintedCoins()
 {
     std::list<CZerocoinMint> listPubCoin;
     Dbc* pcursor = GetCursor();
@@ -1247,112 +1323,12 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins(bool fUnusedOnly, bool fMatu
         CZerocoinMint mint;
         ssValue >> mint;
 
-        //Add any unused mints to the wallet's serial map
-        if (zwgrTracker)
-            zwgrTracker->UpdateMint(mint, false);
-
-        if (fUnusedOnly) {
-            if (mint.IsUsed())
-                continue;
-
-            //double check that we have no record of this serial being used
-            if (ReadZerocoinSpendSerialEntry(mint.GetSerialNumber())) {
-                mint.SetUsed(true);
-                vOverWrite.emplace_back(mint);
-                continue;
-            }
-        }
-
-        if (fMaturedOnly || fUpdateStatus) {
-            //if there is not a record of the block height, then look it up and assign it
-            if (!mint.GetHeight()) {
-                CTransaction tx;
-                uint256 hashBlock;
-
-                if (mint.GetTxHash() == 0) {
-                    uint256 txid;
-                    if (!zerocoinDB->ReadCoinMint(mint.GetValue(), txid)) {
-                        LogPrintf("%s failed to find tx for mint %s\n", __func__,
-                                  mint.GetValue().GetHex().substr(0, 6));
-                        vArchive.emplace_back(mint);
-                    }
-                    mint.SetTxHash(txid);
-                }
-
-                if (!GetTransaction(mint.GetTxHash(), tx, hashBlock, true)) {
-                    LogPrintf("%s failed to find tx for mint txid=%s\n", __func__, mint.GetTxHash().GetHex());
-                    continue;
-                }
-
-                //if not in the block index, most likely is unconfirmed tx
-                if (mapBlockIndex.count(hashBlock)) {
-                    mint.SetHeight(mapBlockIndex[hashBlock]->nHeight);
-                    vOverWrite.emplace_back(mint);
-                } else if (fMaturedOnly){
-                    continue;
-                }
-            }
-
-            //not mature
-            if (mint.GetHeight() > chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations()) {
-                if (!fMaturedOnly)
-                    listPubCoin.emplace_back(mint);
-                continue;
-            }
-
-            //if only requesting an update (fUpdateStatus) then skip the rest and add to list
-            if (fMaturedOnly) {
-                // check to make sure there are at least 3 other mints added to the accumulators after this
-                if (chainActive.Height() < mint.GetHeight() + 1)
-                    continue;
-
-                CBlockIndex *pindex = chainActive[mint.GetHeight() + 1];
-                int nMintsAdded = 0;
-                while(pindex->nHeight < chainActive.Height() - 30) { // 30 just to make sure that its at least 2 checkpoints from the top block
-                    nMintsAdded += count(pindex->vMintDenominationsInBlock.begin(), pindex->vMintDenominationsInBlock.end(), mint.GetDenomination());
-                    if(nMintsAdded >= Params().Zerocoin_RequiredAccumulation())
-                        break;
-                    pindex = chainActive[pindex->nHeight + 1];
-                }
-
-                if(nMintsAdded < Params().Zerocoin_RequiredAccumulation())
-                    continue;
-            }
-        }
         listPubCoin.emplace_back(mint);
     }
 
     pcursor->close();
-
-    //overwrite any updates
-    for (CZerocoinMint& mint : vOverWrite) {
-        if (zwgrTracker)
-            zwgrTracker->UpdateMint(mint, false);
-        WriteZerocoinMint(mint);
-    }
-
-    // archive mints
-    for (CZerocoinMint& mint : vArchive) {
-        if (zwgrTracker)
-            zwgrTracker->Archive(mint, false);
-        ArchiveMintOrphan(mint);
-    }
-
-
     return listPubCoin;
 }
-// Just get the Serial Numbers
-std::list<CBigNum> CWalletDB::ListMintedCoinsSerial()
-{
-    std::list<CBigNum> listPubCoin;
-    std::list<CZerocoinMint> listCoins = ListMintedCoins(false, false, false);
-    
-    for ( auto& coin : listCoins) {
-        listPubCoin.push_back(coin.GetSerialNumber());
-    }
-    return listPubCoin;
-}
-
 
 std::list<CZerocoinSpend> CWalletDB::ListSpentCoins()
 {
@@ -1452,3 +1428,45 @@ std::list<CZerocoinMint> CWalletDB::ListArchivedZerocoins()
     return listMints;
 }
 
+std::list<CDeterministicMint> CWalletDB::ListArchivedDeterministicMints()
+{
+    std::list<CDeterministicMint> listMints;
+    Dbc* pcursor = GetCursor();
+    if (!pcursor)
+        throw runtime_error(std::string(__func__)+" : cannot create DB cursor");
+    unsigned int fFlags = DB_SET_RANGE;
+    for (;;)
+    {
+        // Read next record
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
+        if (fFlags == DB_SET_RANGE)
+            ssKey << make_pair(string("dzco"), CBigNum(0));
+        CDataStream ssValue(SER_DISK, CLIENT_VERSION);
+        int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
+        fFlags = DB_NEXT;
+        if (ret == DB_NOTFOUND)
+            break;
+        else if (ret != 0)
+        {
+            pcursor->close();
+            throw runtime_error(std::string(__func__)+" : error scanning DB");
+        }
+
+        // Unserialize
+        string strType;
+        ssKey >> strType;
+        if (strType != "dzco")
+            break;
+
+        uint256 value;
+        ssKey >> value;
+
+        CDeterministicMint dMint;
+        ssValue >> dMint;
+
+        listMints.emplace_back(dMint);
+    }
+
+    pcursor->close();
+    return listMints;
+}

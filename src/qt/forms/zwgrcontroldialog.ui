@@ -96,7 +96,7 @@
        </column>
        <column>
         <property name="text">
-         <string notr="true">zWgr Public ID</string>
+         <string notr="true">zWgr ID</string>
         </property>
        </column>
        <column>

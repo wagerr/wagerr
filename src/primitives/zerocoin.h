@@ -18,10 +18,13 @@ struct CMintMeta
     int nHeight;
     uint256 hashSerial;
     uint256 hashPubcoin;
+    uint256 hashStake; //requires different hashing method than hashSerial above
     uint8_t nVersion;
     libzerocoin::CoinDenomination denom;
+    uint256 txid;
     bool isUsed;
     bool isArchived;
+    bool isDeterministic;
 };
 
 uint256 GetSerialHash(const CBigNum& bnSerial);

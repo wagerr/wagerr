@@ -8,6 +8,7 @@
 #include "walletdb.h"
 #include "init.h"
 #include "wallet.h"
+#include "primitives/deterministicmint.h"
 
 using namespace libzerocoin;
 
@@ -41,9 +42,6 @@ bool CzWGRWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
         walletdb.WriteZWGRCount(nCount);
     else if (!walletdb.ReadZWGRCount(nCount))
         nCount = 0;
-
-    //TODO remove this leak of seed from logs before merge to master
-    LogPrintf("%s : seed=%s count=%d\n", __func__, seedMaster.GetHex(), nCount);
 
     //todo fix to sync with count above
     mintPool.Reset();
@@ -109,6 +107,8 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
     uint32_t nLastCountUsed = 0;
     bool found = true;
     CWalletDB walletdb(strWalletFile);
+    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
+    std::set<uint256> setChecked;
     while (found) {
         found = false;
         if (fGenerateMintPool)
@@ -116,22 +116,31 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
         LogPrintf("%s: Mintpool size=%d\n", __func__, mintPool.size());
 
         for (pair<uint256, uint32_t> pMint : mintPool.List()) {
+            if (setChecked.count(pMint.first))
+                return;
+            setChecked.insert(pMint.first);
+
             if (ShutdownRequested())
                 return;
 
             if (mapMissingMints.count(pMint.first))
                 continue;
 
+            if (zwgrTracker->HasPubcoinHash(pMint.first)) {
+                mintPool.Remove(pMint.first);
+                continue;
+            }
+
             uint256 txHash;
             CZerocoinMint mint;
             if (zerocoinDB->ReadCoinMint(pMint.first, txHash)) {
                 //this mint has already occured on the chain, increment counter's state to reflect this
-                LogPrintf("%s : Found used coin mint %s \n", __func__, pMint.first.GetHex());
+                LogPrintf("%s : Found used coin mint %s in tx %s\n", __func__, pMint.first.GetHex(), txHash.GetHex());
                 found = true;
 
                 uint256 hashBlock;
                 CTransaction tx;
-                if (!GetTransaction(txHash, tx, hashBlock)) {
+                if (!GetTransaction(txHash, tx, hashBlock, true)) {
                     LogPrintf("%s : failed to get transaction for mint %s!\n", __func__, pMint.first.GetHex());
                     found = false;
                     nLastCountUsed = std::max(pMint.second, nLastCountUsed);
@@ -167,7 +176,6 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
                 if (!fFoundMint || denomination == ZQ_ERROR) {
                     LogPrintf("%s : failed to get mint %s from tx %s!\n", __func__, pMint.first.GetHex(), tx.GetHash().GetHex());
                     found = false;
-                    nLastCountUsed = std::max(pMint.second, nLastCountUsed);
                     mapMissingMints.insert(pMint);
                     break;
                 }
@@ -208,14 +216,40 @@ bool CzWGRWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
     SeedToZWGR(seedZerocoin, bnSerial, bnRandomness, key);
 
     // Create mint object and database it
-    CZerocoinMint mint(denom, bnValue, bnRandomness, bnSerial, false, PrivateCoin::CURRENT_VERSION);
-    mint.SetPrivKey(key.GetPrivKey());
-    mint.SetHeight(nHeight);
-    mint.SetTxHash(txid);
+    uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
+    uint256 hashSerial = GetSerialHash(bnSerial);
+    uint256 hashPubcoin = GetPubCoinHash(bnValue);
+    uint256 nSerial = bnSerial.getuint256();
+    uint256 hashStake = Hash(nSerial.begin(), nSerial.end());
+    CDeterministicMint dMint(PrivateCoin::CURRENT_VERSION, pMint.second, hashSeed, hashSerial, hashPubcoin, hashStake);
+    dMint.SetDenomination(denom);
+    dMint.SetHeight(nHeight);
+    dMint.SetTxHash(txid);
 
-    //Store the mint to DB
-    if (!CWalletDB(strWalletFile).WriteZerocoinMint(mint))
-        return error("%s : failed to database mint %s!", __func__, mint.GetValue().GetHex());
+    // Check if this is also already spent
+    int nHeightTx;
+    if (IsSerialInBlockchain(hashSerial, nHeightTx)) {
+        //Find transaction details and make a wallettx and add to wallet
+        dMint.SetUsed(true);
+        if (chainActive.Height() < nHeightTx)
+            return error("%s: tx height %d is higher than chain height", __func__, nHeightTx);
+
+        uint256 txHash;
+        if (!zerocoinDB->ReadCoinSpend(hashSerial, txHash))
+            return error("%s: did not find serial hash %s in zerocoindb", __func__, hashSerial.GetHex());
+
+        uint256 hashBlock;
+        CTransaction tx;
+        if (!GetTransaction(txHash, tx, hashBlock, true))
+            return error("%s: could not read transaction %s", __func__, txHash.GetHex());
+
+        CWalletTx wtx(pwalletMain, tx);
+        wtx.nTimeReceived = chainActive[nHeightTx]->nTime;
+        pwalletMain->AddToWallet(wtx);
+    }
+
+    // Add to zwgrTracker which also adds to database
+    pwalletMain->zwgrTracker->Add(dMint, true);
 
     //Update the count if it is less than the mint's count
     if (nCount <= pMint.second) {
@@ -225,10 +259,7 @@ bool CzWGRWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
     }
 
     //remove from the pool
-    mintPool.Remove(mint.GetValue());
-
-    //fill the pool up with the next value(s)
-    //GenerateMintPool();
+    mintPool.Remove(dMint.GetPubcoinHash());
 
     return true;
 }
@@ -308,9 +339,9 @@ void CzWGRWallet::UpdateCount()
     walletdb.WriteZWGRCount(nCount);
 }
 
-void CzWGRWallet::GenerateDeterministicZWGR(CoinDenomination denom, PrivateCoin& coin, bool fGenerateOnly)
+void CzWGRWallet::GenerateDeterministicZWGR(CoinDenomination denom, PrivateCoin& coin, CDeterministicMint& dMint, bool fGenerateOnly)
 {
-    GenerateMint(nCount, coin, denom);
+    GenerateMint(nCount, denom, coin, dMint);
     if (fGenerateOnly)
         return;
 
@@ -321,7 +352,7 @@ void CzWGRWallet::GenerateDeterministicZWGR(CoinDenomination denom, PrivateCoin&
     UpdateCount();
 }
 
-void CzWGRWallet::GenerateMint(uint32_t nCount, PrivateCoin& coin, CoinDenomination denom)
+void CzWGRWallet::GenerateMint(const uint32_t& nCount, const CoinDenomination denom, PrivateCoin& coin, CDeterministicMint& dMint)
 {
     uint512 seedZerocoin = GetZerocoinSeed(nCount);
     CBigNum bnSerial;
@@ -331,4 +362,46 @@ void CzWGRWallet::GenerateMint(uint32_t nCount, PrivateCoin& coin, CoinDenominat
     coin = PrivateCoin(Params().Zerocoin_Params(false), denom, bnSerial, bnRandomness);
     coin.setPrivKey(key.GetPrivKey());
     coin.setVersion(PrivateCoin::CURRENT_VERSION);
+
+    uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
+    uint256 hashSerial = GetSerialHash(bnSerial);
+    uint256 nSerial = bnSerial.getuint256();
+    uint256 hashStake = Hash(nSerial.begin(), nSerial.end());
+    uint256 hashPubcoin = GetPubCoinHash(coin.getPublicCoin().getValue());
+    dMint = CDeterministicMint(coin.getVersion(), nCount, hashSeed, hashSerial, hashPubcoin, hashStake);
+    dMint.SetDenomination(denom);
+}
+
+bool CzWGRWallet::RegenerateMint(const CDeterministicMint& dMint, CZerocoinMint& mint)
+{
+    //Check that the seed is correct    todo:handling of incorrect, or multiple seeds
+    uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
+    if (hashSeed != dMint.GetSeedHash())
+        return error("%s: master seed does not match!", __func__);
+
+    //Generate the coin
+    PrivateCoin coin(Params().Zerocoin_Params(false), dMint.GetDenomination(), false);
+    CDeterministicMint dMintDummy;
+    GenerateMint(dMint.GetCount(), dMint.GetDenomination(), coin, dMintDummy);
+
+    //Fill in the zerocoinmint object's details
+    CBigNum bnValue = coin.getPublicCoin().getValue();
+    if (GetPubCoinHash(bnValue) != dMint.GetPubcoinHash())
+        return error("%s: failed to correctly generate mint, pubcoin hash mismatch", __func__);
+    mint.SetValue(bnValue);
+
+    CBigNum bnSerial = coin.getSerialNumber();
+    if (GetSerialHash(bnSerial) != dMint.GetSerialHash())
+        return error("%s: failed to correctly generate mint, serial hash mismatch", __func__);
+    mint.SetSerialNumber(bnSerial);
+
+    mint.SetRandomness(coin.getRandomness());
+    mint.SetPrivKey(coin.getPrivKey());
+    mint.SetVersion(coin.getVersion());
+    mint.SetDenomination(dMint.GetDenomination());
+    mint.SetUsed(dMint.IsUsed());
+    mint.SetTxHash(dMint.GetTxHash());
+    mint.SetHeight(dMint.GetHeight());
+
+    return true;
 }

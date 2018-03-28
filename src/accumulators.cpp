@@ -48,6 +48,8 @@ int GetChecksumHeight(uint32_t nChecksum, CoinDenomination denomination)
 
         //Skip forward in groups of 10 blocks since checkpoints only change every 10 blocks
         if (pindex->nHeight % 10 == 0) {
+            if (pindex->nHeight + 10 > chainActive.Height())
+                return 0;
             pindex = chainActive[pindex->nHeight + 10];
             continue;
         }
@@ -308,10 +310,6 @@ bool ValidateAccumulatorCheckpoint(const CBlock& block, CBlockIndex* pindex, Acc
     if (pindex->nHeight % 10 == 0) {
         uint256 nCheckpointCalculated = 0;
 
-        // if IDB, invalid outpoints must be calculated or else acc checkpoint will be incorrect
-        if (pindex->nHeight == Params().Zerocoin_Block_RecalculateAccumulators())
-            PopulateInvalidOutPointMap();
-
         if (!CalculateAccumulatorCheckpoint(pindex->nHeight, nCheckpointCalculated, mapAccumulators))
             return error("%s : failed to calculate accumulator checkpoint", __func__);
 
@@ -521,11 +519,10 @@ map<CoinDenomination, int> GetMintMaturityHeight()
     for (auto denom : libzerocoin::zerocoinDenomList)
         mapDenomMaturity.insert(make_pair(denom, make_pair(0, 0)));
 
-    int nChainHeight = chainActive.Height();
-    int nHeight2CheckpointsDeep = nChainHeight - (nChainHeight % 10) - 20;
-    CBlockIndex* pindex = chainActive[nHeight2CheckpointsDeep];
+    int nConfirmedHeight = chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations();
+    CBlockIndex* pindex = chainActive[nConfirmedHeight];
 
-    while (pindex->nHeight > Params().Zerocoin_StartHeight()) {
+    while (pindex && pindex->nHeight > Params().Zerocoin_StartHeight()) {
         bool isFinished = true;
         for (auto denom : libzerocoin::zerocoinDenomList) {
             //If the denom has not already had a mint added to it, then see if it has a mint added on this block

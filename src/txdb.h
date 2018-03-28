@@ -85,6 +85,7 @@ public:
     bool ReadCoinMint(const uint256& hashPubcoin, uint256& hashTx);
     bool WriteCoinSpend(const CBigNum& bnSerial, const uint256& txHash);
     bool ReadCoinSpend(const CBigNum& bnSerial, uint256& txHash);
+    bool ReadCoinSpend(const uint256& hashSerial, uint256 &txHash);
     bool EraseCoinMint(const CBigNum& bnPubcoin);
     bool EraseCoinSpend(const CBigNum& bnSerial);
     bool WriteAccumulatorValue(const uint32_t& nChecksum, const CBigNum& bnValue);

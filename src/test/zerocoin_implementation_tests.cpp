@@ -7,10 +7,9 @@
 #include "chainparams.h"
 #include "main.h"
 #include "txdb.h"
-#include "../main.h"
-#include "../accumulators.h"
-#include "../key.h"
-#include "../accumulatorcheckpoints.h"
+#include "primitives/deterministicmint.h"
+#include "key.h"
+#include "accumulatorcheckpoints.h"
 #include "libzerocoin/bignum.h"
 #include <boost/test/unit_test.hpp>
 #include <iostream>
@@ -481,7 +480,8 @@ BOOST_AUTO_TEST_CASE(deterministic_tests)
     int nTests = 50;
     for (int i = 0; i < nTests; i++) {
         PrivateCoin coin(Params().Zerocoin_Params(false), denom, false);
-        zWallet.GenerateDeterministicZWGR(denom, coin);
+        CDeterministicMint dMint;
+        zWallet.GenerateDeterministicZWGR(denom, coin, dMint);
         vCoins.emplace_back(coin);
     }
 

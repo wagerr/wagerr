@@ -11,6 +11,8 @@
 #include "uint256.h"
 #include "primitives/zerocoin.h"
 
+class CDeterministicMint;
+
 class CzWGRWallet
 {
 private:
@@ -24,8 +26,9 @@ public:
     bool SetMasterSeed(const uint256& seedMaster, bool fResetCount = false);
     uint256 GetMasterSeed() { return seedMaster; }
     void SyncWithChain(bool fGenerateMintPool = true);
-    void GenerateDeterministicZWGR(libzerocoin::CoinDenomination denom, libzerocoin::PrivateCoin& coin, bool fGenerateOnly = false);
-    void GenerateMint(uint32_t nCount, libzerocoin::PrivateCoin& coin, libzerocoin::CoinDenomination denom = libzerocoin::CoinDenomination::ZQ_ONE);
+    void GenerateDeterministicZWGR(libzerocoin::CoinDenomination denom, libzerocoin::PrivateCoin& coin, CDeterministicMint& dMint, bool fGenerateOnly = false);
+    void GenerateMint(const uint32_t& nCount, const libzerocoin::CoinDenomination denom, libzerocoin::PrivateCoin& coin, CDeterministicMint& dMint);
+    bool RegenerateMint(const CDeterministicMint& dMint, CZerocoinMint& mint);
     void GenerateMintPool(int nCountStart = -1, int nCountEnd = -1);
     bool LoadMintPoolFromDB();
     void RemoveMintsFromPool(const std::vector<uint256>& vPubcoinHashes);
