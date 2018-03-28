@@ -1642,6 +1642,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
         //Load zerocoin mint hashes to memory
         CWalletDB(pwalletMain->strWalletFile).ListMintedCoins(true, true, true, pwalletMain->zwgrTracker);
+        zwalletMain->LoadMintPoolFromDB();
+        zwalletMain->RemoveMintsFromPool(pwalletMain->zwgrTracker->GetSerialHashes());
         zwalletMain->SyncWithChain();
     }  // (!fDisableWallet)
 #else  // ENABLE_WALLET

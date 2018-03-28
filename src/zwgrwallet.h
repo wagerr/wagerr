@@ -29,6 +29,8 @@ public:
     void GenerateDeterministicZWGR(libzerocoin::CoinDenomination denom, libzerocoin::PrivateCoin& coin, bool fGenerateOnly = false);
     void GenerateMint(uint32_t nCount, libzerocoin::PrivateCoin& coin, libzerocoin::CoinDenomination denom = libzerocoin::CoinDenomination::ZQ_ONE);
     void GenerateMintPool();
+    bool LoadMintPoolFromDB();
+    void RemoveMintsFromPool(const std::vector<uint256>& vPubcoinHashes);
     bool SetMintSeen(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
     bool IsInMintPool(const CBigNum& bnValue) { return mintPool.Has(bnValue); }
 

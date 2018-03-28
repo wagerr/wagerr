@@ -22,11 +22,15 @@ CMintPool::CMintPool(uint32_t nCount)
 void CMintPool::Add(const CBigNum& bnValue, const uint32_t& nCount)
 {
     uint256 hash = GetPubCoinHash(bnValue);
-    insert(make_pair(hash, nCount));
-    if (nCount > nCountLastGenerated)
-        nCountLastGenerated = nCount;
-
+    Add(make_pair(hash, nCount));
     LogPrintf("%s : add %s to mint pool, nCountLastGenerated=%d\n", __func__, bnValue.GetHex().substr(0, 6), nCountLastGenerated);
+}
+
+void CMintPool::Add(const pair<uint256, uint32_t>& pMint)
+{
+    insert(pMint);
+    if (pMint.second > nCountLastGenerated)
+        nCountLastGenerated = pMint.second;
 }
 
 bool CMintPool::Has(const CBigNum& bnValue)
@@ -84,11 +88,16 @@ bool CMintPool::Next(pair<uint256, uint32_t>& pMint)
 
 void CMintPool::Remove(const CBigNum& bnValue)
 {
-    auto it = find(GetPubCoinHash(bnValue));
+    Remove(GetPubCoinHash(bnValue));
+    LogPrintf("%s : remove %s from mint pool\n", __func__, bnValue.GetHex().substr(0, 6));
+}
+
+void CMintPool::Remove(const uint256& hashPubcoin)
+{
+    auto it = find(hashPubcoin);
     if (it == end())
         return;
 
-    LogPrintf("%s : remove %s from mint pool\n", __func__, it->first.GetHex().substr(0, 6));
     nCountLastRemoved = it->second;
     erase(it);
 }

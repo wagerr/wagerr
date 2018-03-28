@@ -55,8 +55,8 @@ bool CzWGRWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
 void CzWGRWallet::GenerateMintPool()
 {
     int n = std::max(mintPool.CountOfLastGenerated() + 1, nCount);
-
     int nStop = n + 20;
+    uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     LogPrintf("%s : n=%d nStop=%d\n", __func__, n, nStop);
     for (int i = n; i < nStop; i++) {
         uint512 seedZerocoin = GetZerocoinSeed(i);
@@ -69,8 +69,31 @@ void CzWGRWallet::GenerateMintPool()
         coin.setVersion(PrivateCoin::CURRENT_VERSION);
         coin.setPrivKey(key.GetPrivKey());
         mintPool.Add(coin.getPublicCoin().getValue(), i);
+        CWalletDB(strWalletFile).WriteMintPoolPair(hashSeed, GetPubCoinHash(coin.getPublicCoin().getValue()), i);
         LogPrintf("%s : %s count=%d\n", __func__, coin.getPublicCoin().getValue().GetHex().substr(0, 6), i);
     }
+}
+
+// pubcoin hashes are stored to db so that a full accounting of mints belonging to the seed can be tracked without regenerating
+bool CzWGRWallet::LoadMintPoolFromDB()
+{
+    vector<pair<uint256, uint32_t> > vGenerated;
+    map<uint256, vector<pair<uint256, uint32_t> > > mapMintPool = CWalletDB(strWalletFile).MapMintPool();
+
+    //Todo: separate hashMasterSeeds
+    for (auto& it : mapMintPool) {
+        //todo check for any missing
+        for (auto& pair : it.second)
+            mintPool.Add(pair);
+    }
+
+    return true;
+}
+
+void CzWGRWallet::RemoveMintsFromPool(const std::vector<uint256>& vPubcoinHashes)
+{
+    for (const uint256& hash : vPubcoinHashes)
+        mintPool.Remove(hash);
 }
 
 //Catch the counter up with the chain
