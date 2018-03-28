@@ -134,8 +134,10 @@ UniValue getblockcount(const UniValue& params, bool fHelp)
         throw runtime_error(
             "getblockcount\n"
             "\nReturns the number of blocks in the longest block chain.\n"
+
             "\nResult:\n"
             "n    (numeric) The current block count\n"
+
             "\nExamples:\n" +
             HelpExampleCli("getblockcount", "") + HelpExampleRpc("getblockcount", ""));
 
@@ -149,8 +151,10 @@ UniValue getbestblockhash(const UniValue& params, bool fHelp)
         throw runtime_error(
             "getbestblockhash\n"
             "\nReturns the hash of the best (tip) block in the longest block chain.\n"
+
             "\nResult\n"
             "\"hex\"      (string) the block hash hex encoded\n"
+
             "\nExamples\n" +
             HelpExampleCli("getbestblockhash", "") + HelpExampleRpc("getbestblockhash", ""));
 
@@ -164,8 +168,10 @@ UniValue getdifficulty(const UniValue& params, bool fHelp)
         throw runtime_error(
             "getdifficulty\n"
             "\nReturns the proof-of-work difficulty as a multiple of the minimum difficulty.\n"
+
             "\nResult:\n"
             "n.nnn       (numeric) the proof-of-work difficulty as a multiple of the minimum difficulty.\n"
+
             "\nExamples:\n" +
             HelpExampleCli("getdifficulty", "") + HelpExampleRpc("getdifficulty", ""));
 
@@ -223,13 +229,16 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
         throw runtime_error(
             "getrawmempool ( verbose )\n"
             "\nReturns all transaction ids in memory pool as a json array of string transaction ids.\n"
+
             "\nArguments:\n"
             "1. verbose           (boolean, optional, default=false) true for a json object, false for array of transaction ids\n"
+
             "\nResult: (for verbose = false):\n"
             "[                     (json array of string)\n"
             "  \"transactionid\"     (string) The transaction id\n"
             "  ,...\n"
             "]\n"
+
             "\nResult: (for verbose = true):\n"
             "{                           (json object)\n"
             "  \"transactionid\" : {       (json object)\n"
@@ -244,6 +253,7 @@ UniValue getrawmempool(const UniValue& params, bool fHelp)
             "       ... ]\n"
             "  }, ...\n"
             "]\n"
+
             "\nExamples\n" +
             HelpExampleCli("getrawmempool", "true") + HelpExampleRpc("getrawmempool", "true"));
 
@@ -262,10 +272,13 @@ UniValue getblockhash(const UniValue& params, bool fHelp)
         throw runtime_error(
             "getblockhash index\n"
             "\nReturns hash of block in best-block-chain at index provided.\n"
+
             "\nArguments:\n"
             "1. index         (numeric, required) The block index\n"
+
             "\nResult:\n"
             "\"hash\"         (string) The block hash\n"
+
             "\nExamples:\n" +
             HelpExampleCli("getblockhash", "1000") + HelpExampleRpc("getblockhash", "1000"));
 
@@ -286,9 +299,11 @@ UniValue getblock(const UniValue& params, bool fHelp)
             "getblock \"hash\" ( verbose )\n"
             "\nIf verbose is false, returns a string that is serialized, hex-encoded data for block 'hash'.\n"
             "If verbose is true, returns an Object with information about block <hash>.\n"
+
             "\nArguments:\n"
             "1. \"hash\"          (string, required) The block hash\n"
             "2. verbose           (boolean, optional, default=true) true for a json object, false for the hex encoded data\n"
+
             "\nResult (for verbose = true):\n"
             "{\n"
             "  \"hash\" : \"hash\",     (string) the block hash (same as provided)\n"
@@ -321,10 +336,13 @@ UniValue getblock(const UniValue& params, bool fHelp)
             "     \"total\" : n,        (numeric) The total supply of all zWGR denominations\n"
             "  }\n"
             "}\n"
+
             "\nResult (for verbose=false):\n"
             "\"data\"             (string) A string that is serialized, hex-encoded data for block 'hash'.\n"
+
             "\nExamples:\n" +
-            HelpExampleCli("getblock", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\"") + HelpExampleRpc("getblock", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\""));
+            HelpExampleCli("getblock", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\"") +
+            HelpExampleRpc("getblock", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\""));
 
     LOCK(cs_main);
 
@@ -361,9 +379,11 @@ UniValue getblockheader(const UniValue& params, bool fHelp)
             "getblockheader \"hash\" ( verbose )\n"
             "\nIf verbose is false, returns a string that is serialized, hex-encoded data for block 'hash' header.\n"
             "If verbose is true, returns an Object with information about block <hash> header.\n"
+
             "\nArguments:\n"
             "1. \"hash\"          (string, required) The block hash\n"
             "2. verbose           (boolean, optional, default=true) true for a json object, false for the hex encoded data\n"
+
             "\nResult (for verbose = true):\n"
             "{\n"
             "  \"version\" : n,         (numeric) The block version\n"
@@ -373,10 +393,13 @@ UniValue getblockheader(const UniValue& params, bool fHelp)
             "  \"bits\" : \"1d00ffff\", (string) The bits\n"
             "  \"nonce\" : n,           (numeric) The nonce\n"
             "}\n"
+
             "\nResult (for verbose=false):\n"
             "\"data\"             (string) A string that is serialized, hex-encoded data for block 'hash' header.\n"
+
             "\nExamples:\n" +
-            HelpExampleCli("getblockheader", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\"") + HelpExampleRpc("getblockheader", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\""));
+            HelpExampleCli("getblockheader", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\"") +
+            HelpExampleRpc("getblockheader", "\"00000000000fd08c2fb661d2fcb0d49abb3a91e5f27082ce64feed3b4dede2e2\""));
 
     std::string strHash = params[0].get_str();
     uint256 hash(strHash);
@@ -407,6 +430,7 @@ UniValue gettxoutsetinfo(const UniValue& params, bool fHelp)
             "gettxoutsetinfo\n"
             "\nReturns statistics about the unspent transaction output set.\n"
             "Note this call may take some time.\n"
+
             "\nResult:\n"
             "{\n"
             "  \"height\":n,     (numeric) The current block height (index)\n"
@@ -417,6 +441,7 @@ UniValue gettxoutsetinfo(const UniValue& params, bool fHelp)
             "  \"hash_serialized\": \"hash\",   (string) The serialized hash\n"
             "  \"total_amount\": x.xxx          (numeric) The total amount\n"
             "}\n"
+
             "\nExamples:\n" +
             HelpExampleCli("gettxoutsetinfo", "") + HelpExampleRpc("gettxoutsetinfo", ""));
 
@@ -444,10 +469,12 @@ UniValue gettxout(const UniValue& params, bool fHelp)
         throw runtime_error(
             "gettxout \"txid\" n ( includemempool )\n"
             "\nReturns details about an unspent transaction output.\n"
+
             "\nArguments:\n"
             "1. \"txid\"       (string, required) The transaction id\n"
             "2. n              (numeric, required) vout value\n"
             "3. includemempool  (boolean, optional) Whether to included the mem pool\n"
+
             "\nResult:\n"
             "{\n"
             "  \"bestblock\" : \"hash\",    (string) the block hash\n"
@@ -470,8 +497,10 @@ UniValue gettxout(const UniValue& params, bool fHelp)
             "\nExamples:\n"
             "\nGet unspent transactions\n" +
             HelpExampleCli("listunspent", "") +
-            "\nView the details\n" + HelpExampleCli("gettxout", "\"txid\" 1") +
-            "\nAs a json rpc call\n" + HelpExampleRpc("gettxout", "\"txid\", 1"));
+            "\nView the details\n" +
+            HelpExampleCli("gettxout", "\"txid\" 1") +
+            "\nAs a json rpc call\n" +
+            HelpExampleRpc("gettxout", "\"txid\", 1"));
 
     LOCK(cs_main);
 
@@ -521,10 +550,13 @@ UniValue verifychain(const UniValue& params, bool fHelp)
         throw runtime_error(
             "verifychain ( numblocks )\n"
             "\nVerifies blockchain database.\n"
+
             "\nArguments:\n"
             "1. numblocks    (numeric, optional, default=288, 0=all) The number of blocks to check.\n"
+
             "\nResult:\n"
             "true|false       (boolean) Verified or not\n"
+
             "\nExamples:\n" +
             HelpExampleCli("verifychain", "") + HelpExampleRpc("verifychain", ""));
 
@@ -548,6 +580,7 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp)
         throw runtime_error(
             "getblockchaininfo\n"
             "Returns an object containing various state info regarding block chain processing.\n"
+
             "\nResult:\n"
             "{\n"
             "  \"chain\": \"xxxx\",        (string) current network name as defined in BIP70 (main, test, regtest)\n"
@@ -558,6 +591,7 @@ UniValue getblockchaininfo(const UniValue& params, bool fHelp)
             "  \"verificationprogress\": xxxx, (numeric) estimate of verification progress [0..1]\n"
             "  \"chainwork\": \"xxxx\"     (string) total amount of work in active chain, in hexadecimal\n"
             "}\n"
+
             "\nExamples:\n" +
             HelpExampleCli("getblockchaininfo", "") + HelpExampleRpc("getblockchaininfo", ""));
 
@@ -595,6 +629,7 @@ UniValue getchaintips(const UniValue& params, bool fHelp)
             "getchaintips\n"
             "Return information about all known tips in the block tree,"
             " including the main chain as well as orphaned branches.\n"
+
             "\nResult:\n"
             "[\n"
             "  {\n"
@@ -610,12 +645,14 @@ UniValue getchaintips(const UniValue& params, bool fHelp)
             "    \"status\": \"xxxx\"        (string) status of the chain (active, valid-fork, valid-headers, headers-only, invalid)\n"
             "  }\n"
             "]\n"
+
             "Possible values for status:\n"
             "1.  \"invalid\"               This branch contains at least one invalid block\n"
             "2.  \"headers-only\"          Not all blocks for this branch are available, but the headers are valid\n"
             "3.  \"valid-headers\"         All blocks are available for this branch, but they were never fully validated\n"
             "4.  \"valid-fork\"            This branch is not part of the active chain, but is fully validated\n"
             "5.  \"active\"                This is the tip of the active main chain, which is certainly valid\n"
+
             "\nExamples:\n" +
             HelpExampleCli("getchaintips", "") + HelpExampleRpc("getchaintips", ""));
 
@@ -678,20 +715,23 @@ UniValue getfeeinfo(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 1)
         throw runtime_error(
-                "getfeeinfo blocks\n"
-                        "\nReturns details of transaction fees over the last n blocks.\n"
-                        "\nArguments:\n"
-                        "1. blocks     (int, required) the number of blocks to get transaction data from\n"
-                        "\nResult:\n"
-                        "{\n"
-                        "  \"txcount\": xxxxx                (numeric) Current tx count\n"
-                        "  \"txbytes\": xxxxx                (numeric) Sum of all tx sizes\n"
-                        "  \"ttlfee\": xxxxx                 (numeric) Sum of all fees\n"
-                        "  \"feeperkb\": xxxxx               (numeric) Average fee per kb over the block range\n"
-                        "  \"rec_highpriorityfee_perkb\": xxxxx    (numeric) Recommended fee per kb to use for a high priority tx\n"
-                        "}\n"
-                        "\nExamples:\n" +
-                HelpExampleCli("getfeeinfo", "5") + HelpExampleRpc("getfeeinfo", "5"));
+            "getfeeinfo blocks\n"
+            "\nReturns details of transaction fees over the last n blocks.\n"
+
+            "\nArguments:\n"
+            "1. blocks     (int, required) the number of blocks to get transaction data from\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"txcount\": xxxxx                (numeric) Current tx count\n"
+            "  \"txbytes\": xxxxx                (numeric) Sum of all tx sizes\n"
+            "  \"ttlfee\": xxxxx                 (numeric) Sum of all fees\n"
+            "  \"feeperkb\": xxxxx               (numeric) Average fee per kb over the block range\n"
+            "  \"rec_highpriorityfee_perkb\": xxxxx    (numeric) Recommended fee per kb to use for a high priority tx\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getfeeinfo", "5") + HelpExampleRpc("getfeeinfo", "5"));
 
     LOCK(cs_main);
 
@@ -771,11 +811,13 @@ UniValue getmempoolinfo(const UniValue& params, bool fHelp)
         throw runtime_error(
             "getmempoolinfo\n"
             "\nReturns details on the active state of the TX memory pool.\n"
+
             "\nResult:\n"
             "{\n"
             "  \"size\": xxxxx                (numeric) Current tx count\n"
             "  \"bytes\": xxxxx               (numeric) Sum of all tx sizes\n"
             "}\n"
+
             "\nExamples:\n" +
             HelpExampleCli("getmempoolinfo", "") + HelpExampleRpc("getmempoolinfo", ""));
 
@@ -788,9 +830,10 @@ UniValue invalidateblock(const UniValue& params, bool fHelp)
         throw runtime_error(
             "invalidateblock \"hash\"\n"
             "\nPermanently marks a block as invalid, as if it violated a consensus rule.\n"
+
             "\nArguments:\n"
             "1. hash   (string, required) the hash of the block to mark as invalid\n"
-            "\nResult:\n"
+
             "\nExamples:\n" +
             HelpExampleCli("invalidateblock", "\"blockhash\"") + HelpExampleRpc("invalidateblock", "\"blockhash\""));
 
@@ -825,9 +868,10 @@ UniValue reconsiderblock(const UniValue& params, bool fHelp)
             "reconsiderblock \"hash\"\n"
             "\nRemoves invalidity status of a block and its descendants, reconsider them for activation.\n"
             "This can be used to undo the effects of invalidateblock.\n"
+
             "\nArguments:\n"
             "1. hash   (string, required) the hash of the block to reconsider\n"
-            "\nResult:\n"
+
             "\nExamples:\n" +
             HelpExampleCli("reconsiderblock", "\"blockhash\"") + HelpExampleRpc("reconsiderblock", "\"blockhash\""));
 
@@ -860,15 +904,18 @@ UniValue findserial(const UniValue& params, bool fHelp)
     if(fHelp || params.size() != 1)
         throw runtime_error(
             "findserial \"serial\"\n"
-                "\nSearches the zerocoin database for a zerocoin spend transaction that contains the specified serial\n"
-                "\nArguments:\n"
-                "1. serial   (string, required) the serial of a zerocoin spend to search for.\n"
-                "\nResult:\n"
-                "{\n"
-                "  \"success\": true/false        (boolean) Whether the serial was found\n"
-                "  \"txid\": xxxxx                (numeric) The transaction that contains the spent serial\n"
-                "}\n"
-                "\nExamples:\n" +
+            "\nSearches the zerocoin database for a zerocoin spend transaction that contains the specified serial\n"
+
+            "\nArguments:\n"
+            "1. serial   (string, required) the serial of a zerocoin spend to search for.\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"success\": true|false        (boolean) Whether the serial was found\n"
+            "  \"txid\": \"xxx\"              (string) The transaction that contains the spent serial\n"
+            "}\n"
+
+            "\nExamples:\n" +
             HelpExampleCli("findserial", "\"serial\"") + HelpExampleRpc("findserial", "\"serial\""));
 
     std::string strSerial = params[0].get_str();
