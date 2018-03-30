@@ -109,14 +109,8 @@ PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent),
     ui->WarningLabel->hide();    // Explanatory text visible in QT-Creator
     ui->dummyHideWidget->hide(); // Dummy widget with elements to hide
 
-    //temporary disable for maintenance
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
-        ui->pushButtonMintzWGR->setEnabled(false);
-        ui->pushButtonMintzWGR->setToolTip(tr("zWGR is currently disabled due to maintenance."));
-
-        ui->pushButtonSpendzWGR->setEnabled(false);
-        ui->pushButtonSpendzWGR->setToolTip(tr("zWGR is currently disabled due to maintenance."));
-    }
+    // Set labels/buttons depending on SPORK_16 status
+    updateSPORK16Status();
 }
 
 PrivacyDialog::~PrivacyDialog()
@@ -698,6 +692,9 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
     // Display AutoMint status
     updateAutomintStatus();
 
+    // Update/enable labels and buttons depending on the current SPORK_16 status
+    updateSPORK16Status();
+
     // Display global supply
     ui->labelZsupplyAmount->setText(QString::number(chainActive.Tip()->GetZerocoinSupply()/COIN) + QString(" <b>zWGR </b> "));
     for (auto denom : libzerocoin::zerocoinDenomList) {
@@ -775,4 +772,27 @@ void PrivacyDialog::updateAutomintStatus()
 
     strAutomintStatus += tr(" Configured target percentage: <b>") + QString::number(pwalletMain->getZeromintPercentage()) + "%</b>";
     ui->label_AutoMintStatus->setText(strAutomintStatus);
+}
+
+void PrivacyDialog::updateSPORK16Status()
+{
+    // Update/enable labels, buttons and tooltips depending on the current SPORK_16 status
+    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
+        // Mint zWGR
+        ui->pushButtonMintzWGR->setEnabled(false);
+        ui->pushButtonMintzWGR->setToolTip(tr("zWGR is currently disabled due to maintenance."));
+
+        // Spend zWGR
+        ui->pushButtonSpendzWGR->setEnabled(false);
+        ui->pushButtonSpendzWGR->setToolTip(tr("zWGR is currently disabled due to maintenance."));
+    }
+    else {
+        // Mint zWGR
+        ui->pushButtonMintzWGR->setEnabled(true);
+        ui->pushButtonMintzWGR->setToolTip(tr("PrivacyDialog", "Enter an amount of Wgr to convert to zWgr", 0));
+
+        // Spend zWGR
+        ui->pushButtonSpendzWGR->setEnabled(true);
+        ui->pushButtonSpendzWGR->setToolTip(tr("Spend Zerocoin. Without 'Pay To:' address creates payments to yourself."));
+    }
 }
