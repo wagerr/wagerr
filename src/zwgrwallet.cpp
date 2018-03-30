@@ -12,32 +12,58 @@
 
 using namespace libzerocoin;
 
-CzWGRWallet::CzWGRWallet(std::string strWalletFile, bool fFirstRun)
+CzWGRWallet::CzWGRWallet(std::string strWalletFile)
 {
     this->strWalletFile = strWalletFile;
     CWalletDB walletdb(strWalletFile);
 
-    uint256 seed;
-    if (!walletdb.ReadZWGRSeed(seed))
-        fFirstRun = true;
+    uint256 hashSeed;
+    bool fFirstRun = !walletdb.ReadCurrentSeedHash(hashSeed);
 
+    //Don't try to do anything if the wallet is locked.
+    if (pwalletMain->IsLocked() && !fFirstRun) {
+        seedMaster = 0;
+        nCountLastUsed = 0;
+        this->mintPool = CMintPool();
+        return;
+    }
+
+    //TODO: make better (hopefully 12 word mnemonic)
     //First time running, generate master seed
-    if (fFirstRun)
-        seed = CBigNum::randBignum(CBigNum(~uint256(0))).getuint256();
+    uint256 seed;
+    if (fFirstRun) {
+        // Borrow random generator from the key class so that we don't have to worry about randomness
+        CKey key;
+        key.MakeNewKey(true);
+        seed = key.GetPrivKey_256();
+        seedMaster = seed;
+    } else if (!pwalletMain->GetDeterministicSeed(hashSeed, seed)) {
+        LogPrintf("%s: failed to get deterministic seed for hashseed %s\n", __func__, hashSeed.GetHex());
+        return;
+    }
 
-    SetMasterSeed(seed);
+    if(!SetMasterSeed(seed)){
+        LogPrintf("%s: failed to save deterministic seed for hashseed %s\n", __func__, hashSeed.GetHex());
+        return;
+    }
     this->mintPool = CMintPool(nCountLastUsed);
 }
 
 bool CzWGRWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
 {
-    this->seedMaster = seedMaster;
 
     CWalletDB walletdb(strWalletFile);
-    if (!walletdb.WriteZWGRSeed(seedMaster))
+    if (pwalletMain->IsLocked())
         return false;
 
+    if (seedMaster != 0 && !pwalletMain->AddDeterministicSeed(seedMaster)) {
+        return error("%s: failed to set master seed.", __func__);
+    }
+
+    this->seedMaster = seedMaster;
+
     nCountLastUsed = 0;
+
     if (fResetCount)
         walletdb.WriteZWGRCount(nCountLastUsed);
     else if (!walletdb.ReadZWGRCount(nCountLastUsed))
@@ -48,10 +74,21 @@ bool CzWGRWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
     return true;
 }
 
+void CzWGRWallet::Lock()
+{
+    seedMaster = 0;
+}
+
 //Add the next 20 mints to the mint pool
 void CzWGRWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 {
+
+    //Is locked
+    if (seedMaster == 0)
+        return;
+
     uint32_t n = nCountLastUsed + 1;
+
     if (nCountStart > 0)
         n = nCountStart;
 
@@ -340,11 +377,6 @@ void CzWGRWallet::SeedToZWGR(const uint512& seedZerocoin, CBigNum& bnSerial, CBi
     }
 }
 
-uint512 CzWGRWallet::GetNextZerocoinSeed()
-{
-    return GetZerocoinSeed(nCountLastUsed + 1);
-}
-
 uint512 CzWGRWallet::GetZerocoinSeed(uint32_t n)
 {
     CDataStream ss(SER_GETHASH, 0);
@@ -395,7 +427,7 @@ bool CzWGRWallet::RegenerateMint(const CDeterministicMint& dMint, CZerocoinMint&
     //Check that the seed is correct    todo:handling of incorrect, or multiple seeds
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     if (hashSeed != dMint.GetSeedHash())
-        return error("%s: master seed does not match!", __func__);
+        return error("%s: master seed does not match!\ndmint:\n %s \nhashSeed: %s\nseed: %s", __func__, dMint.ToString(), hashSeed.GetHex(), seedMaster.GetHex());
 
     //Generate the coin
     PrivateCoin coin(Params().Zerocoin_Params(false), dMint.GetDenomination(), false);

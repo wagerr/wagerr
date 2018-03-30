@@ -40,7 +40,7 @@ public:
     void SetStakeHash(const uint256& hashStake) { this->hashStake = hashStake; }
     void SetTxHash(const uint256& txid) { this->txid = txid; }
     void SetUsed(const bool isUsed) { this->isUsed = isUsed; }
-    std::string ToString();
+    std::string ToString() const;
 
     ADD_SERIALIZE_METHODS;
 

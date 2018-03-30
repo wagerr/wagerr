@@ -24,12 +24,12 @@
 #include "qvalidatedlineedit.h"
 #include "bitcoinamountfield.h"
 
-#include <QtCore/QVariant>
-#include <QtWidgets/QHBoxLayout>
-#include <QtWidgets/QLabel>
-#include <QtWidgets/QPushButton>
-#include <QtWidgets/QToolButton>
-#include <QtWidgets/QSpinBox>
+#include <QVariant>
+#include <QHBoxLayout>
+#include <QLabel>
+#include <QPushButton>
+#include <QToolButton>
+#include <QSpinBox>
 #include <QClipboard>
 #include <QDebug>
 

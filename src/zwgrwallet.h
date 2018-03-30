@@ -22,7 +22,7 @@ private:
     CMintPool mintPool;
 
 public:
-    CzWGRWallet(std::string strWalletFile, bool fFirstRun);
+    CzWGRWallet(std::string strWalletFile);
     bool SetMasterSeed(const uint256& seedMaster, bool fResetCount = false);
     uint256 GetMasterSeed() { return seedMaster; }
     void SyncWithChain(bool fGenerateMintPool = true);
@@ -35,9 +35,9 @@ public:
     bool SetMintSeen(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
     bool IsInMintPool(const CBigNum& bnValue) { return mintPool.Has(bnValue); }
     void UpdateCount();
+    void Lock();
 
 private:
-    uint512 GetNextZerocoinSeed();
     uint512 GetZerocoinSeed(uint32_t n);
     void SeedToZWGR(const uint512& seed, CBigNum& bnSerial, CBigNum& bnRandomness, CKey& key);
 };

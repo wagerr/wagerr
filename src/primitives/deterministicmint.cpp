@@ -35,7 +35,7 @@ void CDeterministicMint::SetNull()
     isUsed = false;
 }
 
-std::string CDeterministicMint::ToString()
+std::string CDeterministicMint::ToString() const
 {
     return strprintf(" DeterministicMint:\n   version=%d\n   count=%d\n   hashseed=%s\n   hashSerial=%s\n   hashStake=%s\n   hashPubcoin=%s\n   txid=%s\n   height=%d\n   denom=%d\n   isUsed=%d\n",
     nVersion, nCount, hashSeed.GetHex(), hashSerial.GetHex(), hashStake.GetHex(), hashPubcoin.GetHex(), txid.GetHex(), nHeight, denom, isUsed);

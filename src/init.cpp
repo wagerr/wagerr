@@ -1701,9 +1701,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         fVerifyingBlocks = false;
 
         //Inititalize zWGRWallet
-        uint256 seed = 0;
-        bool fFirstRunZWallet = !CWalletDB(pwalletMain->strWalletFile).ReadZWGRSeed(seed);
-        zwalletMain = new CzWGRWallet(pwalletMain->strWalletFile, fFirstRunZWallet);
+        zwalletMain = new CzWGRWallet(pwalletMain->strWalletFile);
         uiInterface.InitMessage(_("Syncing zWGR wallet..."));
 
         pwalletMain->setZWallet(zwalletMain);

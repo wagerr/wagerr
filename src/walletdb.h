@@ -174,12 +174,17 @@ public:
     bool WriteZerocoinSpendSerialEntry(const CZerocoinSpend& zerocoinSpend);
     bool EraseZerocoinSpendSerialEntry(const CBigNum& serialEntry);
     bool ReadZerocoinSpendSerialEntry(const CBigNum& bnSerial);
-    bool WriteZWGRSeed(const uint256& seed);
-    bool ReadZWGRSeed(uint256& seed);
+    bool WriteCurrentSeedHash(const uint256& hashSeed);
+    bool ReadCurrentSeedHash(uint256& hashSeed);
+    bool WriteZWGRSeed(const uint256& hashSeed, const vector<unsigned char>& seed);
+    bool ReadZWGRSeed(const uint256& hashSeed, vector<unsigned char>& seed);
+    bool EraseZWGRSeed();
+
     bool WriteZWGRCount(const uint32_t& nCount);
     bool ReadZWGRCount(uint32_t& nCount);
     std::map<uint256, std::vector<pair<uint256, uint32_t> > > MapMintPool();
     bool WriteMintPoolPair(const uint256& hashMasterSeed, const uint256& hashPubcoin, const uint32_t& nCount);
+
 
 private:
     CWalletDB(const CWalletDB&);
