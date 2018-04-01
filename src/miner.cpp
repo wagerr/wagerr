@@ -480,10 +480,10 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             return NULL;
         }
 
-        if (pblock->IsZerocoinStake()) {
-            CWalletTx wtx(pwalletMain, pblock->vtx[1]);
-            pwalletMain->AddToWallet(wtx);
-        }
+//        if (pblock->IsZerocoinStake()) {
+//            CWalletTx wtx(pwalletMain, pblock->vtx[1]);
+//            pwalletMain->AddToWallet(wtx);
+//        }
     }
 
     return pblocktemplate.release();
