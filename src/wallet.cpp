@@ -1598,7 +1598,7 @@ CAmount CWallet::GetZerocoinBalance(bool fMatureOnly) const
 
 CAmount CWallet::GetImmatureZerocoinBalance() const
 {
-    return GetZerocoinBalance(false) - GetZerocoinBalance(true) - GetUnconfirmedBalance();
+    return GetZerocoinBalance(false) - GetZerocoinBalance(true) - GetUnconfirmedZerocoinBalance();
 }
 
 CAmount CWallet::GetUnconfirmedZerocoinBalance() const
