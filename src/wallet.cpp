@@ -2903,7 +2903,6 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         //iterates each utxo inside of CheckStakeKernelHash()
         nAttempts++;
         if (Stake(stakeInput, nBits, block.GetBlockTime(), nTxNewTime, hashProofOfStake)) {
-            LOCK(cs_wallet);
 
             //Double check that this will pass time requirements
             if (nTxNewTime <= chainActive.Tip()->GetMedianTimePast()) {
@@ -4479,12 +4478,12 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
 
     bool isV1Coin = zerocoinSelected.GetVersion() < libzerocoin::PrivateCoin::PUBKEY_VERSION;
     libzerocoin::ZerocoinParams* paramsCoin = Params().Zerocoin_Params(isV1Coin);
-    LogPrintf("%s: *** using v1 coin params=%b, using v1 acc params=%b\n", __func__, isV1Coin, chainActive.Height() < Params().Zerocoin_Block_V2_Start());
+    //LogPrintf("%s: *** using v1 coin params=%b, using v1 acc params=%b\n", __func__, isV1Coin, chainActive.Height() < Params().Zerocoin_Block_V2_Start());
 
     // 2. Get pubcoin from the private coin
     libzerocoin::CoinDenomination denomination = zerocoinSelected.GetDenomination();
     libzerocoin::PublicCoin pubCoinSelected(paramsCoin, zerocoinSelected.GetValue(), denomination);
-    LogPrintf("%s : selected mint %s\n pubcoinhash=%s\n", __func__, zerocoinSelected.ToString(), GetPubCoinHash(zerocoinSelected.GetValue()).GetHex());
+    //LogPrintf("%s : selected mint %s\n pubcoinhash=%s\n", __func__, zerocoinSelected.ToString(), GetPubCoinHash(zerocoinSelected.GetValue()).GetHex());
     if (!pubCoinSelected.validate()) {
         receipt.SetStatus(_("The selected mint coin is an invalid coin"), ZWGR_INVALID_COIN);
         return false;
