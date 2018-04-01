@@ -396,11 +396,18 @@ bool GetAccumulatorValue(int& nHeight, const libzerocoin::CoinDenomination denom
     if (chainActive.Height() < Params().Zerocoin_Block_V2_Start())
         return GetAccumulatorValueFromDB(nCheckpointBeforeMint, denom, bnAccValue);
 
-    //todo if height is less than 1st checkpoint
     int nHeightCheckpoint = 0;
     AccumulatorCheckpoints::Checkpoint checkpoint = AccumulatorCheckpoints::GetClosestCheckpoint(nHeight, nHeightCheckpoint);
     if (nHeightCheckpoint < 0)
         return error("%s: failed to load hard-checkpoint for block %s", __func__, nHeight);
+
+    if (nHeight < nHeightCheckpoint) {
+        //Start at the first zerocoin
+        libzerocoin::Accumulator accumulator(Params().Zerocoin_Params(false), denom);
+        bnAccValue = accumulator.getValue();
+        nHeight = Params().Zerocoin_Block_V2_Start() + 10;
+        return true;
+    }
 
     nHeight = nHeightCheckpoint;
     bnAccValue = checkpoint.at(denom);
