@@ -2081,33 +2081,41 @@ bool CWallet::SelectStakeCoins(std::list<CStakeInput*>& listInputs, CAmount nTar
 bool CWallet::MintableCoins()
 {
     CAmount nBalance = GetBalance();
-    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
-        return error("MintableCoins() : invalid reserve balance amount");
-    if (nBalance <= nReserveBalance)
-        return false;
+    CAmount nZwgrBalance = GetZerocoinBalance(false);
 
-    vector<COutput> vCoins;
-    AvailableCoins(vCoins, true);
+    // Regular WGR
+    if (nBalance > 0) {
+        if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+            return error("%s : invalid reserve balance amount", __func__);
+        if (nBalance <= nReserveBalance)
+            return false;
 
-    for (const COutput& out : vCoins) {
-        int64_t nTxTime = out.tx->GetTxTime();
-        if (out.tx->IsZerocoinSpend()) {
-            if (!out.tx->IsInMainChain())
-                continue;
-            nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
+        vector<COutput> vCoins;
+        AvailableCoins(vCoins, true);
+
+        for (const COutput& out : vCoins) {
+            int64_t nTxTime = out.tx->GetTxTime();
+            if (out.tx->IsZerocoinSpend()) {
+                if (!out.tx->IsInMainChain())
+                    continue;
+                nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
+            }
+
+            if (GetAdjustedTime() - nTxTime > nStakeMinAge)
+                return true;
         }
-
-        if (GetAdjustedTime() - nTxTime > nStakeMinAge)
-            return true;
     }
 
-    list<CMintMeta> vMints = zwgrTracker->ListMints(true, true, true);
-    for (auto mint : vMints) {
-        if (mint.nVersion < CZerocoinMint::STAKABLE_VERSION)
-            continue;
-        if (mint.nHeight > chainActive.Height() - Params().Zerocoin_RequiredStakeDepth())
-            continue;
-        return true;
+    // zWGR
+    if (nZwgrBalance > 0) {
+        list<CMintMeta> vMints = zwgrTracker->ListMints(true, true, true);
+        for (auto mint : vMints) {
+            if (mint.nVersion < CZerocoinMint::STAKABLE_VERSION)
+                continue;
+            if (mint.nHeight > chainActive.Height() - Params().Zerocoin_RequiredStakeDepth())
+                continue;
+           return true;
+        }
     }
 
     return false;
@@ -2855,7 +2863,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
         return error("CreateCoinStake : invalid reserve balance amount");
 
-    if (nBalance <= nReserveBalance)
+    if (nBalance > 0 && nBalance <= nReserveBalance)
         return false;
 
     // Initialize as static and don't update the set on every run of CreateCoinStake() in order to lighten resource use
@@ -2960,7 +2968,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         if (fKernelFound)
             break; // if kernel is found stop searching
     }
-    if (nCredit == 0 || nCredit > nBalance - nReserveBalance) {
+    if (nCredit == 0 || nCredit > (nBalance > 0 ? nBalance - nReserveBalance : GetZerocoinBalance(false))) {
         LogPrintf("*** attempted to stake %d coins\n", nAttempts);
         return false;
     }
