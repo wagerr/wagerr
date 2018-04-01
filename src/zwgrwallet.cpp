@@ -152,7 +152,9 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
                 CoinDenomination denomination = CoinDenomination::ZQ_ERROR;
                 bool fFoundMint = false;
                 CBigNum bnValue = 0;
+                int nIndex = -1;
                 for (const CTxOut out : tx.vout) {
+                    nIndex++;
                     if (!out.scriptPubKey.IsZerocoinMint())
                         continue;
 
@@ -191,6 +193,8 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
                 //Fill out wtx so that a transaction record can be created
                 CWalletTx wtx(pwalletMain, tx);
                 wtx.nTimeReceived = nTimeReceived;
+                wtx.hashBlock = hashBlock;
+                wtx.nIndex = nIndex;
                 pwalletMain->AddToWallet(wtx);
 
                 SetMintSeen(bnValue, nHeight, txHash, denomination);
@@ -243,8 +247,24 @@ bool CzWGRWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
         if (!GetTransaction(txHash, tx, hashBlock, true))
             return error("%s: could not read transaction %s", __func__, txHash.GetHex());
 
+        int nIndex = -1;
+        if (mapBlockIndex.count(hashBlock)) {
+            CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
+            CBlock block;
+            if (ReadBlockFromDisk(block, pindex)) {
+                for (unsigned int i = 0; i < block.vtx.size(); i++) {
+                    if (block.vtx[i].GetHash() == txHash) {
+                        nIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
         CWalletTx wtx(pwalletMain, tx);
         wtx.nTimeReceived = chainActive[nHeightTx]->nTime;
+        wtx.hashBlock = hashBlock;
+        wtx.nIndex = nIndex;
         pwalletMain->AddToWallet(wtx);
     }
 

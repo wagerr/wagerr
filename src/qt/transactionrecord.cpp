@@ -245,7 +245,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             sub.credit = nCredit - nChange;
             parts.append(sub);
             parts.last().involvesWatchAddress = involvesWatchAddress; // maybe pass to TransactionRecord as constructor argument
-        } else if (fAllFromMe) {
+        } else if (fAllFromMe || wtx.IsZerocoinMint()) {
             //
             // Debit
             //
@@ -265,6 +265,10 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
 
                 CTxDestination address;
                 if (ExtractDestination(txout.scriptPubKey, address)) {
+                    //This is most likely only going to happen when resyncing deterministic wallet without the knowledge of the
+                    //private keys that the change was sent to. Do not display a "sent to" here.
+                    if (wtx.IsZerocoinMint())
+                        continue;
                     // Sent to Wagerr Address
                     sub.type = TransactionRecord::SendToAddress;
                     sub.address = CBitcoinAddress(address).ToString();
@@ -304,6 +308,21 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
     return parts;
 }
 
+bool IsZWGRType(TransactionRecord::Type type)
+{
+    switch (type) {
+        case TransactionRecord::StakeZWGR:
+        case TransactionRecord::ZerocoinMint:
+        case TransactionRecord::ZerocoinSpend:
+        case TransactionRecord::RecvFromZerocoinSpend:
+        case TransactionRecord::ZerocoinSpend_Change_zWgr:
+        case TransactionRecord::ZerocoinSpend_FromMe:
+            return true;
+        default:
+            return false;
+    }
+}
+
 void TransactionRecord::updateStatus(const CWalletTx& wtx)
 {
     AssertLockHeld(cs_main);
@@ -321,8 +340,25 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
         (wtx.IsCoinBase() ? 1 : 0),
         wtx.nTimeReceived,
         idx);
-    status.countsForBalance = wtx.IsTrusted() && !(wtx.GetBlocksToMaturity() > 0);
+    //status.countsForBalance = wtx.IsTrusted() && !(wtx.GetBlocksToMaturity() > 0);
     status.depth = wtx.GetDepthInMainChain();
+    if (IsZWGRType(type)) {
+        status.depth = pindex ? chainActive.Height() - pindex->nHeight : 0;
+    }
+
+    //Determine the depth of the block
+    int nBlocksToMaturity = wtx.GetBlocksToMaturity();
+    if (type == TransactionRecord::StakeZWGR) {
+        if (pindex) {
+            nBlocksToMaturity = std::max(0, (int) (Params().COINBASE_MATURITY() - status.depth));
+        } else {
+            nBlocksToMaturity = Params().COINBASE_MATURITY();
+        }
+    } else if (IsZWGRType(type)) {
+        nBlocksToMaturity = 0;
+    }
+
+    status.countsForBalance = wtx.IsTrusted() && !(nBlocksToMaturity > 0);
     status.cur_num_blocks = chainActive.Height();
     status.cur_num_ix_locks = nCompleteTXLocks;
 
@@ -337,12 +373,11 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
     }
     // For generated transactions, determine maturity
     else if (type == TransactionRecord::Generated || type == TransactionRecord::StakeMint || type == TransactionRecord::StakeZWGR || type == TransactionRecord::MNReward) {
-        if (wtx.GetBlocksToMaturity() > 0) {
+        if (nBlocksToMaturity > 0) {
             status.status = TransactionStatus::Immature;
+            status.matures_in = nBlocksToMaturity;
 
-            if (wtx.IsInMainChain()) {
-                status.matures_in = wtx.GetBlocksToMaturity();
-
+            if (pindex && chainActive.Contains(pindex)) {
                 // Check if the block was requested by anyone
                 if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0)
                     status.status = TransactionStatus::MaturesWarning;
@@ -351,6 +386,7 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
             }
         } else {
             status.status = TransactionStatus::Confirmed;
+            status.matures_in = 0;
         }
     } else {
         if (status.depth < 0) {
