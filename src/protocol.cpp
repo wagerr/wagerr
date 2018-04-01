@@ -142,8 +142,10 @@ bool CInv::IsMasterNodeType() const{
 
 const char* CInv::GetCommand() const
 {
-    if (!IsKnownType())
+    if (!IsKnownType()) {
         LogPrint("net", "CInv::GetCommand() : type=%d unknown type", type);
+        return "UNKNOWN";
+    }
 
     return ppszTypeName[type];
 }
