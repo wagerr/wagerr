@@ -679,7 +679,7 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
                 break;
         }
     }
-    CAmount matureZerocoinBalance = zerocoinBalance - immatureZerocoinBalance;
+    CAmount matureZerocoinBalance = zerocoinBalance - unconfirmedZerocoinBalance - immatureZerocoinBalance;
     CAmount nLockedBalance = 0;
     if (walletModel) {
         nLockedBalance = walletModel->getLockedBalance();
