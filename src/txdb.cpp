@@ -349,6 +349,49 @@ bool CZerocoinDB::EraseCoinSpend(const CBigNum& bnSerial)
     return Erase(make_pair('s', hash));
 }
 
+bool CZerocoinDB::WipeCoins(std::string strType)
+{
+    if (strType != "spends" && strType != "mints")
+        return error("%s: did not recognize type %s", __func__, strType);
+
+    boost::scoped_ptr<leveldb::Iterator> pcursor(NewIterator());
+
+    char type = (strType == "spends" ? 's' : 'm');
+    CDataStream ssKeySet(SER_DISK, CLIENT_VERSION);
+    ssKeySet << make_pair(type, uint256(0));
+    pcursor->Seek(ssKeySet.str());
+    // Load mapBlockIndex
+    std::set<uint256> setDelete;
+    while (pcursor->Valid()) {
+        boost::this_thread::interruption_point();
+        try {
+            leveldb::Slice slKey = pcursor->key();
+            CDataStream ssKey(slKey.data(), slKey.data() + slKey.size(), SER_DISK, CLIENT_VERSION);
+            char chType;
+            ssKey >> chType;
+            if (chType == type) {
+                leveldb::Slice slValue = pcursor->value();
+                CDataStream ssValue(slValue.data(), slValue.data() + slValue.size(), SER_DISK, CLIENT_VERSION);
+                uint256 hash;
+                ssValue >> hash;
+                setDelete.insert(hash);
+                pcursor->Next();
+            } else {
+                break; // if shutdown requested or finished loading block index
+            }
+        } catch (std::exception& e) {
+            return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+        }
+    }
+
+    for (auto& hash : setDelete) {
+        if (!Erase(make_pair(type, hash)))
+            LogPrintf("%s: error failed to delete %s\n", __func__, hash.GetHex());
+    }
+
+    return true;
+}
+
 bool CZerocoinDB::WriteAccumulatorValue(const uint32_t& nChecksum, const CBigNum& bnValue)
 {
     LogPrint("zero","%s : checksum:%d val:%s\n", __func__, nChecksum, bnValue.GetHex());

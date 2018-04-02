@@ -534,6 +534,8 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-zeromintpercentage=<n>", strprintf(_("Percentage of automatically minted Zerocoin  (1-100, default: %u)"), 10));
     strUsage += HelpMessageOpt("-preferredDenom=<n>", strprintf(_("Preferred Denomination for automatically minted Zerocoin  (1/5/10/50/100/500/1000/5000), 0 for no preference. default: %u)"), 0));
     strUsage += HelpMessageOpt("-backupzwgr=<n>", strprintf(_("Enable automatic wallet backups triggered after each zWgr minting (0-1, default: %u)"), 1));
+    strUsage += HelpMessageOpt("-reindexzerocoin=<n>", strprintf(_("Delete all zerocoin spends and mints that have been recorded to the blockchain database and reindex them (0-1, default: %u)"), 0));
+
 
 //    strUsage += "  -anonymizewagerramount=<n>     " + strprintf(_("Keep N WGR anonymized (default: %u)"), 0) + "\n";
 //    strUsage += "  -liquidityprovider=<n>       " + strprintf(_("Provide liquidity to Obfuscation by infrequently mixing coins on a continual basis (0-100, default: %u, 1=very frequent, high fees, 100=very infrequent, low fees)"), 0) + "\n";
@@ -1432,6 +1434,62 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 // Populate list of invalid/fraudulent outpoints that are banned from the chain
                 invalid_out::LoadOutpoints();
                 invalid_out::LoadSerials();
+
+                // Drop all information from the zerocoinDB and repopulate
+                if (GetBoolArg("-reindexzerocoin", false)) {
+                    uiInterface.InitMessage(_("Reindexing zerocoin database..."));
+                    if (!zerocoinDB->WipeCoins("spends") || !zerocoinDB->WipeCoins("mints")) {
+                        strLoadError = _("Failed to wipe zerocoinDB");
+                        break;
+                    }
+
+                    CBlockIndex* pindex = chainActive[Params().Zerocoin_StartHeight()];
+                    while (pindex) {
+                        if (pindex->nHeight % 1000 == 0)
+                            LogPrintf("Reindexing zerocoin : block %d...\n", pindex->nHeight);
+
+                        CBlock block;
+                        if (!ReadBlockFromDisk(block, pindex)) {
+                            strLoadError = _("Reindexing zerocoin failed");
+                            break;
+                        }
+
+                        for (const CTransaction& tx : block.vtx) {
+                            for (unsigned int i = 0; i < tx.vin.size(); i++) {
+                                if (tx.IsCoinBase())
+                                    break;
+
+                                if (tx.ContainsZerocoins()) {
+                                    uint256 txid = tx.GetHash();
+                                    //Record Serials
+                                    if (tx.IsZerocoinSpend()) {
+                                        for (auto& in : tx.vin) {
+                                            if (!in.scriptSig.IsZerocoinSpend())
+                                                continue;
+
+                                            libzerocoin::CoinSpend spend = TxInToZerocoinSpend(in);
+                                            zerocoinDB->WriteCoinSpend(spend.getCoinSerialNumber(), txid);
+                                        }
+                                    }
+
+                                    //Record mints
+                                    if (tx.IsZerocoinMint()) {
+                                        for (auto& out : tx.vout) {
+                                            if (!out.IsZerocoinMint())
+                                                continue;
+
+                                            CValidationState state;
+                                            libzerocoin::PublicCoin coin(Params().Zerocoin_Params(pindex->nHeight < Params().Zerocoin_Block_V2_Start()));
+                                            TxOutToPublicCoin(out, coin, state);
+                                            zerocoinDB->WriteCoinMint(coin, txid);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                        pindex = chainActive.Next(pindex);
+                    }
+                }
 
                 // Recalculate money supply for blocks that are impacted by accounting issue after zerocoin activation
                 if (GetBoolArg("-reindexmoneysupply", false)) {
