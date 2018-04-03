@@ -49,20 +49,35 @@ bool CzWGRWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
     return true;
 }
 
-//Add the next 10 mints to the mint pool
-void CzWGRWallet::GenerateMintPool(int nCountStart, int nCountEnd)
+//Add the next 20 mints to the mint pool
+void CzWGRWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 {
-    int n = nCountLastUsed + 1;
+    uint32_t n = nCountLastUsed + 1;
     if (nCountStart > 0)
         n = nCountStart;
 
-    int nStop = n + 20;
+    uint32_t nStop = n + 20;
     if (nCountEnd > 0)
         nStop = std::max(n, n + nCountEnd);
 
+    bool fFound;
+
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     LogPrintf("%s : n=%d nStop=%d\n", __func__, n, nStop);
-    for (int i = n; i < nStop; i++) {
+    for (uint i = n; i < nStop; ++i) {
+        fFound = false;
+
+        // Prevent unnecessary repeated minted
+        for (auto& pair : mintPool) {
+            if(pair.second == i) {
+                fFound = true;
+                break;
+            }
+        }
+
+        if(fFound)
+            continue;
+
         uint512 seedZerocoin = GetZerocoinSeed(i);
         CBigNum bnSerial;
         CBigNum bnRandomness;
@@ -81,15 +96,11 @@ void CzWGRWallet::GenerateMintPool(int nCountStart, int nCountEnd)
 // pubcoin hashes are stored to db so that a full accounting of mints belonging to the seed can be tracked without regenerating
 bool CzWGRWallet::LoadMintPoolFromDB()
 {
-    vector<pair<uint256, uint32_t> > vGenerated;
     map<uint256, vector<pair<uint256, uint32_t> > > mapMintPool = CWalletDB(strWalletFile).MapMintPool();
 
-    //Todo: separate hashMasterSeeds
-    for (auto& it : mapMintPool) {
-        //todo check for any missing
-        for (auto& pair : it.second)
-            mintPool.Add(pair);
-    }
+    uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
+    for (auto& pair : mapMintPool[hashSeed])
+        mintPool.Add(pair);
 
     return true;
 }
@@ -134,7 +145,7 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
             uint256 txHash;
             CZerocoinMint mint;
             if (zerocoinDB->ReadCoinMint(pMint.first, txHash)) {
-                //this mint has already occured on the chain, increment counter's state to reflect this
+                //this mint has already occurred on the chain, increment counter's state to reflect this
                 LogPrintf("%s : Found used coin mint %s in tx %s\n", __func__, pMint.first.GetHex(), txHash.GetHex());
                 found = true;
 
@@ -367,9 +378,6 @@ void CzWGRWallet::GenerateDeterministicZWGR(CoinDenomination denom, PrivateCoin&
 
     //TODO remove this leak of seed from logs before merge to master
     //LogPrintf("%s : Generated new deterministic mint. Count=%d pubcoin=%s seed=%s\n", __func__, nCount, coin.getPublicCoin().getValue().GetHex().substr(0,6), seedZerocoin.GetHex().substr(0, 4));
-
-    //set to the next count
-    UpdateCount();
 }
 
 void CzWGRWallet::GenerateMint(const uint32_t& nCount, const CoinDenomination denom, PrivateCoin& coin, CDeterministicMint& dMint)

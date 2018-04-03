@@ -29,16 +29,16 @@ public:
     void GenerateDeterministicZWGR(libzerocoin::CoinDenomination denom, libzerocoin::PrivateCoin& coin, CDeterministicMint& dMint, bool fGenerateOnly = false);
     void GenerateMint(const uint32_t& nCount, const libzerocoin::CoinDenomination denom, libzerocoin::PrivateCoin& coin, CDeterministicMint& dMint);
     bool RegenerateMint(const CDeterministicMint& dMint, CZerocoinMint& mint);
-    void GenerateMintPool(int nCountStart = -1, int nCountEnd = -1);
+    void GenerateMintPool(uint32_t nCountStart = 0, uint32_t nCountEnd = 0);
     bool LoadMintPoolFromDB();
     void RemoveMintsFromPool(const std::vector<uint256>& vPubcoinHashes);
     bool SetMintSeen(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
     bool IsInMintPool(const CBigNum& bnValue) { return mintPool.Has(bnValue); }
+    void UpdateCount();
 
 private:
     uint512 GetNextZerocoinSeed();
     uint512 GetZerocoinSeed(uint32_t n);
-    void UpdateCount();
     void SeedToZWGR(const uint512& seed, CBigNum& bnSerial, CBigNum& bnRandomness, CKey& key);
 };
 
