@@ -43,7 +43,6 @@ bool CzWGRWallet::SetMasterSeed(const uint256& seedMaster, bool fResetCount)
     else if (!walletdb.ReadZWGRCount(nCountLastUsed))
         nCountLastUsed = 0;
 
-    //todo fix to sync with count above
     mintPool.Reset();
 
     return true;
@@ -63,7 +62,7 @@ void CzWGRWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
     bool fFound;
 
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
-    LogPrintf("%s : n=%d nStop=%d\n", __func__, n, nStop);
+    LogPrintf("%s : n=%d nStop=%d\n", __func__, n, nStop - 1);
     for (uint i = n; i < nStop; ++i) {
         fFound = false;
 
