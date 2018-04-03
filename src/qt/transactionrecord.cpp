@@ -54,23 +54,22 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         if (!wtx.IsZerocoinSpend() && !ExtractDestination(wtx.vout[1].scriptPubKey, address))
             return parts;
 
-        if (!IsMine(*wallet, address) && !fZSpendFromMe) {
-            //if the address is not yours then it means you have a tx sent to you in someone elses coinstake tx
-            for (unsigned int i = 1; i < wtx.vout.size(); i++) {
-                CTxDestination outAddress;
-                if (ExtractDestination(wtx.vout[i].scriptPubKey, outAddress)) {
-                    if (IsMine(*wallet, outAddress)) {
-                        isminetype mine = wallet->IsMine(wtx.vout[i]);
-                        sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
-                        sub.type = TransactionRecord::MNReward;
-                        sub.address = CBitcoinAddress(outAddress).ToString();
-                        sub.credit = wtx.vout[i].nValue;
-                    }
-                }
+        //Masternode reward
+        CTxDestination destMN;
+        int nIndexMN = wtx.vout.size() - 1;
+        if (ExtractDestination(wtx.vout[nIndexMN].scriptPubKey, destMN)) {
+            if (IsMine(*wallet, destMN)) {
+                isminetype mine = wallet->IsMine(wtx.vout[nIndexMN]);
+                sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+                sub.type = TransactionRecord::MNReward;
+                sub.address = CBitcoinAddress(destMN).ToString();
+                sub.credit = wtx.vout[nIndexMN].nValue;
             }
-        } else {
-            //stake reward
-            if (wtx.IsZerocoinSpend()) {
+        }
+
+        //stake reward
+        if (wtx.IsZerocoinSpend()) {
+            if (fZSpendFromMe || wallet->zwgrTracker->HasMintTx(hash)) {
                 sub.involvesWatchAddress = false;
                 sub.type = TransactionRecord::StakeZWGR;
                 sub.address = mapValue["zerocoinmint"];
@@ -80,14 +79,15 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                         sub.credit += out.nValue;
                 }
                 sub.debit -= wtx.vin[0].nSequence * COIN;
-            } else {
-                isminetype mine = wallet->IsMine(wtx.vout[1]);
-                sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
-                sub.type = TransactionRecord::StakeMint;
-                sub.address = CBitcoinAddress(address).ToString();
-                sub.credit = nNet;
             }
+        } else {
+            isminetype mine = wallet->IsMine(wtx.vout[1]);
+            sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+            sub.type = TransactionRecord::StakeMint;
+            sub.address = CBitcoinAddress(address).ToString();
+            sub.credit = nNet;
         }
+
         parts.append(sub);
     } else if (wtx.IsZerocoinSpend()) {
         //zerocoin spend outputs
@@ -342,21 +342,9 @@ void TransactionRecord::updateStatus(const CWalletTx& wtx)
         idx);
     //status.countsForBalance = wtx.IsTrusted() && !(wtx.GetBlocksToMaturity() > 0);
     status.depth = wtx.GetDepthInMainChain();
-    if (IsZWGRType(type)) {
-        status.depth = pindex ? chainActive.Height() - pindex->nHeight + 1: 0;
-    }
 
     //Determine the depth of the block
     int nBlocksToMaturity = wtx.GetBlocksToMaturity();
-    if (type == TransactionRecord::StakeZWGR) {
-        if (pindex) {
-            nBlocksToMaturity = std::max(0, (int) (Params().COINBASE_MATURITY() - status.depth));
-        } else {
-            nBlocksToMaturity = Params().COINBASE_MATURITY();
-        }
-    } else if (IsZWGRType(type)) {
-        nBlocksToMaturity = 0;
-    }
 
     status.countsForBalance = wtx.IsTrusted() && !(nBlocksToMaturity > 0);
     status.cur_num_blocks = chainActive.Height();

@@ -1291,20 +1291,6 @@ bool ContextualCheckZerocoinSpend(const CTransaction& tx, const CoinSpend& spend
         return error("%s : zWgr spend with serial %s from tx %s is not in valid range\n", __func__,
                      spend.getCoinSerialNumber().GetHex(), tx.GetHash().GetHex());
 
-    // Send signal to wallet if this is ours
-    if (pwalletMain) {
-        if (pwalletMain->IsMyZerocoinSpend(spend.getCoinSerialNumber())) {
-            LogPrintf("%s: %s detected zerocoinspend in transaction %s \n", __func__, spend.getCoinSerialNumber().GetHex(), tx.GetHash().GetHex());
-            pwalletMain->NotifyZerocoinChanged(pwalletMain, spend.getCoinSerialNumber().GetHex(), "Used", CT_UPDATED);
-            if (!pwalletMain->mapWallet.count(tx.GetHash())) {
-                CWalletTx wtx(pwalletMain, tx);
-                wtx.nTimeReceived = pindex->GetBlockTime();
-                wtx.hashBlock = hashBlock;
-                pwalletMain->AddToWallet(wtx);
-            }
-        }
-    }
-
     return true;
 }
 
@@ -2966,8 +2952,7 @@ bool UpdatezWgrSupply(const CBlock& block, CBlockIndex* pindex)
                         if (txid == m.GetTxHash()) {
                             CWalletTx wtx(pwalletMain, tx);
                             wtx.nTimeReceived = block.GetBlockTime();
-                            wtx.hashBlock = block.GetHash();
-
+                            wtx.SetMerkleBranch(block);
                             pwalletMain->AddToWallet(wtx);
                             setAddedToWallet.insert(txid);
                         }
@@ -3256,10 +3241,34 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     //Record zWgr serials
+    set<uint256> setAddedTx;
     for (pair<CoinSpend, uint256> pSpend : vSpends) {
         //record spend to database
         if (!zerocoinDB->WriteCoinSpend(pSpend.first.getCoinSerialNumber(), pSpend.second))
             return state.Abort(("Failed to record coin serial to database"));
+
+        // Send signal to wallet if this is ours
+        if (pwalletMain) {
+            if (pwalletMain->IsMyZerocoinSpend(pSpend.first.getCoinSerialNumber())) {
+                LogPrintf("%s: %s detected zerocoinspend in transaction %s \n", __func__, pSpend.first.getCoinSerialNumber().GetHex(), pSpend.second.GetHex());
+                pwalletMain->NotifyZerocoinChanged(pwalletMain, pSpend.first.getCoinSerialNumber().GetHex(), "Used", CT_UPDATED);
+
+                //Don't add the same tx multiple times
+                if (setAddedTx.count(pSpend.second))
+                    continue;
+
+                //Search block for matching tx, turn into wtx, set merkle branch, add to wallet
+                for (CTransaction tx : block.vtx) {
+                    if (tx.GetHash() == pSpend.second) {
+                        CWalletTx wtx(pwalletMain, tx);
+                        wtx.nTimeReceived = pindex->GetBlockTime();
+                        wtx.SetMerkleBranch(block);
+                        pwalletMain->AddToWallet(wtx);
+                        setAddedTx.insert(pSpend.second);
+                    }
+                }
+            }
+        }
     }
 
     //Record mints to db

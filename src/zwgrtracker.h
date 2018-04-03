@@ -21,6 +21,7 @@ public:
     bool HasPubcoinHash(const uint256& hashPubcoin) const;
     bool HasSerial(const CBigNum& bnSerial) const;
     bool HasSerialHash(const uint256& hashSerial) const;
+    bool HasMintTx(const uint256& txid);
     bool IsEmpty() const { return mapSerialHashes.empty(); }
     void Init();
     CMintMeta Get(const uint256& hashSerial);

@@ -164,6 +164,17 @@ std::vector<CMintMeta> CzWGRTracker::GetMints(bool fConfirmedOnly) const
     return vMints;
 }
 
+//Does a mint in the tracker have this txid
+bool CzWGRTracker::HasMintTx(const uint256& txid)
+{
+    for (auto it : mapSerialHashes) {
+        if (it.second.txid == txid)
+            return true;
+    }
+
+    return false;
+}
+
 bool CzWGRTracker::HasPubcoin(const CBigNum &bnValue) const
 {
     // Check if this mint's pubcoin value belongs to our mapSerialHashes (which includes hashpubcoin values)
