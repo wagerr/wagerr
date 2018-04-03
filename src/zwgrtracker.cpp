@@ -124,7 +124,7 @@ CAmount CzWGRTracker::GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) con
             CMintMeta meta = it.second;
             if (meta.isUsed || meta.isArchived)
                 continue;
-            bool fConfirmed = (meta.nHeight < chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations());
+            bool fConfirmed = ((meta.nHeight < chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations()) && !(meta.nHeight == 0));
             if (fConfirmedOnly && !fConfirmed)
                 continue;
             if (fUnconfirmedOnly && fConfirmed)
