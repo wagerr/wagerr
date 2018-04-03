@@ -62,12 +62,23 @@ bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, s
             // Collateral for budget finalization
             // Note: there are still old valid budgets out there, but the check for the new 5 WGR finalization collateral
             //       will also cover the old 50 WGR finalization collateral.
-
-            if (o.scriptPubKey == findScript && o.nValue >= BUDGET_FEE_TX) foundOpReturn = true;
+            LogPrint("mnbudget", "Final Budget: o.scriptPubKey(%s) == findScript(%s) ?\n", o.scriptPubKey.ToString(), findScript.ToString());
+            if (o.scriptPubKey == findScript) {
+                LogPrint("mnbudget", "Final Budget: o.nValue(%ld) >= BUDGET_FEE_TX(%ld) ?\n", o.nValue, BUDGET_FEE_TX);
+                if(o.nValue >= BUDGET_FEE_TX) {
+                    foundOpReturn = true;
+                }
+            }
         }
         else {
             // Collateral for normal budget proposal
-            if (o.scriptPubKey == findScript && o.nValue >= PROPOSAL_FEE_TX) foundOpReturn = true;
+            LogPrint("mnbudget", "Normal Budget: o.scriptPubKey(%s) == findScript(%s) ?\n", o.scriptPubKey.ToString(), findScript.ToString());
+            if (o.scriptPubKey == findScript) {
+                LogPrint("mnbudget", "Normal Budget: o.nValue(%ld) >= PROPOSAL_FEE_TX(%ld) ?\n", o.nValue, PROPOSAL_FEE_TX);
+                if(o.nValue >= PROPOSAL_FEE_TX) {
+                    foundOpReturn = true;
+                }
+            }
         }
     }
     if (!foundOpReturn) {
