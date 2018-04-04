@@ -120,6 +120,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             isminetype mine = wallet->IsMine(txout);
             if (mine) {
                 TransactionRecord sub(hash, nTime);
+                sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 if (fZSpendFromMe) {
                     sub.type = TransactionRecord::ZerocoinSpend_FromMe;
                 } else {
@@ -140,6 +141,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
 
             // zerocoin spend that was sent to someone else
             TransactionRecord sub(hash, nTime);
+            sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             sub.debit = -txout.nValue;
             sub.type = TransactionRecord::ZerocoinSpend;
             sub.address = mapValue["zerocoinspend"];
