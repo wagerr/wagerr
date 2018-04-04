@@ -673,11 +673,14 @@ bool CBudgetManager::IsTransactionValid(const CTransaction& txNew, int nBlockHei
     int nFivePercent = mnodeman.CountEnabled(ActiveProtocol()) / 20;
     std::vector<CFinalizedBudget*> ret;
 
+    LogPrint("mnbudget","CBudgetManager::IsTransactionValid - checking %lli finalized budgets\n", mapFinalizedBudgets.size());
+
     // ------- Grab The Highest Count
 
     std::map<uint256, CFinalizedBudget>::iterator it = mapFinalizedBudgets.begin();
     while (it != mapFinalizedBudgets.end()) {
         CFinalizedBudget* pfinalizedBudget = &((*it).second);
+
         if (pfinalizedBudget->GetVoteCount() > nHighestCount &&
             nBlockHeight >= pfinalizedBudget->GetBlockStart() &&
             nBlockHeight <= pfinalizedBudget->GetBlockEnd()) {
@@ -696,14 +699,27 @@ bool CBudgetManager::IsTransactionValid(const CTransaction& txNew, int nBlockHei
 
     // check the highest finalized budgets (+/- 10% to assist in consensus)
 
+    std::string strProposals = "";
+    int nCountThreshold = nHighestCount - mnodeman.CountEnabled(ActiveProtocol()) / 10;
     it = mapFinalizedBudgets.begin();
     while (it != mapFinalizedBudgets.end()) {
         CFinalizedBudget* pfinalizedBudget = &((*it).second);
+        strProposals = pfinalizedBudget->GetProposals();
 
-        if (pfinalizedBudget->GetVoteCount() > nHighestCount - mnodeman.CountEnabled(ActiveProtocol()) / 10) {
+        LogPrint("mnbudget","CBudgetManager::IsTransactionValid - checking budget (%s) with blockstart %lli, blockend %lli, nBlockHeight %lli, votes %lli, nCountThreshold %lli\n",
+                 strProposals.c_str(), pfinalizedBudget->GetBlockStart(), pfinalizedBudget->GetBlockEnd(),
+                 nBlockHeight, pfinalizedBudget->GetVoteCount(), nCountThreshold);
+
+        if (pfinalizedBudget->GetVoteCount() > nCountThreshold) {
+            LogPrint("mnbudget","CBudgetManager::IsTransactionValid - GetVoteCount() > nCountThreshold passed\n");
             if (nBlockHeight >= pfinalizedBudget->GetBlockStart() && nBlockHeight <= pfinalizedBudget->GetBlockEnd()) {
+                LogPrint("mnbudget","CBudgetManager::IsTransactionValid - GetBlockStart() passed\n");
                 if (pfinalizedBudget->IsTransactionValid(txNew, nBlockHeight)) {
+                    LogPrint("mnbudget","CBudgetManager::IsTransactionValid - pfinalizedBudget->IsTransactionValid() passed\n");
                     return true;
+                }
+                else {
+                    LogPrint("mnbudget","CBudgetManager::IsTransactionValid - pfinalizedBudget->IsTransactionValid() error\n");
                 }
             }
         }
