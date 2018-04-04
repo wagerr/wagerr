@@ -377,13 +377,14 @@ std::list<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly,
 
         if (fMatureOnly || fUpdateStatus) {
             //if there is not a record of the block height, then look it up and assign it
-            if (!mint.nHeight || !mapBlockIndex.count(mint.hashSerial) || !chainActive.Contains(mapBlockIndex.at(mint.hashSerial))) {
+            uint256 txid;
+            bool isInChain = zerocoinDB->ReadCoinMint(mint.hashPubcoin, txid);
+            if (!mint.nHeight || !isInChain) {
                 CTransaction tx;
                 uint256 hashBlock;
 
                 if (mint.txid == 0) {
-                    uint256 txid;
-                    if(!zerocoinDB->ReadCoinMint(mint.hashPubcoin, txid)) {
+                    if (!isInChain) {
                         LogPrintf("%s failed to find tx for mint %s\n", __func__, mint.hashPubcoin.GetHex().substr(0, 6));
                         Archive(mint);
                         continue;
