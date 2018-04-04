@@ -119,6 +119,7 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
     CWalletDB walletdb(strWalletFile);
     CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
     std::set<uint256> setChecked;
+    set<uint256> setAddedTx;
     while (found) {
         found = false;
         if (fGenerateMintPool)
@@ -190,24 +191,23 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
                     break;
                 }
 
-                CBlock block;
-                CWalletTx wtx(pwalletMain, tx);
-                if (mapBlockIndex.count(hashBlock) && ReadBlockFromDisk(block, mapBlockIndex.at(hashBlock)))
-                    wtx.SetMerkleBranch(block);
+                CBlockIndex* pindex;
+                if (mapBlockIndex.count(hashBlock))
+                    pindex = mapBlockIndex.at(hashBlock);
 
-                //The mint was found in the chain, so recalculate the randomness and serial and DB it
-                int nHeight = 0;
-                int nTimeReceived = 0;
-                if (mapBlockIndex.count(hashBlock)) {
-                    nHeight = mapBlockIndex.at(hashBlock)->nHeight;
-                    nTimeReceived = mapBlockIndex.at(hashBlock)->nTime;
+                if (!setAddedTx.count(txHash)) {
+                    CBlock block;
+                    CWalletTx wtx(pwalletMain, tx);
+                    if (pindex && ReadBlockFromDisk(block, pindex))
+                        wtx.SetMerkleBranch(block);
+
+                    //Fill out wtx so that a transaction record can be created
+                    wtx.nTimeReceived = pindex->GetBlockTime();
+                    pwalletMain->AddToWallet(wtx);
+                    setAddedTx.insert(txHash);
                 }
 
-                //Fill out wtx so that a transaction record can be created
-                wtx.nTimeReceived = nTimeReceived;
-                pwalletMain->AddToWallet(wtx);
-
-                SetMintSeen(bnValue, nHeight, txHash, denomination);
+                SetMintSeen(bnValue, pindex->nHeight, txHash, denomination);
                 nLastCountUsed = std::max(pMint.second, nLastCountUsed);
                 nCountLastUsed = std::max(nLastCountUsed, nCountLastUsed);
                 LogPrint("zero", "%s: updated count to %d\n", __func__, nCountLastUsed);

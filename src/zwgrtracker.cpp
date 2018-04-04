@@ -377,7 +377,7 @@ std::list<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly,
 
         if (fMatureOnly || fUpdateStatus) {
             //if there is not a record of the block height, then look it up and assign it
-            if (!mint.nHeight) {
+            if (!mint.nHeight || !mapBlockIndex.count(mint.hashSerial) || !chainActive.Contains(mapBlockIndex.at(mint.hashSerial))) {
                 CTransaction tx;
                 uint256 hashBlock;
 
