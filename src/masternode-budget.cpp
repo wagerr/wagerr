@@ -1988,6 +1988,9 @@ std::string CFinalizedBudget::GetStatus()
 
 bool CFinalizedBudget::IsValid(std::string& strError, bool fCheckCollateral)
 {
+    // All(!) finalized budgets have the name "main", so get some additional information about them
+    std::string strProposals = GetProposals();
+
     // Must be the correct block for payment to happen (once a month)
     if (nBlockStart % GetBudgetPaymentCycleBlocks() != 0) {
         strError = "Invalid BlockStart";
@@ -2008,17 +2011,17 @@ bool CFinalizedBudget::IsValid(std::string& strError, bool fCheckCollateral)
         return false;
     }
     if (nBlockStart == 0) {
-        strError = "Budget " + strBudgetName + " Invalid BlockStart == 0";
+        strError = "Budget " + strBudgetName + " (" + strProposals + ") Invalid BlockStart == 0";
         return false;
     }
     if (nFeeTXHash == 0) {
-        strError = "Budget " + strBudgetName + " Invalid FeeTx == 0";
+        strError = "Budget " + strBudgetName  + " (" + strProposals + ") Invalid FeeTx == 0";
         return false;
     }
 
     // Can only pay out 10% of the possible coins (min value of coins)
     if (GetTotalPayout() > budget.GetTotalBudget(nBlockStart)) {
-        strError = "Budget " + strBudgetName + " Invalid Payout (more than max)";
+        strError = "Budget " + strBudgetName + " (" + strProposals + ") Invalid Payout (more than max)";
         return false;
     }
 
@@ -2027,23 +2030,28 @@ bool CFinalizedBudget::IsValid(std::string& strError, bool fCheckCollateral)
         int nConf = 0;
         if (!IsBudgetCollateralValid(nFeeTXHash, GetHash(), strError2, nTime, nConf, true)) {
             {
-                strError = "Budget " + strBudgetName + " Invalid Collateral : " + strError2;
+                strError = "Budget " + strBudgetName + " (" + strProposals + ") Invalid Collateral : " + strError2;
                 return false;
             }
         }
     }
 
-    //TODO: if N cycles old, invalid, invalid
+    // Remove obsolete finalized budgets after some time
 
     CBlockIndex* pindexPrev = chainActive.Tip();
     if (pindexPrev == NULL) return true;
 
-// TODO: verify if we can safely remove this
-//
-//    if (nBlockStart < pindexPrev->nHeight - 100) {
-//        strError = "Budget " + strBudgetName + " Older than current blockHeight" ;
-//        return false;
-//    }
+    // Get start of current budget-cycle
+    int nCurrentHeight = chainActive.Height();
+    int nBlockStart = nCurrentHeight - nCurrentHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+
+    // Remove budgets where the last payment (from max. 100) ends before 2 budget-cycles before the current one
+    int nMaxAge = nBlockStart - (2 * GetBudgetPaymentCycleBlocks());
+
+    if (GetBlockEnd() < nMaxAge) {
+        strError = strprintf("Budget " + strBudgetName + " (" + strProposals + ") (ends at block %ld) too old and obsolete", GetBlockEnd());
+        return false;
+    }
 
     return true;
 }
