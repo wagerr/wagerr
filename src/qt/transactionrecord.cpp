@@ -54,38 +54,34 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         if (!wtx.IsZerocoinSpend() && !ExtractDestination(wtx.vout[1].scriptPubKey, address))
             return parts;
 
-        //Masternode reward
-        CTxDestination destMN;
-        int nIndexMN = wtx.vout.size() - 1;
-        if (ExtractDestination(wtx.vout[nIndexMN].scriptPubKey, destMN)) {
-            if (IsMine(*wallet, destMN)) {
+        if (wtx.IsZerocoinSpend() && (fZSpendFromMe || wallet->zwgrTracker->HasMintTx(hash))) {
+            //zWGR stake reward
+            sub.involvesWatchAddress = false;
+            sub.type = TransactionRecord::StakeZWGR;
+            sub.address = mapValue["zerocoinmint"];
+            sub.credit = 0;
+            for (const CTxOut& out : wtx.vout) {
+                if (out.IsZerocoinMint())
+                    sub.credit += out.nValue;
+            }
+            sub.debit -= wtx.vin[0].nSequence * COIN;
+        } else if (isminetype mine = wallet->IsMine(wtx.vout[1])) {
+            // WGR stake reward
+            sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+            sub.type = TransactionRecord::StakeMint;
+            sub.address = CBitcoinAddress(address).ToString();
+            sub.credit = wtx.vout[1].nValue;
+        } else {
+            //Masternode reward
+            CTxDestination destMN;
+            int nIndexMN = wtx.vout.size() - 1;
+            if (ExtractDestination(wtx.vout[nIndexMN].scriptPubKey, destMN) && IsMine(*wallet, destMN)) {
                 isminetype mine = wallet->IsMine(wtx.vout[nIndexMN]);
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 sub.type = TransactionRecord::MNReward;
                 sub.address = CBitcoinAddress(destMN).ToString();
                 sub.credit = wtx.vout[nIndexMN].nValue;
             }
-        }
-
-        //stake reward
-        if (wtx.IsZerocoinSpend()) {
-            if (fZSpendFromMe || wallet->zwgrTracker->HasMintTx(hash)) {
-                sub.involvesWatchAddress = false;
-                sub.type = TransactionRecord::StakeZWGR;
-                sub.address = mapValue["zerocoinmint"];
-                sub.credit = nNet;
-                for (const CTxOut& out : wtx.vout) {
-                    if (out.IsZerocoinMint())
-                        sub.credit += out.nValue;
-                }
-                sub.debit -= wtx.vin[0].nSequence * COIN;
-            }
-        } else {
-            isminetype mine = wallet->IsMine(wtx.vout[1]);
-            sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
-            sub.type = TransactionRecord::StakeMint;
-            sub.address = CBitcoinAddress(address).ToString();
-            sub.credit = nNet;
         }
 
         parts.append(sub);
