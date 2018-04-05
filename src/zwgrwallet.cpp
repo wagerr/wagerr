@@ -63,7 +63,7 @@ void CzWGRWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
 
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     LogPrintf("%s : n=%d nStop=%d\n", __func__, n, nStop - 1);
-    for (uint i = n; i < nStop; ++i) {
+    for (uint32_t i = n; i < nStop; ++i) {
         fFound = false;
 
         // Prevent unnecessary repeated minted
