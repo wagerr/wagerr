@@ -70,7 +70,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
             sub.type = TransactionRecord::StakeMint;
             sub.address = CBitcoinAddress(address).ToString();
-            sub.credit = wtx.vout[1].nValue;
+            sub.credit = nNet;
         } else {
             //Masternode reward
             CTxDestination destMN;
