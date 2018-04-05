@@ -2087,6 +2087,10 @@ bool CFinalizedBudget::IsTransactionValid(const CTransaction& txNew, int nBlockH
 
     bool found = false;
     BOOST_FOREACH (CTxOut out, txNew.vout) {
+        LogPrint("mnbudget","CFinalizedBudget::IsTransactionValid - nCurrentBudgetPayment=%d, payee=%s == out.scriptPubKey=%s, amount=%ld == out.nValue=%ld\n",
+                 nCurrentBudgetPayment, vecBudgetPayments[nCurrentBudgetPayment].payee.ToString().c_str(), out.scriptPubKey.ToString().c_str(),
+                 vecBudgetPayments[nCurrentBudgetPayment].nAmount, out.nValue);
+
         if (vecBudgetPayments[nCurrentBudgetPayment].payee == out.scriptPubKey && vecBudgetPayments[nCurrentBudgetPayment].nAmount == out.nValue) {
             found = true;
             LogPrint("mnbudget","CFinalizedBudget::IsTransactionValid - Found valid Budget Payment of %d for %d\n",
