@@ -25,6 +25,8 @@ struct CMintMeta
     bool isUsed;
     bool isArchived;
     bool isDeterministic;
+
+    bool operator <(const CMintMeta& a) const;
 };
 
 uint256 GetSerialHash(const CBigNum& bnSerial);

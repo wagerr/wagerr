@@ -157,15 +157,15 @@ bool CZWgrStake::GetTxFrom(CTransaction& tx)
     return false;
 }
 
-bool CZWgrStake::MarkSpent(CWallet *pwallet)
+bool CZWgrStake::MarkSpent(CWallet *pwallet, const uint256& txid)
 {
     CzWGRTracker* zwgrTracker = pwallet->zwgrTracker;
     CMintMeta meta;
     if (!zwgrTracker->GetMetaFromStakeHash(hashSerial, meta))
         return error("%s: tracker does not have serialhash", __func__);
-    meta.isUsed = true;
 
-    return zwgrTracker->UpdateState(meta);
+    zwgrTracker->SetPubcoinUsed(meta.hashPubcoin, txid);
+    return true;
 }
 
 //!WGR Stake

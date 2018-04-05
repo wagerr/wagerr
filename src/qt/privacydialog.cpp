@@ -416,7 +416,7 @@ void PrivacyDialog::sendzWGR()
     // use mints from zWgr selector if applicable
     vector<CMintMeta> vMintsToFetch;
     vector<CZerocoinMint> vMintsSelected;
-    if (!ZWgrControlDialog::listSelectedMints.empty()) {
+    if (!ZWgrControlDialog::setSelectedMints.empty()) {
         vMintsToFetch = ZWgrControlDialog::GetSelectedMints();
 
         for (auto& meta : vMintsToFetch) {
@@ -473,7 +473,7 @@ void PrivacyDialog::sendzWGR()
     }
 
     // Clear zwgr selector in case it was used
-    ZWgrControlDialog::listSelectedMints.clear();
+    ZWgrControlDialog::setSelectedMints.clear();
     ui->labelzWgrSelected_int->setText(QString("0"));
     ui->labelQuantitySelected_int->setText(QString("0"));
 

@@ -35,7 +35,7 @@ namespace libzerocoin
     // Sanity check: let's verify that the Witness is valid with respect to
     // the coin and Accumulator provided.
     if (!(witness.VerifyWitness(a, coin.getPublicCoin()))) {
-        std::cout << "CoinSpend: Accumulator witness does not verify\n";
+        //std::cout << "CoinSpend: Accumulator witness does not verify\n";
         throw std::runtime_error("Accumulator witness does not verify");
     }
 
@@ -76,28 +76,28 @@ bool CoinSpend::Verify(const Accumulator& a) const
 {
     // Double check that the version is the same as marked in the serial
     if (ExtractVersionFromSerial(coinSerialNumber) != version) {
-        cout << "CoinSpend::Verify: version does not match serial=" << (int)ExtractVersionFromSerial(coinSerialNumber) << " actual=" << (int)version << endl;
+        //cout << "CoinSpend::Verify: version does not match serial=" << (int)ExtractVersionFromSerial(coinSerialNumber) << " actual=" << (int)version << endl;
         return false;
     }
 
     if (a.getDenomination() != this->denomination) {
-        std::cout << "CoinsSpend::Verify: failed, denominations do not match\n";
+        //std::cout << "CoinsSpend::Verify: failed, denominations do not match\n";
         return false;
     }
 
     // Verify both of the sub-proofs using the given meta-data
     if (!commitmentPoK.Verify(serialCommitmentToCoinValue, accCommitmentToCoinValue)) {
-        std::cout << "CoinsSpend::Verify: commitmentPoK failed\n";
+        //std::cout << "CoinsSpend::Verify: commitmentPoK failed\n";
         return false;
     }
 
     if (!accumulatorPoK.Verify(a, accCommitmentToCoinValue)) {
-        std::cout << "CoinsSpend::Verify: accumulatorPoK failed\n";
+        //std::cout << "CoinsSpend::Verify: accumulatorPoK failed\n";
         return false;
     }
 
     if (!serialNumberSoK.Verify(coinSerialNumber, serialCommitmentToCoinValue, signatureHash())) {
-        std::cout << "CoinsSpend::Verify: serialNumberSoK failed. sighash:" << signatureHash().GetHex() << "\n";
+        //std::cout << "CoinsSpend::Verify: serialNumberSoK failed. sighash:" << signatureHash().GetHex() << "\n";
         return false;
     }
 
@@ -138,7 +138,7 @@ bool CoinSpend::HasValidSignature() const
     //V2 serial requires that the signature hash be signed by the public key associated with the serial
     uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end()) >> PrivateCoin::V2_BITSHIFT;
     if (hashedPubkey != GetAdjustedSerial(coinSerialNumber).getuint256()) {
-        cout << "CoinSpend::HasValidSignature() hashedpubkey is not equal to the serial!\n";
+        //cout << "CoinSpend::HasValidSignature() hashedpubkey is not equal to the serial!\n";
         return false;
     }
 

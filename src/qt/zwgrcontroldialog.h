@@ -28,8 +28,8 @@ public:
 
     void setModel(WalletModel* model);
 
-    static std::list<std::string> listSelectedMints;
-    static std::list<CMintMeta> listMints;
+    static std::set<std::string> setSelectedMints;
+    static std::set<CMintMeta> setMints;
     static std::vector<CMintMeta> GetSelectedMints();
 
 private:

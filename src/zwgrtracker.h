@@ -11,7 +11,7 @@ class CzWGRTracker
 private:
     std::string strWalletFile;
     std::map<uint256, CMintMeta> mapSerialHashes;
-    std::map<uint256, CMintMeta> mapArchivedSerialHashes;
+    std::map<uint256, uint256> mapPendingSpends; //serialhash, txid of spend
 public:
     CzWGRTracker(std::string strWalletFile);
     void Add(const CDeterministicMint& dMint, bool isNew = false, bool isArchived = false);
@@ -31,9 +31,10 @@ public:
     std::vector<uint256> GetSerialHashes();
     std::vector<CMintMeta> GetMints(bool fConfirmedOnly) const;
     CAmount GetUnconfirmedBalance() const;
-    std::list<CMintMeta> ListMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus);
-    std::list<CZerocoinMint> ListZerocoinMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus);
-    void SetPubcoinUsed(const uint256& hashPubcoin, const bool isUsed);
+    std::set<CMintMeta> ListMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus);
+    void RemovePending(const uint256& txid);
+    void SetPubcoinUsed(const uint256& hashPubcoin, const uint256& txid);
+    void SetPubcoinNotUsed(const uint256& hashPubcoin);
     bool UnArchive(const uint256& hashPubcoin);
     bool UpdateZerocoinMint(const CZerocoinMint& mint);
     bool UpdateState(const CMintMeta& meta);

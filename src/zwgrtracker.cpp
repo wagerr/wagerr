@@ -258,28 +258,6 @@ bool CzWGRTracker::UpdateState(const CMintMeta& meta)
     return true;
 }
 
-//Only returns mints from that were not generated deterministically
-std::list<CZerocoinMint> CzWGRTracker::ListZerocoinMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus)
-{
-    std::list<CMintMeta> listTracker = ListMints(fUnusedOnly, fMatureOnly, fUpdateStatus);
-
-    CWalletDB walletdb(strWalletFile);
-    std::list<CZerocoinMint> listMintsDB = walletdb.ListMintedCoins();
-
-    //Only select mints that were selected by the tracker
-    std::list<CZerocoinMint> listReturn;
-    for (auto& meta : listTracker) {
-        for (auto& mint : listMintsDB) {
-            uint256 hashPubcoin = GetPubCoinHash(mint.GetValue());
-            if (meta.hashPubcoin == hashPubcoin) {
-                listReturn.emplace_back(mint);
-            }
-        }
-    }
-
-    return listReturn;
-}
-
 void CzWGRTracker::Add(const CDeterministicMint& dMint, bool isNew, bool isArchived)
 {
     CMintMeta meta;
@@ -319,16 +297,44 @@ void CzWGRTracker::Add(const CZerocoinMint& mint, bool isNew, bool isArchived)
         CWalletDB(strWalletFile).WriteZerocoinMint(mint);
 }
 
-void CzWGRTracker::SetPubcoinUsed(const uint256& hashPubcoin, const bool isUsed)
+void CzWGRTracker::SetPubcoinUsed(const uint256& hashPubcoin, const uint256& txid)
 {
     if (!HasPubcoinHash(hashPubcoin))
-        return;;
+        return;
     CMintMeta meta = GetMetaFromPubcoin(hashPubcoin);
-    meta.isUsed = isUsed;
+    meta.isUsed = true;
+    mapPendingSpends.insert(make_pair(meta.hashSerial, txid));
     UpdateState(meta);
 }
 
-std::list<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus)
+void CzWGRTracker::SetPubcoinNotUsed(const uint256& hashPubcoin)
+{
+    if (!HasPubcoinHash(hashPubcoin))
+        return;
+    CMintMeta meta = GetMetaFromPubcoin(hashPubcoin);
+    meta.isUsed = false;
+
+    if (mapPendingSpends.count(meta.hashSerial))
+        mapPendingSpends.erase(meta.hashSerial);
+
+    UpdateState(meta);
+}
+
+void CzWGRTracker::RemovePending(const uint256& txid)
+{
+    uint256 hashSerial;
+    for (auto it : mapPendingSpends) {
+        if (it.second == txid) {
+            hashSerial = it.first;
+            break;
+        }
+    }
+
+    if (hashSerial > 0)
+        mapPendingSpends.erase(hashSerial);
+}
+
+std::set<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus)
 {
     CWalletDB walletdb(strWalletFile);
     if (fUpdateStatus) {
@@ -341,20 +347,16 @@ std::list<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly,
         for (auto& dMint : listDeterministicDB)
             Add(dMint);
         LogPrintf("%s: added %d dzwgr from DB\n", __func__, listDeterministicDB.size());
-
-//        std::list<CZerocoinMint> listArchivedZerocoinMints = walletdb.ListArchivedZerocoins();
-//        for (auto& mint : listArchivedZerocoinMints)
-//            Add(mint, false, true);
-//        LogPrintf("%s: added %d archived zerocoinmints from DB\n", __func__, listArchivedZerocoinMints.size());
-//
-//        std::list<CDeterministicMint> listArchivedDeterministicMints = walletdb.ListArchivedDeterministicMints();
-//        for (auto& dMint : listArchivedDeterministicMints)
-//            Add(dMint, false, true);
-//        LogPrintf("%s: added %d archived deterministic mints from DB\n", __func__, listArchivedDeterministicMints.size());
     }
 
     vector<CMintMeta> vOverWrite;
-    std::list<CMintMeta> listMints;
+    std::set<CMintMeta> setMints;
+    std::set<uint256> setMempool;
+    {
+        LOCK(mempool.cs);
+        mempool.getTransactions(setMempool);
+    }
+
     for (auto& it : mapSerialHashes) {
         CMintMeta mint = it.second;
 
@@ -362,30 +364,39 @@ std::list<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly,
         if (mint.isArchived)
             continue;
 
-        if (fUnusedOnly) {
-            if (mint.isUsed)
-                continue;
-
-            //double check that we have no record of this serial being used
-            int nHeight;
-            if (IsSerialInBlockchain(mint.hashSerial, nHeight)) {
-                mint.isUsed = true;
-                vOverWrite.emplace_back(mint);
-                continue;
-            }
-        }
-
         if (fMatureOnly || fUpdateStatus) {
             //if there is not a record of the block height, then look it up and assign it
             uint256 txid;
-            bool isInChain = zerocoinDB->ReadCoinMint(mint.hashPubcoin, txid);
-            if (!mint.nHeight || !isInChain) {
+            bool isMintInChain = zerocoinDB->ReadCoinMint(mint.hashPubcoin, txid);
+
+            //See if there is internal record of spending this mint (note this is memory only, would reset on restart)
+            bool isPendingSpend = static_cast<bool>(mapPendingSpends.count(mint.hashSerial));
+            if (isPendingSpend) {
+                uint256 txidPendingSpend = mapPendingSpends.at(mint.hashSerial);
+                if (!setMempool.count(txidPendingSpend)) {
+                    RemovePending(txidPendingSpend);
+                    LogPrintf("%s: pending txid %s removed because not in mempool\n", __func__, txidPendingSpend.GetHex());
+                }
+
+            }
+
+            //See if there is blockchain record of spending this mint
+            uint256 txidSpend;
+            bool isConfirmedSpend = zerocoinDB->ReadCoinSpend(mint.hashSerial, txidSpend);
+
+            //If a pending spend got confirmed, then remove it from the pendingspend map
+            if (isPendingSpend && isConfirmedSpend)
+                mapPendingSpends.erase(mint.hashSerial);
+
+            bool isUsed = isPendingSpend || isConfirmedSpend;
+
+            if (!mint.nHeight || !isMintInChain || isUsed != mint.isUsed) {
                 CTransaction tx;
                 uint256 hashBlock;
 
                 if (mint.txid == 0) {
-                    if (!isInChain) {
-                        LogPrintf("%s failed to find tx for mint %s\n", __func__, mint.hashPubcoin.GetHex().substr(0, 6));
+                    if (!isMintInChain) {
+                        LogPrintf("%s failed to find mint in zerocoinDB %s\n", __func__, mint.hashPubcoin.GetHex().substr(0, 6));
                         Archive(mint);
                         continue;
                     }
@@ -400,17 +411,28 @@ std::list<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly,
 
                 //if not in the block index, most likely is unconfirmed tx
                 if (mapBlockIndex.count(hashBlock)) {
+                    if (mint.isUsed != isUsed) {
+                        mint.isUsed = isUsed;
+                        LogPrintf("%s: set mint %s isUsed to %d\n", __func__, mint.hashPubcoin.GetHex(), isUsed);
+                    }
                     mint.nHeight = mapBlockIndex[hashBlock]->nHeight;
+                    vOverWrite.emplace_back(mint);
+                } else if (mint.isUsed != isUsed){
+                    mint.isUsed = isUsed;
+                    LogPrintf("%s: set mint %s isUsed to %d\n", __func__, mint.hashPubcoin.GetHex(), isUsed);
                     vOverWrite.emplace_back(mint);
                 } else if (fMatureOnly) {
                     continue;
                 }
             }
 
+            if (fUnusedOnly && isUsed)
+                continue;
+
             //not mature
             if (mint.nHeight > chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations()) {
                 if (!fMatureOnly)
-                    listMints.emplace_back(mint);
+                    setMints.insert(mint);
                 continue;
             }
 
@@ -434,14 +456,14 @@ std::list<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly,
                     continue;
             }
         }
-        listMints.emplace_back(mint);
+        setMints.insert(mint);
     }
 
     //overwrite any updates
     for (CMintMeta& meta : vOverWrite)
         UpdateState(meta);
 
-    return listMints;
+    return setMints;
 }
 
 void CzWGRTracker::Clear()

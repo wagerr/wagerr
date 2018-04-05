@@ -56,7 +56,7 @@ public:
     CDataStream GetUniqueness() override;
     bool CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut = 0) override;
     bool CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout) override;
-    bool MarkSpent(CWallet* pwallet);
+    bool MarkSpent(CWallet* pwallet, const uint256& txid);
     bool IsZWGR() override { return true; }
     int GetChecksumHeightFromMint();
     int GetChecksumHeightFromSpend();

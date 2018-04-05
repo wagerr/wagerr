@@ -726,10 +726,10 @@ void WalletModel::listLockedCoins(std::vector<COutPoint>& vOutpts)
 }
 
 
-void WalletModel::listZerocoinMints(std::list<CMintMeta>& listMints, bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus)
+void WalletModel::listZerocoinMints(std::set<CMintMeta>& setMints, bool fUnusedOnly, bool fMaturedOnly, bool fUpdateStatus)
 {
-    listMints.clear();
-    listMints = pwalletMain->zwgrTracker->ListMints(fUnusedOnly, fMaturedOnly, fUpdateStatus);
+    setMints.clear();
+    setMints = pwalletMain->zwgrTracker->ListMints(fUnusedOnly, fMaturedOnly, fUpdateStatus);
 }
 
 void WalletModel::loadReceiveRequests(std::vector<std::string>& vReceiveRequests)

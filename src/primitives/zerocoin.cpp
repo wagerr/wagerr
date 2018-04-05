@@ -9,6 +9,11 @@
 #include "util.h"
 #include "utilstrencodings.h"
 
+bool CMintMeta::operator <(const CMintMeta& a) const
+{
+    return this->hashPubcoin < a.hashPubcoin;
+}
+
 uint256 GetSerialHash(const CBigNum& bnSerial)
 {
     CDataStream ss(SER_GETHASH, 0);
