@@ -4877,6 +4877,22 @@ void CWallet::ZWgrBackupWallet()
     BackupWallet(*this, backupPath.string());
 }
 
+string CWallet::MintZerocoinFromOutPoint(CAmount nValue, CWalletTx& wtxNew, vector<CZerocoinMint>& vMints, const vector<COutPoint> vOutpts)
+{
+    CCoinControl* coinControl = new CCoinControl();
+    for (const COutPoint& outpt : vOutpts) {
+        coinControl->Select(outpt);
+    }
+    if (!coinControl->HasSelected()){
+        string strError = _("Error: No valid utxo!");
+        LogPrintf("MintZerocoin() : %s", strError.c_str());
+        return strError;
+    }
+    string strError = MintZerocoin(nValue, wtxNew, vMints, coinControl);
+    delete coinControl;
+    return strError;
+}
+
 string CWallet::MintZerocoin(CAmount nValue, CWalletTx& wtxNew, vector<CZerocoinMint>& vMints, const CCoinControl* coinControl)
 {
     // Check amount
