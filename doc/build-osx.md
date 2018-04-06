@@ -48,7 +48,12 @@ Build Wagerr Core
         git clone https://github.com/wagerr/wagerr
         cd wagerr
 
-2.  Build wagerr-core:
+2.  Make the Homebrew OpenSSL headers visible to the configure script  (do ```brew info openssl``` to find out why this is necessary, or if you use Homebrew with installation folders different from the default).
+
+        export LDFLAGS+=-L/usr/local/opt/openssl/lib
+        export CPPFLAGS+=-I/usr/local/opt/openssl/include
+
+3.  Build wagerr-core:
 
     Configure and build the headless wagerr binaries as well as the GUI (if Qt is found).
 
@@ -58,11 +63,11 @@ Build Wagerr Core
         ./configure
         make
 
-3.  It is recommended to build and run the unit tests:
+4.  It is recommended to build and run the unit tests:
 
         make check
 
-4.  You can also create a .dmg that contains the .app bundle (optional):
+5.  You can also create a .dmg that contains the .app bundle (optional):
 
         make deploy
 
