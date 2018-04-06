@@ -643,8 +643,8 @@ public:
     /** MultiSig address added */
     boost::signals2::signal<void(bool fHaveMultiSig)> NotifyMultiSigChanged;
 
-    /** xION reset */
-    boost::signals2::signal<void()> NotifyxIONReset;
+    /** zWGR reset */
+    boost::signals2::signal<void()> NotifyzWGRReset;
 };
 
 

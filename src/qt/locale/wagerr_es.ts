@@ -1635,11 +1635,11 @@ Por favor compruebe la dirección e inténtelo de nuevo.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
-        <translation>Aceptar conexiones del exterior</translation>
+        <translation>Aceptar conezWGRes del exterior</translation>
     </message>
     <message>
         <source>Allow incoming connections</source>
-        <translation>Permitir conexiones entrantes</translation>
+        <translation>Permitir conezWGRes entrantes</translation>
     </message>
     <message>
         <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
@@ -2226,7 +2226,7 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     </message>
     <message>
         <source>Number of connections</source>
-        <translation>Número de conexiones</translation>
+        <translation>Número de conezWGRes</translation>
     </message>
     <message>
         <source>&amp;Open</source>
@@ -3819,7 +3819,7 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     </message>
     <message>
         <source>Allow JSON-RPC connections from specified source. Valid for &lt;ip&gt; are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times</source>
-        <translation>Permitir conexiones JSON-RPC  desde la fuente especificada. Valido para &lt;ip&gt; sea una única IP (ej: 1.2.3.4), una red/mascara de red (ej: 1.2.3.4/255.255.255.0) o una red/CIDR (ej: 1.2.3.4/24). Esta opción puede ser especificada múltiples veces.</translation>
+        <translation>Permitir conezWGRes JSON-RPC  desde la fuente especificada. Valido para &lt;ip&gt; sea una única IP (ej: 1.2.3.4), una red/mascara de red (ej: 1.2.3.4/255.255.255.0) o una red/CIDR (ej: 1.2.3.4/24). Esta opción puede ser especificada múltiples veces.</translation>
     </message>
     <message>
         <source>An error occurred while setting up the RPC address %s port %u for listening: %s</source>
@@ -3835,7 +3835,7 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     </message>
     <message>
         <source>Bind to given address to listen for JSON-RPC connections. Use [host]:port notation for IPv6. This option can be specified multiple times (default: bind to all interfaces)</source>
-        <translation>Escuchar únicamente a la tarjeta de red indicada para conexiones JSON-RPC. Use la notación [host]:puerto para IPv6. Esta opción puede ser especificada varias veces (por defecto: escuchar en todas las tarjetas de red)</translation>
+        <translation>Escuchar únicamente a la tarjeta de red indicada para conezWGRes JSON-RPC. Use la notación [host]:puerto para IPv6. Esta opción puede ser especificada varias veces (por defecto: escuchar en todas las tarjetas de red)</translation>
     </message>
     <message>
         <source>Cannot obtain a lock on data directory %s. Wagerr Core is probably already running.</source>
@@ -3879,7 +3879,7 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     </message>
     <message>
         <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
-        <translation>Error: La escucha para conexiones entrantes falló (la escucha retorno error %s)</translation>
+        <translation>Error: La escucha para conezWGRes entrantes falló (la escucha retorno error %s)</translation>
     </message>
     <message>
         <source>Error: Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</source>
@@ -4107,7 +4107,7 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     </message>
     <message>
         <source>Accept connections from outside (default: 1 if no -proxy or -connect)</source>
-        <translation>Aceptar conexiones desde afuera (predeterminado: 1 sin opción -proxy o -connect)</translation>
+        <translation>Aceptar conezWGRes desde afuera (predeterminado: 1 sin opción -proxy o -connect)</translation>
     </message>
     <message>
         <source>Accept public REST requests (default: %u)</source>
@@ -4527,11 +4527,11 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     </message>
     <message>
         <source>Listen for JSON-RPC connections on &lt;port&gt; (default: %u or testnet: %u)</source>
-        <translation>Escuchar por conexiones JSON-RPC en &lt;port&gt; (predeterminado: %u o testnet: %u)</translation>
+        <translation>Escuchar por conezWGRes JSON-RPC en &lt;port&gt; (predeterminado: %u o testnet: %u)</translation>
     </message>
     <message>
         <source>Listen for connections on &lt;port&gt; (default: %u or testnet: %u)</source>
-        <translation>Escuchar por conexiones en &lt;port&gt; (predeterminado: %u o testnet: %u)</translation>
+        <translation>Escuchar por conezWGRes en &lt;port&gt; (predeterminado: %u o testnet: %u)</translation>
     </message>
     <message>
         <source>Loading addresses...</source>
@@ -4571,7 +4571,7 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     </message>
     <message>
         <source>Maintain at most &lt;n&gt; connections to peers (default: %u)</source>
-        <translation>Mantener como máximo &lt;n&gt; conexiones a pares (predeterminado: %u)</translation>
+        <translation>Mantener como máximo &lt;n&gt; conezWGRes a pares (predeterminado: %u)</translation>
     </message>
     <message>
         <source>Masternode options:</source>
@@ -4671,7 +4671,7 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     </message>
     <message>
         <source>Password for JSON-RPC connections</source>
-        <translation>Contraseña para conexiones JSON-RPC</translation>
+        <translation>Contraseña para conezWGRes JSON-RPC</translation>
     </message>
     <message>
         <source>Prepend debug output with timestamp (default: %u)</source>
@@ -4691,7 +4691,7 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     </message>
     <message>
         <source>RPC support for HTTP persistent connections (default: %d)</source>
-        <translation>Soporte RPC para conexiones persistentes HTTP (predeterminado %d)</translation>
+        <translation>Soporte RPC para conezWGRes persistentes HTTP (predeterminado %d)</translation>
     </message>
     <message>
         <source>Randomly drop 1 of every &lt;n&gt; network messages</source>
@@ -4963,7 +4963,7 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     </message>
     <message>
         <source>Use OpenSSL (https) for JSON-RPC connections</source>
-        <translation>Usar OpenSSL (https) para conexiones JSON-RPC</translation>
+        <translation>Usar OpenSSL (https) para conezWGRes JSON-RPC</translation>
     </message>
     <message>
         <source>Use UPnP to map the listening port (default: %u)</source>
@@ -4979,7 +4979,7 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     </message>
     <message>
         <source>Username for JSON-RPC connections</source>
-        <translation>Nombre de usuario para conexiones JSON-RPC</translation>
+        <translation>Nombre de usuario para conezWGRes JSON-RPC</translation>
     </message>
     <message>
         <source>Value more than Obfuscation pool maximum allows.</source>
