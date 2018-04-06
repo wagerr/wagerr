@@ -687,7 +687,7 @@
     </message>
     <message>
         <source>Allow incoming connections</source>
-        <translation>Permet connexions entrants</translation>
+        <translation>Permet connezWGRs entrants</translation>
     </message>
     <message>
         <source>Expert</source>
@@ -852,7 +852,7 @@
     </message>
     <message>
         <source>Number of connections</source>
-        <translation>Nombre de connexions</translation>
+        <translation>Nombre de connezWGRs</translation>
     </message>
     <message>
         <source>&amp;Open</source>
