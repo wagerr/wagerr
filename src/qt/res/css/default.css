@@ -256,7 +256,7 @@ WalletFrame {
     }
     
     /* Special handling for statusbar-icons (which are partly QPushButtons) */
-    QPushButton#labelEncryptionIcon, QPushButton#labelConnectionsIcon, QPushButton#labelAutoMintIcon {
+    QPushButton#labelEncryptionIcon, QPushButton#labelConnectionsIcon {
     border: 0px;
     padding-left:0px;
     padding-right:0px;
