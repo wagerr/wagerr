@@ -391,17 +391,14 @@ bool GetAccumulatorValue(int& nHeight, const libzerocoin::CoinDenomination denom
     if (nHeight > chainActive.Height())
         return error("%s: height %d is more than active chain height", __func__, nHeight);
 
-    //Use old db if proto not update yet
+    //Every situation except for about 20 blocks should use this method
     uint256 nCheckpointBeforeMint = chainActive[nHeight]->nAccumulatorCheckpoint;
-    if (chainActive.Height() < Params().Zerocoin_Block_V2_Start())
+    if (nHeight > Params().Zerocoin_Block_V2_Start() + 20)
         return GetAccumulatorValueFromDB(nCheckpointBeforeMint, denom, bnAccValue);
 
     int nHeightCheckpoint = 0;
     AccumulatorCheckpoints::Checkpoint checkpoint = AccumulatorCheckpoints::GetClosestCheckpoint(nHeight, nHeightCheckpoint);
-    if (nHeightCheckpoint < 0)
-        return error("%s: failed to load hard-checkpoint for block %s", __func__, nHeight);
-
-    if (nHeight < nHeightCheckpoint) {
+    if (nHeightCheckpoint < 0) {
         //Start at the first zerocoin
         libzerocoin::Accumulator accumulator(Params().Zerocoin_Params(false), denom);
         bnAccValue = accumulator.getValue();
@@ -448,16 +445,6 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
     //the height to start accumulating coins to add to witness
     int nAccStartHeight = nHeightMintAdded - (nHeightMintAdded % 10);
 
-    //If the checkpoint is from the recalculated checkpoint period, then adjust it
-    int nHeight_LastGoodCheckpoint = Params().Zerocoin_Block_LastGoodCheckpoint();
-    int nHeight_Recalculate = Params().Zerocoin_Block_RecalculateAccumulators();
-    CBlockIndex* pindex = chainActive[nHeightMintAdded];
-    if (pindex->nHeight < nHeight_Recalculate - 10 && pindex->nHeight > nHeight_LastGoodCheckpoint) {
-        //The checkpoint before the mint will be the last good checkpoint
-        nHeightCheckpoint = nHeight_LastGoodCheckpoint;
-        nAccStartHeight = nHeight_LastGoodCheckpoint - 10;
-    }
-
     //Get the accumulator that is right before the cluster of blocks containing our mint was added to the accumulator
     CBigNum bnAccValue = 0;
     if (GetAccumulatorValue(nHeightCheckpoint, coin.getDenomination(), bnAccValue)) {
@@ -466,7 +453,7 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
     }
 
     //add the pubcoins from the blockchain up to the next checksum starting from the block
-    pindex = chainActive[nHeightCheckpoint - 10];
+    CBlockIndex* pindex = chainActive[nHeightCheckpoint - 10];
     int nChainHeight = chainActive.Height();
     int nHeightStop = nChainHeight % 10;
     nHeightStop = nChainHeight - nHeightStop - 20; // at least two checkpoints deep

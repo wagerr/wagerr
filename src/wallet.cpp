@@ -4705,6 +4705,15 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel,
         return false;
     }
 
+    for (const auto& mint : vSelectedMints) {
+        if (mint.GetVersion() < libzerocoin::PrivateCoin::PUBKEY_VERSION) {
+            if (nSecurityLevel < 100) {
+                receipt.SetStatus(_("Version 1 zWGR require a security level of 100 to successfully spend."), nStatus);
+                return false;
+            }
+        }
+    }
+
     if ((static_cast<int>(vSelectedMints.size()) > Params().Zerocoin_MaxSpendsPerTransaction())) {
         receipt.SetStatus(_("Failed to find coin set amongst held coins with less than maxNumber of Spends"), nStatus);
         return false;

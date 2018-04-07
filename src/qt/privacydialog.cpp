@@ -420,6 +420,15 @@ void PrivacyDialog::sendzWGR()
         vMintsToFetch = ZWgrControlDialog::GetSelectedMints();
 
         for (auto& meta : vMintsToFetch) {
+            if (meta.nVersion < libzerocoin::PrivateCoin::PUBKEY_VERSION) {
+                //version 1 coins have to use full security level to successfully spend.
+                if (nSecurityLevel < 100) {
+                    QMessageBox::warning(this, tr("Spend Zerocoin"), tr("Version 1 zWGR require a security level of 100 to successfully spend."), QMessageBox::Ok, QMessageBox::Ok);
+                    ui->TEMintStatus->setPlainText(tr("Failed to spend zWGR"));
+                    ui->TEMintStatus->repaint();
+                    return;
+                }
+            }
             CZerocoinMint mint;
             if (!pwalletMain->GetMint(meta.hashSerial, mint)) {
                 ui->TEMintStatus->setPlainText(tr("Failed to fetch mint associated with serial hash"));
