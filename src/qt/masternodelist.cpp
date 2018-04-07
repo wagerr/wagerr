@@ -11,6 +11,7 @@
 #include "sync.h"
 #include "wallet.h"
 #include "walletmodel.h"
+#include "askpassphrasedialog.h"
 
 #include <QMessageBox>
 #include <QTimer>
@@ -242,7 +243,7 @@ void MasternodeList::on_startButton_clicked()
     WalletModel::EncryptionStatus encStatus = walletModel->getEncryptionStatus();
 
     if (encStatus == walletModel->Locked || encStatus == walletModel->UnlockedForAnonymizationOnly) {
-        WalletModel::UnlockContext ctx(walletModel->requestUnlock());
+        WalletModel::UnlockContext ctx(walletModel->requestUnlock(AskPassphraseDialog::Context::Unlock_Full));
 
         if (!ctx.isValid()) return; // Unlock wallet was cancelled
 
@@ -266,7 +267,7 @@ void MasternodeList::on_startAllButton_clicked()
     WalletModel::EncryptionStatus encStatus = walletModel->getEncryptionStatus();
 
     if (encStatus == walletModel->Locked || encStatus == walletModel->UnlockedForAnonymizationOnly) {
-        WalletModel::UnlockContext ctx(walletModel->requestUnlock());
+        WalletModel::UnlockContext ctx(walletModel->requestUnlock(AskPassphraseDialog::Context::Unlock_Full));
 
         if (!ctx.isValid()) return; // Unlock wallet was cancelled
 
@@ -297,7 +298,7 @@ void MasternodeList::on_startMissingButton_clicked()
     WalletModel::EncryptionStatus encStatus = walletModel->getEncryptionStatus();
 
     if (encStatus == walletModel->Locked || encStatus == walletModel->UnlockedForAnonymizationOnly) {
-        WalletModel::UnlockContext ctx(walletModel->requestUnlock());
+        WalletModel::UnlockContext ctx(walletModel->requestUnlock(AskPassphraseDialog::Context::Unlock_Full));
 
         if (!ctx.isValid()) return; // Unlock wallet was cancelled
 
