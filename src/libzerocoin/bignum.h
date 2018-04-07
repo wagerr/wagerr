@@ -567,7 +567,7 @@ public:
      */
     static CBigNum generatePrime(const unsigned int numBits, bool safe = false) {
         CBigNum ret;
-        if(!BN_generate_prime_ex(ret.bn, numBits, (safe == true), NULL, NULL, NULL)
+        if(!BN_generate_prime_ex(ret.bn, numBits, (safe == true), NULL, NULL, NULL))
             throw bignum_error("CBigNum::generatePrime*= :BN_generate_prime_ex");
         return ret;
     }
@@ -779,7 +779,7 @@ inline const CBigNum operator%(const CBigNum& a, const CBigNum& b)
 inline const CBigNum operator<<(const CBigNum& a, unsigned int shift)
 {
     CBigNum r;
-    f (!BN_lshift(r.bn, a.bn, shift))
+    if (!BN_lshift(r.bn, a.bn, shift))
         throw bignum_error("CBigNum:operator<< : BN_lshift failed");
     return r;
 }
