@@ -2408,9 +2408,9 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
         throw runtime_error(
-            "mintzerocoin <amount> [UTXOs]\n"
-            "amount: Enter an amount of Ion to convert to xIon\n"
-            "UTXOs: (string, optional) A json array of objects. Each object the txid (string) vout (numeric)\n"
+            "mintzerocoin amount ( UTXOs )\n"
+            "amount: (numeric, required) Enter an amount of Wgr to convert to zWgr\n"
+            "UTXOs: (string, optional) A json array of objects. Each object needs the txid (string) and vout (numeric)\n"
             "     [           (json array of json objects)\n"
             "       {\n"
             "         \"txid\":\"id\",    (string) The transaction id\n"
@@ -2418,6 +2418,13 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
             "       }\n"
             "       ,...\n"
             "     ]\n"
+            "\nExamples:\n"
+            "\nMint 50 from anywhere\n" +
+            HelpExampleCli("mintzerocoin", "50") +
+            "\nMint 13 from a specific output\n" + 
+            HelpExampleCli("mintzerocoin", "13 \"[{\\\"txid\\\":\\\"a08e6907dbbd3d809776dbfc5d82e371b764ed838b5655e72f463568df1aadf0\\\",\\\"vout\\\":1}]\"") +
+            "\nAs a json rpc call\n" + 
+            HelpExampleRpc("mintzerocoin", "13, \"[{\\\"txid\\\":\\\"a08e6907dbbd3d809776dbfc5d82e371b764ed838b5655e72f463568df1aadf0\\\",\\\"vout\\\":1}]\""
             + HelpRequiringPassphrase());
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
