@@ -57,7 +57,6 @@ bool CCrypter::Encrypt(const CKeyingMaterial& vchPlaintext, std::vector<unsigned
     int nCLen = nLen + AES_BLOCK_SIZE, nFLen = 0;
     vchCiphertext = std::vector<unsigned char>(nCLen);
 
-    if (!ctx) return false;
     bool fOk = true;
 
     /* WagerrTor - OpenSSL 1.1 fix */
