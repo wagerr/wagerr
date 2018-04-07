@@ -1,5 +1,5 @@
 ---
-name: "wagerr-linux-1.4"
+name: "wagerr-linux-1.5"
 enable_cache: true
 suites:
 - "trusty"
