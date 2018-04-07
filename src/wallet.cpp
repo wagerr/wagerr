@@ -4815,18 +4815,25 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored)
         return;
 
     for (CZerocoinMint mint : listMints) {
-        if (IsSerialKnown(mint.GetSerialNumber()))
+        if (IsSerialKnown(mint.GetSerialNumber())) {
+            LogPrintf("%s: serial %s is already in the blockchain\n", __func__, mint.GetSerialNumber().GetHex());
             continue;
+        }
 
         uint256 txHash;
-        if (!GetZerocoinMint(mint.GetValue(), txHash))
+        if (!GetZerocoinMint(mint.GetValue(), txHash)) {
+            LogPrintf("%s: did not find pubcoin %s in database\n", __func__, mint.GetValue().GetHex());
             continue;
+        }
 
         uint256 hashBlock = 0;
         CTransaction tx;
-        if (!GetTransaction(txHash, tx, hashBlock))
-            continue;
 
+        if (!GetTransaction(txHash, tx, hashBlock)) {
+            LogPrintf("%s: failed to find transaction %s in blockchain\n", __func__, txHash.GetHex());
+            continue;
+        }
+        
         mint.SetTxHash(txHash);
         mint.SetHeight(mapBlockIndex.at(hashBlock)->nHeight);
         if (!walletdb.UnarchiveZerocoin(mint)) {
