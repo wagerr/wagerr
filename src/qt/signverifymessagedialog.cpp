@@ -15,6 +15,7 @@
 #include "base58.h"
 #include "init.h"
 #include "wallet.h"
+#include "askpassphrasedialog.h"
 
 #include <string>
 #include <vector>
@@ -119,7 +120,7 @@ void SignVerifyMessageDialog::on_signMessageButton_SM_clicked()
         return;
     }
 
-    WalletModel::UnlockContext ctx(model->requestUnlock(true));
+    WalletModel::UnlockContext ctx(model->requestUnlock(AskPassphraseDialog::Context::Sign_Message, true));
     if (!ctx.isValid()) {
         ui->statusLabel_SM->setStyleSheet("QLabel { color: red; }");
         ui->statusLabel_SM->setText(tr("Wallet unlock was cancelled."));

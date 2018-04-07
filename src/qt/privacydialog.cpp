@@ -17,6 +17,7 @@
 #include "coincontrol.h"
 #include "zwgrcontroldialog.h"
 #include "spork.h"
+#include "askpassphrasedialog.h"
 
 #include <QClipboard>
 #include <QSettings>
@@ -178,7 +179,7 @@ void PrivacyDialog::on_pushButtonMintzWGR_clicked()
     // Request unlock if wallet was locked or unlocked for mixing:
     WalletModel::EncryptionStatus encStatus = walletModel->getEncryptionStatus();
     if (encStatus == walletModel->Locked) {
-        WalletModel::UnlockContext ctx(walletModel->requestUnlock(true));
+        WalletModel::UnlockContext ctx(walletModel->requestUnlock(AskPassphraseDialog::Context::Mint_zWGR, true));
         if (!ctx.isValid()) {
             // Unlock wallet was cancelled
             ui->TEMintStatus->setPlainText(tr("Error: Your wallet is locked. Please enter the wallet passphrase first."));
@@ -285,7 +286,7 @@ void PrivacyDialog::on_pushButtonSpendzWGR_clicked()
     // Request unlock if wallet was locked or unlocked for mixing:
     WalletModel::EncryptionStatus encStatus = walletModel->getEncryptionStatus();
     if (encStatus == walletModel->Locked || encStatus == walletModel->UnlockedForAnonymizationOnly) {
-        WalletModel::UnlockContext ctx(walletModel->requestUnlock(true));
+        WalletModel::UnlockContext ctx(walletModel->requestUnlock(AskPassphraseDialog::Context::Mint_zWGR, true));
         if (!ctx.isValid()) {
             // Unlock wallet was cancelled
             return;
