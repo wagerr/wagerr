@@ -105,7 +105,8 @@ enum ZerocoinSpendStatus {
     ZWGR_INVALID_WITNESS = 12,                      // Spend coin transaction did not verify
     ZWGR_BAD_SERIALIZATION = 13,                    // Transaction verification failed
     ZWGR_SPENT_USED_ZWGR = 14,                      // Coin has already been spend
-    ZWGR_TX_TOO_LARGE = 15                          // The transaction is larger than the max tx size
+    ZWGR_TX_TOO_LARGE = 15,                          // The transaction is larger than the max tx size
+    ZWGR_SPEND_V1_SEC_LEVEL                         // Spend is V1 and security level is not set to 100
 };
 
 struct CompactTallyItem {
