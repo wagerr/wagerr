@@ -229,7 +229,7 @@
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_5">
                      <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0">
+                      <layout class="QHBoxLayout" name="horizontalLayout_5" stretch="0,0,0">
                        <item>
                         <widget class="QLabel" name="label_5z">
                          <property name="minimumSize">
@@ -736,11 +736,11 @@
                        </item>
                        <item row="5" column="0">
                         <widget class="QLabel" name="labelTotalText">
-                         <property name="text">
-                          <string>Total:</string>
-                         </property>
                          <property name="toolTip">
                           <string>Your current Wagerr balance, unconfirmed and immature transactions included</string>
+                         </property>
+                         <property name="text">
+                          <string>Total:</string>
                          </property>
                         </widget>
                        </item>
@@ -835,7 +835,7 @@
                     </property>
                     <layout class="QVBoxLayout" name="verticalLayout_7">
                      <item>
-                      <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0">
+                      <layout class="QHBoxLayout" name="horizontalLayout_8" stretch="0,0,0">
                        <item>
                         <widget class="QLabel" name="label_5z_3">
                          <property name="minimumSize">
@@ -905,7 +905,7 @@
                        <item row="1" column="0">
                         <widget class="QLabel" name="labelzBalanceMatureText">
                          <property name="toolTip">
-                          <string>Mature: more than 20 confirmation and more than 3 mints of the same denomination after it was minted.
+                          <string>Mature: more than 20 confirmation and more than 1 mint of the same denomination after it was minted.
 These zWGR are spendable.</string>
                          </property>
                          <property name="text">
@@ -922,7 +922,7 @@ These zWGR are spendable.</string>
                           </font>
                          </property>
                          <property name="toolTip">
-                          <string>Mature: more than 20 confirmation and more than 3 mints of the same denomination after it was minted.
+                          <string>Mature: more than 20 confirmation and more than 1 mint of the same denomination after it was minted.
 These zWGR are spendable.</string>
                          </property>
                          <property name="text">
@@ -937,7 +937,7 @@ These zWGR are spendable.</string>
                         <widget class="QLabel" name="labelzBalanceUnconfirmedText">
                          <property name="toolTip">
                           <string>Unconfirmed: less than 20 confirmations
-Immature: confirmed, but less than 3 mints of the same denomination after it was minted</string>
+Immature: confirmed, but less than 1 mint of the same denomination after it was minted</string>
                          </property>
                          <property name="text">
                           <string>Unconfirmed:</string>
@@ -954,7 +954,7 @@ Immature: confirmed, but less than 3 mints of the same denomination after it was
                          </property>
                          <property name="toolTip">
                           <string>Unconfirmed: less than 20 confirmations
-Immature: confirmed, but less than 3 mints of the same denomination after it was minted</string>
+Immature: confirmed, but less than 1 mint of the same denomination after it was minted</string>
                          </property>
                          <property name="text">
                           <string notr="true">0.000 000 00 WGR</string>
@@ -968,7 +968,7 @@ Immature: confirmed, but less than 3 mints of the same denomination after it was
                         <widget class="QLabel" name="labelzBalanceImmatureText">
                          <property name="toolTip">
                           <string>Unconfirmed: less than 20 confirmations
-Immature: confirmed, but less than 3 mints of the same denomination after it was minted</string>
+Immature: confirmed, but less than 1 mint of the same denomination after it was minted</string>
                          </property>
                          <property name="text">
                           <string>Immature:</string>
@@ -985,7 +985,7 @@ Immature: confirmed, but less than 3 mints of the same denomination after it was
                          </property>
                          <property name="toolTip">
                           <string>Unconfirmed: less than 20 confirmations
-Immature: confirmed, but less than 3 mints of the same denomination after it was minted</string>
+Immature: confirmed, but less than 1 mint of the same denomination after it was minted</string>
                          </property>
                          <property name="text">
                           <string notr="true">0.000 000 00 WGR</string>
