@@ -1172,7 +1172,6 @@ bool CWalletDB::ReadCurrentSeedHash(uint256& hashSeed)
 
 bool CWalletDB::WriteZWGRSeed(const uint256& hashSeed, const vector<unsigned char>& seed)
 {
-    LogPrintf("%s: seedHash %s \nseed %s\n", __func__, hashSeed.GetHex(), ReverseEndianString(HexStr(seed)));
     if (!WriteCurrentSeedHash(hashSeed))
         return error("%s: failed to write current seed hash", __func__);
 
@@ -1195,9 +1194,19 @@ bool CWalletDB::EraseZWGRSeed()
     return true;
 }
 
+bool CWalletDB::EraseZWGRSeed_deprecated()
+{
+    return Erase(string("dzs"));
+}
+
 bool CWalletDB::ReadZWGRSeed(const uint256& hashSeed, vector<unsigned char>& seed)
 {
     return Read(make_pair(string("dzs"), hashSeed), seed);
+}
+
+bool CWalletDB::ReadZWGRSeed_deprecated(uint256& seed)
+{
+    return Read(string("dzs"), seed);
 }
 
 bool CWalletDB::WriteZWGRCount(const uint32_t& nCount)

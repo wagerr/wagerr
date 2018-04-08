@@ -438,7 +438,7 @@ bool CCryptoKeyStore::GetDeterministicSeed(const uint256& hashSeed, uint256& see
         strErr = "read seed from wallet";
     }
 
-    return error("s%: Failed to %s\n", __func__, strErr);
+    return error("%s: Failed to %s\n", __func__, strErr);
 
 
 //    return error("Failed to decrypt deterministic seed %s", IsLocked() ? "Wallet is locked!" : "");

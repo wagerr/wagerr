@@ -178,7 +178,9 @@ public:
     bool ReadCurrentSeedHash(uint256& hashSeed);
     bool WriteZWGRSeed(const uint256& hashSeed, const vector<unsigned char>& seed);
     bool ReadZWGRSeed(const uint256& hashSeed, vector<unsigned char>& seed);
+    bool ReadZWGRSeed_deprecated(uint256& seed);
     bool EraseZWGRSeed();
+    bool EraseZWGRSeed_deprecated();
 
     bool WriteZWGRCount(const uint32_t& nCount);
     bool ReadZWGRCount(uint32_t& nCount);
