@@ -4939,7 +4939,7 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, s
         mint.SetTxHash(txid);
         mint.SetHeight(nHeight);
         mint.SetUsed(IsSerialInBlockchain(mint.GetValue(), nHeight));
-        if (!zwgrTracker->UnArchive(hashPubcoin)) {
+        if (!zwgrTracker->UnArchive(hashPubcoin, false)) {
             LogPrintf("%s : failed to unarchive mint %s\n", __func__, mint.GetValue().GetHex());
         } else {
             zwgrTracker->UpdateZerocoinMint(mint);
@@ -4957,7 +4957,7 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, s
         dMint.SetHeight(nHeight);
         dMint.SetUsed(IsSerialInBlockchain(dMint.GetSerialHash(), nHeight));
 
-        if (!zwgrTracker->UnArchive(dMint.GetPubcoinHash())) {
+        if (!zwgrTracker->UnArchive(dMint.GetPubcoinHash(), true)) {
             LogPrintf("%s : failed to unarchive deterministic mint %s\n", __func__, dMint.GetPubcoinHash().GetHex());
         } else {
             zwgrTracker->Add(dMint, true);

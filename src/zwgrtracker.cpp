@@ -43,23 +43,22 @@ bool CzWGRTracker::Archive(CMintMeta& meta)
     return true;
 }
 
-bool CzWGRTracker::UnArchive(const uint256& hashPubcoin)
+bool CzWGRTracker::UnArchive(const uint256& hashPubcoin, bool isDeterministic)
 {
-    if (!HasPubcoinHash(hashPubcoin))
-        return error("%s: tracker does not have record of pubcoinhash %s", __func__, hashPubcoin.GetHex());
-
-    CMintMeta meta = GetMetaFromPubcoin(hashPubcoin);
     CWalletDB walletdb(strWalletFile);
-    if (meta.isDeterministic) {
-        if (!walletdb.UnarchiveDeterministicMint(hashPubcoin))
-            return error("%s: failed to unarchive", __func__);
+    if (isDeterministic) {
+        CDeterministicMint dMint;
+        if (!walletdb.UnarchiveDeterministicMint(hashPubcoin, dMint))
+            return error("%s: failed to unarchive deterministic mint", __func__);
+        Add(dMint, false);
     } else {
-        if (!walletdb.UnarchiveZerocoinMint(hashPubcoin))
-            return error("%s: failed to unarchive", __func__);
+        CZerocoinMint mint;
+        if (!walletdb.UnarchiveZerocoinMint(hashPubcoin, mint))
+            return error("%s: failed to unarchivezerocoin mint", __func__);
+        Add(mint, false);
     }
 
-    mapSerialHashes.at(meta.hashSerial).isArchived = false;
-    LogPrintf("%s: unarchived %s\n", __func__, meta.hashPubcoin.GetHex());
+    LogPrintf("%s: unarchived %s\n", __func__, hashPubcoin.GetHex());
     return true;
 }
 

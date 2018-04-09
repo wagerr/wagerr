@@ -35,7 +35,7 @@ public:
     void RemovePending(const uint256& txid);
     void SetPubcoinUsed(const uint256& hashPubcoin, const uint256& txid);
     void SetPubcoinNotUsed(const uint256& hashPubcoin);
-    bool UnArchive(const uint256& hashPubcoin);
+    bool UnArchive(const uint256& hashPubcoin, bool isDeterministic);
     bool UpdateZerocoinMint(const CZerocoinMint& mint);
     bool UpdateState(const CMintMeta& meta);
     void Clear();
