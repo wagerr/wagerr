@@ -121,7 +121,7 @@ bool CZWgrStake::CreateTxIn(CWallet* pwallet, CTxIn& txIn, uint256 hashTxOut)
     return true;
 }
 
-bool CZWgrStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout)
+bool CZWgrStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout, CAmount nTotal)
 {
     LogPrintf("%s\n", __func__);
 
@@ -193,7 +193,7 @@ CAmount CWgrStake::GetValue()
     return txFrom.vout[nPosition].nValue;
 }
 
-bool CWgrStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout)
+bool CWgrStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout, CAmount nTotal)
 {
     vector<valtype> vSolutions;
     txnouttype whichType;
@@ -219,6 +219,11 @@ bool CWgrStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout)
         scriptPubKey = scriptPubKeyKernel;
 
     vout.emplace_back(CTxOut(0, scriptPubKey));
+
+    // Calculate if we need to split the output
+    if (nTotal / 2 > (CAmount)(pwallet->nStakeSplitThreshold * COIN))
+        vout.emplace_back(CTxOut(0, scriptPubKey));
+
     return true;
 }
 

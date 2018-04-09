@@ -2917,17 +2917,19 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
             // Found a kernel
             LogPrintf("CreateCoinStake : kernel found\n");
             nCredit += stakeInput->GetValue();
-            vector<CTxOut> vout;
-            if (!stakeInput->CreateTxOuts(this, vout)) {
-                LogPrintf("%s : failed to get scriptPubKey\n", __func__);
-                continue;
-            }
-            txNew.vout.insert(txNew.vout.end(), vout.begin(), vout.end());
 
             // Calculate reward
             CAmount nReward;
             nReward = GetBlockValue(chainActive.Height() + 1);
             nCredit += nReward;
+
+            // Create the output transaction(s)
+            vector<CTxOut> vout;
+            if (!stakeInput->CreateTxOuts(this, vout, nCredit)) {
+                LogPrintf("%s : failed to get scriptPubKey\n", __func__);
+                continue;
+            }
+            txNew.vout.insert(txNew.vout.end(), vout.begin(), vout.end());
 
             CAmount nMinFee = 0;
             if (!stakeInput->IsZWGR()) {
