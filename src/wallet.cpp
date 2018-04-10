@@ -35,6 +35,7 @@
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/thread.hpp>
 #include <boost/filesystem/operations.hpp>
+#include <boost/date_time/posix_time/posix_time.hpp>
 
 using namespace std;
 
@@ -5019,6 +5020,16 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, s
     }
 }
 
+string CWallet::GetUniqueWalletBackupName(bool fzwgrAuto) const
+{
+    posix_time::ptime timeLocal = posix_time::second_clock::local_time();
+    stringstream ssDateTime;
+
+
+    ssDateTime << gregorian::to_iso_extended_string(timeLocal.date()) << "-" << timeLocal.time_of_day();
+    return strprintf("wallet%s.dat%s", fzwgrAuto ? "-autozwgrbackup" : "", DateTimeStrFormat(".%Y-%m-%d-%H-%M", GetTime()));
+}
+
 void CWallet::ZWgrBackupWallet()
 {
     filesystem::path backupDir = GetDataDir() / "backups";
@@ -5057,6 +5068,18 @@ void CWallet::ZWgrBackupWallet()
     }
 
     BackupWallet(*this, backupPath.string());
+
+    if(!GetArg("-zwgrbackuppath", "").empty()) {
+        filesystem::path customPath(GetArg("-zwgrbackuppath", ""));
+        filesystem::create_directories(customPath);
+
+        if(!customPath.has_extension()) {
+            customPath /= GetUniqueWalletBackupName(true);
+        }
+
+        BackupWallet(*this, customPath, false);
+    }
+
 }
 
 string CWallet::MintZerocoinFromOutPoint(CAmount nValue, CWalletTx& wtxNew, vector<CDeterministicMint>& vDMints, const vector<COutPoint> vOutpts)

@@ -363,14 +363,7 @@ void WalletView::backupWallet()
 
     if (filename.isEmpty())
         return;
-
-    if (!walletModel->backupWallet(filename)) {
-        emit message(tr("Backup Failed"), tr("There was an error trying to save the wallet data to %1.").arg(filename),
-            CClientUIInterface::MSG_ERROR);
-    } else {
-        emit message(tr("Backup Successful"), tr("The wallet data was successfully saved to %1.").arg(filename),
-            CClientUIInterface::MSG_INFORMATION);
-    }
+    walletModel->backupWallet(filename);
 }
 
 void WalletView::changePassphrase()

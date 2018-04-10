@@ -220,6 +220,8 @@ public:
     bool DatabaseMint(CDeterministicMint& dMint);
     bool SetMintUnspent(const CBigNum& bnSerial);
     bool UpdateMint(const CBigNum& bnValue, const int& nHeight, const uint256& txid, const libzerocoin::CoinDenomination& denom);
+    string GetUniqueWalletBackupName(bool fzwgrAuto) const;
+
 
     /** Zerocin entry changed.
     * @note called with lock cs_wallet held.
@@ -668,6 +670,9 @@ public:
 
     /** zWGR reset */
     boost::signals2::signal<void()> NotifyzWGRReset;
+
+    /** notify wallet file backed up */
+    boost::signals2::signal<void (const bool& fSuccess, const std::string& filename)> NotifyWalletBacked;
 };
 
 
