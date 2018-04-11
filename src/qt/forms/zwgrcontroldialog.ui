@@ -17,7 +17,7 @@
    </size>
   </property>
   <property name="windowTitle">
-   <string>Select zWgr to Spend</string>
+   <string>Select zWGR to Spend</string>
   </property>
   <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
    <item>
@@ -59,7 +59,7 @@
        <item row="1" column="0">
         <widget class="QLabel" name="labelZWgr">
          <property name="text">
-          <string>zWgr</string>
+          <string>zWGR</string>
          </property>
         </widget>
        </item>
@@ -155,7 +155,7 @@
      </column>
      <column>
       <property name="text">
-       <string notr="true">zWgr ID</string>
+         <string notr="true">zWGR ID</string>
       </property>
      </column>
      <column>

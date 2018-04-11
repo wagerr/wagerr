@@ -4463,7 +4463,7 @@ bool CWallet::CreateZerocoinMintTransaction(const CAmount nValue, CMutableTransa
             reservekey->ReturnKey();
     }
 
-    // Sign if these are wagerr outputs - NOTE that zWgr outputs are signed later in SoK
+    // Sign if these are wagerr outputs - NOTE that zWGR outputs are signed later in SoK
     if (!isZCSpendChange) {
         int nIn = 0;
         for (const std::pair<const CWalletTx*, unsigned int>& coin : setCoins) {
@@ -4577,7 +4577,7 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
         }
 
         if (IsSerialKnown(spend.getCoinSerialNumber())) {
-            //Tried to spend an already spent zWgr
+            //Tried to spend an already spent zWGR
             receipt.SetStatus(_("The coin spend has been used"), ZWGR_SPENT_USED_ZWGR);
 
             uint256 hashSerial = GetSerialHash(spend.getCoinSerialNumber());
@@ -4617,7 +4617,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel,
     }
 
     if (nValue < 1) {
-        receipt.SetStatus(_("Value is below the the smallest available denomination (= 1) of zWgr"), nStatus);
+        receipt.SetStatus(_("Value is below the the smallest available denomination (= 1) of zWGR"), nStatus);
         return false;
     }
 
@@ -4646,7 +4646,7 @@ bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, int nSecurityLevel,
         if(!fWholeNumber)
             nValueToSelect = static_cast<CAmount>(ceil(dValue) * COIN);
 
-        // Select the zWgr mints to use in this spend
+        // Select the zWGR mints to use in this spend
         std::map<libzerocoin::CoinDenomination, CAmount> DenomMap = GetMyZerocoinDistribution();
         list<CMintMeta> listMints(setMints.begin(), setMints.end());
         vMintsToFetch = SelectMintsFromList(nValueToSelect, nValueSelected, nMaxSpends, fMinimizeChange,

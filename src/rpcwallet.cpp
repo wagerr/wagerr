@@ -2666,7 +2666,7 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
             HelpRequiringPassphrase() + "\n"
 
             "\nArguments:\n"
-            "1. amount      (numeric, required) Enter an amount of Wgr to convert to zWgr\n"
+            "1. amount      (numeric, required) Enter an amount of Wgr to convert to zWGR\n"
             "2. utxos       (string, optional) A json array of objects.\n"
             "                   Each object needs the txid (string) and vout (numeric)\n"
             "  [\n"
@@ -3081,7 +3081,7 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
 
             "\nArguments:\n"
             "1. \"include_spent\"        (bool, required) Include mints that have already been spent\n"
-            "2. \"denomination\"         (integer, optional) Export a specific denomination of zWgr\n"
+            "2. \"denomination\"         (integer, optional) Export a specific denomination of zWGR\n"
 
             "\nResult:\n"
             "[                   (array of json object)\n"
@@ -3160,7 +3160,7 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "{\n"
             "  \"added\": n,        (numeric) The quantity of zerocoin mints that were added\n"
-            "  \"value\": amount    (numeric) The total zWgr value of zerocoin mints that were added\n"
+            "  \"value\": amount    (numeric) The total zWGR value of zerocoin mints that were added\n"
             "}\n"
 
             "\nExamples\n" +
@@ -3237,7 +3237,7 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
     if(fHelp || !params.empty())
         throw runtime_error(
             "reconsiderzerocoins\n"
-            "\nCheck archived zWgr list to see if any mints were added to the blockchain.\n" +
+            "\nCheck archived zWGR list to see if any mints were added to the blockchain.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nResult:\n"
@@ -3322,11 +3322,11 @@ UniValue getzwgrseed(const UniValue& params, bool fHelp)
     if(fHelp || !params.empty())
         throw runtime_error(
             "getzwgrseed\n"
-            "\nCheck archived zWgr list to see if any mints were added to the blockchain.\n" +
+            "\nCheck archived zWGR list to see if any mints were added to the blockchain.\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nResult\n"
-            "\"seed\" : s,  (string) The deterministic zwgr seed.\n"
+            "\"seed\" : s,  (string) The deterministic zWGR seed.\n"
 
             "\nExamples\n" +
             HelpExampleCli("getzwgrseed", "") + HelpExampleRpc("getzwgrseed", ""));

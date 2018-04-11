@@ -58,7 +58,7 @@ QT_TRANSLATE_NOOP("wagerr-core", ""
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Enable SwiftX, show confirmations for locked transactions (bool, default: %s)"),
 QT_TRANSLATE_NOOP("wagerr-core", ""
-"Enable automatic wallet backups triggered after each zWgr minting (0-1, "
+"Enable automatic wallet backups triggered after each zWGR minting (0-1, "
 "default: %u)"),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Enable spork administration functionality with the appropriate private key."),

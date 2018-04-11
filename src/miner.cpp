@@ -348,7 +348,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             if (!view.HaveInputs(tx))
                 continue;
 
-            // double check that there are no double spent zWgr spends in this block or tx
+            // double check that there are no double spent zWGR spends in this block or tx
             if (tx.IsZerocoinSpend()) {
                 int nHeightTx = 0;
                 if (IsTransactionInChain(tx.GetHash(), nHeightTx))
@@ -370,7 +370,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                         vTxSerials.emplace_back(spend.getCoinSerialNumber());
                     }
                 }
-                //This zWgr serial has already been included in the block, do not add this tx.
+                //This zWGR serial has already been included in the block, do not add this tx.
                 if (fDoubleSerial)
                     continue;
             }

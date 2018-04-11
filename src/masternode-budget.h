@@ -36,6 +36,7 @@ static const CAmount PROPOSAL_FEE_TX = (50 * COIN);
 static const CAmount BUDGET_FEE_TX_OLD = (50 * COIN);
 static const CAmount BUDGET_FEE_TX = (5 * COIN);
 static const int64_t BUDGET_VOTE_UPDATE_MIN = 60 * 60;
+static map<uint256, int> mapPayment_History;
 
 extern std::vector<CBudgetProposalBroadcast> vecImmatureBudgetProposals;
 extern std::vector<CFinalizedBudgetBroadcast> vecImmatureFinalizedBudgets;
@@ -337,6 +338,7 @@ public:
     int GetBlockStart() { return nBlockStart; }
     int GetBlockEnd() { return nBlockStart + (int)(vecBudgetPayments.size() - 1); }
     int GetVoteCount() { return (int)mapVotes.size(); }
+    bool IsPaidAlready(uint256 nProposalHash, int nBlockHeight);
     bool IsTransactionValid(const CTransaction& txNew, int nBlockHeight);
     bool GetBudgetPaymentByBlock(int64_t nBlockHeight, CTxBudgetPayment& payment)
     {

@@ -413,7 +413,7 @@ void PrivacyDialog::sendzWGR()
     ui->TEMintStatus->setPlainText(tr("Spending Zerocoin.\nComputationally expensive, might need several minutes depending on the selected Security Level and your hardware. \nPlease be patient..."));
     ui->TEMintStatus->repaint();
 
-    // use mints from zWgr selector if applicable
+    // use mints from zWGR selector if applicable
     vector<CMintMeta> vMintsToFetch;
     vector<CZerocoinMint> vMintsSelected;
     if (!ZWgrControlDialog::setSelectedMints.empty()) {
@@ -480,7 +480,7 @@ void PrivacyDialog::sendzWGR()
     }
 
     if (walletModel && walletModel->getAddressTableModel()) {
-        // If zWgr was spent successfully update the addressbook with the label
+        // If zWGR was spent successfully update the addressbook with the label
         std::string labelText = ui->addAsLabel->text().toStdString();
         if (!labelText.empty())
             walletModel->updateAddressBookLabels(address.Get(), labelText, "send");
@@ -498,7 +498,7 @@ void PrivacyDialog::sendzWGR()
     CAmount nValueIn = 0;
     int nCount = 0;
     for (CZerocoinSpend spend : receipt.GetSpends()) {
-        strStats += tr("zWgr Spend #: ") + QString::number(nCount) + ", ";
+        strStats += tr("zWGR Spend #: ") + QString::number(nCount) + ", ";
         strStats += tr("denomination: ") + QString::number(spend.GetDenomination()) + ", ";
         strStats += tr("serial: ") + spend.GetSerial().ToString().c_str() + "\n";
         strStats += tr("Spend is 1 of : ") + QString::number(spend.GetMintCount()) + " mints in the accumulator\n";
@@ -514,7 +514,7 @@ void PrivacyDialog::sendzWGR()
         strStats += tr("address: ");
         CTxDestination dest;
         if(txout.scriptPubKey.IsZerocoinMint())
-            strStats += tr("zWgr Mint");
+            strStats += tr("zWGR Mint");
         else if(ExtractDestination(txout.scriptPubKey, dest))
             strStats += tr(CBitcoinAddress(dest).ToString().c_str());
         strStats += "\n";
@@ -806,7 +806,7 @@ void PrivacyDialog::updateSPORK16Status()
     else {
         // Mint zWGR
         ui->pushButtonMintzWGR->setEnabled(true);
-        ui->pushButtonMintzWGR->setToolTip(tr("PrivacyDialog", "Enter an amount of Wgr to convert to zWgr", 0));
+        ui->pushButtonMintzWGR->setToolTip(tr("PrivacyDialog", "Enter an amount of WGR to convert to zWGR", 0));
 
         // Spend zWGR
         ui->pushButtonSpendzWGR->setEnabled(true);
