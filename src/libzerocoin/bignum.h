@@ -361,7 +361,7 @@ public:
         {
             CBigNum cbn;
             BN_rshift(cbn.bn, bn, 8*(nSize-3));
-            nCompact = BN_get_word(bn);
+            nCompact = BN_get_word(cbn.bn);
         }
         // The 0x00800000 bit denotes the sign.
         // Thus, if it is already set, divide the mantissa by 256 and increase the exponent.
