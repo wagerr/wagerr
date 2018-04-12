@@ -263,6 +263,7 @@ extern UniValue setzwgrseed(const UniValue& params, bool fHelp);
 extern UniValue getzwgrseed(const UniValue& params, bool fHelp);
 extern UniValue generatemintlist(const UniValue& params, bool fHelp);
 extern UniValue searchdzwgr(const UniValue& params, bool fHelp);
+extern UniValue dzwgrstate(const UniValue& params, bool fHelp);
 
 extern UniValue getrawtransaction(const UniValue& params, bool fHelp); // in rcprawtransaction.cpp
 extern UniValue listunspent(const UniValue& params, bool fHelp);

@@ -28,6 +28,7 @@ public:
     void SyncWithChain(bool fGenerateMintPool = true);
     void GenerateDeterministicZWGR(libzerocoin::CoinDenomination denom, libzerocoin::PrivateCoin& coin, CDeterministicMint& dMint, bool fGenerateOnly = false);
     void GenerateMint(const uint32_t& nCount, const libzerocoin::CoinDenomination denom, libzerocoin::PrivateCoin& coin, CDeterministicMint& dMint);
+    void GetState(int& nCount, int& nLastGenerated);
     bool RegenerateMint(const CDeterministicMint& dMint, CZerocoinMint& mint);
     void GenerateMintPool(uint32_t nCountStart = 0, uint32_t nCountEnd = 0);
     bool LoadMintPoolFromDB();
