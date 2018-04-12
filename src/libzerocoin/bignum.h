@@ -613,17 +613,13 @@ public:
 
     CBigNum& operator/=(const CBigNum& b)
     {
-	CAutoBN_CTX pctx;
-        if (!BN_div(bn, NULL, bn, b.bn, pctx))
-	    throw bignum_error("CBigNum::operator/= : BN_div failed");
+        *this = *this / b;
         return *this;
     }
 
     CBigNum& operator%=(const CBigNum& b)
     {
-	CAutoBN_CTX pctx;
-        if (!BN_mod(bn, b.bn, bn, pctx))
-	    throw bignum_error("CBigNum::operator%= : BN_mod failed");
+        *this = *this % b;
         return *this;
     }
 
