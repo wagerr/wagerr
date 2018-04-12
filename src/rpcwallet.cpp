@@ -3190,14 +3190,11 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
 
         libzerocoin::CoinDenomination denom = libzerocoin::IntToZerocoinDenomination(d);
         CBigNum bnValue = 0;
-        if (!bnValue)
-            bnValue.SetHex(find_value(o, "p").get_str());
+        bnValue.SetHex(find_value(o, "p").get_str());
         CBigNum bnSerial = 0;
-        if (!bnSerial)
-            bnSerial.SetHex(find_value(o, "s").get_str());
+        bnSerial.SetHex(find_value(o, "s").get_str());
         CBigNum bnRandom = 0;
-        if (!bnRandom)
-            bnRandom.SetHex(find_value(o, "r").get_str());
+        bnRandom.SetHex(find_value(o, "r").get_str());
         uint256 txid(find_value(o, "t").get_str());
 
         int nHeight = find_value(o, "h").get_int();

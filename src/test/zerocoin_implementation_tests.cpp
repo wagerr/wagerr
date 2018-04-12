@@ -243,12 +243,10 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     PrivateCoin privateCoin(Params().Zerocoin_Params(true), pubCoin.getDenomination());
     privateCoin.setPublicCoin(pubCoin);
     CBigNum bn = 0;
-    if (!bn)
-        bn.SetHex(rawTxRand1);
+    bn.SetHex(rawTxRand1);
     privateCoin.setRandomness(bn);
     CBigNum bn2 = 0;
-    if (!bn2)
-        bn2.SetHex(rawTxSerial1);
+    bn2.SetHex(rawTxSerial1);
     privateCoin.setSerialNumber(bn2);
     privateCoin.setVersion(1);
 

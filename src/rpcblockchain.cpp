@@ -920,8 +920,9 @@ UniValue findserial(const UniValue& params, bool fHelp)
 
     std::string strSerial = params[0].get_str();
     CBigNum bnSerial = 0;
+    bnSerial.SetHex(strSerial);
     if (!bnSerial)
-        bnSerial.SetHex(strSerial);
+	throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid serial");
 
     uint256 txid = 0;
     bool fSuccess = zerocoinDB->ReadCoinSpend(bnSerial, txid);

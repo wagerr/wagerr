@@ -54,8 +54,7 @@ namespace AccumulatorCheckpoints
                     return false;
                 }
                 CBigNum bn = 0;
-                if (!bn)
-                    bn.SetHex(vDenomValue.get_str());
+                bn.SetHex(vDenomValue.get_str());
                 checkpoint.insert(std::make_pair(denom, bn));
             }
 
