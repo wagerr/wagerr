@@ -63,7 +63,9 @@ namespace invalid_out
             if (!vSerial.isStr())
                 return false;
 
-            CBigNum bnSerial(vSerial.get_str());
+            CBigNum bnSerial = 0;
+            if (!bnSerial)
+                bnSerial.SetHex(vSerial.get_str());
             if (bnSerial == 0)
                 return false;
             setInvalidSerials.insert(bnSerial);

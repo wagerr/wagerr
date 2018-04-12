@@ -53,7 +53,10 @@ namespace AccumulatorCheckpoints
                 if (!vDenomValue.isStr()) {
                     return false;
                 }
-                checkpoint.insert(make_pair(denom, vDenomValue.get_str()));
+                CBigNum bn = 0;
+                if (!bn)
+                    bn.SetHex(vDenomValue.get_str());
+                checkpoint.insert(std::make_pair(denom, bn));
             }
 
             mapCheckpoints.insert(make_pair(nHeight, checkpoint));

@@ -919,7 +919,9 @@ UniValue findserial(const UniValue& params, bool fHelp)
             HelpExampleCli("findserial", "\"serial\"") + HelpExampleRpc("findserial", "\"serial\""));
 
     std::string strSerial = params[0].get_str();
-    CBigNum bnSerial(strSerial);
+    CBigNum bnSerial = 0;
+    if (!bnSerial)
+        bnSerial.SetHex(strSerial);
 
     uint256 txid = 0;
     bool fSuccess = zerocoinDB->ReadCoinSpend(bnSerial, txid);

@@ -40,13 +40,11 @@ BOOST_AUTO_TEST_CASE(zcparams_test)
 }
 
 std::string zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
-    "4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
-    "6507761337985909570009733045974880842840179742910064245869181719511874612151517265463228221686998754918242243363"
-    "7259085141865462043576798423387184774447920739934236584823824281198163815010674810451660377306056201619676256133"
-    "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
-    "31438167899885040445364023527381951378636564391212010397122822120720357";
-CBigNum bnTrustedModulus(zerocoinModulus);
-libzerocoin::ZerocoinParams zerocoinParams = libzerocoin::ZerocoinParams(bnTrustedModulus);
+"4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
+"6507761337985909570009733045974880842840179742910064245869181719511874612151517265463228221686998754918242243363"
+"7259085141865462043576798423387184774447920739934236584823824281198163815010674810451660377306056201619676256133"
+"8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
+"31438167899885040445364023527381951378636564391212010397122822120720357";
 
 //ZQ_ONE mints
 std::string rawTx1 = "0100000001983d5fd91685bb726c0ebc3676f89101b16e663fd896fea53e19972b95054c49000000006a473044022010fbec3e78f9c46e58193d481caff715ceb984df44671d30a2c0bde95c54055f0220446a97d9340da690eaf2658e5b2bf6a0add06f1ae3f1b40f37614c7079ce450d012103cb666bd0f32b71cbf4f32e95fa58e05cd83869ac101435fcb8acee99123ccd1dffffffff0200e1f5050000000086c10280004c80c3a01f94e71662f2ae8bfcd88dfc5b5e717136facd6538829db0c7f01e5fd793cccae7aa1958564518e0223d6d9ce15b1e38e757583546e3b9a3f85bd14408120cd5192a901bb52152e8759fdd194df230d78477706d0e412a66398f330be38a23540d12ab147e9fb19224913f3fe552ae6a587fb30a68743e52577150ff73042c0f0d8f000000001976a914d6042025bd1fff4da5da5c432d85d82b3f26a01688ac00000000";
@@ -207,6 +205,11 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
 
 BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
 {
+    CBigNum bnTrustedModulus = 0;
+    if (!bnTrustedModulus)
+        bnTrustedModulus.SetDec(zerocoinModulus);
+    libzerocoin::ZerocoinParams zerocoinParams = libzerocoin::ZerocoinParams(bnTrustedModulus);
+
     cout << "Running check_zerocoinspend_test...\n";
 
     //load our serialized pubcoin
@@ -239,8 +242,14 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     // Create a New Zerocoin with specific denomination given by pubCoin
     PrivateCoin privateCoin(Params().Zerocoin_Params(true), pubCoin.getDenomination());
     privateCoin.setPublicCoin(pubCoin);
-    privateCoin.setRandomness(CBigNum(rawTxRand1));
-    privateCoin.setSerialNumber(CBigNum(rawTxSerial1));
+    CBigNum bn = 0;
+    if (!bn)
+        bn.SetHex(rawTxRand1);
+    privateCoin.setRandomness(bn);
+    CBigNum bn2 = 0;
+    if (!bn2)
+        bn2.SetHex(rawTxSerial1);
+    privateCoin.setSerialNumber(bn2);
     privateCoin.setVersion(1);
 
     //Get the checksum of the accumulator we use for the spend and also add it to our checksum map
@@ -359,6 +368,11 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
 
 BOOST_AUTO_TEST_CASE(setup_exceptions_test)
 {
+    CBigNum bnTrustedModulus = 0;
+    if (!bnTrustedModulus)
+        bnTrustedModulus.SetDec(zerocoinModulus);
+    libzerocoin::ZerocoinParams zerocoinParams = libzerocoin::ZerocoinParams(bnTrustedModulus);
+
     cout << "Running check_unitialized parameters,etc for setup exceptions...\n";
 
     CBigNum bnpubcoin;
@@ -447,7 +461,8 @@ BOOST_AUTO_TEST_CASE(bignum_setdecimal)
 {
     CBigNum bnDec;
     bnDec.SetDec(zerocoinModulus);
-    CBigNum bnHex(strHexModulus);
+    CBigNum bnHex;
+    bnHex.SetHex(strHexModulus);
     BOOST_CHECK_MESSAGE(bnDec == bnHex, "CBigNum.SetDec() does not work correctly");
 }
 
