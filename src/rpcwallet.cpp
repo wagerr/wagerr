@@ -3210,7 +3210,7 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
             nVersion = static_cast<uint8_t>(vVersion.get_int());
 
         //Set the privkey if applicable
-        CPrivKey* privkey = nullptr;
+        CPrivKey privkey;
         if (nVersion >= libzerocoin::PrivateCoin::PUBKEY_VERSION) {
             std::string strPrivkey = find_value(o, "k").get_str();
             CKey key;
@@ -3218,10 +3218,10 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
             key.Set(nPrivKey.begin(), nPrivKey.end(), true);
             if (!key.IsValid())
                 return JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "privkey is not valid");
-            *privkey = key.GetPrivKey();
+            privkey = key.GetPrivKey();
         }
 
-        CZerocoinMint mint(denom, bnValue, bnRandom, bnSerial, fUsed, nVersion, privkey);
+        CZerocoinMint mint(denom, bnValue, bnRandom, bnSerial, fUsed, nVersion, &privkey);
         mint.SetTxHash(txid);
         mint.SetHeight(nHeight);
         pwalletMain->zwgrTracker->Add(mint, true);
