@@ -179,7 +179,7 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
     bool found = true;
     CWalletDB walletdb(strWalletFile);
     CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
-    std::set<uint256> setChecked;
+
     set<uint256> setAddedTx;
     while (found) {
         found = false;
@@ -187,7 +187,9 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
             GenerateMintPool();
         LogPrintf("%s: Mintpool size=%d\n", __func__, mintPool.size());
 
-        for (pair<uint256, uint32_t> pMint : mintPool.List()) {
+        std::set<uint256> setChecked;
+        list<pair<uint256,uint32_t> > listMints = mintPool.List();
+        for (pair<uint256, uint32_t> pMint : listMints) {
             LOCK(cs_main);
             if (setChecked.count(pMint.first))
                 return;
@@ -195,9 +197,6 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
 
             if (ShutdownRequested())
                 return;
-
-            if (mapMissingMints.count(pMint.first))
-                continue;
 
             if (zwgrTracker->HasPubcoinHash(pMint.first)) {
                 mintPool.Remove(pMint.first);
@@ -208,7 +207,7 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
             CZerocoinMint mint;
             if (zerocoinDB->ReadCoinMint(pMint.first, txHash)) {
                 //this mint has already occurred on the chain, increment counter's state to reflect this
-                LogPrintf("%s : Found my coin mint %s in tx %s\n", __func__, pMint.first.GetHex(), txHash.GetHex());
+                LogPrintf("%s : Found wallet coin mint=%s count=%d tx=%s\n", __func__, pMint.first.GetHex(), pMint.second, txHash.GetHex());
                 found = true;
 
                 uint256 hashBlock;
@@ -217,7 +216,6 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
                     LogPrintf("%s : failed to get transaction for mint %s!\n", __func__, pMint.first.GetHex());
                     found = false;
                     nLastCountUsed = std::max(pMint.second, nLastCountUsed);
-                    mapMissingMints.insert(pMint);
                     continue;
                 }
 
@@ -249,7 +247,6 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
                 if (!fFoundMint || denomination == ZQ_ERROR) {
                     LogPrintf("%s : failed to get mint %s from tx %s!\n", __func__, pMint.first.GetHex(), tx.GetHash().GetHex());
                     found = false;
-                    mapMissingMints.insert(pMint);
                     break;
                 }
 
