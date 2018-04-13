@@ -118,6 +118,9 @@ void CzWGRWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
     LogPrintf("%s : n=%d nStop=%d\n", __func__, n, nStop - 1);
     for (uint32_t i = n; i < nStop; ++i) {
+        if (ShutdownRequested())
+            return;
+
         fFound = false;
 
         // Prevent unnecessary repeated minted
@@ -132,17 +135,15 @@ void CzWGRWallet::GenerateMintPool(uint32_t nCountStart, uint32_t nCountEnd)
             continue;
 
         uint512 seedZerocoin = GetZerocoinSeed(i);
+        CBigNum bnValue;
         CBigNum bnSerial;
         CBigNum bnRandomness;
         CKey key;
-        SeedToZWGR(seedZerocoin, bnSerial, bnRandomness, key);
+        SeedToZWGR(seedZerocoin, bnValue, bnSerial, bnRandomness, key);
 
-        PrivateCoin coin(Params().Zerocoin_Params(false), CoinDenomination::ZQ_ONE, bnSerial, bnRandomness);
-        coin.setVersion(PrivateCoin::CURRENT_VERSION);
-        coin.setPrivKey(key.GetPrivKey());
-        mintPool.Add(coin.getPublicCoin().getValue(), i);
-        CWalletDB(strWalletFile).WriteMintPoolPair(hashSeed, GetPubCoinHash(coin.getPublicCoin().getValue()), i);
-        LogPrintf("%s : %s count=%d\n", __func__, coin.getPublicCoin().getValue().GetHex().substr(0, 6), i);
+        mintPool.Add(bnValue, i);
+        CWalletDB(strWalletFile).WriteMintPoolPair(hashSeed, GetPubCoinHash(bnValue), i);
+        LogPrintf("%s : %s count=%d\n", __func__, bnValue.GetHex().substr(0, 6), i);
     }
 }
 
@@ -187,6 +188,7 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
         LogPrintf("%s: Mintpool size=%d\n", __func__, mintPool.size());
 
         for (pair<uint256, uint32_t> pMint : mintPool.List()) {
+            LOCK(cs_main);
             if (setChecked.count(pMint.first))
                 return;
             setChecked.insert(pMint.first);
@@ -284,10 +286,15 @@ bool CzWGRWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
 
     // Regenerate the mint
     uint512 seedZerocoin = GetZerocoinSeed(pMint.second);
+    CBigNum bnValueGen;
     CBigNum bnSerial;
     CBigNum bnRandomness;
     CKey key;
-    SeedToZWGR(seedZerocoin, bnSerial, bnRandomness, key);
+    SeedToZWGR(seedZerocoin, bnValueGen, bnSerial, bnRandomness, key);
+
+    //Sanity check
+    if (bnValueGen != bnValue)
+        return error("%s: generated pubcoin and expected value do not match!", __func__);
 
     // Create mint object and database it
     uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
@@ -302,20 +309,17 @@ bool CzWGRWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
 
     // Check if this is also already spent
     int nHeightTx;
-    if (IsSerialInBlockchain(hashSerial, nHeightTx)) {
+    uint256 txidSpend;
+    if (IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend)) {
         //Find transaction details and make a wallettx and add to wallet
         dMint.SetUsed(true);
         if (chainActive.Height() < nHeightTx)
             return error("%s: tx height %d is higher than chain height", __func__, nHeightTx);
 
-        uint256 txHash;
-        if (!zerocoinDB->ReadCoinSpend(hashSerial, txHash))
-            return error("%s: did not find serial hash %s in zerocoindb", __func__, hashSerial.GetHex());
-
         uint256 hashBlock;
         CTransaction tx;
-        if (!GetTransaction(txHash, tx, hashBlock, true))
-            return error("%s: could not read transaction %s", __func__, txHash.GetHex());
+        if (!GetTransaction(txidSpend, tx, hashBlock, true))
+            return error("%s: could not read transaction %s", __func__, txidSpend.GetHex());
 
         CWalletTx wtx(pwalletMain, tx);
         if (mapBlockIndex.count(hashBlock)) {
@@ -353,7 +357,7 @@ bool IsValidCoinValue(const CBigNum& bnValue)
     bnValue.isPrime();
 }
 
-void CzWGRWallet::SeedToZWGR(const uint512& seedZerocoin, CBigNum& bnSerial, CBigNum& bnRandomness, CKey& key)
+void CzWGRWallet::SeedToZWGR(const uint512& seedZerocoin, CBigNum& bnValue, CBigNum& bnSerial, CBigNum& bnRandomness, CKey& key)
 {
     ZerocoinParams* params = Params().Zerocoin_Params(false);
 
@@ -386,8 +390,10 @@ void CzWGRWallet::SeedToZWGR(const uint512& seedZerocoin, CBigNum& bnSerial, CBi
         // Now verify that the commitment is a prime number
         // in the appropriate range. If not, we'll throw this coin
         // away and generate a new one.
-        if (IsValidCoinValue(commitmentValue))
+        if (IsValidCoinValue(commitmentValue)) {
+            bnValue = commitmentValue;
             return;
+        }
 
         //Did not create a valid commitment value.
         //Change randomness to something new and random and try again
@@ -428,10 +434,11 @@ void CzWGRWallet::GenerateDeterministicZWGR(CoinDenomination denom, PrivateCoin&
 void CzWGRWallet::GenerateMint(const uint32_t& nCount, const CoinDenomination denom, PrivateCoin& coin, CDeterministicMint& dMint)
 {
     uint512 seedZerocoin = GetZerocoinSeed(nCount);
+    CBigNum bnValue;
     CBigNum bnSerial;
     CBigNum bnRandomness;
     CKey key;
-    SeedToZWGR(seedZerocoin, bnSerial, bnRandomness, key);
+    SeedToZWGR(seedZerocoin, bnValue, bnSerial, bnRandomness, key);
     coin = PrivateCoin(Params().Zerocoin_Params(false), denom, bnSerial, bnRandomness);
     coin.setPrivKey(key.GetPrivKey());
     coin.setVersion(PrivateCoin::CURRENT_VERSION);
@@ -440,7 +447,7 @@ void CzWGRWallet::GenerateMint(const uint32_t& nCount, const CoinDenomination de
     uint256 hashSerial = GetSerialHash(bnSerial);
     uint256 nSerial = bnSerial.getuint256();
     uint256 hashStake = Hash(nSerial.begin(), nSerial.end());
-    uint256 hashPubcoin = GetPubCoinHash(coin.getPublicCoin().getValue());
+    uint256 hashPubcoin = GetPubCoinHash(bnValue);
     dMint = CDeterministicMint(coin.getVersion(), nCount, hashSeed, hashSerial, hashPubcoin, hashStake);
     dMint.SetDenomination(denom);
 }

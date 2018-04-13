@@ -973,7 +973,8 @@ void FindMints(vector<CMintMeta> vMintsToFind, vector<CMintMeta>& vMintsToUpdate
         //The mint has been incorrectly labelled as spent in zerocoinDB and needs to be undone
         int nHeightTx = 0;
         uint256 hashSerial = meta.hashSerial;
-        if (fSpent && !IsSerialInBlockchain(hashSerial, nHeightTx)) {
+        uint256 txidSpend;
+        if (fSpent && !IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend)) {
             LogPrintf("%s : cannot find block %s. Erasing coinspend from zerocoinDB.\n", __func__, hashBlockSpend.GetHex());
             meta.isUsed = false;
             vMintsToUpdate.push_back(meta);
@@ -1026,20 +1027,6 @@ bool IsSerialKnown(const CBigNum& bnSerial)
     return zerocoinDB->ReadCoinSpend(bnSerial, txHash);
 }
 
-bool IsTransactionInBlockchain(const uint256& txid, int& nHeightTx)
-{
-    CTransaction tx;
-    uint256 hashBlock;
-    if (!GetTransaction(txid, tx, hashBlock, true))
-        return false;
-
-    bool inChain = mapBlockIndex.count(hashBlock) && chainActive.Contains(mapBlockIndex[hashBlock]);
-    if (inChain)
-        nHeightTx = mapBlockIndex.at(hashBlock)->nHeight;
-
-    return inChain;
-}
-
 bool IsSerialInBlockchain(const CBigNum& bnSerial, int& nHeightTx)
 {
     uint256 txHash = 0;
@@ -1050,14 +1037,14 @@ bool IsSerialInBlockchain(const CBigNum& bnSerial, int& nHeightTx)
     return IsTransactionInChain(txHash, nHeightTx);
 }
 
-bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx)
+bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend)
 {
-    uint256 txHash = 0;
+    txidSpend = 0;
     // if not in zerocoinDB then its not in the blockchain
-    if (!zerocoinDB->ReadCoinSpend(hashSerial, txHash))
+    if (!zerocoinDB->ReadCoinSpend(hashSerial, txidSpend))
         return false;
 
-    return IsTransactionInChain(txHash, nHeightTx);
+    return IsTransactionInChain(txidSpend, nHeightTx);
 }
 
 

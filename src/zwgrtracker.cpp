@@ -402,7 +402,7 @@ std::set<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
                     mint.txid = txid;
                 }
 
-                if (!GetTransaction(mint.txid, tx, hashBlock, true)) {
+                if (!IsInitialBlockDownload() && GetTransaction(mint.txid, tx, hashBlock, true)) {
                     LogPrintf("%s failed to find tx for mint txid=%s\n", __func__, mint.txid.GetHex());
                     Archive(mint);
                     continue;

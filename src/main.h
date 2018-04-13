@@ -366,7 +366,7 @@ void FindMints(vector<CMintMeta> vMintsToFind, vector<CMintMeta>& vMintsToUpdate
 bool GetZerocoinMint(const CBigNum& bnPubcoin, uint256& txHash);
 bool IsSerialKnown(const CBigNum& bnSerial);
 bool IsSerialInBlockchain(const CBigNum& bnSerial, int& nHeightTx);
-bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx);
+bool IsSerialInBlockchain(const uint256& hashSerial, int& nHeightTx, uint256& txidSpend);
 bool IsPubcoinInBlockchain(const uint256& hashPubcoin, uint256& txid);
 bool RemoveSerialFromDB(const CBigNum& bnSerial);
 int GetZerocoinStartHeight();

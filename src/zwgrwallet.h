@@ -40,7 +40,7 @@ public:
 
 private:
     uint512 GetZerocoinSeed(uint32_t n);
-    void SeedToZWGR(const uint512& seed, CBigNum& bnSerial, CBigNum& bnRandomness, CKey& key);
+    void SeedToZWGR(const uint512& seed, CBigNum& bnValue, CBigNum& bnSerial, CBigNum& bnRandomness, CKey& key);
 };
 
 #endif //WAGERR_ZWGRWALLET_H

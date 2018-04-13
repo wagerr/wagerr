@@ -4911,9 +4911,9 @@ bool IsMintInChain(const uint256& hashPubcoin, uint256& txid, int& nHeight)
     uint256 hashBlock;
     CTransaction tx;
     if (!GetTransaction(txid, tx, hashBlock))
-        return error("%s: failed to find transaction %s in blockchain\n", __func__, txid.GetHex());
+        return false;
 
-    if (!mapBlockIndex.count(hashBlock))
+    if (!mapBlockIndex.count(hashBlock) || !chainActive.Contains(mapBlockIndex.at(hashBlock)))
         return false;
 
     nHeight = mapBlockIndex.at(hashBlock)->nHeight;
@@ -4955,7 +4955,8 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, s
         
         dMint.SetTxHash(txid);
         dMint.SetHeight(nHeight);
-        dMint.SetUsed(IsSerialInBlockchain(dMint.GetSerialHash(), nHeight));
+        uint256 txidSpend;
+        dMint.SetUsed(IsSerialInBlockchain(dMint.GetSerialHash(), nHeight, txidSpend));
 
         if (!zwgrTracker->UnArchive(dMint.GetPubcoinHash(), true)) {
             LogPrintf("%s : failed to unarchive deterministic mint %s\n", __func__, dMint.GetPubcoinHash().GetHex());
