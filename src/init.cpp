@@ -1607,7 +1607,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         nStart = GetTimeMillis();
         bool fFirstRun = true;
         pwalletMain = new CWallet(strWalletFile);
-        zwalletMain = new CzWGRWallet(pwalletMain->strWalletFile);
         DBErrors nLoadWalletRet = pwalletMain->LoadWallet(fFirstRun);
         if (nLoadWalletRet != DB_LOAD_OK) {
             if (nLoadWalletRet == DB_CORRUPT)
@@ -1656,6 +1655,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
 
         LogPrintf("%s", strErrors.str());
         LogPrintf(" wallet      %15dms\n", GetTimeMillis() - nStart);
+        zwalletMain = new CzWGRWallet(pwalletMain->strWalletFile);
+        pwalletMain->setZWallet(zwalletMain);
 
         RegisterValidationInterface(pwalletMain);
 
@@ -1704,14 +1705,12 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         //Inititalize zWGRWallet
         uiInterface.InitMessage(_("Syncing zWGR wallet..."));
 
-        pwalletMain->setZWallet(zwalletMain);
         bool fEnableZWgrBackups = GetBoolArg("-backupzwgr", true);
         pwalletMain->setZWgrAutoBackups(fEnableZWgrBackups);
 
         //Load zerocoin mint hashes to memory
         pwalletMain->zwgrTracker->Init();
         zwalletMain->LoadMintPoolFromDB();
-        //zwalletMain->RemoveMintsFromPool(pwalletMain->zwgrTracker->GetSerialHashes());
         zwalletMain->SyncWithChain();
     }  // (!fDisableWallet)
 #else  // ENABLE_WALLET

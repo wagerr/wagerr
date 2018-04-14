@@ -306,26 +306,17 @@ bool CzWGRWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
     // Check if this is also already spent
     int nHeightTx;
     uint256 txidSpend;
-    if (IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend)) {
+    CTransaction txSpend;
+    if (IsSerialInBlockchain(hashSerial, nHeightTx, txidSpend, txSpend)) {
         //Find transaction details and make a wallettx and add to wallet
         dMint.SetUsed(true);
-        if (chainActive.Height() < nHeightTx)
-            return error("%s: tx height %d is higher than chain height", __func__, nHeightTx);
+        CWalletTx wtx(pwalletMain, txSpend);
+        CBlockIndex* pindex = chainActive[nHeightTx];
+        CBlock block;
+        if (ReadBlockFromDisk(block, pindex))
+            wtx.SetMerkleBranch(block);
 
-        uint256 hashBlock;
-        CTransaction tx;
-        if (!GetTransaction(txidSpend, tx, hashBlock, true))
-            return error("%s: could not read transaction %s", __func__, txidSpend.GetHex());
-
-        CWalletTx wtx(pwalletMain, tx);
-        if (mapBlockIndex.count(hashBlock)) {
-            CBlockIndex* pindex = mapBlockIndex.at(hashBlock);
-            CBlock block;
-            if (ReadBlockFromDisk(block, pindex))
-                wtx.SetMerkleBranch(block);
-        }
-
-        wtx.nTimeReceived = chainActive[nHeightTx]->nTime;
+        wtx.nTimeReceived = pindex->nTime;
         pwalletMain->AddToWallet(wtx);
     }
 

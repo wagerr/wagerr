@@ -12,12 +12,16 @@ CzWGRTracker::CzWGRTracker(std::string strWalletFile)
 {
     this->strWalletFile = strWalletFile;
     mapSerialHashes.clear();
+    fInitialized = false;
 }
 
 void CzWGRTracker::Init()
 {
     //Load all CZerocoinMints and CDeterministicMints from the database
-    ListMints(false, false, true);
+    if (!fInitialized) {
+        ListMints(false, false, true);
+        fInitialized = true;
+    }
 }
 
 bool CzWGRTracker::Archive(CMintMeta& meta)

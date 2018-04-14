@@ -9,6 +9,7 @@ class CDeterministicMint;
 class CzWGRTracker
 {
 private:
+    bool fInitialized;
     std::string strWalletFile;
     std::map<uint256, CMintMeta> mapSerialHashes;
     std::map<uint256, uint256> mapPendingSpends; //serialhash, txid of spend

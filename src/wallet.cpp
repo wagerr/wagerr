@@ -1424,6 +1424,9 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 {
     int ret = 0;
     int64_t nNow = GetTime();
+    bool fCheckZWGR = GetBoolArg("-zapwallettxes", false);
+    if (fCheckZWGR)
+        zwgrTracker->Init();
 
     CBlockIndex* pindex = pindexStart;
     {
@@ -1431,12 +1434,13 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
 
         // no need to read and scan block, if block was created before
         // our wallet birthday (as adjusted for block time variability)
-        while (pindex && nTimeFirstKey && (pindex->GetBlockTime() < (nTimeFirstKey - 7200)))
+        while (pindex && nTimeFirstKey && (pindex->GetBlockTime() < (nTimeFirstKey - 7200)) && pindex->nHeight <= Params().Zerocoin_StartHeight())
             pindex = chainActive.Next(pindex);
 
         ShowProgress(_("Rescanning..."), 0); // show rescan progress in GUI as dialog or on splashscreen, if -rescan on startup
         double dProgressStart = Checkpoints::GuessVerificationProgress(pindex, false);
         double dProgressTip = Checkpoints::GuessVerificationProgress(chainActive.Tip(), false);
+        set<uint256> setAddedToWallet;
         while (pindex) {
             if (pindex->nHeight % 100 == 0 && dProgressTip - dProgressStart > 0.0)
                 ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((Checkpoints::GuessVerificationProgress(pindex, false) - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
@@ -1449,19 +1453,19 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
             }
 
             //If this is a zapwallettx, need to readd zwgr
-            if (GetBoolArg("-zapwallettx", false)) {
+            if (fCheckZWGR && pindex->nHeight >= Params().Zerocoin_StartHeight()) {
                 list<CZerocoinMint> listMints;
                 BlockToZerocoinMintList(block, listMints, true);
 
-                set<uint256> setAddedToWallet;
                 for (auto& m : listMints) {
                     if (IsMyMint(m.GetValue())) {
+                        LogPrintf("%s: found mint\n", __func__);
                         pwalletMain->UpdateMint(m.GetValue(), pindex->nHeight, m.GetTxHash(), m.GetDenomination());
 
                         // Add the transaction to the wallet
                         for (auto& tx : block.vtx) {
                             uint256 txid = tx.GetHash();
-                            if (setAddedToWallet.count(txid))
+                            if (setAddedToWallet.count(txid) || mapWallet.count(txid))
                                 continue;
                             if (txid == m.GetTxHash()) {
                                 CWalletTx wtx(pwalletMain, tx);
@@ -1472,7 +1476,24 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
                             }
                         }
 
-                        zwalletMain->SetMintSeen(m.GetValue(), pindex->nHeight, m.GetTxHash(), m.GetDenomination());
+                        //Check if the mint was ever spent
+                        int nHeightSpend = 0;
+                        uint256 txidSpend;
+                        CTransaction txSpend;
+                        if (IsSerialInBlockchain(GetSerialHash(m.GetSerialNumber()), nHeightSpend, txidSpend, txSpend)) {
+                            if (setAddedToWallet.count(txidSpend) || mapWallet.count(txidSpend))
+                                continue;
+
+                            CWalletTx wtx(pwalletMain, txSpend);
+                            CBlockIndex* pindexSpend = chainActive[nHeightSpend];
+                            CBlock blockSpend;
+                            if (ReadBlockFromDisk(blockSpend, pindexSpend))
+                                wtx.SetMerkleBranch(blockSpend);
+
+                            wtx.nTimeReceived = pindexSpend->nTime;
+                            pwalletMain->AddToWallet(wtx);
+                            setAddedToWallet.emplace(txidSpend);
+                        }
                     }
                 }
             }
@@ -4968,7 +4989,8 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, s
 
         mint.SetTxHash(txid);
         mint.SetHeight(nHeight);
-        mint.SetUsed(IsSerialInBlockchain(mint.GetValue(), nHeight));
+        mint.SetUsed(IsSerialInBlockchain(mint.GetSerialNumber(), nHeight));
+
         if (!zwgrTracker->UnArchive(hashPubcoin, false)) {
             LogPrintf("%s : failed to unarchive mint %s\n", __func__, mint.GetValue().GetHex());
         } else {
