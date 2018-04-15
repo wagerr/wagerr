@@ -24,7 +24,7 @@ private:
 public:
     CzWGRWallet(std::string strWalletFile);
 
-    void AddToMintPool(const std::pair<uint256, uint32_t>& pMint);
+    void AddToMintPool(const std::pair<uint256, uint32_t>& pMint, bool fVerbose);
     bool SetMasterSeed(const uint256& seedMaster, bool fResetCount = false);
     uint256 GetMasterSeed() { return seedMaster; }
     void SyncWithChain(bool fGenerateMintPool = true);

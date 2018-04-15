@@ -26,13 +26,14 @@ void CMintPool::Add(const CBigNum& bnValue, const uint32_t& nCount)
     LogPrintf("%s : add %s to mint pool, nCountLastGenerated=%d\n", __func__, bnValue.GetHex().substr(0, 6), nCountLastGenerated);
 }
 
-void CMintPool::Add(const pair<uint256, uint32_t>& pMint)
+void CMintPool::Add(const pair<uint256, uint32_t>& pMint, bool fVerbose)
 {
     insert(pMint);
     if (pMint.second > nCountLastGenerated)
         nCountLastGenerated = pMint.second;
 
-    LogPrintf("%s : add %s count %d to mint pool\n", __func__, pMint.first.GetHex().substr(0, 6), pMint.second);
+    if (fVerbose)
+        LogPrintf("%s : add %s count %d to mint pool\n", __func__, pMint.first.GetHex().substr(0, 6), pMint.second);
 }
 
 bool CMintPool::Has(const CBigNum& bnValue)

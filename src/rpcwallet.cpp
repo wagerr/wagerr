@@ -3419,8 +3419,10 @@ UniValue dzwgrstate(const UniValue& params, bool fHelp) {
 void static SearchThread(CzWGRWallet* zwallet, int nCountStart, int nCountEnd)
 {
     LogPrintf("%s: start=%d end=%d\n", __func__, nCountStart, nCountEnd);
+    CWalletDB walletDB(pwalletMain->strWalletFile);
     try {
         uint256 seedMaster = zwallet->GetMasterSeed();
+        uint256 hashSeed = Hash(seedMaster.begin(), seedMaster.end());
         for(int i = nCountStart; i < nCountEnd; i++) {
             boost::this_thread::interruption_point();
             CDataStream ss(SER_GETHASH, 0);
@@ -3434,7 +3436,8 @@ void static SearchThread(CzWGRWallet* zwallet, int nCountStart, int nCountEnd)
             zwallet->SeedToZWGR(zerocoinSeed, bnValue, bnSerial, bnRandomness, key);
 
             uint256 hashPubcoin = GetPubCoinHash(bnValue);
-            zwallet->AddToMintPool(make_pair(hashPubcoin, i));
+            zwallet->AddToMintPool(make_pair(hashPubcoin, i), true);
+            walletDB.WriteMintPoolPair(hashSeed, hashPubcoin, i);
         }
     } catch (std::exception& e) {
         LogPrintf("SearchThread() exception");

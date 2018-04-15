@@ -30,7 +30,7 @@ public:
     CMintPool();
     explicit CMintPool(uint32_t nCount);
     void Add(const CBigNum& bnValue, const uint32_t& nCount);
-    void Add(const std::pair<uint256, uint32_t>& pMint);
+    void Add(const std::pair<uint256, uint32_t>& pMint, bool fVerbose = false);
     bool Has(const CBigNum& bnValue);
     void Remove(const CBigNum& bnValue);
     void Remove(const uint256& hashPubcoin);
