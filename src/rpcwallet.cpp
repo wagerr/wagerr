@@ -25,6 +25,7 @@
 #include "spork.h"
 #include "primitives/deterministicmint.h"
 #include <boost/assign/list_of.hpp>
+#include <boost/thread/thread.hpp>
 
 #include <univalue.h>
 
@@ -3414,9 +3415,37 @@ UniValue dzwgrstate(const UniValue& params, bool fHelp) {
     return obj;
 }
 
+
+void static SearchThread(CzWGRWallet* zwallet, int nCountStart, int nCountEnd)
+{
+    LogPrintf("%s: start=%d end=%d\n", __func__, nCountStart, nCountEnd);
+    try {
+        uint256 seedMaster = zwallet->GetMasterSeed();
+        for(int i = nCountStart; i < nCountEnd; i++) {
+            boost::this_thread::interruption_point();
+            CDataStream ss(SER_GETHASH, 0);
+            ss << seedMaster << i;
+            uint512 zerocoinSeed = Hash512(ss.begin(), ss.end());
+
+            CBigNum bnValue;
+            CBigNum bnSerial;
+            CBigNum bnRandomness;
+            CKey key;
+            zwallet->SeedToZWGR(zerocoinSeed, bnValue, bnSerial, bnRandomness, key);
+
+            uint256 hashPubcoin = GetPubCoinHash(bnValue);
+            zwallet->AddToMintPool(make_pair(hashPubcoin, i));
+        }
+    } catch (std::exception& e) {
+        LogPrintf("SearchThread() exception");
+    } catch (...) {
+        LogPrintf("SearchThread() exception");
+    }
+}
+
 UniValue searchdzwgr(const UniValue& params, bool fHelp)
 {
-    if(fHelp || params.size() != 2)
+    if(fHelp || params.size() != 3)
         throw runtime_error(
             "searchdzwgr\n"
             "\nMake an extended search for deterministically generated zWGR that have not yet been recognized by the wallet.\n" +
@@ -3425,9 +3454,10 @@ UniValue searchdzwgr(const UniValue& params, bool fHelp)
             "\nArguments\n"
             "1. \"count\"       (numeric) Which sequential zWGR to start with.\n"
             "2. \"range\"       (numeric) How many zWGR to generate.\n"
+            "3. \"threads\"     (numeric) How many threads should this operation consume.\n"
 
             "\nExamples\n" +
-            HelpExampleCli("searchdzwgr", "1, 100") + HelpExampleRpc("searchdzwgr", "1, 100"));
+            HelpExampleCli("searchdzwgr", "1, 100, 2") + HelpExampleRpc("searchdzwgr", "1, 100, 2"));
 
     EnsureWalletIsUnlocked();
 
@@ -3439,8 +3469,23 @@ UniValue searchdzwgr(const UniValue& params, bool fHelp)
     if (nRange < 1)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Range has to be at least 1");
 
+    int nThreads = params[2].get_int();
+
     CzWGRWallet* zwallet = pwalletMain->zwalletMain;
-    zwallet->GenerateMintPool(nCount, nRange);
+
+    boost::thread_group* dzwgrThreads = new boost::thread_group();
+    int nRangePerThread = nRange / nThreads;
+
+    int nPrevThreadEnd = nCount - 1;
+    for (int i = 0; i < nThreads; i++) {
+        int nStart = nPrevThreadEnd + 1;;
+        int nEnd = nStart + nRangePerThread;
+        nPrevThreadEnd = nEnd;
+        dzwgrThreads->create_thread(boost::bind(&SearchThread, zwallet, nStart, nEnd));
+    }
+
+    dzwgrThreads->join_all();
+
     CzWGRTracker* tracker = pwalletMain->zwgrTracker;
     zwallet->RemoveMintsFromPool(tracker->GetSerialHashes());
     zwallet->SyncWithChain(false);

@@ -31,6 +31,8 @@ void CMintPool::Add(const pair<uint256, uint32_t>& pMint)
     insert(pMint);
     if (pMint.second > nCountLastGenerated)
         nCountLastGenerated = pMint.second;
+
+    LogPrintf("%s : add %s count %d to mint pool\n", __func__, pMint.first.GetHex().substr(0, 6), pMint.second);
 }
 
 bool CMintPool::Has(const CBigNum& bnValue)
