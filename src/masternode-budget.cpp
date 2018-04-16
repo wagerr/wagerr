@@ -665,10 +665,11 @@ bool CBudgetManager::IsBudgetPaymentBlock(int nBlockHeight)
     return false;
 }
 
-bool CBudgetManager::IsTransactionValid(const CTransaction& txNew, int nBlockHeight)
+TrxValidationStatus CBudgetManager::IsTransactionValid(const CTransaction& txNew, int nBlockHeight)
 {
     LOCK(cs);
 
+    TrxValidationStatus transactionStatus = TrxValidationStatus::InValid;
     int nHighestCount = 0;
     int nFivePercent = mnodeman.CountEnabled(ActiveProtocol()) / 20;
     std::vector<CFinalizedBudget*> ret;
@@ -695,7 +696,7 @@ bool CBudgetManager::IsTransactionValid(const CTransaction& txNew, int nBlockHei
     /*
         If budget doesn't have 5% of the network votes, then we should pay a masternode instead
     */
-    if (nHighestCount < nFivePercent) return false;
+    if (nHighestCount < nFivePercent) return TrxValidationStatus::InValid;
 
     // check the highest finalized budgets (+/- 10% to assist in consensus)
 
@@ -714,9 +715,10 @@ bool CBudgetManager::IsTransactionValid(const CTransaction& txNew, int nBlockHei
             LogPrint("mnbudget","CBudgetManager::IsTransactionValid - GetVoteCount() > nCountThreshold passed\n");
             if (nBlockHeight >= pfinalizedBudget->GetBlockStart() && nBlockHeight <= pfinalizedBudget->GetBlockEnd()) {
                 LogPrint("mnbudget","CBudgetManager::IsTransactionValid - GetBlockStart() passed\n");
-                if (pfinalizedBudget->IsTransactionValid(txNew, nBlockHeight)) {
+                transactionStatus = pfinalizedBudget->IsTransactionValid(txNew, nBlockHeight);
+                if (transactionStatus == TrxValidationStatus::Valid) {
                     LogPrint("mnbudget","CBudgetManager::IsTransactionValid - pfinalizedBudget->IsTransactionValid() passed\n");
-                    return true;
+                    return TrxValidationStatus::Valid;
                 }
                 else {
                     LogPrint("mnbudget","CBudgetManager::IsTransactionValid - pfinalizedBudget->IsTransactionValid() error\n");
@@ -732,7 +734,7 @@ bool CBudgetManager::IsTransactionValid(const CTransaction& txNew, int nBlockHei
     }
 
     //we looked through all of the known budgets
-    return false;
+    return transactionStatus;
 }
 
 std::vector<CBudgetProposal*> CBudgetManager::GetAllProposals()
@@ -2108,20 +2110,20 @@ bool CFinalizedBudget::IsPaidAlready(uint256 nProposalHash, int nBlockHeight)
     return true;
 }
 
-bool CFinalizedBudget::IsTransactionValid(const CTransaction& txNew, int nBlockHeight)
+TrxValidationStatus CFinalizedBudget::IsTransactionValid(const CTransaction& txNew, int nBlockHeight)
 {
+    TrxValidationStatus transactionStatus = TrxValidationStatus::InValid;
     int nCurrentBudgetPayment = nBlockHeight - GetBlockStart();
     if (nCurrentBudgetPayment < 0) {
         LogPrint("mnbudget","CFinalizedBudget::IsTransactionValid - Invalid block - height: %d start: %d\n", nBlockHeight, GetBlockStart());
-        return false;
+        return TrxValidationStatus::InValid;
     }
 
     if (nCurrentBudgetPayment > (int)vecBudgetPayments.size() - 1) {
         LogPrint("mnbudget","CFinalizedBudget::IsTransactionValid - Invalid last block - current budget payment: %d of %d\n", nCurrentBudgetPayment + 1, (int)vecBudgetPayments.size());
-        return false;
+        return TrxValidationStatus::InValid;
     }
 
-    bool found = false;
     bool paid = false;
 
     BOOST_FOREACH (CTxOut out, txNew.vout) {
@@ -2137,18 +2139,18 @@ bool CFinalizedBudget::IsTransactionValid(const CTransaction& txNew, int nBlockH
                           vecBudgetPayments[nCurrentBudgetPayment].nAmount, vecBudgetPayments[nCurrentBudgetPayment].nProposalHash.Get32());
                 // No matter what we've found before, stop all checks here. In future releases there might be more than one budget payment
                 // per block, so even if the first one was not paid yet this one disables all budget payments for this block.
-                found = false;
+                transactionStatus = TrxValidationStatus::DoublePayment;
                 break;
             }
             else {
-                found = true;
+                transactionStatus = TrxValidationStatus::Valid;
                 LogPrint("mnbudget","CFinalizedBudget::IsTransactionValid - Found valid Budget Payment of %d for proposal %d\n",
                           vecBudgetPayments[nCurrentBudgetPayment].nAmount, vecBudgetPayments[nCurrentBudgetPayment].nProposalHash.Get32());
             }
         }
     }
 
-    if (!found) {
+    if (transactionStatus == TrxValidationStatus::InValid) {
         CTxDestination address1;
         ExtractDestination(vecBudgetPayments[nCurrentBudgetPayment].payee, address1);
         CBitcoinAddress address2(address1);
@@ -2157,7 +2159,7 @@ bool CFinalizedBudget::IsTransactionValid(const CTransaction& txNew, int nBlockH
                   address2.ToString(), vecBudgetPayments[nCurrentBudgetPayment].nAmount, nCurrentBudgetPayment);
     }
 
-    return found;
+    return transactionStatus;
 }
 
 void CFinalizedBudget::SubmitVote()
