@@ -39,7 +39,7 @@ CzWGRWallet::CzWGRWallet(std::string strWalletFile)
     }
 
     //Don't try to do anything if the wallet is locked.
-    if (pwalletMain->IsLocked() && !fFirstRun) {
+    if (pwalletMain->IsLocked()) {
         seedMaster = 0;
         nCountLastUsed = 0;
         this->mintPool = CMintPool();
