@@ -367,32 +367,35 @@ std::set<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
         if (mint.isArchived)
             continue;
 
-        if (fMatureOnly || fUpdateStatus) {
-            //if there is not a record of the block height, then look it up and assign it
-            uint256 txid;
-            bool isMintInChain = zerocoinDB->ReadCoinMint(mint.hashPubcoin, txid);
+        //if there is not a record of the block height, then look it up and assign it
+        uint256 txid;
+        bool isMintInChain = zerocoinDB->ReadCoinMint(mint.hashPubcoin, txid);
 
-            //See if there is internal record of spending this mint (note this is memory only, would reset on restart)
-            bool isPendingSpend = static_cast<bool>(mapPendingSpends.count(mint.hashSerial));
-            if (isPendingSpend) {
-                uint256 txidPendingSpend = mapPendingSpends.at(mint.hashSerial);
-                if (!setMempool.count(txidPendingSpend)) {
-                    RemovePending(txidPendingSpend);
-                    LogPrintf("%s: pending txid %s removed because not in mempool\n", __func__, txidPendingSpend.GetHex());
-                }
-
+        //See if there is internal record of spending this mint (note this is memory only, would reset on restart)
+        bool isPendingSpend = static_cast<bool>(mapPendingSpends.count(mint.hashSerial));
+        if (isPendingSpend) {
+            uint256 txidPendingSpend = mapPendingSpends.at(mint.hashSerial);
+            if (!setMempool.count(txidPendingSpend)) {
+                RemovePending(txidPendingSpend);
+                LogPrintf("%s: pending txid %s removed because not in mempool\n", __func__, txidPendingSpend.GetHex());
             }
 
-            //See if there is blockchain record of spending this mint
-            uint256 txidSpend;
-            bool isConfirmedSpend = zerocoinDB->ReadCoinSpend(mint.hashSerial, txidSpend);
+        }
 
-            //If a pending spend got confirmed, then remove it from the pendingspend map
-            if (isPendingSpend && isConfirmedSpend)
-                mapPendingSpends.erase(mint.hashSerial);
+        //See if there is blockchain record of spending this mint
+        uint256 txidSpend;
+        bool isConfirmedSpend = zerocoinDB->ReadCoinSpend(mint.hashSerial, txidSpend);
 
-            bool isUsed = isPendingSpend || isConfirmedSpend;
+        //If a pending spend got confirmed, then remove it from the pendingspend map
+        if (isPendingSpend && isConfirmedSpend)
+            mapPendingSpends.erase(mint.hashSerial);
 
+        bool isUsed = isPendingSpend || isConfirmedSpend;
+
+        if (fUnusedOnly && isUsed)
+            continue;
+
+        if (fMatureOnly || fUpdateStatus) {
             if (!mint.nHeight || !isMintInChain || isUsed != mint.isUsed) {
                 CTransaction tx;
                 uint256 hashBlock;
@@ -413,7 +416,7 @@ std::set<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
                 }
 
                 //if not in the block index, most likely is unconfirmed tx
-                if (mapBlockIndex.count(hashBlock)) {
+                if (mapBlockIndex.count(hashBlock) && !chainActive.Contains(mapBlockIndex[hashBlock])) {
                     if (mint.isUsed != isUsed) {
                         mint.isUsed = isUsed;
                         LogPrintf("%s: set mint %s isUsed to %d\n", __func__, mint.hashPubcoin.GetHex(), isUsed);
@@ -428,9 +431,6 @@ std::set<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
                     continue;
                 }
             }
-
-            if (fUnusedOnly && isUsed)
-                continue;
 
             //not mature
             if (mint.nHeight > chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations()) {
