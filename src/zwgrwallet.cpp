@@ -183,7 +183,6 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
     uint32_t nLastCountUsed = 0;
     bool found = true;
     CWalletDB walletdb(strWalletFile);
-    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
 
     set<uint256> setAddedTx;
     while (found) {
@@ -203,7 +202,7 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
             if (ShutdownRequested())
                 return;
 
-            if (zwgrTracker->HasPubcoinHash(pMint.first)) {
+            if (pwalletMain->zwgrTracker->HasPubcoinHash(pMint.first)) {
                 mintPool.Remove(pMint.first);
                 continue;
             }

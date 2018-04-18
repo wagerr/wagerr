@@ -159,7 +159,7 @@ bool CZWgrStake::GetTxFrom(CTransaction& tx)
 
 bool CZWgrStake::MarkSpent(CWallet *pwallet, const uint256& txid)
 {
-    CzWGRTracker* zwgrTracker = pwallet->zwgrTracker;
+    CzWGRTracker* zwgrTracker = pwallet->zwgrTracker.get();
     CMintMeta meta;
     if (!zwgrTracker->GetMetaFromStakeHash(hashSerial, meta))
         return error("%s: tracker does not have serialhash", __func__);

@@ -242,7 +242,7 @@ public:
     bool fWalletUnlockAnonymizeOnly;
     std::string strWalletFile;
     bool fBackupMints;
-    CzWGRTracker* zwgrTracker;
+    std::unique_ptr<CzWGRTracker> zwgrTracker;
 
     std::set<int64_t> setKeyPool;
     std::map<CKeyID, CKeyMetadata> mapKeyMetadata;
@@ -330,7 +330,7 @@ public:
     void setZWallet(CzWGRWallet* zwallet)
     {
         zwalletMain = zwallet;
-        zwgrTracker = new CzWGRTracker(strWalletFile);
+        zwgrTracker = std::unique_ptr<CzWGRTracker>(new CzWGRTracker(strWalletFile));
     }
 
     CzWGRWallet* getZWallet() { return zwalletMain; }

@@ -12,7 +12,14 @@ CzWGRTracker::CzWGRTracker(std::string strWalletFile)
 {
     this->strWalletFile = strWalletFile;
     mapSerialHashes.clear();
+    mapPendingSpends.clear();
     fInitialized = false;
+}
+
+CzWGRTracker::~CzWGRTracker()
+{
+    mapSerialHashes.clear();
+    mapPendingSpends.clear();
 }
 
 void CzWGRTracker::Init()

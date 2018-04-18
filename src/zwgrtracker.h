@@ -15,6 +15,7 @@ private:
     std::map<uint256, uint256> mapPendingSpends; //serialhash, txid of spend
 public:
     CzWGRTracker(std::string strWalletFile);
+    ~CzWGRTracker();
     void Add(const CDeterministicMint& dMint, bool isNew = false, bool isArchived = false);
     void Add(const CZerocoinMint& mint, bool isNew = false, bool isArchived = false);
     bool Archive(CMintMeta& meta);

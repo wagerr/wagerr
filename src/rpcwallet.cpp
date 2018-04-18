@@ -2924,7 +2924,7 @@ UniValue resetmintzerocoin(const UniValue& params, bool fHelp)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
+    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker.get();
     set<CMintMeta> setMints = zwgrTracker->ListMints(false, false, true);
     vector<CMintMeta> vMintsToFind(setMints.begin(), setMints.end());
     vector<CMintMeta> vMintsMissing;
@@ -2977,7 +2977,7 @@ UniValue resetspentzerocoin(const UniValue& params, bool fHelp)
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     CWalletDB walletdb(pwalletMain->strWalletFile);
-    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
+    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker.get();
     set<CMintMeta> setMints = zwgrTracker->ListMints(false, false, false);
     list<CZerocoinSpend> listSpends = walletdb.ListSpentCoins();
     list<CZerocoinSpend> listUnconfirmedSpends;
@@ -3114,7 +3114,7 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
     if (params.size() == 2)
         denomination = libzerocoin::IntToZerocoinDenomination(params[1].get_int());
 
-    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker;
+    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker.get();
     set<CMintMeta> setMints = zwgrTracker->ListMints(!fIncludeSpent, false, false);
 
     UniValue jsonList(UniValue::VARR);
@@ -3489,8 +3489,7 @@ UniValue searchdzwgr(const UniValue& params, bool fHelp)
 
     dzwgrThreads->join_all();
 
-    CzWGRTracker* tracker = pwalletMain->zwgrTracker;
-    zwallet->RemoveMintsFromPool(tracker->GetSerialHashes());
+    zwallet->RemoveMintsFromPool(pwalletMain->zwgrTracker->GetSerialHashes());
     zwallet->SyncWithChain(false);
 
     //todo: better response
