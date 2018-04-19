@@ -596,8 +596,7 @@ static void NotifyWalletBacked(WalletModel* model, const bool& fSuccess, const s
         method = CClientUIInterface::MessageBoxFlags::MSG_ERROR;
     }
 
-    message += _(filename + ".")_;
-
+    message += _(filename.data());
 
     QMetaObject::invokeMethod(model, "message", Qt::QueuedConnection,
                               Q_ARG(QString, QString::fromStdString(title)),
