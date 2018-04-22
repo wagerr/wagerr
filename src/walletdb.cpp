@@ -904,6 +904,12 @@ void ThreadFlushWalletDB(const string& strFile)
     }
 }
 
+void NotifyBacked(const CWallet& wallet, bool fSuccess, string strMessage)
+{
+    LogPrint(nullptr, strMessage.data());
+    wallet.NotifyWalletBacked(fSuccess, strMessage);
+}
+
 bool BackupWallet(const CWallet& wallet, const filesystem::path& strDest, bool fEnableCustom)
 {
     filesystem::path pathCustom;
@@ -915,17 +921,15 @@ bool BackupWallet(const CWallet& wallet, const filesystem::path& strDest, bool f
         if(!pathWithFile.empty()) {
             if(!pathWithFile.has_extension()) {
                 pathCustom = pathWithFile;
-                filesystem::create_directories(pathCustom);
-                if(access(pathCustom.string().data(), W_OK) != 0) {
-                    string msg = strprintf("Error: failed to backup wallet to %s - Access denied\n", pathCustom.string());
-                    LogPrintf(msg.data());
-                    pathCustom = "";
-                    wallet.NotifyWalletBacked(false, msg);
-                } else {
-                    pathWithFile /= wallet.GetUniqueWalletBackupName(false);
-                }
+                pathWithFile /= wallet.GetUniqueWalletBackupName(false);
             } else {
                 pathCustom = pathWithFile.parent_path();
+            }
+            try {
+                filesystem::create_directories(pathCustom);
+            } catch(const filesystem::filesystem_error& e) {
+                NotifyBacked(wallet, false, strprintf("%s\n", e.what()));
+                pathCustom = "";
             }
         }
     }
@@ -971,7 +975,7 @@ bool BackupWallet(const CWallet& wallet, const filesystem::path& strDest, bool f
                             }
                         }
 
-                        int counter = 0;
+                        int counter = 0; //TODO: add seconds to avoid naming conflicts
                         for (auto entry : folderSet) {
                             counter++;
                             if(entry.second == pathWithFile) {
@@ -994,7 +998,9 @@ bool BackupWallet(const CWallet& wallet, const filesystem::path& strDest, bool f
                                     LogPrintf("Old backup deleted: %s\n", (*entry).second);
                                 }
                             } catch (filesystem::filesystem_error& error) {
-                                LogPrintf("Failed to delete backup %s\n", error.what());
+                                string strMessage = strprintf("Failed to delete backup %s\n", error.what());
+                                LogPrint(nullptr, strMessage.data());
+                                NotifyBacked(wallet, false, strMessage);
                             }
                         }
                     }
@@ -1012,6 +1018,7 @@ bool BackupWallet(const CWallet& wallet, const filesystem::path& strDest, bool f
 bool AttemptBackupWallet(const CWallet& wallet, const filesystem::path& pathSrc, const filesystem::path& pathDest)
 {
     bool retStatus;
+    string strMessage;
     try {
 #if BOOST_VERSION >= 105800 /* BOOST_LIB_VERSION 1_58 */
         filesystem::copy_file(pathSrc.c_str(), pathDest, filesystem::copy_option::overwrite_if_exists);
@@ -1023,13 +1030,15 @@ bool AttemptBackupWallet(const CWallet& wallet, const filesystem::path& pathSrc,
         src.close();
         dst.close();
 #endif
-        LogPrintf("copied wallet.dat to %s\n", pathDest.string());
+        strMessage = strprintf("copied wallet.dat to %s\n", pathDest.string());
+        LogPrint(nullptr, strMessage.data());
         retStatus = true;
     } catch (const filesystem::filesystem_error& e) {
         retStatus = false;
-        LogPrintf("error copying wallet.dat to %s - %s\n", pathDest, e.what());
+        strMessage = strprintf("%s\n", e.what());
+        LogPrint(nullptr, strMessage.data());
     }
-    wallet.NotifyWalletBacked(retStatus, pathDest.string());
+    NotifyBacked(wallet, retStatus, strMessage);
     return retStatus;
 }
 
