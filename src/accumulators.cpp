@@ -515,6 +515,9 @@ map<CoinDenomination, int> GetMintMaturityHeight()
         mapDenomMaturity.insert(make_pair(denom, make_pair(0, 0)));
 
     int nConfirmedHeight = chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations();
+
+    // A mint need to get to at least the min maturity height before it will spend.
+    int nMinimumMaturityHeight = nConfirmedHeight - (nConfirmedHeight % 10);
     CBlockIndex* pindex = chainActive[nConfirmedHeight];
 
     while (pindex && pindex->nHeight > Params().Zerocoin_StartHeight()) {
@@ -527,7 +530,7 @@ map<CoinDenomination, int> GetMintMaturityHeight()
 
                 //if mint was found then record this block as the first block that maturity occurs.
                 if (mapDenomMaturity.at(denom).first >= Params().Zerocoin_RequiredAccumulation())
-                    mapDenomMaturity.at(denom).second = pindex->nHeight;
+                    mapDenomMaturity.at(denom).second = std::min(pindex->nHeight, nMinimumMaturityHeight);
 
                 //Signal that we are finished
                 isFinished = false;
