@@ -5,6 +5,7 @@
 #include "main.h"
 #include "txdb.h"
 #include "walletdb.h"
+#include "accumulators.h"
 
 using namespace std;
 
@@ -238,8 +239,15 @@ bool CzWGRTracker::UpdateState(const CMintMeta& meta)
 
     if (meta.isDeterministic) {
         CDeterministicMint dMint;
-        if (!walletdb.ReadDeterministicMint(meta.hashPubcoin, dMint))
-            return error("%s: failed to read deterministic mint from database", __func__);
+        if (!walletdb.ReadDeterministicMint(meta.hashPubcoin, dMint)) {
+            // Check archive just in case
+            if (!meta.isArchived)
+                return error("%s: failed to read deterministic mint from database", __func__);
+
+            // Unarchive this mint since it is being requested and updated
+            if (!walletdb.UnarchiveDeterministicMint(meta.hashPubcoin, dMint))
+                return error("%s: failed to unarchive deterministic mint from database", __func__);
+        }
 
         dMint.SetTxHash(meta.txid);
         dMint.SetHeight(meta.nHeight);
@@ -344,6 +352,77 @@ void CzWGRTracker::RemovePending(const uint256& txid)
         mapPendingSpends.erase(hashSerial);
 }
 
+bool CzWGRTracker::UpdateStatusInternal(const std::set<uint256>& setMempool, CMintMeta& mint)
+{
+    //! Check whether this mint has been spent and is considered 'pending' or 'confirmed'
+    // If there is not a record of the block height, then look it up and assign it
+    uint256 txidMint;
+    bool isMintInChain = zerocoinDB->ReadCoinMint(mint.hashPubcoin, txidMint);
+
+    //See if there is internal record of spending this mint (note this is memory only, would reset on restart)
+    bool isPendingSpend = static_cast<bool>(mapPendingSpends.count(mint.hashSerial));
+
+    // See if there is a blockchain record of spending this mint
+    uint256 txidSpend;
+    bool isConfirmedSpend = zerocoinDB->ReadCoinSpend(mint.hashSerial, txidSpend);
+
+    // Double check the mempool for pending spend
+    if (isPendingSpend) {
+        uint256 txidPendingSpend = mapPendingSpends.at(mint.hashSerial);
+        if (!setMempool.count(txidPendingSpend) || isConfirmedSpend) {
+            RemovePending(txidPendingSpend);
+            isPendingSpend = false;
+            LogPrintf("%s : Pending txid %s removed because not in mempool\n", __func__, txidPendingSpend.GetHex());
+        }
+    }
+
+    bool isUsed = isPendingSpend || isConfirmedSpend;
+
+    if (!mint.nHeight || !isMintInChain || isUsed != mint.isUsed) {
+        CTransaction tx;
+        uint256 hashBlock;
+
+        // Txid will be marked 0 if there is no knowledge of the final tx hash yet
+        if (mint.txid == 0) {
+            if (!isMintInChain) {
+                LogPrintf("%s : Failed to find mint in zerocoinDB %s\n", __func__, mint.hashPubcoin.GetHex().substr(0, 6));
+                mint.isArchived = true;
+                Archive(mint);
+                return true;
+            }
+            mint.txid = txidMint;
+        }
+
+        if (setMempool.count(mint.txid))
+            return true;
+
+        // Check the transaction associated with this mint
+        if (!IsInitialBlockDownload() && !GetTransaction(mint.txid, tx, hashBlock, true)) {
+            LogPrintf("%s : Failed to find tx for mint txid=%s\n", __func__, mint.txid.GetHex());
+            mint.isArchived = true;
+            Archive(mint);
+            return true;
+        }
+
+        // An orphan tx if hashblock is in mapBlockIndex but not in chain active
+        if (mapBlockIndex.count(hashBlock) && !chainActive.Contains(mapBlockIndex.at(hashBlock))) {
+            LogPrintf("%s : Found orphaned mint txid=%s\n", __func__, mint.txid.GetHex());
+            mint.isUsed = false;
+            mint.nHeight = 0;
+            return true;
+        }
+
+        // Check that the mint has correct used status
+        if (mint.isUsed != isUsed) {
+            LogPrintf("%s : Set mint %s isUsed to %d\n", __func__, mint.hashPubcoin.GetHex(), isUsed);
+            mint.isUsed = isUsed;
+            return true;
+        }
+    }
+
+    return false;
+}
+
 std::set<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, bool fUpdateStatus)
 {
     CWalletDB walletdb(strWalletFile);
@@ -359,7 +438,7 @@ std::set<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
         LogPrintf("%s: added %d dzwgr from DB\n", __func__, listDeterministicDB.size());
     }
 
-    vector<CMintMeta> vOverWrite;
+    std::vector<CMintMeta> vOverWrite;
     std::set<CMintMeta> setMints;
     std::set<uint256> setMempool;
     {
@@ -367,6 +446,7 @@ std::set<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
         mempool.getTransactions(setMempool);
     }
 
+    std::map<libzerocoin::CoinDenomination, int> mapMaturity = GetMintMaturityHeight();
     for (auto& it : mapSerialHashes) {
         CMintMeta mint = it.second;
 
@@ -374,105 +454,24 @@ std::set<CMintMeta> CzWGRTracker::ListMints(bool fUnusedOnly, bool fMatureOnly, 
         if (mint.isArchived)
             continue;
 
-        //if there is not a record of the block height, then look it up and assign it
-        uint256 txid;
-        bool isMintInChain = zerocoinDB->ReadCoinMint(mint.hashPubcoin, txid);
+        // Update the metadata of the mints if requested
+        if (fUpdateStatus && UpdateStatusInternal(setMempool, mint)) {
+            if (mint.isArchived)
+                continue;
 
-        //See if there is internal record of spending this mint (note this is memory only, would reset on restart)
-        bool isPendingSpend = static_cast<bool>(mapPendingSpends.count(mint.hashSerial));
-
-        // See if there is a blockchain record of spending this mint
-        uint256 txidSpend;
-        bool isConfirmedSpend = zerocoinDB->ReadCoinSpend(mint.hashSerial, txidSpend);
-
-        // Double check the mempool for pending spend
-        bool fRemovedPending = false;
-        if (isPendingSpend) {
-            uint256 txidPendingSpend = mapPendingSpends.at(mint.hashSerial);
-            if (!setMempool.count(txidPendingSpend)) {
-                fRemovedPending = true;
-                RemovePending(txidPendingSpend);
-                LogPrintf("%s: pending txid %s removed because not in mempool\n", __func__, txidPendingSpend.GetHex());
-            }
+            // Mint was updated, queue for overwrite
+            vOverWrite.emplace_back(mint);
         }
 
-        //If a pending spend got confirmed, then remove it from the pendingspend map
-        if (isPendingSpend && isConfirmedSpend)
-            mapPendingSpends.erase(mint.hashSerial);
-
-        // If the pending spend was removed from the mempool, and there is no confirmed
-        // spend on the blockchain, then it should no longer be treated as a pending spend
-        if (fRemovedPending && !isConfirmedSpend)
-            isPendingSpend = false;
-
-        bool isUsed = isPendingSpend || isConfirmedSpend;
-
-        if (fUnusedOnly && isUsed)
+        if (fUnusedOnly && mint.isUsed)
             continue;
 
-        if (fMatureOnly || fUpdateStatus) {
-            if (!mint.nHeight || !isMintInChain || isUsed != mint.isUsed) {
-                CTransaction tx;
-                uint256 hashBlock;
-
-                if (mint.txid == 0) {
-                    if (!isMintInChain) {
-                        LogPrintf("%s failed to find mint in zerocoinDB %s\n", __func__, mint.hashPubcoin.GetHex().substr(0, 6));
-                        Archive(mint);
-                        continue;
-                    }
-                    mint.txid = txid;
-                }
-
-                if (!IsInitialBlockDownload() && !GetTransaction(mint.txid, tx, hashBlock, true)) {
-                    LogPrintf("%s failed to find tx for mint txid=%s\n", __func__, mint.txid.GetHex());
-                    Archive(mint);
-                    continue;
-                }
-
-                //if not in the block index, most likely is unconfirmed tx
-                if (mapBlockIndex.count(hashBlock) && !chainActive.Contains(mapBlockIndex.at(hashBlock))) {
-                    if (mint.isUsed != isUsed) {
-                        mint.isUsed = isUsed;
-                        LogPrintf("%s: set mint %s isUsed to %d\n", __func__, mint.hashPubcoin.GetHex(), isUsed);
-                    }
-                    mint.nHeight = mapBlockIndex[hashBlock]->nHeight;
-                    vOverWrite.emplace_back(mint);
-                } else if (mint.isUsed != isUsed){
-                    mint.isUsed = isUsed;
-                    LogPrintf("%s: set mint %s isUsed to %d\n", __func__, mint.hashPubcoin.GetHex(), isUsed);
-                    vOverWrite.emplace_back(mint);
-                } else if (fMatureOnly) {
-                    continue;
-                }
-            }
-
-            //not mature
-            if (mint.nHeight > chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations()) {
-                if (!fMatureOnly)
-                    setMints.insert(mint);
+        if (fMatureOnly) {
+            // Not confirmed
+            if (!mint.nHeight || mint.nHeight > chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations())
                 continue;
-            }
-
-            //if only requesting an update (fUpdateStatus) then skip the rest and add to list
-            if (fMatureOnly) {
-                // check to make sure there are at least 3 other mints added to the accumulators after this
-                if (chainActive.Height() < mint.nHeight + 1)
-                    continue;
-
-                CBlockIndex *pindex = chainActive[mint.nHeight + 1];
-                int nMintsAdded = 0;
-                while (pindex->nHeight < chainActive.Height() - 30) { // 30 just to make sure that its at least 2 checkpoints from the top block
-                    nMintsAdded += count(pindex->vMintDenominationsInBlock.begin(),
-                                         pindex->vMintDenominationsInBlock.end(), mint.denom);
-                    if (nMintsAdded >= Params().Zerocoin_RequiredAccumulation())
-                        break;
-                    pindex = chainActive[pindex->nHeight + 1];
-                }
-
-                if (nMintsAdded < Params().Zerocoin_RequiredAccumulation())
-                    continue;
-            }
+            if (mint.nHeight >= mapMaturity.at(mint.denom))
+                continue;
         }
         setMints.insert(mint);
     }
