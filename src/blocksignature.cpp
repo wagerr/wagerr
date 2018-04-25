@@ -67,7 +67,6 @@ bool CheckBlockSignature(const CBlock& block)
     if (fzWGRStake) {
         libzerocoin::CoinSpend spend = TxInToZerocoinSpend(block.vtx[1].vin[0]);
         pubkey = spend.getPubKey();
-        LogPrintf("%s spend version=%d\n", __func__, spend.getVersion());
     } else {
         txnouttype whichType;
         std::vector<valtype> vSolutions;
