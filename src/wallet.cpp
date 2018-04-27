@@ -2933,15 +2933,15 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
         nLastStakeSetUpdate = GetTime();
     }
+
     if (listInputs.empty())
         return false;
-    LogPrintf("%s: listInputs size=%d\n", __func__, listInputs.size());
+
     if (GetAdjustedTime() - chainActive.Tip()->GetBlockTime() < 60)
         MilliSleep(10000);
 
     CAmount nCredit = 0;
     CScript scriptPubKeyKernel;
-    int nAttempts = 0;
     bool fKernelFound = false;
     for (std::unique_ptr<CStakeInput>& stakeInput : listInputs) {
         // Make sure the wallet is unlocked and shutdown hasn't been requested
@@ -2961,7 +2961,6 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         nTxNewTime = GetAdjustedTime();
 
         //iterates each utxo inside of CheckStakeKernelHash()
-        nAttempts++;
         if (Stake(stakeInput.get(), nBits, block.GetBlockTime(), nTxNewTime, hashProofOfStake)) {
             LOCK(cs_main);
             //Double check that this will pass time requirements
@@ -3029,10 +3028,8 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
         if (fKernelFound)
             break; // if kernel is found stop searching
     }
-    if (!fKernelFound) {
-        LogPrintf("*** attempted to stake %d coins\n", nAttempts);
+    if (!fKernelFound)
         return false;
-    }
 
     // Sign for WGR
     int nIn = 0;

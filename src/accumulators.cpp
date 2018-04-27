@@ -415,7 +415,7 @@ bool GetAccumulatorValue(int& nHeight, const libzerocoin::CoinDenomination denom
 
 bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator, AccumulatorWitness& witness, int nSecurityLevel, int& nMintsAdded, string& strError, CBlockIndex* pindexCheckpoint)
 {
-    LogPrintf("%s: generating\n", __func__);
+    LogPrint("zero", "%s: generating\n", __func__);
     int nLockAttempts = 0;
     while (nLockAttempts < 100) {
         TRY_LOCK(cs_main, lockMain);
@@ -428,7 +428,7 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
     }
     if (nLockAttempts == 100)
         return error("%s: could not get lock on cs_main", __func__);
-    LogPrintf("%s: after lock\n", __func__);
+    LogPrint("zero", "%s: after lock\n", __func__);
     uint256 txid;
     if (!zerocoinDB->ReadCoinMint(coin.getValue(), txid))
         return error("%s failed to read mint from db", __func__);
@@ -503,7 +503,7 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
 
     // calculate how many mints of this denomination existed in the accumulator we initialized
     nMintsAdded += ComputeAccumulatedCoins(nAccStartHeight, coin.getDenomination());
-    LogPrintf("%s : %d mints added to witness\n", __func__, nMintsAdded);
+    LogPrint("zero", "%s : %d mints added to witness\n", __func__, nMintsAdded);
 
     return true;
 }
