@@ -1871,9 +1871,9 @@ void CFinalizedBudget::AutoCheck()
         return;
     }
 
-    //do this 1 in 4 blocks -- spread out the voting activity on mainnet
+    // Do this 1 in 4 blocks -- spread out the voting activity
     // -- this function is only called every fourteenth block, so this is really 1 in 56 blocks
-    if (Params().NetworkID() == CBaseChainParams::MAIN && rand() % 4 != 0) {
+    if (rand() % 4 != 0) {
         LogPrint("mnbudget","CFinalizedBudget::AutoCheck - waiting\n");
         return;
     }
