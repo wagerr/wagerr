@@ -8,11 +8,16 @@
         <file alias="en">locale/wagerr_en.qm</file>
         <file alias="en_US">locale/wagerr_en_US.qm</file>
         <file alias="es">locale/wagerr_es.qm</file>
+        <file alias="es_ES">locale/wagerr_es_ES.qm</file>
         <file alias="fi">locale/wagerr_fi.qm</file>
         <file alias="fr_FR">locale/wagerr_fr_FR.qm</file>
+        <file alias="hi_IN">locale/wagerr_hi_IN.qm</file>
+        <file alias="hr">locale/wagerr_hr.qm</file>
+        <file alias="hr_HR">locale/wagerr_hr_HR.qm</file>
         <file alias="it">locale/wagerr_it.qm</file>
         <file alias="ja">locale/wagerr_ja.qm</file>
         <file alias="ko_KR">locale/wagerr_ko_KR.qm</file>
+        <file alias="lt_LT">locale/wagerr_lt_LT.qm</file>
         <file alias="nl">locale/wagerr_nl.qm</file>
         <file alias="pl">locale/wagerr_pl.qm</file>
         <file alias="pt">locale/wagerr_pt.qm</file>
@@ -23,6 +28,7 @@
         <file alias="sv">locale/wagerr_sv.qm</file>
         <file alias="tr">locale/wagerr_tr.qm</file>
         <file alias="uk">locale/wagerr_uk.qm</file>
+        <file alias="vi">locale/wagerr_vi.qm</file>
         <file alias="zh_CN">locale/wagerr_zh_CN.qm</file>
         <file alias="zh_TW">locale/wagerr_zh_TW.qm</file>
     </qresource>

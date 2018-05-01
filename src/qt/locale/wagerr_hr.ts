@@ -1,108 +1,108 @@
-<TS language="sk" version="2.1">
+<TS language="hr" version="2.1">
 <context>
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>Pravým tlačidlom myši upravte adresu alebo štítok</translation>
+        <translation>Desni klik za promjenu adrese ili oznake</translation>
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>Vytvoriť novú adresu</translation>
+        <translation>Stvori novu adresu</translation>
     </message>
     <message>
         <source>&amp;New</source>
-        <translation>Nový</translation>
+        <translation>&amp;Novo</translation>
     </message>
     <message>
         <source>Copy the currently selected address to the system clipboard</source>
-        <translation>Skopírovať označenú adresu do schránky</translation>
+        <translation>Kopiraj trenutno odabranu adresu u spremnik</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation>Kopírovať</translation>
+        <translation>&amp;Kopiraj</translation>
     </message>
     <message>
         <source>Delete the currently selected address from the list</source>
-        <translation>Vymazať označenú adresu zo zoznamu</translation>
+        <translation>Izbriši trenutno odabranu adresu iz liste</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation>Vymazať</translation>
+        <translation>&amp;Izbriši</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translation>Exportovať údaje na aktuálnej karte do súboru</translation>
+        <translation>Izvezi podatke iz trenutne kartice u datoteku</translation>
     </message>
     <message>
         <source>&amp;Export</source>
-        <translation>Exportovať</translation>
+        <translation>&amp;Izvezi</translation>
     </message>
     <message>
         <source>C&amp;lose</source>
-        <translation>Zatvoriť</translation>
+        <translation>&amp;Zatvori</translation>
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>Vyberte adresu, na ktorú chcete odoslať mince</translation>
+        <translation>Izaberi adresu na koju poslati kovanice</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>Vyberte adresu, na ktorej chcete mince prijať</translation>
+        <translation>Izaberi adresu na koju primiti kovanice</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
-        <translation>Vybrať</translation>
+        <translation>Izaberi</translation>
     </message>
     <message>
         <source>Sending addresses</source>
-        <translation>Odosielacia adresa</translation>
+        <translation>Adrese za slanje</translation>
     </message>
     <message>
         <source>Receiving addresses</source>
-        <translation>Prijímacia adresa</translation>
+        <translation>Adrese za primanje</translation>
     </message>
     <message>
         <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Toto sú vaše Wagerr adresy na odosielanie platieb. Pred odoslaním vždy skontrolujte výšku a adresu prijemcu.</translation>
+        <translation>To su vaše Wagerr adrese za slanje plaćanja. Uvijek provjerite iznos i adresu primatelja prije slanja novca.</translation>
     </message>
     <message>
         <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Toto sú vaše Wagerr adresy na prijímanie platieb. Pre každú transakciu sa odporúča použiť novú prijímaciu adresu.</translation>
+        <translation>To su vaše Wagerr adrese za primanje uplata. Preporuča se upotreba nove adrese primanja za svaku transakciju.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
-        <translation>Skopírovať adresu</translation>
+        <translation>&amp; Kopiraj adresu</translation>
     </message>
     <message>
         <source>Copy &amp;Label</source>
-        <translation>Skopírovať štítok</translation>
+        <translation>Kopiraj i označite</translation>
     </message>
     <message>
         <source>&amp;Edit</source>
-        <translation>Editovať</translation>
+        <translation>&amp;Uredi</translation>
     </message>
     <message>
         <source>Export Address List</source>
-        <translation>Exportovať zoznamu adries</translation>
+        <translation>Izvezi Popis Adresa</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
-        <translation>Súbor oddelený čiarkami (*.csv)</translation>
+        <translation>Comma separated file (*.csv)</translation>
     </message>
     <message>
         <source>Exporting Failed</source>
-        <translation>Export zlyhal</translation>
+        <translation>Izvoz Nije Uspio</translation>
     </message>
     <message>
         <source>There was an error trying to save the address list to %1. Please try again.</source>
-        <translation>Pri pokuse o uloženie zoznamu adries na %1 sa vyskytla chyba. Prosím skúste znova.</translation>
+        <translation>Došlo je do pogreške prilikom spremanja popisa adresa na %1. Molim te pokušaj ponovno.</translation>
     </message>
 </context>
 <context>
     <name>AddressTableModel</name>
     <message>
         <source>Label</source>
-        <translation>Štítok</translation>
+        <translation>Oznaka</translation>
     </message>
     <message>
         <source>Address</source>
@@ -110,118 +110,118 @@
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(žiaden štítok)</translation>
+        <translation>(nema oznake)</translation>
     </message>
 </context>
 <context>
     <name>AskPassphraseDialog</name>
     <message>
         <source>Passphrase Dialog</source>
-        <translation>Okno prístupovej frázy</translation>
+        <translation>Dijalog zaporke</translation>
     </message>
     <message>
         <source>Enter passphrase</source>
-        <translation>Zadajte prístupovú frázu</translation>
+        <translation>Unesite zaporku</translation>
     </message>
     <message>
         <source>New passphrase</source>
-        <translation>Nová prístupová fráza</translation>
+        <translation>Nova zaporka</translation>
     </message>
     <message>
         <source>Repeat new passphrase</source>
-        <translation>Zopakujte prístupovú frázu</translation>
+        <translation>Ponovite novu zaporku</translation>
     </message>
     <message>
         <source>Serves to disable the trivial sendmoney when OS account compromised. Provides no real security.</source>
-        <translation>Slúži na zakázanie obyčajného odoslania peňazí, v prípade, že bol OS účet kompromitovaný. Neposkytuje žiadnu skutočnú bezpečnosť.</translation>
+        <translation>Služi za onemogućavanje trivijalnog slanja novca kada je OS račun ugrožen. Ne pruža nikakvu stvarnu sigurnost</translation>
     </message>
     <message>
         <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
-        <translation>Zadajte novú prístupovú frázu do peňaženky. &lt;br/&gt; Použite prístupovú frázu &lt;b&gt;, ktorá má desať alebo viac náhodných znakov &lt;/ b&gt; alebo &lt;b&gt; osem alebo viac slov &lt;/ b&gt;.</translation>
+        <translation>Unesite novu lozinku u novčanik.1 Koristite zaporku od 2 deset  ili više znakova slučajnih znakova2 ili 3 osam ili više riječi3.</translation>
     </message>
     <message>
         <source>Encrypt wallet</source>
-        <translation>Šifrovať peňaženku</translation>
+        <translation>Šifriranje novčanika</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to unlock the wallet.</source>
-        <translation>Táto operácia potrebuje prístupovú frázu peňaženky na odomknutie peňaženky.</translation>
+        <translation>Za ovu operaciju potrebna je vaša zaporka novčanika za otključavanje novčanika.</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
-        <translation>Odomknúť peňaženku</translation>
+        <translation>Otključaj novčanik</translation>
     </message>
     <message>
         <source>This operation needs your wallet passphrase to decrypt the wallet.</source>
-        <translation>Táto operácia potrebuje prístupovú frázu peňaženky na dešifrovanie peňaženky.</translation>
+        <translation>Za ovu je operaciju potrebna vaša zaporka novčanika za dešifriranje novčanika</translation>
     </message>
     <message>
         <source>Decrypt wallet</source>
-        <translation>Dešifrovať peňaženku</translation>
+        <translation>Dešifriranje novčanika</translation>
     </message>
     <message>
         <source>Change passphrase</source>
-        <translation>Zmeniť prístupovú frázu</translation>
+        <translation>Izmjena zaporke</translation>
     </message>
     <message>
         <source>Enter the old and new passphrase to the wallet.</source>
-        <translation>Zadajte starú a novú prístupovú frázu do peňaženky.</translation>
+        <translation>Unesite staru i novu zaporku u novčanik.</translation>
     </message>
     <message>
         <source>Confirm wallet encryption</source>
-        <translation>Potvrďte šifrovanie peňaženky</translation>
+        <translation>Potvrdite šifriranje novčanika</translation>
     </message>
     <message>
         <source>Wagerr will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>Wagerr sa teraz ukončí, aby dokončil proces šifrovania. Nezabudnite, že šifrovanie peňaženky nemôže úplne ochrániť vaše WGR pred odcudzením škodlivým softvérom, ktorý infikuje váš počítač.</translation>
+        <translation>Wagerr se sada zatvara kako bi dovršio proces šifriranja. Ne zaboravite da šifriranje vašeg novčanika ne može u potpunosti zaštititi vaše WGR od krađe zlonamjernog softvera koji zarazi vaše računalo.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
-        <translation>Naozaj chcete zašifrovať svoju peňaženku?</translation>
+        <translation>Jeste li sigurni da želite šifrirati svoj novčanik?</translation>
     </message>
     <message>
         <source>Warning: If you encrypt your wallet and lose your passphrase, you will &lt;b&gt;LOSE ALL OF YOUR WGR&lt;/b&gt;!</source>
-        <translation>Upozornenie: Ak zašifrujete svoju peňaženku a stratíte svoju prístupovú frázu, &lt;b&gt; PRÍDETE O VŠETKY WGR &lt;/ b&gt;!</translation>
+        <translation>Upozorenje: Ako šifrirate svoj novčanik i izgubite vašu zaporku, vi ćete1 IZGUBITI ĆE TE SAV VAŠ WGR1!</translation>
     </message>
     <message>
         <source>Wallet encrypted</source>
-        <translation>Peňaženka zašifrovaná</translation>
+        <translation>Novčanik je šifriran</translation>
     </message>
     <message>
         <source>IMPORTANT: Any previous backups you have made of your wallet file should be replaced with the newly generated, encrypted wallet file. For security reasons, previous backups of the unencrypted wallet file will become useless as soon as you start using the new, encrypted wallet.</source>
-        <translation>DÔLEŽITÉ: Všetky predchádzajúce zálohy súboru peňaženky, by mali byť nahradené novo vytvoreným šifrovaným súborom peňaženky. Z bezpečnostných dôvodov sa predchádzajúce zálohy súboru nezašifrovanej peňaženky stanú nepotrebné, akonáhle začnete používať novú zašifrovanú peňaženku.</translation>
+        <translation>VAŽNO: Bilo kakve prethodne sigurnosne kopije koje ste napravili iz svoje datoteke lisnice trebale bi se zamijeniti novom generičkom, šifriranom datotekom novčanika. Iz sigurnosnih razloga, prethodne sigurnosne kopije nekodirane datoteke novčanika postat će beskorisne čim počnete koristiti novu, šifriranu novčanik.</translation>
     </message>
     <message>
         <source>Wallet encryption failed</source>
-        <translation>Šifrovanie peňaženky zlyhalo</translation>
+        <translation>Šifriranje novčanika nije uspjelo</translation>
     </message>
     <message>
         <source>Wallet encryption failed due to an internal error. Your wallet was not encrypted.</source>
-        <translation>Šifrovanie peňaženky zlyhalo kvôli internej chybe. Vaša peňaženka nebola zašifrovaná.</translation>
+        <translation>Šifriranje novčanika nije uspjelo zbog unutarnje pogreške. Vaš novčanik nije bio šifriran.</translation>
     </message>
     <message>
         <source>The supplied passphrases do not match.</source>
-        <translation>Zadané prístupové frázy sa nezhodujú.</translation>
+        <translation>Isporučene zaporke ne odgovaraju.</translation>
     </message>
     <message>
         <source>Wallet unlock failed</source>
-        <translation>Odomknutie peňaženky zlyhalo</translation>
+        <translation>Otključavanje novčanika nije uspjelo</translation>
     </message>
     <message>
         <source>The passphrase entered for the wallet decryption was incorrect.</source>
-        <translation>Zadaná prístupová fráza pre dešifrovanie peňaženky bola nesprávna.</translation>
+        <translation>Zaporka unesena za dešifriranje novčanika je netočna</translation>
     </message>
     <message>
         <source>Wallet decryption failed</source>
-        <translation>Dešifrovanie peňaženky zlyhalo</translation>
+        <translation>Dešifriranje novčanika nije uspjelo</translation>
     </message>
     <message>
         <source>Wallet passphrase was successfully changed.</source>
-        <translation>Prístupová fráza pre peňaženku bola úspešne zmenená.</translation>
+        <translation>Zaporka za novčanik je uspješno promijenjena.</translation>
     </message>
     <message>
         <source>Warning: The Caps Lock key is on!</source>
-        <translation>Upozornenie: Tlačidlo Caps Lock je zapnuté!</translation>
+        <translation>Upozorenje: Caps Lock je uključen!</translation>
     </message>
 </context>
 <context>
@@ -231,11 +231,11 @@
     <name>Bip38ToolDialog</name>
     <message>
         <source>BIP 38 Tool</source>
-        <translation>BIP 38 Utilita</translation>
+        <translation>BIP 38 Alat</translation>
     </message>
     <message>
         <source>&amp;BIP 38 Encrypt</source>
-        <translation>BIP 38 Šifrovanie</translation>
+        <translation>&amp;BIP 38 Šifriranje</translation>
     </message>
     <message>
         <source>Address:</source>
@@ -243,7 +243,7 @@
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>Vyberte predtým použitú adresu</translation>
+        <translation>Odaberi prethodno korištenu adresu</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -251,7 +251,7 @@
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>Vložte adresu zo schránky</translation>
+        <translation>Zaljepi adresu iz međuspremnika</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -259,314 +259,346 @@
     </message>
     <message>
         <source>Passphrase: </source>
-        <translation>Prístupová fráza:</translation>
+        <translation>Zaporka:</translation>
     </message>
     <message>
         <source>Encrypted Key:</source>
-        <translation>Šifrovaný kľúč:</translation>
+        <translation>Šifrirani ključ:</translation>
     </message>
     <message>
         <source>Copy the current signature to the system clipboard</source>
-        <translation>Skopírujte aktuálny podpis do schránky</translation>
+        <translation>Kopirajte trenutačni potpis u međuspremnik sustava</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
-        <translation>Zašifrovať kľúč</translation>
+        <translation>Šifriranje &amp;Ključ</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
-        <translation>Všetko zmazať</translation>
+        <translation>Očistiti &amp;Sve</translation>
     </message>
     <message>
         <source>&amp;BIP 38 Decrypt</source>
-        <translation>BIP 38 dešifrovanie</translation>
+        <translation>&amp; BIP 38 Dešifriranje</translation>
     </message>
     <message>
         <source>Enter the BIP 38 encrypted private key. Enter the passphrase in the middle box. Click Decrypt Key to compute the private key. After the key is decrypted, clicking 'Import Address' will add this private key to the wallet.</source>
-        <translation>Zadajte súkromný kľúč zašifrovaný BIP 38. Zadajte prístupovú frázu do stredného poľa. Kliknite na Dešifrovať kľúč, ak chcete vypočítať privátny kľúč. Po dešifrovaní kľúča pridáte do peňaženky tento súkromný kľúč kliknutím na položku 'Importovať adresu'.</translation>
+        <translation>Unesite BIP 38 šifrirani privatni ključ. Unesite zaporku u srednji okvir. Pritisnite Dešifrujte Ključ da biste izračunali privatni ključ. Nakon dešifriranja ključa, klikom na "Import Address" dodati će taj privatni ključ u novčanik.</translation>
     </message>
     <message>
         <source>Decrypt &amp;Key</source>
-        <translation>Dešifrovať kľúč</translation>
+        <translation>Dešifrujte &amp;Kljuc</translation>
     </message>
     <message>
         <source>Decrypted Key:</source>
-        <translation>Dešifrovaný kľúč:</translation>
+        <translation>Dešifrirani Kljuc:</translation>
     </message>
     <message>
         <source>Import Address</source>
-        <translation>Importovať adresu:</translation>
+        <translation>Importiraj adresu</translation>
     </message>
     <message>
         <source>Click "Decrypt Key" to compute key</source>
-        <translation>Kliknite na tlačidlo "Dešifrovať kľúč" pre výpočet kľúča</translation>
+        <translation>Pritisnite "Dešifrujte Ključ" za izračunavanje ključa</translation>
     </message>
     <message>
         <source>The entered passphrase is invalid. </source>
-        <translation>Zadaná prístupová fráza je neplatná.</translation>
+        <translation>Utipkana šifra nije važeča</translation>
     </message>
     <message>
         <source>Allowed: 0-9,a-z,A-Z,</source>
-        <translation>Povolené: 0-9, a-z, A-Z,</translation>
+        <translation>Dozvoljeno: 0-9,a-z,A-Z,</translation>
     </message>
     <message>
         <source>The entered address is invalid.</source>
-        <translation>Zadaná adresa je neplatná.</translation>
+        <translation>Utipkana adresa nije važeča</translation>
     </message>
     <message>
         <source>Please check the address and try again.</source>
-        <translation>Skontrolujte adresu a skúste to znova.</translation>
+        <translation>Molimo da provjerite adresu i probajte isponova</translation>
     </message>
     <message>
         <source>The entered address does not refer to a key.</source>
-        <translation>Zadaná adresa neodkazuje na kľúč.</translation>
+        <translation>Unesena adresa ne odnosi se na ključ.</translation>
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
-        <translation>Odomknutie peňaženky bolo zrušené.</translation>
+        <translation>Otklučavanje novčanika ukinuto</translation>
     </message>
     <message>
         <source>Private key for the entered address is not available.</source>
-        <translation>Súkromný kľúč pre zadanú adresu nie je k dispozícii.</translation>
+        <translation>Privatni ključ za unesenu adresu nije dostupan.</translation>
     </message>
     <message>
         <source>Failed to decrypt.</source>
-        <translation>Dešifrovanie zlyhalo.</translation>
+        <translation>Nije uspjelo dešifriranje.</translation>
     </message>
     <message>
         <source>Please check the key and passphrase and try again.</source>
-        <translation>Skontrolujte, prosím, kľúč a prístupovú frázu a skúste to znova.</translation>
+        <translation>Molimo vas provjerite ključ i zaporku i pokušajte ponovo.</translation>
     </message>
     <message>
         <source>Data Not Valid.</source>
-        <translation>Neplatné dáta.</translation>
+        <translation>Podaci nisu važeći.</translation>
     </message>
     <message>
         <source>Please try again.</source>
-        <translation>Prosím skúste znova.</translation>
+        <translation>Moli te ponovi</translation>
     </message>
     <message>
         <source>Please wait while key is imported</source>
-        <translation>Počkajte, kým sa importuje kľúč</translation>
+        <translation>Pričekajte dok se ključevi importiraju</translation>
     </message>
     <message>
         <source>Key Already Held By Wallet</source>
-        <translation>Kľúč je už uložený v peňaženke</translation>
+        <translation>Ključ već pohranjen novčanikom</translation>
     </message>
     <message>
         <source>Error Adding Key To Wallet</source>
-        <translation>Chyba pri pridávaní kľúča do peňaženky</translation>
+        <translation>Greška kod dodavanja ključa u novčanik</translation>
     </message>
     <message>
         <source>Successfully Added Private Key To Wallet</source>
-        <translation>Súkromný kľúč bol úspešne pridaný do peňaženky</translation>
+        <translation>Uspješno dodan privatni ključ na novčanik</translation>
     </message>
 </context>
 <context>
     <name>BitcoinGUI</name>
     <message>
         <source>Wallet</source>
-        <translation>Peňaženka</translation>
+        <translation>Novčanik</translation>
     </message>
     <message>
         <source>Node</source>
-        <translation>Uzol</translation>
+        <translation>Čvor</translation>
     </message>
     <message>
         <source>&amp;Overview</source>
-        <translation>Prehľad</translation>
+        <translation>&amp;Pregled</translation>
     </message>
     <message>
         <source>Show general overview of wallet</source>
-        <translation>Zobraziť všeobecný prehľad peňaženky</translation>
+        <translation>Pokaži opći pregled novčanika</translation>
     </message>
     <message>
         <source>&amp;Send</source>
-        <translation>Odoslať</translation>
+        <translation>&amp;Pošalji</translation>
     </message>
     <message>
         <source>&amp;Receive</source>
-        <translation>Prijať</translation>
+        <translation>&amp;Primite</translation>
     </message>
     <message>
         <source>&amp;Transactions</source>
-        <translation>Transakcie</translation>
+        <translation>&amp;Transakcije</translation>
     </message>
     <message>
         <source>Browse transaction history</source>
-        <translation>Prezrieť históriu transakcií</translation>
+        <translation>Pregledajte povijest transakcija</translation>
+    </message>
+    <message>
+        <source>Privacy Actions for zWGR</source>
+        <translation>Aktivnosti na privatnost za zWGR</translation>
     </message>
     <message>
         <source>E&amp;xit</source>
-        <translation>Koniec</translation>
+        <translation>E&amp;Izlaz</translation>
     </message>
     <message>
         <source>Quit application</source>
-        <translation>Ukončiť aplikáciu</translation>
+        <translation>Napusti aplikaciju</translation>
     </message>
     <message>
         <source>About &amp;Qt</source>
-        <translation>O aplikácii</translation>
+        <translation>O &amp;Qt</translation>
     </message>
     <message>
         <source>Show information about Qt</source>
-        <translation>Zobraziť informácie o Qt</translation>
+        <translation>Prikaži informacije o Qt</translation>
     </message>
     <message>
         <source>&amp;Options...</source>
-        <translation>Možnosti...</translation>
+        <translation>&amp;Opcije ...</translation>
     </message>
     <message>
         <source>&amp;Show / Hide</source>
-        <translation>Zobraziť / Skryť</translation>
+        <translation>&amp;Prikaži / Sakrij</translation>
     </message>
     <message>
         <source>Show or hide the main Window</source>
-        <translation>Zobraziť alebo skryť hlavné okno</translation>
+        <translation>Prikaži ili sakrij glavni prozor</translation>
     </message>
     <message>
         <source>&amp;Encrypt Wallet...</source>
-        <translation>Šifrovať peňaženku...</translation>
+        <translation>&amp;Šifrirajte novčanik ...</translation>
     </message>
     <message>
         <source>Encrypt the private keys that belong to your wallet</source>
-        <translation>Šifrujte súkromné kľúče, ktoré patria Vašej peňaženke</translation>
+        <translation>Šifriranje privatnih ključeva koji pripadaju vašem novčaniku</translation>
     </message>
     <message>
         <source>&amp;Backup Wallet...</source>
-        <translation>Zálohovať peňaženku...</translation>
+        <translation>Sigurnosna kopija novčanika ...</translation>
     </message>
     <message>
         <source>Backup wallet to another location</source>
-        <translation>Zálohovať peňaženku na iné miesto</translation>
+        <translation>Sigurnosna kopija novčanika na drugu lokaciju</translation>
     </message>
     <message>
         <source>&amp;Change Passphrase...</source>
-        <translation>Zmeniť prístupovú frázu...</translation>
+        <translation>&amp; Promijeni zaporku ...</translation>
     </message>
     <message>
         <source>Change the passphrase used for wallet encryption</source>
-        <translation>Zmeniť prístupovú frázu, ktorá bola použitá na šifrovanie peňaženky</translation>
+        <translation>Promjena zaporke koja se koristi za šifriranje novčanika.</translation>
     </message>
     <message>
         <source>&amp;Unlock Wallet...</source>
-        <translation>Odomknúť peňaženku...</translation>
+        <translation>&amp; Otključaj novčanik ...</translation>
     </message>
     <message>
         <source>Unlock wallet</source>
-        <translation>Odomknúť peňaženku</translation>
+        <translation>Otključaj novčanik</translation>
     </message>
     <message>
         <source>&amp;Lock Wallet</source>
-        <translation>Zamknúť peňaženku</translation>
+        <translation>&amp; Zaključaj novčanik</translation>
     </message>
     <message>
         <source>Sign &amp;message...</source>
-        <translation>Podpísať správu...</translation>
+        <translation>Prijava i poruka ...</translation>
     </message>
     <message>
         <source>&amp;Verify message...</source>
-        <translation>Overiť správu...</translation>
+        <translation>&amp; Potvrdite poruku ...</translation>
     </message>
     <message>
         <source>&amp;Information</source>
-        <translation>Informácie</translation>
+        <translation>&amp;Informacije</translation>
     </message>
     <message>
         <source>Show diagnostic information</source>
-        <translation>Zobraziť diagnostické informácie</translation>
+        <translation>Prikaz dijagnostičkih podataka</translation>
     </message>
     <message>
         <source>&amp;Debug console</source>
-        <translation>Debugovacia konzola</translation>
+        <translation>&amp;Konzola za uklanjanje pogrešaka</translation>
     </message>
     <message>
         <source>Open debugging console</source>
-        <translation>Otvoriť debugovaciu konzola</translation>
+        <translation>Otvorite konzolu za uklanjanje pogrešaka</translation>
     </message>
     <message>
         <source>&amp;Network Monitor</source>
-        <translation>Monitor siete</translation>
+        <translation>&amp; Monitor mreže</translation>
     </message>
     <message>
         <source>Show network monitor</source>
-        <translation>Zobraziť monitor siete</translation>
+        <translation>Prikaži mrežni monitor</translation>
     </message>
     <message>
         <source>&amp;Peers list</source>
-        <translation>Zoznam uzlov</translation>
+        <translation>&amp; Popis suradnika</translation>
     </message>
     <message>
         <source>Show peers info</source>
-        <translation>Zobraziť informácie o uzloch</translation>
+        <translation>Prikaži podatke o suradnicima</translation>
     </message>
     <message>
         <source>Wallet &amp;Repair</source>
-        <translation>Oprava peňaženky</translation>
+        <translation>Novčanik i popravak</translation>
     </message>
     <message>
         <source>Show wallet repair options</source>
-        <translation>Zobraziť možnosti opravy peňaženky</translation>
+        <translation>Prikaz opcija popravka novčanika</translation>
     </message>
     <message>
         <source>Open configuration file</source>
-        <translation>Otvoriť konfiguračný súbor</translation>
+        <translation>Otvori konfiguracijsku datoteku</translation>
     </message>
     <message>
         <source>Show Automatic &amp;Backups</source>
-        <translation>Zobraziť automatické zálohy</translation>
+        <translation>Prikaži automatsko i sigurnosno kopiranje</translation>
     </message>
     <message>
         <source>Show automatically created wallet backups</source>
-        <translation>Zobraziť automaticky vytvorené zálohy peňaženky</translation>
+        <translation>Prikaži automatski stvorene sigurnosne kopije za novčanik.</translation>
     </message>
     <message>
         <source>&amp;Sending addresses...</source>
-        <translation>Odosielacie adresy</translation>
+        <translation>&amp; Slanje adresa ...</translation>
     </message>
     <message>
         <source>Show the list of used sending addresses and labels</source>
-        <translation>Zobraziť zoznam použitých odosielajúcich adries a štítkov</translation>
+        <translation>Prikaz popisa upotrijebljenih poslanih adresa i oznaka</translation>
     </message>
     <message>
         <source>&amp;Receiving addresses...</source>
-        <translation>Prijímacie adresy...</translation>
+        <translation>Primanje adresa ...</translation>
     </message>
     <message>
         <source>Show the list of used receiving addresses and labels</source>
-        <translation>Zobraziť zoznam použitých odosielajúcich adries a štítkov</translation>
+        <translation>Prikaz popisa upotrijebljenih primljenih adresa i oznaka</translation>
+    </message>
+    <message>
+        <source>&amp;Multisignature creation...</source>
+        <translation>&amp; Stvaranje višestruke oznake ...</translation>
+    </message>
+    <message>
+        <source>Create a new multisignature address and add it to this wallet</source>
+        <translation>Izradite novu adresu s višestrukim adresama i dodajte je u taj novčanik</translation>
+    </message>
+    <message>
+        <source>&amp;Multisignature spending...</source>
+        <translation>&amp; Izdaci za više osoba ...</translation>
+    </message>
+    <message>
+        <source>Spend from a multisignature address</source>
+        <translation>Potrošite s adrese s više adresa</translation>
+    </message>
+    <message>
+        <source>&amp;Multisignature signing...</source>
+        <translation>Potpisivanje više znakova ...</translation>
+    </message>
+    <message>
+        <source>Sign with a multisignature address</source>
+        <translation>Prijavite se s adresom s više adresa</translation>
     </message>
     <message>
         <source>Open &amp;URI...</source>
-        <translation>Otvoriť URI...</translation>
+        <translation>Otvori &amp; URI ...</translation>
     </message>
     <message>
         <source>&amp;Command-line options</source>
-        <translation>Možnosti príkazového riadku</translation>
+        <translation>&amp;Opcije-naredbene linije</translation>
     </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
-        <translation>Synchronizácia dodatočných údajov: %p%</translation>
+        <translation>Usklađivanje dodatnih podataka: %p%</translation>
+    </message>
+    <message>
+        <source>%1 behind. Scanning block %2</source>
+        <translation>%1 iza. Skeniranje blokiranjem %2</translation>
     </message>
     <message>
         <source>&amp;File</source>
-        <translation>Súbor</translation>
+        <translation>&amp;Datoteka</translation>
     </message>
     <message>
         <source>&amp;Settings</source>
-        <translation>Nastavenia</translation>
+        <translation>&amp; Postavke</translation>
     </message>
     <message>
         <source>&amp;Tools</source>
-        <translation>Nástroje</translation>
+        <translation>&amp;Alati</translation>
     </message>
     <message>
         <source>&amp;Help</source>
-        <translation>Pomoc</translation>
+        <translation>&amp;Pomoc</translation>
     </message>
     <message>
         <source>Tabs toolbar</source>
-        <translation>Panel nástrojov Záložky</translation>
+        <translation>Alatna traka kartica</translation>
     </message>
     <message>
         <source>Wagerr Core</source>
@@ -574,288 +606,140 @@
     </message>
     <message>
         <source>Send coins to a Wagerr address</source>
-        <translation>Odoslať mince na adresu Wagerr</translation>
+        <translation>Pošaljite kovanice na Wagerr adresu</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
-        <translation>Vyžiadať platby (generuje QR kódy a wagerr: identifikátory URI)</translation>
+        <translation>Zahtjev za plaćanja (generira QR kodove i wagerr:URI)</translation>
+    </message>
+    <message>
+        <source>&amp;Privacy</source>
+        <translation>&amp;Privatnost</translation>
     </message>
     <message>
         <source>&amp;Masternodes</source>
-        <translation>&amp;Masternodes</translation>
+        <translation>&amp;Masternode</translation>
     </message>
     <message>
         <source>Browse masternodes</source>
-        <translation>Prezrieť masternody</translation>
+        <translation>Pregledajte masternode</translation>
     </message>
     <message>
         <source>&amp;About Wagerr Core</source>
-        <translation>O Wagerr Core</translation>
+        <translation>&amp; O Wagerr Coreu</translation>
     </message>
     <message>
         <source>Show information about Wagerr Core</source>
-        <translation>Zobraziť informácie o Wagerr Core</translation>
+        <translation>Prikaz informacija o Wagerr Coreu</translation>
     </message>
     <message>
         <source>Modify configuration options for Wagerr</source>
-        <translation>Zmeňte možnosti konfigurácie pre Wagerr</translation>
+        <translation>Izmijenite opcije konfiguracije za Wagerr</translation>
     </message>
     <message>
         <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Podpíšte správy pomocou adresy Wagerr, aby ste preukázali, že ich vlastníte</translation>
+        <translation>Potpišite poruke s vašim Wagerr adresama kako biste dokazali da ih posjedujete</translation>
     </message>
     <message>
         <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Overte správy, aby sa zabezpečilo, že boli podpísané zadanými Wagerr adresami</translation>
+        <translation>Potvrdite poruke kako biste bili sigurni da su potpisani s određenim Wagerr adresama</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
-        <translation>BIP 38 Utilita</translation>
+        <translation>&amp;BIP38 alat</translation>
     </message>
     <message>
         <source>Encrypt and decrypt private keys using a passphrase</source>
-        <translation>Šifrovať a dešifrovať privátne kľúče pomocou prístupovej frázy</translation>
-    </message>
-    <message>
-        <source>&amp;MultiSend</source>
-        <translation>&amp;MultiSend</translation>
-    </message>
-    <message>
-        <source>MultiSend Settings</source>
-        <translation>MultiSend Nastavenia</translation>
-    </message>
-    <message>
-        <source>Open Wallet &amp;Configuration File</source>
-        <translation>Otvoriť konfiguračný súbor peňaženky</translation>
-    </message>
-    <message>
-        <source>Open &amp;Masternode Configuration File</source>
-        <translation>Otvoriť konfiguračný súbor masternodu</translation>
-    </message>
-    <message>
-        <source>Open Masternode configuration file</source>
-        <translation>Otvoriť konfiguračný súbor masternodu</translation>
-    </message>
-    <message>
-        <source>Open a Wagerr: URI or payment request</source>
-        <translation>Otvorte Wagerr: URI alebo žiadosť o platbu</translation>
-    </message>
-    <message>
-        <source>&amp;Blockchain explorer</source>
-        <translation>Blockchain prehliadač</translation>
-    </message>
-    <message>
-        <source>Block explorer window</source>
-        <translation>Okno blockchain prehliadača</translation>
-    </message>
-    <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Zobraziť pomocnú správu programu Wagerr Core a získajte zoznam možností príkazového riadka Wagerr</translation>
+        <translation>Šifriranje i dešifriranje privatnih ključeva pomoću zaporke</translation>
     </message>
     <message>
         <source>Wagerr Core client</source>
-        <translation>Wagerr Core klient</translation>
-    </message>
-    <message>
-        <source>Synchronizing with network...</source>
-        <translation>Synchronizácia so sieťou ...</translation>
-    </message>
-    <message>
-        <source>Importing blocks from disk...</source>
-        <translation>Importovanie blokov z disku ...</translation>
-    </message>
-    <message>
-        <source>Reindexing blocks on disk...</source>
-        <translation>Reindexovanie blokov na disku ...</translation>
-    </message>
-    <message>
-        <source>No block source available...</source>
-        <translation>Nie je dostupný žiadny zdroj blokov...</translation>
-    </message>
-    <message>
-        <source>Up to date</source>
-        <translation>Aktuálny</translation>
-    </message>
-    <message>
-        <source>%1 and %2</source>
-        <translation>%1 a %2</translation>
-    </message>
-    <message>
-        <source>Catching up...</source>
-        <translation>Dobieham...</translation>
-    </message>
-    <message>
-        <source>Last received block was generated %1 ago.</source>
-        <translation>Posledný prijatý blok bol vytvorený pred %1.</translation>
-    </message>
-    <message>
-        <source>Transactions after this will not yet be visible.</source>
-        <translation>Po tomto ešte transakcie nebudú viditeľné.</translation>
+        <translation>Wagerr Core klijent</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Varovanie</translation>
+        <translation>Upozorenje</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Informácia</translation>
+        <translation>Informacija</translation>
     </message>
-    <message>
-        <source>Sent transaction</source>
-        <translation>Odoslaná transakcia</translation>
-    </message>
-    <message>
-        <source>Incoming transaction</source>
-        <translation>Prichádzajúca transakcia</translation>
-    </message>
-    <message>
-        <source>Sent MultiSend transaction</source>
-        <translation>Poslať MultiSend transakciu</translation>
-    </message>
-    <message>
-        <source>Date: %1
-Amount: %2
-Type: %3
-Address: %4
-</source>
-        <translation>Dátum: %1
-Suma: %2
-Typ: %3
-Adresa: %4
-</translation>
-    </message>
-    <message>
-        <source>Staking is active
- MultiSend: %1</source>
-        <translation>Staking je aktívny
-MultiSend: %1</translation>
-    </message>
-    <message>
-        <source>Active</source>
-        <translation>Aktívny</translation>
-    </message>
-    <message>
-        <source>Not Active</source>
-        <translation>Neaktívny</translation>
-    </message>
-    <message>
-        <source>Staking is not active
- MultiSend: %1</source>
-        <translation>Staking nie je aktívny
-MultiSend: %1</translation>
-    </message>
-    <message>
-        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
-        <translation>Peňaženka je &lt;b&gt;zašifrovaná&lt;/ b&gt; a momentálne je &lt;b&gt;odomknutá&lt;/ b&gt;</translation>
-    </message>
-    <message>
-        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
-        <translation>Peňaženka je &lt;b&gt;zašifrovaná&lt;/ b&gt; a momentálne je &lt;b&gt;zamknutá&lt;/ b&gt;</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>BlockExplorer</name>
     <message>
-        <source>Blockchain Explorer</source>
-        <translation>Blockchain prehliadač</translation>
-    </message>
-    <message>
         <source>Address / Block / Transaction</source>
-        <translation>Adresa / Blok / Transakcia</translation>
+        <translation>Adresa / Blok / Transakcija</translation>
     </message>
-    <message>
-        <source>Search</source>
-        <translation>Hľadať</translation>
-    </message>
-    <message>
-        <source>TextLabel</source>
-        <translation>TextLabel</translation>
-    </message>
-    <message>
-        <source>Not all transactions will be shown. To view all transactions you need to set txindex=1 in the configuration file (wagerr.conf).</source>
-        <translation>Nie všetky transakcie sa zobrazia. Ak chcete zobraziť všetky transakcie, musíte v konfiguračnom súbore (wagerr.conf) nastaviť txindex = 1.</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>ClientModel</name>
-    <message>
-        <source>Network Alert</source>
-        <translation>Upozornenie siete </translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>CoinControlDialog</name>
     <message>
         <source>Quantity:</source>
-        <translation>Množstvo:</translation>
-    </message>
-    <message>
-        <source>Bytes:</source>
-        <translation>Bytov:</translation>
+        <translation>Količina:</translation>
     </message>
     <message>
         <source>Amount:</source>
-        <translation>Suma:</translation>
+        <translation>Iznos:</translation>
     </message>
     <message>
         <source>Priority:</source>
-        <translation>Priorita:</translation>
-    </message>
-    <message>
-        <source>Fee:</source>
-        <translation>Poplatok:</translation>
-    </message>
-    <message>
-        <source>After Fee:</source>
-        <translation>Po poplatku:</translation>
-    </message>
-    <message>
-        <source>Change:</source>
-        <translation>Zmena:</translation>
+        <translation>Prioritet:</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>Suma</translation>
+        <translation>Iznos</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tip</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>Dátum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <source>Confirmations</source>
-        <translation>Potvrdenia</translation>
+        <translation>Potvrde</translation>
     </message>
     <message>
         <source>Confirmed</source>
-        <translation>Potvrdené</translation>
-    </message>
-    <message>
-        <source>Priority</source>
-        <translation>Priorita</translation>
+        <translation>Potvrđeno</translation>
     </message>
     <message>
         <source>Copy address</source>
-        <translation>Skopírovať adresu</translation>
+        <translation>Kopiraj adrese</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>Skopírovať štítok</translation>
+        <translation>Kopiraj oznaku</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>Skopírovať sumu</translation>
+        <translation>Kopiraj iznos</translation>
     </message>
     <message>
-        <source>Copy transaction ID</source>
-        <translation>Skopírovať ID transakcie</translation>
+        <source>Copy quantity</source>
+        <translation>Kopiraj količinu</translation>
+    </message>
+    <message>
+        <source>yes</source>
+        <translation>da</translation>
+    </message>
+    <message>
+        <source>no</source>
+        <translation>ne</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(žiaden štítok)</translation>
+        <translation>(nema oznake)</translation>
     </message>
     </context>
 <context>
@@ -879,7 +763,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     </context>
 <context>
@@ -889,8 +773,12 @@ MultiSend: %1</translation>
         <translation>Adresa</translation>
     </message>
     <message>
-        <source>Active</source>
-        <translation>Aktívny</translation>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
     </message>
     </context>
 <context>
@@ -905,14 +793,18 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(žiaden štítok)</translation>
+        <translation>(nema oznake)</translation>
     </message>
     </context>
 <context>
     <name>MultisigDialog</name>
     <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
         <source>Amount:</source>
-        <translation>Suma:</translation>
+        <translation>Iznos:</translation>
     </message>
     </context>
 <context>
@@ -936,16 +828,20 @@ MultiSend: %1</translation>
 <context>
     <name>PrivacyDialog</name>
     <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
         <source>Quantity:</source>
-        <translation>Množstvo:</translation>
+        <translation>Količina:</translation>
     </message>
     <message>
         <source>Amount:</source>
-        <translation>Suma:</translation>
+        <translation>Iznos:</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>Vyberte predtým použitú adresu</translation>
+        <translation>Odaberi prethodno korištenu adresu</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -953,7 +849,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>Vložte adresu zo schránky</translation>
+        <translation>Zaljepi adresu iz međuspremnika</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -961,139 +857,231 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Priority:</source>
-        <translation>Priorita:</translation>
+        <translation>Prioritet:</translation>
     </message>
     <message>
-        <source>TextLabel</source>
-        <translation>TextLabel</translation>
+        <source>no</source>
+        <translation>ne</translation>
     </message>
     <message>
-        <source>Fee:</source>
-        <translation>Poplatok:</translation>
-    </message>
-    <message>
-        <source>Bytes:</source>
-        <translation>Bytov:</translation>
-    </message>
-    <message>
-        <source>Change:</source>
-        <translation>Zmena:</translation>
+        <source>Copy quantity</source>
+        <translation>Kopiraj količinu</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>Skopírovať sumu</translation>
+        <translation>Kopiraj iznos</translation>
     </message>
     </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
-        <translation>Suma</translation>
+        <translation>Iznos</translation>
+    </message>
+    <message>
+        <source>NETWORK</source>
+        <translation>MREŽA</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
     </message>
     </context>
 <context>
     <name>QRImageWidget</name>
+    <message>
+        <source>Save QR Code</source>
+        <translation>Spremi QR Kod</translation>
+    </message>
     </context>
 <context>
     <name>RPCConsole</name>
     <message>
         <source>&amp;Information</source>
-        <translation>Informácie</translation>
+        <translation>&amp;Informacije</translation>
+    </message>
+    <message>
+        <source>Name</source>
+        <translation>Ime</translation>
+    </message>
+    <message>
+        <source>N/A</source>
+        <translation>N/A</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Otvori</translation>
+    </message>
+    <message>
+        <source>Network</source>
+        <translation>Mreža</translation>
+    </message>
+    <message>
+        <source>Client version</source>
+        <translation>Verzija klijenta</translation>
+    </message>
+    <message>
+        <source>%1 B</source>
+        <translation>%1 B</translation>
+    </message>
+    <message>
+        <source>%1 KB</source>
+        <translation>%1 KB</translation>
+    </message>
+    <message>
+        <source>%1 MB</source>
+        <translation>%1 MB</translation>
+    </message>
+    <message>
+        <source>%1 GB</source>
+        <translation>%1 GB</translation>
+    </message>
+    <message>
+        <source>via %1</source>
+        <translation>via %1</translation>
     </message>
     </context>
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Obiši sva polja obrasca.</translation>
+    </message>
+    <message>
+        <source>Remove</source>
+        <translation>Ukloni</translation>
+    </message>
+    <message>
         <source>Copy label</source>
-        <translation>Skopírovať štítok</translation>
+        <translation>Kopiraj oznaku</translation>
+    </message>
+    <message>
+        <source>Copy message</source>
+        <translation>Kopiraj poruku</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>Skopírovať sumu</translation>
+        <translation>Kopiraj iznos</translation>
     </message>
 </context>
 <context>
     <name>ReceiveRequestDialog</name>
+    <message>
+        <source>QR Code</source>
+        <translation>QR Kod</translation>
+    </message>
+    <message>
+        <source>Copy &amp;URI</source>
+        <translation>Kopiraj &amp;URI</translation>
+    </message>
+    <message>
+        <source>Copy &amp;Address</source>
+        <translation>Kopiraj &amp;Adresu</translation>
+    </message>
+    <message>
+        <source>URI</source>
+        <translation>URI</translation>
+    </message>
     <message>
         <source>Address</source>
         <translation>Adresa</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>Suma</translation>
+        <translation>Iznos</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>Štítok</translation>
+        <translation>Oznaka</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Poruka</translation>
     </message>
     </context>
 <context>
     <name>RecentRequestsTableModel</name>
     <message>
         <source>Date</source>
-        <translation>Dátum</translation>
+        <translation>Datum</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>Štítok</translation>
+        <translation>Oznaka</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Poruka</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>Suma</translation>
+        <translation>Iznos</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(žiaden štítok)</translation>
+        <translation>(nema oznake)</translation>
+    </message>
+    <message>
+        <source>(no message)</source>
+        <translation>(nema poruke)</translation>
     </message>
     </context>
 <context>
     <name>SendCoinsDialog</name>
     <message>
         <source>Quantity:</source>
-        <translation>Množstvo:</translation>
-    </message>
-    <message>
-        <source>Bytes:</source>
-        <translation>Bytov:</translation>
+        <translation>Količina:</translation>
     </message>
     <message>
         <source>Amount:</source>
-        <translation>Suma:</translation>
+        <translation>Iznos:</translation>
     </message>
     <message>
         <source>Priority:</source>
-        <translation>Priorita:</translation>
+        <translation>Prioritet:</translation>
     </message>
     <message>
-        <source>Fee:</source>
-        <translation>Poplatok:</translation>
+        <source>no</source>
+        <translation>ne</translation>
     </message>
     <message>
-        <source>After Fee:</source>
-        <translation>Po poplatku:</translation>
+        <source>0 WGR</source>
+        <translation>0 WGR</translation>
     </message>
     <message>
-        <source>Change:</source>
-        <translation>Zmena:</translation>
+        <source>Confirmation time:</source>
+        <translation>Vrijeme potvrde:</translation>
+    </message>
+    <message>
+        <source>Clear all fields of the form.</source>
+        <translation>Obiši sva polja obrasca.</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
-        <translation>Všetko zmazať</translation>
+        <translation>Očistiti &amp;Sve</translation>
+    </message>
+    <message>
+        <source>Copy quantity</source>
+        <translation>Kopiraj količinu</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>Skopírovať sumu</translation>
+        <translation>Kopiraj iznos</translation>
+    </message>
+    <message>
+        <source>%1 to %2</source>
+        <translation>%1 do %2</translation>
     </message>
     <message>
         <source>(no label)</source>
-        <translation>(žiaden štítok)</translation>
+        <translation>(nema oznake)</translation>
     </message>
 </context>
 <context>
     <name>SendCoinsEntry</name>
     <message>
         <source>Choose previously used address</source>
-        <translation>Vyberte predtým použitú adresu</translation>
+        <translation>Odaberi prethodno korištenu adresu</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -1101,25 +1089,41 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>Vložte adresu zo schránky</translation>
+        <translation>Zaljepi adresu iz međuspremnika</translation>
     </message>
     <message>
         <source>Alt+P</source>
         <translation>Alt+P</translation>
     </message>
+    <message>
+        <source>Remove this entry</source>
+        <translation>Ukloni ovaj unos</translation>
+    </message>
+    <message>
+        <source>Message:</source>
+        <translation>Poruka:</translation>
+    </message>
+    <message>
+        <source>Memo:</source>
+        <translation>Memo:</translation>
+    </message>
     </context>
 <context>
     <name>ShutdownWindow</name>
+    <message>
+        <source>Wagerr Core is shutting down...</source>
+        <translation>Wagerr Core se gasi...</translation>
+    </message>
     </context>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
         <source>The Wagerr address to sign the message with</source>
-        <translation>Adresa Wagerr, ktorou chcete správu podpísať</translation>
+        <translation>Wagerr adresa za potpisivanje poruke s</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>Vyberte predtým použitú adresu</translation>
+        <translation>Odaberi prethodno korištenu adresu</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -1127,7 +1131,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>Vložte adresu zo schránky</translation>
+        <translation>Zaljepi adresu iz međuspremnika</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -1135,72 +1139,104 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>Copy the current signature to the system clipboard</source>
-        <translation>Skopírujte aktuálny podpis do schránky</translation>
+        <translation>Kopirajte trenutačni potpis u međuspremnik sustava</translation>
     </message>
     <message>
         <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Podpíšte správu, aby ste preukázali, že ste vlastníkom tejto Wagerr adresy</translation>
+        <translation>Potpišite poruku da biste dokazali da ste vlasnik ove Wagerr adrese</translation>
     </message>
     <message>
         <source>The Wagerr address the message was signed with</source>
-        <translation>Wagerr adresa, ktorou bola správa podpísaná</translation>
+        <translation>Wagerr adresa s kojom je potpisana poruka</translation>
     </message>
     <message>
         <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Skontrolujte správu, aby ste sa uistili, že bola podpísaná zadanou Wagerr adresou</translation>
+        <translation>Potvrdite poruku kako biste bili sigurni da je potpisan s navedenom Wagerr adresom</translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
-        <translation>Zmazať všetky polia správy</translation>
+        <translation>Ponovno postavite sva polja s obavijestima o znakovima</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
-        <translation>Všetko zmazať</translation>
+        <translation>Očistiti &amp;Sve</translation>
     </message>
     <message>
         <source>Reset all verify message fields</source>
-        <translation>Zmazať všetky polia verifikácie správy</translation>
+        <translation>Ponovno postavite sva polja za potvrdu poruka</translation>
     </message>
     <message>
         <source>The entered address is invalid.</source>
-        <translation>Zadaná adresa je neplatná.</translation>
+        <translation>Utipkana adresa nije važeča</translation>
     </message>
     <message>
         <source>Please check the address and try again.</source>
-        <translation>Skontrolujte adresu a skúste to znova.</translation>
+        <translation>Molimo da provjerite adresu i probajte isponova</translation>
     </message>
     <message>
         <source>The entered address does not refer to a key.</source>
-        <translation>Zadaná adresa neodkazuje na kľúč.</translation>
+        <translation>Unesena adresa ne odnosi se na ključ.</translation>
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
-        <translation>Odomknutie peňaženky bolo zrušené.</translation>
+        <translation>Otklučavanje novčanika ukinuto</translation>
     </message>
     <message>
         <source>Private key for the entered address is not available.</source>
-        <translation>Súkromný kľúč pre zadanú adresu nie je k dispozícii.</translation>
+        <translation>Privatni ključ za unesenu adresu nije dostupan.</translation>
     </message>
-    </context>
+    <message>
+        <source>Message signed.</source>
+        <translation>Poruka potpisana.</translation>
+    </message>
+    <message>
+        <source>Message verified.</source>
+        <translation>Poruka verificirana.</translation>
+    </message>
+</context>
 <context>
     <name>SplashScreen</name>
     <message>
         <source>Wagerr Core</source>
         <translation>Wagerr Core</translation>
     </message>
-    </context>
+    <message>
+        <source>Version %1</source>
+        <translation>Verzija %1</translation>
+    </message>
+    <message>
+        <source>[testnet]</source>
+        <translation>[testnet]</translation>
+    </message>
+</context>
 <context>
     <name>TrafficGraphWidget</name>
-    </context>
+    <message>
+        <source>KB/s</source>
+        <translation>KB/s</translation>
+    </message>
+</context>
 <context>
     <name>TransactionDesc</name>
     <message>
+        <source>Status</source>
+        <translation>Status</translation>
+    </message>
+    <message>
         <source>Date</source>
-        <translation>Dátum</translation>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <source>Source</source>
+        <translation>Izvor</translation>
+    </message>
+    <message>
+        <source>Message</source>
+        <translation>Poruka</translation>
     </message>
     <message>
         <source>Amount</source>
-        <translation>Suma</translation>
+        <translation>Iznos</translation>
     </message>
     </context>
 <context>
@@ -1210,54 +1246,82 @@ MultiSend: %1</translation>
     <name>TransactionTableModel</name>
     <message>
         <source>Date</source>
-        <translation>Dátum</translation>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tip</translation>
     </message>
     <message>
         <source>Address</source>
         <translation>Adresa</translation>
+    </message>
+    <message>
+        <source>(n/a)</source>
+        <translation>(n/a)</translation>
     </message>
     </context>
 <context>
     <name>TransactionView</name>
     <message>
+        <source>Today</source>
+        <translation>Danas</translation>
+    </message>
+    <message>
+        <source>This week</source>
+        <translation>Ovaj tjedan</translation>
+    </message>
+    <message>
+        <source>This month</source>
+        <translation>Ovaj mjesec</translation>
+    </message>
+    <message>
+        <source>Last month</source>
+        <translation>Prošli mjesec</translation>
+    </message>
+    <message>
         <source>Copy address</source>
-        <translation>Skopírovať adresu</translation>
+        <translation>Kopiraj adrese</translation>
     </message>
     <message>
         <source>Copy label</source>
-        <translation>Skopírovať štítok</translation>
+        <translation>Kopiraj oznaku</translation>
     </message>
     <message>
         <source>Copy amount</source>
-        <translation>Skopírovať sumu</translation>
-    </message>
-    <message>
-        <source>Copy transaction ID</source>
-        <translation>Skopírovať ID transakcie</translation>
+        <translation>Kopiraj iznos</translation>
     </message>
     <message>
         <source>Comma separated file (*.csv)</source>
-        <translation>Súbor oddelený čiarkami (*.csv)</translation>
+        <translation>Comma separated file (*.csv)</translation>
     </message>
     <message>
         <source>Confirmed</source>
-        <translation>Potvrdené</translation>
+        <translation>Potvrđeno</translation>
     </message>
     <message>
         <source>Date</source>
-        <translation>Dátum</translation>
+        <translation>Datum</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tip</translation>
     </message>
     <message>
         <source>Label</source>
-        <translation>Štítok</translation>
+        <translation>Oznaka</translation>
     </message>
     <message>
         <source>Address</source>
         <translation>Adresa</translation>
     </message>
     <message>
+        <source>ID</source>
+        <translation>ID</translation>
+    </message>
+    <message>
         <source>Exporting Failed</source>
-        <translation>Export zlyhal</translation>
+        <translation>Izvoz Nije Uspio</translation>
     </message>
     </context>
 <context>
@@ -1273,29 +1337,37 @@ MultiSend: %1</translation>
     <name>WalletView</name>
     <message>
         <source>&amp;Export</source>
-        <translation>Exportovať</translation>
+        <translation>&amp;Izvezi</translation>
     </message>
     <message>
         <source>Export the data in the current tab to a file</source>
-        <translation>Exportovať údaje na aktuálnej karte do súboru</translation>
+        <translation>Izvezi podatke iz trenutne kartice u datoteku</translation>
     </message>
     </context>
 <context>
     <name>ZWgrControlDialog</name>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
     </context>
 <context>
     <name>wagerr-core</name>
     <message>
         <source>Error</source>
-        <translation>Chyba</translation>
+        <translation>Greška</translation>
     </message>
     <message>
         <source>Information</source>
-        <translation>Informácia</translation>
+        <translation>Informacija</translation>
+    </message>
+    <message>
+        <source>Use the test network</source>
+        <translation>Koristi testnu mrežu</translation>
     </message>
     <message>
         <source>Warning</source>
-        <translation>Varovanie</translation>
+        <translation>Upozorenje</translation>
     </message>
     </context>
 </TS>

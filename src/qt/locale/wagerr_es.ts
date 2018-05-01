@@ -3,7 +3,7 @@
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>Click derecho para editar dirección o etiqueta</translation>
+        <translation>Click derecho para editar la dirección o etiqueta</translation>
     </message>
     <message>
         <source>Create a new address</source>
@@ -47,7 +47,7 @@
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>Escoja la dirección con las cual recibirá las monedas</translation>
+        <translation>Escoja la dirección en la cual recibirá las monedas</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
@@ -136,8 +136,8 @@
         <translation>Sirve para desactivar el envío de dinero cuando la cuenta del SO está comprometida. No provee de una seguridad real</translation>
     </message>
     <message>
-        <source>For anonymization and staking only</source>
-        <translation>Desbloquear solo para anonimización y staking</translation>
+        <source>For anonymization, automint, and staking only</source>
+        <translation>Para anonimización y staking solamente</translation>
     </message>
     <message>
         <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
@@ -229,6 +229,17 @@
     </message>
 </context>
 <context>
+    <name>BanTableModel</name>
+    <message>
+        <source>IP/Netmask</source>
+        <translation>IP/Máscara de Red</translation>
+    </message>
+    <message>
+        <source>Banned Until</source>
+        <translation>Suspendido hasta</translation>
+    </message>
+</context>
+<context>
     <name>Bip38ToolDialog</name>
     <message>
         <source>BIP 38 Tool</source>
@@ -239,16 +250,16 @@
         <translation>&amp;Cifrado BIP 38</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Introduzca la dirección Wagerr que querría cifrar usando BIP 38. Introduzca una contraseña en el campo central. Haga clic en cifrar para generar la clave privada cifrada.</translation>
-    </message>
-    <message>
         <source>Address:</source>
         <translation>Dirección:</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>La dirección Wagerr con la que desee firmar el mensaje</translation>
+        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <translation>Introduzca la dirección Wagerr que querría cifrar usando BIP 38. Introduzca una contraseña en el campo central. Haga clic en cifrar para generar la clave privada cifrada.</translation>
+    </message>
+    <message>
+        <source>The Wagerr address to encrypt</source>
+        <translation>La dirección Wagerr a cifrar</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -279,16 +290,24 @@
         <translation>Copiar la firma actual al portapapeles del sistema</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Firme el mensaje para demostrar que eres el propietario de esta dirección Wagerr</translation>
+        <source>Encrypt the private key for this Wagerr address</source>
+        <translation>Cifrar la llave privada para esta dirección Wagerr</translation>
+    </message>
+    <message>
+        <source>Reset all fields</source>
+        <translation>Limpiar todos los campos</translation>
+    </message>
+    <message>
+        <source>The encrypted private key</source>
+        <translation>La llave privada cifrada</translation>
+    </message>
+    <message>
+        <source>Decrypt the entered key using the passphrase</source>
+        <translation>Descifrar la llave ingresada usando la frase de contraseña</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
         <translation>Cifrar &amp;Clave</translation>
-    </message>
-    <message>
-        <source>Reset all sign message fields</source>
-        <translation>Limpiar todos los campos de firma de mensaje</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
@@ -303,20 +322,8 @@
         <translation>Introduzca la clave cifrada privada BIP 38. Introduzca la contraseña en el campo central. Haga clic en descifrar clave para generar la clave privada. Después de que la clave sea descifrada, pulsando en 'Importar dirección' añadirá esta clave privada al monedero.</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>La dirección Wagerr con la que se firmó el mensaje</translation>
-    </message>
-    <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Verifica el mensaje para asegurar que fue firmado con la dirección Wagerr especificada</translation>
-    </message>
-    <message>
         <source>Decrypt &amp;Key</source>
         <translation>Descifrar &amp;Clave</translation>
-    </message>
-    <message>
-        <source>Reset all verify message fields</source>
-        <translation>Limpiar todos los campos de verificación de mensaje</translation>
     </message>
     <message>
         <source>Decrypted Key:</source>
@@ -424,6 +431,10 @@
     <message>
         <source>Browse transaction history</source>
         <translation>Navegar por el historial de transacciones</translation>
+    </message>
+    <message>
+        <source>Privacy Actions for zWGR</source>
+        <translation>Acciones de privacidad para zWGR</translation>
     </message>
     <message>
         <source>E&amp;xit</source>
@@ -566,6 +577,30 @@
         <translation>Mostrar la lista de las direcciones y etiquetas usadas</translation>
     </message>
     <message>
+        <source>&amp;Multisignature creation...</source>
+        <translation>Creación multifirmas ...</translation>
+    </message>
+    <message>
+        <source>Create a new multisignature address and add it to this wallet</source>
+        <translation>Crear una nueva dirección multifirma y agregarla a esta cartera</translation>
+    </message>
+    <message>
+        <source>&amp;Multisignature spending...</source>
+        <translation>Gasto multifirmas...</translation>
+    </message>
+    <message>
+        <source>Spend from a multisignature address</source>
+        <translation>Gastar desde una dirección multifirmas</translation>
+    </message>
+    <message>
+        <source>&amp;Multisignature signing...</source>
+        <translation>Firma multifirmas...</translation>
+    </message>
+    <message>
+        <source>Sign with a multisignature address</source>
+        <translation>Firmar con una dirección multifirmas</translation>
+    </message>
+    <message>
         <source>Open &amp;URI...</source>
         <translation>Abrir &amp;URI...</translation>
     </message>
@@ -575,11 +610,19 @@
     </message>
     <message numerus="yes">
         <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>Procesado %n bloque del historial de transacciones.</numerusform><numerusform>Procesados %n bloques del historial de transacciones.</numerusform></translation>
+        <translation><numerusform>Procesados %n bloques del histórico de transacciones.</numerusform><numerusform>Procesados %n bloques del histórico de transacciones.</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
         <translation>Sincronizando datos adicionales: %p%</translation>
+    </message>
+    <message>
+        <source>%1 behind. Scanning block %2</source>
+        <translation>%1 detrás. Escaneando bloque %2</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonymization and staking only</source>
+        <translation>El monedero está &lt;b&gt;cifrado&lt;/b&gt; y actualmente &lt;b&gt;desbloqueado&lt;/b&gt; para anonimato y prueba de participación.</translation>
     </message>
     <message>
         <source>&amp;File</source>
@@ -616,10 +659,6 @@
     <message>
         <source>&amp;Privacy</source>
         <translation>&amp;Privacidad</translation>
-    </message>
-    <message>
-        <source>Privacy Action for zWGR and Obfuscation</source>
-        <translation>Privacidad con zWGR y Ofuscación</translation>
     </message>
     <message>
         <source>&amp;Masternodes</source>
@@ -697,6 +736,10 @@
         <source>Wagerr Core client</source>
         <translation>Cliente Wagerr Core</translation>
     </message>
+    <message numerus="yes">
+        <source>%n active connection(s) to Wagerr network</source>
+        <translation><numerusform>%n conexión(es) activas a la red Wagerr</numerusform><numerusform>%n conexión(es) activas a la red Wagerr</numerusform></translation>
+    </message>
     <message>
         <source>Synchronizing with network...</source>
         <translation>Sincronizando con la red...</translation>
@@ -717,13 +760,25 @@
         <source>Up to date</source>
         <translation>Actualizado</translation>
     </message>
+    <message numerus="yes">
+        <source>%n hour(s)</source>
+        <translation><numerusform>%n horas</numerusform><numerusform>%n horas</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n day(s)</source>
+        <translation><numerusform>%n días</numerusform><numerusform>%n días</numerusform></translation>
+    </message>
+    <message numerus="yes">
+        <source>%n week(s)</source>
+        <translation><numerusform>%n semanas</numerusform><numerusform>%n semanas</numerusform></translation>
+    </message>
     <message>
         <source>%1 and %2</source>
         <translation>%1 y %2</translation>
     </message>
-    <message>
-        <source>%1 behind</source>
-        <translation>%1 detrás</translation>
+    <message numerus="yes">
+        <source>%n year(s)</source>
+        <translation><numerusform>%n años</numerusform><numerusform>%n años</numerusform></translation>
     </message>
     <message>
         <source>Catching up...</source>
@@ -794,12 +849,16 @@ MultiEnvío: %1</translation>
 MultiEnvío: %1</translation>
     </message>
     <message>
-        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
-        <translation>El monedero está &lt;b&gt;encriptado&lt;/b&gt; y actualmente &lt;b&gt;desbloqueado&lt;/b&gt;</translation>
+        <source>AutoMint is currently enabled and set to </source>
+        <translation>AutoMint está actualmente habilitado y configurado</translation>
     </message>
     <message>
-        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonimization and staking only</source>
-        <translation>El monedero está &lt;b&gt;encriptado&lt;/b&gt; y actualmente &lt;b&gt;desbloqueado&lt;/b&gt; sólo para anonimato y prueba de participación.</translation>
+        <source>AutoMint is disabled</source>
+        <translation>AutoMint está desactivado</translation>
+    </message>
+    <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
+        <translation>El monedero está &lt;b&gt;encriptado&lt;/b&gt; y actualmente &lt;b&gt;desbloqueado&lt;/b&gt;</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
@@ -840,8 +899,8 @@ MultiEnvío: %1</translation>
 <context>
     <name>ClientModel</name>
     <message>
-        <source>Total: %1 (OBF compatible: %2 / Enabled: %3)</source>
-        <translation>Total: %1 (Ofuscación compatible: %2 / Activado: %3)</translation>
+        <source>Total: %1 (IPv4: %2 / IPv6: %3 / Tor: %4 / Unknown: %5)</source>
+        <translation>Total: %1 (IPv4: %2 / IPv6: %3 / Tor: %4 / Desconocido: %5)</translation>
     </message>
     <message>
         <source>Network Alert</source>
@@ -917,6 +976,10 @@ MultiEnvío: %1</translation>
     <message>
         <source>Received with address</source>
         <translation>Recibido con dirección</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tipo</translation>
     </message>
     <message>
         <source>Date</source>
@@ -1007,10 +1070,6 @@ MultiEnvío: %1</translation>
         <translation>medio-alta</translation>
     </message>
     <message>
-        <source>Can vary +/- %1 duff(s) per input.</source>
-        <translation>Puede variar +/- %1 duff(s) por entrada.</translation>
-    </message>
-    <message>
         <source>medium</source>
         <translation>media</translation>
     </message>
@@ -1069,6 +1128,10 @@ MultiEnvío: %1</translation>
     <message>
         <source>This label turns red, if any recipient receives an amount smaller than %1.</source>
         <translation>Esta etiqueta se vuelve roja, si algún destinatario recibe una cantidad menor que %1.</translation>
+    </message>
+    <message>
+        <source>Can vary +/- %1 uwgr per input.</source>
+        <translation>Pode variar +/- %1 uwgr por entrada.</translation>
     </message>
     <message>
         <source>(no label)</source>
@@ -1270,8 +1333,8 @@ MultiEnvío: %1</translation>
         <translation>Formulario</translation>
     </message>
     <message>
-        <source>My Masternodes</source>
-        <translation>Mis Nodos Maestros</translation>
+        <source>MASTERNODES</source>
+        <translation>MASTERNODES</translation>
     </message>
     <message>
         <source>Note: Status of your masternodes in local wallet can potentially be slightly incorrect.&lt;br /&gt;Always wait for wallet to sync additional data and then double check from another node&lt;br /&gt;if your node should be running but you still see "MISSING" in "Status" field.</source>
@@ -1435,6 +1498,14 @@ MultiEnvío no se activará a menos que haga usted click en Activar</translation
         <translation>Dirección:</translation>
     </message>
     <message>
+        <source>Label:</source>
+        <translation>Etiqueta:</translation>
+    </message>
+    <message>
+        <source>Enter a label for this address to add it to your address book</source>
+        <translation>Introduzca una etiqueta para esta dirección para añadirla a su libreta de direcciones</translation>
+    </message>
+    <message>
         <source>Delete Address From MultiSend Vector</source>
         <translation>Borrar Dirección De Vector MultiEnvío</translation>
     </message>
@@ -1467,6 +1538,10 @@ MultiEnvío no se activará a menos que haga usted click en Activar</translation
         <translation>Enviar Para Recomensas De Nodos Maestros</translation>
     </message>
     <message>
+        <source>(no label)</source>
+        <translation>(sin etiqueta)</translation>
+    </message>
+    <message>
         <source>The entered address:
 </source>
         <translation>La dirección introducida:
@@ -1489,6 +1564,12 @@ Por favor compruebe la dirección e inténtelo de nuevo.</translation>
         <translation>Por favor Introduzca 1 - 100 por ciento.</translation>
     </message>
     <message>
+        <source>Saved the MultiSend to memory, but failed saving properties to the database.
+</source>
+        <translation>Salvou o MultiSend na memória, mas não salvou as propriedades no banco de dados.
+</translation>
+    </message>
+    <message>
         <source>MultiSend Vector
 </source>
         <translation>Vector MultiEnvío
@@ -1503,6 +1584,177 @@ Por favor compruebe la dirección e inténtelo de nuevo.</translation>
 </source>
         <translation>No se pudo localizar la dirección
 </translation>
+    </message>
+</context>
+<context>
+    <name>MultisigDialog</name>
+    <message>
+        <source>Multisignature Address Interactions</source>
+        <translation>Interacciones de direcciones multifirmas</translation>
+    </message>
+    <message>
+        <source>Create MultiSignature &amp;Address</source>
+        <translation>Crear una dirección multifirma</translation>
+    </message>
+    <message>
+        <source>How many people must sign to verify a transaction</source>
+        <translation>Cuántas personas deben firmar para verificar una transacción</translation>
+    </message>
+    <message>
+        <source>Enter the minimum number of signatures required to sign transactions</source>
+        <translation>Entra el número mínimo de firmas requerido para firmar la transacción</translation>
+    </message>
+    <message>
+        <source>Address Label:</source>
+        <translation>Etiqueta de dirección</translation>
+    </message>
+    <message>
+        <source>Add another address that could sign to verify a transaction from the multisig address.</source>
+        <translation>Agrega otra dirección que pueda firmar para verificar la transacción desde la dirección multifirmas</translation>
+    </message>
+    <message>
+        <source>&amp;Add Address / Key</source>
+        <translation>Agrega dirección / Llave</translation>
+    </message>
+    <message>
+        <source>Local addresses or public keys that can sign:</source>
+        <translation>Direcciones locales o llaves publicas que puedan firmar:</translation>
+    </message>
+    <message>
+        <source>Create a new multisig address</source>
+        <translation>Crea una nueva dirección multifirmas</translation>
+    </message>
+    <message>
+        <source>C&amp;reate</source>
+        <translation>Crear</translation>
+    </message>
+    <message>
+        <source>Status:</source>
+        <translation>Estado:</translation>
+    </message>
+    <message>
+        <source>Use below to quickly import an address by its redeem. Don't forget to add a label before clicking import!
+Keep in mind, the wallet will rescan the blockchain to find transactions containing the new address.
+Please be patient after clicking import.</source>
+        <translation>Use debajo para importar rápidamente una dirección al canjearla. ¡No olvide agregar una etiqueta antes de hacer clic en importar!
+Tenga en cuenta que la billetera volverá a explorar la cadena de bloques para buscar transacciones que contengan la nueva dirección.
+Por favor, tenga paciencia después de hacer clic en importar.</translation>
+    </message>
+    <message>
+        <source>&amp;Import Redeem</source>
+        <translation>Importar Canje</translation>
+    </message>
+    <message>
+        <source>&amp;Create MultiSignature Tx</source>
+        <translation>Crear transacción multifirmas</translation>
+    </message>
+    <message>
+        <source>Inputs:</source>
+        <translation>Entradas:</translation>
+    </message>
+    <message>
+        <source>Coin Control</source>
+        <translation>Control de moneda</translation>
+    </message>
+    <message>
+        <source>Quantity Selected:</source>
+        <translation>Cantidad Seleccionada:</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Cantidad:</translation>
+    </message>
+    <message>
+        <source>Add an input to fund the outputs</source>
+        <translation>Agregue una entrada para financiar las salidas</translation>
+    </message>
+    <message>
+        <source>Add a Raw Input</source>
+        <translation>Agregar una entrada sin procesar</translation>
+    </message>
+    <message>
+        <source>Address / Amount:</source>
+        <translation>Dirección / Cantidad:</translation>
+    </message>
+    <message>
+        <source>Add destinations to send WGR to</source>
+        <translation>Agregue los destinos para enviar WGR</translation>
+    </message>
+    <message>
+        <source>Add &amp;Destination</source>
+        <translation>Agregar destino</translation>
+    </message>
+    <message>
+        <source>Create a transaction object using the given inputs to the given outputs</source>
+        <translation>Crear un objeto de transacción usando las entradas dadas a las salidas dadas</translation>
+    </message>
+    <message>
+        <source>Cr&amp;eate</source>
+        <translation>Crear</translation>
+    </message>
+    <message>
+        <source>&amp;Sign MultiSignature Tx</source>
+        <translation>Firmar transacción multifirmas</translation>
+    </message>
+    <message>
+        <source>Transaction Hex:</source>
+        <translation>Hexadecimal de transacción:</translation>
+    </message>
+    <message>
+        <source>Sign the transaction from this wallet or from provided private keys</source>
+        <translation>Firma la transacción desde esta cartera o desde llaves privadas provistas</translation>
+    </message>
+    <message>
+        <source>S&amp;ign</source>
+        <translation>Firmar</translation>
+    </message>
+    <message>
+        <source>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;DISABLED until transaction has been signed enough times.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</source>
+        <translation>&lt;html&gt;&lt;head/&gt;&lt;body&gt;&lt;p&gt;DESACTIVADO hasta que la transacción se haya firmado suficientes veces.&lt;/p&gt;&lt;/body&gt;&lt;/html&gt;</translation>
+    </message>
+    <message>
+        <source>Co&amp;mmit</source>
+        <translation>Confirmar</translation>
+    </message>
+    <message>
+        <source>Add private keys to sign the transaction with</source>
+        <translation>Agregar llaves privadas para firmar la transacción</translation>
+    </message>
+    <message>
+        <source>Add Private &amp;Key</source>
+        <translation>Agregar llave privada</translation>
+    </message>
+    <message>
+        <source>Sign with only private keys (Not Recommened)</source>
+        <translation>Firmar solo con llaves privadas (No Recomendado)</translation>
+    </message>
+    <message>
+        <source>Invalid Tx Hash.</source>
+        <translation>Hash de transacción inválido</translation>
+    </message>
+    <message>
+        <source>Vout position must be positive.</source>
+        <translation>La posición de Vout debe ser positiva.</translation>
+    </message>
+    <message>
+        <source>Maximum possible addresses reached. (15)</source>
+        <translation>Máxima cantidad de direcciones posibles alcanzadas. (15)</translation>
+    </message>
+    <message>
+        <source>Vout Position: </source>
+        <translation>Posición Vout:</translation>
+    </message>
+    <message>
+        <source>Amount: </source>
+        <translation>Cantidad:</translation>
+    </message>
+    <message>
+        <source>Maximum (15)</source>
+        <translation>Máximo (15)</translation>
     </message>
 </context>
 <context>
@@ -1696,6 +1948,14 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Mapear un puerto utilizando &amp;UPnP</translation>
     </message>
     <message>
+        <source>Enable automatic minting of WGR units to zWGR</source>
+        <translation>Ative a cunhagem automática de unidades WGR para zWGR</translation>
+    </message>
+    <message>
+        <source>Enable zWGR Automint</source>
+        <translation>Ativar zWGR Automint</translation>
+    </message>
+    <message>
         <source>Percentage of incoming WGR which get automatically converted to zWGR via Zerocoin Protocol (min: 10%)</source>
         <translation>Porcentaje de WGRs entrantes que serán automáticamente convertidos a zWGR a través del Protocolo Zerocoin (mín: 10%)</translation>
     </message>
@@ -1705,7 +1965,15 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     </message>
     <message>
         <source>Wait with automatic conversion to Zerocoin until enough WGR for this denomination is available</source>
-        <translation>Retrasar la conversión automática a Zerocoin hasta que hayan suficientes WGR disponibles para esta denominación</translation>
+        <translation>Retrasar la conversión automática a Zerocoin hasta que hayan suficientes WGR disponibles para este tamaño de billete</translation>
+    </message>
+    <message>
+        <source>Preferred Automint zWGR Denomination</source>
+        <translation>Tamaño de billete zWGR preferido en la creación automática de dinero</translation>
+    </message>
+    <message>
+        <source>Stake split threshold:</source>
+        <translation>Limite de divisão da estaca:</translation>
     </message>
     <message>
         <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
@@ -1772,6 +2040,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Dígitos decimales</translation>
     </message>
     <message>
+        <source>Hide empty balances</source>
+        <translation>Ocultar saldos vazios</translation>
+    </message>
+    <message>
         <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
         <translation>Direcciones web de terceras partes (p.e. un explorador de bloques) que aparecen en la pestaña de transacciones como objetos contextuales del menú. %s en la dirección web es reemplazada por el identificador de la transacción. Múltiples direcciones web están separadas por una barra vertical (|).</translation>
     </message>
@@ -1800,8 +2072,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>&amp;Cancelar</translation>
     </message>
     <message>
-        <source>I don't care</source>
-        <translation>No me preocupa</translation>
+        <source>Any</source>
+        <translation>Qualquer</translation>
     </message>
     <message>
         <source>default</source>
@@ -1831,6 +2103,14 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <source>The supplied proxy address is invalid.</source>
         <translation>La dirección proxy indicada es inválida.</translation>
     </message>
+    <message>
+        <source>The supplied proxy port is invalid.</source>
+        <translation>A porta do proxy fornecida é inválida.</translation>
+    </message>
+    <message>
+        <source>The supplied proxy settings are invalid.</source>
+        <translation>As configurações de proxy fornecidas são inválidas.</translation>
+    </message>
 </context>
 <context>
     <name>OverviewPage</name>
@@ -1839,16 +2119,20 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Formulario</translation>
     </message>
     <message>
-        <source>WGR Balances</source>
-        <translation>Balances WGR</translation>
-    </message>
-    <message>
         <source>Available:</source>
         <translation>Disponible:</translation>
     </message>
     <message>
         <source>Your current spendable balance</source>
         <translation>Tu balance actualmente disponible</translation>
+    </message>
+    <message>
+        <source>Total Balance, including all unavailable coins.</source>
+        <translation>Saldo Total, incluindo todas as moedas indisponíveis.</translation>
+    </message>
+    <message>
+        <source>WGR Balance</source>
+        <translation>Balance WGR</translation>
     </message>
     <message>
         <source>Pending:</source>
@@ -1867,8 +2151,32 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Recompensa de participación o de nodo maestro que aún no ha madurado</translation>
     </message>
     <message>
+        <source>Current locked balance in watch-only addresses</source>
+        <translation>Saldo bloqueado atual em endereços somente para assistir</translation>
+    </message>
+    <message>
+        <source>Your current Wagerr balance, unconfirmed and immature transactions included</source>
+        <translation>Seu saldo atual da Wagerr, transações não confirmadas e imaturas incluídas</translation>
+    </message>
+    <message>
+        <source>zWGR Balance</source>
+        <translation>Balanço zWGR</translation>
+    </message>
+    <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
         <translation>La información mostrada puede estar desactualizada. Su monedero se sincroniza automáticamente con la red Wagerr después de establecer una conexión, pero este proceso aún no se ha completado.</translation>
+    </message>
+    <message>
+        <source>OVERVIEW</source>
+        <translation>VISÃO GERAL</translation>
+    </message>
+    <message>
+        <source>Combined Balance (including unconfirmed and immature coins)</source>
+        <translation>Saldos combinados (incluidas las monedas no confirmadas e inmaduras)</translation>
+    </message>
+    <message>
+        <source>Combined Balance</source>
+        <translation>Saldo Combinado</translation>
     </message>
     <message>
         <source>Unconfirmed transactions to watch-only addresses</source>
@@ -1881,10 +2189,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Total:</source>
         <translation>Total:</translation>
-    </message>
-    <message>
-        <source>Your current total balance</source>
-        <translation>Su balance total actual</translation>
     </message>
     <message>
         <source>Current total balance in watch-only addresses</source>
@@ -1903,12 +2207,50 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Disponible:</translation>
     </message>
     <message>
+        <source>Locked WGR or Masternode collaterals. These are excluded from zWGR minting.</source>
+        <translation>Bloqueado WGR o Masternode colaterales. Estos están excluidos de la zWGR minting.</translation>
+    </message>
+    <message>
+        <source>Locked:</source>
+        <translation>Bloqueado:</translation>
+    </message>
+    <message>
+        <source>Unconfirmed:</source>
+        <translation>Sin confirmar:</translation>
+    </message>
+    <message>
+        <source>Your current zWGR balance, unconfirmed and immature zWGR included.</source>
+        <translation>Seu saldo atual do zWGR, zWGR não confirmado e imaturo incluído.</translation>
+    </message>
+    <message>
         <source>Recent transactions</source>
         <translation>Transacciones recientes</translation>
     </message>
     <message>
         <source>out of sync</source>
         <translation>desincronizado</translation>
+    </message>
+    <message>
+        <source>Current percentage of zWGR.
+If AutoMint is enabled this percentage will settle around the configured AutoMint percentage (default = 10%).
+</source>
+        <translation>Porcentaje actual de zWGR.
+Si AutoMint está habilitado, este porcentaje se establecerá alrededor del porcentaje de AutoMint configurado (predeterminado = 10%).
+</translation>
+    </message>
+    <message>
+        <source>AutoMint is currently enabled and set to </source>
+        <translation>AutoMint está actualmente habilitado y configurado</translation>
+    </message>
+    <message>
+        <source>To disable AutoMint add 'enablezeromint=0' in wagerr.conf.</source>
+        <translation>Para desactivar AutoMint agrega 'enablezeromint=0' en wagerr.conf.</translation>
+    </message>
+    <message>
+        <source>AutoMint is currently disabled.
+To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.conf</source>
+        <translation>AutoMint está actualmente desactivado.
+Para habilitar AutoMint cambie 'enablezeromint = 0' a 'enablezeromint = 1' en wagerr.conf</translation>
     </message>
 </context>
 <context>
@@ -2020,16 +2362,48 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
 <context>
     <name>PrivacyDialog</name>
     <message>
+        <source>Zerocoin Actions:</source>
+        <translation>Acciones Zerocoin:</translation>
+    </message>
+    <message>
         <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
         <translation>La información mostrada puede estar desactualizada. Su monedero se sincroniza automáticamente con la red Wagerr después de establecer una conexión, pero este proceso aún no se ha completado.</translation>
+    </message>
+    <message>
+        <source>Mint Zerocoin</source>
+        <translation>Creación de moneda Zerocoin</translation>
     </message>
     <message>
         <source>0</source>
         <translation>0</translation>
     </message>
     <message>
+        <source>zWGR</source>
+        <translation>zWGR</translation>
+    </message>
+    <message>
+        <source>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</source>
+        <translation>Disponibles para minting son monedas que están confirmadas y no bloqueadas o Masternode colaterales.</translation>
+    </message>
+    <message>
+        <source>Available for Minting:</source>
+        <translation>Disponible para Creación de moneda:</translation>
+    </message>
+    <message>
+        <source>0.000 000 00 WGR</source>
+        <translation>0.000 000 00 WGR</translation>
+    </message>
+    <message>
+        <source>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</source>
+        <translation>Resetear la base de datos del monedero Zerocoin. Esta opción borra transacciones que no consiguieron salir publicadas en la cadena de bloques.</translation>
+    </message>
+    <message>
         <source>Reset</source>
         <translation>Reiniciar</translation>
+    </message>
+    <message>
+        <source>Coin Control...</source>
+        <translation>Control de Monedas...</translation>
     </message>
     <message>
         <source>Quantity:</source>
@@ -2040,8 +2414,72 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Cantidad:</translation>
     </message>
     <message>
+        <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data.</source>
+        <translation>Reescanear la cadena de bloques entera buscando creación de moneda Zerocoin y otros meta-datos.</translation>
+    </message>
+    <message>
+        <source>ReScan</source>
+        <translation>ReeScanear</translation>
+    </message>
+    <message>
+        <source>Status and/or Mesages from the last Mint Action.</source>
+        <translation>Estado y/o Mensajes de la última Acción de Creación de moneda.</translation>
+    </message>
+    <message>
+        <source>PRIVACY</source>
+        <translation>PRIVACIDADE</translation>
+    </message>
+    <message>
+        <source>Quantity Selected:</source>
+        <translation>Cantidad Seleccionada:</translation>
+    </message>
+    <message>
+        <source>Spend Zerocoin. Without 'Pay To:' address creates payments to yourself.</source>
+        <translation>Gastar Zerocoin. Sin direcciones "Pagar a:", esto creará pagos a usted mismo.</translation>
+    </message>
+    <message>
+        <source>Spend Zerocoin</source>
+        <translation>Gastar Zerocoin</translation>
+    </message>
+    <message>
+        <source>Available (mature and spendable) zWGR for spending</source>
+        <translation>ZWGR disponible (maduro y gastable) para gastar</translation>
+    </message>
+    <message>
+        <source>Available Balance:</source>
+        <translation>Balance disponible:</translation>
+    </message>
+    <message>
+        <source>Available (mature and spendable) zWGR for spending
+
+zWGR are mature when they have more than 20 confirmations AND more than 2 mints of the same denomination after them were minted</source>
+        <translation>ZWGR disponible (maduro y gastable) para gastar
+
+zWGR son maduros cuando tienen más de 20 confirmaciones Y más de 2 mints de la misma denominación después de ellos fueron minted</translation>
+    </message>
+    <message>
+        <source>0 zWGR</source>
+        <translation>0 zWGR</translation>
+    </message>
+    <message>
+        <source>Security Level for Zerocoin Transactions. More is better, but needs more time and resources.</source>
+        <translation>Nivel de Seguridad para Transacciones Zerocoin. Cuanto más mejor, pero necesitará más tiempo y recursos.</translation>
+    </message>
+    <message>
+        <source>Security Level:</source>
+        <translation>Nivel de Seguridad:</translation>
+    </message>
+    <message>
+        <source>Security Level 1 - 100 (default: 42)</source>
+        <translation>Nivel de Seguridad 1 - 100 (por defecto: 42)</translation>
+    </message>
+    <message>
         <source>Pay &amp;To:</source>
         <translation>Pagar &amp;A:</translation>
+    </message>
+    <message>
+        <source>The Wagerr address to send the payment to. Creates local payment to yourself when empty.</source>
+        <translation>La dirección Wagerr a la que enviar el pago. Si se deja en blanco, crea un pago a usted mismo.</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2072,8 +2510,169 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Ca&amp;ntidad:</translation>
     </message>
     <message>
+        <source>Convert Change to Zerocoin (might cost additional fees)</source>
+        <translation>Convertir el Cambio a Zerocoin (puede costar alguna tasa adicional)</translation>
+    </message>
+    <message>
+        <source>If checked, the wallet tries to minimize the returning change instead of minimizing the number of spent denominations.</source>
+        <translation>Si está marcado, el monedero intenta minimizar el cambio de vuelta en lugar de minimizar el número de billetes necesarios.</translation>
+    </message>
+    <message>
+        <source>Minimize Change</source>
+        <translation>Minimizar Cambio</translation>
+    </message>
+    <message>
+        <source>Information about the available Zerocoin funds.</source>
+        <translation>Información sobre los fondos Zerocoin disponibles.</translation>
+    </message>
+    <message>
+        <source>Zerocoin Stats:</source>
+        <translation>Estadísticas Zerocoin:</translation>
+    </message>
+    <message>
+        <source>Total Balance including unconfirmed and immature zWGR</source>
+        <translation>Balance total incluyendo zWGR no confirmado e inmaduro</translation>
+    </message>
+    <message>
+        <source>Total Zerocoin  Balance:</source>
+        <translation>Balance total de Zerocoin:</translation>
+    </message>
+    <message>
+        <source>Denominations with value 1:</source>
+        <translation>Billetes con valor 1:</translation>
+    </message>
+    <message>
+        <source>Denom. with value 1:</source>
+        <translation>Billetes con valor 1:</translation>
+    </message>
+    <message>
+        <source>Show the current status of automatic zWGR minting.
+
+To change the status (restart required):
+- enable: add 'enablezeromint=1' to wagerr.conf
+- disable: add 'enablezeromint=0' to wagerr.conf
+
+To change the percentage (no restart required):
+- menu Settings-&gt;Options-&gt;Percentage of autominted zWGR
+
+</source>
+        <translation>Mostrar o status atual do zWGR minting automático.
+
+Para alterar o status (reinicialização obrigatória):
+- enable: adicione 'enablezeromint = 1' ao wagerr.conf
+- disable: adiciona 'enablezeromint = 0' ao wagerr.conf
+
+Para alterar a porcentagem (não é necessário reiniciar):
+- menu Configurações-&gt; Opções-&gt; Porcentagem de zWGRs automáticos
+</translation>
+    </message>
+    <message>
+        <source>AutoMint Status</source>
+        <translation>Status de AutoMint</translation>
+    </message>
+    <message>
+        <source>Global Supply:</source>
+        <translation>Abastecimento Global:</translation>
+    </message>
+    <message>
+        <source>Denom. 1:</source>
+        <translation>Denom. 1:</translation>
+    </message>
+    <message>
+        <source>Denom. 5:</source>
+        <translation>Denom. 5:</translation>
+    </message>
+    <message>
+        <source>Denom. 10:</source>
+        <translation>Denom. 10:</translation>
+    </message>
+    <message>
+        <source>Denom. 50:</source>
+        <translation>Denom. 50:</translation>
+    </message>
+    <message>
+        <source>Denom. 100:</source>
+        <translation>Denom. 100:</translation>
+    </message>
+    <message>
+        <source>Denom. 500:</source>
+        <translation>Denom. 500:</translation>
+    </message>
+    <message>
+        <source>Denom. 1000:</source>
+        <translation>Denom. 1000:</translation>
+    </message>
+    <message>
+        <source>Denom. 5000:</source>
+        <translation>Denom. 5000:</translation>
+    </message>
+    <message>
+        <source>0 x</source>
+        <translation>0 x</translation>
+    </message>
+    <message>
+        <source>Denominations with value 5:</source>
+        <translation>Billetes con valor 5:</translation>
+    </message>
+    <message>
+        <source>Denom. with value 5:</source>
+        <translation>Billetes con valor 5:</translation>
+    </message>
+    <message>
+        <source>Denominations with value 10:</source>
+        <translation>Billetes con valor 10:</translation>
+    </message>
+    <message>
+        <source>Denom. with value 10:</source>
+        <translation>Billetes con valor 10:</translation>
+    </message>
+    <message>
+        <source>Denominations with value 50:</source>
+        <translation>Billetes con valor 50:</translation>
+    </message>
+    <message>
+        <source>Denom. with value 50:</source>
+        <translation>Billetes con valor 50:</translation>
+    </message>
+    <message>
+        <source>Denominations with value 100:</source>
+        <translation>Billetes con valor 100:</translation>
+    </message>
+    <message>
+        <source>Denom. with value 100:</source>
+        <translation>Billetes con valor 100:</translation>
+    </message>
+    <message>
+        <source>Denominations with value 500:</source>
+        <translation>Billetes con valor 500:</translation>
+    </message>
+    <message>
+        <source>Denom. with value 500:</source>
+        <translation>Billetes con valor 500:</translation>
+    </message>
+    <message>
+        <source>Denominations with value 1000:</source>
+        <translation>Billetes con valor 1000:</translation>
+    </message>
+    <message>
+        <source>Denom. with value 1000:</source>
+        <translation>Billetes con valor 1000:</translation>
+    </message>
+    <message>
+        <source>Denominations with value 5000:</source>
+        <translation>Billetes con valor 5000:</translation>
+    </message>
+    <message>
+        <source>Denom. with value 5000:</source>
+        <translation>Billetes con valor 5000:</translation>
+    </message>
+    <message>
         <source>Priority:</source>
         <translation>Prioridad:</translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation>EtiquetaDeTexto</translation>
     </message>
     <message>
         <source>Fee:</source>
@@ -2096,6 +2695,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>¡Fondos insuficientes!</translation>
     </message>
     <message>
+        <source>Coins automatically selected</source>
+        <translation>Monedas seleccionadas automáticamente</translation>
+    </message>
+    <message>
         <source>medium</source>
         <translation>media</translation>
     </message>
@@ -2112,12 +2715,20 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Dirección de cambio personalizada</translation>
     </message>
     <message>
+        <source>Amount After Fee:</source>
+        <translation>Cantidad Después de Tasas:</translation>
+    </message>
+    <message>
         <source>Change:</source>
         <translation>Cambio:</translation>
     </message>
     <message>
         <source>out of sync</source>
         <translation>desincronizado</translation>
+    </message>
+    <message>
+        <source>Mint Status: Okay</source>
+        <translation>Estado de Creación de Moneda: Ok</translation>
     </message>
     <message>
         <source>Copy quantity</source>
@@ -2128,10 +2739,236 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Copiar cantidad</translation>
     </message>
     <message>
+        <source> &lt;b&gt;enabled&lt;/b&gt;.</source>
+        <translation>&lt;b&gt;ativado&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source> &lt;b&gt;disabled&lt;/b&gt;.</source>
+        <translation>&lt;b&gt;Desativado&lt;/b&gt;.</translation>
+    </message>
+    <message>
+        <source> Configured target percentage: &lt;b&gt;</source>
+        <translation>Porcentagem de segmentação configurada:&lt;b&gt;</translation>
+    </message>
+    <message>
+        <source>zWGR is currently disabled due to maintenance.</source>
+        <translation>zWGR actualmente está desactivado debido al mantenimiento.</translation>
+    </message>
+    <message>
+        <source>zWGR is currently undergoing maintenance.</source>
+        <translation>zWGR se encuentra actualmente en mantenimiento.</translation>
+    </message>
+    <message>
+        <source>Denom. with value &lt;b&gt;1&lt;/b&gt;:</source>
+        <translation>Billetes con valor &lt;b&gt; 1&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. with value &lt;b&gt;5&lt;/b&gt;:</source>
+        <translation>Billetes con valor &lt;b&gt; 5&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. with value &lt;b&gt;10&lt;/b&gt;:</source>
+        <translation>Billetes con valor &lt;b&gt; 10&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. with value &lt;b&gt;50&lt;/b&gt;:</source>
+        <translation>Billetes con valor &lt;b&gt;50&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. with value &lt;b&gt;100&lt;/b&gt;:</source>
+        <translation>Billetes con valor &lt;b&gt;100&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. with value &lt;b&gt;500&lt;/b&gt;:</source>
+        <translation>Billetes con valor &lt;b&gt;500&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. with value &lt;b&gt;1000&lt;/b&gt;:</source>
+        <translation>Billetes con valor &lt;b&gt;1000&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. with value &lt;b&gt;5000&lt;/b&gt;:</source>
+        <translation>Billetes con valor &lt;b&gt;5000&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>AutoMint Status:</source>
+        <translation>Status AutoMint:</translation>
+    </message>
+    <message>
+        <source>Denom. &lt;b&gt;1&lt;/b&gt;:</source>
+        <translation>Denom. &lt;b&gt;1&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. &lt;b&gt;5&lt;/b&gt;:</source>
+        <translation>Denom. &lt;b&gt;5&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. &lt;b&gt;10&lt;/b&gt;:</source>
+        <translation>Denom. &lt;b&gt;10&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. &lt;b&gt;50&lt;/b&gt;:</source>
+        <translation>Denom. &lt;b&gt;50&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. &lt;b&gt;100&lt;/b&gt;:</source>
+        <translation>Denom. &lt;b&gt;100&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. &lt;b&gt;500&lt;/b&gt;:</source>
+        <translation>Denom. &lt;b&gt;500&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. &lt;b&gt;1000&lt;/b&gt;:</source>
+        <translation>Denom. &lt;b&gt;1000&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Denom. &lt;b&gt;5000&lt;/b&gt;:</source>
+        <translation>Denom. &lt;b&gt;5000&lt;/b&gt;:</translation>
+    </message>
+    <message>
+        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
+        <translation>Error: Tu monedero está bloqueado. Por favor, primero introduzca la clave de desbloqueo.</translation>
+    </message>
+    <message>
+        <source>Message: Enter an amount &gt; 0.</source>
+        <translation>Mensaje: Introduzca una cantidad &gt; 0.</translation>
+    </message>
+    <message>
+        <source>Minting </source>
+        <translation>Creando moneda</translation>
+    </message>
+    <message>
+        <source>Successfully minted </source>
+        <translation>Monedas creadas correctamente</translation>
+    </message>
+    <message>
+        <source> zWGR in </source>
+        <translation>zWGR en</translation>
+    </message>
+    <message>
+        <source> sec. Used denominations:
+</source>
+        <translation>seg. Billetes usados:
+</translation>
+    </message>
+    <message>
+        <source>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware.
+Please be patient...</source>
+        <translation>Ejecutando ResetMintZerocoin: reescaneando la cadena de bloques entera, esto necesitará hasta media hora dependiendo de su hardware.
+Por favor espere...</translation>
+    </message>
+    <message>
+        <source>Duration: </source>
+        <translation>Duración:</translation>
+    </message>
+    <message>
+        <source> sec.
+</source>
+        <translation>seg.
+</translation>
+    </message>
+    <message>
+        <source>Starting ResetSpentZerocoin: </source>
+        <translation>Iniciando ResetSpentZerocoin:</translation>
+    </message>
+    <message>
+        <source>No 'Pay To' address provided, creating local payment</source>
+        <translation>No se especificó drección 'Pagar A', por lo que asumimos un pago local</translation>
+    </message>
+    <message>
+        <source>Invalid Wagerr Address</source>
+        <translation>Dirección Wagerr Inválida</translation>
+    </message>
+    <message>
+        <source>Invalid Send Amount</source>
+        <translation>Cantidad a Enviar Inválida</translation>
+    </message>
+    <message>
+        <source>Confirm additional Fees</source>
+        <translation>Confirmar Tasas adicionales</translation>
+    </message>
+    <message>
+        <source>Are you sure you want to send?&lt;br /&gt;&lt;br /&gt;</source>
+        <translation>¿Está seguro que desea enviar?&lt;br /&gt;&lt;br /&gt;</translation>
+    </message>
+    <message>
+        <source> to address </source>
+        <translation>a la dirección</translation>
+    </message>
+    <message>
+        <source> to a newly generated (unused and therefore anonymous) local address &lt;br /&gt;</source>
+        <translation>a una dirección local recién generada (no utilizada y, por lo tanto, anónima)&lt;br /&gt;</translation>
+    </message>
+    <message>
+        <source>with Security Level </source>
+        <translation>con Nivel de Seguridad</translation>
+    </message>
+    <message>
         <source>Confirm send coins</source>
         <translation>Confirmar enviar monedas</translation>
     </message>
-    </context>
+    <message>
+        <source>Spending Zerocoin.
+Computationally expensive, might need several minutes depending on the selected Security Level and your hardware.
+Please be patient...</source>
+        <translation>Gastando Zerocoin.
+Esto es computacionalmente intensivo, puede necesitar varios minutos dependiendo del Nivel de Seguridad elegido y el hardware de su máquina.
+Por favor tenga paciencia...</translation>
+    </message>
+    <message>
+        <source>Too much inputs (</source>
+        <translation>Demasiadas entradas (</translation>
+    </message>
+    <message>
+        <source>) needed.
+Maximum allowed: </source>
+        <translation>) necesario.
+Máximo permitido:</translation>
+    </message>
+    <message>
+        <source>
+Either mint higher denominations (so fewer inputs are needed) or reduce the amount to spend.</source>
+        <translation>
+También mint las denominaciones más altas (por lo tanto, se necesitan menos datos) o reduzca la cantidad a gastar.</translation>
+    </message>
+    <message>
+        <source>Spend Zerocoin failed with status = </source>
+        <translation>Gastar Zerocoin falló con estado =</translation>
+    </message>
+    <message>
+        <source>denomination: </source>
+        <translation>billete:</translation>
+    </message>
+    <message>
+        <source>serial: </source>
+        <translation>serial:</translation>
+    </message>
+    <message>
+        <source>Spend is 1 of : </source>
+        <translation>Gasto 1 de :</translation>
+    </message>
+    <message>
+        <source>value out: </source>
+        <translation>valor salida:</translation>
+    </message>
+    <message>
+        <source>address: </source>
+        <translation>dirección:</translation>
+    </message>
+    <message>
+        <source>Sending successful, return code: </source>
+        <translation>Envío correcto, código devuelto: </translation>
+    </message>
+    <message>
+        <source>txid: </source>
+        <translation>txid:</translation>
+    </message>
+    <message>
+        <source>fee: </source>
+        <translation>tasa:</translation>
+    </message>
+</context>
 <context>
     <name>QObject</name>
     <message>
@@ -2161,6 +2998,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>NETWORK</source>
         <translation>RED</translation>
+    </message>
+    <message>
+        <source>BLOOM</source>
+        <translation>BLOOM</translation>
     </message>
     <message>
         <source>UNKNOWN</source>
@@ -2313,8 +3154,16 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>&amp;Nodos conectados</translation>
     </message>
     <message>
+        <source>Banned peers</source>
+        <translation>Pares proibidos</translation>
+    </message>
+    <message>
         <source>Select a peer to view detailed information.</source>
         <translation>Seleccione un nodo conectado para ver información detallada.</translation>
+    </message>
+    <message>
+        <source>Whitelisted</source>
+        <translation>Whitelisted</translation>
     </message>
     <message>
         <source>Direction</source>
@@ -2331,14 +3180,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Services</source>
         <translation>Servicios</translation>
-    </message>
-    <message>
-        <source>Starting Height</source>
-        <translation>Altura de inicio</translation>
-    </message>
-    <message>
-        <source>Sync Height</source>
-        <translation>Altura de sincronía</translation>
     </message>
     <message>
         <source>Ban Score</source>
@@ -2373,8 +3214,36 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Reparar &amp;Monedero</translation>
     </message>
     <message>
+        <source>Delete local Blockchain Folders</source>
+        <translation>Eliminar directorios locales de Blockchain</translation>
+    </message>
+    <message>
         <source>Wallet In Use:</source>
         <translation>Monedero En Uso:</translation>
+    </message>
+    <message>
+        <source>Starting Block</source>
+        <translation>Bloco de partida</translation>
+    </message>
+    <message>
+        <source>Synced Headers</source>
+        <translation>Cabeçalhos sincronizados</translation>
+    </message>
+    <message>
+        <source>Synced Blocks</source>
+        <translation>Blocos sincronizados</translation>
+    </message>
+    <message>
+        <source>The duration of a currently outstanding ping.</source>
+        <translation>A duração de um ping atualmente pendente.</translation>
+    </message>
+    <message>
+        <source>Ping Wait</source>
+        <translation>Espera de Ping</translation>
+    </message>
+    <message>
+        <source>Time Offset</source>
+        <translation>Compensação Temporal</translation>
     </message>
     <message>
         <source>Salvage wallet</source>
@@ -2417,6 +3286,14 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Reconstruir el índice de la cadena de bloques desde los archivos blk000??.dat actuales.</translation>
     </message>
     <message>
+        <source>-resync:</source>
+        <translation>resincronizando:</translation>
+    </message>
+    <message>
+        <source>Deletes all local blockchain folders so the wallet synchronizes from scratch.</source>
+        <translation>Eliminar todos los directorios locales de blockchain y sincronizar la cartera desde el principio</translation>
+    </message>
+    <message>
         <source>The buttons below will restart the wallet with command-line options to repair the wallet, fix issues with corrupt blockhain files or missing/obsolete transactions.</source>
         <translation>Los botones de más abajo reiniciarán el programa con comandos especiales para reparar el monedero, solucionar problemas con cadenas de bloques corruptas o buscar transacciones obsoletas o perdidas</translation>
     </message>
@@ -2445,6 +3322,54 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Bienvenido a la consola RPC de Wagerr.</translation>
     </message>
     <message>
+        <source>&amp;Disconnect Node</source>
+        <translation>&amp; Disconnect Node</translation>
+    </message>
+    <message>
+        <source>Ban Node for</source>
+        <translation>Nó de proibição para</translation>
+    </message>
+    <message>
+        <source>1 &amp;hour</source>
+        <translation>1 &amp;hour</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>1 &amp;day</translation>
+    </message>
+    <message>
+        <source>1 &amp;week</source>
+        <translation>1 &amp;week</translation>
+    </message>
+    <message>
+        <source>1 &amp;year</source>
+        <translation>1 &amp;year</translation>
+    </message>
+    <message>
+        <source>&amp;Unban Node</source>
+        <translation>&amp; Unban Node</translation>
+    </message>
+    <message>
+        <source>This will delete your local blockchain folders and the wallet will synchronize the complete Blockchain from scratch.&lt;br /&gt;&lt;br /&gt;</source>
+        <translation>Esto eliminará las carpetas de blockchain locales y la cartera sincronizará la cadena de bloques completa desde cero.&lt;br /&gt;&lt;br /&gt;</translation>
+    </message>
+    <message>
+        <source>This needs quite some time and downloads a lot of data.&lt;br /&gt;&lt;br /&gt;</source>
+        <translation>Esto requiere bastante tiempo y descarga una gran cantidad de datos.&lt;br /&gt;&lt;br /&gt;</translation>
+    </message>
+    <message>
+        <source>Your transactions and funds will be visible again after the download has completed.&lt;br /&gt;&lt;br /&gt;</source>
+        <translation>Sus transacciones y fondos serán visibles nuevamente después de que se haya completado la descarga.&lt;br /&gt;&lt;br /&gt;</translation>
+    </message>
+    <message>
+        <source>Do you want to continue?.&lt;br /&gt;</source>
+        <translation>¿Desea continuar?.&lt;br /&gt;</translation>
+    </message>
+    <message>
+        <source>Confirm resync Blockchain</source>
+        <translation>Confirmar resincronización de Blockchain</translation>
+    </message>
+    <message>
         <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
         <translation>Use las teclas arriba y abajo para navegar por la historia, y &lt;b&gt;Ctrl-L&lt;/b&gt; para limpiar la pantalla.</translation>
     </message>
@@ -2469,6 +3394,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>%1 GB</translation>
     </message>
     <message>
+        <source>(node id: %1)</source>
+        <translation>(node id: %1)</translation>
+    </message>
+    <message>
         <source>via %1</source>
         <translation>via %1</translation>
     </message>
@@ -2485,12 +3414,16 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Salientes</translation>
     </message>
     <message>
-        <source>Unknown</source>
-        <translation>Desconocido</translation>
+        <source>Yes</source>
+        <translation>sí</translation>
     </message>
     <message>
-        <source>Fetching...</source>
-        <translation>Descargando...</translation>
+        <source>No</source>
+        <translation>Não</translation>
+    </message>
+    <message>
+        <source>Unknown</source>
+        <translation>Desconocido</translation>
     </message>
 </context>
 <context>
@@ -2514,6 +3447,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
         <translation>Un mensaje opcional a adjuntar a la solicitud de pago, que será mostrado cuando se abra la solicitud. Nota: El mensaje no se envía junto al pago por la red Wagerr.</translation>
+    </message>
+    <message>
+        <source>RECEIVE</source>
+        <translation>RECEBER</translation>
     </message>
     <message>
         <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
@@ -2673,6 +3610,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Enviar Monedas</translation>
     </message>
     <message>
+        <source>SEND</source>
+        <translation>ENVIAR</translation>
+    </message>
+    <message>
         <source>Coin Control Features</source>
         <translation>Funciones de Control de Monedas</translation>
     </message>
@@ -2781,8 +3722,20 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>(La comisión automática no se ha inicializado todavía. Esto normalmente necesita unos cuantos bloques...)</translation>
     </message>
     <message>
+        <source>SwiftX</source>
+        <translation>SwiftX</translation>
+    </message>
+    <message>
         <source>Confirmation time:</source>
         <translation>Tiempo de confirmación:</translation>
+    </message>
+    <message>
+        <source>Open Coin Control...</source>
+        <translation>Abrir Control de Monedas...</translation>
+    </message>
+    <message>
+        <source>Coins automatically selected</source>
+        <translation>Monedas seleccionadas automáticamente</translation>
     </message>
     <message>
         <source>If the custom fee is set to 1000 uWGRs and the transaction is only 250 bytes, then "per kilobyte" only pays 250 uWGRs in fee,&lt;br /&gt;while "at least" pays 1000 uWGRs. For transactions bigger than a kilobyte both pay by kilobyte.</source>
@@ -2841,8 +3794,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Añadir Destinata&amp;rio</translation>
     </message>
     <message>
-        <source>SwiftTX</source>
-        <translation>SwiftTX</translation>
+        <source>Anonymized WGR</source>
+        <translation>WGR anonimizados</translation>
     </message>
     <message>
         <source>Balance:</source>
@@ -2889,24 +3842,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>La herramienta de división de bloques no funciona con varias direcciones. Inténtelo otra vez.</translation>
     </message>
     <message>
-        <source>using</source>
-        <translation>usando</translation>
-    </message>
-    <message>
-        <source>anonymous funds</source>
-        <translation>fondos anónimos</translation>
-    </message>
-    <message>
         <source>Warning: Invalid Wagerr address</source>
         <translation>Advertencia: Direcciones Wagerr inválidas</translation>
-    </message>
-    <message>
-        <source>any available funds (not recommended)</source>
-        <translation>cualquier fondo disponible (no recomendado)</translation>
-    </message>
-    <message>
-        <source>and SwiftTX</source>
-        <translation>y SwiftTX</translation>
     </message>
     <message>
         <source>%1 to %2</source>
@@ -2932,9 +3869,17 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
         <translation>Una comisión %1 veces más alta que %2 por kB se considera exageradamente alta.</translation>
     </message>
+    <message numerus="yes">
+        <source>Estimated to begin confirmation within %n block(s).</source>
+        <translation><numerusform>Estimamos que empezará la confirmación en %n bloques.</numerusform><numerusform>Estimamos que empezará la confirmación en %n bloques.</numerusform></translation>
+    </message>
     <message>
         <source>The recipient address is not valid, please recheck.</source>
         <translation>La dirección de destino no es válida, por favor compruébelo de nuevo.</translation>
+    </message>
+    <message>
+        <source>using SwiftX</source>
+        <translation>usando o SwiftX</translation>
     </message>
     <message>
         <source> split into %1 outputs using the UTXO splitter.</source>
@@ -2971,6 +3916,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Error: The wallet was unlocked only to anonymize coins.</source>
         <translation>Error: El monedero se desbloqueó sólo para anonimizar monedas.</translation>
+    </message>
+    <message>
+        <source>Error: The wallet was unlocked only to anonymize coins. Unlock canceled.</source>
+        <translation>Error: El monedero ya fue desbloqueado para anonimizar monedas. El desbloqueo total se ha cancelado.</translation>
     </message>
     <message>
         <source>Pay only the minimum fee of %1</source>
@@ -3246,6 +4195,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
 </context>
 <context>
     <name>TransactionDesc</name>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Abierto para %n bloques más</numerusform><numerusform>Abierto para %n bloques más</numerusform></translation>
+    </message>
     <message>
         <source>Open until %1</source>
         <translation>Abierto hasta %1</translation>
@@ -3253,18 +4206,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>conflicted</source>
         <translation>conflictivo (bloque huérfano?)</translation>
-    </message>
-    <message>
-        <source>%1/offline (verified via swifttx)</source>
-        <translation>%1/offline (verificado via swifttx)</translation>
-    </message>
-    <message>
-        <source>%1/confirmed (verified via swifttx)</source>
-        <translation>%1/confirmado (verificado via swifttx)</translation>
-    </message>
-    <message>
-        <source>%1 confirmations (verified via swifttx)</source>
-        <translation>%1 confirmaciones (verificado via swifttx)</translation>
     </message>
     <message>
         <source>%1/offline</source>
@@ -3279,23 +4220,35 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>%1 confirmaciones</translation>
     </message>
     <message>
-        <source>%1/offline (SwiftTX verification in progress - %2 of %3 signatures)</source>
+        <source>%1/offline (verified via SwiftX)</source>
+        <translation>%1/offline (verificado via swifttx)</translation>
+    </message>
+    <message>
+        <source>%1/confirmed (verified via SwiftX)</source>
+        <translation>%1/confirmado (verificado via swifttx)</translation>
+    </message>
+    <message>
+        <source>%1 confirmations (verified via SwiftX)</source>
+        <translation>%1 confirmaciones (verificado via swifttx)</translation>
+    </message>
+    <message>
+        <source>%1/offline (SwiftX verification in progress - %2 of %3 signatures)</source>
         <translation>%1/offline (verificación SwiftTX en marcha - %2 de %3 firmas)</translation>
     </message>
     <message>
-        <source>%1/confirmed (SwiftTX verification in progress - %2 of %3 signatures )</source>
+        <source>%1/confirmed (SwiftX verification in progress - %2 of %3 signatures )</source>
         <translation>%1/confirmado (verificación SwiftTX en marcha - %2 de %3 firmas)</translation>
     </message>
     <message>
-        <source>%1 confirmations (SwiftTX verification in progress - %2 of %3 signatures)</source>
+        <source>%1 confirmations (SwiftX verification in progress - %2 of %3 signatures)</source>
         <translation>%1 confirmaciones (verificación SwiftTX en marcha - %2 de %3 firmas)</translation>
     </message>
     <message>
-        <source>%1/offline (SwiftTX verification failed)</source>
+        <source>%1/offline (SwiftX verification failed)</source>
         <translation>%1/offline (falló la verificación SwiftTX)</translation>
     </message>
     <message>
-        <source>%1/confirmed (SwiftTX verification failed)</source>
+        <source>%1/confirmed (SwiftX verification failed)</source>
         <translation>%1/confirmado (falló la verificación SwiftTX)</translation>
     </message>
     <message>
@@ -3305,6 +4258,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>, has not been successfully broadcast yet</source>
         <translation>, no ha sido correctamente transmitida todavía</translation>
+    </message>
+    <message numerus="yes">
+        <source>, broadcast through %n node(s)</source>
+        <translation><numerusform>, retransmitido a través de %n nodos</numerusform><numerusform>, retransmitido a través de %n nodos</numerusform></translation>
     </message>
     <message>
         <source>Date</source>
@@ -3345,6 +4302,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Credit</source>
         <translation>Crédito</translation>
+    </message>
+    <message numerus="yes">
+        <source>matures in %n more block(s)</source>
+        <translation><numerusform>madura en %n bloques más</numerusform><numerusform>madura en %n bloques más</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
@@ -3444,6 +4405,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <source>Address</source>
         <translation>Dirección</translation>
     </message>
+    <message numerus="yes">
+        <source>Open for %n more block(s)</source>
+        <translation><numerusform>Abierto para %n bloques más</numerusform><numerusform>Abierto para %n bloques más</numerusform></translation>
+    </message>
     <message>
         <source>Open until %1</source>
         <translation>Abierto hasta %1</translation>
@@ -3506,7 +4471,7 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     </message>
     <message>
         <source>Obfuscation Create Denominations</source>
-        <translation>Ofuscación Crea Denominaciones</translation>
+        <translation>Ofuscación Crea Billetes</translation>
     </message>
     <message>
         <source>Sent to</source>
@@ -3519,10 +4484,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Payment to yourself</source>
         <translation>Pago a usted mismo</translation>
-    </message>
-    <message>
-        <source>Minted</source>
-        <translation>Creación de moneda</translation>
     </message>
     <message>
         <source>Mined</source>
@@ -3608,26 +4569,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Enviado a</translation>
     </message>
     <message>
-        <source>Obfuscated</source>
-        <translation>Ofuscado</translation>
-    </message>
-    <message>
-        <source>Obfuscation Make Collateral Inputs</source>
-        <translation>La Ofuscación Crea Entradas Colaterales</translation>
-    </message>
-    <message>
-        <source>Obfuscation Create Denominations</source>
-        <translation>Ofuscación Crea Denominaciones</translation>
-    </message>
-    <message>
-        <source>Obfuscation Denominate</source>
-        <translation>Ofuscación Denominada</translation>
-    </message>
-    <message>
-        <source>Obfuscation Collateral Payment</source>
-        <translation>Pago Colateral de Ofuscación</translation>
-    </message>
-    <message>
         <source>To yourself</source>
         <translation>A usted mismo</translation>
     </message>
@@ -3642,6 +4583,18 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Masternode Reward</source>
         <translation>Recompensa de Nodo Maestro</translation>
+    </message>
+    <message>
+        <source>Zerocoin Mint</source>
+        <translation>Creación de moneda Zerocoin</translation>
+    </message>
+    <message>
+        <source>Zerocoin Spend</source>
+        <translation>Gasto de Zerocoin</translation>
+    </message>
+    <message>
+        <source>Zerocoin Spend to Self</source>
+        <translation>Pago Zerocoin a tí mismo</translation>
     </message>
     <message>
         <source>Other</source>
@@ -3761,12 +4714,16 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Enviar Monedas</translation>
     </message>
     <message>
-        <source>SwiftTX doesn't support sending values that high yet. Transactions are currently limited to %1 WGR.</source>
+        <source>SwiftX doesn't support sending values that high yet. Transactions are currently limited to %1 WGR.</source>
         <translation>SwiftTX no soporta el envío de importes tan altos todavía. Las transacciones están actualmente limitadas a %1 WGR.</translation>
     </message>
 </context>
 <context>
     <name>WalletView</name>
+    <message>
+        <source>HISTORY</source>
+        <translation>HISTÓRIA</translation>
+    </message>
     <message>
         <source>&amp;Export</source>
         <translation>&amp;Exportar</translation>
@@ -3787,30 +4744,30 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <source>Wallet Data (*.dat)</source>
         <translation>Datos del Monedero (*.dat)</translation>
     </message>
-    <message>
-        <source>Backup Failed</source>
-        <translation>La copia de seguridad Falló</translation>
-    </message>
-    <message>
-        <source>There was an error trying to save the wallet data to %1.</source>
-        <translation>Hubo un error intentando guardar los datos del monedero a %1.</translation>
-    </message>
-    <message>
-        <source>Backup Successful</source>
-        <translation>Copia de Seguridad Satisfactoria</translation>
-    </message>
-    <message>
-        <source>The wallet data was successfully saved to %1.</source>
-        <translation>Los datos del monedero se guardaron correctamente a %1.</translation>
-    </message>
 </context>
 <context>
     <name>ZWgrControlDialog</name>
     <message>
+        <source>Quantity</source>
+        <translation>Cantidad</translation>
+    </message>
+    <message>
         <source>0</source>
         <translation>0</translation>
     </message>
-    </context>
+    <message>
+        <source>zWGR</source>
+        <translation>zWGR</translation>
+    </message>
+    <message>
+        <source>Select/Deselect All</source>
+        <translation>Seleccionar/Deseleccionar Todos</translation>
+    </message>
+    <message>
+        <source>Is Spendable</source>
+        <translation>Es Gastable</translation>
+    </message>
+</context>
 <context>
     <name>wagerr-core</name>
     <message>
@@ -3820,10 +4777,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Allow JSON-RPC connections from specified source. Valid for &lt;ip&gt; are a single IP (e.g. 1.2.3.4), a network/netmask (e.g. 1.2.3.4/255.255.255.0) or a network/CIDR (e.g. 1.2.3.4/24). This option can be specified multiple times</source>
         <translation>Permitir conezWGRes JSON-RPC  desde la fuente especificada. Valido para &lt;ip&gt; sea una única IP (ej: 1.2.3.4), una red/mascara de red (ej: 1.2.3.4/255.255.255.0) o una red/CIDR (ej: 1.2.3.4/24). Esta opción puede ser especificada múltiples veces.</translation>
-    </message>
-    <message>
-        <source>An error occurred while setting up the RPC address %s port %u for listening: %s</source>
-        <translation>Un error ocurrió mientras se ajustaba la dirección RPC %s puerto %u para escucha en: %s</translation>
     </message>
     <message>
         <source>Bind to given address and always listen on it. Use [host]:port notation for IPv6</source>
@@ -3836,6 +4789,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Bind to given address to listen for JSON-RPC connections. Use [host]:port notation for IPv6. This option can be specified multiple times (default: bind to all interfaces)</source>
         <translation>Escuchar únicamente a la tarjeta de red indicada para conezWGRes JSON-RPC. Use la notación [host]:puerto para IPv6. Esta opción puede ser especificada varias veces (por defecto: escuchar en todas las tarjetas de red)</translation>
+    </message>
+    <message>
+        <source>Calculated accumulator checkpoint is not what is recorded by block index</source>
+        <translation>El punto de chequeo del acumulador que hemos calculado no coincide con lo guardado en el índice de bloques</translation>
     </message>
     <message>
         <source>Cannot obtain a lock on data directory %s. Wagerr Core is probably already running.</source>
@@ -3858,10 +4815,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Borrar todas las transacciones del monedero y solo recuperar partes de la cadena de bloque a traves de -rescan al inicio.</translation>
     </message>
     <message>
-        <source>Disable all Wagerr specific functionality (Masternodes, Obfuscation, SwiftTX, Budgeting) (0-1, default: %u)</source>
-        <translation>Desabilitar toda la funcionalidad especifica Wagerr (Masternodes, Obfuscation, SwiftTX, Budgeting) (0-1, predeterminado: %u)</translation>
-    </message>
-    <message>
         <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
         <translation>Distribuido bajo licencia MIT software license, ver el archivo adjunto COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;</translation>
     </message>
@@ -3870,16 +4823,16 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Activar la función de administración de sporks con la llave privada apropiada.</translation>
     </message>
     <message>
-        <source>Enable swifttx, show confirmations for locked transactions (bool, default: %s)</source>
-        <translation>Activar swifttx, mostrar confirmaciones para transacciones bloqueadas (bool, predeterminado: %s)</translation>
-    </message>
-    <message>
         <source>Enter regression test mode, which uses a special chain in which blocks can be solved instantly.</source>
         <translation>Entrar en el modo prueba de regresión, el cual usa una cadena especial en el cual los bloques pueden ser resueltos instantaneamente.</translation>
     </message>
     <message>
         <source>Error: Listening for incoming connections failed (listen returned error %s)</source>
         <translation>Error: La escucha para conezWGRes entrantes falló (la escucha retorno error %s)</translation>
+    </message>
+    <message>
+        <source>Error: The transaction is larger than the maximum allowed transaction size!</source>
+        <translation>Erro: a transação é maior que o tamanho máximo permitido da transação!</translation>
     </message>
     <message>
         <source>Error: Unsupported argument -socks found. Setting SOCKS version isn't possible anymore, only SOCKS5 proxies are supported.</source>
@@ -3914,16 +4867,16 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Se encontró salidas denominadas sin confirmar, se esperará hasta que se confirmen para continuar.</translation>
     </message>
     <message>
-        <source>How thorough the block verification of -checkblocks is (0-4, default: %u)</source>
-        <translation>Cuán exhaustiva es la verificación de bloque de -checkblocks (0-4, predeterminado: %u)</translation>
-    </message>
-    <message>
         <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
         <translation>Si paytxfee no esta definido, incluir suficiente comisión de manera que la transacción se vuelva confirmada en promedio dentro de n bloques (predeterminado: %u)</translation>
     </message>
     <message>
         <source>In this mode -genproclimit controls how many blocks are generated immediately.</source>
         <translation>En este modo -genproclimit controla cuantos bloques son generados inmediatamente.</translation>
+    </message>
+    <message>
+        <source>Insufficient or insufficient confirmed funds, you might need to wait a few minutes and try again.</source>
+        <translation>Fondos insuficientes o fondos confirmados insuficientes, es posible que tenga que esperar unos minutos y volver a intentarlo.</translation>
     </message>
     <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s' (must be at least the minrelay fee of %s to prevent stuck transactions)</source>
@@ -3966,6 +4919,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Consultar por direcciones de pares vía búsqueda en DNS, si cantidad de direcciones esta bajo (predeterminado: 1 a menos que se utilice -connect)</translation>
     </message>
     <message>
+        <source>Randomize credentials for every proxy connection. This enables Tor stream isolation (default: %u)</source>
+        <translation>Credenciales aleatorias para cada conexión proxy. Esto habilita el aislamiento del flujos de datos Tor (por defecto: %u)</translation>
+    </message>
+    <message>
         <source>Require high priority for relaying free or low-fee transactions (default:%u)</source>
         <translation>Requerir alta prioridad para transmitir transacción de libre o baja comisión (predeterminado: %u)</translation>
     </message>
@@ -3994,36 +4951,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Soportar filtrado de bloques y transacciones con filtros bloom (por defecto: %u)</translation>
     </message>
     <message>
-        <source>SwiftTX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
-        <translation>SwiftTX requiere entradas con hasta 6 confirmaciones, es posible que debas esperar unos minutos e intentar nuevamente.</translation>
-    </message>
-    <message>
         <source>This product includes software developed by the OpenSSL Project for use in the OpenSSL Toolkit &lt;https://www.openssl.org/&gt; and cryptographic software written by Eric Young and UPnP software written by Thomas Bernard.</source>
         <translation>Este producto incluye software desarrollado por el Proyecto OpenSSL para uso en OpenSSL Toolkit &lt;https://www.openssl.org/&gt; y software de cifrado escrito por Eric Young y software de UPnP escrito por Thomas Bernard.</translation>
-    </message>
-    <message>
-        <source>To use wagerrd, or the -server option to wagerr-qt, you must set an rpcpassword in the configuration file:
-%s
-It is recommended you use the following random password:
-rpcuser=wagerrrpc
-rpcpassword=%s
-(you do not need to remember this password)
-The username and password MUST NOT be the same.
-If the file does not exist, create it with owner-readable-only file permissions.
-It is also recommended to set alertnotify so you are notified of problems;
-for example: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
-</source>
-        <translation>Para usar wagerrd, o la opción -server de wagerr-qt, debes definir un rpcpassword en el archivo de configuración:
-%s
-Es recomendado que uses la siguiente contraseña aleatoria:
-rpcuser=wagerr
-rpcrpcpassword=%s
-(No necesitas recordar esta contraseña)
-El nombre de usuario y contraseña NO DEBEN ser los mismos.
-Si el archivo no existe, crearlo con permisos de solo lectura para el propietario.
-También es recomendado definir alertnotify de manera que seas notificado de problemas;
-por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
-</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer. Wagerr Core is probably already running.</source>
@@ -4114,10 +5043,6 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Aceptar peticiones públicas REST (predeterminado: %u)</translation>
     </message>
     <message>
-        <source>Acceptable ciphers (default: %s)</source>
-        <translation>Métodos de cifrado aceptables (predeterminado: %s)</translation>
-    </message>
-    <message>
         <source>Add a node to connect to and attempt to keep the connection open</source>
         <translation>Agregar un nodo a conectarse y intentar mantener abierta la conexión</translation>
     </message>
@@ -4138,8 +5063,16 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Intentar recuperar claves privadas desde un wallet.dat dañado</translation>
     </message>
     <message>
+        <source>Automatically create Tor hidden service (default: %d)</source>
+        <translation>Crear automáticamente servicio Tor oculto (por defecto: %d)</translation>
+    </message>
+    <message>
         <source>Block creation options:</source>
         <translation>Opciones de creación de bloque:</translation>
+    </message>
+    <message>
+        <source>Calculating missing accumulators...</source>
+        <translation>Calculando acumuladores pendientes...</translation>
     </message>
     <message>
         <source>Can't denominate: no compatible inputs left.</source>
@@ -4218,16 +5151,20 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Se detectó base de datos de bloques dañado</translation>
     </message>
     <message>
-        <source>Could not parse -rpcbind value %s as network address</source>
-        <translation>El valor %s de -rpcbind no pudo ser leído como una dirección de red.</translation>
-    </message>
-    <message>
         <source>Could not parse masternode.conf</source>
         <translation>No se pudo analizar el contenido de masternode.conf </translation>
     </message>
     <message>
         <source>Debugging/Testing options:</source>
         <translation>Opciones de Depuración/Pruebas:</translation>
+    </message>
+    <message>
+        <source>Delete blockchain folders and resync from scratch</source>
+        <translation>Eliminar directorios de Blockchain y resincronizar desde el principio</translation>
+    </message>
+    <message>
+        <source>Disable OS notifications for incoming transactions (default: %u)</source>
+        <translation>Desactivar notificaciones del sistema para transacciones extrantes (por defecto: %u)</translation>
     </message>
     <message>
         <source>Disable safemode, override a real safe mode event (default: %u)</source>
@@ -4248,6 +5185,18 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     <message>
         <source>Done loading</source>
         <translation>Realizando carga</translation>
+    </message>
+    <message>
+        <source>Enable automatic Zerocoin minting (0-1, default: %u)</source>
+        <translation>Habilitar creación automática de Zerocoin (0-1, por defecto: %u)</translation>
+    </message>
+    <message>
+        <source>Enable publish hash transaction (locked via SwiftX) in &lt;address&gt;</source>
+        <translation>Activar inclusión del hash de la transacción (fijada mediante SwiftTX) en &lt;address&gt;</translation>
+    </message>
+    <message>
+        <source>Enable publish raw transaction (locked via SwiftX) in &lt;address&gt;</source>
+        <translation>Activar inclusión de la transacción en bruto (fijada mediante SwiftTX) en &lt;address&gt;</translation>
     </message>
     <message>
         <source>Enable the client to act as a masternode (0-1, default: %u)</source>
@@ -4326,6 +5275,10 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Error: Ya tienes entradas pendientes en el pool de Ofuscación</translation>
     </message>
     <message>
+        <source>Failed to calculate accumulator checkpoint</source>
+        <translation>Error al calcular el punto de control del acumulador</translation>
+    </message>
+    <message>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Falló la escucha en cualquiera de los puertos. Usar -listen=0 si quieres esto.</translation>
     </message>
@@ -4402,16 +5355,16 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>La entrada no es válida.</translation>
     </message>
     <message>
+        <source>Insufficient funds</source>
+        <translation>Fondos insuficientes</translation>
+    </message>
+    <message>
         <source>Insufficient funds.</source>
         <translation>Fondos insuficientes.</translation>
     </message>
     <message>
-        <source>Invalid -onion address: '%s'</source>
-        <translation>Dirección -onion inválida: '%s'</translation>
-    </message>
-    <message>
-        <source>Invalid -proxy address: '%s'</source>
-        <translation>Dirección -proxy inválida: '%s'</translation>
+        <source>Invalid -onion address or hostname: '%s'</source>
+        <translation>Dirección o nombre de equipo -onion inválido: '%s'</translation>
     </message>
     <message>
         <source>Invalid amount for -maxtxfee=&lt;amount&gt;: '%s'</source>
@@ -4438,6 +5391,10 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Importe inválido para -reservebalance=&lt;amount&gt;</translation>
     </message>
     <message>
+        <source>Invalid amount</source>
+        <translation>Cantidad incorrecta</translation>
+    </message>
+    <message>
         <source>Invalid masternodeprivkey. Please see documenation.</source>
         <translation>Valor de masternodeprivkey es inválido. Por favor ver la documentación.</translation>
     </message>
@@ -4458,8 +5415,76 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Script inválido detectado.</translation>
     </message>
     <message>
+        <source>Percentage of automatically minted Zerocoin  (1-100, default: %u)</source>
+        <translation>Porcentaje de Zerocoin creadas automáticamente (10-100, por defecto: %u)</translation>
+    </message>
+    <message>
+        <source>Reindex the WGR and zWGR money supply statistics</source>
+        <translation>Reindexar as estatísticas de fornecimento de dinheiro WGR e zWGR</translation>
+    </message>
+    <message>
+        <source>SwiftX options:</source>
+        <translation>Opciones SwiftX:</translation>
+    </message>
+    <message>
         <source>This is a pre-release test build - use at your own risk - do not use for staking or merchant applications!</source>
         <translation>Esto es una versión pre-release de prueba - use bajo su propia responsabilidad - ¡No lo utilice para recompensa de participación ni aplicaciones de comercio!</translation>
+    </message>
+    <message>
+        <source> mints deleted
+</source>
+        <translation>creaciones de moneda borradas
+</translation>
+    </message>
+    <message>
+        <source> mints updated, </source>
+        <translation>creaciones de moneda actualizadas,</translation>
+    </message>
+    <message>
+        <source> unconfirmed transactions removed
+</source>
+        <translation>transacciones sin confirmar eliminadas
+</translation>
+    </message>
+    <message>
+        <source>Disable all Wagerr specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
+        <translation>Desabilitar toda la funcionalidad especifica Wagerr (Masternodes, Obfuscation, SwiftTX, Budgeting) (0-1, predeterminado: %u)</translation>
+    </message>
+    <message>
+        <source>Enable SwiftX, show confirmations for locked transactions (bool, default: %s)</source>
+        <translation>Activar swifttx, mostrar confirmaciones para transacciones bloqueadas (bool, predeterminado: %s)</translation>
+    </message>
+    <message>
+        <source>Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.</source>
+        <translation>¡La transacción fue rechazada! Esto puede ocurrir si alguna de sus monedas ya se gastó con anterioridad, por ejemplo, si estuvo usted usando una copia de su monedero wallet.dat y gastó allí monedas pero no las marcó como gastadas aquí.</translation>
+    </message>
+    <message>
+        <source>Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!</source>
+        <translation>Error: ¡Esta transacción requiere una tasa de al menos %s debido a la cantidad enviada, su complejidad, o el uso de fondos recibidos recientemente!</translation>
+    </message>
+    <message>
+        <source>Error: Unsupported argument -checklevel found. Checklevel must be level 4.</source>
+        <translation>Error: Se ha especificado un argumento no soportado -checklevel. El Checklevel debe ser siempre 4. </translation>
+    </message>
+    <message>
+        <source>Execute command when the best block changes and its size is over (%s in cmd is replaced by block hash, %d with the block size)</source>
+        <translation>Execute o comando quando o melhor bloco for alterado e seu tamanho terminar (%s em cmd é substituído por hash de bloco, %d com o tamanho do bloco)</translation>
+    </message>
+    <message>
+        <source>Failed to find coin set amongst held coins with less than maxNumber of Spends</source>
+        <translation>Não foi possível encontrar o conjunto de moedas entre as moedas retidas com menos de um máximo de gastos</translation>
+    </message>
+    <message>
+        <source>In rare cases, a spend with 7 coins exceeds our maximum allowable transaction size, please retry spend using 6 or less coins</source>
+        <translation>Em casos raros, um gasto com 7 moedas excede nosso tamanho máximo de transação permitido. Repita o investimento usando 6 moedas ou menos</translation>
+    </message>
+    <message>
+        <source>Preferred Denomination for automatically minted Zerocoin  (1/5/10/50/100/500/1000/5000), 0 for no preference. default: %u)</source>
+        <translation>Tamaño de Billete Zerocoin Preferido para los Zerocoin creados automáticamente (1/5/10/50/100/500/1000/5000), poner 0 si no tiene preferencias. Por defecto: %u) </translation>
+    </message>
+    <message>
+        <source>SwiftX requires inputs with at least 6 confirmations, you might need to wait a few minutes and try again.</source>
+        <translation>SwiftX requiere entradas con al menos 6 confirmaciones, es posible que deba esperar unos minutos e intente de nuevo.</translation>
     </message>
     <message>
         <source>&lt;category&gt; can be:</source>
@@ -4468,6 +5493,10 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     <message>
         <source>Attempt to force blockchain corruption recovery</source>
         <translation>Intentar forzar la recuperación de la cadena de bloques corrupta</translation>
+    </message>
+    <message>
+        <source>CoinSpend: Accumulator witness does not verify</source>
+        <translation>CoinSpend: testemunha do acumulador não verifica</translation>
     </message>
     <message>
         <source>Display the stake modifier calculations in the debug.log file.</source>
@@ -4482,10 +5511,6 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Activar inclusión del hash del bloque en &lt;address&gt;</translation>
     </message>
     <message>
-        <source>Enable publish hash transaction (locked via SwiftTX) in &lt;address&gt;</source>
-        <translation>Activar inclusión del hash de la transacción (fijada mediante SwiftTX) en &lt;address&gt;</translation>
-    </message>
-    <message>
         <source>Enable publish hash transaction in &lt;address&gt;</source>
         <translation>Activar inclusión del hash de la transacción en &lt;address&gt;</translation>
     </message>
@@ -4494,16 +5519,36 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Activar inclusión del bloque en bruto en &lt;address&gt;</translation>
     </message>
     <message>
-        <source>Enable publish raw transaction (locked via SwiftTX) in &lt;address&gt;</source>
-        <translation>Activar inclusión de la transacción en bruto (fijada mediante SwiftTX) en &lt;address&gt;</translation>
-    </message>
-    <message>
         <source>Enable publish raw transaction in &lt;address&gt;</source>
         <translation>Activar inclusión de la transacción en bruto en &lt;address&gt;</translation>
     </message>
     <message>
         <source>Enable staking functionality (0-1, default: %u)</source>
         <translation>Activar funcionalidad de recompensa por participación (0-1, por defecto: %u)</translation>
+    </message>
+    <message>
+        <source>Error: A fatal internal error occurred, see debug.log for details</source>
+        <translation>Error: Un error interno fatal a ocurrido, ver debug.log para mas detalles</translation>
+    </message>
+    <message>
+        <source>Error: No valid utxo!</source>
+        <translation>Erro: Nenhum utxo válido!</translation>
+    </message>
+    <message>
+        <source>Failed to create mint</source>
+        <translation>Falha ao criar hortelã</translation>
+    </message>
+    <message>
+        <source>Failed to deserialize</source>
+        <translation>Falha ao desserializar</translation>
+    </message>
+    <message>
+        <source>Failed to select a zerocoin</source>
+        <translation>Falha ao selecionar um zerocoin</translation>
+    </message>
+    <message>
+        <source>Failed to write coin serial number into wallet</source>
+        <translation>Falha ao gravar o número de série da moeda na carteira</translation>
     </message>
     <message>
         <source>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</source>
@@ -4554,6 +5599,10 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Cargando cache de pagos de nodos maestros</translation>
     </message>
     <message>
+        <source>Loading sporks...</source>
+        <translation>Cargando sporks...</translation>
+    </message>
+    <message>
         <source>Loading wallet... (%3.2f %%)</source>
         <translation>Cargando monedero: (%3.2f %%)</translation>
     </message>
@@ -4562,12 +5611,20 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Cargando monedero...</translation>
     </message>
     <message>
+        <source>Location of the auth cookie (default: data dir)</source>
+        <translation>Localização do cookie de autenticação (padrão: data dir)</translation>
+    </message>
+    <message>
         <source>Lock is already in place.</source>
         <translation>Bloqueo esta en su lugar.</translation>
     </message>
     <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
         <translation>Bloquear nodos maestros desde el archivo de configuración de nodo maestro (predeterminado: %u)</translation>
+    </message>
+    <message>
+        <source>Lookup(): Invalid -proxy address or hostname: '%s'</source>
+        <translation>Pesquisa (): Endereço de proxy ou nome de host inválido: '%s'</translation>
     </message>
     <message>
         <source>Maintain at most &lt;n&gt; connections to peers (default: %u)</source>
@@ -4594,12 +5651,20 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Máximo buffer de envío por conexión, &lt;n&gt;*1000 bytes (predeterminado: %u)</translation>
     </message>
     <message>
+        <source>Mint did not make it into blockchain</source>
+        <translation>Mint não fez isso em blockchain</translation>
+    </message>
+    <message>
         <source>Missing input transaction information.</source>
         <translation>Información de transacciones de entrada perdidas.</translation>
     </message>
     <message>
         <source>Mixing in progress...</source>
         <translation>Mezcla en progreso...</translation>
+    </message>
+    <message>
+        <source>Need address because change is not exact</source>
+        <translation>Precisa de endereço porque a mudança não é exata</translation>
     </message>
     <message>
         <source>Need to specify a port with -whitebind: '%s'</source>
@@ -4619,7 +5684,7 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     </message>
     <message>
         <source>No matching denominations found for mixing.</source>
-        <translation>No hay denominaciones emparejadas encontradas para mezclado.</translation>
+        <translation>No hemos encontrado billetes coincidentes para mezclado.</translation>
     </message>
     <message>
         <source>Node relay options:</source>
@@ -4674,6 +5739,14 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Contraseña para conezWGRes JSON-RPC</translation>
     </message>
     <message>
+        <source>isValid(): Invalid -proxy address or hostname: '%s'</source>
+        <translation>isValid (): Endereço de proxy ou nome de host inválido: '%s'</translation>
+    </message>
+    <message>
+        <source>Preparing for resync...</source>
+        <translation>Preparando para resincronizar...</translation>
+    </message>
+    <message>
         <source>Prepend debug output with timestamp (default: %u)</source>
         <translation>Agregar timestamp a la salida de depuración (predeterminado: %u)</translation>
     </message>
@@ -4682,16 +5755,8 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Mostrar versión y salir</translation>
     </message>
     <message>
-        <source>RPC SSL options: (see the Bitcoin Wiki for SSL setup instructions)</source>
-        <translation>Opciones RPC SSL: (ver el Bitcoin Wiki para instrucciones de instalación SSL)</translation>
-    </message>
-    <message>
         <source>RPC server options:</source>
         <translation>Opciones del servidor RPC:</translation>
-    </message>
-    <message>
-        <source>RPC support for HTTP persistent connections (default: %d)</source>
-        <translation>Soporte RPC para conezWGRes persistentes HTTP (predeterminado %d)</translation>
     </message>
     <message>
         <source>Randomly drop 1 of every &lt;n&gt; network messages</source>
@@ -4710,6 +5775,10 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Recibir y mostrar alertas de red P2P (predeterminado: %u)</translation>
     </message>
     <message>
+        <source>Reindex the accumulator database</source>
+        <translation>Reindexar la base de datos del acumulador</translation>
+    </message>
+    <message>
         <source>Relay and mine data carrier transactions (default: %u)</source>
         <translation>Transmitir y minar datos de transacciones enviadas (predeterminado: %u)</translation>
     </message>
@@ -4726,6 +5795,14 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Reescaneado...</translation>
     </message>
     <message>
+        <source>ResetMintZerocoin finished: </source>
+        <translation>ResetMintZerocoin finalizado:</translation>
+    </message>
+    <message>
+        <source>ResetSpentZerocoin finished: </source>
+        <translation>ResetSpentZerocoin finalizado:</translation>
+    </message>
+    <message>
         <source>Run a thread to flush wallet periodically (default: %u)</source>
         <translation>Ejecutar un hilo de ejecución para nivelar el monedero periódicamente (predeterminado: %u)</translation>
     </message>
@@ -4736,14 +5813,6 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     <message>
         <source>Send transactions as zero-fee transactions if possible (default: %u)</source>
         <translation>Enviar transacciones como transacciones cero-comisión si es posible (predeterminado: %u)</translation>
-    </message>
-    <message>
-        <source>Server certificate file (default: %s)</source>
-        <translation>Archivo certificado del servidor (predeterminado: %s)</translation>
-    </message>
-    <message>
-        <source>Server private key (default: %s)</source>
-        <translation>Clave privada del servidor (predeterminado: %s)</translation>
     </message>
     <message>
         <source>Session not complete!</source>
@@ -4772,6 +5841,10 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     <message>
         <source>Set minimum block size in bytes (default: %u)</source>
         <translation>Ajustar el tamaño mínimo de bloque en bytes (predeterminado: %u)</translation>
+    </message>
+    <message>
+        <source>Set the Maximum reorg depth (default: %u)</source>
+        <translation>Establezca la profundidad máxima de reorganización (valor predeterminado: %u)</translation>
     </message>
     <message>
         <source>Set the masternode private key</source>
@@ -4834,6 +5907,10 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Especifique su propia dirección pública</translation>
     </message>
     <message>
+        <source>Spend Valid</source>
+        <translation>Gastar Válido</translation>
+    </message>
+    <message>
         <source>Spend unconfirmed change when sending transactions (default: %u)</source>
         <translation>Gastar cambio no confirmado cuando se envían transacciones (predeterminado: %u)</translation>
     </message>
@@ -4856,10 +5933,6 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     <message>
         <source>Submitted to masternode, waiting in queue %s</source>
         <translation>Enviado a masternode, quedando en espera %s</translation>
-    </message>
-    <message>
-        <source>SwiftTX options:</source>
-        <translation>Opciones SwiftTX:</translation>
     </message>
     <message>
         <source>Synchronization failed</source>
@@ -4890,6 +5963,22 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Sincronizando con la red... </translation>
     </message>
     <message>
+        <source>The coin spend has been used</source>
+        <translation>O gasto com moedas foi usado</translation>
+    </message>
+    <message>
+        <source>The new spend coin transaction did not verify</source>
+        <translation>A nova transação de moeda de gasto não foi confirmada</translation>
+    </message>
+    <message>
+        <source>The selected mint coin is an invalid coin</source>
+        <translation>A moeda de hortelã selecionada é uma moeda inválida</translation>
+    </message>
+    <message>
+        <source>The transaction did not verify</source>
+        <translation>A transação não verificou</translation>
+    </message>
+    <message>
         <source>This help message</source>
         <translation>Este mensaje de ayuda</translation>
     </message>
@@ -4908,6 +5997,26 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
     <message>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
         <translation>Limite para desconexión de peers de mal desempeño (predeterminado: %u)</translation>
+    </message>
+    <message>
+        <source>Too many spends needed</source>
+        <translation>Gastos demais são necessários</translation>
+    </message>
+    <message>
+        <source>Tor control port password (default: empty)</source>
+        <translation>Contraseña del puerto de control Tor (por defecto: vacío)</translation>
+    </message>
+    <message>
+        <source>Tor control port to use if onion listening enabled (default: %s)</source>
+        <translation>Puerto de control Tor a utilizar si está activada la escucha Onion (por defecto: %s)</translation>
+    </message>
+    <message>
+        <source>Transaction Created</source>
+        <translation>Transação Criada</translation>
+    </message>
+    <message>
+        <source>Transaction Mint Started</source>
+        <translation>Cotação de transação iniciada</translation>
     </message>
     <message>
         <source>Transaction amount too small</source>
@@ -4942,12 +6051,28 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Transmitiendo la transacción final.</translation>
     </message>
     <message>
+        <source>Try to spend with a higher security level to include more coins</source>
+        <translation>Tente gastar com um nível de segurança mais alto para incluir mais moedas</translation>
+    </message>
+    <message>
+        <source>Trying to spend an already spent serial #, try again.</source>
+        <translation>Tentando gastar um número de série já gasto, tente novamente.</translation>
+    </message>
+    <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
         <translation>Imposible enlazar %s en esta computadora (enlace retorna error %s)</translation>
     </message>
     <message>
+        <source>Unable to find transaction containing mint</source>
+        <translation>Não é possível encontrar transações contendo hortelã</translation>
+    </message>
+    <message>
         <source>Unable to sign spork message, wrong key?</source>
         <translation>Imposible firmar el mensaje spork, ¿llave equivocada?</translation>
+    </message>
+    <message>
+        <source>Unable to start HTTP server. See debug log for details.</source>
+        <translation>Não é possível iniciar o servidor HTTP. Veja o log de depuração para detalhes.</translation>
     </message>
     <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
@@ -4962,16 +6087,16 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Actualizar el monedero al formato ultimo</translation>
     </message>
     <message>
-        <source>Use OpenSSL (https) for JSON-RPC connections</source>
-        <translation>Usar OpenSSL (https) para conezWGRes JSON-RPC</translation>
-    </message>
-    <message>
         <source>Use UPnP to map the listening port (default: %u)</source>
         <translation>Usar UPnP para mapear el puerto de escucha (predeterminado: %u)</translation>
     </message>
     <message>
         <source>Use UPnP to map the listening port (default: 1 when listening)</source>
         <translation>Usar UPnP para mapear el puerto de escucha (predeterminado: 1 cuando esta en escucha)</translation>
+    </message>
+    <message>
+        <source>Use a custom max chain reorganization depth (default: %u)</source>
+        <translation>Utilice una profundidad de reorganización de cadena máxima personalizada (valor predeterminado: %u)</translation>
     </message>
     <message>
         <source>Use the test network</source>
@@ -5034,6 +6159,10 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Probando...</translation>
     </message>
     <message>
+        <source>You don't have enough Zerocoins in your wallet</source>
+        <translation>Você não tem Zerocoins suficientes na sua carteira</translation>
+    </message>
+    <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation>Usted necesita reconstruir la base de datos usando -reindex para cambiar -txindex</translation>
     </message>
@@ -5054,12 +6183,16 @@ por ejemplo: alertnotify=echo %%s | mail -s "Wagerr Alert" admin@foo.com
         <translation>Opciones de notificación ZeroMQ:</translation>
     </message>
     <message>
+        <source>Zerocoin options:</source>
+        <translation>Opciones Zerocoin:</translation>
+    </message>
+    <message>
         <source>on startup</source>
         <translation>al inicio</translation>
     </message>
     <message>
         <source>wallet.dat corrupt, salvage failed</source>
-        <translation>wallet.dat esta corrupto, guardado falló</translation>
+        <translation>wallet.dat esta corrupto, fallo al guardar</translation>
     </message>
 </context>
 </TS>

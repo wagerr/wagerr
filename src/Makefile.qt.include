@@ -15,11 +15,16 @@ QT_TS = \
   qt/locale/wagerr_en.ts \
   qt/locale/wagerr_en_US.ts \
   qt/locale/wagerr_es.ts \
+  qt/locale/wagerr_es_ES.ts \
   qt/locale/wagerr_fi.ts \
   qt/locale/wagerr_fr_FR.ts \
+  qt/locale/wagerr_hi_IN.ts \
+  qt/locale/wagerr_hr.ts \
+  qt/locale/wagerr_hr_HR.ts \
   qt/locale/wagerr_it.ts \
   qt/locale/wagerr_ja.ts \
   qt/locale/wagerr_ko_KR.ts \
+  qt/locale/wagerr_lt_LT.ts \
   qt/locale/wagerr_nl.ts \
   qt/locale/wagerr_pl.ts \
   qt/locale/wagerr_pt.ts \
@@ -30,6 +35,7 @@ QT_TS = \
   qt/locale/wagerr_sv.ts \
   qt/locale/wagerr_tr.ts \
   qt/locale/wagerr_uk.ts \
+  qt/locale/wagerr_vi.ts \
   qt/locale/wagerr_zh_CN.ts \
   qt/locale/wagerr_zh_TW.ts
 

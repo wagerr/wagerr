@@ -1,111 +1,79 @@
-<TS language="ja" version="2.1">
+<TS language="vi" version="2.1">
 <context>
     <name>AddressBookPage</name>
     <message>
         <source>Right-click to edit address or label</source>
-        <translation>右クリックでアドレスもしくはラベルを編集</translation>
+        <translation>Ấn chuột phải để sửa địa chỉ hoặc tên</translation>
     </message>
     <message>
         <source>Create a new address</source>
-        <translation>新しいアドレスを作成</translation>
+        <translation>Tạo địa chỉ mới </translation>
     </message>
     <message>
         <source>&amp;New</source>
-        <translation>＆新規</translation>
-    </message>
-    <message>
-        <source>Copy the currently selected address to the system clipboard</source>
-        <translation>クリップボードへ現在選択しているアドレスをコピー</translation>
+        <translation>Mới</translation>
     </message>
     <message>
         <source>&amp;Copy</source>
-        <translation>＆コピー</translation>
+        <translation>Sao chép</translation>
     </message>
     <message>
         <source>Delete the currently selected address from the list</source>
-        <translation>リストから選択されたアドレスを削除</translation>
+        <translation>Xóa các địa chỉ được chọn khỏi danh sách</translation>
     </message>
     <message>
         <source>&amp;Delete</source>
-        <translation>＆削除</translation>
+        <translation>Xóa</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Xuất dữ liệu của tab hiện tại sang file</translation>
     </message>
     <message>
         <source>&amp;Export</source>
-        <translation>＆エクスポート</translation>
+        <translation>Xuất</translation>
     </message>
     <message>
         <source>C&amp;lose</source>
-        <translation>＆閉じる</translation>
+        <translation>Đóng</translation>
     </message>
     <message>
         <source>Choose the address to send coins to</source>
-        <translation>送信先アドレスを選んでコインを送る</translation>
+        <translation>Chọn địa chỉ để gửi coin đi</translation>
     </message>
     <message>
         <source>Choose the address to receive coins with</source>
-        <translation>受信用アドレスを選んでコインを受け取る</translation>
+        <translation>Chọn địa chỉ để nhận coin về</translation>
     </message>
     <message>
         <source>C&amp;hoose</source>
-        <translation>＆選択</translation>
+        <translation>Chọn</translation>
     </message>
     <message>
         <source>Sending addresses</source>
-        <translation>送信先アドレス</translation>
+        <translation>Địa chỉ nhận</translation>
     </message>
     <message>
         <source>Receiving addresses</source>
-        <translation>受信用アドレス</translation>
+        <translation>Địa chỉ gửi </translation>
     </message>
     <message>
-        <source>&amp;Copy Address</source>
-        <translation>＆アドレスをコビー</translation>
+        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Đây là địa chỉ ví Wagerr của bạn để gửi đi. Luôn luôn kiểm tra số lượng và địa chỉ ví nhận trước khi gửi.</translation>
     </message>
     <message>
-        <source>&amp;Edit</source>
-        <translation>＆編集</translation>
-    </message>
-    <message>
-        <source>Export Address List</source>
-        <translation>アドレスリストをエクスポート</translation>
-    </message>
-    <message>
-        <source>Exporting Failed</source>
-        <translation>エクスポート失敗</translation>
+        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Đây là địa chỉ ví Wagerr của bạn để nhận. Bạn nên sử dụng địa chỉ ví nhận mới cho mỗi giao dịch</translation>
     </message>
     </context>
 <context>
     <name>AddressTableModel</name>
-    <message>
-        <source>Address</source>
-        <translation>アドレス</translation>
-    </message>
     </context>
 <context>
     <name>AskPassphraseDialog</name>
     <message>
-        <source>New passphrase</source>
-        <translation>新しいパスワード</translation>
-    </message>
-    <message>
-        <source>Repeat new passphrase</source>
-        <translation>新しいパスワードの確認</translation>
-    </message>
-    <message>
-        <source>Encrypt wallet</source>
-        <translation>財布を暗号化</translation>
-    </message>
-    <message>
-        <source>Change passphrase</source>
-        <translation>パスワードを変更</translation>
-    </message>
-    <message>
-        <source>Enter the old and new passphrase to the wallet.</source>
-        <translation>現在のパスワードと新しいパスワードを財布に入力</translation>
-    </message>
-    <message>
-        <source>Wallet encrypted</source>
-        <translation>財布が暗号化された</translation>
+        <source>Unlock wallet</source>
+        <translation>Mở khóa ví</translation>
     </message>
     </context>
 <context>
@@ -113,21 +81,13 @@
     </context>
 <context>
     <name>Bip38ToolDialog</name>
-    <message>
-        <source>Address:</source>
-        <translation>アドレス：</translation>
-    </message>
-    <message>
-        <source>Passphrase: </source>
-        <translation>パスワード：</translation>
-    </message>
-    <message>
-        <source>Encrypted Key:</source>
-        <translation>暗号化されたキー</translation>
-    </message>
     </context>
 <context>
     <name>BitcoinGUI</name>
+    <message>
+        <source>Unlock wallet</source>
+        <translation>Mở khóa ví</translation>
+    </message>
     </context>
 <context>
     <name>BlockExplorer</name>
@@ -152,17 +112,9 @@
     </context>
 <context>
     <name>MasternodeList</name>
-    <message>
-        <source>Address</source>
-        <translation>アドレス</translation>
-    </message>
     </context>
 <context>
     <name>MultiSendDialog</name>
-    <message>
-        <source>Address:</source>
-        <translation>アドレス：</translation>
-    </message>
     </context>
 <context>
     <name>MultisigDialog</name>
@@ -202,10 +154,6 @@
     </context>
 <context>
     <name>ReceiveRequestDialog</name>
-    <message>
-        <source>Address</source>
-        <translation>アドレス</translation>
-    </message>
     </context>
 <context>
     <name>RecentRequestsTableModel</name>
@@ -236,21 +184,9 @@
     </context>
 <context>
     <name>TransactionTableModel</name>
-    <message>
-        <source>Address</source>
-        <translation>アドレス</translation>
-    </message>
     </context>
 <context>
     <name>TransactionView</name>
-    <message>
-        <source>Address</source>
-        <translation>アドレス</translation>
-    </message>
-    <message>
-        <source>Exporting Failed</source>
-        <translation>エクスポート失敗</translation>
-    </message>
     </context>
 <context>
     <name>UnitDisplayStatusBarControl</name>
@@ -265,7 +201,11 @@
     <name>WalletView</name>
     <message>
         <source>&amp;Export</source>
-        <translation>＆エクスポート</translation>
+        <translation>Xuất</translation>
+    </message>
+    <message>
+        <source>Export the data in the current tab to a file</source>
+        <translation>Xuất dữ liệu của tab hiện tại sang file</translation>
     </message>
     </context>
 <context>
