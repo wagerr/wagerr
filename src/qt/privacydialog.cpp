@@ -794,7 +794,9 @@ void PrivacyDialog::updateAutomintStatus()
 void PrivacyDialog::updateSPORK16Status()
 {
     // Update/enable labels, buttons and tooltips depending on the current SPORK_16 status
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
+    bool fButtonsEnabled =  ui->pushButtonMintzWGR->isEnabled();
+    bool fMaintenanceMode = GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE);
+    if (fMaintenanceMode && fButtonsEnabled) {
         // Mint zWGR
         ui->pushButtonMintzWGR->setEnabled(false);
         ui->pushButtonMintzWGR->setToolTip(tr("zWGR is currently disabled due to maintenance."));
@@ -802,8 +804,7 @@ void PrivacyDialog::updateSPORK16Status()
         // Spend zWGR
         ui->pushButtonSpendzWGR->setEnabled(false);
         ui->pushButtonSpendzWGR->setToolTip(tr("zWGR is currently disabled due to maintenance."));
-    }
-    else {
+    } else if (!fMaintenanceMode && !fButtonsEnabled) {
         // Mint zWGR
         ui->pushButtonMintzWGR->setEnabled(true);
         ui->pushButtonMintzWGR->setToolTip(tr("PrivacyDialog", "Enter an amount of WGR to convert to zWGR", 0));
