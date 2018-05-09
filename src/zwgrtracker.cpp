@@ -145,10 +145,6 @@ CAmount CzWGRTracker::GetBalance(bool fConfirmedOnly, bool fUnconfirmedOnly) con
             myZerocoinSupply.at(meta.denom)++;
         }
     }
-    for (auto& denom : libzerocoin::zerocoinDenomList) {
-        LogPrint("zero","%s My coins for denomination %d pubcoin %s\n", __func__,denom, myZerocoinSupply.at(denom));
-    }
-    LogPrint("zero","Total value of coins %d\n",nTotal);
 
     if (nTotal < 0 ) nTotal = 0; // Sanity never hurts
 
