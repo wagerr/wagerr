@@ -12,6 +12,7 @@
 
 #include "init.h"
 
+#include "accumulatorcheckpoints.h"
 #include "accumulators.h"
 #include "activemasternode.h"
 #include "addrman.h"
@@ -40,7 +41,7 @@
 #include "util.h"
 #include "utilmoneystr.h"
 #include "validationinterface.h"
-#include "accumulatorcheckpoints.h"
+#include "zwgrchain.h"
 
 #ifdef ENABLE_WALLET
 #include "db.h"
@@ -1442,56 +1443,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 // Drop all information from the zerocoinDB and repopulate
                 if (GetBoolArg("-reindexzerocoin", false)) {
                     uiInterface.InitMessage(_("Reindexing zerocoin database..."));
-                    if (!zerocoinDB->WipeCoins("spends") || !zerocoinDB->WipeCoins("mints")) {
-                        strLoadError = _("Failed to wipe zerocoinDB");
+                    std::string strError = ReindexZerocoinDB();
+                    if (strError != "") {
+                        strLoadError = strError;
                         break;
-                    }
-
-                    CBlockIndex* pindex = chainActive[Params().Zerocoin_StartHeight()];
-                    while (pindex) {
-                        if (pindex->nHeight % 1000 == 0)
-                            LogPrintf("Reindexing zerocoin : block %d...\n", pindex->nHeight);
-
-                        CBlock block;
-                        if (!ReadBlockFromDisk(block, pindex)) {
-                            strLoadError = _("Reindexing zerocoin failed");
-                            break;
-                        }
-
-                        for (const CTransaction& tx : block.vtx) {
-                            for (unsigned int i = 0; i < tx.vin.size(); i++) {
-                                if (tx.IsCoinBase())
-                                    break;
-
-                                if (tx.ContainsZerocoins()) {
-                                    uint256 txid = tx.GetHash();
-                                    //Record Serials
-                                    if (tx.IsZerocoinSpend()) {
-                                        for (auto& in : tx.vin) {
-                                            if (!in.scriptSig.IsZerocoinSpend())
-                                                continue;
-
-                                            libzerocoin::CoinSpend spend = TxInToZerocoinSpend(in);
-                                            zerocoinDB->WriteCoinSpend(spend.getCoinSerialNumber(), txid);
-                                        }
-                                    }
-
-                                    //Record mints
-                                    if (tx.IsZerocoinMint()) {
-                                        for (auto& out : tx.vout) {
-                                            if (!out.IsZerocoinMint())
-                                                continue;
-
-                                            CValidationState state;
-                                            libzerocoin::PublicCoin coin(Params().Zerocoin_Params(pindex->nHeight < Params().Zerocoin_Block_V2_Start()));
-                                            TxOutToPublicCoin(out, coin, state);
-                                            zerocoinDB->WriteCoinMint(coin, txid);
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                        pindex = chainActive.Next(pindex);
                     }
                 }
 

@@ -14,6 +14,7 @@
 #include "timedata.h"
 #include "util.h"
 #include "stakeinput.h"
+#include "zwgrchain.h"
 
 using namespace std;
 

@@ -18,6 +18,7 @@
 #include "utilmoneystr.h"
 #include "wallet.h"
 #include "walletdb.h"
+#include "zwgrchain.h"
 
 #include <stdint.h>
 
