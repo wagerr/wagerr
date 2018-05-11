@@ -1246,7 +1246,8 @@ bool ContextualCheckZerocoinMint(const CTransaction& tx, const PublicCoin& coin,
     if (pindex->nHeight >= Params().Zerocoin_Block_V2_Start() && Params().NetworkID() != CBaseChainParams::TESTNET) {
         //See if this coin has already been added to the blockchain
         uint256 txid;
-        if(zerocoinDB->ReadCoinMint(coin.getValue(), txid))
+        int nHeight;
+        if (zerocoinDB->ReadCoinMint(coin.getValue(), txid) && IsTransactionInChain(txid, nHeight))
             return error("%s: pubcoin %s was already accumulated in tx %s", __func__,
                          coin.getValue().GetHex().substr(0, 10),
                          txid.GetHex());
