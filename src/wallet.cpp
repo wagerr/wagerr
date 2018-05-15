@@ -2110,9 +2110,15 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
 
     //zWGR
     if (GetBoolArg("-zwgrstake", true) && chainActive.Height() > Params().Zerocoin_Block_V2_Start() && !IsSporkActive(SPORK_16_ZEROCOIN_MAINTENANCE_MODE)) {
-        //Add zWGR
-        set<CMintMeta> setMints = zwgrTracker->ListMints(true, true, true);
+        //Only update zWGR set once per update interval
+        bool fUpdate = false;
+        static int64_t nTimeLastUpdate = 0;
+        if (GetAdjustedTime() - nTimeLastUpdate > nStakeSetUpdateTime) {
+            fUpdate = true;
+            nTimeLastUpdate = GetAdjustedTime();
+        }
 
+        set<CMintMeta> setMints = zwgrTracker->ListMints(true, true, fUpdate);
         for (auto meta : setMints) {
             if (meta.hashStake == 0) {
                 CZerocoinMint mint;
@@ -2923,16 +2929,10 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     if (nBalance > 0 && nBalance <= nReserveBalance)
         return false;
 
-    // Initialize as static and don't update the set on every run of CreateCoinStake() in order to lighten resource use
-    static int nLastStakeSetUpdate = 0;
-    static list<std::unique_ptr<CStakeInput> > listInputs;
-    if (GetTime() - nLastStakeSetUpdate > nStakeSetUpdateTime) {
-        listInputs.clear();
-        if (!SelectStakeCoins(listInputs, nBalance - nReserveBalance))
-            return false;
-
-        nLastStakeSetUpdate = GetTime();
-    }
+    // Get the list of stakable inputs
+    std::list<std::unique_ptr<CStakeInput> > listInputs;
+    if (!SelectStakeCoins(listInputs, nBalance - nReserveBalance))
+        return false;
 
     if (listInputs.empty())
         return false;
@@ -3063,7 +3063,6 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     }
 
     // Successfully generated coinstake
-    nLastStakeSetUpdate = 0; //this will trigger stake set to repopulate next round
     return true;
 }
 
