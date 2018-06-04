@@ -11,6 +11,7 @@
 #include "bitcoingui.h"
 #include "blockexplorer.h"
 #include "clientmodel.h"
+#include "governancepage.h"
 #include "guiutil.h"
 #include "masternodeconfig.h"
 #include "multisenddialog.h"
@@ -123,12 +124,14 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     transactionsPage->setLayout(vbox);
 
     privacyPage = new PrivacyDialog();
+    governancePage = new GovernancePage();
     receiveCoinsPage = new ReceiveCoinsDialog();
     sendCoinsPage = new SendCoinsDialog();
     //placeBetPage = new PlaceBetDialog();
 
     addWidget(overviewPage);
     addWidget(transactionsPage);
+    addWidget(governancePage);
     addWidget(privacyPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
@@ -194,6 +197,7 @@ void WalletView::setClientModel(ClientModel* clientModel)
     if (settings.value("fShowMasternodesTab").toBool()) {
         masternodeListPage->setClientModel(clientModel);
     }
+    governancePage->setClientModel(clientModel);
 }
 
 void WalletView::setWalletModel(WalletModel* walletModel)
@@ -210,6 +214,7 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     privacyPage->setModel(walletModel);
     receiveCoinsPage->setModel(walletModel);
     sendCoinsPage->setModel(walletModel);
+    governancePage->setWalletModel(walletModel);
     //placeBetPage->setModel(walletModel);
 
     if (walletModel) {
@@ -262,6 +267,10 @@ void WalletView::gotoHistoryPage()
     setCurrentWidget(transactionsPage);
 }
 
+void WalletView::gotoGovernancePage()
+{
+    setCurrentWidget(governancePage);
+}
 
 void WalletView::gotoBlockExplorerPage()
 {

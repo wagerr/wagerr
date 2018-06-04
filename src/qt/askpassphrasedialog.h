@@ -44,7 +44,8 @@ public:
         Mint_zWGR,      /** Mint zWGR */
         BIP_38,         /** BIP38 menu */
         Multi_Sig,      /** Multi-Signature dialog */
-        Sign_Message    /** Sign/verify message dialog */
+        Sign_Message,   /** Sign/verify message dialog */
+        UI_Vote,        /** Governance Tab UI Voting */
     };
 
     explicit AskPassphraseDialog(Mode mode, QWidget* parent, WalletModel* model, Context context);
