@@ -151,6 +151,47 @@ CAmount CTransaction::GetValueOut() const
     return nValueOut;
 }
 
+CAmount CTransaction::AddVoutValues(CAmount& nValueOut, CAmount& nValueBurned) const
+{
+    for (std::vector<CTxOut>::const_iterator it(vout.begin()); it != vout.end(); ++it)
+    {
+        // Wagerr: previously MoneyRange() was called here. This has been replaced with negative check and boundary wrap check.
+        if (it->nValue < 0)
+            throw std::runtime_error("CTransaction::AddVoutValues() : value out of range : less than 0");
+
+        if ((nValueOut + it->nValue) < nValueOut)
+            throw std::runtime_error("CTransaction::AddVoutValues() : value out of range : wraps the int64_t boundary");
+
+        if (it->scriptPubKey.IsUnspendable())
+        {
+            if ((nValueBurned + it->nValue) < nValueBurned)
+                throw std::runtime_error("CTransaction::AddVoutValues() : value out of range : wraps the int64_t boundary");
+            nValueBurned += it->nValue;
+        }
+        nValueOut += it->nValue;
+    }
+    return nValueOut;
+}
+
+CAmount CTransaction::GetValueBurned() const
+{
+    CAmount nValueBurned = 0;
+    for (std::vector<CTxOut>::const_iterator it(vout.begin()); it != vout.end(); ++it)
+    {
+        if (it->scriptPubKey.IsUnspendable()){
+            // Wagerr: previously MoneyRange() was called here. This has been replaced with negative check and boundary wrap check.
+            if (it->nValue < 0)
+                throw std::runtime_error("CTransaction::GetValueBurned() : value out of range : less than 0");
+
+            if ((nValueBurned + it->nValue) < nValueBurned)
+                throw std::runtime_error("CTransaction::GetValueBurned() : value out of range : wraps the int64_t boundary");
+
+            nValueBurned += it->nValue;
+        }
+    }
+    return nValueBurned;
+}
+
 CAmount CTransaction::GetZerocoinMinted() const
 {
     for (const CTxOut txOut : vout) {
