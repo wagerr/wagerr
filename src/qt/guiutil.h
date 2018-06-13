@@ -229,19 +229,18 @@ QString formatPingTime(double dPingTime);
 /* Format a CNodeCombinedStats.nTimeOffset into a user-readable string. */
 QString formatTimeOffset(int64_t nTimeOffset);
 
-#if defined(Q_OS_MAC) && QT_VERSION >= 0x050000
-// workaround for Qt OSX Bug:
-// https://bugreports.qt-project.org/browse/QTBUG-15631
-// QProgressBar uses around 10% CPU even when app is in background
-class ProgressBar : public QProgressBar
-{
-    bool event(QEvent* e)
+#if defined(Q_OS_MAC)
+    // workaround for Qt OSX Bug:
+    // https://bugreports.qt-project.org/browse/QTBUG-15631
+    // QProgressBar uses around 10% CPU even when app is in background
+    class ProgressBar : public QProgressBar
     {
-        return (e->type() != QEvent::StyleAnimationUpdate) ? QProgressBar::event(e) : false;
-    }
-};
+        bool event(QEvent *e) {
+            return (e->type() != QEvent::StyleAnimationUpdate) ? QProgressBar::event(e) : false;
+        }
+    };
 #else
-typedef QProgressBar ProgressBar;
+    typedef QProgressBar ProgressBar;
 #endif
 
 } // namespace GUIUtil
