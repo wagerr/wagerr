@@ -2164,6 +2164,17 @@ int64_t GetBlockValue(int nHeight)
     return nSubsidy;
 }
 
+int64_t GetBlockPayouts( std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetReward){
+
+    CAmount nPayout = 0;
+    for(unsigned i = 0; i < vexpectedPayouts.size(); i++){
+        nPayout += vexpectedPayouts[i].nValue;
+    }
+
+    nMNBetReward = nPayout/94*3; // Betting payouts are 94% of betting amount. 3% of the betting amount is MN fee.
+
+    return  nPayout;
+}
 
 int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount)
 {

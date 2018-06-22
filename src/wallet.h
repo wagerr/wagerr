@@ -481,7 +481,9 @@ public:
     int GenerateObfuscationOutputs(int nTotalValue, std::vector<CTxOut>& vout);
     bool CreateCollateralTransaction(CMutableTransaction& txCollateral, std::string& strReason);
     bool ConvertList(std::vector<CTxIn> vCoins, std::vector<int64_t>& vecAmounts);
-    bool CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime);
+    bool FindCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime, vector<CWalletTx>& vwtxPrev);
+    bool FillCoinStake(CMutableTransaction& txNew, CAmount& nFees, std::vector<CTxOut> voutPayouts);
+    bool SignCoinStake(CMutableTransaction& txNew, vector<CWalletTx>& vwtxPrev);
     bool MultiSend();
     void AutoCombineDust();
     void AutoZeromint();
