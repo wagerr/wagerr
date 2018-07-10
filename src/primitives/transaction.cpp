@@ -73,6 +73,14 @@ CTxOut::CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn)
     nRounds = -10;
 }
 
+CTxOut::CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn,const CAmount& nBetValueIn)
+{
+    nValue = nValueIn;
+    nBetValue = nBetValueIn;
+    scriptPubKey = scriptPubKeyIn;
+    nRounds = -10;
+}
+
 bool COutPoint::IsMasternodeReward(const CTransaction* tx) const
 {
     if(!tx->IsCoinStake())

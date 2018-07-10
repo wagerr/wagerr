@@ -116,6 +116,7 @@ class CTxOut
 {
 public:
     CAmount nValue;
+    CAmount nBetValue;
     CScript scriptPubKey;
     int nRounds;
 
@@ -125,6 +126,7 @@ public:
     }
 
     CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn);
+    CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn);
 
     ADD_SERIALIZE_METHODS;
 
