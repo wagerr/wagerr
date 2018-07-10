@@ -19,7 +19,7 @@ const std::string CLIENT_NAME("Wagerr Core");
 /**
  * Client version number
  */
-#define CLIENT_VERSION_SUFFIX "-Vegas"
+#define CLIENT_VERSION_SUFFIX "-Paddy Power™"
 
 
 /**
@@ -92,8 +92,8 @@ std::string FormatFullVersion()
     return CLIENT_BUILD;
 }
 
-/** 
- * Format the subversion field according to BIP 14 spec (https://github.com/bitcoin/bips/blob/master/bip-0014.mediawiki) 
+/**
+ * Format the subversion field according to BIP 14 spec (https://github.com/bitcoin/bips/blob/master/bip-0014.mediawiki)
  */
 std::string FormatSubVersion(const std::string& name, int nClientVersion, const std::vector<std::string>& comments)
 {
