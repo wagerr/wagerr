@@ -418,6 +418,70 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& tran
     return SendCoinsReturn(OK);
 }
 
+WalletModel::SendCoinsReturn WalletModel::prepareBetTransaction(WalletModelTransaction& transaction, CAmount amount, const std::string& eventId, const std::string& teamToWin)
+{
+    if (isAnonymizeOnlyUnlocked()) {
+        return AnonymizeOnlyUnlocked;
+    }
+
+    CAmount nBalance = getBalance();
+    if (amount > nBalance) {
+        return AmountExceedsBalance;
+    }
+
+    {
+        LOCK2(cs_main, wallet->cs_wallet);
+
+        transaction.newPossibleKeyChange(wallet);
+        CAmount nFeeRequired = 0;
+        std::string strFailReason;
+
+        CWalletTx* newTx = transaction.getTransaction();
+        CReserveKey* keyChange = transaction.getPossibleKeyChange();
+
+        CBitcoinAddress address("");
+        CScript scriptPubKey = GetScriptForDestination(address.Get());
+        bool fCreated = wallet->CreateTransaction(scriptPubKey, amount, *newTx, *keyChange, nFeeRequired, strFailReason, NULL, ALL_COINS, false, (CAmount)0, "2|1.0|" + eventId + "|" + teamToWin);
+
+        if (!fCreated) {
+            if ((amount + nFeeRequired) > nBalance) {
+                return SendCoinsReturn(AmountWithFeeExceedsBalance);
+            }
+            emit message(tr("Place Bet"), QString::fromStdString(strFailReason),
+                CClientUIInterface::MSG_ERROR);
+            return TransactionCreationFailed;
+        }
+
+        // reject insane fee
+        if (nFeeRequired > ::minRelayTxFee.GetFee(transaction.getTransactionSize()) * 10000)
+            return InsaneFee;
+    }
+
+    return SendCoinsReturn(OK);
+}
+
+WalletModel::SendCoinsReturn WalletModel::placeBet(WalletModelTransaction& transaction, CAmount amount, const std::string& eventId, const std::string& teamToWin)
+{
+    if (isAnonymizeOnlyUnlocked()) {
+        return AnonymizeOnlyUnlocked;
+    }
+
+    {
+        LOCK2(cs_main, wallet->cs_wallet);
+
+        CWalletTx* newTx = transaction.getTransaction();
+        CReserveKey* keyChange = transaction.getPossibleKeyChange();
+
+        if (!wallet->CommitTransaction(*newTx, *keyChange, "tx"))
+        {
+            return TransactionCommitFailed;
+        }
+    }
+    checkBalanceChanged(); // update balance immediately, otherwise there could be a short noticeable delay until pollBalanceChanged hits
+
+    return SendCoinsReturn(OK);
+}
+
 OptionsModel* WalletModel::getOptionsModel()
 {
     return optionsModel;

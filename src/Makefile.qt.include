@@ -50,6 +50,8 @@ QT_FORMS_UI = \
   qt/forms/optionsdialog.ui \
   qt/forms/overviewpage.ui \
   qt/forms/receivecoinsdialog.ui \
+  qt/forms/placebetdialog.ui \
+  qt/forms/placebetevent.ui \
   qt/forms/privacydialog.ui \
   qt/forms/receiverequestdialog.ui \
   qt/forms/rpcconsole.ui \
@@ -93,6 +95,8 @@ QT_MOC_CPP = \
   qt/moc_qvalidatedlineedit.cpp \
   qt/moc_qvaluecombobox.cpp \
   qt/moc_receivecoinsdialog.cpp \
+  qt/moc_placebetdialog.cpp \
+  qt/moc_placebetevent.cpp \
   qt/moc_privacydialog.cpp \
   qt/moc_receiverequestdialog.cpp \
   qt/moc_recentrequeststablemodel.cpp \
@@ -171,6 +175,8 @@ BITCOIN_QT_H = \
   qt/qvalidatedlineedit.h \
   qt/qvaluecombobox.h \
   qt/receivecoinsdialog.h \
+  qt/placebetdialog.h \
+  qt/placebetevent.h \
   qt/privacydialog.h \
   qt/receiverequestdialog.h \
   qt/recentrequeststablemodel.h \
@@ -199,6 +205,7 @@ RES_ICONS = \
   qt/res/icons/address-book.png \
   qt/res/icons/automint_active.png \
   qt/res/icons/automint_inactive.png \
+  qt/res/icons/betting.png \
   qt/res/icons/wagerr.ico \
   qt/res/icons/wagerr.png \
   qt/res/icons/wagerr_testnet.ico \
@@ -305,6 +312,8 @@ BITCOIN_QT_CPP += \
   qt/paymentrequestplus.cpp \
   qt/paymentserver.cpp \
   qt/receivecoinsdialog.cpp \
+  qt/placebetdialog.cpp \
+  qt/placebetevent.cpp \
   qt/privacydialog.cpp \
   qt/receiverequestdialog.cpp \
   qt/recentrequeststablemodel.cpp \
