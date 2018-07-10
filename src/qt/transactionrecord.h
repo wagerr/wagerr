@@ -80,6 +80,8 @@ public:
         SendToOther,
         RecvWithAddress,
         MNReward,
+        BetWin,
+        BetPlaced,
         RecvFromOther,
         SendToSelf,
         ZerocoinMint,

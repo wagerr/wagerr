@@ -64,6 +64,8 @@ public slots:
     void gotoPrivacyPage();
     /** Switch to send coins page */
     void gotoSendCoinsPage(QString addr = "");
+    /** Switch to place bet page */
+    void gotoPlaceBetPage(QString addr = "");
     /** Switch to explorer page */
     void gotoBlockExplorerPage();
     /** Show Sign/Verify Message dialog and switch to sign message tab */

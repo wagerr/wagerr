@@ -18,6 +18,8 @@
 #include "receivecoinsdialog.h"
 #include "privacydialog.h"
 #include "sendcoinsdialog.h"
+#include "placebetdialog.h"
+#include "placebetevent.h"
 #include "signverifymessagedialog.h"
 #include "transactiontablemodel.h"
 #include "transactionview.h"
@@ -34,6 +36,10 @@
 #include <QPushButton>
 #include <QSettings>
 #include <QVBoxLayout>
+
+#include <cstdio>
+#include <boost/algorithm/string.hpp>
+#include <boost/assign/list_of.hpp>
 
 WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
                                           clientModel(0),
@@ -117,12 +123,14 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     privacyPage = new PrivacyDialog();
     receiveCoinsPage = new ReceiveCoinsDialog();
     sendCoinsPage = new SendCoinsDialog();
+    placeBetPage = new PlaceBetDialog();
 
     addWidget(overviewPage);
     addWidget(transactionsPage);
     addWidget(privacyPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
+    addWidget(placeBetPage);
     addWidget(explorerWindow);
 
     QSettings settings;
@@ -145,6 +153,9 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
 
     // Pass through messages from sendCoinsPage
     connect(sendCoinsPage, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
+
+    // Pass through messages from sendCoinsPage
+    connect(placeBetPage, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
 
     // Pass through messages from transactionView
     connect(transactionView, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
@@ -197,6 +208,7 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     privacyPage->setModel(walletModel);
     receiveCoinsPage->setModel(walletModel);
     sendCoinsPage->setModel(walletModel);
+    placeBetPage->setModel(walletModel);
 
     if (walletModel) {
         // Receive and pass through messages from wallet model
@@ -280,6 +292,238 @@ void WalletView::gotoSendCoinsPage(QString addr)
 
     if (!addr.isEmpty())
         sendCoinsPage->setAddress(addr);
+}
+
+void WalletView::gotoPlaceBetPage(QString addr)
+{
+    setCurrentWidget(placeBetPage);
+
+    // go thru blockchain and get data
+
+
+
+    // Set event name
+    std::string evtDes;
+
+
+
+    std::map<std::string, std::string> eventNames;
+    eventNames.insert(make_pair("WCUP", "World Cup"));
+
+    std::map<std::string, std::string> roundNames;
+    roundNames.insert(make_pair("R1", "Round 1"));
+    roundNames.insert(make_pair("RD2", "Round 2"));
+    roundNames.insert(make_pair("RD3", "Round 3"));
+    roundNames.insert(make_pair("F16", "Final 16"));
+    roundNames.insert(make_pair("QFL", "Quarter Final"));
+    roundNames.insert(make_pair("SFL", "Semi Final"));
+    roundNames.insert(make_pair("FIN", "Final"));
+
+
+    std::map<std::string, std::string> countryNames;
+    countryNames.insert(make_pair("ARG", "Argentina"));
+    countryNames.insert(make_pair("AUS", "Australia"));
+    countryNames.insert(make_pair("BRA", "Brazil"));
+    countryNames.insert(make_pair("CRC", "Costa Rica"));
+    countryNames.insert(make_pair("DEN", "Denmark"));
+    countryNames.insert(make_pair("EGY", "Egypt"));
+    countryNames.insert(make_pair("ESP", "Spain"));
+    countryNames.insert(make_pair("FRA", "France"));
+    countryNames.insert(make_pair("GER", "Germany"));
+    countryNames.insert(make_pair("IRN", "Iran"));
+    countryNames.insert(make_pair("ISL", "Iceland"));
+    countryNames.insert(make_pair("KSA", "Saudi Arabia"));
+    countryNames.insert(make_pair("MAR", "Morocco"));
+    countryNames.insert(make_pair("MEX", "Mexico"));
+    countryNames.insert(make_pair("PER", "Peru"));
+    countryNames.insert(make_pair("POR", "Portugal"));
+    countryNames.insert(make_pair("RUS", "Russia"));
+    countryNames.insert(make_pair("SRB", "Serbia"));
+    countryNames.insert(make_pair("URU", "Uruguay"));
+    countryNames.insert(make_pair("BEL", "Belgium"));
+    countryNames.insert(make_pair("COL", "Columbia"));
+    countryNames.insert(make_pair("CRO", "Croatia"));
+    countryNames.insert(make_pair("ENG", "England"));
+    countryNames.insert(make_pair("JPN", "Japan"));
+    countryNames.insert(make_pair("KOR", "Korea Republic"));
+    countryNames.insert(make_pair("NGA", "Nigeria"));
+    countryNames.insert(make_pair("NIG", "Nigeria"));
+    countryNames.insert(make_pair("PAN", "Panama"));
+    countryNames.insert(make_pair("POL", "Poland"));
+    countryNames.insert(make_pair("SEN", "Senegal"));
+    countryNames.insert(make_pair("SWE", "Sweden"));
+    countryNames.insert(make_pair("SUI", "Switzerland"));
+    countryNames.insert(make_pair("TUN", "Tunisia "));
+
+    placeBetPage->clear();
+
+    std::map<uint256, uint32_t> coreWalletVouts;
+    std::vector<CEvent *> eventsVector;
+    // FIXME Copied from `rpcwallet.cpp`.
+    // TODO We currently search the entire block chain every time we query the
+    // current events. Instead, the events up to a particular block/transaction
+    // should be read and cached when the process starts, and ideally persisted,
+    // to reduce the processing time for this command.
+    CBlockIndex* pindex = chainActive.Genesis();
+    bool skipping = true;
+    while (pindex) {
+        CBlock block;
+        ReadBlockFromDisk(block, pindex);
+        BOOST_FOREACH (CTransaction& tx, block.vtx) {
+            // This is an early optimisation: we know that no events were posted
+            // before the following transaction, so we skip them.
+            if (skipping) {
+                if (tx.GetHash().ToString() != "948965410fc242a3d7b0cf562d100425efb2180696ad6bd3ac06b5d5679d07f9") {
+                    continue;
+                }
+                skipping = false;
+            }
+
+            bool match = false;
+            for (unsigned int i = 0; i < tx.vin.size(); i++) {
+                const CTxIn& txin = tx.vin[i];
+                //printf("VIn: %s",tx.vin[i].ToString().c_str());
+                COutPoint prevout = txin.prevout;
+
+                // TODO Investigate whether a transaction can have multiple
+                // `vout`s to the same address.
+                if (coreWalletVouts[prevout.hash] == prevout.n) {
+                    match = true;
+                    break;
+                }
+            }
+
+            for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                const CTxOut& txout = tx.vout[i];
+                std::string scriptPubKey = txout.scriptPubKey.ToString();
+
+                // TODO Remove hard-coded values from this block.
+                if ( match && scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                    vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
+                    std::string evtDescr(v.begin(), v.end());
+                    std::vector<std::string> strs;
+                    boost::split(strs, evtDescr, boost::is_any_of("|"));
+
+                    if (strs.size() != 11 || strs[0] != "1" || strs[1] != "1.0") {
+                        continue;
+                    }
+
+                    time_t time = (time_t) std::strtol(strs[3].c_str(), nullptr, 10);
+                    CEvent *event = CEvent::ParseEvent(evtDescr);
+
+                    time_t currentTime = std::time(0);
+                    //only add events up until 20 minutes(1200 seconds) before they start
+                    if( time > (currentTime + 1200)){
+
+                        //add events to vector
+                        eventsVector.push_back(event);
+                    }
+                }
+
+                txnouttype type;
+                vector<CTxDestination> addrs;
+                int nRequired;
+                if (!ExtractDestinations(txout.scriptPubKey, type, addrs, nRequired)) {
+                    continue;
+                }
+
+                BOOST_FOREACH (const CTxDestination& addr, addrs) {
+                    // TODO Take this wallet address as a configuration value.
+                    if (CBitcoinAddress(addr).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
+                        coreWalletVouts.insert(make_pair(tx.GetHash(), i));
+                    }
+                }
+            }
+        }
+        pindex = chainActive.Next(pindex);
+    }
+
+
+    //sort events by timestamp
+    struct compare_times{
+        inline bool operator() (CEvent *event1, CEvent *event2){
+            return (event1->starting < event2->starting);
+        }
+    };
+    std::sort(eventsVector.begin(), eventsVector.end(), compare_times());
+
+
+
+    //remove duplicates from list (Remove older duplicates)
+    std::vector<CEvent *> cleanEventsVector;
+    for(unsigned int i = 0; i < eventsVector.size(); i++ ){
+
+        bool found = false;
+
+        //loop through and check if the eventid matches a result event id
+        for (unsigned int j = 0; j < cleanEventsVector.size(); j++) {
+
+            if (eventsVector[i]->id == cleanEventsVector[j]->id) {
+                found = true;
+                //replacing the old event details with the updated event details
+                std::replace(cleanEventsVector.begin(), cleanEventsVector.end(), cleanEventsVector[j], eventsVector[i]);
+            }
+        }
+
+        //if not found put the event into the clean list
+        if(found == false){
+            cleanEventsVector.push_back(eventsVector[i]);
+        }
+    }
+
+
+    //put events on screen
+    for(unsigned int i = 0; i < cleanEventsVector.size(); i++ ){
+
+        std::string evtDes = "";
+        time_t time = (time_t) std::strtol(cleanEventsVector[i]->starting.c_str(), nullptr, 10);
+
+        std::map<std::string, std::string>::iterator it;
+        it = eventNames.find(cleanEventsVector[i]->name);
+        // TODO Investigate whether it would be better to skip event
+        // descriptions with unsupported fields rather than to
+        // output those fields.
+        evtDes += it == eventNames.end() ? cleanEventsVector[i]->name : it->second;
+
+        evtDes += " ";
+        it = roundNames.find(cleanEventsVector[i]->round);
+        evtDes += it == roundNames.end() ? cleanEventsVector[i]->round : it->second;
+        evtDes += "   ";
+
+
+        tm *ptm = std::gmtime(&time);
+        static const char mon_name[][4] = {
+            "Jan", "Feb", "Mar", "Apr", "May", "Jun",
+            "Jul", "Aug", "Sep", "Aug", "Nov", "Dec"
+        };
+        char result[22];
+
+        sprintf(
+            result,
+            "%.2d:%.2d UTC+0   %.2d %3s",
+            ptm->tm_hour,
+            ptm->tm_min,
+            ptm->tm_mday,
+            mon_name[ptm->tm_mon]
+        );
+        evtDes += result;
+
+        evtDes += "   ";
+        it = countryNames.find(cleanEventsVector[i]->homeTeam);
+        evtDes += it == countryNames.end() ? cleanEventsVector[i]->homeTeam : it->second;
+        evtDes += " V ";
+        it = countryNames.find(cleanEventsVector[i]->awayTeam);
+        evtDes += it == countryNames.end() ? cleanEventsVector[i]->awayTeam : it->second;
+
+
+        placeBetPage->addEvent(
+            cleanEventsVector[i],
+            evtDes,
+            cleanEventsVector[i]->homeOdds,
+            cleanEventsVector[i]->awayOdds,
+            cleanEventsVector[i]->drawOdds
+        );
+    }
 }
 
 void WalletView::gotoSignMessageTab(QString addr)
