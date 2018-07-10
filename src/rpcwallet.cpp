@@ -23,6 +23,7 @@
 
 #include "libzerocoin/Coin.h"
 #include "spork.h"
+#include <boost/algorithm/string.hpp>
 #include <boost/assign/list_of.hpp>
 
 #include <univalue.h>
@@ -30,6 +31,277 @@
 using namespace std;
 using namespace boost;
 using namespace boost::assign;
+
+// TODO The Wagerr functions in this file are being placed here for speed of
+// implementation, but should be moved to more appropriate locations once time
+// allows.
+UniValue listevents(const UniValue& params, bool fHelp)
+{
+    if (fHelp || (params.size() > 0))
+        throw runtime_error(
+            "listevents\n"
+            "\nGet live Wagerr events.\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"id\": \"xxx\",         (string) The event ID\n"
+            "    \"name\": \"xxx\",       (string) The name of the event\n"
+            "    \"round\": \"xxx\",      (string) The round of the event\n"
+            "    \"starting\": n,         (numeric) When the event will start\n"
+            "    \"teams\": [\n"
+            "      {\n"
+            "        \"name\": \"xxxx\",  (string) Team to win\n"
+            "        \"odds\": n          (numeric) Odds to win\n"
+            "      }\n"
+            "      ,...\n"
+            "    ]\n"
+            "  }\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("listevents", "") + HelpExampleRpc("listevents", ""));
+
+    UniValue ret(UniValue::VARR);
+
+    // We keep track of `vout`s that are addressed to our "Core Wallet" (the
+    // wallet that we use to issue events and results). Afterwards, if a `vin`
+    // for a transaction corresponds to a transaction ID/`vout` index pair then
+    // we know that that transaction has been sent from our "Core Wallet" and we
+    // will process the transaction.
+    std::map<uint256, uint32_t> coreWalletVouts;
+
+    // TODO We currently search the entire block chain every time we query the
+    // current events. Instead, the events up to a particular block/transaction
+    // should be read and cached when the process starts, and ideally persisted,
+    // to reduce the processing time for this command.
+    CBlockIndex* pindex = chainActive.Genesis();
+    bool skipping = true;
+
+    while (pindex) {
+
+        //if( pindex->nHeight > 46000 ) {
+
+            CBlock block;
+            ReadBlockFromDisk(block, pindex);
+
+            BOOST_FOREACH(CTransaction& tx, block.vtx) {
+
+                uint256 txHash = tx.GetHash();
+
+                // This is an early optimisation: we know that no events were posted
+                // before the following transaction, so we skip them.
+                if (skipping && CBaseChainParams::TESTNET) {
+                    if (tx.GetHash().ToString() != "948965410fc242a3d7b0cf562d100425efb2180696ad6bd3ac06b5d5679d07f9") {
+                        continue;
+                    }
+                    skipping = false;
+                }
+
+                // Ensure the event TX has come from Oracle wallet by looking at the vins.
+                const CTxIn &txin = tx.vin[0];
+                COutPoint prevout = txin.prevout;
+                bool match        = false;
+
+                uint256 hashBlock;
+                CTransaction txPrev;
+                if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
+
+                    const CTxOut &txout = txPrev.vout[0];
+                    std::string scriptPubKey = txout.scriptPubKey.ToString();
+
+                    txnouttype type;
+                    vector<CTxDestination> addrs;
+                    int nRequired;
+                    if (!ExtractDestinations(txout.scriptPubKey, type, addrs, nRequired)) {
+                        continue;
+                    }
+
+                    BOOST_FOREACH (const CTxDestination &addr, addrs) {
+                        // TODO Take this wallet address as a configuration value.
+                        if (CBitcoinAddress(addr).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
+                            printf( "MATCH vinAddr %s Our Addr %s \n", CBitcoinAddress(addr).ToString().c_str(), "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ" );
+                            match = true;
+                            break;
+                        }
+                    }
+                }
+
+                for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                    const CTxOut &txout = tx.vout[i];
+                    std::string scriptPubKey = txout.scriptPubKey.ToString();
+
+                    // TODO Remove hard-coded values from this block.
+                    if( match && scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                        vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
+                        std::string evtDescr(v.begin(), v.end());
+                        std::vector <std::string> strs;
+                        boost::split(strs, evtDescr, boost::is_any_of("|"));
+
+                        if (strs.size() != 11 || strs[0] != "1") {
+                            continue;
+                        }
+
+                        time_t time = (time_t) std::strtol(strs[3].c_str(), nullptr, 10);
+                        time_t currentTime = std::time(0);
+                        if (time < (currentTime - 1200)) {
+                            continue;
+                        }
+
+                        printf("%s \n", evtDescr.c_str());
+
+                        // TODO Handle version field.
+
+                        UniValue evt(UniValue::VOBJ);
+
+                        evt.push_back(Pair("tx-id", txHash.ToString().c_str()));
+                        evt.push_back(Pair("id", strs[2]));
+                        evt.push_back(Pair("name", strs[4]));
+                        evt.push_back(Pair("round", strs[5]));
+                        evt.push_back(Pair("starting", strs[3]));
+
+                        UniValue teams(UniValue::VARR);
+                        for (unsigned int t = 6; t <= 8; t++) {
+                            UniValue team(UniValue::VOBJ);
+
+                            if (t < 8) {
+                                team.push_back(Pair("name", strs[t]));
+                                team.push_back(Pair("odds", strs[t + 2]));
+                            } else {
+                                team.push_back(Pair("name", "DRW"));
+                                team.push_back(Pair("odds", strs[t + 2]));
+                            }
+
+                            teams.push_back(team);
+                        }
+                        evt.push_back(Pair("teams", teams));
+
+                        ret.push_back(evt);
+                    }
+                }
+            }
+        //}
+        pindex = chainActive.Next(pindex);
+    }
+
+    return ret;
+}
+
+// TODO There is a lot of code shared between `listbets` and `listtransactions`.
+// This would ideally be abstracted when time allows.
+UniValue listbets(const UniValue& params, bool fHelp)
+{
+    // TODO The command-line parameters for this command aren't handled as
+    // described, either the documentation or the behaviour of this command
+    // should be corrected when time allows.
+
+    if (fHelp || params.size() > 4)
+        throw runtime_error(
+            "listtransactions ( \"account\" count from includeWatchonly)\n"
+            "\nReturns up to 'count' most recent transactions skipping the first 'from' transactions for account 'account'.\n"
+            "\nArguments:\n"
+            "1. \"account\"    (string, optional) The account name. If not included, it will list all transactions for all accounts.\n"
+            "                                     If \"\" is set, it will list transactions for the default account.\n"
+            "2. count          (numeric, optional, default=10) The number of transactions to return\n"
+            "3. from           (numeric, optional, default=0) The number of transactions to skip\n"
+            "4. includeWatchonly (bool, optional, default=false) Include transactions to watchonly addresses (see 'importaddress')\n"
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"event-id\":\"accountname\",       (string) The ID of the event being bet on.\n"
+            "    \"team-to-win\":\"wagerraddress\",  (string) The team to win.\n"
+            "    \"amount\": x.xxx,                  (numeric) The amount bet in WGR.\n"
+            "  }\n"
+            "]\n"
+
+            "\nExamples:\n"
+            "\nList the most recent 10 bets in the systems\n" +
+            HelpExampleCli("listbets", ""));
+
+    string strAccount = "*";
+    if (params.size() > 0)
+        strAccount = params[0].get_str();
+    int nCount = 10;
+    if (params.size() > 1)
+        nCount = params[1].get_int();
+    int nFrom = 0;
+    if (params.size() > 2)
+        nFrom = params[2].get_int();
+    isminefilter filter = ISMINE_SPENDABLE;
+    if (params.size() > 3)
+        if (params[3].get_bool())
+            filter = filter | ISMINE_WATCH_ONLY;
+
+    if (nCount < 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative count");
+    if (nFrom < 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative from");
+
+    UniValue ret(UniValue::VARR);
+
+    const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
+
+    // iterate backwards until we have nCount items to return:
+    for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
+        CWalletTx* const pwtx = (*it).second.first;
+        if (pwtx != 0) {
+
+            uint256 txHash = (*pwtx).GetHash();
+
+            for (unsigned int i = 0; i < (*pwtx).vout.size(); i++) {
+                const CTxOut& txout = (*pwtx).vout[i];
+                std::string s = txout.scriptPubKey.ToString();
+
+                if (s.length() > 0) {
+                    // TODO Remove hard-coded values from this block.
+                    if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+                        vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
+                        std::string betDescr(v.begin(), v.end());
+                        std::vector<std::string> strs;
+                        boost::split(strs, betDescr, boost::is_any_of("|"));
+
+                        if (strs.size() != 4 || strs[0] != "2") {
+                            continue;
+                        }
+
+                        UniValue entry(UniValue::VOBJ);
+                        entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
+                        entry.push_back(Pair("event-id", strs[2]));
+                        entry.push_back(Pair("team-to-win", strs[3]));
+                        entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+                        ret.push_back(entry);
+                    }
+                }
+            }
+        }
+
+        if ((int)ret.size() >= (nCount + nFrom)) break;
+    }
+    // ret is newest to oldest
+
+    if (nFrom > (int)ret.size())
+        nFrom = ret.size();
+    if ((nFrom + nCount) > (int)ret.size())
+        nCount = ret.size() - nFrom;
+
+    vector<UniValue> arrTmp = ret.getValues();
+
+    vector<UniValue>::iterator first = arrTmp.begin();
+    std::advance(first, nFrom);
+    vector<UniValue>::iterator last = arrTmp.begin();
+    std::advance(last, nFrom+nCount);
+
+    if (last != arrTmp.end()) arrTmp.erase(last, arrTmp.end());
+    if (first != arrTmp.begin()) arrTmp.erase(arrTmp.begin(), first);
+
+    std::reverse(arrTmp.begin(), arrTmp.end()); // Return oldest to newest
+
+    ret.clear();
+    ret.setArray();
+    ret.push_backV(arrTmp);
+
+    return ret;
+}
 
 int64_t nWalletUnlockTime;
 static CCriticalSection cs_nWalletUnlockTime;
@@ -43,6 +315,16 @@ void EnsureWalletIsUnlocked()
 {
     if (pwalletMain->IsLocked() || pwalletMain->fWalletUnlockAnonymizeOnly)
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
+}
+
+void EnsureEnoughWagerr(CAmount total)
+{
+
+    CAmount nBalance = pwalletMain->GetBalance();
+
+    if (total > nBalance) {
+         throw JSONRPCError(RPC_WALLET_INSUFFICIENT_FUNDS, "Error: Not enough funds in wallet or account");
+    }
 }
 
 void WalletTxToJSON(const CWalletTx& wtx, UniValue& entry)
@@ -290,7 +572,10 @@ UniValue getaddressesbyaccount(const UniValue& params, bool fHelp)
     return ret;
 }
 
-void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false)
+// TODO `opReturn` was added as an optional parameter for speed of
+// implementation. This approach should be validated and corrected when time
+// allows.
+void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false, const std::string& opReturn = "")
 {
     // Check amount
     if (nValue <= 0)
@@ -312,7 +597,7 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     // Create and send the transaction
     CReserveKey reservekey(pwalletMain);
     CAmount nFeeRequired;
-    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, NULL, ALL_COINS, fUseIX, (CAmount)0)) {
+    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, NULL, ALL_COINS, fUseIX, (CAmount)0, opReturn)) {
         if (nValue + nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         LogPrintf("SendMoney() : %s\n", strError);
@@ -320,6 +605,79 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     }
     if (!pwalletMain->CommitTransaction(wtxNew, reservekey, (!fUseIX ? "tx" : "ix")))
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
+}
+
+UniValue placebet(const UniValue& params, bool fHelp)
+{
+    // TODO - remove hardcoded teams and events. Ideally would be provided by Oracle node.
+    // Used to validate users input to placebet RPC command.
+    std::vector<std::string> rd1EventIds = {"#000","#001","#002","#003","#004","#005","#006","#007","#008","#009","#010","#011","#012","#013","#014","#015",
+                                            "#016","#017","#018","#019","#020","#021","#022","#023","#024","#025","#026","#027","#028","#029","#030","#031",
+                                            "#032","#033","#034","#035","#036","#037","#038","#039","#040","#041","#042","#043","#044","#045","#046","#047",
+                                            "#048","#049","#050","#060","#061","#062","#063","#064","#065","#066","#067","#068","#069","#070"};
+    std::vector<std::string> rd1Teams = {"TES","DRW","ARG", "AUS", "BEL", "BRA", "COL", "CRC", "CRO", "DEN", "EGY", "ENG", "FRA", "GER", "ISL", "IRN", "JPN", "KOR",
+                                         "MEX", "MAR", "NGA","NIG", "PAN", "PER", "POL", "POR", "RUS", "KSA", "SEN", "SRB", "ESP", "SWE", "SUI", "TUN", "URU",};
+
+    if (fHelp || params.size() < 3 || params.size() > 5)
+        throw runtime_error(
+            "placebet \"event-id\" \"team\" amount ( \"comment\" \"comment-to\" )\n"
+            "\n WARNING!!! - Betting closes 20 minutes before event start time. Any bets placed after this time will be \n"
+            "invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on an event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. \"event-id\"    (string, required) The event to bet on (Must be 4 characters in length e.g. \"#000\").\n"
+            "2. \"team\"        (string, required) The team to win.(Must be 3 character team abbreviation e.g for Russia: \"RUS\". Or for a draw: \"DRW\" ) \n"
+            "3. \"amount\"      (numeric, required) The amount in wgr to send. eg 0.1\n"
+            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
+            "                             to which you're sending the transaction. This is not part of the \n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placebet", "\"#000\" \"RUS\" 0.1 \"donation\" \"seans outpost\"") +
+            HelpExampleRpc("placebet", "\"#000\", \"RUS\", 0.1, \"donation\", \"seans outpost\""));
+
+    // Amount
+    CAmount nAmount = AmountFromValue(params[2]);
+
+    // Validate bet amount so its between 1 - 10000 WGR inclusive.
+    if( nAmount < (1 * COIN ) || nAmount > (10000 * COIN)){
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 1 - 10000 WGR inclusive.");
+    }
+
+    // Wallet comments
+    CWalletTx wtx;
+    if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
+        wtx.mapValue["comment"] = params[3].get_str();
+    if (params.size() > 4 && !params[4].isNull() && !params[4].get_str().empty())
+        wtx.mapValue["to"] = params[4].get_str();
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    CBitcoinAddress address("");
+    std::string eventId = params[0].get_str();
+    std::string team = params[1].get_str();
+
+    if(std::find(rd1Teams.begin(),rd1Teams.end(), team) == rd1Teams.end() || std::find(rd1EventIds.begin(),rd1EventIds.end(),eventId) == rd1EventIds.end()){
+
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet details. Please ensure your team and event are correct.");
+    }
+
+    // TODO `address` isn't used when adding the following transaction to the
+    // blockchain, so ideally it would not need to be supplied to `SendMoney`.
+    // Ideally an alternative function, such as `BurnMoney`, would be developed
+    // and used, which would take the `OP_RETURN` value in place of the address
+    // value.
+    // Note that, during testing, the `opReturn` value is added to the
+    // blockchain incorrectly if its length is less than 5. This behaviour would
+    // ideally be investigated and corrected/justified when time allows.
+    SendMoney(address.Get(), nAmount, wtx, false, "2|1.0|" + eventId + "|" + team);
+
+    return wtx.GetHash().GetHex();
 }
 
 UniValue sendtoaddress(const UniValue& params, bool fHelp)
