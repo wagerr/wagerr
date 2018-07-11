@@ -1,5 +1,5 @@
 [Unit]
-Description=Wagerr's distributed currency daemon
+Description=WAGERR's distributed currency daemon
 After=network.target
 
 [Service]
