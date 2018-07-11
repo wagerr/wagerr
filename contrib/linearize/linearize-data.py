@@ -6,7 +6,6 @@
 # Distributed under the MIT/X11 software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 #
-# Copyright (c) 2018 The Wagerr developers
 
 from __future__ import print_function, division
 import json
@@ -263,8 +262,9 @@ if __name__ == '__main__':
 			continue
 		settings[m.group(1)] = m.group(2)
 	f.close()
+
 	if 'netmagic' not in settings:
-		settings['netmagic'] = '842d61fd'
+		settings['netmagic'] = 'f9beb4d9'
 	if 'input' not in settings:
 		settings['input'] = 'input'
 	if 'hashlist' not in settings:

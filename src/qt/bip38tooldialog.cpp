@@ -1,8 +1,6 @@
-// Copyright (c) 2011-2014 The Bitcoin developers
-// Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2017-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "bip38tooldialog.h"
@@ -23,7 +21,7 @@
 
 #include <QClipboard>
 
-Bip38ToolDialog::Bip38ToolDialog(QWidget* parent) : QDialog(parent),
+Bip38ToolDialog::Bip38ToolDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                                     ui(new Ui::Bip38ToolDialog),
                                                     model(0)
 {
@@ -173,6 +171,12 @@ void Bip38ToolDialog::on_clearButton_ENC_clicked()
 }
 
 CKey key;
+void Bip38ToolDialog::on_pasteButton_DEC_clicked()
+{
+    // Paste text from clipboard into recipient field
+    ui->encryptedKeyIn_DEC->setText(QApplication::clipboard()->text());
+}
+
 void Bip38ToolDialog::on_decryptKeyButton_DEC_clicked()
 {
     string strPassphrase = ui->passphraseIn_DEC->text().toStdString();
@@ -190,7 +194,7 @@ void Bip38ToolDialog::on_decryptKeyButton_DEC_clicked()
     CPubKey pubKey = key.GetPubKey();
     CBitcoinAddress address(pubKey.GetID());
 
-    ui->decryptedKeyOut_DEC->setText(QString::fromStdString(HexStr(privKey)));
+    ui->decryptedKeyOut_DEC->setText(QString::fromStdString(CBitcoinSecret(key).ToString()));
     ui->addressOut_DEC->setText(QString::fromStdString(address.ToString()));
 }
 

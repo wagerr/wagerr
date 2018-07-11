@@ -1,7 +1,7 @@
 <!--- Remove this description and sections that do not apply -->
 
 This issue tracker is only for technical issues related to Wagerr Core.
-General Wagerr questions and/or support requests and are best directed to the [Wagerr Discord](https://discord.wagerr.com).
+General Wagerr questions and/or support requests and are best directed to the [WAGERR Discord](https://discord.wagerr.com).
 
 ### Describe the issue
 

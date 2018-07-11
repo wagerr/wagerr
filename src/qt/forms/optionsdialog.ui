@@ -485,7 +485,7 @@
          <item>
           <widget class="QValueComboBox" name="lang">
            <property name="toolTip">
-            <string>The user interface language can be set here. This setting will take effect after restarting Wagerr.</string>
+            <string>The user interface language can be set here. This setting will take effect after restarting WAGERR.</string>
            </property>
           </widget>
          </item>

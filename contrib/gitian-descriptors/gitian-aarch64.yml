@@ -1,5 +1,5 @@
 ---
-name: "wagerr-aarch64-1.5"
+name: "wagerr-aarch64-3.2"
 enable_cache: true
 suites:
 - "xenial"

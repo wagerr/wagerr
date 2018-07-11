@@ -19,8 +19,8 @@ BEGIN
     BEGIN
         BLOCK "040904E4" // U.S. English - multilingual (hex)
         BEGIN
-            VALUE "CompanyName",        "Wagerr"
-            VALUE "FileDescription",    "Wagerr Core (OSS GUI client for Wagerr)"
+            VALUE "CompanyName",        "WAGERR"
+            VALUE "FileDescription",    "Wagerr Core (OSS GUI client for WAGERR)"
             VALUE "FileVersion",        VER_FILEVERSION_STR
             VALUE "InternalName",       "wagerr-qt"
             VALUE "LegalCopyright",     COPYRIGHT_STR
