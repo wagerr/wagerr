@@ -11,7 +11,7 @@ if [ -z "${TRAVIS_COMMIT_RANGE}" ]; then
   echo "Cannot run lint-whitespace.sh without commit range. To run locally, use:"
   echo "TRAVIS_COMMIT_RANGE='<commit range>' .lint-whitespace.sh"
   echo "For example:"
-  echo "TRAVIS_COMMIT_RANGE='47ba2c3...ee50c9e' .lint-whitespace.sh"
+  echo "TRAVIS_COMMIT_RANGE='201494f..1f16562' .lint-whitespace.sh"
   exit 1
 fi
 
