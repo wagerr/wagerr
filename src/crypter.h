@@ -1,4 +1,6 @@
 // Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2017-2018 The PIVX developers
+// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -191,6 +193,10 @@ public:
             mi++;
         }
     }
+
+    bool GetDeterministicSeed(const uint256& hashSeed, uint256& seed);
+    bool AddDeterministicSeed(const uint256& seed);
+
 
     /**
      * Wallet status (encrypted, locked) changed.

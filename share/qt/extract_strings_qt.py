@@ -1,5 +1,3 @@
-
-# Copyright (c) 2018 The Wagerr developers
 #!/usr/bin/python
 '''
 Extract _("...") strings for translation and convert to Qt stringdefs so that

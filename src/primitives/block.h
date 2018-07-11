@@ -151,8 +151,7 @@ public:
         return !IsProofOfStake();
     }
 
-    bool SignBlock(const CKeyStore& keystore);
-    bool CheckBlockSignature() const;
+    bool IsZerocoinStake() const;
 
     std::pair<COutPoint, unsigned int> GetProofOfStake() const
     {

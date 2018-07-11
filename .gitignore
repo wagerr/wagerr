@@ -129,25 +129,6 @@ qa/pull-tester/test.*/*
 CMakeLists.txt
 cmake-build-debug
 
-# text editors
+# custom
+*_hdi_settings.json
 .vscode/
-
-
-# dev tools
-/test1.exe
-/test1.c
-/test1
-
-# dont add *.old
-*.old
-
-# dont add release folder
-release/
-
-# ignore build_config.mk
-src/leveldb/build_config.mk
-
-# snapcraft
-stage/
-parts/
-prime/

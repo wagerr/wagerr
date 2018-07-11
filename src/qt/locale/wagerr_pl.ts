@@ -108,10 +108,6 @@
         <translation>Powtórz nowe hasło</translation>
     </message>
     <message>
-        <source>For anonymization and staking only</source>
-        <translation>Tylko dla anonimizacji i stakingu</translation>
-    </message>
-    <message>
         <source>Encrypt wallet</source>
         <translation>Zakoduj portfel</translation>
     </message>
@@ -189,6 +185,9 @@
     </message>
 </context>
 <context>
+    <name>BanTableModel</name>
+    </context>
+<context>
     <name>Bip38ToolDialog</name>
     <message>
         <source>BIP 38 Tool</source>
@@ -227,10 +226,6 @@
         <translation>Zakodowany klucz:</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Zatwierdź wiadomość, aby udowodnić, że podany adres Wagerr jest w twoim posiadaniu</translation>
-    </message>
-    <message>
         <source>Encrypt &amp;Key</source>
         <translation>Kodowanie &amp;klucz</translation>
     </message>
@@ -241,10 +236,6 @@
     <message>
         <source>&amp;BIP 38 Decrypt</source>
         <translation>&amp;BIP 38 Zakoduj</translation>
-    </message>
-    <message>
-        <source>Reset all verify message fields</source>
-        <translation>Resetuj wszystkie zweryfikowane pola tekstowe</translation>
     </message>
     <message>
         <source>Decrypted Key:</source>
@@ -519,11 +510,11 @@
     </message>
     <message>
         <source>Wagerr Core</source>
-        <translation>&amp;Rdzeń Wagerr</translation>
+        <translation>&amp;Rdzeń WAGERR</translation>
     </message>
     <message>
         <source>Send coins to a Wagerr address</source>
-        <translation>Wyślij monety do adresu Wagerr</translation>
+        <translation>Wyślij monety do adresu WAGERR</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -546,16 +537,16 @@
         <translation>Pokaż informacje o rdzeniu bitcoina</translation>
     </message>
     <message>
-        <source>Modify configuration options for Wagerr</source>
-        <translation>Modyfikuj opcje konfiguracji Wagerr</translation>
+        <source>Modify configuration options for WAGERR</source>
+        <translation>Modyfikuj opcje konfiguracji WAGERR</translation>
     </message>
     <message>
         <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Zatwierdź wiadomość z twoimi adresami Wagerr, by udowodnić, że jesteś w ich posiadaniu</translation>
+        <translation>Zatwierdź wiadomość z twoimi adresami WAGERR, by udowodnić, że jesteś w ich posiadaniu</translation>
     </message>
     <message>
         <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Zweryfikuj wiadomości by upewnić się, że zostały zatwierdzone z podanego adresu Wagerr</translation>
+        <translation>Zweryfikuj wiadomości by upewnić się, że zostały zatwierdzone z podanego adresu WAGERR</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -582,8 +573,8 @@
         <translation>Otwórz &amp;Plik konfiguracji Masternode</translation>
     </message>
     <message>
-        <source>Open a Wagerr: URI or payment request</source>
-        <translation>Otwórz Wagerr: URI i żądanie zapłaty</translation>
+        <source>Open a WAGERR: URI or payment request</source>
+        <translation>Otwórz WAGERR: URI i żądanie zapłaty</translation>
     </message>
     <message>
         <source>&amp;Blockchain explorer</source>
@@ -595,7 +586,7 @@
     </message>
     <message>
         <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Pokaż wiadomość pomocy rdzenia Wagerr, aby dostać listę możliwych opcji Wagerr command-line</translation>
+        <translation>Pokaż wiadomość pomocy rdzenia WAGERR, aby dostać listę możliwych opcji Wagerr command-line</translation>
     </message>
     <message>
         <source>Wagerr Core client</source>
@@ -688,10 +679,6 @@ MultiWysyłlka: %1</translation>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt;</source>
         <translation>Portfel jest 1Zakodowany1 i obecnie 2Odblokowany2</translation>
-    </message>
-    <message>
-        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonimization and staking only</source>
-        <translation>Portfel jest 1Zakodowany1 i obecnie 2Odblokowany2 tylko dla anonimizacji i stakingu</translation>
     </message>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
@@ -913,7 +900,7 @@ MultiWysyłlka: %1</translation>
     <name>HelpMessageDialog</name>
     <message>
         <source>Wagerr Core</source>
-        <translation>&amp;Rdzeń Wagerr</translation>
+        <translation>&amp;Rdzeń WAGERR</translation>
     </message>
     </context>
 <context>
@@ -928,7 +915,7 @@ MultiWysyłlka: %1</translation>
     </message>
     <message>
         <source>Wagerr Core</source>
-        <translation>&amp;Rdzeń Wagerr</translation>
+        <translation>&amp;Rdzeń WAGERR</translation>
     </message>
     <message>
         <source>Error</source>
@@ -944,10 +931,6 @@ MultiWysyłlka: %1</translation>
     <message>
         <source>Form</source>
         <translation>Forma</translation>
-    </message>
-    <message>
-        <source>My Masternodes</source>
-        <translation>Moje Masternode</translation>
     </message>
     <message>
         <source>Address</source>
@@ -1101,6 +1084,10 @@ MultiWysyłlka: %1</translation>
         <translation>Podgląd MultiWysyłki</translation>
     </message>
     <message>
+        <source>(no label)</source>
+        <translation>(brak zakładki)</translation>
+    </message>
+    <message>
         <source>The entered address:
 </source>
         <translation>Wprowadzony adres:
@@ -1127,6 +1114,21 @@ Proszę sprawdzić adres i spróbować ponownie</translation>
 </translation>
     </message>
 </context>
+<context>
+    <name>MultisigDialog</name>
+    <message>
+        <source>Status:</source>
+        <translation>Status:</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Liczba:</translation>
+    </message>
+    </context>
 <context>
     <name>ObfuscationConfig</name>
     <message>
@@ -1212,8 +1214,8 @@ Proszę sprawdzić adres i spróbować ponownie</translation>
         <translation>&amp;Sieć</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Wagerr.</source>
-        <translation>Język interfejsu użytkownika może być wybrany tutaj. Ustawienia ulegną zmianie po restarcie Wagerr</translation>
+        <source>The user interface language can be set here. This setting will take effect after restarting WAGERR.</source>
+        <translation>Język interfejsu użytkownika może być wybrany tutaj. Ustawienia ulegną zmianie po restarcie WAGERR</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
@@ -1313,7 +1315,7 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
         <source>The supplied proxy address is invalid.</source>
         <translation>Podany adres proxy jest nieprawidłowy</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>OverviewPage</name>
     <message>
@@ -1341,10 +1343,6 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
         <translation>Całość:</translation>
     </message>
     <message>
-        <source>Your current total balance</source>
-        <translation>Twój całkowity bilans</translation>
-    </message>
-    <message>
         <source>Current total balance in watch-only addresses</source>
         <translation>Obecny całkowity bilans w adresach tylko do obejrzenia</translation>
     </message>
@@ -1364,7 +1362,7 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
         <source>out of sync</source>
         <translation>Brak synchronizacji</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>PaymentServer</name>
     <message>
@@ -1424,6 +1422,10 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
     <message>
         <source>Priority:</source>
         <translation>Priorytet:</translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation>TekstZakładka</translation>
     </message>
     <message>
         <source>Fee:</source>
@@ -1647,14 +1649,6 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
         <translation>Usługi</translation>
     </message>
     <message>
-        <source>Starting Height</source>
-        <translation>Wysokość rozpoczęcia</translation>
-    </message>
-    <message>
-        <source>Sync Height</source>
-        <translation>Wysokość synchronizacji</translation>
-    </message>
-    <message>
         <source>Connection Time</source>
         <translation>Czas połączenia</translation>
     </message>
@@ -1742,7 +1736,7 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
         <source>Unknown</source>
         <translation>Nieznane</translation>
     </message>
-    </context>
+</context>
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
@@ -1936,7 +1930,7 @@ https://www.transifex.com/wagerr/wagerr-translations </translation>
     <name>SplashScreen</name>
     <message>
         <source>Wagerr Core</source>
-        <translation>&amp;Rdzeń Wagerr</translation>
+        <translation>&amp;Rdzeń WAGERR</translation>
     </message>
     </context>
 <context>

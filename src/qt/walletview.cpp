@@ -1,5 +1,7 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2015 The Bitcoin developers
+// Copyright (c) 2016-2018 The PIVX developers
+// Copyright (c) 2018 The Wagerr developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "walletview.h"
@@ -607,14 +609,7 @@ void WalletView::backupWallet()
 
     if (filename.isEmpty())
         return;
-
-    if (!walletModel->backupWallet(filename)) {
-        emit message(tr("Backup Failed"), tr("There was an error trying to save the wallet data to %1.").arg(filename),
-            CClientUIInterface::MSG_ERROR);
-    } else {
-        emit message(tr("Backup Successful"), tr("The wallet data was successfully saved to %1.").arg(filename),
-            CClientUIInterface::MSG_INFORMATION);
-    }
+    walletModel->backupWallet(filename);
 }
 
 void WalletView::changePassphrase()

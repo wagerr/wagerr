@@ -1,7 +1,7 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2015-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -94,13 +94,22 @@ static const Checkpoints::CCheckpointData dataRegtest = {
     0,
     100};
 
-libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params() const
+libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params(bool useModulusV1) const
 {
     assert(this);
-    static CBigNum bnTrustedModulus(zerocoinModulus);
-    static libzerocoin::ZerocoinParams ZCParams = libzerocoin::ZerocoinParams(bnTrustedModulus);
+    static CBigNum bnHexModulus = 0;
+    if (!bnHexModulus)
+        bnHexModulus.SetHex(zerocoinModulus);
+    static libzerocoin::ZerocoinParams ZCParamsHex = libzerocoin::ZerocoinParams(bnHexModulus);
+    static CBigNum bnDecModulus = 0;
+    if (!bnDecModulus)
+        bnDecModulus.SetDec(zerocoinModulus);
+    static libzerocoin::ZerocoinParams ZCParamsDec = libzerocoin::ZerocoinParams(bnDecModulus);
 
-    return &ZCParams;
+    if (useModulusV1)
+        return &ZCParamsHex;
+
+    return &ZCParamsDec;
 }
 
 class CMainParams : public CChainParams
@@ -114,26 +123,25 @@ public:
          * The message start string is designed to be unlikely to occur in normal data.
          * The characters are rarely used upper ASCII, not valid as UTF-8, and produce
          * a large 4-byte int at any alignment.
-         */ 
-        /* 842d61fd */
-        pchMessageStart[0] = 0x84;              
-        pchMessageStart[1] = 0x2d;              
-        pchMessageStart[2] = 0x61;              
-        pchMessageStart[3] = 0xfd;              
-        vAlertPubKey = ParseHex("04a6254e2ff57f433b3afa2764d8fffec82899a22fd14de054123f5f6d5dc4c9d011d6b03e35f9b093f1529cfe8324cf516838ff90fa8824be6ceea8fdf856bd64");
-        nDefaultPort = 55002;                   
+         */
+        pchMessageStart[0] = 0x84;
+        pchMessageStart[1] = 0x2d;
+        pchMessageStart[2] = 0x61;
+        pchMessageStart[3] = 0xfd;
+        vAlertPubKey = ParseHex("04300ed6502f7210f8864f1facb2b817f085d5dc7ebf1577dfe14f4fc7ab37d851aa54aa3d2d252823063524750faaf24427ede912bf4958f7b3e63c7cce8dd036");
+        nDefaultPort = 55002;
         bnProofOfWorkLimit = ~uint256(0) >> 20; // Wagerr starting difficulty is 1 / 2^12
-        nSubsidyHalvingInterval = 210000;       // Halving interval
-        nMaxReorganizationDepth = 100;          
-        nEnforceBlockUpgradeMajority = 750;     
-        nRejectBlockOutdatedMajority = 950;     
-        nToCheckBlockUpgradeMajority = 1000;    
-        nMinerThreads = 0;                      // Obsolete (**TODO**)
-        nTargetTimespan = 1 * 60;               // Wagerr: 1 day
-        nTargetSpacing = 1 * 60;                // Wagerr: 1 minute
-        nMaturity = 100;                        // Block maturity
-        nMasternodeCountDrift = 20;             
-        nMaxMoneyOut = 398360470 * COIN;        // Max. Money is calculated by 2x premine value
+        nSubsidyHalvingInterval = 210000;
+        nMaxReorganizationDepth = 100;
+        nEnforceBlockUpgradeMajority = 750;
+        nRejectBlockOutdatedMajority = 950;
+        nToCheckBlockUpgradeMajority = 1000;
+        nMinerThreads = 0;
+        nTargetTimespan = 1 * 60;              // WAGERR: 1 day
+        nTargetSpacing = 1 * 60;               // WAGERR: 1 minute
+        nMaturity = 100;
+        nMasternodeCountDrift = 20;
+        nMaxMoneyOut = 398360470 * COIN;
 
         /** Height or Time Based Activations **/
         nLastPOWBlock = 1001;                   // PoW Phase 3 End
@@ -141,11 +149,15 @@ public:
         nZerocoinStartHeight = 1500;            // Zerocoin start height
         nZerocoinStartTime = 1518696182;        // GMT: Thursday, 15. February 2018 12:03:02
         nBlockEnforceSerialRange = 1;           // Enforce serial range starting this block
-        nBlockRecalculateAccumulators = 1650; // Trigger a recalculation of accumulators
-        nBlockFirstFraudulent = 99999999;           // 1110; //First block that bad serials emerged (currently we do not have any) *** TODO ***
+        nBlockRecalculateAccumulators = 1650;   // Trigger a recalculation of accumulators
+        nBlockFirstFraudulent = 99999999;       // 1110; //First block that bad serials emerged (currently we do not have any) *** TODO ***
         nBlockLastGoodCheckpoint = 1648;        // Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
         nBlockEnforceInvalidUTXO = 1850;        // Start enforcing the invalid UTXO's
-        
+        nInvalidAmountFiltered = 0*COIN;        //Amount of invalid coins filtered through exchanges, that should be considered valid
+        nBlockZerocoinV2 = 99999999;            //The block that zerocoin v2 becomes active
+        nEnforceNewSporkKey = 1533081601;       //!> Sporks signed after Wednesday, 1. August 2018 00:00:01 AM GMT must use the new spork key
+        nRejectOldSporkKey = 1534464001;        //!> Fully reject old spork key after Friday, 17. August 2018 00:00:01 GMT
+
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot
          * be spent as it did not originally exist in the database.
@@ -180,12 +192,9 @@ public:
         vSeeds.push_back(CDNSSeedData("3", "main.devseeder1.wgr.host"));    // Wagerr's dev1 testseed
         vSeeds.push_back(CDNSSeedData("4", "main.devseeder2.wgr.host"));    // Wagerr's dev2 testseed
 
-        // Wagerr addresses start with 'W'
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 73);
-        // Wagerr script addresses start with '7'
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);
-        // Wagerr private keys start with '7' or 'W'
-        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 199);
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 73);   // wagerr addresses start with 'W'
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 63);   // wagerr script addresses start with '7'
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 199);      // wagerr private keys start with '7' or 'W'
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x02)(0x2D)(0x25)(0x33).convert_to_container<std::vector<unsigned char> >();
         base58Prefixes[EXT_SECRET_KEY] = boost::assign::list_of(0x02)(0x21)(0x31)(0x2B).convert_to_container<std::vector<unsigned char> >();
         // 	BIP44 coin type is from https://github.com/satoshilabs/slips/blob/master/slip-0044.md
@@ -203,7 +212,8 @@ public:
         fHeadersFirstSyncingActive = false;
 
         nPoolMaxTransactions = 3;
-        strSporkKey = "040f00b37452d6e7ac00b4a2e2699bab35b5ed3c8d3e1ecaf63317900fd7b52324f4243d11cc70c40dde54bdbc1e9a732ee63b1eec60ca45e6d529ad2b43d4d614";
+        strSporkKey = "043cb569d89fb78fc61df67617012e6c33c1ba306f4620bbb89424279a4931adf4a9e238db60aa7f78cd10ef780f21f1fd3b881f014fd0f656db4b6a6a98f0cff2";
+        strSporkKeyOld = "040f00b37452d6e7ac00b4a2e2699bab35b5ed3c8d3e1ecaf63317900fd7b52324f4243d11cc70c40dde54bdbc1e9a732ee63b1eec60ca45e6d529ad2b43d4d614";
         strObfuscationPoolDummyAddress = "WWqou25edpCatoZgSxhd3dpNbhn3dxh21D";
         nStartMasternodePayments = 1518696182; // GMT: Thursday, 15. February 2018 12:03:02
 
@@ -220,6 +230,8 @@ public:
         nRequiredAccumulation = 1;
         nDefaultSecurityLevel = 100; //full security level for accumulators
         nZerocoinHeaderVersion = 4; //Block headers must be this version once zerocoin is active
+        nZerocoinRequiredStakeDepth = 200; //The required confirmations for a zwgr to be stakable
+
         nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
     }
 
@@ -245,14 +257,14 @@ public:
         pchMessageStart[1] = 0x9e;
         pchMessageStart[2] = 0xd1;
         pchMessageStart[3] = 0x99;
-        vAlertPubKey = ParseHex("04f91dd428ecc5f2bee0aaf073f8a258418a34e6ff42c8454dbb42d02aac6c2596d42e2f63f435c6143f35354fb0f9645c5e158f396091974439184ccdff6e06cd");
+        vAlertPubKey = ParseHex("04b5aa7cd76159c35fb3dab3cf3cab8d93ecb592b2cbea519145e63cfe92110fe0f68d0e5205af01482334256358c070f5658f638e4191aa7298fb435b65216767");
         nDefaultPort = 55004;
         nEnforceBlockUpgradeMajority = 51;
         nRejectBlockOutdatedMajority = 75;
         nToCheckBlockUpgradeMajority = 100;
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // Wagerr: 1 day
-        nTargetSpacing = 1 * 60;  // Wagerr: 1 minute
+        nTargetTimespan = 1 * 60; // WAGERR: 1 day
+        nTargetSpacing = 1 * 60;  // WAGERR: 1 minute
         nLastPOWBlock = 300;
         nMaturity = 15;
         nMasternodeCountDrift = 4;
@@ -265,7 +277,11 @@ public:
         nBlockFirstFraudulent = 99999999; //First block that bad serials emerged (currently we do not have any) *** TODO ***
         nBlockLastGoodCheckpoint = 1398; //Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
         nBlockEnforceInvalidUTXO = 1600; //Start enforcing the invalid UTXO's
-        
+        nInvalidAmountFiltered = 0; //Amount of invalid coins filtered through exchanges, that should be considered valid
+        nBlockZerocoinV2 = 99999999; //The block that zerocoin v2 becomes active
+        nEnforceNewSporkKey = 1521604800; //!> Sporks signed after Wednesday, March 21, 2018 4:00:00 AM GMT must use the new spork key
+        nRejectOldSporkKey = 1522454400; //!> Reject old spork key after Saturday, March 31, 2018 12:00:00 AM GMT
+
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696182;
         genesis.nNonce = 75183976;
@@ -279,12 +295,10 @@ public:
         vSeeds.push_back(CDNSSeedData("2", "test.testseederv2.wgr.host")); // Wagerr's official testseed 2
         vSeeds.push_back(CDNSSeedData("3", "test.devseeder1.wgr.host"));   // Wagerr's dev1 testseed
         vSeeds.push_back(CDNSSeedData("4", "test.devseeder2.wgr.host"));   // Wagerr's dev2 testseed
-        // Testnet Wagerr addresses start with 'y'
-        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 65);
-        // Testnet Wagerr script addresses start with '8' or '9'
-        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 125);
-        // Testnet private keys start with '9' or 'c' (Wagerr defaults)
-        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 177); 
+
+        base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 73);   // Testnet wagerr addresses start with 'y'
+        base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 19);  // Testnet wagerr script addresses start with '8' or '9'
+        base58Prefixes[SECRET_KEY] = std::vector<unsigned char>(1, 199);     // Testnet private keys start with '9' or 'c' (Bitcoin defaults)
         // Testnet wagerr BIP32 pubkeys start with 'DRKV'
         base58Prefixes[EXT_PUBLIC_KEY] = boost::assign::list_of(0x3a)(0x80)(0x61)(0xa0).convert_to_container<std::vector<unsigned char> >();
         // Testnet wagerr BIP32 prvkeys start with 'DRKP'
@@ -302,23 +316,10 @@ public:
         fTestnetToBeDeprecatedFieldRPC = true;
 
         nPoolMaxTransactions = 2;
-        strSporkKey = "04b2d1b19607edcca2fbf1d3238a0200a434900593f7e5e38102e7681465e5785ddcf1a105ee595c51ef3be1bfc8ea9dc14c8c30b2e0edaa5f5d3f57b77f272046";
+        strSporkKey = "0466223434350e5754c7379008e82954820a4bcc17335c42b915a0223c486e8bbbf87ba6281777d19ec73dc0b43416b33df432e3f4685770e56f9688afec7c2e3c";
+        strSporkKeyOld = "04b2d1b19607edcca2fbf1d3238a0200a434900593f7e5e38102e7681465e5785ddcf1a105ee595c51ef3be1bfc8ea9dc14c8c30b2e0edaa5f5d3f57b77f272046";
         strObfuscationPoolDummyAddress = "TMPUBzcsHZawA32XYYDF9FHQp6icv492CV";
         nStartMasternodePayments = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
-
-        /** Zerocoin */
-        zerocoinModulus = "25195908475657893494027183240048398571429282126204032027777137836043662020707595556264018525880784"
-            "4069182906412495150821892985591491761845028084891200728449926873928072877767359714183472702618963750149718246911"
-            "6507761337985909570009733045974880842840179742910064245869181719511874612151517265463228221686998754918242243363"
-            "7259085141865462043576798423387184774447920739934236584823824281198163815010674810451660377306056201619676256133"
-            "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
-            "31438167899885040445364023527381951378636564391212010397122822120720357";
-        nMaxZerocoinSpendsPerTransaction = 7; // Assume about 20kb each
-        nMinZerocoinMintFee = 1 * CENT; //high fee required for zerocoin mints
-        nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
-        nRequiredAccumulation = 1;
-        nDefaultSecurityLevel = 100; //full security level for accumulators
-        nZerocoinHeaderVersion = 4; //Block headers must be this version once zerocoin is active
         nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
                                        // here because we only have a 8 block finalization window on testnet
     }
@@ -340,7 +341,6 @@ public:
         networkID = CBaseChainParams::REGTEST;
         strNetworkID = "regtest";
         strNetworkID = "regtest";
-        /* 1276a1fa */
         pchMessageStart[0] = 0x12;
         pchMessageStart[1] = 0x76;
         pchMessageStart[2] = 0xa1;
@@ -350,8 +350,8 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
-        nTargetTimespan = 24 * 60 * 60;         // Wagerr: 1 day
-        nTargetSpacing = 1 * 60;                // Wagerr: 1 minutes
+        nTargetTimespan = 24 * 60 * 60; // WAGERR: 1 day
+        nTargetSpacing = 1 * 60;        // WAGERR: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         genesis.nTime = 1518696183;             // GMT: Thursday, 15. February 2018 12:03:03
         genesis.nBits = 0x207fffff;
@@ -361,8 +361,8 @@ public:
         nDefaultPort = 55006;
         assert(hashGenesisBlock == uint256("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec"));
 
-        vFixedSeeds.clear();                    //! Testnet mode doesn't have any fixed seeds.
-        vSeeds.clear();                         //! Testnet mode doesn't have any DNS seeds.
+        vFixedSeeds.clear(); //! Testnet mode doesn't have any fixed seeds.
+        vSeeds.clear();      //! Testnet mode doesn't have any DNS seeds.
 
         fMiningRequiresPeers = false;
         fAllowMinDifficultyBlocks = true;
@@ -388,7 +388,7 @@ public:
     {
         networkID = CBaseChainParams::UNITTEST;
         strNetworkID = "unittest";
-        nDefaultPort = 51478;
+        nDefaultPort = 55008;
         vFixedSeeds.clear(); //! Unit test mode doesn't have any fixed seeds.
         vSeeds.clear();      //! Unit test mode doesn't have any DNS seeds.
 

@@ -1,6 +1,6 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2015-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -210,12 +210,13 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
         nWatchOnlyLockedBalance = pwalletMain->GetLockedWatchOnlyBalance();
     }
     // WGR Balance
-    CAmount nTotalBalance = balance + unconfirmedBalance;
-    CAmount wgrAvailableBalance = balance - immatureBalance - nLockedBalance;
+    CAmount nTotalBalance = balance + unconfirmedBalance + nLockedBalance;
+    CAmount wgrAvailableBalance = balance - immatureBalance;
     CAmount nTotalWatchBalance = watchOnlyBalance + watchUnconfBalance + watchImmatureBalance;    
-    CAmount nUnlockedBalance = nTotalBalance - nLockedBalance;
+    CAmount nUnlockedBalance = nTotalBalance - nLockedBalance - nLockedBalance; // increment nLockedBalance twice because it was added to
+                                                                                // nTotalBalance above
     // zWGR Balance
-    CAmount matureZerocoinBalance = zerocoinBalance - immatureZerocoinBalance;
+    CAmount matureZerocoinBalance = zerocoinBalance - unconfirmedZerocoinBalance - immatureZerocoinBalance;
     // Percentages
     QString szPercentage = "";
     QString sPercentage = "";
