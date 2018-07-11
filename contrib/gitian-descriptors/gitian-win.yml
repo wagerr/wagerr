@@ -1,5 +1,5 @@
 ---
-name: "wagerr-win-1.5"
+name: "wagerr-win-3.2"
 enable_cache: true
 suites:
 - "trusty"

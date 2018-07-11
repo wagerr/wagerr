@@ -1,5 +1,5 @@
 ---
-name: "wagerr-osx-1.5"
+name: "wagerr-osx-3.2"
 enable_cache: true
 suites:
 - "trusty"

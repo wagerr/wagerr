@@ -24,11 +24,8 @@
 
 #include "libzerocoin/Coin.h"
 #include "spork.h"
-<<<<<<< HEAD
-#include "primitives/deterministicmint.h"
-=======
 #include <boost/algorithm/string.hpp>
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
+#include "primitives/deterministicmint.h"
 #include <boost/assign/list_of.hpp>
 #include <boost/thread/thread.hpp>
 

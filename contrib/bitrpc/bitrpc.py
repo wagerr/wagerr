@@ -1,5 +1,3 @@
-# Copyright (c) 2018 The Wagerr developers
-
 from jsonrpc import ServiceProxy
 import sys
 import string
