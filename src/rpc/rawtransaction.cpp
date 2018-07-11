@@ -342,6 +342,7 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
             "      \"data\": \"hex\",     (string, required) The key is \"data\", the value is hex encoded data\n"
             "      ...\n"
             "    }\n"
+
             "\nResult:\n"
             "\"transaction\"            (string) hex string of the transaction\n"
 
@@ -380,7 +381,6 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
     set<CBitcoinAddress> setAddress;
     vector<string> addrList = sendTo.getKeys();
     BOOST_FOREACH(const string& name_, addrList) {
-<<<<<<< HEAD:src/rpc/rawtransaction.cpp
         if (name_ == "data") {
             std::vector<unsigned char> data = ParseHexV(sendTo[name_].getValStr(),"Data");
 
@@ -398,26 +398,6 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
             CScript scriptPubKey = GetScriptForDestination(address.Get());
             CAmount nAmount = AmountFromValue(sendTo[name_]);
 
-=======
-
-        if (name_ == "data") {
-            std::vector<unsigned char> data = ParseHexV(sendTo[name_].getValStr(),"Data");
-
-            CTxOut out(0, CScript() << OP_RETURN << data);
-            rawTx.vout.push_back(out);
-        } else {
-            CBitcoinAddress address(name_);
-            if (!address.IsValid())
-                throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid Bitcoin address: ")+name_);
-
-            if (setAddress.count(address))
-                throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ")+name_);
-            setAddress.insert(address);
-
-            CScript scriptPubKey = GetScriptForDestination(address.Get());
-            CAmount nAmount = AmountFromValue(sendTo[name_]);
-
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33:src/rpcrawtransaction.cpp
             CTxOut out(nAmount, scriptPubKey);
             rawTx.vout.push_back(out);
         }
@@ -425,7 +405,6 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
 
     return EncodeHexTx(rawTx);
 }
-
 
 UniValue decoderawtransaction(const UniValue& params, bool fHelp)
 {
