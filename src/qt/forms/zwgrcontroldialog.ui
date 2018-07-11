@@ -7,58 +7,113 @@
     <x>0</x>
     <y>0</y>
     <width>681</width>
-    <height>384</height>
+    <height>450</height>
    </rect>
   </property>
   <property name="minimumSize">
    <size>
     <width>681</width>
-    <height>384</height>
+    <height>450</height>
    </size>
   </property>
   <property name="windowTitle">
-   <string>Select zWgr to Spend</string>
+   <string>Select zWGR to Spend</string>
   </property>
-  <layout class="QGridLayout" name="gridLayout">
-   <item row="0" column="0">
-    <layout class="QFormLayout" name="formLayout">
-     <property name="sizeConstraint">
-      <enum>QLayout::SetDefaultConstraint</enum>
+  <layout class="QVBoxLayout" name="verticalLayout" stretch="0,0,0,0">
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+     <property name="spacing">
+      <number>-1</number>
      </property>
-     <item row="0" column="0">
-      <widget class="QLabel" name="labelQuantity">
-       <property name="text">
-        <string>Quantity</string>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <item>
+      <layout class="QFormLayout" name="formLayout">
+       <property name="horizontalSpacing">
+        <number>10</number>
        </property>
-      </widget>
-     </item>
-     <item row="0" column="1">
-      <widget class="QLabel" name="labelQuantity_int">
-       <property name="text">
-        <string>0</string>
+       <property name="verticalSpacing">
+        <number>10</number>
        </property>
-      </widget>
-     </item>
-     <item row="1" column="0">
-      <widget class="QLabel" name="labelZWgr">
-       <property name="text">
-        <string>zWgr</string>
+       <property name="leftMargin">
+        <number>6</number>
        </property>
-      </widget>
-     </item>
-     <item row="1" column="1">
-      <widget class="QLabel" name="labelZWgr_int">
-       <property name="text">
-        <string>0</string>
+       <property name="rightMargin">
+        <number>6</number>
        </property>
-      </widget>
+       <item row="0" column="0">
+        <widget class="QLabel" name="labelQuantity">
+         <property name="text">
+          <string>Quantity</string>
+         </property>
+        </widget>
+       </item>
+       <item row="0" column="1">
+        <widget class="QLabel" name="labelQuantity_int">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="0">
+        <widget class="QLabel" name="labelZWgr">
+         <property name="text">
+          <string>zWGR</string>
+         </property>
+        </widget>
+       </item>
+       <item row="1" column="1">
+        <widget class="QLabel" name="labelZWgr_int">
+         <property name="text">
+          <string>0</string>
+         </property>
+        </widget>
+       </item>
+      </layout>
      </item>
-     <item row="2" column="0">
+     <item>
+      <spacer name="horizontalSpacer_2">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
+     </item>
+    </layout>
+   </item>
+   <item>
+    <layout class="QHBoxLayout" name="horizontalLayout3" stretch="0,0">
+     <property name="spacing">
+      <number>14</number>
+     </property>
+     <property name="bottomMargin">
+      <number>10</number>
+     </property>
+     <item>
       <widget class="QPushButton" name="pushButtonAll">
        <property name="text">
         <string>Select/Deselect All</string>
        </property>
       </widget>
+     </item>
+     <item>
+      <spacer name="horizontalSpacer">
+       <property name="orientation">
+        <enum>Qt::Horizontal</enum>
+       </property>
+       <property name="sizeHint" stdset="0">
+        <size>
+         <width>40</width>
+         <height>20</height>
+        </size>
+       </property>
+      </spacer>
      </item>
     </layout>
    </item>
@@ -66,6 +121,12 @@
     <layout class="QVBoxLayout" name="verticalLayout">
      <item>
       <widget class="QTreeWidget" name="treeWidget">
+      <property name="sizePolicy">
+          <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+          </sizepolicy>
+      </property>
        <property name="minimumSize">
         <size>
          <width>0</width>
@@ -96,7 +157,12 @@
        </column>
        <column>
         <property name="text">
-         <string notr="true">zWgr Public ID</string>
+         <string notr="true">zWGR ID</string>
+        </property>
+       </column>
+       <column>
+        <property name="text">
+         <string notr="true">zWGR Version</string>
         </property>
        </column>
        <column>
@@ -113,6 +179,12 @@
      </item>
      <item>
       <widget class="QDialogButtonBox" name="buttonBox">
+      <property name="sizePolicy">
+          <sizepolicy hsizetype="Maximum" vsizetype="Fixed">
+              <horstretch>0</horstretch>
+              <verstretch>0</verstretch>
+          </sizepolicy>
+      </property>
        <property name="orientation">
         <enum>Qt::Horizontal</enum>
        </property>

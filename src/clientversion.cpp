@@ -1,4 +1,5 @@
 // Copyright (c) 2012-2014 The Bitcoin developers
+// Copyright (c) 2016-2017 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -19,7 +20,11 @@ const std::string CLIENT_NAME("Wagerr Core");
 /**
  * Client version number
  */
+<<<<<<< HEAD
+#define CLIENT_VERSION_SUFFIX "-Paddy Power ™"
+=======
 #define CLIENT_VERSION_SUFFIX "-Paddy Power™"
+>>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
 
 
 /**

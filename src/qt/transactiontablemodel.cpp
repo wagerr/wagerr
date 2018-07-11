@@ -1,4 +1,6 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
+// Copyright (c) 2014-2016 The Dash developers
+// Copyright (c) 2016-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -347,7 +349,9 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
     case TransactionRecord::SendToSelf:
         return tr("Payment to yourself");
     case TransactionRecord::StakeMint:
-        return tr("Minted");
+        return tr("WGR Stake");
+    case TransactionRecord::StakeZWGR:
+        return tr("zWGR Stake");
     case TransactionRecord::Generated:
         return tr("Mined");
     case TransactionRecord::ObfuscationDenominate:
@@ -361,15 +365,15 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
     case TransactionRecord::Obfuscated:
         return tr("Obfuscated");
     case TransactionRecord::ZerocoinMint:
-        return tr("Converted Wgr to zWgr");
+        return tr("Converted WGR to zWGR");
     case TransactionRecord::ZerocoinSpend:
-        return tr("Spent zWgr");
+        return tr("Spent zWGR");
     case TransactionRecord::RecvFromZerocoinSpend:
-        return tr("Received Wgr from zWgr");
+        return tr("Received WGR from zWGR");
     case TransactionRecord::ZerocoinSpend_Change_zWgr:
-        return tr("Minted Change as zWgr from zWgr Spend");
+        return tr("Minted Change as zWGR from zWGR Spend");
     case TransactionRecord::ZerocoinSpend_FromMe:
-        return tr("Converted zWgr to Wgr");
+        return tr("Converted zWGR to WGR");
 
     default:
         return QString();
@@ -381,6 +385,7 @@ QVariant TransactionTableModel::txAddressDecoration(const TransactionRecord* wtx
     switch (wtx->type) {
     case TransactionRecord::Generated:
     case TransactionRecord::StakeMint:
+    case TransactionRecord::StakeZWGR:
     case TransactionRecord::MNReward:
         return QIcon(":/icons/tx_mined");
     case TransactionRecord::RecvWithObfuscation:
@@ -425,7 +430,9 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord* wtx, b
         return QString::fromStdString(wtx->address) + watchAddress;
     case TransactionRecord::ZerocoinMint:
     case TransactionRecord::ZerocoinSpend_Change_zWgr:
-        return tr("zWgr Accumulator");
+        return tr("Anonymous (zWGR Transaction)");
+    case TransactionRecord::StakeZWGR:
+        return tr("Anonymous (zWGR Stake)");
     case TransactionRecord::SendToSelf:
     default:
         return tr("(n/a)") + watchAddress;
