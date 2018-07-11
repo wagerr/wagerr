@@ -1,4 +1,5 @@
 // Copyright (c) 2011-2013 The Bitcoin developers
+// Copyright (c) 2017-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -99,13 +100,17 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
 
     typeWidget->addItem(tr("To yourself"), TransactionFilterProxy::TYPE(TransactionRecord::SendToSelf));
     typeWidget->addItem(tr("Mined"), TransactionFilterProxy::TYPE(TransactionRecord::Generated));
-    typeWidget->addItem(tr("Minted"), TransactionFilterProxy::TYPE(TransactionRecord::StakeMint));
+    typeWidget->addItem(tr("Minted"), TransactionFilterProxy::TYPE(TransactionRecord::StakeMint) | TransactionFilterProxy::TYPE(TransactionRecord::StakeZWGR));
     typeWidget->addItem(tr("Masternode Reward"), TransactionFilterProxy::TYPE(TransactionRecord::MNReward));
+<<<<<<< HEAD
+    typeWidget->addItem(tr("Received WGR from zWGR"), TransactionFilterProxy::TYPE(TransactionRecord::RecvFromZerocoinSpend));
+=======
     typeWidget->addItem(tr("Bet Payout"), TransactionFilterProxy::TYPE(TransactionRecord::BetWin));
     typeWidget->addItem(tr("Received Wgr from zWgr"), TransactionFilterProxy::TYPE(TransactionRecord::RecvFromZerocoinSpend));
+>>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
     typeWidget->addItem(tr("Zerocoin Mint"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinMint));
     typeWidget->addItem(tr("Zerocoin Spend"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend));
-    typeWidget->addItem(tr("Zerocoin Spend, Change in zWgr"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend_Change_zWgr));
+    typeWidget->addItem(tr("Zerocoin Spend, Change in zWGR"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend_Change_zWgr));
     typeWidget->addItem(tr("Zerocoin Spend to Self"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend_FromMe));
     typeWidget->addItem(tr("Other"), TransactionFilterProxy::TYPE(TransactionRecord::Other));
     typeWidget->setCurrentIndex(settings.value("transactionType").toInt());

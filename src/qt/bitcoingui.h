@@ -1,4 +1,5 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
+// Copyright (c) 2017-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -86,6 +87,7 @@ private:
     QLabel* labelStakingIcon;
     QPushButton* labelAutoMintIcon;
     QPushButton* labelEncryptionIcon;
+    QLabel* labelTorIcon;
     QPushButton* labelConnectionsIcon;
     QLabel* labelBlocksIcon;
     QLabel* progressBarLabel;
@@ -198,6 +200,10 @@ public slots:
     /** Show incoming transaction notification for new transactions. */
     void incomingTransaction(const QString& date, int unit, const CAmount& amount, const QString& type, const QString& address);
 #endif // ENABLE_WALLET
+
+private:
+    /** Set the Tor-enabled icon as shown in the UI. */
+    void updateTorIcon();
 
 private slots:
 #ifdef ENABLE_WALLET

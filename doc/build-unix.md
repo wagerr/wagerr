@@ -8,7 +8,7 @@ Some notes on how to build Wagerr in Unix.
 Note
 ---------------------
 Always use absolute paths to configure and compile wagerr and the dependencies,
-for example, when specifying the the path of the dependency:
+for example, when specifying the path of the dependency:
 
 	../dist/configure --enable-cxx --disable-shared --with-pic --prefix=$BDB_PREFIX
 
