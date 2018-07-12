@@ -259,17 +259,11 @@ extern UniValue importzerocoins(const UniValue& params, bool fHelp);
 extern UniValue exportzerocoins(const UniValue& params, bool fHelp);
 extern UniValue reconsiderzerocoins(const UniValue& params, bool fHelp);
 extern UniValue getspentzerocoinamount(const UniValue& params, bool fHelp);
-<<<<<<< HEAD:src/rpc/server.h
 extern UniValue setzwgrseed(const UniValue& params, bool fHelp);
 extern UniValue getzwgrseed(const UniValue& params, bool fHelp);
 extern UniValue generatemintlist(const UniValue& params, bool fHelp);
 extern UniValue searchdzwgr(const UniValue& params, bool fHelp);
 extern UniValue dzwgrstate(const UniValue& params, bool fHelp);
-=======
-extern UniValue listevents(const UniValue& params, bool fHelp);
-extern UniValue placebet(const UniValue& params, bool fHelp);
-extern UniValue listbets(const UniValue& params, bool fHelp);
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33:src/rpcserver.h
 
 extern UniValue getrawtransaction(const UniValue& params, bool fHelp); // in rpc/rawtransaction.cpp
 extern UniValue listunspent(const UniValue& params, bool fHelp);
