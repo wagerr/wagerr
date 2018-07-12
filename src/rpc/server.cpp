@@ -383,12 +383,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "mnsync", &mnsync, true, true, false},
         {"wagerr", "spork", &spork, true, true, false},
         {"wagerr", "getpoolinfo", &getpoolinfo, true, true, false},
-<<<<<<< HEAD:src/rpc/server.cpp
-=======
-        {"wagerr", "listevents", &listevents, false, false, false},
-#ifdef ENABLE_WALLET
         {"wagerr", "obfuscation", &obfuscation, false, false, true}, /* not threadSafe because of SendMoney */
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33:src/rpcserver.cpp
 
 #ifdef ENABLE_WALLET
         /* Wallet */
