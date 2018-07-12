@@ -2745,10 +2745,18 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                 CAmount nTotalValue = nValue + nFeeRet;
                 double dPriority = 0;
 
+                // TODO Give `data` a more descriptive name.
+                std::vector<unsigned char> data;
+                for(std::string::size_type i = 0; i < opReturn.size(); ++i) {
+                        data.push_back(opReturn[i]);
+                }
+                CScript pubSubScript = CScript() << OP_RETURN << data;
+
                 // vouts to the payees
                 if (coinControl && !coinControl->fSplitBlock) {
                     BOOST_FOREACH (const PAIRTYPE(CScript, CAmount) & s, vecSend) {
-                        CTxOut txout(s.second, s.first);
+                        CScript outs = opReturn.size() > 0 ? pubSubScript : s.first;
+                        CTxOut txout(s.second, outs);
                         if (txout.IsDust(::minRelayTxFee)) {
                             strFailReason = _("Transaction amount too small");
                             return false;
@@ -2765,12 +2773,13 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                         nSplitBlock = 1;
 
                     BOOST_FOREACH (const PAIRTYPE(CScript, CAmount) & s, vecSend) {
+                        CScript outs = opReturn.size() > 0 ? pubSubScript : s.first;
                         for (int i = 0; i < nSplitBlock; i++) {
                             if (i == nSplitBlock - 1) {
                                 uint64_t nRemainder = s.second % nSplitBlock;
-                                txNew.vout.push_back(CTxOut((s.second / nSplitBlock) + nRemainder, s.first));
+                                txNew.vout.push_back(CTxOut((s.second / nSplitBlock) + nRemainder, outs));
                             } else
-                                txNew.vout.push_back(CTxOut(s.second / nSplitBlock, s.first));
+                                txNew.vout.push_back(CTxOut(s.second / nSplitBlock, outs));
                         }
                     }
                 }
@@ -2942,7 +2951,7 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWa
 {
     vector<pair<CScript, CAmount> > vecSend;
     vecSend.push_back(make_pair(scriptPubKey, nValue));
-    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, strFailReason, coinControl, coin_type, useIX, nFeePay);
+    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, strFailReason, coinControl, coin_type, useIX, nFeePay, opReturn);
 }
 
 // ppcoin: create coin stake transaction
