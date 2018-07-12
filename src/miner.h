@@ -9,8 +9,6 @@
 #define BITCOIN_MINER_H
 
 #include <stdint.h>
-#include "primitives/transaction.h"
-#include <vector>
 
 class CBlock;
 class CBlockHeader;
@@ -30,12 +28,6 @@ CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, CWallet* pwallet,
 void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& nExtraNonce);
 /** Check mined block */
 void UpdateTime(CBlockHeader* block, const CBlockIndex* pindexPrev);
-
-std::vector<std::vector<std::string>> getEventResults();
-void getEventBets();
-std::vector<CTxOut> GetBetPayouts();
-std::vector<CTxOut> GetBetPayoutsForTransactions(std::vector<CTransaction> txs);
-//std::vector<std::vector<std::string>> getEventOddsForResults( );
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake);
 

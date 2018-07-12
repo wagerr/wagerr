@@ -1665,39 +1665,7 @@ CAmount CWallet::GetImmatureZerocoinBalance() const
 
 CAmount CWallet::GetUnconfirmedZerocoinBalance() const
 {
-<<<<<<< HEAD
     return zwgrTracker->GetUnconfirmedBalance();
-=======
-    CAmount nUnconfirmed = 0;
-    CWalletDB walletdb(pwalletMain->strWalletFile);
-    list<CZerocoinMint> listMints = walletdb.ListMintedCoins(true, false, true);
-
-    std::map<libzerocoin::CoinDenomination, int> mapUnconfirmed;
-    for (const auto& denom : libzerocoin::zerocoinDenomList){
-        mapUnconfirmed.insert(make_pair(denom, 0));
-    }
-
-    {
-        LOCK2(cs_main, cs_wallet);
-        for (auto& mint : listMints){
-            if (!mint.GetHeight() || mint.GetHeight() > chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations()) {
-                libzerocoin::CoinDenomination denom = mint.GetDenomination();
-                nUnconfirmed += libzerocoin::ZerocoinDenominationToAmount(denom);
-                mapUnconfirmed.at(denom)++;
-            }
-        }
-    }
-
-    for (auto& denom : libzerocoin::zerocoinDenomList) {
-        LogPrint("zero","%s My unconfirmed coins for denomination %d pubcoin %s\n", __func__,denom, mapUnconfirmed.at(denom));
-    }
-
-    LogPrint("zero","Total value of unconfirmed coins %ld\n", nUnconfirmed);
-
-    if (nUnconfirmed < 0 ) nUnconfirmed = 0; // Sanity never hurts
-
-    return nUnconfirmed;
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
 }
 
 CAmount CWallet::GetUnlockedCoins() const
@@ -2732,7 +2700,6 @@ bool CWallet::ConvertList(std::vector<CTxIn> vCoins, std::vector<CAmount>& vecAm
     return true;
 }
 
-// TODO See `rpcwallet.cpp:SendMoney` for notes on `opReturn`.
 bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
     CWalletTx& wtxNew,
     CReserveKey& reservekey,
@@ -2741,8 +2708,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
     const CCoinControl* coinControl,
     AvailableCoinsType coin_type,
     bool useIX,
-    CAmount nFeePay,
-    const std::string& opReturn)
+    CAmount nFeePay)
 {
     if (useIX && nFeePay < CENT) nFeePay = CENT;
 
@@ -2777,18 +2743,10 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                 CAmount nTotalValue = nValue + nFeeRet;
                 double dPriority = 0;
 
-                // TODO Give `data` a more descriptive name.
-                std::vector<unsigned char> data;
-                for(std::string::size_type i = 0; i < opReturn.size(); ++i) {
-                        data.push_back(opReturn[i]);
-                }
-                CScript pubSubScript = CScript() << OP_RETURN << data;
-
                 // vouts to the payees
                 if (coinControl && !coinControl->fSplitBlock) {
                     BOOST_FOREACH (const PAIRTYPE(CScript, CAmount) & s, vecSend) {
-                        CScript outs = opReturn.size() > 0 ? pubSubScript : s.first;
-                        CTxOut txout(s.second, outs);
+                        CTxOut txout(s.second, s.first);
                         if (txout.IsDust(::minRelayTxFee)) {
                             strFailReason = _("Transaction amount too small");
                             return false;
@@ -2805,13 +2763,12 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                         nSplitBlock = 1;
 
                     BOOST_FOREACH (const PAIRTYPE(CScript, CAmount) & s, vecSend) {
-                        CScript outs = opReturn.size() > 0 ? pubSubScript : s.first;
                         for (int i = 0; i < nSplitBlock; i++) {
                             if (i == nSplitBlock - 1) {
                                 uint64_t nRemainder = s.second % nSplitBlock;
-                                txNew.vout.push_back(CTxOut((s.second / nSplitBlock) + nRemainder, outs));
+                                txNew.vout.push_back(CTxOut((s.second / nSplitBlock) + nRemainder, s.first));
                             } else
-                                txNew.vout.push_back(CTxOut(s.second / nSplitBlock, outs));
+                                txNew.vout.push_back(CTxOut(s.second / nSplitBlock, s.first));
                         }
                     }
                 }
@@ -2978,16 +2935,15 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
     return true;
 }
 
-// TODO See `rpcwallet.cpp:SendMoney` for notes on `opReturn`.
-bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay, const std::string& opReturn)
+bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWalletTx& wtxNew, CReserveKey& reservekey, CAmount& nFeeRet, std::string& strFailReason, const CCoinControl* coinControl, AvailableCoinsType coin_type, bool useIX, CAmount nFeePay)
 {
     vector<pair<CScript, CAmount> > vecSend;
     vecSend.push_back(make_pair(scriptPubKey, nValue));
-    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, strFailReason, coinControl, coin_type, useIX, nFeePay, opReturn);
+    return CreateTransaction(vecSend, wtxNew, reservekey, nFeeRet, strFailReason, coinControl, coin_type, useIX, nFeePay);
 }
 
 // ppcoin: create coin stake transaction
-bool CWallet::FindCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime, vector<CWalletTx>& vwtxPrev)
+bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime)
 {
     // The following split & combine thresholds are important to security
     // Should not be adjusted if you don't understand the consequences
@@ -3017,12 +2973,9 @@ bool CWallet::FindCoinStake(const CKeyStore& keystore, unsigned int nBits, int64
     if (listInputs.empty())
         return false;
 
-<<<<<<< HEAD
     if (GetAdjustedTime() - chainActive.Tip()->GetBlockTime() < 60)
         MilliSleep(10000);
 
-=======
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
     CAmount nCredit = 0;
     CScript scriptPubKeyKernel;
     bool fKernelFound = false;
@@ -3084,15 +3037,8 @@ bool CWallet::FindCoinStake(const CKeyStore& keystore, unsigned int nBits, int64
             if (nBytes >= DEFAULT_BLOCK_MAX_SIZE / 5)
                 return error("CreateCoinStake : exceeded coinstake size limit");
 
-<<<<<<< HEAD
             //Masternode payment
             FillBlockPayee(txNew, nMinFee, true, stakeInput->IsZWGR());
-=======
-            txNew.vin.push_back(CTxIn(pcoin.first->GetHash(), pcoin.second));
-            nCredit += pcoin.first->vout[pcoin.second].nValue;
-            vwtxPrev.push_back(*pcoin.first);
-            txNew.vout.push_back(CTxOut(0, scriptPubKeyOut));
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
 
             uint256 hashTxOut = txNew.GetHash();
             CTxIn in;
@@ -3140,13 +3086,9 @@ bool CWallet::FindCoinStake(const CKeyStore& keystore, unsigned int nBits, int64
             if (!TxOutToPublicCoin(out, pubcoin, state))
                 return error("%s: extracting pubcoin from txout failed", __func__);
 
-<<<<<<< HEAD
             uint256 hashPubcoin = GetPubCoinHash(pubcoin.getValue());
             if (!zwgrTracker->HasPubcoinHash(hashPubcoin))
                 return error("%s: could not find pubcoinhash %s in tracker", __func__, hashPubcoin.GetHex());
-=======
-        CAmount nFeeNeeded = 0 * COIN; //GetMinimumFee(nBytes, nTxConfirmTarget, mempool);
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
 
             CMintMeta meta = zwgrTracker->GetMetaFromPubcoin(hashPubcoin);
             meta.txid = txNew.GetHash();
@@ -5118,22 +5060,10 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored, s
         uint256 txidSpend;
         dMint.SetUsed(IsSerialInBlockchain(dMint.GetSerialHash(), nHeight, txidSpend));
 
-<<<<<<< HEAD
         if (!zwgrTracker->UnArchive(dMint.GetPubcoinHash(), true)) {
             LogPrintf("%s : failed to unarchive deterministic mint %s\n", __func__, dMint.GetPubcoinHash().GetHex());
         } else {
             zwgrTracker->Add(dMint, true);
-=======
-        if (!GetTransaction(txHash, tx, hashBlock)) {
-            LogPrintf("%s: failed to find transaction %s in blockchain\n", __func__, txHash.GetHex());
-            continue;
-        }
-
-        mint.SetTxHash(txHash);
-        mint.SetHeight(mapBlockIndex.at(hashBlock)->nHeight);
-        if (!walletdb.UnarchiveZerocoin(mint)) {
-            LogPrintf("%s : failed to unarchive mint %s\n", __func__, mint.GetValue().GetHex());
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
         }
         listDMintsRestored.emplace_back(dMint);
     }
@@ -5347,7 +5277,6 @@ bool CWallet::SpendZerocoin(CAmount nAmount, int nSecurityLevel, CWalletTx& wtxN
     return true;
 }
 
-<<<<<<< HEAD
 bool CWallet::GetMintFromStakeHash(const uint256& hashStake, CZerocoinMint& mint)
 {
     CMintMeta meta;
@@ -5374,23 +5303,10 @@ bool CWallet::GetMint(const uint256& hashSerial, CZerocoinMint& mint)
     } else if (!walletdb.ReadZerocoinMint(meta.hashPubcoin, mint)) {
         return error("%s: failed to read zerocoinmint from database", __func__);
     }
-=======
-bool CWallet::FillCoinStake(CMutableTransaction& txNew, CAmount& nFees, std::vector<CTxOut> voutPayouts)
-{
-    //  std::vector<CTxOut> vout
-    //  BOOST_FOREACH (const CTxOut& out, voutIn)
-    //      vout.push_back(out);
-    BOOST_FOREACH (const CTxOut& out, voutPayouts)
-        txNew.vout.push_back(out);
-
-    //Masternode payment
-    FillBlockPayee(txNew, nFees, true);   // Kokary: add betting fee
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
 
     return true;
 }
 
-<<<<<<< HEAD
 
 bool CWallet::IsMyMint(const CBigNum& bnValue) const
 {
@@ -5436,16 +5352,5 @@ bool CWallet::DatabaseMint(CDeterministicMint& dMint)
 {
     CWalletDB walletdb(strWalletFile);
     zwgrTracker->Add(dMint, true);
-=======
-bool CWallet::SignCoinStake(CMutableTransaction& txNew, vector<CWalletTx>& vwtxPrev)
-{
-    // Sign
-    int nIn = 0;
-    BOOST_FOREACH (const CWalletTx pcoin, vwtxPrev) {
-        if (!SignSignature(*this, pcoin, txNew, nIn++))
-            return error("CreateCoinStake : failed to sign coinstake");
-    }
-
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
     return true;
 }

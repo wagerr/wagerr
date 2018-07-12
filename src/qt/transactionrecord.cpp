@@ -15,11 +15,6 @@
 #include "zwgrchain.h"
 
 #include <stdint.h>
-#include <boost/thread.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/algorithm/hex.hpp>
 
 /* Return positive answer if transaction should be shown in list.
  */
@@ -60,7 +55,6 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         if (!wtx.IsZerocoinSpend() && !ExtractDestination(wtx.vout[1].scriptPubKey, address))
             return parts;
 
-<<<<<<< HEAD
         if (wtx.IsZerocoinSpend() && (fZSpendFromMe || wallet->zwgrTracker->HasMintTx(hash))) {
             //zWGR stake reward
             sub.involvesWatchAddress = false;
@@ -70,26 +64,6 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             for (const CTxOut& out : wtx.vout) {
                 if (out.IsZerocoinMint())
                     sub.credit += out.nValue;
-=======
-        if (!IsMine(*wallet, address)) {
-            //if the address is not yours then it means you have a tx sent to you in someone elses coinstake tx
-            for (unsigned int i = 1; i < wtx.vout.size(); i++) {
-                CTxDestination outAddress;
-                if (ExtractDestination(wtx.vout[i].scriptPubKey, outAddress)) {
-                    if (IsMine(*wallet, outAddress)) {
-
-                        if(wtx.vout.size() > 3){
-                            sub.type = TransactionRecord::BetWin;
-                        }else{
-                            sub.type = TransactionRecord::MNReward;
-                        }
-                        sub.address = CBitcoinAddress(outAddress).ToString();
-                        isminetype mine = wallet->IsMine(wtx.vout[i]);
-                        sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
-                        sub.credit = wtx.vout[i].nValue;
-                    }
-                }
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
             }
             sub.debit -= wtx.vin[0].nSequence * COIN;
         } else if (isminetype mine = wallet->IsMine(wtx.vout[1])) {
@@ -302,31 +276,11 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
                 } else if (txout.IsZerocoinMint()){
                     sub.type = TransactionRecord::ZerocoinMint;
                     sub.address = mapValue["zerocoinmint"];
-<<<<<<< HEAD
                     sub.credit += txout.nValue;
                 } else {
-=======
-                }else{
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
                     // Sent to IP, or other non-address transaction like OP_EVAL
                     sub.type = TransactionRecord::SendToOther;
                     sub.address = mapValue["to"];
-                }
-
-
-                std::string s = txout.scriptPubKey.ToString();
-                if(s.length() > 0 && 0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
-
-                    vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
-                    std::string betDescr(v.begin(), v.end());
-                    std::vector<std::string> strs;
-                    boost::split(strs, betDescr, boost::is_any_of("|"));
-                    std::string txType = strs[0].c_str();
-
-                    if(strs.size() == 4 && txType == "2"){
-                        sub.type = TransactionRecord::BetPlaced;
-                        sub.address = betDescr;
-                    }
                 }
 
                 if (mapValue["DS"] == "1") {

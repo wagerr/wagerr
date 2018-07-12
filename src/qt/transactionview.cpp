@@ -102,12 +102,7 @@ TransactionView::TransactionView(QWidget* parent) : QWidget(parent), model(0), t
     typeWidget->addItem(tr("Mined"), TransactionFilterProxy::TYPE(TransactionRecord::Generated));
     typeWidget->addItem(tr("Minted"), TransactionFilterProxy::TYPE(TransactionRecord::StakeMint) | TransactionFilterProxy::TYPE(TransactionRecord::StakeZWGR));
     typeWidget->addItem(tr("Masternode Reward"), TransactionFilterProxy::TYPE(TransactionRecord::MNReward));
-<<<<<<< HEAD
     typeWidget->addItem(tr("Received WGR from zWGR"), TransactionFilterProxy::TYPE(TransactionRecord::RecvFromZerocoinSpend));
-=======
-    typeWidget->addItem(tr("Bet Payout"), TransactionFilterProxy::TYPE(TransactionRecord::BetWin));
-    typeWidget->addItem(tr("Received Wgr from zWgr"), TransactionFilterProxy::TYPE(TransactionRecord::RecvFromZerocoinSpend));
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
     typeWidget->addItem(tr("Zerocoin Mint"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinMint));
     typeWidget->addItem(tr("Zerocoin Spend"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend));
     typeWidget->addItem(tr("Zerocoin Spend, Change in zWGR"), TransactionFilterProxy::TYPE(TransactionRecord::ZerocoinSpend_Change_zWgr));

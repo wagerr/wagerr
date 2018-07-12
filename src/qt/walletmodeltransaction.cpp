@@ -16,13 +16,6 @@ WalletModelTransaction::WalletModelTransaction(const QList<SendCoinsRecipient>& 
     walletTransaction = new CWalletTx();
 }
 
-WalletModelTransaction::WalletModelTransaction() : walletTransaction(0),
-                                                   keyChange(0),
-                                                   fee(0)
-{
-    walletTransaction = new CWalletTx();
-}
-
 WalletModelTransaction::~WalletModelTransaction()
 {
     delete keyChange;

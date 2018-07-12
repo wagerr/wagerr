@@ -21,7 +21,6 @@
 #include "masternode-budget.h"
 #include "masternode-payments.h"
 #include "masternodeman.h"
-#include "miner.h"
 #include "merkleblock.h"
 #include "net.h"
 #include "obfuscation.h"
@@ -1809,19 +1808,14 @@ double ConvertBitsToDouble(unsigned int nBits)
 
 int64_t GetBlockValue(int nHeight)
 {
-<<<<<<< HEAD
    
-=======
-    int64_t nSubsidy = 0;
-
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
     if (Params().NetworkID() == CBaseChainParams::REGTEST || Params().NetworkID() == CBaseChainParams::TESTNET) {
         if (nHeight == 0) {
             // Genesis block
             return 0 * COIN;
         } else if (nHeight == 1) {
             /* PREMINE: Current available wagerr on DEX marketc 198360471 wagerr
-            Info abobut premine:
+            Info abobut premine: 
             Full premine size is 198360471. First 100 blocks mine 250000 wagerr per block - 198360471 - (100 * 250000) = 173360471
             */
             // 87.4 % of premine
@@ -1863,42 +1857,12 @@ int64_t GetBlockValue(int nHeight)
         // PoS - Phase 2 lasts until - undefined)
         nSubsidy = 3.8 * COIN;
     } else {
-<<<<<<< HEAD
         nSubsidy = 0 * COIN;
-=======
-        // MAIN
-        if (nHeight == 0) {
-            // Genesis block
-            nSubsidy = 0 * COIN;
-        } else if (nHeight == 1) {
-            /* PREMINE: Current available wagerr on DEX marketc 198360471 wagerr
-            Info abobut premine:
-            Full premine size is 198360471. First 100 blocks mine 250000 wagerr per block - 198360471 - (100 * 250000) = 173360471
-            */
-            // 87.4 % of premine
-            nSubsidy = 173360471 * COIN;
-        } else if (nHeight > 1 && nHeight <= 101 && nHeight <= Params().LAST_POW_BLOCK()) { // check for last PoW block is not required, it does not harm to leave it *** TODO ***
-            // PoW Phase 1 does produce 12.6 % of full premine (25000000 WGR)
-            nSubsidy = 250000 * COIN;
-        } else if (nHeight > 1 && nHeight > 101 && nHeight <= Params().LAST_POW_BLOCK()) {
-            // PoW Phase does not produce any coins
-            nSubsidy = 0 * COIN;
-        } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight <= 10000) {
-            // PoS - Phase 1 lasts until block 1110)
-            nSubsidy = 0 * COIN;
-        } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight > 10000) {
-            // PoS - Phase 2 lasts until - undefined)
-            nSubsidy = 3.8 * COIN;
-        } else {
-            nSubsidy = 0 * COIN;
-        }
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
     }
 
     return nSubsidy;
 }
 
-<<<<<<< HEAD
 CAmount GetSeeSaw(const CAmount& blockValue, int nMasternodeCount, int nHeight)
 {
     //if a mn count is inserted into the function we are looking for a specific result for a masternode count
@@ -1908,43 +1872,6 @@ CAmount GetSeeSaw(const CAmount& blockValue, int nMasternodeCount, int nHeight)
         else
             nMasternodeCount = mnodeman.size();
     }
-=======
-int64_t GetBlockPayouts( std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetReward){
-
-    CAmount nPayout = 0;
-    CAmount totalAmountBet = 0;
-    std::string devPayoutWallet;
-
-    for(unsigned i = 0; i < vexpectedPayouts.size(); i++){
-        totalAmountBet += vexpectedPayouts[i].nBetValue;
-        nPayout += vexpectedPayouts[i].nValue;
-    }
-
-    //build dev payout fee
-    if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        devPayoutWallet = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";
-    }
-    else {
-        devPayoutWallet = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";
-    }
-
-    if(vexpectedPayouts.size() > 0){
-        CAmount devPayout = totalAmountBet * 0.006;
-        vexpectedPayouts.emplace_back(devPayout, GetScriptForDestination(CBitcoinAddress( devPayoutWallet ).Get()));
-
-        nPayout += devPayout;
-    }
-
-    // Betting payouts are 94% of betting amount.
-    // 2.4% of the betting amount is MN fee.
-    // 0.6% dev fund. 3% never created/burned.
-    nMNBetReward = totalAmountBet * 0.024;
-
-    //printf("Masternode bet reward %i \n", nMNBetReward);
-
-    return  nPayout;
-}
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
 
     int64_t nMoneySupply = chainActive.Tip()->nMoneySupply;
     int64_t mNodeCoins = nMasternodeCount * 25000 * COIN;
@@ -2756,7 +2683,6 @@ static int64_t nTimeConnect = 0;
 static int64_t nTimeIndex = 0;
 static int64_t nTimeCallbacks = 0;
 static int64_t nTimeTotal = 0;
-int64_t blockNo = 0;
 
 bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool fJustCheck, bool fAlreadyChecked)
 {
@@ -2966,105 +2892,20 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 //              FormatMoney(nValueOut), FormatMoney(nValueIn),
 //              FormatMoney(nFees), FormatMoney(pindex->nMint), FormatMoney(nAmountZerocoinSpent));
 
-<<<<<<< HEAD
-=======
-    if (!pblocktree->WriteBlockIndex(CDiskBlockIndex(pindex)))
-
-        return error("Connect() : WriteBlockIndex for pindex failed");
-
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
     int64_t nTime1 = GetTimeMicros();
     nTimeConnect += nTime1 - nTimeStart;
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime1 - nTimeStart), 0.001 * (nTime1 - nTimeStart) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime1 - nTimeStart) / (nInputs - 1), nTimeConnect * 0.000001);
 
     //PoW phase redistributed fees to miner. PoS stage destroys fees.
     CAmount nExpectedMint = GetBlockValue(pindex->pprev->nHeight);
-    CAmount nMNBetReward = 0;
     if (block.IsProofOfWork())
         nExpectedMint += nFees;
 
-<<<<<<< HEAD
     //Check that the block does not overmint
     if (!IsBlockValueValid(block, nExpectedMint, pindex->nMint)) {
         return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
                                     FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)),
                          REJECT_INVALID, "bad-cb-amount");
-=======
-    // Calculate the expected bet payouts.
-    // Only look for events, bets and results after a given block on testnet. Full of test data.
-    std::vector<CTxOut> vExpectedPayouts;
-    if (CBaseChainParams::TESTNET && pindex->nHeight > 23320) {
-
-        LogPrintf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
-
-        vExpectedPayouts = GetBetPayouts();
-        nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
-        nExpectedMint += nMNBetReward;
-
-        for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
-            LogPrintf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
-        }
-    }
-
-    // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure connect block wont pay to much.
-    if (!IsBlockValueValid(block, nExpectedMint, pindex->nMint)) {
-        return state.DoS(100,
-                         error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
-                               FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)),
-                         REJECT_INVALID, "bad-cb-amount");
-    }
-
-    // Validate the payout vector against the block being submitted.
-//    if (!IsBlockPayoutsValid(vExpectedPayouts, block)) {
-//        printf("Betting payout tx's did not match the payout tx's in the block. \n");
-//
-//        return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ",
-//                                    pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
-//    }
-
-
-    vExpectedPayouts.clear();
-
-    // zerocoin accumulator: if a new accumulator checkpoint was generated, check that it is the correct value
-    if (!fVerifyingBlocks && pindex->nHeight >= Params().Zerocoin_StartHeight() && pindex->nHeight % 10 == 0) {
-        uint256 nCheckpointCalculated = 0;
-
-        // if IDB, invalid outpoints must be calculated or else acc checkpoint will be incorrect
-        if (pindex->nHeight == Params().Zerocoin_Block_RecalculateAccumulators())
-            PopulateInvalidOutPointMap();
-
-        if (!CalculateAccumulatorCheckpoint(pindex->nHeight, nCheckpointCalculated)) {
-            //Calculate list of checkpoints that may be missing due to deletion on block 809000, and rewinding back before 809000
-            int nStop = Params().Zerocoin_Block_RecalculateAccumulators();
-            if (pindex->nHeight < nStop && pindex->nHeight > Params().Zerocoin_Block_LastGoodCheckpoint()) {
-                LogPrintf("%s : Checkpoint not found for block %d, recalculating accumulators\n", __func__, pindex->nHeight);
-                CBlockIndex* pindexCheckpoint = chainActive[Params().Zerocoin_Block_LastGoodCheckpoint()];
-                list<uint256> listCheckpoints;
-                while (pindexCheckpoint->nHeight <= nStop) {
-                    if (!count(listCheckpoints.begin(), listCheckpoints.end(), pindexCheckpoint->nAccumulatorCheckpoint))
-                        listCheckpoints.emplace_back(pindexCheckpoint->nAccumulatorCheckpoint);
-
-                    pindexCheckpoint = chainActive.Next(pindexCheckpoint);
-                    if (!pindexCheckpoint)
-                        break;
-                }
-
-                string strError;
-                if (!ReindexAccumulators(listCheckpoints, strError) || !CalculateAccumulatorCheckpoint(pindex->nHeight, nCheckpointCalculated))
-                    return state.DoS(100, error("ConnectBlock() : failed to recalculate accumulator checkpoint"));
-            } else {
-                return state.DoS(100, error("ConnectBlock() : failed to calculate accumulator checkpoint"));
-            }
-        }
-
-        if (nCheckpointCalculated != block.nAccumulatorCheckpoint) {
-            LogPrintf("%s: block=%d calculated: %s\n block: %s\n", __func__, pindex->nHeight, nCheckpointCalculated.GetHex(), block.nAccumulatorCheckpoint.GetHex());
-            return state.DoS(100, error("ConnectBlock() : accumulator does not match calculated value"));
-        }
-    } else if (!fVerifyingBlocks) {
-        if (block.nAccumulatorCheckpoint != pindex->pprev->nAccumulatorCheckpoint)
-            return state.DoS(100, error("ConnectBlock() : new accumulator checkpoint generated on a block that is not multiple of 10"));
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
     }
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
@@ -3165,89 +3006,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         if (it != mapZerocoinspends.end())
             mapZerocoinspends.erase(it);
     }
-
-    return true;
-}
-
-bool IsBlockPayoutsValid( std::vector<CTxOut> vExpectedPayouts, const CBlock& block ){
-
-//    CBlockIndex* pindexPrev = chainActive.Tip();
-//    if (pindexPrev == NULL) return true;
-//
-//    // Here we can again calulate the bet payout to be minted. Else pass from the connet block function as its calculated there again.
-//    CAmount expectedTotalPayouts = 0;
-//    CBlockIndex *BocksIndex = chainActive.Tip();
-//
-//    CBlock blocker;
-//    ReadBlockFromDisk(blocker, BocksIndex);
-//    CTransaction &tx = blocker.vtx[1];
-//
-//    const CTxIn &txin        = tx.vin[0];
-//    COutPoint prevout        = txin.prevout;
-//    CAmount totalStakeAmount = 105555556;
-//    int numStakingTx         = 0;
-//
-//    CAmount nReward;
-//    const CBlockIndex* pIndex0 = chainActive.Tip();
-//    nReward = GetBlockValue(pIndex0->nHeight );
-//
-//    printf("Reward %li \n", nReward );
-//
-//    printf("hash: %s \n", prevout.ToString().c_str());
-
-//    uint256 hashBlock;
-//    CTransaction txPrev;
-//    if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
-//
-//        const CTxOut &prevTxOut  = txPrev.vout[prevout.n];
-//        std::string scriptPubKey = prevTxOut.scriptPubKey.ToString();
-//        totalStakeAmount         += prevTxOut.nValue;
-//
-//        printf("Staking input amount: %li \n", totalStakeAmount);
-//    }
-
-//    CAmount totalStakeAcc = 0;
-//    for( int i = 0; i <= tx.vout.size(); i++) {
-//        const CTxOut &txout = tx.vout[i];
-//        CAmount stakeAmount = txout.nValue;
-//
-//        totalStakeAcc += stakeAmount;
-//
-//        if( totalStakeAmount == totalStakeAcc ){
-//            printf("Match %i \n", i);
-//            numStakingTx = i;
-//        }
-//
-//        printf("Staking amount match %li \n", totalStakeAcc);
-//    }
-//
-//    //printf("Vout Size: %lu \n", tx.vout.size());
-//    //printf("vExpectedPayouts Size: %li \n", vExpectedPayouts.size() );
-//
-//    vExpectedPayouts.emplace_back( 2.5 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 50 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 12.5 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 12.5 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 250 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 4.675 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 2.5 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-
-//    for(unsigned int i = 0; i < vExpectedPayouts.size(); i++){
-//        const CTxOut &txout = tx.vout[i+2];
-//        CAmount betAmount   = txout.nValue;
-//        CAmount vExpected   = vExpectedPayouts[i].nValue;
-//
-//        printf("Vout nValue %li \n", betAmount );
-//        printf("Expected nValue %li \n", vExpected );
-//
-//        // Check vExpected matches the tx value.
-//        if( vExpected != betAmount ){
-//            printf("Validation failed! \n" );
-//            //return false;
-//        }
-//    }
-
-    printf("Validation passed :)! \n" );
 
     return true;
 }
@@ -4060,23 +3818,10 @@ bool CheckBlockHeader(const CBlockHeader& block, CValidationState& state, bool f
         if(block.nVersion < Params().Zerocoin_HeaderVersion())
             return state.DoS(50, error("CheckBlockHeader() : block version must be above 4 after ZerocoinStartHeight"),
             REJECT_INVALID, "block-version");
-<<<<<<< HEAD
     } else {
         if (block.nVersion >= Params().Zerocoin_HeaderVersion())
             return state.DoS(50, error("CheckBlockHeader() : block version must be below 4 before ZerocoinStartHeight"),
             REJECT_INVALID, "block-version");
-=======
-
-        // WagerrTor - disable reject block as our blocks are in version 4 since block 1
-        //this check can be cleaned up (**TODO** after test)
-
-    //}
-    //else {
-    //   if (block.nVersion >= Params().Zerocoin_HeaderVersion()){
-    //        return state.DoS(50, error("CheckBlockHeader() : block version must be below 4 before ZerocoinStartHeight"),
-    //        REJECT_INVALID, "block-version");
-    //    }
->>>>>>> 72d065ded5d287371c32c6f5b0d5e5186d84ac33
     }
 
     return true;

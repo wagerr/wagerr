@@ -108,7 +108,7 @@ public:
     explicit WalletModel(CWallet* wallet, OptionsModel* optionsModel, QObject* parent = 0);
     ~WalletModel();
 
-    enum StatusCode // Returned by sendCoins and placeBet
+    enum StatusCode // Returned by sendCoins
     {
         OK,
         InvalidAmount,
@@ -119,8 +119,7 @@ public:
         TransactionCreationFailed, // Error returned when wallet is still locked
         TransactionCommitFailed,
         AnonymizeOnlyUnlocked,
-        InsaneFee,
-        NoBetSelected
+        InsaneFee
     };
 
     enum EncryptionStatus {
@@ -167,10 +166,6 @@ public:
 
     // Send coins to a list of recipients
     SendCoinsReturn sendCoins(WalletModelTransaction& transaction);
-
-    SendCoinsReturn prepareBetTransaction(WalletModelTransaction& transaction, CAmount amount, const std::string& eventId, const std::string& teamToWin);
-
-    SendCoinsReturn placeBet(WalletModelTransaction& transaction, CAmount amount, const std::string& eventId, const std::string& teamToWin);
 
     // Wallet encryption
     bool setWalletEncrypted(bool encrypted, const SecureString& passphrase);
