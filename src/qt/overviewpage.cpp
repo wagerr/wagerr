@@ -211,9 +211,9 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     }
     // WGR Balance
     CAmount nTotalBalance = balance + unconfirmedBalance;
-    CAmount wgrAvailableBalance = balance - immatureBalance;
+    CAmount wgrAvailableBalance = balance - immatureBalance - nLockedBalance;
     CAmount nTotalWatchBalance = watchOnlyBalance + watchUnconfBalance + watchImmatureBalance;    
-    CAmount nUnlockedBalance = nTotalBalance - nLockedBalance - nLockedBalance; // increment nLockedBalance twice because it was added to
+    CAmount nUnlockedBalance = nTotalBalance - nLockedBalance; // increment nLockedBalance twice because it was added to
                                                                                 // nTotalBalance above
     // zWGR Balance
     CAmount matureZerocoinBalance = zerocoinBalance - unconfirmedZerocoinBalance - immatureZerocoinBalance;
