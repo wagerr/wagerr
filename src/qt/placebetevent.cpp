@@ -126,7 +126,7 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
     std::string loseOddsString = std::to_string(std::stod(fields[9]) / 10000);
     std::string drawOddsString = std::to_string(std::stod(fields[10]) / 10000);
 
-    printf("CEvent::ParseEvent: %s\n", descr.c_str());
+    LogPrintf("CEvent::ParseEvent: %s\n", descr.c_str());
     return new CEvent(
         fields[2],
         fields[4],
@@ -141,14 +141,13 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
 }
 
 PlaceBetEvent::PlaceBetEvent(
-QWidget* parent, CEvent* event, const std::string& eventDetails, const  std::string& homeOdds, const std::string& awayOdds, const std::string& drawOdds
-) : QStackedWidget(parent),
+QWidget* parent, CEvent* event, const std::string& eventDetails, const  std::string& homeOdds, const std::string& awayOdds, const std::string& drawOdds) : QStackedWidget(parent),
                                                   ui(new Ui::PlaceBetEvent),
                                                   model(0),
                                                   event(event)
 {
-printf("PlaceBetEvent::PlaceBetEvent: about to print\n");
-printf("PlaceBetEvent::PlaceBetEvent: %s %s\n", event->id.c_str(), event->homeTeam.c_str());
+    LogPrintf("PlaceBetEvent::PlaceBetEvent: about to print\n");
+    LogPrintf("PlaceBetEvent::PlaceBetEvent: %s %s\n", event->id.c_str(), event->homeTeam.c_str());
     ui->setupUi(this);
 
     setCurrentWidget(ui->SendCoins);

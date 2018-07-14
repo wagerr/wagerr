@@ -359,7 +359,6 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
     placeBetPage->clear();
 
-    std::map<uint256, uint32_t> coreWalletVouts;
     std::vector<CEvent *> eventsVector;
     // FIXME Copied from `rpcwallet.cpp`.
     // TODO We currently search the entire block chain every time we query the
@@ -382,16 +381,28 @@ void WalletView::gotoPlaceBetPage(QString addr)
             }
 
             bool match = false;
-            for (unsigned int i = 0; i < tx.vin.size(); i++) {
-                const CTxIn& txin = tx.vin[i];
-                //printf("VIn: %s",tx.vin[i].ToString().c_str());
-                COutPoint prevout = txin.prevout;
+            // Ensure if event TX that has it been posted by Oracle wallet by looking at the vins.
+            const CTxIn &txin = tx.vin[0];
+            COutPoint prevout = txin.prevout;
 
-                // TODO Investigate whether a transaction can have multiple
-                // `vout`s to the same address.
-                if (coreWalletVouts[prevout.hash] == prevout.n) {
-                    match = true;
-                    break;
+            uint256 hashBlock;
+            CTransaction txPrev;
+            if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
+
+                const CTxOut &prevTxOut = txPrev.vout[0];
+                std::string scriptPubKey = prevTxOut.scriptPubKey.ToString();
+
+                txnouttype type;
+                vector<CTxDestination> prevAddrs;
+                int nRequired;
+
+                if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
+                    BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
+                        // TODO Take this wallet address as a configuration value.
+                        if (CBitcoinAddress(prevAddr).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
+                            match = true;
+                        }
+                    }
                 }
             }
 
@@ -419,20 +430,6 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
                         //add events to vector
                         eventsVector.push_back(event);
-                    }
-                }
-
-                txnouttype type;
-                vector<CTxDestination> addrs;
-                int nRequired;
-                if (!ExtractDestinations(txout.scriptPubKey, type, addrs, nRequired)) {
-                    continue;
-                }
-
-                BOOST_FOREACH (const CTxDestination& addr, addrs) {
-                    // TODO Take this wallet address as a configuration value.
-                    if (CBitcoinAddress(addr).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
-                        coreWalletVouts.insert(make_pair(tx.GetHash(), i));
                     }
                 }
             }
