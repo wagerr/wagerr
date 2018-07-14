@@ -2946,9 +2946,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // Calculate the expected bet payouts.
     // Only look for events, bets and results after a given block on testnet. Full of test data.
     std::vector<CTxOut> vExpectedPayouts;
-    if (CBaseChainParams::TESTNET && pindex->nHeight > 23320) {
 
-        LogPrintf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
+    if (CBaseChainParams::TESTNET && pindex->nHeight > 20000) {
+
+
+        printf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
 
         vExpectedPayouts = GetBetPayouts();
         nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
@@ -3080,85 +3082,70 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     return true;
 }
 
-bool IsBlockPayoutsValid( std::vector<CTxOut> vExpectedPayouts, const CBlock& block ){
+bool IsBlockPayoutsValid( std::vector<CTxOut> vExpectedPayouts, int nHeight) {
 
-//    CBlockIndex* pindexPrev = chainActive.Tip();
-//    if (pindexPrev == NULL) return true;
-//
-//    // Here we can again calulate the bet payout to be minted. Else pass from the connet block function as its calculated there again.
-//    CAmount expectedTotalPayouts = 0;
-//    CBlockIndex *BocksIndex = chainActive.Tip();
-//
-//    CBlock blocker;
-//    ReadBlockFromDisk(blocker, BocksIndex);
-//    CTransaction &tx = blocker.vtx[1];
-//
-//    const CTxIn &txin        = tx.vin[0];
-//    COutPoint prevout        = txin.prevout;
-//    CAmount totalStakeAmount = 105555556;
-//    int numStakingTx         = 0;
-//
-//    CAmount nReward;
-//    const CBlockIndex* pIndex0 = chainActive.Tip();
-//    nReward = GetBlockValue(pIndex0->nHeight );
-//
-//    printf("Reward %li \n", nReward );
-//
-//    printf("hash: %s \n", prevout.ToString().c_str());
+    unsigned long size = vExpectedPayouts.size();
 
-//    uint256 hashBlock;
-//    CTransaction txPrev;
-//    if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
-//
-//        const CTxOut &prevTxOut  = txPrev.vout[prevout.n];
-//        std::string scriptPubKey = prevTxOut.scriptPubKey.ToString();
-//        totalStakeAmount         += prevTxOut.nValue;
-//
-//        printf("Staking input amount: %li \n", totalStakeAmount);
-//    }
+    // If bet payouts to validate in the block then do so.
+    //if (size > 0) {
+        CBlockIndex *pindexPrev = NULL;
+        pindexPrev = chainActive[26126];
 
-//    CAmount totalStakeAcc = 0;
-//    for( int i = 0; i <= tx.vout.size(); i++) {
-//        const CTxOut &txout = tx.vout[i];
-//        CAmount stakeAmount = txout.nValue;
-//
-//        totalStakeAcc += stakeAmount;
-//
-//        if( totalStakeAmount == totalStakeAcc ){
-//            printf("Match %i \n", i);
-//            numStakingTx = i;
-//        }
-//
-//        printf("Staking amount match %li \n", totalStakeAcc);
-//    }
-//
-//    //printf("Vout Size: %lu \n", tx.vout.size());
-//    //printf("vExpectedPayouts Size: %li \n", vExpectedPayouts.size() );
-//
-//    vExpectedPayouts.emplace_back( 2.5 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 50 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 12.5 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 12.5 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 250 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 4.675 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
-//    vExpectedPayouts.emplace_back( 2.5 * COIN, GetScriptForDestination(CBitcoinAddress( "TKodznkKiSAm9R2M8Mw6wHAVFYopAmChK3" ).Get()));
+        if (pindexPrev == NULL) return true;
 
-//    for(unsigned int i = 0; i < vExpectedPayouts.size(); i++){
-//        const CTxOut &txout = tx.vout[i+2];
-//        CAmount betAmount   = txout.nValue;
-//        CAmount vExpected   = vExpectedPayouts[i].nValue;
-//
-//        printf("Vout nValue %li \n", betAmount );
-//        printf("Expected nValue %li \n", vExpected );
-//
-//        // Check vExpected matches the tx value.
-//        if( vExpected != betAmount ){
-//            printf("Validation failed! \n" );
-//            //return false;
-//        }
-//    }
+        CAmount stakeAmount = 0;
 
-    printf("Validation passed :)! \n" );
+        CBlock block;
+        ReadBlockFromDisk(block, pindexPrev);
+        CTransaction &tx = block.vtx[1];
+
+        const CTxIn &txin = tx.vin[0];
+        COutPoint prevout = txin.prevout;
+        int numStakingTx = 0;
+
+        printf("hash: %s \n", prevout.ToString().c_str());
+
+        uint256 hashBlock;
+        CTransaction txPrev;
+
+        if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
+
+            const CTxOut &prevTxOut = txPrev.vout[prevout.n];
+            stakeAmount = prevTxOut.nValue;
+
+            printf("Staking input amount: %li \n", stakeAmount);
+        }
+
+        CAmount totalStakeAcc = 0;
+        for (int i = 1; i <= tx.vout.size(); i++) {
+            const CTxOut &txout = tx.vout[i];
+            CAmount voutStake = txout.nValue;
+
+            totalStakeAcc += voutStake;
+
+            if (stakeAmount < totalStakeAcc) {
+                printf("Staking Vout size: %i \n", i);
+                numStakingTx = i +1;
+                break;
+            }
+        }
+
+        for (unsigned int i = 0; i < vExpectedPayouts.size(); i++) {
+            const CTxOut &txout = tx.vout[i + numStakingTx];
+            CAmount betAmount = txout.nValue;
+            CAmount vExpected = vExpectedPayouts[i].nValue;
+
+            printf("Bet Amount %li  - Expected Bet Amount: %li \n", betAmount, vExpected );
+            //printf("Expected nValue %li \n", vExpected );
+
+            // Check vExpected matches the tx value.
+            if (vExpected != betAmount) {
+                printf("Validation failed! \n");
+                //.return false;
+            }
+        }
+    //}
+
     return true;
 }
 
