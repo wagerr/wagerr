@@ -676,7 +676,7 @@ UniValue placebet(const UniValue& params, bool fHelp)
     CAmount nAmount = AmountFromValue(params[2]);
 
     // Validate bet amount so its between 1 - 10000 WGR inclusive.
-    if( nAmount < (1 * COIN ) || nAmount > (10000 * COIN)){
+    if( nAmount < (50 * COIN ) || nAmount > (10000 * COIN)){
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 1 - 10000 WGR inclusive.");
     }
 
@@ -694,10 +694,10 @@ UniValue placebet(const UniValue& params, bool fHelp)
     std::string eventId = params[0].get_str();
     std::string team = params[1].get_str();
 
-    if(std::find(rd1Teams.begin(),rd1Teams.end(), team) == rd1Teams.end() || std::find(rd1EventIds.begin(),rd1EventIds.end(),eventId) == rd1EventIds.end()){
-
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet details. Please ensure your team and event are correct.");
-    }
+//    if(std::find(rd1Teams.begin(),rd1Teams.end(), team) == rd1Teams.end() || std::find(rd1EventIds.begin(),rd1EventIds.end(),eventId) == rd1EventIds.end()){
+//
+//        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet details. Please ensure your team and event are correct.");
+//    }
 
     // TODO `address` isn't used when adding the following transaction to the
     // blockchain, so ideally it would not need to be supplied to `SendMoney`.

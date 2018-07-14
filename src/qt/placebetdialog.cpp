@@ -192,10 +192,10 @@ void PlaceBetDialog::setModel(WalletModel* model)
         // connect(ui->checkBoxFreeTx, SIGNAL(stateChanged(int)), this, SLOT(updateGlobalFeeVariables()));
         // connect(ui->checkBoxFreeTx, SIGNAL(stateChanged(int)), this, SLOT(coinControlUpdateLabels()));
         // ui->customFee->setSingleStep(CWallet::minTxFee.GetFeePerK());
-        // updateFeeSectionControls();
-        // updateMinFeeLabel();
-        // updateSmartFeeLabel();
-        // updateGlobalFeeVariables();
+         updateFeeSectionControls();
+         updateMinFeeLabel();
+         updateSmartFeeLabel();
+         updateGlobalFeeVariables();
     }
 }
 
@@ -225,19 +225,18 @@ void PlaceBetDialog::on_placeBetButton_clicked()
         return;
     }
 
-    if (!ui->payAmount->validate() || ui->payAmount->value(0) < (1 * COIN) || ui->payAmount->value(0) > ( 10000 * COIN ) ){
+    if (!ui->payAmount->validate() || ui->payAmount->value(0) < (50 * COIN) || ui->payAmount->value(0) > ( 10000 * COIN ) ){
         ui->payAmount->setValid(false);
 
         QString questionString = tr("Bet must be between 1 - 10000 WGR inclusive!");
 
-        // Display message box
-        QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Invalid bet!"),
-                                                                   questionString.arg(""),
-                                                                   QMessageBox::Yes | QMessageBox::Cancel,
-                                                                   QMessageBox::Cancel);
-        if (retval == QMessageBox::Yes || retval == QMessageBox::Cancel) {
-            return;
-        }
+        QPair<QString, CClientUIInterface::MessageBoxFlags> msgParams;
+        // Default to a warning message, override if error message is needed
+        msgParams.second = CClientUIInterface::MSG_WARNING;
+
+        msgParams.first = tr("Bet amount has to be between 50-10000 WGR inclusive");
+        emit message(tr("Invalid Bet Amount!"), msgParams.first, msgParams.second);
+        return;
     }
 
 
@@ -357,6 +356,8 @@ void PlaceBetDialog::send(CAmount amount, const std::string& eventId, const std:
     // now send the prepared transaction
     WalletModel::SendCoinsReturn sendStatus = model->placeBet(currentTransaction, amount, eventId, teamToWin);
     processPlaceBetReturn(sendStatus);
+
+    ui->payAmount->clear();
 
     //need to fix the
     // if (sendStatus.status == WalletModel::OK) {
@@ -480,8 +481,9 @@ void PlaceBetDialog::prepareBet(CEvent* event, const std::string& teamToWin, con
     betEvent = event;
     betTeamToWin = teamToWin;
     betOddsToWin = oddsToWin;
-printf("PlaceBetDialog::prepareBet: about to print\n");
-printf("PlaceBetDialog::prepareBet: %s %s %s %s", event->id.c_str(), event->homeTeam.c_str(), betTeamToWin.c_str(), betOddsToWin.c_str());
+
+    LogPrintf("PlaceBetDialog::prepareBet: about to print\n");
+    LogPrintf("PlaceBetDialog::prepareBet: %s %s %s %s", event->id.c_str(), event->homeTeam.c_str(), betTeamToWin.c_str(), betOddsToWin.c_str());
 
     ui->eventLabel->setText(QString::fromStdString(evtDes));
 }
@@ -494,8 +496,9 @@ PlaceBetEvent* PlaceBetDialog::addEvent(
     const std::string& drawOdds
 )
 {
-printf("PlaceBetDialog::addEvent: about to print\n");
-printf("PlaceBetDialog::addEvent: %s %s\n", eventDetails.c_str(), homeOdds.c_str());
+    LogPrintf("PlaceBetDialog::addEvent: about to print\n");
+    LogPrintf("PlaceBetDialog::addEvent: %s %s\n", eventDetails.c_str(), homeOdds.c_str());
+
     PlaceBetEvent* event = new PlaceBetEvent(this, evt, eventDetails, homeOdds, awayOdds, drawOdds);
     event->setModel(model);
     ui->events->addWidget(event);
