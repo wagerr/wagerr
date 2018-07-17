@@ -539,7 +539,7 @@ std::vector<std::vector<std::string>> getEventResults() {
     int nCurrentHeight = chainActive.Height();
     
     // Set the Oracle wallet address. 
-    std:string OracleWalletAddr = "";
+    std::string OracleWalletAddr = "";
     if (Params().NetworkID() == CBaseChainParams::MAIN) {
         OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
     }
@@ -886,7 +886,7 @@ std::vector<CTxOut> GetBetPayouts() {
     printf( "Results found: %li \n", results.size() );
 
     // Set the Oracle wallet address. 
-    std:string OracleWalletAddr = "";
+    std::string OracleWalletAddr = "";
     if (Params().NetworkID() == CBaseChainParams::MAIN) {
         OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
     }
