@@ -2730,6 +2730,7 @@ static int64_t nTimeIndex = 0;
 static int64_t nTimeCallbacks = 0;
 static int64_t nTimeTotal = 0;
 int64_t blockNo = 0;
+std::vector<CTxOut> vexpectedPayout;
 
 bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool fJustCheck, bool fAlreadyChecked)
 {
@@ -2949,41 +2950,46 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     //PoW phase redistributed fees to miner. PoS stage destroys fees.
     CAmount nExpectedMint = GetBlockValue(pindex->pprev->nHeight);
     CAmount nMNBetReward = 0;
+
     if (block.IsProofOfWork())
         nExpectedMint += nFees;
 
     // Calculate the expected bet payouts.
-    // Only look for events, bets and results after a given block on testnet. Full of test data.
     std::vector<CTxOut> vExpectedPayouts;
 
-    if (CBaseChainParams::TESTNET && pindex->nHeight > 20000) {
+    printf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
 
+    vExpectedPayouts = GetBetPayouts();
+    nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward );
+    nExpectedMint += nMNBetReward;
 
-        printf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
+    for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
+        printf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
+    }
 
-        vExpectedPayouts = GetBetPayouts();
-        nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
-        nExpectedMint += nMNBetReward;
+    // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
+    if ( !IsBlockValueValid( block, nExpectedMint, pindex->nMint ) ) {
+        return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
+    }
 
-        for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
-            printf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
+    // If we have payouts then store the next block index and the vExpectedPayouts so we can validate them on the next block.
+    if( vExpectedPayouts.size() > 0){
+        blockNo = pindex->nHeight + 1;
+        vexpectedPayout = vExpectedPayouts;
+
+        LogPrintf("Block and payous stored: %i \n", blockNo);
+    }
+
+    // Validate the payout TX's so a miner cant game the payouts.
+    if( blockNo == pindex->nHeight ){
+        LogPrintf("Run block val: %li \n ", pindex->nHeight);
+
+        // Validate the payout vector against the block containing the payout TX's.
+        if (!IsBlockPayoutsValid(vexpectedPayout, pindex->nHeight)) {
+            return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
         }
     }
 
-    // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure connect block wont pay to much.
-    if (!IsBlockValueValid(block, nExpectedMint, pindex->nMint)) {
-        return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
-                                    FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)),
-                            REJECT_INVALID, "bad-cb-amount");
-    }
-
-    // if (!IsBlockPayoutsValid(vExpectedPayouts, pindex->nHeight )) {
-    //        printf("Betting payout tx's did not match the payout tx's in the block. \n");
-    //
-    //        return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ",
-    //               pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
-    //}
-    
     vExpectedPayouts.clear();
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
@@ -3088,69 +3094,93 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     return true;
 }
 
-bool IsBlockPayoutsValid( std::vector<CTxOut> vExpectedPayouts, int nHeight) {
-
+/**
+ * Validates the payout block to ensure all bet payout amounts and payout addresses match their expected values.
+ *
+ * @param vExpectedPayouts -  The bet payout vector.
+ * @param nHeight - The current chain height.
+ * @return
+ */
+bool IsBlockPayoutsValid( std::vector<CTxOut> vExpectedPayouts, int nHeight ) {
     unsigned long size = vExpectedPayouts.size();
 
-    // If bet payouts to validate in the block then do so.
-    //if (size > 0) {
-        CBlockIndex *pindexPrev = NULL;
-        pindexPrev = chainActive[26126];
+    // If we have payouts to validate.
+    if (size > 0) {
 
-        if (pindexPrev == NULL) return true;
+        int curHeight = chainActive.Height();
 
-        CAmount stakeAmount = 0;
+        CBlockIndex *BlockIndex = NULL;
+        BlockIndex = chainActive[curHeight];
+
+        if (BlockIndex == NULL) { return true; }
 
         CBlock block;
-        ReadBlockFromDisk(block, pindexPrev);
+        ReadBlockFromDisk(block, BlockIndex);
         CTransaction &tx = block.vtx[1];
 
-        const CTxIn &txin = tx.vin[0];
-        COutPoint prevout = txin.prevout;
-        int numStakingTx = 0;
-
-        printf("hash: %s \n", prevout.ToString().c_str());
+        // Get the vin staking value so we can use it to find out how many staking TX in the vouts.
+        const CTxIn &txin         = tx.vin[0];
+        COutPoint prevout         = txin.prevout;
+        unsigned int numStakingTx = 0;
+        CAmount stakeAmount       = 0;
 
         uint256 hashBlock;
         CTransaction txPrev;
 
         if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
-
             const CTxOut &prevTxOut = txPrev.vout[prevout.n];
             stakeAmount = prevTxOut.nValue;
-
-            printf("Staking input amount: %li \n", stakeAmount);
         }
 
+        // Count the coinbase and staking vouts in the current block TX.
         CAmount totalStakeAcc = 0;
-        for (int i = 1; i <= tx.vout.size(); i++) {
+        for (unsigned int i = 0; i < tx.vout.size(); i++) {
             const CTxOut &txout = tx.vout[i];
-            CAmount voutStake = txout.nValue;
+            CAmount voutValue   = txout.nValue;
 
-            totalStakeAcc += voutStake;
-
-            if (stakeAmount < totalStakeAcc) {
-                printf("Staking Vout size: %i \n", i);
-                numStakingTx = i +1;
+            if (totalStakeAcc < stakeAmount) {
+                numStakingTx++;
+            }
+            else {
                 break;
             }
+
+            totalStakeAcc += voutValue;
         }
 
-        for (unsigned int i = 0; i < vExpectedPayouts.size(); i++) {
-            const CTxOut &txout = tx.vout[i + numStakingTx];
-            CAmount betAmount = txout.nValue;
-            CAmount vExpected = vExpectedPayouts[i].nValue;
+        // Validate the payout block against the expected payouts vector. If all payout amounts and payout addresses match then we have a valid payout block.
+        for (unsigned int i = numStakingTx; i < tx.vout.size() - 1; i++) {
+            const CTxOut &txout = tx.vout[i];
+            CAmount voutValue   = txout.nValue;
+            CAmount vExpected   = vExpectedPayouts[i - numStakingTx].nValue;
 
-            printf("Bet Amount %li  - Expected Bet Amount: %li \n", betAmount, vExpected );
-            //printf("Expected nValue %li \n", vExpected );
+            LogPrintf("Bet Amount %li  - Expected Bet Amount: %li \n", voutValue, vExpected );
+
+            // Get the bet payout address.
+            CTxDestination betAddr;
+            ExtractDestination( tx.vout[i].scriptPubKey, betAddr );
+            std::string betAddrS = CBitcoinAddress(betAddr).ToString();
+
+            // Get the expected payout address.
+            CTxDestination expectedAddr;
+            ExtractDestination( vExpectedPayouts[i - numStakingTx].scriptPubKey, expectedAddr );
+            std::string expectedAddrS = CBitcoinAddress(expectedAddr).ToString();
+
+            LogPrintf("Bet Address %s  - Expected Bet Address: %s \n", betAddrS.c_str(), expectedAddrS.c_str() );
 
             // Check vExpected matches the tx value.
-            if (vExpected != betAmount) {
-                printf("Validation failed! \n");
-                //.return false;
+            if (vExpected != voutValue && betAddrS == expectedAddrS) {
+                LogPrintf("Validation failed! \n");
+                return false;
             }
         }
-    //}
+    }
+
+    // Reset these variables for the the next payout block to be validated.
+    blockNo = 0;
+    vexpectedPayout.clear();
+
+    LogPrintf( "Payout Block is valid! \n" );
 
     return true;
 }
