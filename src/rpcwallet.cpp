@@ -68,7 +68,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
     UniValue ret(UniValue::VARR);
     
     // Set the Oracle wallet address. 
-    std:string OracleWalletAddr = "";
+    std::string OracleWalletAddr = "";
     if (Params().NetworkID() == CBaseChainParams::MAIN) {
         OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
     }

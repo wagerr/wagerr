@@ -303,7 +303,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
     // go thru blockchain and get data
 
     // Set the Oracle wallet address. 
-    std:string OracleWalletAddr = "";
+    std::string OracleWalletAddr = "";
     if (Params().NetworkID() == CBaseChainParams::MAIN) {
         OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
     }
