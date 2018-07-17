@@ -444,27 +444,21 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             std::vector<CTxOut> voutPayouts;
             CAmount nMNBetReward = 0;
 
-            // Create the bet payouts vector and add to the coinstake to payout winning bets.
-            // Only look for events, bets and results after a given block on testnet. Full of test data.
-            if( CBaseChainParams::TESTNET && nHeight > 20000) {
+            printf("\nMINER BLOCK: %i \n", nHeight);
 
-                LogPrintf("\nMINER BLOCK: %i \n", nHeight);
+            voutPayouts = GetBetPayouts();
+            GetBlockPayouts(voutPayouts, nMNBetReward);
 
-                voutPayouts = GetBetPayouts();
-                GetBlockPayouts(voutPayouts, nMNBetReward);
-
-                for (unsigned int l = 0; l < voutPayouts.size(); l++) {
-                    LogPrintf("MINER EXPECTED: %s \n", voutPayouts[l].ToString().c_str());
-                }
-
-                //for (unsigned int l = 0; l < voutPayouts.size(); l++) {
-                //    logPrintf("%s - Including bet payment: %s \n", __func__, voutPayouts[l].ToString().c_str());
-                //}
-
-                //LogPrintf("%s - MN betting fee payout: %li \n", __func__, nMNBetReward);
-
+            for (unsigned int l = 0; l < voutPayouts.size(); l++) {
+                printf("MINER EXPECTED: %s \n", voutPayouts[l].ToString().c_str());
             }
-            
+
+            //for (unsigned int l = 0; l < voutPayouts.size(); l++) {
+            //    logPrintf("%s - Including bet payment: %s \n", __func__, voutPayouts[l].ToString().c_str());
+            //}
+
+            //LogPrintf("%s - MN betting fee payout: %li \n", __func__, nMNBetReward);
+
             // Fill coin stake transaction.
             pwallet->FillCoinStake(txCoinStake, nMNBetReward, voutPayouts); // Kokary: add betting fee
 
@@ -600,9 +594,6 @@ std::vector<std::vector<std::string>> getEventResults() {
                     const CTxOut &txout = tx.vout[i];
                     std::string scriptPubKey = txout.scriptPubKey.ToString();
 
-                    CTxDestination address;
-                    ExtractDestination(tx.vout[i].scriptPubKey, address);
-
                     // TODO Remove hard-coded values from this block.
                     if(scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
 
@@ -622,9 +613,9 @@ std::vector<std::vector<std::string>> getEventResults() {
 
                         std::vector<string> entry;
 
-                        // Event_id.
+                        // Event ID.
                         entry.emplace_back(strs[2].c_str());
-                        // Team_to_win.
+                        // Result
                         entry.emplace_back(strs[3].c_str());
 
                         results.push_back(entry);
