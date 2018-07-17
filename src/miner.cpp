@@ -464,6 +464,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 //LogPrintf("%s - MN betting fee payout: %li \n", __func__, nMNBetReward);
 
             }
+            
             // Fill coin stake transaction.
             pwallet->FillCoinStake(txCoinStake, nMNBetReward, voutPayouts); // Kokary: add betting fee
 
@@ -542,6 +543,15 @@ std::vector<std::vector<std::string>> getEventResults() {
 
     std::vector<std::vector<std::string>> results;
     int nCurrentHeight = chainActive.Height();
+    
+    // Set the Oracle wallet address. 
+    std:string OracleWalletAddr = "";
+    if (Params().NetworkID() == CBaseChainParams::MAIN) {
+        OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
+    }
+    else {
+        OracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
+    }
 
     // Get the current block so we can look for any results in it.
     CBlockIndex *resultsBocksIndex = NULL;
@@ -575,7 +585,7 @@ std::vector<std::vector<std::string>> getEventResults() {
                 if (ExtractDestinations(txout.scriptPubKey, type, addrs, nRequired)) {
                     BOOST_FOREACH (const CTxDestination &addr, addrs) {
                         // TODO Take this wallet address as a configuration value.
-                        if (CBitcoinAddress(addr).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
+                        if (CBitcoinAddress(addr).ToString() == OracleWalletAddr) {
                             validResult = true;
                         }
                     }
@@ -882,10 +892,16 @@ std::vector<CTxOut> GetBetPayouts() {
 
     // Get all the results posted in the latest block.
     std::vector<std::vector<std::string>> results = getEventResults( );
-    LogPrintf( "Results found: %li \n", results.size() );
+    printf( "Results found: %li \n", results.size() );
 
-    // Check if the results have already been posted in the last 24 hours (i.e remove results already paid out).
-    //results = checkResults(results);
+    // Set the Oracle wallet address. 
+    std:string OracleWalletAddr = "";
+    if (Params().NetworkID() == CBaseChainParams::MAIN) {
+        OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
+    }
+    else {
+        OracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
+    }
 
     // Traverse the blockchain for an event to match a result and all the bets on a result.
     for(unsigned int currResult = 0; currResult < results.size(); currResult++) {
@@ -940,7 +956,7 @@ std::vector<CTxOut> GetBetPayouts() {
                     if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
                         BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
                             // TODO Take this wallet address as a configuration value.
-                            if (CBitcoinAddress(prevAddr).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
+                            if (CBitcoinAddress(prevAddr).ToString() == OracleWalletAddr) {
                                 match = true;
                             }
                         }
@@ -985,7 +1001,7 @@ std::vector<CTxOut> GetBetPayouts() {
 
                             LogPrintf("EVENT OP CODE - %s \n", betDescr.c_str());
 
-                            if ( CBitcoinAddress(address).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ" && pVersion == "1.0") {
+                            if ( CBitcoinAddress(address).ToString() == OracleWalletAddr && pVersion == "1.0") {
 
                                 // If current event ID matches result ID set the teams and odds.
                                 if (results[currResult][0] == eventId) {
@@ -1016,8 +1032,6 @@ std::vector<CTxOut> GetBetPayouts() {
                                 std::string eventId = strs[2];
                                 std::string result = strs[3];
 
-                                LogPrintf("BET OP CODE - %s \n", betDescr.c_str());
-
                                 // If bet was placed less than 20 mins before event start or after event start discard it.
                                 if (eventStart > 0 && transactionTime > (eventStart - 1200)) {
                                     eventStartedFlag = true;
@@ -1026,17 +1040,22 @@ std::vector<CTxOut> GetBetPayouts() {
 
                                 // Is the bet a winning bet?
                                 if (results[currResult][0] == eventId && results[currResult][1] == result) {
-
+                                    CAmount winnings = 0;
+                                    
                                     // Calculate winnings.
                                     if (latestHomeTeam == result) {
-                                        payout = (betAmount * (latestHomeOdds - sixPercent)) / oddsDivisor;
+                                       winnings = betAmount * latestHomeOdds;
                                     }
                                     else if (latestAwayTeam == result) {
-                                        payout = (betAmount * (latestAwayOdds - sixPercent)) / oddsDivisor;
+                                        winnings = betAmount * latestAwayOdds;
                                     }
-                                    else {
-                                        payout = (betAmount * (latestDrawOdds - sixPercent)) / oddsDivisor;
+                                    else{
+                                        winnings = betAmount * latestDrawOdds;
                                     }
+                                    
+                                    // printf("Fees -> %li", ((( winnings - betAmount) / COIN) * sixPercent ));
+                                    
+                                    payout = ((winnings-(winnings-(betAmount*oddsDivisor))/100*6)/oddsDivisor);
 
                                     // TODO - May allow user to specify the address in future release.
                                     // Get change address from users bet TX so we can payout to that if they win.
@@ -1055,8 +1074,11 @@ std::vector<CTxOut> GetBetPayouts() {
                                     LogPrintf("AMOUNT: %li \n", payout);
                                     LogPrintf("ADDRESS: %s \n", CBitcoinAddress( payoutAddress ).ToString().c_str());
 
-                                    // Add wining bet payout to the bet vector array.
-                                    vexpectedPayouts.emplace_back(payout, GetScriptForDestination(CBitcoinAddress(payoutAddress).Get()), betAmount);
+                                    // Only add valid payouts to the vector.
+                                    if(payout > 0){
+                                        // Add wining bet payout to the bet vector array.
+                                        vexpectedPayouts.emplace_back(payout, GetScriptForDestination(CBitcoinAddress(payoutAddress).Get()), betAmount);
+                                    }
                                 }
                             }
                         }

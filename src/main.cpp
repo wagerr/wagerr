@@ -1866,36 +1866,45 @@ int64_t GetBlockValue(int nHeight)
 }
 
 int64_t GetBlockPayouts( std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetReward){
-    CAmount nPayout = 0;
+    CAmount profitAcc = 0; 
+    CAmount nPayout   = 0;
     CAmount totalAmountBet = 0;
-    std::string devPayoutWallet;
+    std::string devPayoutAddr  = "";
+    std::string OMNOPayoutAddr = "";
 
      for(unsigned i = 0; i < vexpectedPayouts.size(); i++){
-        totalAmountBet += vexpectedPayouts[i].nBetValue;
-         nPayout += vexpectedPayouts[i].nValue;
+        CAmount betValue = vexpectedPayouts[i].nBetValue;
+        CAmount payValue = vexpectedPayouts[i].nValue;
+    
+        //printf( "Bet Amount: %li     Pay Amount %li: ", betValue, payValue );
+
+        totalAmountBet += betValue;
+        profitAcc += payValue - betValue;
+        nPayout += payValue;
     }
  
-    //build dev payout fee
+    // Set the OMNO and Dev reward addresses for mainment and testnet.
     if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        devPayoutWallet = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";
+        devPayoutAddr  = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";
+        OMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";
     }
     else {
-        devPayoutWallet = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";
+        devPayoutAddr  = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";
+        OMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";
     }
 
     if(vexpectedPayouts.size() > 0){
-        CAmount devPayout = totalAmountBet * 0.006;
-        vexpectedPayouts.emplace_back(devPayout, GetScriptForDestination(CBitcoinAddress( devPayoutWallet ).Get()));
+        // Calculate the OMNO reward and the Dev reward.
+        CAmount nOMNOReward = profitAcc / 94 * 100 * 0.024;
+        CAmount nDevReward  = profitAcc / 94 * 100 * 0.006;
 
-        nPayout += devPayout;
+        // Add both reward payouts to the payout vector.
+        vexpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress( devPayoutAddr ).Get()));
+        vexpectedPayouts.emplace_back(nOMNOReward, GetScriptForDestination(CBitcoinAddress( OMNOPayoutAddr ).Get()));
+
+        //nMNBetReward = totalAmountBet * 0.024;
+        nPayout += nDevReward + nOMNOReward;
     }
-
-    // Betting payouts are 94% of betting amount.
-    // 2.4% of the betting amount is MN fee.
-    // 0.6% dev fund. 3% never created/burned.
-    nMNBetReward = totalAmountBet * 0.024;
-
-    //printf("Masternode bet reward %i \n", nMNBetReward);
  
      return  nPayout;
 }
@@ -2957,27 +2966,24 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         nExpectedMint += nMNBetReward;
 
         for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
-            LogPrintf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
+            printf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
         }
     }
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure connect block wont pay to much.
-    //Check that the block does not overmint
     if (!IsBlockValueValid(block, nExpectedMint, pindex->nMint)) {
         return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
                                     FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)),
-                         REJECT_INVALID, "bad-cb-amount");
+                            REJECT_INVALID, "bad-cb-amount");
     }
 
-/*  
-    // Validate the payout vector against the block being submitted.
-    if (!IsBlockPayoutsValid(vExpectedPayouts, block)) {
-        printf("Betting payout tx's did not match the payout tx's in the block. \n");
-
-        return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ",
-                                    pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
-    }
-*/
+    // if (!IsBlockPayoutsValid(vExpectedPayouts, pindex->nHeight )) {
+    //        printf("Betting payout tx's did not match the payout tx's in the block. \n");
+    //
+    //        return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ",
+    //               pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
+    //}
+    
     vExpectedPayouts.clear();
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
