@@ -302,7 +302,14 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
     // go thru blockchain and get data
 
-
+    // Set the Oracle wallet address. 
+    std:string OracleWalletAddr = "";
+    if (Params().NetworkID() == CBaseChainParams::MAIN) {
+        OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
+    }
+    else {
+        OracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
+    }
 
     // Set event name
     std::string evtDes;
@@ -399,7 +406,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                 if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
                     BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
                         // TODO Take this wallet address as a configuration value.
-                        if (CBitcoinAddress(prevAddr).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
+                        if (CBitcoinAddress(prevAddr).ToString() == OracleWalletAddr) {
                             match = true;
                         }
                     }

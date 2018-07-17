@@ -66,6 +66,15 @@ UniValue listevents(const UniValue& params, bool fHelp)
             HelpExampleCli("listevents", "") + HelpExampleRpc("listevents", ""));
 
     UniValue ret(UniValue::VARR);
+    
+    // Set the Oracle wallet address. 
+    std:string OracleWalletAddr = "";
+    if (Params().NetworkID() == CBaseChainParams::MAIN) {
+        OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
+    }
+    else {
+        OracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
+    }
 
     // We keep track of `vout`s that are addressed to our "Core Wallet" (the
     // wallet that we use to issue events and results). Afterwards, if a `vin`
@@ -122,8 +131,8 @@ UniValue listevents(const UniValue& params, bool fHelp)
 
                     BOOST_FOREACH (const CTxDestination &addr, addrs) {
                         // TODO Take this wallet address as a configuration value.
-                        if (CBitcoinAddress(addr).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
-                            printf( "MATCH vinAddr %s Our Addr %s \n", CBitcoinAddress(addr).ToString().c_str(), "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ" );
+                        if (CBitcoinAddress(addr).ToString() == OracleWalletAddr) {
+                            LogPrintf( "MATCH vinAddr %s Our Addr %s \n", CBitcoinAddress(addr).ToString().c_str(), OracleWalletAddr );
                             match = true;
                             break;
                         }
@@ -190,7 +199,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
     return ret;
 }
 
-// TODO There is a lot of code shared between `listbets` and `listtransactions`.
+// TODO There is a lot of code shared between `bets` and `listtransactions`.
 // This would ideally be abstracted when time allows.
 UniValue listbets(const UniValue& params, bool fHelp)
 {
