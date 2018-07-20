@@ -138,23 +138,24 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     // ppcoin: if coinstake available add coinstake tx
     static int64_t nLastCoinStakeSearchTime = GetAdjustedTime(); // only initialized at startup
 
-    vector<CWalletTx> vwtxPrev;
     CMutableTransaction txCoinStake;
+    std::unique_ptr<CStakeInput> stakeInput;
     
     if (fProofOfStake) {
         boost::this_thread::interruption_point();
         pblock->nTime = GetAdjustedTime();
         CBlockIndex* pindexPrev = chainActive.Tip();
         pblock->nBits = GetNextWorkRequired(pindexPrev, pblock);
-        CMutableTransaction txCoinStake;
         int64_t nSearchTime = pblock->nTime; // search to current time
         bool fStakeFound = false;
         if (nSearchTime >= nLastCoinStakeSearchTime) {
             unsigned int nTxNewTime = 0;
-            if (pwallet->CreateCoinStake(*pwallet, pblock->nBits, nSearchTime - nLastCoinStakeSearchTime, txCoinStake, nTxNewTime, vwtxPrev)) {
+            if (pwallet->FindCoinStake(*pwallet, pblock->nBits, nSearchTime - nLastCoinStakeSearchTime, txCoinStake, nTxNewTime, stakeInput)) {
                 pblock->nTime = nTxNewTime;
                 pblock->vtx[0].vout[0].SetEmpty();
                 pblock->vtx.push_back(CTransaction(txCoinStake));
+                pblocktemplate->vTxFees.push_back(0);   // updated at end
+                pblocktemplate->vTxSigOps.push_back(-1); // updated at end
                 fStakeFound = true;
             }
             nLastCoinStakeSearchInterval = nSearchTime - nLastCoinStakeSearchTime;
@@ -460,11 +461,16 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             //LogPrintf("%s - MN betting fee payout: %li \n", __func__, nMNBetReward);
 
             // Fill coin stake transaction.
-            pwallet->FillCoinStake(txCoinStake, nMNBetReward, voutPayouts); // Kokary: add betting fee
+//            pwallet->FillCoinStake(txCoinStake, nMNBetReward, voutPayouts); // Kokary: add betting fee
+            if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, voutPayouts, stakeInput)) {
+                LogPrintf("%s: filled coin stake tx [%s]\n", __func__, txCoinStake.ToString());
+            } else {
+                LogPrintf("%s: failed to fill coin stake tx\n", __func__);
+                return NULL;
+            }
 
             // Sign with updated tx.
-            pwallet->SignCoinStake(txCoinStake, vwtxPrev);
-            pblock->vtx[1] = CTransaction(txCoinStake);
+  //          pwallet->SignCoinStake(txCoinStake, vwtxPrev);
             voutPayouts.clear();
         }
 
@@ -477,6 +483,10 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         if (!fProofOfStake) {
             pblock->vtx[0] = txNew;
             pblocktemplate->vTxFees[0] = -nFees;
+        } else {
+            pblock->vtx[1] = CTransaction(txCoinStake);
+            pblocktemplate->vTxFees[1] = -nFees;
+            pblocktemplate->vTxSigOps[1] = GetLegacySigOpCount(txCoinStake);
         }
 
         // Fill in header
