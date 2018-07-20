@@ -2955,7 +2955,7 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWa
 }
 
 // ppcoin: create coin stake transaction
-bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime, vector<CWalletTx>& vwtxPrev)
+bool CWallet::FindCoinStake(const CKeyStore& keystore, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, unsigned int& nTxNewTime, std::unique_ptr<CStakeInput>& newStakeInput)
 {
     // The following split & combine thresholds are important to security
     // Should not be adjusted if you don't understand the consequences
@@ -3019,6 +3019,7 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
             // Found a kernel
             LogPrintf("CreateCoinStake : kernel found\n");
+
             nCredit += stakeInput->GetValue();
 
             // Calculate reward
@@ -3046,29 +3047,10 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
 
             // Limit size
             unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
-            if (nBytes >= DEFAULT_BLOCK_MAX_SIZE * 0.85)
+            if (nBytes >= DEFAULT_BLOCK_MAX_SIZE / 5)
                 return error("CreateCoinStake : exceeded coinstake size limit");
 
-            //Masternode payment
-            FillBlockPayee(txNew, nMinFee, true, stakeInput->IsZWGR());
-
-            uint256 hashTxOut = txNew.GetHash();
-            CTxIn in;
-            if (!stakeInput->CreateTxIn(this, in, hashTxOut)) {
-                LogPrintf("%s : failed to create TxIn\n", __func__);
-                txNew.vin.clear();
-                txNew.vout.clear();
-                nCredit = 0;
-                continue;
-            }
-            txNew.vin.emplace_back(in);
-
-            //Mark mints as spent
-            if (stakeInput->IsZWGR()) {
-                CZWgrStake* z = (CZWgrStake*)stakeInput.get();
-                if (!z->MarkSpent(this, txNew.GetHash()))
-                    return error("%s: failed to mark mint as used\n", __func__);
-            }
+            newStakeInput = std::move(stakeInput);
 
             fKernelFound = true;
             break;
@@ -3078,37 +3060,6 @@ bool CWallet::CreateCoinStake(const CKeyStore& keystore, unsigned int nBits, int
     }
     if (!fKernelFound)
         return false;
-
-    // Sign for WGR
-    int nIn = 0;
-    if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
-        for (CTxIn txIn : txNew.vin) {
-            const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
-            if (!SignSignature(*this, *wtx, txNew, nIn++))
-                return error("CreateCoinStake : failed to sign coinstake");
-        }
-    } else {
-        //Update the mint database with tx hash and height
-        for (const CTxOut& out : txNew.vout) {
-            if (!out.IsZerocoinMint())
-                continue;
-
-            libzerocoin::PublicCoin pubcoin(Params().Zerocoin_Params(false));
-            CValidationState state;
-            if (!TxOutToPublicCoin(out, pubcoin, state))
-                return error("%s: extracting pubcoin from txout failed", __func__);
-
-            uint256 hashPubcoin = GetPubCoinHash(pubcoin.getValue());
-            if (!zwgrTracker->HasPubcoinHash(hashPubcoin))
-                return error("%s: could not find pubcoinhash %s in tracker", __func__, hashPubcoin.GetHex());
-
-            CMintMeta meta = zwgrTracker->GetMetaFromPubcoin(hashPubcoin);
-            meta.txid = txNew.GetHash();
-            meta.nHeight = chainActive.Height() + 1;
-            if (!zwgrTracker->UpdateState(meta))
-                return error("%s: failed to update metadata in tracker", __func__);
-        }
-    }
 
     // Successfully generated coinstake
     return true;
@@ -5367,27 +5318,64 @@ bool CWallet::DatabaseMint(CDeterministicMint& dMint)
     return true;
 }
 
-bool CWallet::FillCoinStake(CMutableTransaction& txNew, CAmount& nFees, std::vector<CTxOut> voutPayouts)
+bool CWallet::FillCoinStake(const CKeyStore& keystore, CMutableTransaction& txNew, CAmount &nFee, std::vector<CTxOut> voutPayouts, std::unique_ptr<CStakeInput>& stakeInput)
 {
-    //  std::vector<CTxOut> vout
-    //  BOOST_FOREACH (const CTxOut& out, voutIn)
-    //      vout.push_back(out);
-    BOOST_FOREACH (const CTxOut& out, voutPayouts)
-        txNew.vout.push_back(out);
 
-    //Masternode payment
-    FillBlockPayee(txNew, nFees, true, false);   // Kokary: add betting fee
+    {
+        LOCK(cs_main);
 
-    return true;
-}
+        BOOST_FOREACH (const CTxOut& out, voutPayouts)
+            txNew.vout.push_back(out);
 
-bool CWallet::SignCoinStake(CMutableTransaction& txNew, vector<CWalletTx>& vwtxPrev)
-{
-    // Sign
+        //Masternode payment
+        FillBlockPayee(txNew, nFee, true, stakeInput->IsZWGR());
+
+        uint256 hashTxOut = txNew.GetHash();
+        CTxIn in;
+        if (!stakeInput->CreateTxIn(this, in, hashTxOut)) {
+            txNew.vin.clear();
+            txNew.vout.clear();
+            return error("%s : failed to create TxIn\n", __func__);
+        }
+        txNew.vin.emplace_back(in);
+
+        //Mark mints as spent
+        if (stakeInput->IsZWGR()) {
+            CZWgrStake* z = (CZWgrStake*)stakeInput.get();
+            if (!z->MarkSpent(this, txNew.GetHash()))
+                return error("%s: failed to mark mint as used\n", __func__);
+        }
+    }
+
+    // Sign for WGR
     int nIn = 0;
-    BOOST_FOREACH (const CWalletTx pcoin, vwtxPrev) {
-        if (!SignSignature(*this, pcoin, txNew, nIn++))
-            return error("CreateCoinStake : failed to sign coinstake");
+    if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
+        for (CTxIn txIn : txNew.vin) {
+            const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
+            if (!SignSignature(*this, *wtx, txNew, nIn++))
+                return error("CreateCoinStake : failed to sign coinstake");
+        }
+    } else {
+        //Update the mint database with tx hash and height
+        for (const CTxOut& out : txNew.vout) {
+            if (!out.IsZerocoinMint())
+                continue;
+
+            libzerocoin::PublicCoin pubcoin(Params().Zerocoin_Params(false));
+            CValidationState state;
+            if (!TxOutToPublicCoin(out, pubcoin, state))
+                return error("%s: extracting pubcoin from txout failed", __func__);
+
+            uint256 hashPubcoin = GetPubCoinHash(pubcoin.getValue());
+            if (!zwgrTracker->HasPubcoinHash(hashPubcoin))
+                return error("%s: could not find pubcoinhash %s in tracker", __func__, hashPubcoin.GetHex());
+
+            CMintMeta meta = zwgrTracker->GetMetaFromPubcoin(hashPubcoin);
+            meta.txid = txNew.GetHash();
+            meta.nHeight = chainActive.Height() + 1;
+            if (!zwgrTracker->UpdateState(meta))
+                return error("%s: failed to update metadata in tracker", __func__);
+        }
     }
 
     return true;
