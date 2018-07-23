@@ -98,7 +98,6 @@ void MultiSendDialog::on_viewButton_clicked()
     ui->message->setProperty("status", "ok");
     ui->message->style()->polish(ui->message);
     ui->message->setText(strStatus + QString(strMultiSendPrint.c_str()));
-    return;
 }
 
 void MultiSendDialog::on_addButton_clicked()
@@ -164,7 +163,6 @@ void MultiSendDialog::on_addButton_clicked()
         return;
     }
     ui->message->setText(tr("MultiSend Vector") + "\n" + QString(strMultiSendPrint.c_str()));
-    return;
 }
 
 void MultiSendDialog::on_deleteButton_clicked()
@@ -190,8 +188,6 @@ void MultiSendDialog::on_deleteButton_clicked()
         ui->message->setText(tr("Could not locate address"));
 
     updateCheckBoxes();
-
-    return;
 }
 
 void MultiSendDialog::on_activateButton_clicked()
@@ -215,7 +211,6 @@ void MultiSendDialog::on_activateButton_clicked()
     ui->message->setProperty("status", "ok");
     ui->message->style()->polish(ui->message);
     ui->message->setText(strRet);
-    return;
 }
 
 void MultiSendDialog::on_disableButton_clicked()
@@ -232,5 +227,4 @@ void MultiSendDialog::on_disableButton_clicked()
     ui->message->setProperty("status", "");
     ui->message->style()->polish(ui->message);
     ui->message->setText(strRet);
-    return;
 }
