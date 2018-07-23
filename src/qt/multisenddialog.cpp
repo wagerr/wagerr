@@ -14,8 +14,6 @@
 #include <QMessageBox>
 #include <boost/lexical_cast.hpp>
 
-using namespace std;
-using namespace boost;
 
 MultiSendDialog::MultiSendDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint),
                                                     ui(new Ui::MultiSendDialog),
