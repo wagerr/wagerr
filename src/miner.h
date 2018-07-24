@@ -31,9 +31,9 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
 /** Check mined block */
 void UpdateTime(CBlockHeader* block, const CBlockIndex* pindexPrev);
 
-std::vector<std::vector<std::string>> getEventResults();
+std::vector<std::vector<std::string>> getEventResults(int height);
 void getEventBets();
-std::vector<CTxOut> GetBetPayouts();
+std::vector<CTxOut> GetBetPayouts( int height );
 std::vector<CTxOut> GetBetPayoutsForTransactions(std::vector<CTransaction> txs);
 //std::vector<std::vector<std::string>> getEventOddsForResults( );
 
