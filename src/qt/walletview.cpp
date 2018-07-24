@@ -314,6 +314,8 @@ void WalletView::gotoPlaceBetPage(QString addr)
     // Set event name
     std::string evtDes;
 
+
+
     std::map<std::string, std::string> eventNames;
     eventNames.insert(make_pair("WCUP", "World Cup"));
 
@@ -370,21 +372,11 @@ void WalletView::gotoPlaceBetPage(QString addr)
     // current events. Instead, the events up to a particular block/transaction
     // should be read and cached when the process starts, and ideally persisted,
     // to reduce the processing time for this command.
-    // Look back the chain 14 days for any events and bets.
-    int nCurrentHeight = chainActive.Height();
-
-    CBlockIndex *BlocksIndex = NULL;
-    if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        BlocksIndex = chainActive[nCurrentHeight - 20160];
-    }
-    else {
-        BlocksIndex = chainActive[nCurrentHeight - 20160];
-    }
+    CBlockIndex* pindex = chainActive.Genesis();
     bool skipping = true;
-
-    while (BlocksIndex) {
+    while (pindex) {
         CBlock block;
-        ReadBlockFromDisk(block, BlocksIndex);
+        ReadBlockFromDisk(block, pindex);
         BOOST_FOREACH (CTransaction& tx, block.vtx) {
             // This is an early optimisation: we know that no events were posted
             // before the following transaction, so we skip them.
@@ -449,7 +441,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                 }
             }
         }
-        BlocksIndex = chainActive.Next(BlocksIndex);
+        pindex = chainActive.Next(pindex);
     }
 
 
