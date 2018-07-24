@@ -445,23 +445,23 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             std::vector<CTxOut> voutPayouts;
             CAmount nMNBetReward = 0;
 
-            if( nHeight > 20000) {
-                printf("\nMINER BLOCK: %i \n", nHeight);
 
-                voutPayouts = GetBetPayouts( nHeight );
-                GetBlockPayouts(voutPayouts, nMNBetReward);
+            LogPrintf("\nMINER BLOCK: %i \n", nHeight);
+
+            voutPayouts = GetBetPayouts( nHeight );
+            GetBlockPayouts(voutPayouts, nMNBetReward);
 
 
-                for (unsigned int l = 0; l < voutPayouts.size(); l++) {
-                    printf("MINER EXPECTED: %s \n", voutPayouts[l].ToString().c_str());
-                }
-
-                //for (unsigned int l = 0; l < voutPayouts.size(); l++) {
-                //    logPrintf("%s - Including bet payment: %s \n", __func__, voutPayouts[l].ToString().c_str());
-                //}
-
-                //LogPrintf("%s - MN betting fee payout: %li \n", __func__, nMNBetReward);
+            for (unsigned int l = 0; l < voutPayouts.size(); l++) {
+                LogPrintf("MINER EXPECTED: %s \n", voutPayouts[l].ToString().c_str());
             }
+
+            //for (unsigned int l = 0; l < voutPayouts.size(); l++) {
+            //    logPrintf("%s - Including bet payment: %s \n", __func__, voutPayouts[l].ToString().c_str());
+            //}
+
+            //LogPrintf("%s - MN betting fee payout: %li \n", __func__, nMNBetReward);
+
             // Fill coin stake transaction.
 //            pwallet->FillCoinStake(txCoinStake, nMNBetReward, voutPayouts); // Kokary: add betting fee
             if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, voutPayouts, stakeInput)) {
