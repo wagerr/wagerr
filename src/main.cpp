@@ -2955,16 +2955,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // Calculate the expected bet payouts.
     std::vector<CTxOut> vExpectedPayouts;
 
-    if( pindex->nHeight > 20000) {
-        printf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
+    LogPrintf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
 
-        vExpectedPayouts = GetBetPayouts(  pindex->nHeight  );
-        nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
-        nExpectedMint += nMNBetReward;
+    vExpectedPayouts = GetBetPayouts(  pindex->nHeight  );
+    nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
+    nExpectedMint += nMNBetReward;
 
-        for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
-            printf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
-        }
+    for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
+        LogPrintf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
     }
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
