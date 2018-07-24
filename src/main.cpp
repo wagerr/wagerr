@@ -3147,7 +3147,7 @@ bool IsBlockPayoutsValid( std::vector<CTxOut> vExpectedPayouts, CBlock block ) {
             LogPrintf("Bet Address %s  - Expected Bet Address: %s \n", betAddrS.c_str(), expectedAddrS.c_str() );
 
             // Check vExpected matches the tx value.
-            if (vExpected != voutValue && betAddrS == expectedAddrS) {
+            if (vExpected != voutValue && betAddrS != expectedAddrS) {
                 LogPrintf("Validation failed! \n");
                 return false;
             }
@@ -3155,7 +3155,7 @@ bool IsBlockPayoutsValid( std::vector<CTxOut> vExpectedPayouts, CBlock block ) {
     }
 
 
-    LogPrintf( "Payout Block is valid! \n" );
+    //LogPrintf( "Payout Block is valid! \n" );
 
     return true;
 }
