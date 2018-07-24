@@ -87,24 +87,15 @@ UniValue listevents(const UniValue& params, bool fHelp)
     // current events. Instead, the events up to a particular block/transaction
     // should be read and cached when the process starts, and ideally persisted,
     // to reduce the processing time for this command.
-    int nCurrentHeight = chainActive.Height();
-
-    CBlockIndex *BlocksIndex = NULL;
-    if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        BlocksIndex = chainActive[nCurrentHeight - 20160];
-    }
-    else {
-        BlocksIndex = chainActive[nCurrentHeight - 20160];
-    }
-
+    CBlockIndex* pindex = chainActive.Genesis();
     bool skipping = true;
 
-    while (BlocksIndex) {
+    while (pindex) {
 
         //if( pindex->nHeight > 46000 ) {
 
             CBlock block;
-            ReadBlockFromDisk(block, BlocksIndex);
+            ReadBlockFromDisk(block, pindex);
 
             BOOST_FOREACH(CTransaction& tx, block.vtx) {
 
@@ -202,7 +193,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
                 }
             }
         //}
-        BlocksIndex = chainActive.Next(BlocksIndex);
+        pindex = chainActive.Next(pindex);
     }
 
     return ret;
