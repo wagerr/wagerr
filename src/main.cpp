@@ -2957,7 +2957,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     LogPrintf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
 
-    vExpectedPayouts = GetBetPayouts(  pindex->nHeight  );
+    vExpectedPayouts = GetBetPayouts(  pindex->nHeight - 1 );
     nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
     nExpectedMint += nMNBetReward;
 
