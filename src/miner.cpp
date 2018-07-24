@@ -445,12 +445,10 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             std::vector<CTxOut> voutPayouts;
             CAmount nMNBetReward = 0;
 
-
             LogPrintf("\nMINER BLOCK: %i \n", nHeight);
 
-            voutPayouts = GetBetPayouts( nHeight );
+            voutPayouts = GetBetPayouts(nHeight - 1);
             GetBlockPayouts(voutPayouts, nMNBetReward);
-
 
             for (unsigned int l = 0; l < voutPayouts.size(); l++) {
                 LogPrintf("MINER EXPECTED: %s \n", voutPayouts[l].ToString().c_str());
@@ -463,7 +461,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             //LogPrintf("%s - MN betting fee payout: %li \n", __func__, nMNBetReward);
 
             // Fill coin stake transaction.
-//            pwallet->FillCoinStake(txCoinStake, nMNBetReward, voutPayouts); // Kokary: add betting fee
+            // pwallet->FillCoinStake(txCoinStake, nMNBetReward, voutPayouts); // Kokary: add betting fee
             if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, voutPayouts, stakeInput)) {
                 LogPrintf("%s: filled coin stake tx [%s]\n", __func__, txCoinStake.ToString());
             }
@@ -473,7 +471,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             }
 
             // Sign with updated tx.
-  //          pwallet->SignCoinStake(txCoinStake, vwtxPrev);
+            // pwallet->SignCoinStake(txCoinStake, vwtxPrev);
             voutPayouts.clear();
         }
 
@@ -891,7 +889,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
 
     // Get all the results posted in the latest block.
     std::vector<std::vector<std::string>> results = getEventResults( height);
-    printf( "Results found: %li \n", results.size() );
+    LogPrintf( "Results found: %li \n", results.size() );
 
     // Set the Oracle wallet address. 
     std::string OracleWalletAddr = "";
