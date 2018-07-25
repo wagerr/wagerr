@@ -445,13 +445,15 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             std::vector<CTxOut> voutPayouts;
             CAmount nMNBetReward = 0;
 
-            LogPrintf("\nMINER BLOCK: %i \n", nHeight);
+            if( nHeight > 20966  ) {
+                printf("\nMINER BLOCK: %i \n", nHeight);
 
-            voutPayouts = GetBetPayouts(nHeight - 1);
-            GetBlockPayouts(voutPayouts, nMNBetReward);
+                voutPayouts = GetBetPayouts(nHeight - 1);
+                GetBlockPayouts(voutPayouts, nMNBetReward);
 
-            for (unsigned int l = 0; l < voutPayouts.size(); l++) {
-                LogPrintf("MINER EXPECTED: %s \n", voutPayouts[l].ToString().c_str());
+                for (unsigned int l = 0; l < voutPayouts.size(); l++) {
+                    printf("MINER EXPECTED: %s \n", voutPayouts[l].ToString().c_str());
+                }
             }
 
             //for (unsigned int l = 0; l < voutPayouts.size(); l++) {

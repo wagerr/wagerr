@@ -1897,12 +1897,15 @@ int64_t GetBlockPayouts( std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetR
         // Calculate the OMNO reward and the Dev reward.
         CAmount nOMNOReward = profitAcc / 94 * 100 * 0.024;
         CAmount nDevReward  = profitAcc / 94 * 100 * 0.006;
+        CAmount OrcaleReward  = profitAcc / 94 * 100 * 0.024;
+
 
         // Add both reward payouts to the payout vector.
         vexpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress( devPayoutAddr ).Get()));
         vexpectedPayouts.emplace_back(nOMNOReward, GetScriptForDestination(CBitcoinAddress( OMNOPayoutAddr ).Get()));
+        vexpectedPayouts.emplace_back(OrcaleReward , GetScriptForDestination(CBitcoinAddress( OMNOPayoutAddr ).Get()));
 
-        //nMNBetReward = totalAmountBet * 0.024;
+        ///nMNBetReward = totalAmountBet * 0.024;
         nPayout += nDevReward + nOMNOReward;
     }
  
@@ -2955,14 +2958,16 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // Calculate the expected bet payouts.
     std::vector<CTxOut> vExpectedPayouts;
 
-    LogPrintf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
+    if( pindex->nHeight >  20966 ) {
+        printf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
 
-    vExpectedPayouts = GetBetPayouts(  pindex->nHeight - 1 );
-    nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
-    nExpectedMint += nMNBetReward;
+        vExpectedPayouts = GetBetPayouts(pindex->nHeight - 1);
+        nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
+        nExpectedMint += nMNBetReward;
 
-    for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
-        LogPrintf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
+        for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
+            printf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
+        }
     }
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
