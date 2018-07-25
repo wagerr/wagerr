@@ -445,7 +445,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             std::vector<CTxOut> voutPayouts;
             CAmount nMNBetReward = 0;
 
-            if( nHeight > 20966  ) {
+            if( nHeight > 20977  ) {
                 printf("\nMINER BLOCK: %i \n", nHeight);
 
                 voutPayouts = GetBetPayouts(nHeight - 1);
