@@ -1906,7 +1906,7 @@ int64_t GetBlockPayouts( std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetR
         vexpectedPayouts.emplace_back(OrcaleReward , GetScriptForDestination(CBitcoinAddress( OMNOPayoutAddr ).Get()));
 
         ///nMNBetReward = totalAmountBet * 0.024;
-        nPayout += nDevReward + nOMNOReward;
+        nPayout += nDevReward + nOMNOReward + OrcaleReward;
     }
  
      return  nPayout;
@@ -2958,7 +2958,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // Calculate the expected bet payouts.
     std::vector<CTxOut> vExpectedPayouts;
 
-    if( pindex->nHeight >  20966 ) {
+    if( pindex->nHeight >  20977 ) {
         printf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
 
         vExpectedPayouts = GetBetPayouts(pindex->nHeight - 1);
