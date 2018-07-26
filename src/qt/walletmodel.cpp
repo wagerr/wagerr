@@ -443,6 +443,12 @@ WalletModel::SendCoinsReturn WalletModel::prepareBetTransaction(WalletModelTrans
         CScript scriptPubKey = GetScriptForDestination(address.Get());
         bool fCreated = wallet->CreateTransaction(scriptPubKey, amount, *newTx, *keyChange, nFeeRequired, strFailReason, NULL, ALL_COINS, false, (CAmount)0, "2|1.0|" + eventId + "|" + teamToWin);
 
+        if( nFeeRequired <= 0 ){
+            emit message(tr("Place Bet Failed!"), QString::fromStdString("Click the send tab and see if you have \"Send as zero fee TX if possible\" checkbox checked. If so uncheck and place bet again. \nThis is required to produce a change address on your bet TX where your bet winnings will be sent.!"),
+                         CClientUIInterface::MSG_ERROR);
+            return TransactionCreationFailed;
+        }
+
         if (!fCreated) {
             if ((amount + nFeeRequired) > nBalance) {
                 return SendCoinsReturn(AmountWithFeeExceedsBalance);
