@@ -78,19 +78,31 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
             sub.address = CBitcoinAddress(address).ToString();
             sub.credit = nNet;
         } else {
-            //Masternode reward
+            // Masternode reward
             CTxDestination destMN;
             int nIndexMN = wtx.vout.size() - 1;
             if (ExtractDestination(wtx.vout[nIndexMN].scriptPubKey, destMN) && IsMine(*wallet, destMN)) {
                 isminetype mine = wallet->IsMine(wtx.vout[nIndexMN]);
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
-                if(wtx.vout.size() > 3){
-                    sub.type = TransactionRecord::BetWin;
-                }else{
-                    sub.type = TransactionRecord::MNReward;
-                }
+                sub.type = TransactionRecord::MNReward;
                 sub.address = CBitcoinAddress(destMN).ToString();
                 sub.credit = wtx.vout[nIndexMN].nValue;
+            }
+            // Bet Winning payout.
+            else{
+                CTxDestination destBetWin;
+
+                for( unsigned int i = 0; i < wtx.vout.size(); i++  ){
+
+                    if (ExtractDestination(wtx.vout[i].scriptPubKey, destBetWin) && IsMine(*wallet, destBetWin)) {
+                        isminetype mine = wallet->IsMine(wtx.vout[i]);
+                        sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+                        sub.type = TransactionRecord::BetWin;
+                        sub.address = CBitcoinAddress(destBetWin).ToString();
+                        sub.credit = wtx.vout[i].nValue;
+                    }
+
+                }
             }
         }
 
