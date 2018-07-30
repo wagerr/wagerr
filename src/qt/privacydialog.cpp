@@ -29,7 +29,8 @@
 PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystemMenuHint | Qt::WindowTitleHint | Qt::WindowCloseButtonHint | Qt::WindowCloseButtonHint),
                                                           ui(new Ui::PrivacyDialog),
                                                           walletModel(0),
-                                                          currentBalance(-1)
+                                                          currentBalance(-1),
+                                                          fDenomsMinimized(true)
 {
     nDisplayUnit = 0; // just make sure it's not unitialized
     ui->setupUi(this);
@@ -100,6 +101,7 @@ PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystem
     else{
         fMinimizeChange = settings.value("fMinimizeChange").toBool();
     }
+
     ui->checkBoxMinimizeChange->setChecked(fMinimizeChange);
 
     // Start with displaying the "out of sync" warnings
@@ -111,10 +113,17 @@ PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystem
 
     // Set labels/buttons depending on SPORK_16 status
     updateSPORK16Status();
+
+    // init Denoms section
+    if(!settings.contains("fDenomsSectionMinimized"))
+        settings.setValue("fDenomsSectionMinimized", true);
+    minimizeDenomsSection(settings.value("fDenomsSectionMinimized").toBool());
 }
 
 PrivacyDialog::~PrivacyDialog()
 {
+    QSettings settings;
+    settings.setValue("fDenomsSectionMinimized", fDenomsMinimized);
     delete ui;
 }
 
@@ -250,6 +259,7 @@ void PrivacyDialog::on_pushButtonMintReset_clicked()
 
     return;
 }
+
 
 void PrivacyDialog::on_pushButtonSpentReset_clicked()
 {
@@ -581,6 +591,29 @@ void PrivacyDialog::coinControlUpdateLabels()
     }
 }
 
+
+void PrivacyDialog::on_pushButtonShowDenoms_clicked()
+{
+    minimizeDenomsSection(false);
+}
+
+void PrivacyDialog::on_pushButtonHideDenoms_clicked()
+{
+    minimizeDenomsSection(true);
+}
+
+void PrivacyDialog::minimizeDenomsSection(bool fMinimize)
+{
+    if (fMinimize) {
+        ui->balanceSupplyFrame->show();
+        ui->verticalFrameRight->hide();
+    } else {
+        ui->balanceSupplyFrame->hide();
+        ui->verticalFrameRight->show();
+    }
+    fDenomsMinimized = fMinimize;
+}
+
 bool PrivacyDialog::updateLabel(const QString& address)
 {
     if (!walletModel)
@@ -702,6 +735,7 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
 
     ui->labelzAvailableAmount->setText(QString::number(zerocoinBalance/COIN) + QString(" zWGR "));
     ui->labelzAvailableAmount_2->setText(QString::number(matureZerocoinBalance/COIN) + QString(" zWGR "));
+    ui->labelzAvailableAmount_4->setText(QString::number(zerocoinBalance/COIN) + QString(" zWGR "));
     ui->labelzWGRAmountValue->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, balance - immatureBalance - nLockedBalance, false, BitcoinUnits::separatorAlways));
 
     // Display AutoMint status
@@ -712,6 +746,8 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
 
     // Display global supply
     ui->labelZsupplyAmount->setText(QString::number(chainActive.Tip()->GetZerocoinSupply()/COIN) + QString(" <b>zWGR </b> "));
+    ui->labelZsupplyAmount_2->setText(QString::number(chainActive.Tip()->GetZerocoinSupply()/COIN) + QString(" <b>zWGR </b> "));
+
     for (auto denom : libzerocoin::zerocoinDenomList) {
         int64_t nSupply = chainActive.Tip()->mapZerocoinSupply.at(denom);
         QString strSupply = QString::number(nSupply) + " x " + QString::number(denom) + " = <b>" +
