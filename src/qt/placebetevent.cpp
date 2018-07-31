@@ -121,22 +121,37 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
 //     // printf(">!> %s\n", evtDes.c_str());
 //
 
-    const std::string x = "";
     std::string winOddsString = std::to_string(std::stod(fields[8]) / 10000);
-    std::string loseOddsString = std::to_string(std::stod(fields[9]) / 10000);
-    std::string drawOddsString = std::to_string(std::stod(fields[10]) / 10000);
+    winOddsString =  winOddsString.substr(0, winOddsString.size() -4);
+    std::string loseOddsString;
+    std::string drawOddsString;
 
-    LogPrintf("CEvent::ParseEvent: %s\n", descr.c_str());
+    if( std::stod(fields[9]) > 0 ){
+        loseOddsString = std::to_string(std::stod(fields[9]) / 10000);
+        loseOddsString = loseOddsString.substr(0, loseOddsString.size() -4);
+    }
+    else{
+        loseOddsString = "N/A";
+    }
+
+    if( std::stod(fields[10]) > 0 ){
+        drawOddsString = std::to_string(std::stod(fields[10]) / 10000);
+        drawOddsString =  drawOddsString.substr(0, drawOddsString.size() -4);
+    }
+    else{
+        drawOddsString = "N/A";
+    }
+
     return new CEvent(
-        fields[2],
-        fields[4],
-        fields[5],
-        fields[3],
-        fields[6],
-        winOddsString.substr(0, winOddsString.size() -4),
-        fields[7],
-        loseOddsString.substr(0, loseOddsString.size() -4),
-        drawOddsString.substr(0, drawOddsString.size() -4)
+            fields[2],
+            fields[4],
+            fields[5],
+            fields[3],
+            fields[6],
+            winOddsString,
+            fields[7],
+            loseOddsString,
+            drawOddsString
     );
 }
 
