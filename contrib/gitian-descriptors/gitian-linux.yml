@@ -27,7 +27,6 @@ packages:
 - "bsdmainutils"
 - "ca-certificates"
 - "python"
-reference_datetime: "2015-06-01 00:00:00"
 remotes:
 - "url": "https://github.com/wagerr/wagerr.git"
   "dir": "wagerr"
@@ -170,6 +169,5 @@ script: |
     cd ../../
     rm -rf distsrc-${i}
   done
-  mkdir -p $OUTDIR/src
   mkdir -p $OUTDIR/src
   mv $SOURCEDIST $OUTDIR/src
