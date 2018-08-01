@@ -19,7 +19,7 @@ const std::string CLIENT_NAME("Wagerr Core");
 /**
  * Client version number
  */
-#define CLIENT_VERSION_SUFFIX "-Paddy Power™"
+#define CLIENT_VERSION_SUFFIX "-Sláinte"
 
 
 /**
