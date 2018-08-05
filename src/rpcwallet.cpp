@@ -3676,7 +3676,11 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
         objMint.push_back(Pair("u", mint.IsUsed()));
         objMint.push_back(Pair("v", mint.GetVersion()));
         if (mint.GetVersion() >= 2) {
-            objMint.push_back(Pair("k", HexStr(mint.GetPrivKey())));
+            CKey key;
+            key.SetPrivKey(mint.GetPrivKey(), true);
+            CBitcoinSecret cBitcoinSecret;
+            cBitcoinSecret.SetKey(key);
+            objMint.push_back(Pair("k", cBitcoinSecret.ToString()));
         }
         jsonList.push_back(objMint);
     }
@@ -3754,10 +3758,10 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
         CPrivKey privkey;
         if (nVersion >= libzerocoin::PrivateCoin::PUBKEY_VERSION) {
             std::string strPrivkey = find_value(o, "k").get_str();
-            CKey key;
-            uint256 nPrivKey(strPrivkey);
-            key.Set(nPrivKey.begin(), nPrivKey.end(), true);
-            if (!key.IsValid())
+            CBitcoinSecret vchSecret;
+            bool fGood = vchSecret.SetString(strPrivkey);
+            CKey key = vchSecret.GetKey();
+            if (!key.IsValid() && fGood)
                 return JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "privkey is not valid");
             privkey = key.GetPrivKey();
         }
