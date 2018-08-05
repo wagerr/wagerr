@@ -25,10 +25,12 @@ CBigNum SeedTo1024(uint256 hashSeed) {
     hasher << hashSeed;
 
     vector<unsigned char> vResult;
-    for (int i = 0; i < 4; i ++) {
-        vector<unsigned char> vHash = CBigNum(hasher.GetHash()).getvch();
-        vResult.insert(vResult.end(), vHash.begin(), vHash.end());
+    vector<unsigned char> vHash = CBigNum(hasher.GetHash()).getvch();
+    vResult.insert(vResult.end(), vHash.begin(), vHash.end());
+    for (int i = 0; i < 3; i ++) {
         hasher << vResult;
+        vHash = CBigNum(hasher.GetHash()).getvch();
+        vResult.insert(vResult.end(), vHash.begin(), vHash.end());
     }
 
     CBigNum bnResult;
