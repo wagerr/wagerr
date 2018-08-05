@@ -572,7 +572,8 @@ void RPCConsole::clear()
 
     message(CMD_REPLY, (tr("Welcome to the Wagerr RPC console.") + "<br>" +
                            tr("Use up and down arrows to navigate history, and <b>Ctrl-L</b> to clear screen.") + "<br>" +
-                           tr("Type <b>help</b> for an overview of available commands.")),
+                           tr("Type <b>help</b> for an overview of available commands.") + "<br><br>" +
+                           tr("WARNING: Placing bets via RPC and the debug console can result in loss of funds and invalid bets. We recommend using the betting GUI only to place bets. All other bets are done at your own risk.")),
         true);
 }
 
