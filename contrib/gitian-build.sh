@@ -314,6 +314,7 @@ then
 	    ./bin/gbuild -j ${proc} -m ${mem} --commit wagerr=${COMMIT} --url wagerr=${url} ../wagerr/contrib/gitian-descriptors/gitian-aarch64.yml
 	    ./bin/gsign -p $signProg --signer $SIGNER --release ${VERSION}-aarch64 --destination ../gitian.sigs/ ../wagerr/contrib/gitian-descriptors/gitian-aarch64.yml
 	    mv build/out/wagerr-*.tar.gz build/out/src/wagerr-*.tar.gz ../wagerr-binaries/${VERSION}
+	fi
 	popd
 
         if [[ $commitFiles = true ]]
