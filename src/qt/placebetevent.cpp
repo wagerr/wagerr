@@ -45,14 +45,14 @@ CEvent::CEvent(
 }
 
 // Returns null on failure
-CEvent* CEvent::ParseEvent(const std::string& descr) 
+CEvent* CEvent::ParseEvent(const std::string& descr)
 {
 //     std::map<std::string, std::string> eventNames;
 //     eventNames.insert(make_pair("WCUP", "World Cup"));
 //     std::map<std::string, std::string> countryNames;
 //     countryNames.insert(make_pair("RUS", "Russia"));
 //     countryNames.insert(make_pair("KSA", "Kazakhstan"));
-// 
+//
     std::vector<std::string> fields;
     boost::split(fields, descr, boost::is_any_of("|"));
 
@@ -61,16 +61,16 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
     }
 
 //     evtDes = "";
-// 
+//
 //     // TODO Handle version field.
-// 
+//
 //     // UniValue evt(UniValue::VOBJ);
-// 
+//
 //     // evt.push_back(Pair("id", strs[2]));
 //     // evt.push_back(Pair("name", strs[4]));
 //     // evt.push_back(Pair("round", strs[5]));
 //     // evt.push_back(Pair("starting", strs[3]));
-// 
+//
 //     // // evtDes += evtDescr;
 //     // // evtDes += " ";
 //     // time_t time = (time_t) std::strtol(strs[2].c_str(), nullptr, 10);
@@ -90,9 +90,9 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
 //     //     mon_name[ptm->tm_mon]
 //     // );
 //     // evtDes += result;
-// 
+//
 //     // printf(">>> %s\n", evtDescr.c_str());
-// 
+//
 //     // evtDes += "   ";
 //     // std::map<std::string, std::string>::iterator it;
 //     // it = countryNames.find(strs[5]);
@@ -106,7 +106,7 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
 //     //     continue;
 //     // }
 //     // evtDes += it->second;
-// 
+//
 //     // // UniValue teams(UniValue::VARR);
 //     // // for (unsigned int t = 6; t <= 7; t++) {
 //     // //     UniValue team(UniValue::VOBJ);
@@ -115,18 +115,18 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
 //     // //     teams.push_back(team);
 //     // // }
 //     // // evt.push_back(Pair("teams", teams));
-// 
+//
 //     // // ret.push_back(evt);
-// 
+//
 //     // printf(">!> %s\n", evtDes.c_str());
-// 
+//
 
     const std::string x = "";
     std::string winOddsString = std::to_string(std::stod(fields[8]) / 10000);
     std::string loseOddsString = std::to_string(std::stod(fields[9]) / 10000);
     std::string drawOddsString = std::to_string(std::stod(fields[10]) / 10000);
 
-    printf("CEvent::ParseEvent: %s\n", descr.c_str());
+    LogPrintf("CEvent::ParseEvent: %s\n", descr.c_str());
     return new CEvent(
         fields[2],
         fields[4],
@@ -141,14 +141,13 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
 }
 
 PlaceBetEvent::PlaceBetEvent(
-QWidget* parent, CEvent* event, const std::string& eventDetails, const  std::string& homeOdds, const std::string& awayOdds, const std::string& drawOdds
-) : QStackedWidget(parent),
+QWidget* parent, CEvent* event, const std::string& eventDetails, const  std::string& homeOdds, const std::string& awayOdds, const std::string& drawOdds) : QStackedWidget(parent),
                                                   ui(new Ui::PlaceBetEvent),
                                                   model(0),
                                                   event(event)
 {
-printf("PlaceBetEvent::PlaceBetEvent: about to print\n");
-printf("PlaceBetEvent::PlaceBetEvent: %s %s\n", event->id.c_str(), event->homeTeam.c_str());
+    LogPrintf("PlaceBetEvent::PlaceBetEvent: about to print\n");
+    LogPrintf("PlaceBetEvent::PlaceBetEvent: %s %s\n", event->id.c_str(), event->homeTeam.c_str());
     ui->setupUi(this);
 
     setCurrentWidget(ui->SendCoins);
@@ -164,12 +163,12 @@ printf("PlaceBetEvent::PlaceBetEvent: %s %s\n", event->id.c_str(), event->homeTe
 // #if QT_VERSION >= 0x040700
 //     ui->addAsLabel->setPlaceholderText(tr("Enter a label for this address to add it to your address book"));
 // #endif
-// 
+//
 //     // normal wagerr address field
 //     GUIUtil::setupAddressWidget(ui->payTo, this);
 //     // just a label for displaying wagerr address(es)
 //     ui->payTo_is->setFont(GUIUtil::bitcoinAddressFont());
-// 
+//
 //     // Connect signals
 //     connect(ui->payAmount, SIGNAL(valueChanged()), this, SIGNAL(payAmountChanged()));
 //     connect(ui->deleteButton, SIGNAL(clicked()), this, SLOT(deleteClicked()));

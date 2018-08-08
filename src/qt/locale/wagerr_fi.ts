@@ -93,7 +93,11 @@
         <source>Exporting Failed</source>
         <translation>Vienti epäonnistui</translation>
     </message>
-    </context>
+    <message>
+        <source>There was an error trying to save the address list to %1. Please try again.</source>
+        <translation>Tapahtui virhe osoitelistan tallennuksessa %1. Yritä uudestaan.</translation>
+    </message>
+</context>
 <context>
     <name>AddressTableModel</name>
     <message>
@@ -132,10 +136,6 @@
         <translation>Ottaa pois käytöstä tavallisen sendmoneyn kun käyttöjärjestelmä on kompromisoitu. Ei tarjoa todellista turvaa.</translation>
     </message>
     <message>
-        <source>For anonymization and staking only</source>
-        <translation>Vain anonymisointiin ja panostukseen</translation>
-    </message>
-    <message>
         <source>Enter the new passphrase to the wallet.&lt;br/&gt;Please use a passphrase of &lt;b&gt;ten or more random characters&lt;/b&gt;, or &lt;b&gt;eight or more words&lt;/b&gt;.</source>
         <translation>Syötä uusi salausavain lompakkoon &lt;br/&gt; Käytä salausavaimena &lt;b&gt;yli kymmentä satunnaista merkkiä&lt;/b&gt;, tai &lt;b&gt; kahdeksaa tai useampaa sanaa&lt;/b&gt;.</translation>
     </message>
@@ -172,8 +172,8 @@
         <translation>Vahvista lompakon salaus</translation>
     </message>
     <message>
-        <source>Wagerr will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>Wagerr sulkeutuu salausprosessin ajaksi. Muista, että lompakon salaus ei voi täysin suojella WGRien varkaudelta, jos tietokoneesi sisältää haittaohjelmia.</translation>
+        <source>WAGERR will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
+        <translation>WAGERR sulkeutuu salausprosessin ajaksi. Muista, että lompakon salaus ei voi täysin suojella WGRien varkaudelta, jos tietokoneesi sisältää haittaohjelmia.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -225,6 +225,9 @@
     </message>
 </context>
 <context>
+    <name>BanTableModel</name>
+    </context>
+<context>
     <name>Bip38ToolDialog</name>
     <message>
         <source>BIP 38 Tool</source>
@@ -235,17 +238,8 @@
         <translation>&amp;BIP 38 Salaus</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Syötä Wagerr osoite, jonnka tahtoisit salata käyttäen BIP 38.
-Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityisavaimen.</translation>
-    </message>
-    <message>
         <source>Address:</source>
         <translation>Osoite:</translation>
-    </message>
-    <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Wagerr osoite, jolla viesti allekirjoitetaan</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -276,16 +270,8 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
         <translation>Kopioi nykyinen allekirjoitus järjestelmän leikepöydälle</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Allekirjoita viesti todistaaksesi, että omistat tämän Wagerr osoitteen</translation>
-    </message>
-    <message>
         <source>Encrypt &amp;Key</source>
         <translation>Salaus &amp;Avain</translation>
-    </message>
-    <message>
-        <source>Reset all sign message fields</source>
-        <translation>Tyhjennä kaikki allekirjoita viesti kentät</translation>
     </message>
     <message>
         <source>Clear &amp;All</source>
@@ -300,20 +286,8 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
         <translation>Syötä BIP 38 salattu yksityisavain. Syötä salausavain laatikkoon. Paina Avaa Salaus tuottaaksesi yksityisavaimen. Kun avain on dekryptattu, painamalla "Import osoite" lisää tämän yksityisavaimen lompakkoon.</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>Wagerr osoite, jolla viesti allekirjoitettiin</translation>
-    </message>
-    <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Vahvista että viesti on allekirjoitettu kyseessä olevalla Wagerr osoitteella.</translation>
-    </message>
-    <message>
         <source>Decrypt &amp;Key</source>
         <translation>Salauksen avaus &amp;Avain</translation>
-    </message>
-    <message>
-        <source>Reset all verify message fields</source>
-        <translation>Tyhjennä kaikki vahvista viesti kentät</translation>
     </message>
     <message>
         <source>Decrypted Key:</source>
@@ -592,7 +566,7 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
     </message>
     <message>
         <source>Wagerr Core</source>
-        <translation>Wagerr Ydin</translation>
+        <translation>WAGERR Ydin</translation>
     </message>
     <message>
         <source>Send coins to a Wagerr address</source>
@@ -619,8 +593,8 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
         <translation>Näytä tietoja Wagerr Ytimestä</translation>
     </message>
     <message>
-        <source>Modify configuration options for Wagerr</source>
-        <translation>Muokkaa konfiguraatio vaihtoehtoja Wagerr:lle</translation>
+        <source>Modify configuration options for WAGERR</source>
+        <translation>Muokkaa konfiguraatio vaihtoehtoja WAGERR:lle</translation>
     </message>
     <message>
         <source>Sign messages with your Wagerr addresses to prove you own them</source>
@@ -659,8 +633,8 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
         <translation>Avaa Masternode konfiguraatiotiedosto</translation>
     </message>
     <message>
-        <source>Open a Wagerr: URI or payment request</source>
-        <translation>Avaa Wagerr: URI tai pyydä maksua</translation>
+        <source>Open a WAGERR: URI or payment request</source>
+        <translation>Avaa WAGERR: URI tai pyydä maksua</translation>
     </message>
     <message>
         <source>&amp;Blockchain explorer</source>
@@ -676,7 +650,7 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
     </message>
     <message>
         <source>Wagerr Core client</source>
-        <translation>Wagerr Ydin asiakasohjelma</translation>
+        <translation>WAGERR Ydin asiakasohjelma</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -701,10 +675,6 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
     <message>
         <source>%1 and %2</source>
         <translation>%1 ja %2</translation>
-    </message>
-    <message>
-        <source>%1 behind</source>
-        <translation>%1 takana</translation>
     </message>
     <message>
         <source>Catching up...</source>
@@ -811,6 +781,10 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
     <message>
         <source>Amount</source>
         <translation>Määrä</translation>
+    </message>
+    <message>
+        <source>Type</source>
+        <translation>Tyyppi</translation>
     </message>
     <message>
         <source>Date</source>
@@ -935,7 +909,7 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
     <name>HelpMessageDialog</name>
     <message>
         <source>Wagerr Core</source>
-        <translation>Wagerr Ydin</translation>
+        <translation>WAGERR Ydin</translation>
     </message>
     <message>
         <source>Usage:</source>
@@ -958,7 +932,7 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
     </message>
     <message>
         <source>Wagerr Core</source>
-        <translation>Wagerr Ydin</translation>
+        <translation>WAGERR Ydin</translation>
     </message>
     <message>
         <source>Error</source>
@@ -1079,6 +1053,10 @@ Syötä salausavain laatikon keskelle. Paina salaa tuottaaksesi salatun yksityis
         <translation>Lähetä Masternode palkkioihin</translation>
     </message>
     <message>
+        <source>(no label)</source>
+        <translation>(ei nimikettä)</translation>
+    </message>
+    <message>
         <source>The entered address:
 </source>
         <translation>Syötetty osoite:</translation>
@@ -1113,6 +1091,21 @@ Please check the address and try again.</source>
     </message>
 </context>
 <context>
+    <name>MultisigDialog</name>
+    <message>
+        <source>Status:</source>
+        <translation>Tila:</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
+        <source>Amount:</source>
+        <translation>Määrä:</translation>
+    </message>
+    </context>
+<context>
     <name>ObfuscationConfig</name>
     <message>
         <source>Configure Obfuscation</source>
@@ -1136,11 +1129,11 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Käytä 2 erillistä masternodea sekoittaaksesi enintään 25000 Wagerr</translation>
+        <translation>Käytä 2 erillistä masternodea sekoittaaksesi enintään 25000 WAGERR</translation>
     </message>
     <message>
         <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Käytä 8 erillistä masternodea sekoittaaksesi enintään 25000 Wagerr</translation>
+        <translation>Käytä 8 erillistä masternodea sekoittaaksesi enintään 25000 WAGERR</translation>
     </message>
     <message>
         <source>Use 16 separate masternodes</source>
@@ -1148,11 +1141,11 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>Tämä vaihtoehto on nopein ja maksaa noin ~0.025 WGR anonymoidaksesi 25000 Wagerr</translation>
+        <translation>Tämä vaihtoehto on nopein ja maksaa noin ~0.025 WGR anonymoidaksesi 25000 WAGERR</translation>
     </message>
     <message>
         <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>Tämä vaihtoehto on suhteellisen nopea ja maksaa 0.05 Wagerr anonymoidaksesi 25000 Wagerr</translation>
+        <translation>Tämä vaihtoehto on suhteellisen nopea ja maksaa 0.05 Wagerr anonymoidaksesi 25000 WAGERR</translation>
     </message>
     <message>
         <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
@@ -1160,7 +1153,7 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>0.1 WGR per 25000 WGR you anonymize.</source>
-        <translation>0.1 per 25000 Wagerr, jotka anonymisoit.</translation>
+        <translation>0.1 per 25000 WAGERR, jotka anonymisoit.</translation>
     </message>
     <message>
         <source>Obfuscation Configuration</source>
@@ -1233,7 +1226,7 @@ Please check the address and try again.</source>
         <translation>&amp;Verkko</translation>
     </message>
     <message>
-        <source>The user interface language can be set here. This setting will take effect after restarting Wagerr.</source>
+        <source>The user interface language can be set here. This setting will take effect after restarting WAGERR.</source>
         <translation>Käyttöliittymän kielen voi säätää täällä. Tämä asetus tulee voimaan uudelleenkäynnistettyäsi lompakon.</translation>
     </message>
     <message>
@@ -1340,7 +1333,7 @@ Please check the address and try again.</source>
         <source>The supplied proxy address is invalid.</source>
         <translation>Tarjottu proxy osoite on virheellinen.</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>OverviewPage</name>
     <message>
@@ -1374,10 +1367,6 @@ Please check the address and try again.</source>
     <message>
         <source>Total:</source>
         <translation>Määrä:</translation>
-    </message>
-    <message>
-        <source>Your current total balance</source>
-        <translation>Sinun nykyinen kokonaissaldo</translation>
     </message>
     <message>
         <source>Spendable:</source>
@@ -1443,6 +1432,10 @@ Please check the address and try again.</source>
     <message>
         <source>Priority:</source>
         <translation>Tärkeys:</translation>
+    </message>
+    <message>
+        <source>TextLabel</source>
+        <translation>TekstiNimike</translation>
     </message>
     <message>
         <source>Fee:</source>
@@ -1672,10 +1665,6 @@ Please check the address and try again.</source>
     <message>
         <source>Unknown</source>
         <translation>Tuntematon</translation>
-    </message>
-    <message>
-        <source>Fetching...</source>
-        <translation>Haetaan...</translation>
     </message>
 </context>
 <context>
@@ -1958,10 +1947,6 @@ Please check the address and try again.</source>
         <translation>Lisää &amp;Vastaanottaja</translation>
     </message>
     <message>
-        <source>SwiftTX</source>
-        <translation>SwiftTX</translation>
-    </message>
-    <message>
         <source>Balance:</source>
         <translation>Saldo:</translation>
     </message>
@@ -1976,10 +1961,6 @@ Please check the address and try again.</source>
     <message>
         <source>Copy fee</source>
         <translation>Kopioi taksa</translation>
-    </message>
-    <message>
-        <source>using</source>
-        <translation>käyttää</translation>
     </message>
     <message>
         <source>Warning: Invalid Wagerr address</source>
@@ -2018,6 +1999,10 @@ Please check the address and try again.</source>
         <translation>Virhe: Lompakko avattiin vain kolikoiden anonymisointiin. Avaus peruutettu.</translation>
     </message>
     <message>
+        <source>Pay only the minimum fee of %1</source>
+        <translation>Maksa vain %1 minimi taksa</translation>
+    </message>
+    <message>
         <source>(no label)</source>
         <translation>(ei nimikettä)</translation>
     </message>
@@ -2030,7 +2015,7 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>The Wagerr address to send the payment to</source>
-        <translation>Wagerr osoite johon maksu lähetetään</translation>
+        <translation>WAGERR osoite johon maksu lähetetään</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2073,7 +2058,7 @@ Please check the address and try again.</source>
     <name>ShutdownWindow</name>
     <message>
         <source>Wagerr Core is shutting down...</source>
-        <translation>Wagerr core sammuu...</translation>
+        <translation>Wagerr Core sammuu...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -2092,7 +2077,7 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>The Wagerr address to sign the message with</source>
-        <translation>Wagerr osoite, jolla viesti allekirjoitetaan</translation>
+        <translation>WAGERR osoite, jolla viesti allekirjoitetaan</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2128,7 +2113,7 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>The Wagerr address the message was signed with</source>
-        <translation>Wagerr osoite, jolla viesti allekirjoitettiin</translation>
+        <translation>WAGERR osoite, jolla viesti allekirjoitettiin</translation>
     </message>
     <message>
         <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
@@ -2215,7 +2200,7 @@ Please check the address and try again.</source>
     <name>SplashScreen</name>
     <message>
         <source>Wagerr Core</source>
-        <translation>Wagerr Ydin</translation>
+        <translation>WAGERR Ydin</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -2231,7 +2216,7 @@ Please check the address and try again.</source>
     </message>
     <message>
         <source>The Wagerr Core developers</source>
-        <translation>Wagerr core kehittäjät</translation>
+        <translation>Wagerr Core kehittäjät</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -2336,10 +2321,6 @@ Please check the address and try again.</source>
     <message>
         <source>Payment to yourself</source>
         <translation>Maksut itsellesi</translation>
-    </message>
-    <message>
-        <source>Minted</source>
-        <translation>Luotu</translation>
     </message>
     <message>
         <source>Mined</source>
@@ -2480,6 +2461,10 @@ Please check the address and try again.</source>
         <source>Exporting Successful</source>
         <translation>Vienti onnistui</translation>
     </message>
+    <message>
+        <source>The transaction history was successfully saved to %1.</source>
+        <translation>Rahansiirto historia onnistuneesti tallennettu %1</translation>
+    </message>
     </context>
 <context>
     <name>UnitDisplayStatusBarControl</name>
@@ -2524,15 +2509,7 @@ Please check the address and try again.</source>
         <source>Wallet Data (*.dat)</source>
         <translation>Lompakko Data (*.dat)</translation>
     </message>
-    <message>
-        <source>Backup Failed</source>
-        <translation>Varmuuskopiointi epäonnistui</translation>
-    </message>
-    <message>
-        <source>Backup Successful</source>
-        <translation>Varmuuskopiointi onnistui</translation>
-    </message>
-    </context>
+</context>
 <context>
     <name>ZWgrControlDialog</name>
     <message>

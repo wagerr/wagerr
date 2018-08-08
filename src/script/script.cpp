@@ -1,5 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2017-2018 The PIVX developers
+// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -256,8 +258,10 @@ bool CScript::IsZerocoinMint() const
 
 bool CScript::IsZerocoinSpend() const
 {
-    return (this->size() > 0 &&
-        this->at(0) == OP_ZEROCOINSPEND);
+    if (this->empty())
+        return false;
+
+    return (this->at(0) == OP_ZEROCOINSPEND);
 }
 
 bool CScript::IsPushOnly(const_iterator pc) const

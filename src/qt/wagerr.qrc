@@ -58,6 +58,7 @@
         <file alias="staking_inactive">res/icons/staking_inactive.png</file>
         <file alias="automint_active">res/icons/automint_active.png</file>
         <file alias="automint_inactive">res/icons/automint_inactive.png</file>
+        <file alias="onion">res/icons/onion.png</file>
     </qresource>
     <qresource prefix="/css">
         <file alias="default">res/css/default.css</file>

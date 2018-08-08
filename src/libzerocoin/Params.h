@@ -11,6 +11,7 @@
 **/
 // Copyright (c) 2017 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
+
 #ifndef PARAMS_H_
 #define PARAMS_H_
 

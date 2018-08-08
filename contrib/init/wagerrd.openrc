@@ -17,7 +17,7 @@ BITCOIND_GROUP=${BITCOIND_GROUP:-wagerr}
 BITCOIND_BIN=${BITCOIND_BIN:-/usr/bin/wagerrd}
 
 name="Wagerr Core Daemon"
-description="Wagerr crypto-currency p2p network daemon"
+description="WAGERR crypto-currency p2p network daemon"
 
 command="/usr/bin/wagerrd"
 command_args="-pid=\"${BITCOIND_PIDFILE}\" \
@@ -78,7 +78,7 @@ checkconfig()
 		eerror "It is also recommended that you also set alertnotify so you are "
 		eerror "notified of problems:"
 		eerror ""
-		eerror "ie: alertnotify=echo %%s | mail -s \"Wagerr Alert\"" \
+		eerror "ie: alertnotify=echo %%s | mail -s \"WAGERR Alert\"" \
 			"admin@foo.com"
 		eerror ""
 		return 1

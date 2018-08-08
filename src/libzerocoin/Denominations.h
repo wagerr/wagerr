@@ -1,12 +1,7 @@
-/**
- * @file       Denominations.h
- *
- * @brief      Denomination info for the Zerocoin library.
- *
- * @copyright  Copyright 2017 PIVX Developers
- * @license    This project is released under the MIT license.
- **/
+// Copyright (c) 2017 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
+// Distributed under the MIT software license, see the accompanying
+// file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #ifndef DENOMINATIONS_H_
 #define DENOMINATIONS_H_
