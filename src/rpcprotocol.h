@@ -77,7 +77,7 @@ enum RPCErrorCode {
     RPC_WALLET_ENCRYPTION_FAILED = -16,    //! Failed to encrypt the wallet
     RPC_WALLET_ALREADY_UNLOCKED = -17,     //! Wallet is already unlocked
 
-    //! Bet errors 
+    //! Bet errors
     RPC_BET_DETAILS_ERROR = -31            //! Error: Incorrect bet details. Please ensure your team and event are correct.
 };
 

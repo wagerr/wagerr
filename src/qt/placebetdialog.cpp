@@ -163,7 +163,7 @@ void PlaceBetDialog::setModel(WalletModel* model)
         setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(),
                    model->getZerocoinBalance (), model->getUnconfirmedZerocoinBalance (), model->getImmatureZerocoinBalance (),
                    model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());
-        connect(model, SIGNAL(balanceChanged(CAmount, CAmount,  CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this, 
+        connect(model, SIGNAL(balanceChanged(CAmount, CAmount,  CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)), this,
                          SLOT(setBalance(CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount, CAmount)));
         connect(model->getOptionsModel(), SIGNAL(displayUnitChanged(int)), this, SLOT(updateDisplayUnit()));
         updateDisplayUnit();
@@ -225,10 +225,21 @@ void PlaceBetDialog::on_placeBetButton_clicked()
         return;
     }
 
-    if (!ui->payAmount->validate() || ui->payAmount->value(0) <= 0) {
+    if (!ui->payAmount->validate() || ui->payAmount->value(0) < (1 * COIN) || ui->payAmount->value(0) > ( 10000 * COIN ) ){
         ui->payAmount->setValid(false);
-        return;
+
+        QString questionString = tr("Bet must be between 1 - 10000 WGR inclusive!");
+
+        // Display message box
+        QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Invalid bet!"),
+                                                                   questionString.arg(""),
+                                                                   QMessageBox::Yes | QMessageBox::Cancel,
+                                                                   QMessageBox::Cancel);
+        if (retval == QMessageBox::Yes || retval == QMessageBox::Cancel) {
+            return;
+        }
     }
+
 
     // //set split block in model
     // // CoinControlDialog::coinControl->fSplitBlock = ui->splitBlockCheckBox->checkState() == Qt::Checked;
@@ -304,7 +315,7 @@ void PlaceBetDialog::send(CAmount amount, const std::string& eventId, const std:
     }
 
     CAmount txFee = currentTransaction.getTransactionFee();
-    QString questionString = tr("Are you sure you want to send?!");
+    QString questionString = tr("Are you sure you want to send?");
     questionString.append("<br /><br />%1");
 
     if (txFee > 0) {
@@ -347,7 +358,7 @@ void PlaceBetDialog::send(CAmount amount, const std::string& eventId, const std:
     WalletModel::SendCoinsReturn sendStatus = model->placeBet(currentTransaction, amount, eventId, teamToWin);
     processPlaceBetReturn(sendStatus);
 
-    //need to fix the 
+    //need to fix the
     // if (sendStatus.status == WalletModel::OK) {
     //     printf("I accept your wagerr good sir!! \n");
     //     accept();
@@ -517,13 +528,13 @@ void PlaceBetDialog::updateTabsAndLabels()
 void PlaceBetDialog::removeEvent(PlaceBetEvent* event)
 {
 //     event->hide();
-// 
+//
 //     // If the last event is about to be removed add an empty one
 //     if (ui->events->count() == 1)
 //         addEntry();
-// 
+//
 //     event->deleteLater();
-// 
+//
 //     updateTabsAndLabels();
 }
 
@@ -564,7 +575,7 @@ void PlaceBetDialog::pasteEntry(const SendCoinsRecipient& rv)
 {
 //     if (!fNewRecipientAllowed)
 //         return;
-// 
+//
 //     PlaceBetEvent* event = 0;
 //     // Replace the first event if it is still unused
 //     if (ui->events->count() == 1) {
@@ -576,7 +587,7 @@ void PlaceBetDialog::pasteEntry(const SendCoinsRecipient& rv)
 //     if (!event) {
 //         event = addEntry();
 //     }
-// 
+//
 //     event->setValue(rv);
 //     updateTabsAndLabels();
 }
@@ -589,7 +600,7 @@ bool PlaceBetDialog::handlePaymentRequest(const SendCoinsRecipient& rv)
     return true;
 }
 
-void PlaceBetDialog::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance, 
+void PlaceBetDialog::setBalance(const CAmount& balance, const CAmount& unconfirmedBalance, const CAmount& immatureBalance,
                                  const CAmount& zerocoinBalance, const CAmount& unconfirmedZerocoinBalance, const CAmount& immatureZerocoinBalance,
                                  const CAmount& watchBalance, const CAmount& watchUnconfirmedBalance, const CAmount& watchImmatureBalance)
 {
@@ -614,7 +625,7 @@ void PlaceBetDialog::updateDisplayUnit()
     TRY_LOCK(cs_main, lockMain);
     if (!lockMain) return;
 
-    setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(), 
+    setBalance(model->getBalance(), model->getUnconfirmedBalance(), model->getImmatureBalance(),
                model->getZerocoinBalance (), model->getUnconfirmedZerocoinBalance (), model->getImmatureZerocoinBalance (),
                model->getWatchBalance(), model->getWatchUnconfirmedBalance(), model->getWatchImmatureBalance());
     coinControlUpdateLabels();
@@ -634,7 +645,7 @@ void PlaceBetDialog::updateSwiftTX()
 void PlaceBetDialog::processPlaceBetReturn(const WalletModel::SendCoinsReturn& sendCoinsReturn, const QString& msgArg, bool fPrepare)
 {
     bool fAskForUnlock = false;
-    
+
     QPair<QString, CClientUIInterface::MessageBoxFlags> msgParams;
     // Default to a warning message, override if error message is needed
     msgParams.second = CClientUIInterface::MSG_WARNING;
@@ -963,7 +974,7 @@ void PlaceBetDialog::coinControlUpdateLabels()
 {
 //     if (!model || !model->getOptionsModel() || !model->getOptionsModel()->getCoinControlFeatures())
 //         return;
-// 
+//
 //     // set pay amounts
 //     CoinControlDialog::payAmounts.clear();
 //     for (int i = 0; i < ui->events->count(); ++i) {
@@ -971,11 +982,11 @@ void PlaceBetDialog::coinControlUpdateLabels()
 //         if (event)
 //             CoinControlDialog::payAmounts.append(event->getValue().amount);
 //     }
-// 
+//
 //     if (CoinControlDialog::coinControl->HasSelected()) {
 //         // actual coin control calculation
 //         CoinControlDialog::updateLabels(model, this);
-// 
+//
 //         // show coin control stats
 //         // ui->labelCoinControlAutomaticallySelected->hide();
 //         // ui->widgetCoinControl->show();
