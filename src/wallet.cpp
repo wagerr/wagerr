@@ -1284,7 +1284,7 @@ CAmount CWalletTx::GetAvailableWatchOnlyCredit(const bool& fUseCache) const
     fAvailableWatchCreditCached = true;
     return nCredit;
 }
-    
+
 CAmount CWalletTx::GetLockedWatchOnlyCredit() const
 {
     if (pwallet == 0)
@@ -1607,7 +1607,7 @@ CAmount CWallet::GetUnconfirmedZerocoinBalance() const
     CAmount nUnconfirmed = 0;
     CWalletDB walletdb(pwalletMain->strWalletFile);
     list<CZerocoinMint> listMints = walletdb.ListMintedCoins(true, false, true);
- 
+
     std::map<libzerocoin::CoinDenomination, int> mapUnconfirmed;
     for (const auto& denom : libzerocoin::zerocoinDenomList){
         mapUnconfirmed.insert(make_pair(denom, 0));
@@ -4833,7 +4833,7 @@ void CWallet::ReconsiderZerocoins(std::list<CZerocoinMint>& listMintsRestored)
             LogPrintf("%s: failed to find transaction %s in blockchain\n", __func__, txHash.GetHex());
             continue;
         }
-        
+
         mint.SetTxHash(txHash);
         mint.SetHeight(mapBlockIndex.at(hashBlock)->nHeight);
         if (!walletdb.UnarchiveZerocoin(mint)) {
