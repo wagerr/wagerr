@@ -1,7 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2015-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -30,7 +30,7 @@
 #include <boost/filesystem/path.hpp>
 #include <boost/thread/exceptions.hpp>
 
-//Wagerr only features
+//WAGERR only features
 
 extern bool fMasterNode;
 extern bool fLiteMode;
@@ -61,6 +61,7 @@ extern bool fLogIPs;
 extern volatile bool fReopenDebugLog;
 
 void SetupEnvironment();
+bool SetupNetworking();
 
 /** Return true if log accepts specified category */
 bool LogAcceptCategory(const char* category);
@@ -106,6 +107,8 @@ static inline bool error(const char* format)
     return false;
 }
 
+double double_safe_addition(double fValue, double fIncrement);
+double double_safe_multiplication(double fValue, double fmultiplicator);
 void PrintExceptionContinue(std::exception* pex, const char* pszThread);
 void ParseParameters(int argc, const char* const argv[]);
 void FileCommit(FILE* fileout);

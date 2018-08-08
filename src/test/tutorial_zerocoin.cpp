@@ -9,7 +9,8 @@
 * @copyright  Copyright 2013 Ian Miers, Christina Garman and Matthew Green
 * @license    This project is released under the MIT license.
 **/
-
+// Copyright (c) 2017-2018 The PIVX developers
+// Copyright (c) 2018 The Wagerr developers
 
 #include <boost/test/unit_test.hpp>
 #include <string>
@@ -209,7 +210,7 @@ ZerocoinTutorial()
 
 		// Construct the CoinSpend object. This acts like a signature on the
 		// transaction.
-        libzerocoin::CoinSpend spend(params, newCoin, accumulator, 0, witness, 0);//(0) - Presstab
+        libzerocoin::CoinSpend spend(params, params, newCoin, accumulator, 0, witness, 0, libzerocoin::SpendType::SPEND);//(0) - Presstab
 
 		// This is a sanity check. The CoinSpend object should always verify,
 		// but why not check before we put it onto the wire?
@@ -236,7 +237,7 @@ ZerocoinTutorial()
 		/********************************************************************/
 
 		// Deserialize the CoinSpend intro a fresh object
-		libzerocoin::CoinSpend newSpend(params, serializedCoinSpend);
+		libzerocoin::CoinSpend newSpend(params, params, serializedCoinSpend);
 
 		// Create a new metadata object to contain the hash of the received
 		// ZEROCOIN_SPEND transaction. If we were a real client we'd actually

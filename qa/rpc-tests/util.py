@@ -1,4 +1,4 @@
-# Copyright (c) 2014-2018 The Bitcoin Core developers
+# Copyright (c) 2014 The Bitcoin Core developers
 # Copyright (c) 2014-2015 The Dash developers
 # Copyright (c) 2015-2017 The PIVX developers
 # Copyright (c) 2018 The Wagerr developers

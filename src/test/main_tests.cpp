@@ -1,4 +1,4 @@
-// Copyright (c) 2014-2018 The Bitcoin Core developers
+// Copyright (c) 2014 The Bitcoin Core developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2017 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
@@ -46,7 +46,7 @@ BOOST_AUTO_TEST_CASE(subsidy_limit_test)
         nSum += nSubsidy;
         BOOST_CHECK(nSum > 0 && nSum <= nMoneySupplyPoWEnd);
     }
-    // BOOST_CHECK(nSum == 19626072100000000ULL);
+    BOOST_CHECK(nSum == 19626072100000000ULL);
 }
 
 BOOST_AUTO_TEST_SUITE_END()

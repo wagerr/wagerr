@@ -1,6 +1,6 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
-// Copyright (c) 2016-2017 The PIVX developers
+// Copyright (c) 2016-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -621,6 +621,15 @@ void CTxMemPool::queryHashes(vector<uint256>& vtxid)
     vtxid.reserve(mapTx.size());
     for (map<uint256, CTxMemPoolEntry>::iterator mi = mapTx.begin(); mi != mapTx.end(); ++mi)
         vtxid.push_back((*mi).first);
+}
+
+void CTxMemPool::getTransactions(std::set<uint256>& setTxid)
+{
+    setTxid.clear();
+
+    LOCK(cs);
+    for (map<uint256, CTxMemPoolEntry>::iterator mi = mapTx.begin(); mi != mapTx.end(); ++mi)
+        setTxid.insert((*mi).first);
 }
 
 bool CTxMemPool::lookup(uint256 hash, CTransaction& result) const

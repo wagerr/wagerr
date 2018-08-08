@@ -127,7 +127,7 @@ public:
 
     CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn);
     CTxOut(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn);
-
+    
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
@@ -251,6 +251,7 @@ public:
 
     // Return sum of txouts.
     CAmount GetValueOut() const;
+
     CAmount AddVoutValues(CAmount& nValueOut, CAmount& nValueBurned) const;
     CAmount GetValueBurned() const;
     // GetValueIn() is a method on CCoinsViewCache, because
@@ -264,7 +265,7 @@ public:
 
     bool IsZerocoinSpend() const
     {
-        return (vin.size() > 0 && vin[0].prevout.IsNull() && vin[0].scriptSig[0] == OP_ZEROCOINSPEND);
+        return (vin.size() > 0 && vin[0].prevout.hash == 0 && vin[0].scriptSig[0] == OP_ZEROCOINSPEND);
     }
 
     bool IsZerocoinMint() const
@@ -293,11 +294,7 @@ public:
         return (vin.size() == 1 && vin[0].prevout.IsNull() && !ContainsZerocoins());
     }
 
-    bool IsCoinStake() const
-    {
-        // ppcoin: the coin stake transaction is marked with the first output empty
-        return (vin.size() > 0 && (!vin[0].prevout.IsNull()) && vout.size() >= 2 && vout[0].IsEmpty());
-    }
+    bool IsCoinStake() const;
 
     friend bool operator==(const CTransaction& a, const CTransaction& b)
     {

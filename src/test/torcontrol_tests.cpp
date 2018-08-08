@@ -1,8 +1,9 @@
 // Copyright (c) 2017 The Zcash developers
+// Copyright (c) 2017 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
-//
+
 #include "torcontrol.cpp"
 
 #include <boost/test/unit_test.hpp>

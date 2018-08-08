@@ -9,7 +9,7 @@
  * @copyright  Copyright 2013 Ian Miers, Christina Garman and Matthew Green
  * @license    This project is released under the MIT license.
  **/
-// Copyright (c) 2017 The PIVX developers
+// Copyright (c) 2017-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 
 #include <sstream>
@@ -109,7 +109,7 @@ void AccumulatorWitness::resetValue(const Accumulator& checkpoint, const PublicC
 }
 
 void AccumulatorWitness::AddElement(const PublicCoin& c) {
-	if(element != c) {
+	if(element.getValue() != c.getValue()) {
 		witness += c;
 	}
 }
@@ -126,7 +126,15 @@ const CBigNum& AccumulatorWitness::getValue() const {
 bool AccumulatorWitness::VerifyWitness(const Accumulator& a, const PublicCoin &publicCoin) const {
 	Accumulator temp(witness);
 	temp += element;
-	return (temp == a && this->element == publicCoin);
+    if (!(temp == a)) {
+        std::cout << "VerifyWitness: failed verify temp does not equal a\n";
+        return false;
+    } else if (this->element != publicCoin) {
+        std::cout << "VerifyWitness: failed verify pubcoins not equal\n";
+        return false;
+    }
+
+	return true;
 }
 
 AccumulatorWitness& AccumulatorWitness::operator +=(

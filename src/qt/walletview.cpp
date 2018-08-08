@@ -1,5 +1,7 @@
-// Copyright (c) 2011-2013 The Bitcoin developers
-// Distributed under the MIT/X11 software license, see the accompanying
+// Copyright (c) 2011-2015 The Bitcoin developers
+// Copyright (c) 2016-2018 The PIVX developers
+// Copyright (c) 2018 The Wagerr developers
+// Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "walletview.h"
@@ -300,7 +302,14 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
     // go thru blockchain and get data
 
-
+    // Set the Oracle wallet address. 
+    std::string OracleWalletAddr = "";
+    if (Params().NetworkID() == CBaseChainParams::MAIN) {
+        OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
+    }
+    else {
+        OracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
+    }
 
     // Set event name
     std::string evtDes;
@@ -357,7 +366,6 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
     placeBetPage->clear();
 
-    std::map<uint256, uint32_t> coreWalletVouts;
     std::vector<CEvent *> eventsVector;
     // FIXME Copied from `rpcwallet.cpp`.
     // TODO We currently search the entire block chain every time we query the
@@ -380,16 +388,28 @@ void WalletView::gotoPlaceBetPage(QString addr)
             }
 
             bool match = false;
-            for (unsigned int i = 0; i < tx.vin.size(); i++) {
-                const CTxIn& txin = tx.vin[i];
-                //printf("VIn: %s",tx.vin[i].ToString().c_str());
-                COutPoint prevout = txin.prevout;
+            // Ensure if event TX that has it been posted by Oracle wallet by looking at the vins.
+            const CTxIn &txin = tx.vin[0];
+            COutPoint prevout = txin.prevout;
 
-                // TODO Investigate whether a transaction can have multiple
-                // `vout`s to the same address.
-                if (coreWalletVouts[prevout.hash] == prevout.n) {
-                    match = true;
-                    break;
+            uint256 hashBlock;
+            CTransaction txPrev;
+            if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
+
+                const CTxOut &prevTxOut = txPrev.vout[0];
+                std::string scriptPubKey = prevTxOut.scriptPubKey.ToString();
+
+                txnouttype type;
+                vector<CTxDestination> prevAddrs;
+                int nRequired;
+
+                if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
+                    BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
+                        // TODO Take this wallet address as a configuration value.
+                        if (CBitcoinAddress(prevAddr).ToString() == OracleWalletAddr) {
+                            match = true;
+                        }
+                    }
                 }
             }
 
@@ -398,7 +418,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                 std::string scriptPubKey = txout.scriptPubKey.ToString();
 
                 // TODO Remove hard-coded values from this block.
-                if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                if ( match && scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
                     vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
                     std::string evtDescr(v.begin(), v.end());
                     std::vector<std::string> strs;
@@ -417,21 +437,6 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
                         //add events to vector
                         eventsVector.push_back(event);
-                    }
-
-                }
-                
-                txnouttype type;
-                vector<CTxDestination> addrs;
-                int nRequired;
-                if (!ExtractDestinations(txout.scriptPubKey, type, addrs, nRequired)) {
-                    continue;
-                }
-
-                BOOST_FOREACH (const CTxDestination& addr, addrs) {
-                    // TODO Take this wallet address as a configuration value.
-                    if (CBitcoinAddress(addr).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
-                        coreWalletVouts.insert(make_pair(tx.GetHash(), i));
                     }
                 }
             }
@@ -452,12 +457,12 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
     //remove duplicates from list (Remove older duplicates)
     std::vector<CEvent *> cleanEventsVector;
-    for(int i = 0; i < eventsVector.size(); i++ ){
+    for(unsigned int i = 0; i < eventsVector.size(); i++ ){
 
         bool found = false;
 
         //loop through and check if the eventid matches a result event id
-        for (int j = 0; j < cleanEventsVector.size(); j++) {
+        for (unsigned int j = 0; j < cleanEventsVector.size(); j++) {
 
             if (eventsVector[i]->id == cleanEventsVector[j]->id) {
                 found = true;
@@ -474,7 +479,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
 
     //put events on screen
-    for(int i = 0; i < cleanEventsVector.size(); i++ ){
+    for(unsigned int i = 0; i < cleanEventsVector.size(); i++ ){
 
         std::string evtDes = "";
         time_t time = (time_t) std::strtol(cleanEventsVector[i]->starting.c_str(), nullptr, 10);
@@ -491,7 +496,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
         evtDes += it == roundNames.end() ? cleanEventsVector[i]->round : it->second;
         evtDes += "   ";
 
-        
+
         tm *ptm = std::gmtime(&time);
         static const char mon_name[][4] = {
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
@@ -608,14 +613,7 @@ void WalletView::backupWallet()
 
     if (filename.isEmpty())
         return;
-
-    if (!walletModel->backupWallet(filename)) {
-        emit message(tr("Backup Failed"), tr("There was an error trying to save the wallet data to %1.").arg(filename),
-            CClientUIInterface::MSG_ERROR);
-    } else {
-        emit message(tr("Backup Successful"), tr("The wallet data was successfully saved to %1.").arg(filename),
-            CClientUIInterface::MSG_INFORMATION);
-    }
+    walletModel->backupWallet(filename);
 }
 
 void WalletView::changePassphrase()

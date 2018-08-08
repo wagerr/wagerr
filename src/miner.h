@@ -1,5 +1,7 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
-// Copyright (c) 2009-2013 The Bitcoin developers
+// Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2016 The PIVX developers
+// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -29,9 +31,9 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
 /** Check mined block */
 void UpdateTime(CBlockHeader* block, const CBlockIndex* pindexPrev);
 
-std::vector<std::vector<std::string>> getEventResults();
+std::vector<std::vector<std::string>> getEventResults(int height);
 void getEventBets();
-std::vector<CTxOut> GetBetPayouts();
+std::vector<CTxOut> GetBetPayouts( int height );
 std::vector<CTxOut> GetBetPayoutsForTransactions(std::vector<CTransaction> txs);
 //std::vector<std::vector<std::string>> getEventOddsForResults( );
 

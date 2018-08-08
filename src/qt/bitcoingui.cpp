@@ -1,6 +1,6 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2017 The PIVX developers
+// Copyright (c) 2015-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
@@ -72,6 +72,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             unitDisplayControl(0),
                                                                             labelStakingIcon(0),
                                                                             labelEncryptionIcon(0),
+                                                                            labelTorIcon(0),
                                                                             labelConnectionsIcon(0),
                                                                             labelBlocksIcon(0),
                                                                             progressBarLabel(0),
@@ -200,13 +201,13 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     labelEncryptionIcon->setFlat(true); // Make the button look like a label, but clickable
     labelEncryptionIcon->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
     labelEncryptionIcon->setMaximumSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
+    labelTorIcon = new QLabel();
     labelConnectionsIcon = new QPushButton();
     labelConnectionsIcon->setObjectName("labelConnectionsIcon");
     labelConnectionsIcon->setFlat(true); // Make the button look like a label, but clickable
     labelConnectionsIcon->setStyleSheet(".QPushButton { background-color: rgba(255, 255, 255, 0);}");
     labelConnectionsIcon->setMaximumSize(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE);
     labelBlocksIcon = new QLabel();
-
 #ifdef ENABLE_WALLET
     if (enableWallet) {
         frameBlocksLayout->addStretch();
@@ -219,6 +220,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
         frameBlocksLayout->addWidget(labelAutoMintIcon);
     }
 #endif // ENABLE_WALLET
+    frameBlocksLayout->addWidget(labelTorIcon);
     frameBlocksLayout->addStretch();
     frameBlocksLayout->addWidget(labelConnectionsIcon);
     frameBlocksLayout->addStretch();
@@ -282,7 +284,6 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
     connect(timerStakingIcon, SIGNAL(timeout()), this, SLOT(setStakingStatus()));
     timerStakingIcon->start(10000);
     setStakingStatus();
-
 
     QTimer* timerAutoMintIcon = new QTimer(labelAutoMintIcon);
     connect(timerAutoMintIcon, SIGNAL(timeout()), this, SLOT(setAutoMintStatus()));
@@ -423,7 +424,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     aboutQtAction->setStatusTip(tr("Show information about Qt"));
     aboutQtAction->setMenuRole(QAction::AboutQtRole);
     optionsAction = new QAction(QIcon(":/icons/options"), tr("&Options..."), this);
-    optionsAction->setStatusTip(tr("Modify configuration options for Wagerr"));
+    optionsAction->setStatusTip(tr("Modify configuration options for WAGERR"));
     optionsAction->setMenuRole(QAction::PreferencesRole);
     toggleHideAction = new QAction(networkStyle->getAppIcon(), tr("&Show / Hide"), this);
     toggleHideAction->setStatusTip(tr("Show or hide the main Window"));
@@ -478,7 +479,7 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     multisigSignAction->setStatusTip(tr("Sign with a multisignature address"));
 
     openAction = new QAction(QApplication::style()->standardIcon(QStyle::SP_FileIcon), tr("Open &URI..."), this);
-    openAction->setStatusTip(tr("Open a Wagerr: URI or payment request"));
+    openAction->setStatusTip(tr("Open a WAGERR: URI or payment request"));
     openBlockExplorerAction = new QAction(QIcon(":/icons/explorer"), tr("&Blockchain explorer"), this);
     openBlockExplorerAction->setStatusTip(tr("Block explorer window"));
 
@@ -638,6 +639,9 @@ void BitcoinGUI::setClientModel(ClientModel* clientModel)
         connect(clientModel, SIGNAL(showProgress(QString, int)), this, SLOT(showProgress(QString, int)));
 
         rpcConsole->setClientModel(clientModel);
+
+        updateTorIcon();
+
 #ifdef ENABLE_WALLET
         if (walletFrame) {
             walletFrame->setClientModel(clientModel);
@@ -1090,7 +1094,7 @@ void BitcoinGUI::message(const QString& title, const QString& message, unsigned 
             break;
         }
     }
-    // Append title to "Wagerr - "
+    // Append title to "WAGERR - "
     if (!msgType.isEmpty())
         strTitle += " - " + msgType;
 
@@ -1282,6 +1286,24 @@ void BitcoinGUI::setEncryptionStatus(int status)
     }
 }
 #endif // ENABLE_WALLET
+
+void BitcoinGUI::updateTorIcon()
+{
+    std::string ip_port;
+    bool tor_enabled = clientModel->getTorInfo(ip_port);
+
+    if (tor_enabled) {
+        if (labelTorIcon->pixmap() == 0) {
+            QString ip_port_q = QString::fromStdString(ip_port);
+            labelTorIcon->setPixmap(QIcon(":/icons/onion").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
+            labelTorIcon->setToolTip(tr("Tor is <b>enabled</b>: %1").arg(ip_port_q));
+        } else {
+            labelTorIcon->show();
+        }
+    } else {
+        labelTorIcon->hide();
+    }
+}
 
 void BitcoinGUI::showNormalIfMinimized(bool fToggleHidden)
 {
