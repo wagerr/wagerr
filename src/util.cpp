@@ -434,7 +434,7 @@ boost::filesystem::path GetDefaultDataDir()
     return GetSpecialFolderPath(CSIDL_APPDATA) / "WAGERR";
 #else
     fs::path pathRet;
-    char* pszHome = getenv("SNAP_USER_COMMON");
+    char* pszHome = getenv("HOME");
     if (pszHome == NULL || strlen(pszHome) == 0)
         pathRet = fs::path("/");
     else
