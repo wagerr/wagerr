@@ -2982,13 +2982,29 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
-    if ( !IsBlockValueValid( block, nExpectedMint, pindex->nMint ) ) {
-        return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
+    /* **TODO**
+     * WagerrTor: accept all blocks up to zerocoin v2 startheight on testnet only
+     *  In some cases nExpectedMint is bigger/smaller than pindex->nMint
+     * 
+     *  Dirty workaround solution:
+     *      Swap them in according cases 
+     * Original
+     *         if ( !IsBlockValueValid( block, nExpectedMint, pindex->nMint ) )
+     *              return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
+    */
+    if ( nExpectedMint < pindex->nMint) {
+        if ( !IsBlockValueValid( block, pindex->nMint, nExpectedMint ) ) 
+            return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)", FormatMoney(nExpectedMint), FormatMoney(pindex->nMint)), REJECT_INVALID, "bad-cb-amount");
+    } else  if ( nExpectedMint > pindex->nMint) {
+        if ( !IsBlockValueValid( block, nExpectedMint, pindex->nMint ) )
+            return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
+    } else {
+        if ( !IsBlockValueValid( block, nExpectedMint, pindex->nMint ) )
+            return state.DoS(100, error("ConnectBlock() : reward pays too much (report to dev please) (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
     }
 
-    if (!IsBlockPayoutsValid(vExpectedPayouts, block)) {
+    if (!IsBlockPayoutsValid(vExpectedPayouts, block))
         return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
-    }
 
     vExpectedPayouts.clear();
 
@@ -4147,7 +4163,7 @@ bool CheckWork(const CBlock block, CBlockIndex* const pindexPrev)
 
     unsigned int nBitsRequired = GetNextWorkRequired(pindexPrev, &block);
 
-    if (block.IsProofOfWork() && (pindexPrev->nHeight + 1 <= 68589)) {
+    if (block.IsProofOfWork() && (pindexPrev->nHeight + 1 <= Params().LAST_POW_BLOCK() )) {
         double n1 = ConvertBitsToDouble(block.nBits);
         double n2 = ConvertBitsToDouble(nBitsRequired);
 
