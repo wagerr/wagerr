@@ -167,6 +167,24 @@ public:
         nEnforceNewSporkKey = 1536710400;       //!> Sporks signed after must use the new spork key (GMT: Wednesday, 12. September 2018 00:00:00)
         nRejectOldSporkKey = 1514764801;        //!> Fully reject old spork key after GMT: Monday, 1. January 2018 00:00:01
 
+        /** Bet related parameters **/
+        nBetStartHeight = 240000;
+        strOracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";     // Oracle payout address
+        nBetBlocksIndexTimespan = 20160;
+        strDevPayoutAddr = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";        // Dev payout address
+        strOMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";       // OMNO Payout address
+        nOMNOReward = 94 * 100 * 0.024;                                 // profitAcc / 94 * 100 * 0.024 (nMNBetReward = totalAmountBet * 0.024)
+        nDevReward = 94 * 100 * 0.006;                                  // profitAcc / 94 * 100 * 0.006
+        nOddsDivisor = 10000;                                           // Odds divisor
+        nBetXPercent = 6;                                               // 6 percent
+        nTraverseBlocksAmount = 129600;                                 // Traverse block amount a event scan to match a result and all the bets on a result.
+        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already bpaid out.
+        strBetResultTypeID = "3";                                       // result type ID 
+        strBetEventID = "2";                                            // event type ID
+        nMinBetPayoutRange = 50;                                        // Only payout bets that are between 50 - 10000 WRG inclusive.
+        nMaxBetPayoutRange = 10000;                                     // Only payout bets that are between 50 - 10000 WRG inclusive.
+        nBetPlaceTimeoutBlocks = 1200;                                  // If bet was placed less than 1200 blocks (20 mins) before event start or after event start discard it.
+
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot
          * be spent as it did not originally exist in the database.
@@ -290,6 +308,23 @@ public:
         nBlockZerocoinV2 = 55000; //The block that zerocoin v2 becomes active
         nEnforceNewSporkKey = 1521604800; //!> Sporks signed after Wednesday, March 21, 2018 4:00:00 AM GMT must use the new spork key
         nRejectOldSporkKey = 1522454400; //!> Reject old spork key after Saturday, March 31, 2018 12:00:00 AM GMT
+
+        /** Bet related parameters **/
+        nBetStartHeight = 20998;
+        strOracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
+        nBetBlocksIndexTimespan = 20160;
+        strDevPayoutAddr = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";        // Dev payout testnet address
+        strOMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";       // OMNO Payout testnet address
+        nOMNOReward = 94 * 100 * 0.024;                                 // profitAcc / 94 * 100 * 0.024 (nMNBetReward = totalAmountBet * 0.024)
+        nDevReward = 94 * 100 * 0.006;                                  // profitAcc / 94 * 100 * 0.006
+        nOddsDivisor = 10000;                                           // Odds divisor
+        nTraverseBlocksAmount = 4000;                                   // Traverse block amount a event scan to match a result and all the bets on a result.
+        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already bpaid out.
+        strBetResultTypeID = "3";                                       // result type ID 
+        strBetEventID = "2";                                            // event type ID
+        nMinBetPayoutRange = 50;                                        // Only payout bets that are between 50 - 10000 WRG inclusive.
+        nMaxBetPayoutRange = 10000;                                     // Only payout bets that are between 50 - 10000 WRG inclusive.
+        nBetPlaceTimeoutBlocks = 1200;                                  // If bet was placed less than 1200 blocks (20 mins) before event start or after event start discard it.
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696182;

@@ -1869,8 +1869,10 @@ int64_t GetBlockPayouts( std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetR
     CAmount profitAcc = 0; 
     CAmount nPayout   = 0;
     CAmount totalAmountBet = 0;
-    std::string devPayoutAddr  = "";
-    std::string OMNOPayoutAddr = "";
+
+    // Set the OMNO and Dev reward addresses
+    std::string devPayoutAddr  = Params().DevPayoutAddr();
+    std::string OMNOPayoutAddr = Params().OMNOPayoutAddr();
 
      for(unsigned i = 0; i < vexpectedPayouts.size(); i++){
         CAmount betValue = vexpectedPayouts[i].nBetValue;
@@ -1883,20 +1885,10 @@ int64_t GetBlockPayouts( std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetR
         nPayout += payValue;
     }
  
-    // Set the OMNO and Dev reward addresses for mainment and testnet.
-    if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        devPayoutAddr  = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";
-        OMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";
-    }
-    else {
-        devPayoutAddr  = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";
-        OMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";
-    }
-
     if(vexpectedPayouts.size() > 0){
         // Calculate the OMNO reward and the Dev reward.
-        CAmount nOMNOReward = profitAcc / 94 * 100 * 0.024;
-        CAmount nDevReward  = profitAcc / 94 * 100 * 0.006;
+        CAmount nOMNOReward = profitAcc / Params().OMNOReward();
+        CAmount nDevReward  = profitAcc / Params().DevReward();
 
         // Add both reward payouts to the payout vector.
         vexpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress( devPayoutAddr ).Get()));
@@ -2954,16 +2946,38 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // Calculate the expected bet payouts.
     std::vector<CTxOut> vExpectedPayouts;
+    if( pindex->nHeight > Params().BetStartHeight()) {
 
-    if( pindex->nHeight > 20998 ) {
-        printf("\nMAIN BLOCK: %i \n", (pindex->nHeight));
+        std::string strBetNetBlockTxt;
+        std::ostringstream BetNetBlockTxt;
+        std::ostringstream BetNetExpectedTxt;
+
+        if (Params().NetworkID() == CBaseChainParams::MAIN) {
+            strBetNetBlockTxt = "MAIN";
+        } else if(Params().NetworkID() == CBaseChainParams::TESTNET) {
+            strBetNetBlockTxt = "TESTNET";
+        } else if(Params().NetworkID() == CBaseChainParams::REGTEST) {
+            strBetNetBlockTxt = "REGTEST";
+        } else if(Params().NetworkID() == CBaseChainParams::UNITTEST) {
+            strBetNetBlockTxt = "UNITTEST";
+        }
+
+        // build text **TODO** (has to be edited)
+        BetNetBlockTxt << "\n" << strBetNetBlockTxt << " BLOCK: %i \n";
+        BetNetExpectedTxt << strBetNetBlockTxt << " EXPECTED: %s \n";
+        std::string strBetNetBlockTmp = BetNetBlockTxt.str();
+        std::string strBetNetExpectedTxt = BetNetExpectedTxt.str();
+	    const char * BetNetBlockTxtConst = strBetNetBlockTmp.c_str();
+        const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
+
+        printf(BetNetBlockTxtConst, (pindex->nHeight));
 
         vExpectedPayouts = GetBetPayouts(pindex->nHeight - 1);
         nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
         nExpectedMint += nMNBetReward;
 
         for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
-            printf("MAIN EXPECTED: %s \n", vExpectedPayouts[l].ToString().c_str());
+            printf(BetNetExpectedTxtConst, vExpectedPayouts[l].ToString().c_str());
         }
     }
 
