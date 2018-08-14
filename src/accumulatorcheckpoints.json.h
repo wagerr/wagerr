@@ -10,7 +10,7 @@
 std::string GetMainCheckpoints() {
     std::string strMainCheckpoints = "[\n"
             "  {\n"
-            "    \"height\": 0,\n"
+            "    \"height\": 1500,\n"
             "    \"1\": \"0\",\n"
             "    \"5\": \"0\",\n"
             "    \"10\": \"0\",\n"
@@ -27,7 +27,7 @@ std::string GetMainCheckpoints() {
 std::string GetTestCheckpoints() {
     std::string strTestCheckpoints = "[\n"
             "  {\n"
-            "    \"height\": 0,\n"
+            "    \"height\": 350,\n"
             "    \"1\": \"0\",\n"
             "    \"5\": \"0\",\n"
             "    \"10\": \"0\",\n"
@@ -44,7 +44,7 @@ std::string GetTestCheckpoints() {
 std::string GetRegTestCheckpoints() {
     std::string strRegTestCheckpoints = "[\n"
             "  {\n"
-            "    \"height\": 0,\n"
+            "    \"height\": 350,\n"
             "    \"1\": \"0\",\n"
             "    \"5\": \"0\",\n"
             "    \"10\": \"0\",\n"
