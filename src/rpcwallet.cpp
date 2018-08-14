@@ -68,13 +68,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
     UniValue ret(UniValue::VARR);
     
     // Set the Oracle wallet address. 
-    std::string OracleWalletAddr = "";
-    if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
-    }
-    else {
-        OracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
-    }
+    std::string OracleWalletAddr = Params().OracleWalletAddr();
 
     // We keep track of `vout`s that are addressed to our "Core Wallet" (the
     // wallet that we use to issue events and results). Afterwards, if a `vin`

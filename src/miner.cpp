@@ -445,7 +445,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             std::vector<CTxOut> voutPayouts;
             CAmount nMNBetReward = 0;
 
-            if( nHeight > 20998  ) {
+            if( nHeight > Params().BetStartHeight()) {
                 printf("\nMINER BLOCK: %i \n", nHeight);
 
                 voutPayouts = GetBetPayouts(nHeight - 1);
@@ -548,17 +548,10 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
  */
 std::vector<std::vector<std::string>> getEventResults( int height ) {
 
+    // Set the Oracle wallet address. 
+    std::string OracleWalletAddr = Params().OracleWalletAddr();
     std::vector<std::vector<std::string>> results;
     int nCurrentHeight = chainActive.Height();
-    
-    // Set the Oracle wallet address. 
-    std::string OracleWalletAddr = "";
-    if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
-    }
-    else {
-        OracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
-    }
 
     // Get the current block so we can look for any results in it.
     CBlockIndex *resultsBocksIndex = NULL;
@@ -616,7 +609,7 @@ std::vector<std::vector<std::string>> getEventResults( int height ) {
                     boost::split(strs, betDescr, boost::is_any_of("|"));
 
                     // Only look for result transactions.
-                    if (strs.size() != 4 || strs[0] != "3") {
+                    if (strs.size() != 4 || strs[0] != Params().BetResultTypeID()) {
                         break;
                     }
 
@@ -649,11 +642,7 @@ std::vector<std::vector<std::string>> checkResults( std::vector<std::vector<std:
 
     // Set the number of blocks we want to look back for results already bpaid out.
     CBlockIndex *resultsBocksIndex = NULL;
-    if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        resultsBocksIndex = chainActive[nCurrentHeight - 1440];
-    } else {
-        resultsBocksIndex = chainActive[nCurrentHeight - 1440];
-    }
+    resultsBocksIndex = chainActive[nCurrentHeight - Params().BetBlockPayoutAmount()];
 
     // Check if there is a result already posted for an event in the last x blocks
     while (resultsBocksIndex) {
@@ -667,7 +656,7 @@ std::vector<std::vector<std::string>> checkResults( std::vector<std::vector<std:
                 const CTxOut& txout = tx.vout[i];
                 std::string s = txout.scriptPubKey.ToString();
 
-                if (s.length() > 0 && CBitcoinAddress(tx.vout[0].ToString()).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ") {
+                if (s.length() > 0 && CBitcoinAddress(tx.vout[0].ToString()).ToString() == Params().OracleWalletAddr()) {
 
                     if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
 
@@ -678,7 +667,7 @@ std::vector<std::vector<std::string>> checkResults( std::vector<std::vector<std:
                         boost::split(strs, betDescr, boost::is_any_of("|"));
 
                         //check if the result is the correct result type (3) and size
-                        if (strs.size() != 4 || strs[0] != "3") {
+                        if (strs.size() != 4 || strs[0] != Params().BetResultTypeID()) {
                             continue;
                         }
 
@@ -720,7 +709,7 @@ std::vector<CTxOut> GetBetPayoutsForTransactions(std::vector<CTransaction> txs) 
                 boost::split(strs, betDescr, boost::is_any_of("|"));
 
                 // Only look for result transactions.
-                if (strs.size() != 4 || strs[0] != "3") {
+                if (strs.size() != 4 || strs[0] != Params().BetResultTypeID()) {
                     break;
                 }
                 printf("Searching for %s -> %s\n", strs[2].c_str(), strs[3].c_str());
@@ -746,15 +735,10 @@ std::vector<CTxOut> GetBetPayoutsForTransactions(std::vector<CTransaction> txs) 
         for(unsigned int currResult = 0; currResult < results.size(); currResult++) {
 
             CBlockIndex *BlocksIndex = NULL;
-            if (Params().NetworkID() == CBaseChainParams::MAIN) {
-                BlocksIndex = chainActive[nCurrentHeight - 129600];
-            }
-            else {
-                BlocksIndex = chainActive[nCurrentHeight - 4000];
-            }
+            BlocksIndex = chainActive[nCurrentHeight - Params().TraverseBlocksAmount()];
 
             CAmount payout = 0 * COIN;
-            unsigned int oddsDivisor = 10000;
+            unsigned int oddsDivisor = Params().OddsDivisor();
 
             // Traverse the blockchain to find events and bets.
             while (BlocksIndex) {
@@ -800,7 +784,7 @@ std::vector<CTxOut> GetBetPayoutsForTransactions(std::vector<CTransaction> txs) 
                                 CTxDestination address;
                                 ExtractDestination(tx.vout[0].scriptPubKey, address);
 
-                                if (CBitcoinAddress(address).ToString() == "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ" && pVersion == "1.0") {
+                                if (CBitcoinAddress(address).ToString() == Params().OracleWalletAddr() && pVersion == "1.0") {
                                     map<std::string, std::string>::iterator it = results.find(eventId);
                                     if (it == results.end()) {
                                         continue;
@@ -821,7 +805,7 @@ std::vector<CTxOut> GetBetPayoutsForTransactions(std::vector<CTransaction> txs) 
                             }
 
                             // Bet OP RETURN transaction.
-                            if (strs.size() == 4 && txType == "2") {
+                            if (strs.size() == 4 && txType == Params().BetEventID()) {
                                 std::string pVersion = strs[1];
                                 std::string eventId  = strs[2];
                                 std::string result   = strs[3];
@@ -894,13 +878,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
     LogPrintf( "Results found: %li \n", results.size() );
 
     // Set the Oracle wallet address. 
-    std::string OracleWalletAddr = "";
-    if (Params().NetworkID() == CBaseChainParams::MAIN) {
-        OracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";
-    }
-    else {
-        OracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
-    }
+    std::string OracleWalletAddr = Params().OracleWalletAddr();
 
     // Traverse the blockchain for an event to match a result and all the bets on a result.
     for(unsigned int currResult = 0; currResult < results.size(); currResult++) {
@@ -910,15 +888,11 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
 
         // Look back the chain 14 days for any events and bets.
         CBlockIndex *BlocksIndex = NULL;
-        if (Params().NetworkID() == CBaseChainParams::MAIN) {
-            BlocksIndex = chainActive[nCurrentHeight - 20160];
-        }
-        else {
-            BlocksIndex = chainActive[nCurrentHeight - 20160];
-        }
 
-        unsigned int oddsDivisor    = 10000;
-        unsigned int sixPercent     = 600;
+        BlocksIndex = chainActive[nCurrentHeight - Params().BetBlocksIndexTimespan()];
+
+        unsigned int oddsDivisor    = Params().OddsDivisor();
+        unsigned int betXPercent    = 100 * Params().BetXPercent();
         unsigned int latestHomeOdds = 0;
         unsigned int latestAwayOdds = 0;
         unsigned int latestDrawOdds = 0;
@@ -1020,11 +994,11 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
                             }
                         }
 
-                        // Only payout bets that are between 1 - 100000 WRG inclusive.
-                        if( betAmount >= (50 * COIN) && betAmount <= (10000 * COIN) ) {
+                        // Only payout bets that are between 50 - 10000 WRG inclusive (MaxBetPayoutRange).
+                        if( betAmount >= (Params().MinBetPayoutRange() * COIN) && betAmount <= (Params().MaxBetPayoutRange() * COIN) ) {
 
                             // Bet OP RETURN transaction.
-                            if (eventFound && strs.size() == 4 && txType == "2") {
+                            if (eventFound && strs.size() == 4 && txType == Params().BetEventID()) {
                                 CAmount payout = 0 * COIN;
 
                                 std::string pVersion = strs[1];
@@ -1032,7 +1006,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
                                 std::string result = strs[3];
 
                                 // If bet was placed less than 20 mins before event start or after event start discard it.
-                                if (eventStart > 0 && transactionTime > (eventStart - 1200)) {
+                                if (eventStart > 0 && transactionTime > (eventStart - Params().BetPlaceTimeoutBlocks())) {
                                     eventStartedFlag = true;
                                     break;
                                 }
@@ -1043,7 +1017,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
                                     
                                     // Calculate winnings.
                                     if (latestHomeTeam == result) {
-                                       winnings = betAmount * latestHomeOdds;
+                                    winnings = betAmount * latestHomeOdds;
                                     }
                                     else if (latestAwayTeam == result) {
                                         winnings = betAmount * latestAwayOdds;
@@ -1052,7 +1026,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
                                         winnings = betAmount * latestDrawOdds;
                                     }
                                     
-                                    // printf("Fees -> %li", ((( winnings - betAmount) / COIN) * sixPercent ));
+                                    // printf("Fees -> %li", ((( winnings - betAmount) / COIN) * betXPercent ));
 
                                     payout = ((winnings-(winnings-(betAmount*oddsDivisor))/100*6)/oddsDivisor);
 
@@ -1085,12 +1059,12 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
                 }
 
                 if(eventStartedFlag){
-                     break;
+                    break;
                 }
             }
 
             if(eventStartedFlag){
-                 break;
+                break;
             }
 
             BlocksIndex = chainActive.Next(BlocksIndex);

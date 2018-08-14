@@ -127,6 +127,23 @@ public:
     int Zerocoin_Block_V2_Start() const { return nBlockZerocoinV2; }
     CAmount InvalidAmountFiltered() const { return nInvalidAmountFiltered; };
 
+    /** Betting on blockchain **/
+    std::string OracleWalletAddr() const { return strOracleWalletAddr; }
+    int BetBlocksIndexTimespan() const { return nBetBlocksIndexTimespan; }
+    int BetStartHeight() const { return nBetStartHeight; }
+    std::string DevPayoutAddr() const { return strDevPayoutAddr; }
+    std::string OMNOPayoutAddr() const { return strOMNOPayoutAddr; }
+    int OMNOReward() const { return nOMNOReward; }
+    int DevReward() const { return nDevReward; }
+    int OddsDivisor() const { return nOddsDivisor; }
+    int BetXPercent() const { return nBetXPercent; }
+    int TraverseBlocksAmount() const { return nTraverseBlocksAmount; }
+    int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; }
+    std::string BetResultTypeID() const { return strBetResultTypeID; }
+    std::string BetEventID() const { return strBetEventID; }
+    int MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
+    int MinBetPayoutRange() const { return nMinBetPayoutRange; }
+    int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
 protected:
     CChainParams() {}
 
@@ -189,6 +206,23 @@ protected:
     int nBlockLastGoodCheckpoint;
     int nBlockEnforceInvalidUTXO;
     int nBlockZerocoinV2;
+
+    std::string strOracleWalletAddr;
+    int nBetBlocksIndexTimespan;
+    int nBetStartHeight;
+    std::string strDevPayoutAddr;
+    std::string strOMNOPayoutAddr;
+    int nOMNOReward;
+    int nDevReward;
+    int nOddsDivisor;
+    int nBetXPercent;
+    int nTraverseBlocksAmount;
+    int nBetBlockPayoutAmount;
+    std::string strBetResultTypeID;
+    std::string strBetEventID;
+    int nMinBetPayoutRange;
+    int nMaxBetPayoutRange;
+    int nBetPlaceTimeoutBlocks;
 };
 
 /**
