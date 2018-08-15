@@ -893,6 +893,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
         BlocksIndex = chainActive[nCurrentHeight - Params().BetBlocksIndexTimespan()];
 
         unsigned int oddsDivisor    = Params().OddsDivisor();
+        unsigned int betXPermille   = Params().BetXPermille();
         unsigned int latestHomeOdds = 0;
         unsigned int latestAwayOdds = 0;
         unsigned int latestDrawOdds = 0;
