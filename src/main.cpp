@@ -2979,8 +2979,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         BetNetExpectedTxt << strBetNetBlockTxt << " EXPECTED: %s \n";
         std::string strBetNetBlockTmp = BetNetBlockTxt.str();
         std::string strBetNetExpectedTxt = BetNetExpectedTxt.str();
-	    const char * BetNetBlockTxtConst = strBetNetBlockTmp.c_str();
-        const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
+	    //const char * BetNetBlockTxtConst = strBetNetBlockTmp.c_str();
+        //const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
 
         //printf(BetNetBlockTxtConst, (pindex->nHeight));
 
