@@ -551,7 +551,6 @@ std::vector<std::vector<std::string>> getEventResults( int height ) {
     // Set the Oracle wallet address. 
     std::string OracleWalletAddr = Params().OracleWalletAddr();
     std::vector<std::vector<std::string>> results;
-    int nCurrentHeight = chainActive.Height();
 
     // Get the current block so we can look for any results in it.
     CBlockIndex *resultsBocksIndex = NULL;
@@ -892,7 +891,6 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
         BlocksIndex = chainActive[nCurrentHeight - Params().BetBlocksIndexTimespan()];
 
         unsigned int oddsDivisor    = Params().OddsDivisor();
-        unsigned int betXPermille   = Params().BetXPermille();
         unsigned int latestHomeOdds = 0;
         unsigned int latestAwayOdds = 0;
         unsigned int latestDrawOdds = 0;
@@ -1049,7 +1047,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
 
                                     // Only add valid payouts to the vector.
                                     if(payout > 0){
-                                        // Add wining bet payout to the bet vector array.
+                                        // Add wining bet payout to the bet vector.
                                         vexpectedPayouts.emplace_back(payout, GetScriptForDestination(CBitcoinAddress(payoutAddress).Get()), betAmount);
                                     }
                                 }
