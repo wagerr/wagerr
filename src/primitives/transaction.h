@@ -139,6 +139,7 @@ public:
     void SetNull()
     {
         nValue = -1;
+        nBetValue = -1;
         scriptPubKey.clear();
         nRounds = -10; // an initial value, should be no way to get this by calculations
     }
