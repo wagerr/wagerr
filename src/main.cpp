@@ -2982,15 +2982,17 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 	    const char * BetNetBlockTxtConst = strBetNetBlockTmp.c_str();
         const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
 
-        printf(BetNetBlockTxtConst, (pindex->nHeight));
+        //printf(BetNetBlockTxtConst, (pindex->nHeight));
 
         vExpectedPayouts = GetBetPayouts(pindex->nHeight - 1);
         nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
         nExpectedMint += nMNBetReward;
 
+        /*
         for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
             printf(BetNetExpectedTxtConst, vExpectedPayouts[l].ToString().c_str());
         }
+        */
     }
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
