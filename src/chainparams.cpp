@@ -173,10 +173,10 @@ public:
         nBetBlocksIndexTimespan = 20160;
         strDevPayoutAddr = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";        // Dev payout address
         strOMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";       // OMNO Payout address
-        nOMNOReward = 94 * 100 * 0.024;                                 // profitAcc / 94 * 100 * 0.024 (nMNBetReward = totalAmountBet * 0.024)
-        nDevReward = 94 * 100 * 0.006;                                  // profitAcc / 94 * 100 * 0.006
+        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = totalAmountBet * 0.024)
+        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006
         nOddsDivisor = 10000;                                           // Odds divisor
-        nBetXPercent = 6;                                               // 6 percent
+        nBetXPermille = 60;                                             // 6 percent
         nTraverseBlocksAmount = 129600;                                 // Traverse block amount a event scan to match a result and all the bets on a result.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already bpaid out.
         strBetResultTypeID = "3";                                       // result type ID 
@@ -315,9 +315,10 @@ public:
         nBetBlocksIndexTimespan = 20160;
         strDevPayoutAddr = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";        // Dev payout testnet address
         strOMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";       // OMNO Payout testnet address
-        nOMNOReward = 94 * 100 * 0.024;                                 // profitAcc / 94 * 100 * 0.024 (nMNBetReward = totalAmountBet * 0.024)
-        nDevReward = 94 * 100 * 0.006;                                  // profitAcc / 94 * 100 * 0.006
+        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = totalAmountBet * 0.024)
+        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006
         nOddsDivisor = 10000;                                           // Odds divisor
+        nBetXPermille = 60;                                             // 6 percent
         nTraverseBlocksAmount = 4000;                                   // Traverse block amount a event scan to match a result and all the bets on a result.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already bpaid out.
         strBetResultTypeID = "3";                                       // result type ID 
