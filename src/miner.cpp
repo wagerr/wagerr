@@ -892,7 +892,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
         BlocksIndex = chainActive[nCurrentHeight - Params().BetBlocksIndexTimespan()];
 
         unsigned int oddsDivisor    = Params().OddsDivisor();
-        unsigned int betXPercent    = 100 * Params().BetXPercent();
+        unsigned int betXPermille   = Params().BetXPermille();
         unsigned int latestHomeOdds = 0;
         unsigned int latestAwayOdds = 0;
         unsigned int latestDrawOdds = 0;
@@ -1028,7 +1028,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
                                     
                                     // printf("Fees -> %li", ((( winnings - betAmount) / COIN) * betXPercent ));
 
-                                    payout = ((winnings-(winnings-(betAmount*oddsDivisor))/100*6)/oddsDivisor);
+                                    payout = (winnings - ((winnings - betAmount*oddsDivisor) * betXPermille / 1000)) / oddsDivisor;
 
                                     // TODO - May allow user to specify the address in future release.
                                     // Get change address from users bet TX so we can payout to that if they win.
