@@ -1960,9 +1960,9 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
         return GetSeeSaw(blockValue, nMasternodeCount, nHeight);
     } else {
         //When zWGR is staked, masternode only gets 2 WGR
-        ret = 3 * COIN;
+        ret = blockValue * 0.75;
         if (isZWGRStake)
-            ret = 2 * COIN;
+            ret = blockValue - (3 * COIN);
     }
 
     return ret;
