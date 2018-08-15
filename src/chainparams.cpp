@@ -58,18 +58,14 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
     (       1, uint256("000001364c4ed20f1b240810b5aa91fee23ae9b64b6e746b594b611cf6d8c87b"))          // First PoW premine block
     (     101, uint256("0000005e89a1fab52bf996e7eb7d653962a0eb064c16c09887504797deb7feaf"))          // Last premine block
     (    1001, uint256("0000002a314058a8f61293e18ddbef5664a2097ac0178005f593444549dd5b8c"))          // Last PoW block
-    (    4559, uint256("f26ac8c87c21ab26e34340c54b2a16c0f1b1c1cce2202e0eb6e79ca9579e2022"))          // 
     (    5530, uint256("b3a8e6eb90085394c1af916d5690fd5b83d53c43cf60c7b6dd1e904e0ede8e88"))          // Block on which switch off happened, 5531, 5532 differed
-    (    6160, uint256("7e7e688ae130d6b0bdfd3f059c6be93ba5e59c0bc28eb13f09e8158092151ad4"))          
-    (   12588, uint256("d9d1da49888f0d6febbdb02f79dde7fdc20d72a20e6f0d672e9543085cb70ca7"))          
     (   14374, uint256("61dc2dbb225de3146bc59ab96dedf48047ece84d004acaf8f386ae7a7d074983"))          // 1.4.34
     (   70450, uint256("ea83266a9dfd7cf92a96aa07f86bdf60d45850bd47c175745e71a1aaf60b4091"))          // Last block 1.5.0
-    (  207023, uint256("73814647b7d6f401bafd0c64ec1ba133f4bb0dcfc790a9fd7843590f1d40843b"))          // Last block 1.6.1
-    (  254456, uint256("e585543db7074f8a596e39aef77cc28b238143fe2fd0df194f2f33f597395305"));         // Last block 1.6.3
+    (  257142, uint256("eca635870323e7c0785fec1e663f4cb8645b7e84b5df4511ba4c189e580bfafd"));         // Last block 1.6.4
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-    1534212328, // * UNIX timestamp of last checkpoint block
-    532143,      // * total number of transactions between genesis and last checkpoint
+    1534374855, // * UNIX timestamp of last checkpoint block
+    537630,      // * total number of transactions between genesis and last checkpoint
                 //   (the tx=... number in the SetBestChain debug.log lines)
     5000        // * estimated number of transactions per day after checkpoint
 };
@@ -77,22 +73,11 @@ static const Checkpoints::CCheckpointData data = {
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
     boost::assign::map_list_of
     (       1, uint256("0x00000385558ec1b9af7f939e1626a3116b9fb988c86c2f915e6451e8efcd0521"))        // First PoW block
-    (     200, uint256("0x0000015bef4f6677a5055b7b35fa0791d4df50c2a887c39aaf6ec42e2aab13fa"))
-    (     300, uint256("0x00000020e9647debfcf5a2c2b0b43d24eef32646a7b1b3e78d82879080a07366"))        // Last PoW block
-    (     941, uint256("0xb40633bf2a3b4c4ecc5a784233287ba7a74a17b58dc40c29d3886ef34c10181a"))
-    (    1500, uint256("0x63bc2ca1c9d0fab31fc05868a231c165823c61d5621a81630aadbf5fd79a1e15"))        // First stop
-    (    2075, uint256("0x8ddcd1c685dd70b84fb4de5a5235f2f50382dec2fcddf1c507661944c48658a8"))        // v1.5.0
-    (   10000, uint256("0x7d649e179ab3c76780bf2bf82a411c427507929cf4a9b661f25798952006f2e9"))
-    (   18000, uint256("0xd89f137fff32b32a06ba7ffe8e2ab07eb4a5befe379f92a3d649338922726e14"))
-    (   20998, uint256("0xf237d8bc4e8485f64a2324f086a3d054340a8a61e89816dac1ee4bb1acca1957"))        // BetStartHeight
-    (   21012, uint256("0xb61795f2cdafd83bc7622eebe7fd293886dd46793ce861ff606f5c705ccfc3f3"))        // checkpoint must persist, **TODO** ERROR: ConnectBlock() : reward pays too much (actual=3409.72222222 vs limit=3381.25722222)
-    (   21013, uint256("0x6b840a513eb978f0f28279d3cfed5928db4379fa86e8660f050fadedf632d901"))        // checkpoint must persist, **TODO** ERROR: ConnectBlock()   reward pays too much
-    (   29797, uint256("0x489a0d372ccd04243ab9f6f41b8b3a044b05ab409e893e57aac82799e9c13846"))        // checkpoint must persist, **TODO** ERROR: ConnectBlock() : reward pays too much (actual=18314.47865111 vs limit=18185.46439963)
-    (   47251, uint256("0xde05f8cc5cf59d8270e13bb9acd33c8ec5bfebf6628ebe0dbeab2d6d77e5b37c"));       // Last block
+    (   49218, uint256("0x6c4305e5d691f667806cc6fd9e6fc07a9e6897cf71b4dfdf152971bdac57d8f4"));       // Last block 1.6.4
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1534253519,
-    96492,
+    1534373310,
+    100474,
     300};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
