@@ -249,6 +249,11 @@ QString ClientModel::formatClientStartupTime() const
     return QDateTime::fromTime_t(nClientStartupTime).toString();
 }
 
+QString ClientModel::dataDir() const
+{
+    return QString::fromStdString(GetDataDir().string());
+}
+
 void ClientModel::updateBanlist()
 {
     banTableModel->refresh();

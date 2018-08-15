@@ -495,6 +495,7 @@ void RPCConsole::setClientModel(ClientModel* model)
         ui->clientName->setText(model->clientName());
         ui->buildDate->setText(model->formatBuildDate());
         ui->startupTime->setText(model->formatClientStartupTime());
+        ui->dataDir->setText(model->dataDir());
         ui->networkName->setText(QString::fromStdString(Params().NetworkIDString()));
 
         //Setup autocomplete and attach it
