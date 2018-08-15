@@ -1887,8 +1887,19 @@ int64_t GetBlockPayouts( std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetR
  
     if(vexpectedPayouts.size() > 0){
         // Calculate the OMNO reward and the Dev reward.
-        CAmount nOMNOReward = profitAcc / Params().OMNOReward();
-        CAmount nDevReward  = profitAcc / Params().DevReward();
+        CAmount nOMNOReward = (CAmount)((profitAcc / (1000.0 - Params().BetXPermille()) * Params().OMNORewardPermille()));
+        CAmount nDevReward  = (CAmount)((profitAcc / (1000.0 - Params().BetXPermille()) * Params().DevRewardPermille()));
+
+// Kokary: Putting odds in variables can cause significant rounding errors to occur.
+// to see an illustration of floating point rounding errors, resync with the following code. 
+/*  
+        if (nOMNOReward != profitAcc / 94 * 100 * 0.024){
+            LogPrintf("Floating point rounding error");
+        } 
+        if (nDevReward != profitAcc / 94 * 100 * 0.006){
+            LogPrintf("Floating point rounding error");
+        }
+*/
 
         // Add both reward payouts to the payout vector.
         vexpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress( devPayoutAddr ).Get()));
@@ -2890,6 +2901,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             if (nSigOps > nMaxBlockSigOps)
                 return state.DoS(100, error("ConnectBlock() : too many sigops"), REJECT_INVALID, "bad-blk-sigops");
 
+            // Coinstakes actually do typically pay a fee
             if (!tx.IsCoinStake())
                 nFees += view.GetValueIn(tx) - tx.GetValueOut();
             nValueIn += view.GetValueIn(tx);
@@ -2926,7 +2938,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // track money supply and mint amount info
     CAmount nMoneySupplyPrev = pindex->pprev ? pindex->pprev->nMoneySupply : 0;
-    pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn - nValueBurned;
+    pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn;
     pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
 
 //    LogPrintf("XX69----------> ConnectBlock(): nValueOut: %s, nValueIn: %s, nFees: %s, nMint: %s zWgrSpent: %s\n",
@@ -2983,24 +2995,20 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
     /* **TODO**
-     * WagerrTor: accept all blocks up to zerocoin v2 startheight on testnet only
-     *  In some cases nExpectedMint is bigger/smaller than pindex->nMint
      * 
-     *  Dirty workaround solution:
-     *      Swap them in according cases 
-     * Original
-     *         if ( !IsBlockValueValid( block, nExpectedMint, pindex->nMint ) )
-     *              return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
-    */
-    if ( nExpectedMint < pindex->nMint) {
-        if ( !IsBlockValueValid( block, pindex->nMint, nExpectedMint ) ) 
-            return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)", FormatMoney(nExpectedMint), FormatMoney(pindex->nMint)), REJECT_INVALID, "bad-cb-amount");
-    } else  if ( nExpectedMint > pindex->nMint) {
-        if ( !IsBlockValueValid( block, nExpectedMint, pindex->nMint ) )
-            return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
-    } else {
-        if ( !IsBlockValueValid( block, nExpectedMint, pindex->nMint ) )
-            return state.DoS(100, error("ConnectBlock() : reward pays too much (report to dev please) (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
+     * Kokary: there are some oddities with fee calculation:
+     * - Coinstake transactions do have fees, resulting in rougly 4400 satoshi less mints
+     * - When there are no masternodes to pay, those MN rewards are not paid, resulting in 1*COIN less than expected mints
+     * - Testnet is polluted with test coinstake payouts between block 15195 and 15220
+     * A 'safe' check that also checks for underminting coins would be something like this:
+     *     if ((pindex->nHeight < 15195 || pindex->nHeight > 15220) && (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint )) )
+     *         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
+     * Though if we keep this check for minimum mint, it should be moved to IsBlockValueValid().
+     */
+    if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= 15195 || pindex->nHeight <= 15220)) {
+        LogPrintf("Skipping validation of mint size on testnet subset");
+    } else if (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint)) {
+        return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
     }
 
     if (!IsBlockPayoutsValid(vExpectedPayouts, block))

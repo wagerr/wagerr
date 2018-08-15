@@ -207,6 +207,7 @@ bool IsBlockValueValid(const CBlock& block, CAmount nExpectedValue, CAmount nMin
 
         //are these blocks even enabled
         if (!IsSporkActive(SPORK_13_ENABLE_SUPERBLOCKS)) {
+            // An alternative check would be: if ((nHeight < 15195 || nHeight > 15220) && (nMinted > nExpectedValue || nMinted < (nExpectedValue - 2*COIN)) )
             return nMinted <= nExpectedValue;
         }
 

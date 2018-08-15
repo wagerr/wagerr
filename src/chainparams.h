@@ -133,10 +133,10 @@ public:
     int BetStartHeight() const { return nBetStartHeight; }
     std::string DevPayoutAddr() const { return strDevPayoutAddr; }
     std::string OMNOPayoutAddr() const { return strOMNOPayoutAddr; }
-    int OMNOReward() const { return nOMNOReward; }
-    int DevReward() const { return nDevReward; }
+    int OMNORewardPermille() const { return nOMNORewardPermille; }
+    int DevRewardPermille() const { return nDevRewardPermille; }
     int OddsDivisor() const { return nOddsDivisor; }
-    int BetXPercent() const { return nBetXPercent; }
+    int BetXPermille() const { return nBetXPermille; }
     int TraverseBlocksAmount() const { return nTraverseBlocksAmount; }
     int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; }
     std::string BetResultTypeID() const { return strBetResultTypeID; }
@@ -212,10 +212,10 @@ protected:
     int nBetStartHeight;
     std::string strDevPayoutAddr;
     std::string strOMNOPayoutAddr;
-    int nOMNOReward;
-    int nDevReward;
+    int nOMNORewardPermille;
+    int nDevRewardPermille;
     int nOddsDivisor;
-    int nBetXPercent;
+    int nBetXPermille;
     int nTraverseBlocksAmount;
     int nBetBlockPayoutAmount;
     std::string strBetResultTypeID;
