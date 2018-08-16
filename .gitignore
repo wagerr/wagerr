@@ -132,3 +132,7 @@ cmake-build-debug
 # custom
 *_hdi_settings.json
 .vscode/
+
+# keys
+share/keys/
+
