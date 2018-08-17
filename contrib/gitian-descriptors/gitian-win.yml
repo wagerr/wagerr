@@ -49,7 +49,7 @@ script: |
 
   function create_global_faketime_wrappers {
   for prog in ${FAKETIME_PROGS}; do
-    echo '#!/bin/bash' > ${WRAP_DIR}/${prog}
+    echo '#!/usr/bin/env bash' > ${WRAP_DIR}/${prog}
     echo "REAL=\`which -a ${prog} | grep -v ${WRAP_DIR}/${prog} | head -1\`" >> ${WRAP_DIR}/${prog}
     echo 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1' >> ${WRAP_DIR}/${prog}
     echo "export FAKETIME=\"$1\"" >> ${WRAP_DIR}/${prog}
@@ -61,7 +61,7 @@ script: |
   function create_per-host_faketime_wrappers {
   for i in $HOSTS; do
     for prog in ${FAKETIME_HOST_PROGS}; do
-        echo '#!/bin/bash' > ${WRAP_DIR}/${i}-${prog}
+        echo '#!/usr/bin/env bash' > ${WRAP_DIR}/${i}-${prog}
         echo "REAL=\`which -a ${i}-${prog} | grep -v ${WRAP_DIR}/${i}-${prog} | head -1\`" >> ${WRAP_DIR}/${i}-${prog}
         echo 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1' >> ${WRAP_DIR}/${i}-${prog}
         echo "export FAKETIME=\"$1\"" >> ${WRAP_DIR}/${i}-${prog}
@@ -77,14 +77,14 @@ script: |
   for i in $HOSTS; do
     mkdir -p ${WRAP_DIR}/${i}
     for prog in collect2; do
-        echo '#!/bin/bash' > ${WRAP_DIR}/${i}/${prog}
+        echo '#!/usr/bin/env bash' > ${WRAP_DIR}/${i}/${prog}
         REAL=$(${i}-gcc -print-prog-name=${prog})
         echo "export MALLOC_PERTURB_=255" >> ${WRAP_DIR}/${i}/${prog}
         echo "${REAL} \$@" >> $WRAP_DIR/${i}/${prog}
         chmod +x ${WRAP_DIR}/${i}/${prog}
     done
     for prog in gcc g++; do
-        echo '#!/bin/bash' > ${WRAP_DIR}/${i}-${prog}
+        echo '#!/usr/bin/env bash' > ${WRAP_DIR}/${i}-${prog}
         echo "REAL=\`which -a ${i}-${prog} | grep -v ${WRAP_DIR}/${i}-${prog} | head -1\`" >> ${WRAP_DIR}/${i}-${prog}
         echo 'export LD_PRELOAD=/usr/lib/x86_64-linux-gnu/faketime/libfaketime.so.1' >> ${WRAP_DIR}/${i}-${prog}
         echo "export FAKETIME=\"$1\"" >> ${WRAP_DIR}/${i}-${prog}
@@ -144,8 +144,10 @@ script: |
 
     CONFIG_SITE=${BASEPREFIX}/${i}/share/config.site ./configure --prefix=/ --disable-ccache --disable-maintainer-mode --disable-dependency-tracking ${CONFIGFLAGS} CFLAGS="${HOST_CFLAGS}" CXXFLAGS="${HOST_CXXFLAGS}"
     make ${MAKEOPTS}
+    # make ${MAKEOPTS} -C src check-security
     make deploy
     make install DESTDIR=${INSTALLPATH}
+    rename 's/-setup\.exe$/-setup-unsigned.exe/' *-setup.exe
     cp -f wagerr-*setup*.exe $OUTDIR/
     cd installed
     # mv ${DISTNAME}/bin/*.dll ${DISTNAME}/lib/ # temporarily disabled for Zerocoin
@@ -159,9 +161,11 @@ script: |
     cd ../../
     rm -rf distsrc-${i}
   done
-  cd $OUTDIR
-  rename 's/-setup\.exe$/-setup-unsigned.exe/' *-setup.exe
-  find . -name "*-setup-unsigned.exe" | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ${OUTDIR}/${DISTNAME}-win-unsigned.tar.gz
+  cp -rf contrib/windeploy $BUILD_DIR
+  cd $BUILD_DIR/windeploy
+  mkdir unsigned
+  cp $OUTDIR/wagerr-*setup-unsigned.exe unsigned/
+  find . | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ${OUTDIR}/${DISTNAME}-win-unsigned.tar.gz
   mv ${OUTDIR}/${DISTNAME}-x86_64-*-debug.zip ${OUTDIR}/${DISTNAME}-win64-debug.zip
   mv ${OUTDIR}/${DISTNAME}-i686-*-debug.zip ${OUTDIR}/${DISTNAME}-win32-debug.zip
   mv ${OUTDIR}/${DISTNAME}-x86_64-*.zip ${OUTDIR}/${DISTNAME}-win64.zip
