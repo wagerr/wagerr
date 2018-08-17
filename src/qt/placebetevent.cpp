@@ -161,8 +161,8 @@ QWidget* parent, CEvent* event, const std::string& eventDetails, const  std::str
                                                   model(0),
                                                   event(event)
 {
-    LogPrintf("PlaceBetEvent::PlaceBetEvent: about to print\n");
-    LogPrintf("PlaceBetEvent::PlaceBetEvent: %s %s\n", event->id.c_str(), event->homeTeam.c_str());
+    //LogPrintf("PlaceBetEvent::PlaceBetEvent: about to print\n");
+    //LogPrintf("PlaceBetEvent::PlaceBetEvent: %s %s\n", event->id.c_str(), event->homeTeam.c_str());
     ui->setupUi(this);
 
     setCurrentWidget(ui->SendCoins);
@@ -204,22 +204,22 @@ void PlaceBetEvent::on_pasteButton_clicked()
 
 void PlaceBetEvent::on_pushButtonPlaceHomeBet_clicked()
 {
-printf("PlaceBetEvent::on_pushButtonPlaceHomeBet_clicked: about to print\n");
-printf("PlaceBetEvent::on_pushButtonPlaceHomeBet_clicked: %s %s\n", event->id.c_str(), event->homeTeam.c_str());
+//printf("PlaceBetEvent::on_pushButtonPlaceHomeBet_clicked: about to print\n");
+//printf("PlaceBetEvent::on_pushButtonPlaceHomeBet_clicked: %s %s\n", event->id.c_str(), event->homeTeam.c_str());
     emit currentEventChanged(event, event->homeTeam, event->homeOdds);
 }
 
 void PlaceBetEvent::on_pushButtonPlaceAwayBet_clicked()
 {
-printf("PlaceBetEvent::on_pushButtonPlaceAwayBet_clicked: about to print\n");
-printf("PlaceBetEvent::on_pushButtonPlaceAwayBet_clicked: %s %s\n", event->id.c_str(), event->awayTeam.c_str());
+//printf("PlaceBetEvent::on_pushButtonPlaceAwayBet_clicked: about to print\n");
+//printf("PlaceBetEvent::on_pushButtonPlaceAwayBet_clicked: %s %s\n", event->id.c_str(), event->awayTeam.c_str());
     emit currentEventChanged(event, event->awayTeam, event->awayOdds);
 }
 
 void PlaceBetEvent::on_pushButtonPlaceDrawBet_clicked()
 {
-printf("PlaceBetEvent::on_pushButtonPlaceDrawBet_clicked: about to print\n");
-printf("PlaceBetEvent::on_pushButtonPlaceDrawBet_clicked: %s %s\n", event->id.c_str(), event->drawOdds.c_str());
+//printf("PlaceBetEvent::on_pushButtonPlaceDrawBet_clicked: about to print\n");
+//printf("PlaceBetEvent::on_pushButtonPlaceDrawBet_clicked: %s %s\n", event->id.c_str(), event->drawOdds.c_str());
     emit currentEventChanged(event, "DRW", event->drawOdds);
 }
 
