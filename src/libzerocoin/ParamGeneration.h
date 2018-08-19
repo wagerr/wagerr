@@ -50,7 +50,6 @@ CBigNum              calculateGroupGenerator(uint256 seed, uint256 pSeed, uint25
 CBigNum              generateRandomPrime(uint32_t primeBitLen, uint256 in_seed, uint256 *out_seed,
                                         uint32_t *prime_gen_counter);
 CBigNum              generateIntegerFromSeed(uint32_t numBits, uint256 seed, uint32_t *numIterations);
-bool                primalityTestByTrialDivision(uint32_t candidate);
 
 }/* namespace libzerocoin */
 
