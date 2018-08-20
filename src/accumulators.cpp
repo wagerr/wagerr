@@ -280,7 +280,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
         LogPrint("zero", "%s found %d mints\n", __func__, listPubcoins.size());
 
         //add the pubcoins to accumulator
-        for (const PublicCoin pubcoin : listPubcoins) {
+        for (const PublicCoin& pubcoin : listPubcoins) {
             if(!mapAccumulators.Accumulate(pubcoin, true))
                 return error("%s: failed to add pubcoin to accumulator at height %d", __func__, pindex->nHeight);
         }

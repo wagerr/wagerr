@@ -110,7 +110,7 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
     } else if (wtx.IsZerocoinSpend()) {
         //zerocoin spend outputs
         bool fFeeAssigned = false;
-        for (const CTxOut txout : wtx.vout) {
+        for (const CTxOut& txout : wtx.vout) {
             // change that was reminted as zerocoins
             if (txout.IsZerocoinMint()) {
                 // do not display record if this isn't from our wallet
