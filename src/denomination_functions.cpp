@@ -105,7 +105,7 @@ bool getIdealSpends(
     // Start with the Highest Denomination coin and grab coins as long as the remaining amount is greater than the
     // current denomination value
     for (auto& coin : reverse_iterate(zerocoinDenomList)) {
-        for (const CMintMeta mint : listMints) {
+        for (const CMintMeta& mint : listMints) {
             if (mint.isUsed) continue;
             if (nRemainingValue >= ZerocoinDenominationToAmount(coin) && coin == mint.denom) {
                 mapOfDenomsUsed.at(coin)++;
@@ -129,7 +129,7 @@ std::vector<CMintMeta> getSpends(
     nCoinsSpentValue = 0;
     for (auto& coin : reverse_iterate(zerocoinDenomList)) {
         do {
-            for (const CMintMeta mint : listMints) {
+            for (const CMintMeta& mint : listMints) {
                 if (mint.isUsed) continue;
                 if (coin == mint.denom && mapOfDenomsUsed.at(coin)) {
                     vSelectedMints.push_back(mint);
@@ -150,7 +150,7 @@ void listSpends(const std::vector<CZerocoinMint>& vSelectedMints)
     for (auto& denom : libzerocoin::zerocoinDenomList)
         mapZerocoinSupply.insert(std::make_pair(denom, 0));
 
-    for (const CZerocoinMint mint : vSelectedMints) {
+    for (const CZerocoinMint& mint : vSelectedMints) {
         libzerocoin::CoinDenomination denom = mint.GetDenomination();
         mapZerocoinSupply.at(denom)++;
     }
