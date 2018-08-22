@@ -436,7 +436,6 @@ void WalletView::gotoPlaceBetPage(QString addr)
         pindex = chainActive.Next(pindex);
     }
 
-
     //sort events by timestamp
     struct compare_times{
         inline bool operator() (CEvent *event1, CEvent *event2){
@@ -444,8 +443,6 @@ void WalletView::gotoPlaceBetPage(QString addr)
         }
     };
     std::sort(eventsVector.begin(), eventsVector.end(), compare_times());
-
-
 
     //remove duplicates from list (Remove older duplicates)
     std::vector<CEvent *> cleanEventsVector;
@@ -458,17 +455,24 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
             if (eventsVector[i]->id == cleanEventsVector[j]->id) {
                 found = true;
-                //replacing the old event details with the updated event details
-                std::replace(cleanEventsVector.begin(), cleanEventsVector.end(), cleanEventsVector[j], eventsVector[i]);
+
+                //Remove the event if all odds are zero (cancel event TX)
+                if( eventsVector[i]->homeOdds == "N/A" && eventsVector[i]->awayOdds == "N/A" && eventsVector[i]->drawOdds == "N/A" ){
+                    cleanEventsVector.erase(cleanEventsVector.begin() + j);
+                }
+                //replace the old event details with the updated event details
+                else
+                {
+                    std::replace(cleanEventsVector.begin(), cleanEventsVector.end(), cleanEventsVector[j], eventsVector[i]);
+                }
             }
         }
 
         //if not found put the event into the clean list
-        if(found == false){
+        if( ! found){
             cleanEventsVector.push_back(eventsVector[i]);
         }
     }
-
 
     //put events on screen
     for(unsigned int i = 0; i < cleanEventsVector.size(); i++ ){
