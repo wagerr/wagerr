@@ -17,6 +17,7 @@
 #include "utilmoneystr.h"
 #include "accumulatormap.h"
 #include "accumulators.h"
+#include "accumulatorcheckpoints.h"
 
 #include <stdint.h>
 #include <univalue.h>
@@ -959,6 +960,47 @@ UniValue getaccumulatorvalues(const UniValue& params, bool fHelp)
         if(!GetAccumulatorValueFromDB(pindex->nAccumulatorCheckpoint, denom, bnValue))
             throw JSONRPCError(RPC_DATABASE_ERROR, "failed to find value in database");
 
+        UniValue obj(UniValue::VOBJ);
+        obj.push_back(Pair(std::to_string(denom), bnValue.GetHex()));
+        ret.push_back(obj);
+    }
+
+    return ret;
+}
+
+UniValue calculateaccumulatorvalues(const UniValue& params, bool fHelp)
+{
+    // First zerocoin mints occur in blocks 331114 and 331117
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "generateaccumulatorvalues \"height\"\n"
+                    "\nReturns the calculated accumulator values associated with a block height\n"
+
+                    "\nArguments:\n"
+                    "1. height   (numeric, required) the height of the checkpoint.\n"
+
+                    "\nExamples:\n" +
+            HelpExampleCli("generateaccumulatorvalues", "\"height\"") + HelpExampleRpc("generateaccumulatorvalues", "\"height\""));
+
+    int nHeight = params[0].get_int();
+
+    CBlockIndex* pindex = chainActive[nHeight];
+    if (!pindex)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "invalid block height");
+
+    uint256 nCheckpointCalculated = 0;
+
+    AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().Zerocoin_Block_V2_Start()));
+
+    if (!CalculateAccumulatorCheckpointWithoutDB(nHeight, nCheckpointCalculated, mapAccumulators))
+        return error("%s : failed to calculate accumulator checkpoint", __func__);
+
+    UniValue ret(UniValue::VARR);
+
+    for (libzerocoin::CoinDenomination denom : libzerocoin::zerocoinDenomList) {
+        CBigNum bnValue;
+
+        bnValue = mapAccumulators.GetValue(denom);
         UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair(std::to_string(denom), bnValue.GetHex()));
         ret.push_back(obj);

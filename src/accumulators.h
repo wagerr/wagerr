@@ -22,6 +22,7 @@ bool GetAccumulatorValueFromDB(uint256 nCheckpoint, libzerocoin::CoinDenominatio
 bool GetAccumulatorValueFromChecksum(uint32_t nChecksum, bool fMemoryOnly, CBigNum& bnAccValue);
 void AddAccumulatorChecksum(const uint32_t nChecksum, const CBigNum &bnValue, bool fMemoryOnly);
 bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, AccumulatorMap& mapAccumulators);
+bool CalculateAccumulatorCheckpointWithoutDB(int nHeight, uint256& nCheckpoint, AccumulatorMap& mapAccumulators);
 void DatabaseChecksums(AccumulatorMap& mapAccumulators);
 bool LoadAccumulatorValuesFromDB(const uint256 nCheckpoint);
 bool EraseAccumulatorValues(const uint256& nCheckpointErase, const uint256& nCheckpointPrevious);
