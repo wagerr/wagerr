@@ -152,6 +152,8 @@ public:
         nEnforceNewSporkKey = 1536710400;       //!> Sporks signed after must use the new spork key (GMT: Wednesday, 12. September 2018 00:00:00)
         nRejectOldSporkKey = 1514764801;        //!> Fully reject old spork key after GMT: Monday, 1. January 2018 00:00:01
 
+        nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
+
         /** Bet related parameters **/
         nBetStartHeight = 240000;
         strOracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";     // Oracle payout address
@@ -293,6 +295,8 @@ public:
         nBlockZerocoinV2 = 24500; //The block that zerocoin v2 becomes active
         nEnforceNewSporkKey = 1521604800; //!> Sporks signed after Wednesday, March 21, 2018 4:00:00 AM GMT must use the new spork key
         nRejectOldSporkKey = 1522454400; //!> Reject old spork key after Saturday, March 31, 2018 12:00:00 AM GMT
+
+        nZerocoinStartHeight = 50;            // Start accumulation coins here - first zerocoin mint occurs at block 87
 
         /** Bet related parameters **/
         nBetStartHeight = 20998;
