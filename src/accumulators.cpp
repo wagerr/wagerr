@@ -414,7 +414,7 @@ bool GetAccumulatorValue(int& nHeight, const libzerocoin::CoinDenomination denom
     return true;
 }
 
-bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator, AccumulatorWitness& witness, int nSecurityLevel, int& nMintsAdded, string& strError, CBlockIndex* pindexCheckpoint)
+bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator, AccumulatorWitness& witness, int nSecurityLevel, int& nMintsAdded, string& strError, bool isV1Coin, CBlockIndex* pindexCheckpoint)
 {
     LogPrint("zero", "%s: generating\n", __func__);
     int nLockAttempts = 0;
@@ -474,7 +474,6 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
     RandomizeSecurityLevel(nSecurityLevel); //make security level not always the same and predictable
     libzerocoin::Accumulator witnessAccumulator = accumulator;
 
-    bool fDoubleCounted = false;
     while (pindex) {
         if (pindex->nHeight != nAccStartHeight && pindex->pprev->nAccumulatorCheckpoint != pindex->nAccumulatorCheckpoint)
             ++nCheckpointsAdded;
@@ -488,21 +487,21 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
 
             bnAccValue = 0;
             uint256 nCheckpointSpend = chainActive[pindex->nHeight + 10]->nAccumulatorCheckpoint;
-            if (!GetAccumulatorValueFromDB(nCheckpointSpend, coin.getDenomination(), bnAccValue) || bnAccValue == 0)
-                return error("%s : failed to find checksum in database for accumulator", __func__);
+            if (!isV1Coin){
+                if (!GetAccumulatorValueFromDB(nCheckpointSpend, coin.getDenomination(), bnAccValue) || bnAccValue == 0)
+                    return error("%s : failed to find checksum in database for accumulator", __func__);
 
-            accumulator.setValue(bnAccValue);
+                accumulator.setValue(bnAccValue);
+            }
+
             break;
         }
 
-        nMintsAdded += AddBlockMintsToAccumulator(coin, nHeightMintAdded, pindex, &witnessAccumulator, true);
-
-        // 10 blocks were accumulated twice when zWGR v2 was activated
-        if (pindex->nHeight == 1050010 && !fDoubleCounted) {
-            pindex = chainActive[1050000];
-            fDoubleCounted = true;
-            continue;
+        if (isV1Coin){
+            AddBlockMintsToAccumulator(coin, nHeightMintAdded, pindex, &accumulator, false);
         }
+
+        nMintsAdded += AddBlockMintsToAccumulator(coin, nHeightMintAdded, pindex, &witnessAccumulator, true);
 
         pindex = chainActive.Next(pindex);
     }
@@ -569,8 +568,7 @@ map<CoinDenomination, int> GetMintMaturityHeight()
 //Generate checkpoint value for a specific block height, starting with an empty accumulator
 bool CalculateAccumulatorCheckpointWithoutDB(int nHeight, uint256& nCheckpoint, AccumulatorMap& mapAccumulators)
 {
-//    if (nHeight < Params().Zerocoin_StartHeight()) {
-    if (nHeight < 1) {
+    if (nHeight < Params().Zerocoin_AccumulationStartHeight()) {
         nCheckpoint = 0;
         return true;
     }
@@ -583,8 +581,7 @@ bool CalculateAccumulatorCheckpointWithoutDB(int nHeight, uint256& nCheckpoint, 
 
     //Accumulate all coins over the full zerocoin period
     int nTotalMintsFound = 0;
-//    CBlockIndex *pindex = chainActive[Params().Zerocoin_StartHeight()];
-    CBlockIndex *pindex = chainActive[1];
+    CBlockIndex *pindex = chainActive[Params().Zerocoin_AccumulationStartHeight()];
 
     while (pindex->nHeight < nHeight) {
         // checking whether we should stop this process due to a shutdown request
@@ -592,8 +589,7 @@ bool CalculateAccumulatorCheckpointWithoutDB(int nHeight, uint256& nCheckpoint, 
             return false;
 
         //make sure this block is eligible for accumulation
-// if (pindex->nHeight < Params().Zerocoin_StartHeight()) {        
-        if (pindex->nHeight < 1) { 
+        if (pindex->nHeight < Params().Zerocoin_AccumulationStartHeight()) {        
             pindex = chainActive[pindex->nHeight + 1];
             continue;
         }

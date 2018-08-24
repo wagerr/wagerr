@@ -127,6 +127,8 @@ public:
     int Zerocoin_Block_V2_Start() const { return nBlockZerocoinV2; }
     CAmount InvalidAmountFiltered() const { return nInvalidAmountFiltered; };
 
+    int Zerocoin_AccumulationStartHeight() const { return nZerocoinAccumulationStartHeight; }
+
     /** Betting on blockchain **/
     std::string OracleWalletAddr() const { return strOracleWalletAddr; }
     int BetBlocksIndexTimespan() const { return nBetBlocksIndexTimespan; }
@@ -206,6 +208,8 @@ protected:
     int nBlockLastGoodCheckpoint;
     int nBlockEnforceInvalidUTXO;
     int nBlockZerocoinV2;
+
+    int nZerocoinAccumulationStartHeight;
 
     std::string strOracleWalletAddr;
     int nBetBlocksIndexTimespan;
