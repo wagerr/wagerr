@@ -166,6 +166,7 @@ public:
         nBetXPermille = 60;                                             // 6 percent
         nTraverseBlocksAmount = 129600;                                 // Traverse block amount a event scan to match a result and all the bets on a result.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already bpaid out.
+        strBetRefundTypeID = "4";                                           // bet refund type ID
         strBetResultTypeID = "3";                                       // result type ID 
         strBetEventID = "2";                                            // event type ID
         nMinBetPayoutRange = 50;                                        // Only payout bets that are between 50 - 10000 WRG inclusive.

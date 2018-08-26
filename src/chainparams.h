@@ -141,6 +141,7 @@ public:
     int BetXPermille() const { return nBetXPermille; }
     int TraverseBlocksAmount() const { return nTraverseBlocksAmount; }
     int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; }
+    std::string BetRefundTypeID() const { return strBetRefundTypeID; }
     std::string BetResultTypeID() const { return strBetResultTypeID; }
     std::string BetEventID() const { return strBetEventID; }
     int MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
@@ -222,6 +223,7 @@ protected:
     int nBetXPermille;
     int nTraverseBlocksAmount;
     int nBetBlockPayoutAmount;
+    std::string strBetRefundTypeID;
     std::string strBetResultTypeID;
     std::string strBetEventID;
     int nMinBetPayoutRange;
