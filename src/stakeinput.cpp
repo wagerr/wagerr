@@ -135,7 +135,7 @@ bool CZWgrStake::CreateTxOuts(CWallet* pwallet, vector<CTxOut>& vout, CAmount nT
     if (!pwallet->DatabaseMint(dMint))
         return error("%s: failed to database the staked zWGR", __func__);
 
-    for (unsigned int i = 0; i < 3; i++) {
+    for (unsigned int i = 0; i < 1; i++) {
         CTxOut out;
         CDeterministicMint dMintReward;
         if (!pwallet->CreateZWGROutPut(libzerocoin::CoinDenomination::ZQ_ONE, out, dMintReward))

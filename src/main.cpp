@@ -1824,10 +1824,12 @@ int64_t GetBlockValue(int nHeight)
             return 173360471 * COIN;
         } else if (nHeight < 200 && nHeight > 1) {
             return 250000 * COIN;
-        } else if (nHeight >= 200 && nHeight <= Params().LAST_POW_BLOCK()) { // check for last PoW block is not required, it does not harm to leave it *** TODO ***
+        } else if (nHeight >= 200 && nHeight <= Params().LAST_POW_BLOCK()) {
             return 100000 * COIN;
-        } else if (nHeight >= 200 && nHeight > Params().LAST_POW_BLOCK()) { // check for last PoW block is not required, it does not harm to leave it *** TODO ***
+        } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight <= Params().Zerocoin_Block_V2_Start()) { 
             return 3.8 / 90 * 100 * COIN;
+        } else if (nHeight > Params().Zerocoin_Block_V2_Start()) {
+            return 3.8 * COIN;
         } else {
             return 0 * COIN;
         }
@@ -1962,7 +1964,7 @@ int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCou
         //When zWGR is staked, masternode only gets 2 WGR
         ret = blockValue * 0.75;
         if (isZWGRStake)
-            ret = blockValue - (3 * COIN);
+            ret = blockValue - (1 * COIN); // 3.8 zWGR - 1 zWGR = 2.8 zWGR for MNs instead of 2.85 zWGR for MNs
     }
 
     return ret;
