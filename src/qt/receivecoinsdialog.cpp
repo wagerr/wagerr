@@ -32,6 +32,7 @@ ReceiveCoinsDialog::ReceiveCoinsDialog(QWidget* parent) : QDialog(parent, Qt::Wi
 #ifdef Q_OS_MAC // Icons on push buttons are very uncommon on Mac
     ui->clearButton->setIcon(QIcon());
     ui->receiveButton->setIcon(QIcon());
+    ui->receivingAddressesButton->setIcon(QIcon());
     ui->showRequestButton->setIcon(QIcon());
     ui->removeRequestButton->setIcon(QIcon());
 #endif
@@ -153,6 +154,15 @@ void ReceiveCoinsDialog::on_receiveButton_clicked()
 
     /* Store request for later reference */
     model->getRecentRequestsTableModel()->addNewRequest(info);
+}
+
+void ReceiveCoinsDialog::on_receivingAddressesButton_clicked()
+{
+    if (!model)
+        return;
+    AddressBookPage dlg(AddressBookPage::ForEditing, AddressBookPage::ReceivingTab, this);
+    dlg.setModel(model->getAddressTableModel());
+    dlg.exec();
 }
 
 void ReceiveCoinsDialog::on_recentRequestsView_doubleClicked(const QModelIndex& index)

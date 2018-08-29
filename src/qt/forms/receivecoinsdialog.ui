@@ -297,6 +297,20 @@
                  </property>
                 </spacer>
                </item>
+               <item>
+                <widget class="QPushButton" name="receivingAddressesButton">
+                 <property name="text">
+                  <string>Receiving Addresses</string>
+                 </property>
+                 <property name="icon">
+                  <iconset resource="../wagerr.qrc">
+                   <normaloff>:/icons/address-book</normaloff>:/icons/address-book</iconset>
+                 </property>
+                 <property name="autoDefault">
+                  <bool>false</bool>
+                 </property>
+                </widget>
+               </item>
               </layout>
              </item>
              <item row="9" column="2">
