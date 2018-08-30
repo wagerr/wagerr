@@ -1413,7 +1413,6 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     fCLTVHasMajority = false;
                 else
                     fCLTVHasMajority = fIsActiveCLTV;
-                LogPrintf("CHECKLOCKTIMEVERIFY Active: %s\n", fCLTVHasMajority.load());
 
                 if (fReindex)
                     pblocktree->WriteReindexing(true);
