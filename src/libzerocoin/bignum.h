@@ -95,19 +95,17 @@ public:
     }
 
     //CBigNum(char n) is not portable.  Use 'signed char' or 'unsigned char'.
-    CBigNum(signed char n)      { bn = BN_new(); if (n >= 0) setulong(n); else setint64(n); }
-    CBigNum(short n)            { bn = BN_new(); if (n >= 0) setulong(n); else setint64(n); }
-    CBigNum(int n)              { bn = BN_new(); if (n >= 0) setulong(n); else setint64(n); }
-    CBigNum(long n)             { bn = BN_new(); if (n >= 0) setulong(n); else setint64(n); }
-#ifdef __APPLE__
-    CBigNum(int64_t n)            { bn = BN_new(); setint64(n); }
-#endif
-    CBigNum(unsigned char n)    { bn = BN_new(); setulong(n); }
-    CBigNum(unsigned short n)   { bn = BN_new(); setulong(n); }
-    CBigNum(unsigned int n)     { bn = BN_new(); setulong(n); }
-    CBigNum(unsigned long n)    { bn = BN_new(); setulong(n); }
-  //  CBigNum(uint64_t n)           { bn = BN_new(); setuint64(n); }
-    explicit CBigNum(uint256 n) { bn = BN_new(); setuint256(n); }
+    CBigNum(signed char n)        { bn = BN_new(); if (n >= 0) setulong(n); else setint64(n); }
+    CBigNum(short n)              { bn = BN_new(); if (n >= 0) setulong(n); else setint64(n); }
+    CBigNum(int n)                { bn = BN_new(); if (n >= 0) setulong(n); else setint64(n); }
+    CBigNum(long n)               { bn = BN_new(); if (n >= 0) setulong(n); else setint64(n); }
+    CBigNum(long long n)          { bn = BN_new(); setint64(n); }
+    CBigNum(unsigned char n)      { bn = BN_new(); setulong(n); }
+    CBigNum(unsigned short n)     { bn = BN_new(); setulong(n); }
+    CBigNum(unsigned int n)       { bn = BN_new(); setulong(n); }
+    CBigNum(unsigned long n)      { bn = BN_new(); setulong(n); }
+    CBigNum(unsigned long long n) { bn = BN_new(); setuint64(n); }
+    explicit CBigNum(uint256 n)   { bn = BN_new(); setuint256(n); }
 
     explicit CBigNum(const std::vector<unsigned char>& vch)
     {
@@ -182,7 +180,7 @@ public:
 
         if (sn < (int64_t)0)
         {
-            // Since the minimum signed integer cannot be represented as positive so long as its type is signed, 
+            // Since the minimum signed integer cannot be represented as positive so long as its type is signed,
             // and it's not well-defined what happens if you make it unsigned before negating it,
             // we instead increment the negative integer by 1, convert it, then increment the (now positive) unsigned integer by 1 to compensate
             n = -(sn + 1);
