@@ -73,11 +73,11 @@ if __name__ == "__main__":
                         numPercents = tempLine.count('%') - numExtraPercents - 2*tempLine.count('%%')
 
                         if numPercents != numCommas:
-                            print "Incorrect number of arguments for LogPrint(f) statement found."
+                            print("Incorrect number of arguments for LogPrint(f) statement found.")
                             print(str(file) + ":" + str(lineCounter - tempCount))
-                            print "Line = " + tempLine
+                            print("Line = " + tempLine)
                             print("numRelevantCommas = " + str(numCommas) + ", numRelevantPercents = " + str(numPercents))
-                            print ""
+                            print("")
                             
                             incorrectInstanceCounter += 1
 
