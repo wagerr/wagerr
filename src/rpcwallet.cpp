@@ -81,7 +81,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
     // current events. Instead, the events up to a particular block/transaction
     // should be read and cached when the process starts, and ideally persisted,
     // to reduce the processing time for this command.
-    CBlockIndex* pindex = chainActive.Genesis();
+    CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     bool skipping = true;
 
     while (pindex) {
