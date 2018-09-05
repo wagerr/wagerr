@@ -149,14 +149,14 @@ public:
         nBlockLastGoodCheckpoint = 1648;        // Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
         nBlockEnforceInvalidUTXO = 1850;        // Start enforcing the invalid UTXO's
         nInvalidAmountFiltered = 0*COIN;        //Amount of invalid coins filtered through exchanges, that should be considered valid
-        nBlockZerocoinV2 = 294776;              //The block that zerocoin v2 becomes active (28 days after checkpoint at height 254456 which will happen somewhere around GMT: Tuesday, 11. September 2018 02:05:28)
-        nEnforceNewSporkKey = 1536710400;       //!> Sporks signed after must use the new spork key (GMT: Wednesday, 12. September 2018 00:00:00)
-        nRejectOldSporkKey = 1514764801;        //!> Fully reject old spork key after GMT: Monday, 1. January 2018 00:00:01
+        nBlockZerocoinV2 = 298386;              //The block that zerocoin v2 becomes active (estimated at unix time 1536868800 -  (GMT): Thursday, September 13, 2018 6:00:00 PM
+        nEnforceNewSporkKey = 1536868800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
+        nRejectOldSporkKey = 1537128000;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
 
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
         /** Bet related parameters **/
-        nBetStartHeight = 240000;
+        nBetStartHeight = 298386;
         strOracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";     // Oracle payout address
         nBetBlocksIndexTimespan = 20160;
         strDevPayoutAddr = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";        // Dev payout address
@@ -165,7 +165,7 @@ public:
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006
         nOddsDivisor = 10000;                                           // Odds divisor
         nBetXPermille = 60;                                             // 6 percent
-        nTraverseBlocksAmount = 129600;                                 // Traverse block amount a event scan to match a result and all the bets on a result.
+        nTraverseBlocksAmount = 80640;                                  // 8 weeks: Traverse block amount a event scan to match a result and all the bets on a result.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already bpaid out.
         strBetRefundTypeID = "4";                                           // bet refund type ID
         strBetResultTypeID = "3";                                       // result type ID 
@@ -303,7 +303,7 @@ public:
         /** Bet related parameters **/
         nBetStartHeight = 26150;
         strOracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
-        nBetBlocksIndexTimespan = 26150;
+        nBetBlocksIndexTimespan = 20160;
         strDevPayoutAddr = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";        // Dev payout testnet address
         strOMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";       // OMNO Payout testnet address
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = totalAmountBet * 0.024)
