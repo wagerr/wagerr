@@ -364,7 +364,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
     // current events. Instead, the events up to a particular block/transaction
     // should be read and cached when the process starts, and ideally persisted,
     // to reduce the processing time for this command.
-    CBlockIndex* pindex = chainActive.Genesis();
+    CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     bool skipping = true;
     while (pindex) {
         CBlock block;
@@ -372,7 +372,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
         BOOST_FOREACH (CTransaction& tx, block.vtx) {
             // This is an early optimisation: we know that no events were posted
             // before the following transaction, so we skip them.
-            if (skipping) {
+            if (skipping && CBaseChainParams::TESTNET) {
                 if (tx.GetHash().ToString() != "948965410fc242a3d7b0cf562d100425efb2180696ad6bd3ac06b5d5679d07f9") {
                     continue;
                 }
