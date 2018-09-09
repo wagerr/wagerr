@@ -357,30 +357,20 @@ void WalletView::gotoPlaceBetPage(QString addr)
     countryNames.insert(make_pair("TUN", "Tunisia "));
 
     placeBetPage->clear();
-
     std::vector<CEvent *> eventsVector;
-    // FIXME Copied from `rpcwallet.cpp`.
-    // TODO We currently search the entire block chain every time we query the
-    // current events. Instead, the events up to a particular block/transaction
-    // should be read and cached when the process starts, and ideally persisted,
-    // to reduce the processing time for this command.
-    CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
-    bool skipping = true;
+
+    // Look back to the betting start block for events to list on the wallet QT.
+    CBlockIndex* pindex =  chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
+
     while (pindex) {
+
         CBlock block;
         ReadBlockFromDisk(block, pindex);
-        BOOST_FOREACH (CTransaction& tx, block.vtx) {
-            // This is an early optimisation: we know that no events were posted
-            // before the following transaction, so we skip them.
-            if (skipping && CBaseChainParams::TESTNET) {
-                if (tx.GetHash().ToString() != "948965410fc242a3d7b0cf562d100425efb2180696ad6bd3ac06b5d5679d07f9") {
-                    continue;
-                }
-                skipping = false;
-            }
 
-            bool match = false;
-            // Ensure if event TX that has it been posted by Oracle wallet by looking at the vins.
+        BOOST_FOREACH (CTransaction& tx, block.vtx) {
+
+            // Ensure event TX has been posted by Oracle wallet.
+            bool validEventTx = false;
             const CTxIn &txin = tx.vin[0];
             COutPoint prevout = txin.prevout;
 
@@ -388,35 +378,38 @@ void WalletView::gotoPlaceBetPage(QString addr)
             CTransaction txPrev;
             if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
 
-                const CTxOut &prevTxOut = txPrev.vout[0];
+                const CTxOut &prevTxOut  = txPrev.vout[0];
                 std::string scriptPubKey = prevTxOut.scriptPubKey.ToString();
 
                 txnouttype type;
                 vector<CTxDestination> prevAddrs;
                 int nRequired;
+                if(ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
 
-                if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
                     BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
-                        // TODO Take this wallet address as a configuration value.
                         if (CBitcoinAddress(prevAddr).ToString() == OracleWalletAddr) {
-                            match = true;
+                            validEventTx = true;
                         }
                     }
+
                 }
             }
 
+            // Check TX vouts to see if they contain event op code.
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
+
                 const CTxOut& txout = tx.vout[i];
                 std::string scriptPubKey = txout.scriptPubKey.ToString();
 
                 // TODO Remove hard-coded values from this block.
-                if ( match && scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                if ( validEventTx && scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+
                     vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
                     std::string evtDescr(v.begin(), v.end());
                     std::vector<std::string> strs;
                     boost::split(strs, evtDescr, boost::is_any_of("|"));
 
-                    if (strs.size() != 11 || strs[0] != "1" || strs[1] != "1.0") {
+                    if (strs.size() != 11 || strs[0] != Params().EventTxType() || strs[1] != Params().OpCodeProtocolVersion() ) {
                         continue;
                     }
 
@@ -456,7 +449,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
             if (eventsVector[i]->id == cleanEventsVector[j]->id) {
                 found = true;
 
-                //Remove the event if all odds are zero (cancel event TX)
+                //remove the event if all odds are zero (cancel event TX)
                 if( eventsVector[i]->homeOdds == "N/A" && eventsVector[i]->awayOdds == "N/A" && eventsVector[i]->drawOdds == "N/A" ){
                     cleanEventsVector.erase(cleanEventsVector.begin() + j);
                 }

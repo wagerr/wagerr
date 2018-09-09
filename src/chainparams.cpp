@@ -156,23 +156,24 @@ public:
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
         /** Bet related parameters **/
-        nBetStartHeight = 298386;
-        strOracleWalletAddr = "WdoAnFfB59B2ka69vcxhsQokwufuKzV7Ty";     // Oracle payout address
-        nBetBlocksIndexTimespan = 20160;
-        strDevPayoutAddr = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";        // Dev payout address
-        strOMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";       // OMNO Payout address
-        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = totalAmountBet * 0.024)
-        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006
-        nOddsDivisor = 10000;                                           // Odds divisor
-        nBetXPermille = 60;                                             // 6 percent
-        nTraverseBlocksAmount = 80640;                                  // 8 weeks: Traverse block amount a event scan to match a result and all the bets on a result.
-        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already bpaid out.
-        strBetRefundTypeID = "4";                                           // bet refund type ID
-        strBetResultTypeID = "3";                                       // result type ID 
-        strBetEventID = "2";                                            // event type ID
-        nMinBetPayoutRange = 50;                                        // Only payout bets that are between 50 - 10000 WRG inclusive.
-        nMaxBetPayoutRange = 10000;                                     // Only payout bets that are between 50 - 10000 WRG inclusive.
-        nBetPlaceTimeoutBlocks = 1200;                                  // If bet was placed less than 1200 blocks (20 mins) before event start or after event start discard it.
+        strOpCodeProtocolVersion = "1.0";                               // Betting OP Code protocol version number.
+        nBetStartHeight = 298386;                                       // The block that betting protocols become active.
+        strOracleWalletAddr = "WWxqQtNnkYkde5UkmjF42VK7aGtkANPt4K";     // Oracle Masternode Event & Result Posting Wallet Address.
+        nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        strDevPayoutAddr = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";        // Development fund payout address.
+        strOMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";       // OMNO fund payout address.
+        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
+        nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
+        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
+        strEventTxType = "1";                                           // Event transaction type ID.
+        strBetTxType = "2";                                             // Bet transaction type ID.
+        strResultTxType = "3";                                          // Result transaction type ID.
+        strRefundTxType = "4";                                          // Refund bets transaction type ID.
+        nMinBetPayoutRange = 50;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 50 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 50 - 10000 WRG inclusive).
+        nBetPlaceTimeoutBlocks = 1200;                                  // Discard bets placed less than 1200 seconds (approx. 20 mins) before event start time
 
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot
@@ -301,22 +302,24 @@ public:
         nZerocoinStartHeight = 50;            // Start accumulation coins here - first zerocoin mint occurs at block 87
 
         /** Bet related parameters **/
-        nBetStartHeight = 26150;
-        strOracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";
-        nBetBlocksIndexTimespan = 20160;
-        strDevPayoutAddr = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";        // Dev payout testnet address
-        strOMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";       // OMNO Payout testnet address
-        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = totalAmountBet * 0.024)
-        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006
-        nOddsDivisor = 10000;                                           // Odds divisor
-        nBetXPermille = 60;                                             // 6 percent
-        nTraverseBlocksAmount = 4000;                                   // Traverse block amount a event scan to match a result and all the bets on a result.
-        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already bpaid out.
-        strBetResultTypeID = "3";                                       // result type ID 
-        strBetEventID = "2";                                            // event type ID
-        nMinBetPayoutRange = 50;                                        // Only payout bets that are between 50 - 10000 WRG inclusive.
-        nMaxBetPayoutRange = 10000;                                     // Only payout bets that are between 50 - 10000 WRG inclusive.
-        nBetPlaceTimeoutBlocks = 1200;                                  // If bet was placed less than 1200 blocks (20 mins) before event start or after event start discard it.
+        strOpCodeProtocolVersion = "1.0";                               // Betting OP Code protocol version number (Testnet).
+        nBetStartHeight = 26150;                                        // The block that betting protocols become active (Testnet).
+        strOracleWalletAddr = "TCQyQ6dm6GKfpeVvHWHzcRAjtKsJ3hX4AJ";     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
+        nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
+        strDevPayoutAddr = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";        // Development fund payout address (Testnet).
+        strOMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";       // OMNO fund payout address (Testnet).
+        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
+        nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
+        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
+        strEventTxType = "1";                                           // Event transaction type ID.
+        strBetTxType = "2";                                             // Bet transaction type ID.
+        strResultTxType = "3";                                          // Result transaction type ID.
+        strRefundTxType = "4";                                          // Refund bets transaction type ID.
+        nMinBetPayoutRange = 50;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 50 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 50 - 10000 WRG inclusive).
+        nBetPlaceTimeoutBlocks = 1200;                                  // Discard bets placed less than 1200 seconds (approx. 20 mins) before event start time,
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696182;

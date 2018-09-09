@@ -82,111 +82,99 @@ UniValue listevents(const UniValue& params, bool fHelp)
     // should be read and cached when the process starts, and ideally persisted,
     // to reduce the processing time for this command.
     CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
-    bool skipping = true;
 
     while (pindex) {
 
-        //if( pindex->nHeight > 46000 ) {
+        CBlock block;
+        ReadBlockFromDisk(block, pindex);
 
-            CBlock block;
-            ReadBlockFromDisk(block, pindex);
+        BOOST_FOREACH(CTransaction& tx, block.vtx) {
 
-            BOOST_FOREACH(CTransaction& tx, block.vtx) {
+            uint256 txHash = tx.GetHash();
 
-                uint256 txHash = tx.GetHash();
+            // Ensure the event TX has come from Oracle wallet.
+            const CTxIn &txin = tx.vin[0];
+            COutPoint prevout = txin.prevout;
+            bool validEventTx = false;
 
-                // This is an early optimisation: we know that no events were posted
-                // before the following transaction, so we skip them.
-                if (skipping && CBaseChainParams::TESTNET) {
-                    if (tx.GetHash().ToString() != "948965410fc242a3d7b0cf562d100425efb2180696ad6bd3ac06b5d5679d07f9") {
-                        continue;
-                    }
-                    skipping = false;
+            uint256 hashBlock;
+            CTransaction txPrev;
+            if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
+
+                const CTxOut &txout = txPrev.vout[0];
+                std::string scriptPubKey = txout.scriptPubKey.ToString();
+
+                txnouttype type;
+                vector<CTxDestination> addrs;
+                int nRequired;
+                if (!ExtractDestinations(txout.scriptPubKey, type, addrs, nRequired)) {
+                    continue;
                 }
 
-                // Ensure the event TX has come from Oracle wallet by looking at the vins.
-                const CTxIn &txin = tx.vin[0];
-                COutPoint prevout = txin.prevout;
-                bool match        = false;
-
-                uint256 hashBlock;
-                CTransaction txPrev;
-                if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
-
-                    const CTxOut &txout = txPrev.vout[0];
-                    std::string scriptPubKey = txout.scriptPubKey.ToString();
-
-                    txnouttype type;
-                    vector<CTxDestination> addrs;
-                    int nRequired;
-                    if (!ExtractDestinations(txout.scriptPubKey, type, addrs, nRequired)) {
-                        continue;
-                    }
-
-                    BOOST_FOREACH (const CTxDestination &addr, addrs) {
-                        // TODO Take this wallet address as a configuration value.
-                        if (CBitcoinAddress(addr).ToString() == OracleWalletAddr) {
-                            LogPrintf( "MATCH vinAddr %s Our Addr %s \n", CBitcoinAddress(addr).ToString().c_str(), OracleWalletAddr );
-                            match = true;
-                            break;
-                        }
-                    }
-                }
-
-                for (unsigned int i = 0; i < tx.vout.size(); i++) {
-                    const CTxOut &txout = tx.vout[i];
-                    std::string scriptPubKey = txout.scriptPubKey.ToString();
-
-                    // TODO Remove hard-coded values from this block.
-                    if( match && scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
-                        vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
-                        std::string evtDescr(v.begin(), v.end());
-                        std::vector <std::string> strs;
-                        boost::split(strs, evtDescr, boost::is_any_of("|"));
-
-                        if (strs.size() != 11 || strs[0] != "1") {
-                            continue;
-                        }
-
-                        time_t time = (time_t) std::strtol(strs[3].c_str(), nullptr, 10);
-                        time_t currentTime = std::time(0);
-                        if (time < (currentTime - 1200)) {
-                            continue;
-                        }
-
-                        printf("%s \n", evtDescr.c_str());
-
-                        // TODO Handle version field.
-
-                        UniValue evt(UniValue::VOBJ);
-
-                        evt.push_back(Pair("tx-id", txHash.ToString().c_str()));
-                        evt.push_back(Pair("id", strs[2]));
-                        evt.push_back(Pair("name", strs[4]));
-                        evt.push_back(Pair("round", strs[5]));
-                        evt.push_back(Pair("starting", strs[3]));
-
-                        UniValue teams(UniValue::VARR);
-                        for (unsigned int t = 6; t <= 8; t++) {
-                            UniValue team(UniValue::VOBJ);
-
-                            if (t < 8) {
-                                team.push_back(Pair("name", strs[t]));
-                                team.push_back(Pair("odds", strs[t + 2]));
-                            } else {
-                                team.push_back(Pair("name", "DRW"));
-                                team.push_back(Pair("odds", strs[t + 2]));
-                            }
-
-                            teams.push_back(team);
-                        }
-                        evt.push_back(Pair("teams", teams));
-
-                        ret.push_back(evt);
+                BOOST_FOREACH (const CTxDestination &addr, addrs) {
+                    if (CBitcoinAddress(addr).ToString() == OracleWalletAddr) {
+                        LogPrintf( "MATCH vinAddr %s Our Addr %s \n", CBitcoinAddress(addr).ToString().c_str(), OracleWalletAddr );
+                        validEventTx = true;
+                        break;
                     }
                 }
             }
-        //}
+
+            for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                const CTxOut &txout = tx.vout[i];
+                std::string scriptPubKey = txout.scriptPubKey.ToString();
+
+                // TODO Remove hard-coded values from this block.
+                if( validEventTx && scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+
+                    vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
+                    std::string evtDescr(v.begin(), v.end());
+                    std::vector <std::string> strs;
+                    boost::split(strs, evtDescr, boost::is_any_of("|"));
+
+                    if (strs.size() != 11 || strs[0] != Params().EventTxType() ) {
+                        continue;
+                    }
+
+                    time_t time = (time_t) std::strtol(strs[3].c_str(), nullptr, 10);
+                    time_t currentTime = std::time(0);
+                    if (time < (currentTime - Params().BetPlaceTimeoutBlocks())) {
+                        continue;
+                    }
+
+                    printf("%s \n", evtDescr.c_str());
+
+                    // TODO Handle version field.
+
+                    UniValue evt(UniValue::VOBJ);
+
+                    evt.push_back(Pair("tx-id", txHash.ToString().c_str()));
+                    evt.push_back(Pair("id", strs[2]));
+                    evt.push_back(Pair("name", strs[4]));
+                    evt.push_back(Pair("round", strs[5]));
+                    evt.push_back(Pair("starting", strs[3]));
+
+                    UniValue teams(UniValue::VARR);
+                    for (unsigned int t = 6; t <= 8; t++) {
+                        UniValue team(UniValue::VOBJ);
+
+                        if (t < 8) {
+                            team.push_back(Pair("name", strs[t]));
+                            team.push_back(Pair("odds", strs[t + 2]));
+                        } else {
+                            team.push_back(Pair("name", "DRW"));
+                            team.push_back(Pair("odds", strs[t + 2]));
+                        }
+
+                        teams.push_back(team);
+                    }
+                    evt.push_back(Pair("teams", teams));
+
+                    ret.push_back(evt);
+                }
+            }
+        }
+
         pindex = chainActive.Next(pindex);
     }
 
@@ -266,7 +254,7 @@ UniValue listbets(const UniValue& params, bool fHelp)
                         std::vector<std::string> strs;
                         boost::split(strs, betDescr, boost::is_any_of("|"));
 
-                        if (strs.size() != 4 || strs[0] != "2") {
+                        if (strs.size() != 4 || strs[0] != Params().BetTxType()) {
                             continue;
                         }
 
