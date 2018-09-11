@@ -20,7 +20,7 @@ const std::string CLIENT_NAME("Wagerr Core");
 /**
  * Client version number
  */
-#define CLIENT_VERSION_SUFFIX "-Sláinte"
+#define CLIENT_VERSION_SUFFIX "-Monte Carlo"
 
 
 /**
