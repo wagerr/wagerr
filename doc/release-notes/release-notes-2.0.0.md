@@ -17,6 +17,13 @@ shut down (which might take a few minutes for older versions), then run the
 installer (on Windows) or just copy over `/Applications/Wagerr-Qt` (on Mac)
 or `wagerrd`/`wagerr-qt` (on Linux).
 
+Upgrade warning
+---------------
+
+Before any upgrade we recommend that you securely backup your wallet. Please see
+the [Wagerr help desk article](https://wagerr.zendesk.com/hc/en-us/articles/360001309872-How-to-backup-and-restore-Wagerr-dat-and-private-keys)
+for more information.
+
 Compatibility
 ==============
 
@@ -31,6 +38,24 @@ and you must download the version labelled for High Sierra.**
 
 Notable changes
 ===============
+
+Betting
+-------
+
+The highly anticipated update to the Wagerr blockchain is finally here!
+
+The new Wagerr Core wallets will fork the network at block 298386 which is
+approximately 6:00:00 PM UTC Thursday, September 13, 2018.
+
+With this fork we are enabling “On-Chain” betting. Users can place bets against
+the chain and coins will be burned and minted by the chain as required. The
+“On-Chain” betting fee is 6% of the profit from winning bets. This low fee means
+that Wagerr will offer some of the most competitive odds in the world for these
+matches. The Oracle portion of the fees collected shall be distributed to all
+active Masternodes.
+
+Wagerr’s first mainnet betting will be the boxing rematch between Canelo Álvarez
+vs. Gennady Golovkin, taking place on September 15, 2018.
 
 zWGR changes
 ------------
@@ -57,25 +82,6 @@ zWGR is now associated with a deterministic seed key. With this seed key, users
 are able to securely backup their zWGR outside of the wallet that the zWGR had
 been minted on. zWGR can also be transferred from wallet to wallet without the
 need of transferring the wallet data file.
-
-Betting
--------
-
-The highly anticipated update to the Wagerr blockchain is finally here!
-
-The new Wagerr Core wallets will fork the network at block 298386 which is
-approximately 6:00:00 PM UTC Thursday, September 13, 2018.
-
-With this fork we are enabling “On-Chain” betting. Users can place bets against
-the chain and coins will be burned and minted by the chain as required. The
-“On-Chain” betting fee is 6% of the profit from winning bets. This low fee means
-that Wagerr will offer some of the most competitive odds in the world for these
-matches. The Oracle portion of the fees collected shall be distributed to all
-active Masternodes.
-
-Wagerr’s first mainnet betting will be the boxing rematch between Canelo Álvarez
-vs. Gennady Golovkin, taking place on September 15, 2018.
-
 
 2.0.0 change log
 ----------------
@@ -247,6 +253,10 @@ vs. Gennady Golovkin, taking place on September 15, 2018.
 - `bac6985` [WGRCORE-33] Add new mainnet checkpoint for block 290000 (Cryptarchist)
 - `436f350` [WGRCORE-38] Add help link to Telegram on betting tab (Cryptarchist)
 - `57c0c0f` [WGRCORE-44] Build: Bump version to 2.0.99 (Cryptarchist)
+- `310874f` [WGRCORE-27] Doc: Add release notes for 2.0.0 (Cryptarchist)
+- `5b3596c` [WGRCORE-49] Update v2.0.0 client name to Monte Carlo (Cryptarchist)
+- `8b26520` [WGRCORE-52] Qt: Fix bet amount warning to the correct values (Cryptarchist)
+- `c7bf1b3` [WGRCORE-25] Ensure that we use the min and max BetPayoutRange variables in placebetdialog.cpp (Kokary)
 
 Credits
 =======
