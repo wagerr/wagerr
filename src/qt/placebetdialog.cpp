@@ -225,7 +225,7 @@ void PlaceBetDialog::on_placeBetButton_clicked()
         return;
     }
 
-    if (!ui->payAmount->validate() || ui->payAmount->value(0) < (50 * COIN) || ui->payAmount->value(0) > ( 10000 * COIN ) ){
+    if (!ui->payAmount->validate() || ui->payAmount->value(0) < (Params().MinBetPayoutRange() * COIN) || ui->payAmount->value(0) > ( Params().MaxBetPayoutRange() * COIN ) ){
         ui->payAmount->setValid(false);
 
         QString questionString = tr("Bet amount must be between 50 - 10,000 WGR inclusive!");
