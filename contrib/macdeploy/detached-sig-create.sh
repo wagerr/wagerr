@@ -6,7 +6,7 @@ BUNDLE=${ROOTDIR}/Wagerr-Qt.app
 CODESIGN=codesign
 TEMPDIR=sign.temp
 TEMPLIST=${TEMPDIR}/signatures.txt
-OUT=signature.tar.gz
+OUT=signature-osx.tar.gz
 
 if [ ! -n "$1" ]; then
   echo "usage: $0 <codesign args>"
