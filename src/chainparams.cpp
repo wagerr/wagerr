@@ -145,12 +145,13 @@ public:
         nLastPOWBlock = 1001;                   // PoW Phase 3 End
         nModifierUpdateBlock = 1100;            // Modify block on height
         nZerocoinStartHeight = 1500;            // Zerocoin start height
+        nZerocoinAccumulationStartHeight = 1500;// RCP command starts accumulation here - first zerocoin mint occurs at block 87
         nZerocoinStartTime = 1518696182;        // GMT: Thursday, 15. February 2018 12:03:02
         nBlockEnforceSerialRange = 1;           // Enforce serial range starting this block
         nBlockRecalculateAccumulators = 1650;   // Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 99999999;       // 1110; //First block that bad serials emerged (currently we do not have any) *** TODO ***
         nBlockLastGoodCheckpoint = 1648;        // Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
-        nBlockEnforceInvalidUTXO = 1850;        // Start enforcing the invalid UTXO's
+        nBlockEnforceInvalidUTXO = 1500;        // Start enforcing the invalid UTXO's
         nInvalidAmountFiltered = 0*COIN;        //Amount of invalid coins filtered through exchanges, that should be considered valid
         nBlockZerocoinV2 = 298386;              //The block that zerocoin v2 becomes active (estimated at unix time 1536868800 -  (GMT): Thursday, September 13, 2018 6:00:00 PM
         nEnforceNewSporkKey = 1536868800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
@@ -291,6 +292,7 @@ public:
         nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
         nZerocoinStartHeight = 350;
+        nZerocoinAccumulationStartHeight = 350;
         nZerocoinStartTime = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 1400; //Trigger a recalculation of accumulators

@@ -970,17 +970,16 @@ UniValue getaccumulatorvalues(const UniValue& params, bool fHelp)
 
 UniValue calculateaccumulatorvalues(const UniValue& params, bool fHelp)
 {
-    // First zerocoin mints occur in blocks 331114 and 331117
     if (fHelp || params.size() != 1)
         throw runtime_error(
-            "generateaccumulatorvalues \"height\"\n"
+            "calculateaccumulatorvalues \"height\"\n"
                     "\nReturns the calculated accumulator values associated with a block height\n"
 
                     "\nArguments:\n"
                     "1. height   (numeric, required) the height of the checkpoint.\n"
 
                     "\nExamples:\n" +
-            HelpExampleCli("generateaccumulatorvalues", "\"height\"") + HelpExampleRpc("generateaccumulatorvalues", "\"height\""));
+            HelpExampleCli("calculateaccumulatorvalues", "\"height\"") + HelpExampleRpc("generateaccumulatorvalues", "\"height\""));
 
     int nHeight = params[0].get_int();
 
@@ -990,21 +989,22 @@ UniValue calculateaccumulatorvalues(const UniValue& params, bool fHelp)
 
     uint256 nCheckpointCalculated = 0;
 
-    AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().Zerocoin_Block_V2_Start()));
+    AccumulatorMap mapAccumulators(Params().Zerocoin_Params(false));
 
     if (!CalculateAccumulatorCheckpointWithoutDB(nHeight, nCheckpointCalculated, mapAccumulators))
         return error("%s : failed to calculate accumulator checkpoint", __func__);
 
     UniValue ret(UniValue::VARR);
+    UniValue obj(UniValue::VOBJ);
 
+    obj.push_back(Pair("height", nHeight));
     for (libzerocoin::CoinDenomination denom : libzerocoin::zerocoinDenomList) {
         CBigNum bnValue;
 
         bnValue = mapAccumulators.GetValue(denom);
-        UniValue obj(UniValue::VOBJ);
         obj.push_back(Pair(std::to_string(denom), bnValue.GetHex()));
-        ret.push_back(obj);
     }
+    ret.push_back(obj);
 
     return ret;
 }
