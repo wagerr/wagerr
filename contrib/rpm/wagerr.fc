@@ -1,0 +1,8 @@
+/usr/bin/wagerr-cli		--	gen_context(system_u:object_r:wagerr_exec_t,s0)
+/usr/sbin/wagerrd		--	gen_context(system_u:object_r:wagerr_exec_t,s0)
+/usr/lib(64)?/wagerr/wagerrd		--	gen_context(system_u:object_r:wagerr_exec_t,s0)
+
+/etc/wagerr(/.*)?		gen_context(system_u:object_r:wagerr_conf_t,s0)
+/var/lib/wagerr(/.*)?		gen_context(system_u:object_r:wagerr_var_lib_t,s0)
+
+(/var)?/run/wagerrd(/.*)?   gen_context(system_u:object_r:wagerr_var_run_t,s0)
