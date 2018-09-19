@@ -995,27 +995,30 @@ if test "x$use_ccache" = "xyes"; then
 fi
 
 dnl bignum value
-if test x"$req_bignum" = x"auto"; then
+set_bignum=$req_bignum
+case $req_bignum in
+auto)
   GMP_CHECK
-  if test x"$has_gmp" = x"yes"; then
+  if test x"$has_gmp" != x"yes"; then
+    AC_MSG_ERROR([gmp bignum automatically selected but libgmp is not available. Use depends,
+    install libgmp or select an other bignum implementation (ONLY gmp is fully SUPPORTED)])
+  else
     set_bignum=gmp
   fi
-else
-  set_bignum=$req_bignum
-  case $set_bignum in
-  gmp)
-    GMP_CHECK
-    if test x"$has_gmp" != x"yes"; then
-      AC_MSG_ERROR([gmp bignum explicitly requested but libgmp not available])
-    fi
-    ;;
-  openssl)
-    ;;
-  *)
-    AC_MSG_ERROR([invalid bignum implementation selection])
-    ;;
-  esac
-fi
+  ;;
+gmp)
+  GMP_CHECK
+  if test x"$has_gmp" != x"yes"; then
+    AC_MSG_ERROR([gmp bignum explicitly requested but libgmp is not available])
+  fi
+  ;;
+openssl)
+    AC_MSG_WARN([openssl bignum explicitly requested. This is DEPRECATED.])
+  ;;
+*)
+  AC_MSG_ERROR([invalid bignum implementation selection])
+  ;;
+esac
 
 dnl enable wallet
 AC_MSG_CHECKING([if wallet should be enabled])
