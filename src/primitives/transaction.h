@@ -299,8 +299,6 @@ public:
     }
 
     std::string ToString() const;
-
-    bool GetCoinAge(uint64_t& nCoinAge) const;  // ppcoin: get transaction coin age
 };
 
 /** A mutable version of CTransaction. */
