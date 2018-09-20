@@ -543,6 +543,8 @@ public:
 
     bool IsDenominatedAmount(CAmount nInputAmount) const;
 
+    bool IsUsed(const CBitcoinAddress address) const;
+
     isminetype IsMine(const CTxIn& txin) const;
     CAmount GetDebit(const CTxIn& txin, const isminefilter& filter) const;
     isminetype IsMine(const CTxOut& txout) const

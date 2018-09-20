@@ -132,7 +132,7 @@ void ReceiveCoinsDialog::on_receiveButton_clicked()
     if (!model || !model->getOptionsModel() || !model->getAddressTableModel() || !model->getRecentRequestsTableModel())
         return;
 
-    QString address;
+    address = getAddress(label);
     QString label = ui->reqLabel->text();
     if (ui->reuseAddress->isChecked()) {
         /* Choose existing receiving address */
@@ -283,3 +283,11 @@ void ReceiveCoinsDialog::copyAddress()
 {
     copyColumnToClipboard(RecentRequestsTableModel::Address);
 }
+
+void ReceiveCoinsDialog::receiveAddressUsed()
+{
+    if (model && model->isUsed(CBitcoinAddress(address.toStdString()))) {
+        clear();
+    }
+}
+
