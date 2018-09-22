@@ -72,6 +72,7 @@ BASE_SCRIPTS= [
     'wallet_abandonconflict.py',
     'rpc_rawtransaction.py',
     'feature_reindex.py',
+    'rpc_bip38.py',
     # vv Tests less than 30s vv
     'wallet_keypool_topup.py',
     'interface_zmq.py',
