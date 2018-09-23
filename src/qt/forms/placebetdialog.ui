@@ -387,7 +387,7 @@
               </item>
 
                 <item>
-                 <layout class="QHBoxLayout" name="verticalLayout_3">
+                 <layout class="QHBoxLayout" name="verticalLayout_4">
                   <property name="spacing">
                    <number>6</number>
                   </property>
@@ -2922,7 +2922,7 @@
         <item>
          <widget class="QFrame" name="frame_Send">
 
-          <layout class="QVBoxLayout" name="verticalLayout">
+          <layout class="QVBoxLayout" name="verticalLayout5">
 
               <item>
                <layout class="QHBoxLayout" name="horizontalLayoutCoinControl2" stretch="0,0,0,0">
@@ -2978,7 +2978,7 @@
               </item>
 
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl2" stretch="0,0,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl3" stretch="0,0,0,0">
                 <property name="spacing">
                  <number>8</number>
                 </property>
@@ -3008,60 +3008,7 @@
               </item>
 
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl2" stretch="0,0,0,0">
-                <property name="spacing">
-                 <number>8</number>
-                </property>
-                <property name="bottomMargin">
-                 <number>10</number>
-                </property>
-
-                    <item>
-                     <widget class="QLabel" name="warningLabel2">
-                      <property name="text">
-                       <string>WARNING:</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignLeft|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-
-                    <item>
-                     <widget class="QLabel" name="warningLabel">
-                      <property name="text">
-                       <string>Any bets placed on 0 or N/A odds will be burned. Do not make bets on 0 or N/A odds.</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignLeft|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                      </property>
-                      <property name="font">
-                       <font>
-                        <bold>true</bold>
-                       </font>
-                      </property>
-                     </widget>
-                    </item>
-
-                    <item>
-                     <spacer name="horizontalSpacer">
-                      <property name="orientation">
-                       <enum>Qt::Horizontal</enum>
-                      </property>
-                      <property name="sizeHint" stdset="0">
-                       <size>
-                        <width>40</width>
-                        <height>20</height>
-                       </size>
-                      </property>
-                     </spacer>
-                    </item>
-
-               </layout>
-              </item>
-
-              <item>
-               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl2" stretch="0,0,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl4" stretch="0,0,0,0">
                 <property name="spacing">
                  <number>8</number>
                 </property>
@@ -3095,7 +3042,7 @@
                     </item>
 
                     <item>
-                     <spacer name="horizontalSpacer">
+                     <spacer name="horizontalSpacer2">
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
                       </property>
@@ -3180,7 +3127,7 @@
             </widget>
            </item> -->
            <item>
-            <spacer name="horizontalSpacer">
+            <spacer name="horizontalSpacer3">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
