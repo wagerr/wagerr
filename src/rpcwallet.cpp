@@ -3242,6 +3242,149 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
     return ret;
 }
 
+UniValue spendzerocoinfrom(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() > 6 || params.size() < 5)
+        throw runtime_error(
+            "spendzerocoinfrom amount mintchange minimizechange securitylevel selectedmints ( \"address\" )\n"
+            "\nSpend zWGR to a WGR address.\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nArguments:\n"
+            "1. amount          (numeric, required) Amount to spend.\n"
+            "2. mintchange      (boolean, required) Re-mint any leftover change.\n"
+            "3. minimizechange  (boolean, required) Try to minimize the returning change  [false]\n"
+            "4. securitylevel   (numeric, required) Amount of checkpoints to add to the accumulator.\n"
+            "                       A checkpoint contains 10 blocks worth of zerocoinmints.\n"
+            "                       The more checkpoints that are added, the more untraceable the transaction.\n"
+            "                       Use [100] to add the maximum amount of checkpoints available.\n"
+            "                       Adding more checkpoints makes the minting process take longer\n"
+            "5. selectedmints   (string, optional) A json array of strings.\n"
+            "                       Each string cointains the pubcoin hash of a zerocoin mint\n"
+            "6. \"address\"     (string, optional, default=change) Send to specified address or to a new change address.\n"
+            "                       If there is change then an address is required\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"txid\": \"xxx\",             (string) Transaction hash.\n"
+            "  \"bytes\": nnn,              (numeric) Transaction size.\n"
+            "  \"fee\": amount,             (numeric) Transaction fee (if any).\n"
+            "  \"spends\": [                (array) JSON array of input objects.\n"
+            "    {\n"
+            "      \"denomination\": nnn,   (numeric) Denomination value.\n"
+            "      \"pubcoin\": \"xxx\",      (string) Pubcoin in hex format.\n"
+            "      \"serial\": \"xxx\",       (string) Serial number in hex format.\n"
+            "      \"acc_checksum\": \"xxx\", (string) Accumulator checksum in hex format.\n"
+            "    }\n"
+            "    ,...\n"
+            "  ],\n"
+            "  \"outputs\": [                 (array) JSON array of output objects.\n"
+            "    {\n"
+            "      \"value\": amount,         (numeric) Value in WGR.\n"
+            "      \"address\": \"xxx\"         (string) WGR address or \"zerocoinmint\" for reminted change.\n"
+            "    }\n"
+            "    ,...\n"
+            "  ]\n"
+            "}\n"
+
+            "\nExamples\n" +
+            HelpExampleCli("spendzerocoinfrom", "5000 false true 100 \"[\\\"4945d2549abc3b893810bb6499eb890c98a0dbe3ab945ed0baefa938409ca039\\\"]\" \"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\"") +
+            HelpExampleRpc("spendzerocoinfrom", "5000 false true 100 \"[\\\"4945d2549abc3b893810bb6499eb890c98a0dbe3ab945ed0baefa938409ca039\\\"]\" \"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\""));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
+        throw JSONRPCError(RPC_WALLET_ERROR, "zWGR is currently disabled due to maintenance.");
+
+    EnsureWalletIsUnlocked();
+
+    int64_t nTimeStart = GetTimeMillis();
+    CAmount nAmount = AmountFromValue(params[0]);   // Spending amount
+    bool fMintChange = params[1].get_bool();        // Mint change to zWGR
+    bool fMinimizeChange = params[2].get_bool();    // Minimize change
+    int nSecurityLevel = params[3].get_int();       // Security level
+
+    CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
+    if (params.size() == 6) {
+        // Destination address was supplied as params[4]. Optional parameters MUST be at the end
+        // to avoid type confusion from the JSON interpreter
+        address = CBitcoinAddress(params[5].get_str());
+        if(!address.IsValid())
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+    }
+
+    CWalletTx wtx;
+    vector<CZerocoinMint> vMintsSelected;
+    CZerocoinSpendReceipt receipt;
+    bool fSuccess;
+
+    UniValue inputsPubcoinHashes = params[4].get_array();
+    for (unsigned int inx = 0; inx < inputsPubcoinHashes.size(); inx++){
+        const UniValue& inputPubcoinHash = inputsPubcoinHashes[inx];
+        const uint256 pubcoinHash = uint256(inputPubcoinHash.get_str());
+        CMintMeta mintMeta = pwalletMain->zwgrTracker->GetMetaFromPubcoin(pubcoinHash);
+
+        if (mintMeta.nVersion < libzerocoin::PrivateCoin::PUBKEY_VERSION) {
+            //version 1 coins have to use full security level to successfully spend.
+            if (nSecurityLevel < 100)
+                throw JSONRPCError(RPC_WALLET_ERROR, "Version 1 zWGR require a security level of 100 to successfully spend.");
+        }
+        CZerocoinMint mint;
+        if (!pwalletMain->GetMint(mintMeta.hashSerial, mint))
+            throw JSONRPCError(RPC_WALLET_ERROR, "Failed to fetch mint associated with serial hash");
+        vMintsSelected.emplace_back(mint);
+    }
+
+
+    if(params.size() == 6) // Spend to supplied destination address
+        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
+    else                   // Spend to newly generated local address
+        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange);
+
+    if (!fSuccess)
+        throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
+
+    CAmount nValueIn = 0;
+    UniValue arrSpends(UniValue::VARR);
+    for (CZerocoinSpend spend : receipt.GetSpends()) {
+        UniValue obj(UniValue::VOBJ);
+        obj.push_back(Pair("denomination", spend.GetDenomination()));
+        obj.push_back(Pair("pubcoin", spend.GetPubCoin().GetHex()));
+        obj.push_back(Pair("serial", spend.GetSerial().GetHex()));
+        uint32_t nChecksum = spend.GetAccumulatorChecksum();
+        obj.push_back(Pair("acc_checksum", HexStr(BEGIN(nChecksum), END(nChecksum))));
+        arrSpends.push_back(obj);
+        nValueIn += libzerocoin::ZerocoinDenominationToAmount(spend.GetDenomination());
+    }
+
+    CAmount nValueOut = 0;
+    UniValue vout(UniValue::VARR);
+    for (unsigned int i = 0; i < wtx.vout.size(); i++) {
+        const CTxOut& txout = wtx.vout[i];
+        UniValue out(UniValue::VOBJ);
+        out.push_back(Pair("value", ValueFromAmount(txout.nValue)));
+        nValueOut += txout.nValue;
+
+        CTxDestination dest;
+        if(txout.scriptPubKey.IsZerocoinMint())
+            out.push_back(Pair("address", "zerocoinmint"));
+        else if(ExtractDestination(txout.scriptPubKey, dest))
+            out.push_back(Pair("address", CBitcoinAddress(dest).ToString()));
+        vout.push_back(out);
+    }
+
+    //construct JSON to return
+    UniValue ret(UniValue::VOBJ);
+    ret.push_back(Pair("txid", wtx.GetHash().ToString()));
+    ret.push_back(Pair("bytes", (int64_t)wtx.GetSerializeSize(SER_NETWORK, CTransaction::CURRENT_VERSION)));
+    ret.push_back(Pair("fee", ValueFromAmount(nValueIn - nValueOut)));
+    ret.push_back(Pair("duration_millis", (GetTimeMillis() - nTimeStart)));
+    ret.push_back(Pair("spends", arrSpends));
+    ret.push_back(Pair("outputs", vout));
+
+    return ret;
+}
+
 UniValue resetmintzerocoin(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 1)
