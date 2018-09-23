@@ -181,6 +181,12 @@ QWidget* parent, CEvent* event, const std::string& eventDetails, const  std::str
     ui->pushButtonPlaceHomeBet->setText(QString::fromStdString(event->homeOdds));
     ui->pushButtonPlaceAwayBet->setText(QString::fromStdString(event->awayOdds));
     ui->pushButtonPlaceDrawBet->setText(QString::fromStdString(event->drawOdds));
+    ui->pushButtonPlaceHomeBet->setStyleSheet(QStringLiteral("QPushButton:disabled{background-color:#c0c0c0}"));
+    ui->pushButtonPlaceAwayBet->setStyleSheet(QStringLiteral("QPushButton:disabled{background-color:#c0c0c0}"));
+    ui->pushButtonPlaceDrawBet->setStyleSheet(QStringLiteral("QPushButton:disabled{background-color:#c0c0c0}"));
+    if(event->homeOdds == "N/A") ui->pushButtonPlaceHomeBet->setEnabled(false);
+    if(event->awayOdds == "N/A") ui->pushButtonPlaceAwayBet->setEnabled(false);
+    if(event->drawOdds == "N/A") ui->pushButtonPlaceDrawBet->setEnabled(false);
 
 // #ifdef Q_OS_MAC
 //     ui->payToLayout->setSpacing(4);
