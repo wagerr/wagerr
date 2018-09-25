@@ -3015,6 +3015,44 @@
                 <property name="bottomMargin">
                  <number>10</number>
                 </property>
+                    <item>
+                     <widget class="QLabel" name="warningLabel">
+                      <property name="text">
+                       <string>A 6% Direct-Chain betting fee is applied to the profit of winning bets.</string>
+                      </property>
+                      <property name="alignment">
+                       <set>Qt::AlignLeft|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                      </property>
+                      <property name="font">
+                       <font>
+                        <bold>true</bold>
+                       </font>
+                      </property>
+                     </widget>
+                    </item>
+                    <item>
+                     <spacer name="horizontalSpacer2">
+                      <property name="orientation">
+                       <enum>Qt::Horizontal</enum>
+                      </property>
+                      <property name="sizeHint" stdset="0">
+                       <size>
+                        <width>40</width>
+                        <height>20</height>
+                       </size>
+                      </property>
+                     </spacer>
+                    </item>
+               </layout>
+              </item>
+              <item>
+               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl5" stretch="0,0,0,0">
+                <property name="spacing">
+                 <number>8</number>
+                </property>
+                <property name="bottomMargin">
+                 <number>10</number>
+                </property>
 
                     <item>
                      <widget class="QLabel" name="warningLabel2">
@@ -3042,7 +3080,7 @@
                     </item>
 
                     <item>
-                     <spacer name="horizontalSpacer2">
+                     <spacer name="horizontalSpacer3">
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
                       </property>
@@ -3127,7 +3165,7 @@
             </widget>
            </item> -->
            <item>
-            <spacer name="horizontalSpacer3">
+            <spacer name="horizontalSpacer4">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
