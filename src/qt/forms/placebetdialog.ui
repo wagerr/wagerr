@@ -287,7 +287,7 @@
                      <string notr="true">font-weight:bold;</string>
                     </property>
                     <property name="text">
-                     <string>Home (W)</string>
+                     <string>Home</string>
                     </property>
                    </widget>
                   </item>
@@ -320,7 +320,7 @@
                      <string notr="true">font-weight:bold;</string>
                     </property>
                     <property name="text">
-                     <string>Away (W)</string>
+                     <string>Away</string>
                     </property>
                    </widget>
                   </item>
