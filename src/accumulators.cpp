@@ -487,18 +487,11 @@ bool GenerateAccumulatorWitness(const PublicCoin &coin, Accumulator& accumulator
 
             bnAccValue = 0;
             uint256 nCheckpointSpend = chainActive[pindex->nHeight + 10]->nAccumulatorCheckpoint;
-            if (!isV1Coin){
-                if (!GetAccumulatorValueFromDB(nCheckpointSpend, coin.getDenomination(), bnAccValue) || bnAccValue == 0)
-                    return error("%s : failed to find checksum in database for accumulator", __func__);
+            if (!GetAccumulatorValueFromDB(nCheckpointSpend, coin.getDenomination(), bnAccValue) || bnAccValue == 0)
+                return error("%s : failed to find checksum in database for accumulator", __func__);
 
-                accumulator.setValue(bnAccValue);
-            }
-
+            accumulator.setValue(bnAccValue);
             break;
-        }
-
-        if (isV1Coin){
-            AddBlockMintsToAccumulator(coin, nHeightMintAdded, pindex, &accumulator, false);
         }
 
         nMintsAdded += AddBlockMintsToAccumulator(coin, nHeightMintAdded, pindex, &witnessAccumulator, true);
