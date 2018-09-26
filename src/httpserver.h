@@ -67,7 +67,8 @@ public:
         GET,
         POST,
         HEAD,
-        PUT
+        PUT,
+        OPTIONS
     };
 
     /** Get requested URI.
