@@ -325,11 +325,11 @@ void PlaceBetDialog::send(CAmount amount, const std::string& eventId, const std:
         questionString.append(tr("are added as transaction fee"));
         questionString.append(" ");
 
-        // append transaction size
+        // append transaction size.
         questionString.append(" (" + QString::number((double)currentTransaction.getTransactionSize() / 1000) + " kB)");
     }
 
-    // Display message box
+    // Display message box.
     QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Confirm place bet"),
         questionString.arg(""),
         QMessageBox::Yes | QMessageBox::Cancel,
@@ -339,9 +339,9 @@ void PlaceBetDialog::send(CAmount amount, const std::string& eventId, const std:
         return;
     }
 
-    //check if the event in furthur than 20 minutes into the future
+    // Check if the event is further than 22 minutes into the future.
     time_t currentTime = std::time(0);
-    if((currentTime + 1200) > std::stoi(eventTime)) {
+    if((currentTime + 1320) > std::stoi(eventTime)) {
         QString questionString1 = tr("Betting expired! Please ensure you bet more than 20 minutes before the event start time!");
         questionString1.append("<br /><br />%1");
 
@@ -353,7 +353,7 @@ void PlaceBetDialog::send(CAmount amount, const std::string& eventId, const std:
         return;
     }
 
-    // now send the prepared transaction
+    // Now send the prepared transaction.
     WalletModel::SendCoinsReturn sendStatus = model->placeBet(currentTransaction, amount, eventId, teamToWin);
     processPlaceBetReturn(sendStatus);
 
