@@ -43,6 +43,15 @@ void ZWgrControlDialog::setModel(WalletModel *model)
     updateList();
 }
 
+// helper function str_pad
+QString ZWgrControlDialog::strPad(QString s, int nPadLength, QString sPadding)
+{
+    while (s.length() < nPadLength)
+        s = sPadding + s;
+
+    return s;
+}
+
 //Update the tree widget
 void ZWgrControlDialog::updateList()
 {
@@ -61,7 +70,7 @@ void ZWgrControlDialog::updateList()
         mapDenomPosition[denom] = ui->treeWidget->indexOfTopLevelItem(itemDenom);
 
         itemDenom->setFlags(flgTristate);
-        itemDenom->setText(COLUMN_DENOMINATION, QString::number(denom));
+        itemDenom->setText(COLUMN_DENOMINATION, strPad(QString::number(denom), 5, " "));
     }
 
     // select all unused coins - including not mature. Update status of coins too.
@@ -85,9 +94,9 @@ void ZWgrControlDialog::updateList()
         else
             itemMint->setCheckState(COLUMN_CHECKBOX, Qt::Unchecked);
 
-        itemMint->setText(COLUMN_DENOMINATION, QString::number(mint.denom));
+        itemMint->setText(COLUMN_DENOMINATION, strPad(QString::number(mint.denom), 5, " "));
         itemMint->setText(COLUMN_PUBCOIN, QString::fromStdString(strPubCoinHash));
-        itemMint->setText(COLUMN_VERSION, QString::number(mint.nVersion));
+        itemMint->setText(COLUMN_VERSION, strPad(QString::number(mint.nVersion), 3, " "));
 
         int nConfirmations = (mint.nHeight ? nBestHeight - mint.nHeight : 0);
         if (nConfirmations < 0) {
@@ -95,7 +104,7 @@ void ZWgrControlDialog::updateList()
             nConfirmations = 0;
         }
 
-        itemMint->setText(COLUMN_CONFIRMATIONS, QString::number(nConfirmations));
+        itemMint->setText(COLUMN_CONFIRMATIONS, strPad(QString::number(nConfirmations), 15, " "));
 
         // check for maturity
         bool isMature = false;
