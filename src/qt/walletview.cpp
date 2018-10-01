@@ -489,7 +489,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
         tm *ptm = std::gmtime(&time);
         static const char mon_name[][4] = {
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Aug", "Nov", "Dec"
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         };
         char result[22];
 
