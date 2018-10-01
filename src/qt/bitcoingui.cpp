@@ -1157,7 +1157,7 @@ void BitcoinGUI::incomingTransaction(const QString& date, int unit, const CAmoun
     // Only send notifications when not disabled
     if(!bdisableSystemnotifications){
         // On new transaction, make an info balloon
-        message((amount) < 0 ? (pwalletMain->fMultiSendNotify == true ? tr("Sent MultiSend transaction") : ( type == "Sent to" ? tr("Bet Placed") : tr("Sent transaction"))) : ( type == "Bet Winnings" ? tr("Incoming Bet Payout") : tr("Incoming transaction")),
+        message((amount) < 0 ? (pwalletMain->fMultiSendNotify == true ? tr("Sent MultiSend transaction") : ( type == "Placed Bet" ? tr("Bet Placed") : tr("Sent transaction"))) : ( type == "Bet Winnings" ? tr("Incoming Bet Payout") : tr("Incoming transaction")),
             tr("Date: %1\n"
                "Amount: %2\n"
                "Type: %3\n"
