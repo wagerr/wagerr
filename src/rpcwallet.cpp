@@ -638,8 +638,8 @@ UniValue placebet(const UniValue& params, bool fHelp)
                                             "#016","#017","#018","#019","#020","#021","#022","#023","#024","#025","#026","#027","#028","#029","#030","#031",
                                             "#032","#033","#034","#035","#036","#037","#038","#039","#040","#041","#042","#043","#044","#045","#046","#047",
                                             "#048","#049","#050","#060","#061","#062","#063","#064","#065","#066","#067","#068","#069","#070"};
-    std::vector<std::string> rd1Teams = {"TES","DRW","ARG", "AUS", "BEL", "BRA", "COL", "CRC", "CRO", "DEN", "EGY", "ENG", "FRA", "GER", "ISL", "IRN", "JPN", "KOR",
-                                         "MEX", "MAR", "NGA","NIG", "PAN", "PER", "POL", "POR", "RUS", "KSA", "SEN", "SRB", "ESP", "SWE", "SUI", "TUN", "URU",};
+    std::vector<std::string> rd1Teams = {"TES","DRW","ARG", "AUS", "BEL", "BRA", "COL", "CRI", "HRV", "DNK", "EGY", "ENG", "FRA", "DEU", "ISL", "IRN", "JPN", "KOR",
+                                         "MEX", "MAR", "NGA","NIG", "PAN", "PER", "POL", "PRT", "RUS", "SAU", "SEN", "SRB", "ESP", "SWE", "CHE", "TUN", "URY",};
 
     if (fHelp || params.size() < 3 || params.size() > 5)
         throw runtime_error(
