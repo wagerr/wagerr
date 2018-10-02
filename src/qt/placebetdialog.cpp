@@ -462,7 +462,7 @@ void PlaceBetDialog::prepareBet(CEvent* event, const std::string& teamToWin, con
     tm *ptm = std::gmtime(&time);
     static const char mon_name[][4] = {
         "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-        "Jul", "Aug", "Sep", "Aug", "Nov", "Dec"
+        "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
     };
     char result[22];
     // evtDes += evtDescr;
