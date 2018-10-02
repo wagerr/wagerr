@@ -287,7 +287,7 @@
                      <string notr="true">font-weight:bold;</string>
                     </property>
                     <property name="text">
-                     <string>Home (W)</string>
+                     <string>Home</string>
                     </property>
                    </widget>
                   </item>
@@ -320,7 +320,7 @@
                      <string notr="true">font-weight:bold;</string>
                     </property>
                     <property name="text">
-                     <string>Away (W)</string>
+                     <string>Away</string>
                     </property>
                    </widget>
                   </item>
@@ -387,7 +387,7 @@
               </item>
 
                 <item>
-                 <layout class="QHBoxLayout" name="verticalLayout_3">
+                 <layout class="QHBoxLayout" name="verticalLayout_4">
                   <property name="spacing">
                    <number>6</number>
                   </property>
@@ -2922,7 +2922,7 @@
         <item>
          <widget class="QFrame" name="frame_Send">
 
-          <layout class="QVBoxLayout" name="verticalLayout">
+          <layout class="QVBoxLayout" name="verticalLayout5">
 
               <item>
                <layout class="QHBoxLayout" name="horizontalLayoutCoinControl2" stretch="0,0,0,0">
@@ -2978,7 +2978,7 @@
               </item>
 
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl2" stretch="0,0,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl3" stretch="0,0,0,0">
                 <property name="spacing">
                  <number>8</number>
                 </property>
@@ -3008,29 +3008,17 @@
               </item>
 
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl2" stretch="0,0,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl4" stretch="0,0,0,0">
                 <property name="spacing">
                  <number>8</number>
                 </property>
                 <property name="bottomMargin">
                  <number>10</number>
                 </property>
-
-                    <item>
-                     <widget class="QLabel" name="warningLabel2">
-                      <property name="text">
-                       <string>WARNING:</string>
-                      </property>
-                      <property name="alignment">
-                       <set>Qt::AlignLeft|Qt::AlignTrailing|Qt::AlignVCenter</set>
-                      </property>
-                     </widget>
-                    </item>
-
                     <item>
                      <widget class="QLabel" name="warningLabel">
                       <property name="text">
-                       <string>Any bets placed on 0 or N/A odds will be burned. Do not make bets on 0 or N/A odds.</string>
+                       <string>A 6% Direct-Chain betting fee is applied to the profit of winning bets.</string>
                       </property>
                       <property name="alignment">
                        <set>Qt::AlignLeft|Qt::AlignTrailing|Qt::AlignVCenter</set>
@@ -3042,9 +3030,8 @@
                       </property>
                      </widget>
                     </item>
-
                     <item>
-                     <spacer name="horizontalSpacer">
+                     <spacer name="horizontalSpacer2">
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
                       </property>
@@ -3056,12 +3043,10 @@
                       </property>
                      </spacer>
                     </item>
-
                </layout>
               </item>
-
               <item>
-               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl2" stretch="0,0,0,0">
+               <layout class="QHBoxLayout" name="horizontalLayoutCoinControl5" stretch="0,0,0,0">
                 <property name="spacing">
                  <number>8</number>
                 </property>
@@ -3095,7 +3080,7 @@
                     </item>
 
                     <item>
-                     <spacer name="horizontalSpacer">
+                     <spacer name="horizontalSpacer3">
                       <property name="orientation">
                        <enum>Qt::Horizontal</enum>
                       </property>
@@ -3180,7 +3165,7 @@
             </widget>
            </item> -->
            <item>
-            <spacer name="horizontalSpacer">
+            <spacer name="horizontalSpacer4">
              <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>

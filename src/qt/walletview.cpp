@@ -391,7 +391,6 @@ void WalletView::gotoPlaceBetPage(QString addr)
                             validEventTx = true;
                         }
                     }
-
                 }
             }
 
@@ -415,30 +414,23 @@ void WalletView::gotoPlaceBetPage(QString addr)
 
                     time_t time = (time_t) std::strtol(strs[3].c_str(), nullptr, 10);
                     CEvent *event = CEvent::ParseEvent(evtDescr);
-
                     time_t currentTime = std::time(0);
-                    //only add events up until 20 minutes(1200 seconds) before they start
-                    if( time > (currentTime + 1200)){
 
-                        //add events to vector
+                    // Only add events up until 22 minutes (1320 seconds) before they start.
+                    if( time > ( currentTime + 1320 ) ){
+
+                        // Add events to vector
                         eventsVector.push_back(event);
                     }
                 }
             }
         }
+
         pindex = chainActive.Next(pindex);
     }
 
-    //sort events by timestamp
-    struct compare_times{
-        inline bool operator() (CEvent *event1, CEvent *event2){
-            return (event1->starting < event2->starting);
-        }
-    };
-    std::sort(eventsVector.begin(), eventsVector.end(), compare_times());
-
     //remove duplicates from list (Remove older duplicates)
-    std::vector<CEvent *> cleanEventsVector;
+    std::vector<CEvent *>  cleanEventsVector;
     for(unsigned int i = 0; i < eventsVector.size(); i++ ){
 
         bool found = false;
@@ -467,6 +459,13 @@ void WalletView::gotoPlaceBetPage(QString addr)
         }
     }
 
+    struct compare_times{
+        inline bool operator() (CEvent *event1, CEvent *event2){
+            return (event1->starting < event2->starting);
+        }
+    };
+    std::sort(cleanEventsVector.begin(), cleanEventsVector.end(), compare_times());
+
     //put events on screen
     for(unsigned int i = 0; i < cleanEventsVector.size(); i++ ){
 
@@ -489,7 +488,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
         tm *ptm = std::gmtime(&time);
         static const char mon_name[][4] = {
             "Jan", "Feb", "Mar", "Apr", "May", "Jun",
-            "Jul", "Aug", "Sep", "Aug", "Nov", "Dec"
+            "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"
         };
         char result[22];
 

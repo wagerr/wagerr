@@ -63,12 +63,13 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
     (   70450, uint256("ea83266a9dfd7cf92a96aa07f86bdf60d45850bd47c175745e71a1aaf60b4091"))
     (  257142, uint256("eca635870323e7c0785fec1e663f4cb8645b7e84b5df4511ba4c189e580bfafd"))
     (  290000, uint256("5a70e614a2e6035be0fa1dd1a67bd6caa0a78e396e889aac42bbbc08e11cdabd"))
-    (  294400, uint256("01be3c3c84fd6063ba27080996d346318242d5335efec936408c1e1ae3fdb4a1"));
+    (  294400, uint256("01be3c3c84fd6063ba27080996d346318242d5335efec936408c1e1ae3fdb4a1"))
+    (  320000, uint256("9060f8d44058c539653f37eaac4c53de7397e457dda264c5ee1be94293e9f6bb"));
 
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-    1536634958, // * UNIX timestamp of last checkpoint block
-    613554,     // * total number of transactions between genesis and last checkpoint
+    1538190282, // * UNIX timestamp of last checkpoint block
+    671130,     // * total number of transactions between genesis and last checkpoint
                 //   (the tx=... number in the SetBestChain debug.log lines)
     5000        // * estimated number of transactions per day after checkpoint
 };
@@ -145,12 +146,13 @@ public:
         nLastPOWBlock = 1001;                   // PoW Phase 3 End
         nModifierUpdateBlock = 1100;            // Modify block on height
         nZerocoinStartHeight = 1500;            // Zerocoin start height
+        nZerocoinAccumulationStartHeight = 1500;// RCP command starts accumulation here - first zerocoin mint occurs at block 87
         nZerocoinStartTime = 1518696182;        // GMT: Thursday, 15. February 2018 12:03:02
         nBlockEnforceSerialRange = 1;           // Enforce serial range starting this block
         nBlockRecalculateAccumulators = 1650;   // Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 99999999;       // 1110; //First block that bad serials emerged (currently we do not have any) *** TODO ***
         nBlockLastGoodCheckpoint = 1648;        // Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
-        nBlockEnforceInvalidUTXO = 1850;        // Start enforcing the invalid UTXO's
+        nBlockEnforceInvalidUTXO = 1500;        // Start enforcing the invalid UTXO's
         nInvalidAmountFiltered = 0*COIN;        //Amount of invalid coins filtered through exchanges, that should be considered valid
         nBlockZerocoinV2 = 298386;              //The block that zerocoin v2 becomes active (estimated at unix time 1536868800 -  (GMT): Thursday, September 13, 2018 6:00:00 PM
         nEnforceNewSporkKey = 1536868800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
@@ -291,6 +293,7 @@ public:
         nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
         nZerocoinStartHeight = 350;
+        nZerocoinAccumulationStartHeight = 350;
         nZerocoinStartTime = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 1400; //Trigger a recalculation of accumulators
