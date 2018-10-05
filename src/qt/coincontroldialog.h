@@ -61,7 +61,6 @@ private:
     QAction* lockAction;
     QAction* unlockAction;
 
-    QString strPad(QString, int, QString);
     void sortView(int, Qt::SortOrder);
     void updateView();
 

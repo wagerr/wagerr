@@ -37,7 +37,6 @@ private:
     WalletModel* model;
     PrivacyDialog* privacyDialog;
 
-    QString strPad(QString, int, QString);
     void updateList();
     void updateLabels();
 
