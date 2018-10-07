@@ -17,6 +17,7 @@
 
 #include <univalue.h>
 
+#include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include <fstream>
 
