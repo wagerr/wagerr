@@ -17,7 +17,6 @@
 
 #include <univalue.h>
 
-#include <boost/lexical_cast.hpp>
 #include <boost/tokenizer.hpp>
 #include <fstream>
 
@@ -842,7 +841,7 @@ UniValue getmasternodescores (const UniValue& params, bool fHelp)
     if (params.size() == 1) {
         try {
             nLast = std::stoi(params[0].get_str());
-        } catch (const boost::bad_lexical_cast &) {
+        } catch (const std::invalid_argument&) {
             throw runtime_error("Exception on param 2");
         }
     }
