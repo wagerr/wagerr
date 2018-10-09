@@ -18,6 +18,16 @@ namespace Ui {
 class ZWgrControlDialog;
 }
 
+class CZWgrControlWidgetItem : public QTreeWidgetItem
+{
+public:
+    explicit CZWgrControlWidgetItem(QTreeWidget *parent, int type = Type) : QTreeWidgetItem(parent, type) {}
+    explicit CZWgrControlWidgetItem(int type = Type) : QTreeWidgetItem(type) {}
+    explicit CZWgrControlWidgetItem(QTreeWidgetItem *parent, int type = Type) : QTreeWidgetItem(parent, type) {}
+
+    bool operator<(const QTreeWidgetItem &other) const;
+};
+
 class ZWgrControlDialog : public QDialog
 {
     Q_OBJECT
@@ -48,6 +58,7 @@ private:
         COLUMN_CONFIRMATIONS,
         COLUMN_ISSPENDABLE
     };
+    friend class CZWgrControlWidgetItem;
 
 private slots:
     void updateSelection(QTreeWidgetItem* item, int column);
