@@ -205,11 +205,6 @@ public:
         return std::vector<unsigned char>(vch, vch + size());
     }
 
-    std::string GetHex()
-    {
-        std::string my_std_string(reinterpret_cast<const char*>(vch), 65);
-        return my_std_string;
-    }
 };
 
 struct CExtPubKey {

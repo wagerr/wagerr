@@ -85,7 +85,7 @@ bool CheckBlockSignature(const CBlock& block)
     }
 
     if (!pubkey.IsValid())
-        return error("%s: invalid pubkey %s", __func__, pubkey.GetHex());
+        return error("%s: invalid pubkey %s", __func__, HexStr(pubkey));
 
     return pubkey.Verify(block.GetHash(), block.vchBlockSig);
 }
