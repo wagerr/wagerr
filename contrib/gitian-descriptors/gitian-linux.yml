@@ -7,10 +7,6 @@ architectures:
 - "amd64"
 packages:
 - "curl"
-- "g++-aarch64-linux-gnu"
-- "g++-4.8-aarch64-linux-gnu"
-- "gcc-4.8-aarch64-linux-gnu"
-- "binutils-aarch64-linux-gnu"
 - "g++-arm-linux-gnueabihf"
 - "g++-4.8-arm-linux-gnueabihf"
 - "gcc-4.8-arm-linux-gnueabihf"
