@@ -144,7 +144,6 @@ extern unsigned int nCoinCacheSize;
 extern CFeeRate minRelayTxFee;
 extern bool fAlerts;
 extern bool fVerifyingBlocks;
-extern bool fCLTVHasMajority;
 
 extern bool fLargeWorkForkFound;
 extern bool fLargeWorkInvalidChainFound;

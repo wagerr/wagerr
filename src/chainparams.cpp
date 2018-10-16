@@ -132,9 +132,9 @@ public:
         bnProofOfWorkLimit = ~uint256(0) >> 20; // Wagerr starting difficulty is 1 / 2^12
         nSubsidyHalvingInterval = 210000;
         nMaxReorganizationDepth = 100;
-        nEnforceBlockUpgradeMajority = 1080;
-        nRejectBlockOutdatedMajority = 1368;
-        nToCheckBlockUpgradeMajority = 1440;
+        nEnforceBlockUpgradeMajority = 8100; // 75%
+        nRejectBlockOutdatedMajority = 10260; // 95%
+        nToCheckBlockUpgradeMajority = 10800; // Approximate expected amount of blocks in 7 days (1440*7.5)
         nMinerThreads = 0;
         nTargetTimespan = 1 * 60;              // WAGERR: 1 day
         nTargetSpacing = 1 * 60;               // WAGERR: 1 minute
@@ -281,9 +281,9 @@ public:
         pchMessageStart[3] = 0x99;
         vAlertPubKey = ParseHex("04b5aa7cd76159c35fb3dab3cf3cab8d93ecb592b2cbea519145e63cfe92110fe0f68d0e5205af01482334256358c070f5658f638e4191aa7298fb435b65216767");
         nDefaultPort = 55004;
-        nEnforceBlockUpgradeMajority = 51;
-        nRejectBlockOutdatedMajority = 75;
-        nToCheckBlockUpgradeMajority = 100;
+        nEnforceBlockUpgradeMajority = 4320; // 75%
+        nRejectBlockOutdatedMajority = 5472; // 95%
+        nToCheckBlockUpgradeMajority = 5760; // 4 days
         nMinerThreads = 0;
         nTargetTimespan = 1 * 60; // WAGERR: 1 day
         nTargetSpacing = 1 * 60;  // WAGERR: 1 minute
