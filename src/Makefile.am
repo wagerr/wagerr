@@ -88,7 +88,7 @@ if BUILD_BITCOIN_UTILS
   bin_PROGRAMS += wagerr-cli wagerr-tx
 endif
 
-.PHONY: FORCE
+.PHONY: FORCE check-symbols check-security
 # Wagerr Core #
 BITCOIN_CORE_H = \
   activemasternode.h \
@@ -535,6 +535,7 @@ CLEANFILES += univalue/*.gcda univalue/*.gcno
 CLEANFILES += zmq/*.gcda zmq/*.gcno
 CLEANFILES += obj/build.h
 
+EXTRA_DIST =
 
 
 config/wagerr-config.h: config/stamp-h1
@@ -555,6 +556,17 @@ clean-local:
 	## FIXME: How to get the appropriate modulename_CPPFLAGS in here?
 	$(AM_V_GEN) $(WINDRES) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(CPPFLAGS) -DWINDRES_PREPROC -i $< -o $@
 
+check-symbols: $(bin_PROGRAMS)
+if GLIBC_BACK_COMPAT
+	@echo "Checking glibc back compat..."
+	$(AM_V_at) READELF=$(READELF) CPPFILT=$(CPPFILT) $(top_srcdir)/contrib/devtools/symbol-check.py < $(bin_PROGRAMS)
+endif
+
+check-security: $(bin_PROGRAMS)
+if HARDEN
+	@echo "Checking binary security..."
+	$(AM_V_at) READELF=$(READELF) OBJDUMP=$(OBJDUMP) $(top_srcdir)/contrib/devtools/security-check.py < $(bin_PROGRAMS)
+endif
 
 %.pb.cc %.pb.h: %.proto
 	@test -f $(PROTOC)
