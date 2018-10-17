@@ -38,6 +38,9 @@ OSX_PLIST=$(top_builddir)/share/qt/Info.plist #not installed
 OSX_QT_TRANSLATIONS = da,de,es,hu,ru,uk,zh_CN,zh_TW
 
 DIST_DOCS = $(wildcard doc/*.md) $(wildcard doc/release-notes/*.md)
+DIST_CONTRIB = $(top_srcdir)/contrib/wagerr-cli.bash-completion \
+	       $(top_srcdir)/contrib/wagerr-tx.bash-completion \
+	       $(top_srcdir)/contrib/wagerrd.bash-completion
 
 WINDOWS_PACKAGING = $(top_srcdir)/share/pixmaps/wagerr.ico \
   $(top_srcdir)/share/pixmaps/nsis-header.bmp \
