@@ -253,9 +253,9 @@ def main():
     if not args.keepcache:
         shutil.rmtree("%s/test/cache" % config["environment"]["BUILDDIR"], ignore_errors=True)
 
-    run_tests(test_list, config["environment"]["SRCDIR"], config["environment"]["BUILDDIR"], config["environment"]["EXEEXT"], tmpdir, args.jobs, args.coverage, passon_args, args.combinedlogslen)
+    run_tests(test_list, config["environment"]["SRCDIR"], config["environment"]["BUILDDIR"], config["environment"]["EXEEXT"], tmpdir, args.jobs, args.coverage, passon_args, args.combinedlogslen, level=logging_level)
 
-def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_coverage=False, args=[], combined_logs_len=0):
+def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_coverage=False, args=[], combined_logs_len=0, level=logging.DEBUG):
     # Warn if bitcoind is already running (unix only)
     try:
         if subprocess.check_output(["pidof", "wagerrd"]) is not None:
@@ -294,22 +294,22 @@ def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_cove
             raise
 
     #Run Tests
-    job_queue = TestHandler(jobs, tests_dir, tmpdir, test_list, flags)
+    job_queue = TestHandler(jobs, tests_dir, tmpdir, test_list, flags, level)
     time0 = time.time()
     test_results = []
 
     max_len_name = len(max(test_list, key=len))
-
-    for _ in range(len(test_list)):
+    test_count = len(test_list)
+    for i in range(test_count):
         test_result, testdir, stdout, stderr = job_queue.get_next()
         test_results.append(test_result)
-
+        done_str = "{}/{} - {}{}{}".format(i + 1, test_count, BOLD[1], test_result.name, BOLD[0])
         if test_result.status == "Passed":
-            logging.debug("\n%s%s%s passed, Duration: %s s" % (BOLD[1], test_result.name, BOLD[0], test_result.time))
+            logging.debug("%s passed, Duration: %s s" % (done_str, test_result.time))
         elif test_result.status == "Skipped":
-            logging.debug("\n%s%s%s skipped" % (BOLD[1], test_result.name, BOLD[0]))
+            logging.debug("%s skipped" % (done_str))
         else:
-            print("\n%s%s%s failed, Duration: %s s\n" % (BOLD[1], test_result.name, BOLD[0], test_result.time))
+            print("%s failed, Duration: %s s\n" % (done_str, test_result.time))
             print(BOLD[1] + 'stdout:\n' + BOLD[0] + stdout + '\n')
             print(BOLD[1] + 'stderr:\n' + BOLD[0] + stderr + '\n')
             if combined_logs_len and os.path.isdir(testdir):
@@ -360,13 +360,14 @@ class TestHandler:
     Trigger the test scripts passed in via the list.
     """
 
-    def __init__(self, num_tests_parallel, tests_dir, tmpdir, test_list=None, flags=None):
+    def __init__(self, num_tests_parallel, tests_dir, tmpdir, test_list=None, flags=None, logging_level=logging.DEBUG):
         assert(num_tests_parallel >= 1)
         self.num_jobs = num_tests_parallel
         self.tests_dir = tests_dir
         self.tmpdir = tmpdir
         self.test_list = test_list
         self.flags = flags
+        self.logging_level = logging_level
         self.num_running = 0
         # In case there is a graveyard of zombie wagerrds, we can apply a
         # pseudorandom offset to hopefully jump over them.
@@ -397,6 +398,7 @@ class TestHandler:
                               log_stderr))
         if not self.jobs:
             raise IndexError('pop from empty list')
+        dot_count = 0
         while True:
             # Return first proc that finishes
             time.sleep(.5)
@@ -418,9 +420,14 @@ class TestHandler:
                         status = "Failed"
                     self.num_running -= 1
                     self.jobs.remove(j)
-
+                    if self.logging_level == logging.DEBUG:
+                        clearline = '\r' + (' ' * dot_count) + '\r'
+                        print(clearline, end='', flush=True)
+                        dot_count = 0
                     return TestResult(name, status, int(time.time() - time0)), testdir, stdout, stderr
-            print('.', end='', flush=True)
+            if self.logging_level == logging.DEBUG:
+                print('.', end='', flush=True)
+                dot_count += 1
 
 class TestResult():
     def __init__(self, name, status, time):
