@@ -51,8 +51,8 @@
     "args":
     ["-create",
      "in=4d49a71ec9da436f71ec4ee231d04f292a29cd316f598bb7068feccabdc59485:0",
-     "set=privatekeys:[\"891ns7GR4owBiozmFa8jDSaJWNZ2q4XoSYdUS2kSNuKJ9BaxLkC\"]",
-     "set=prevtxs:[{\"txid\":\"4d49a71ec9da436f71ec4ee231d04f292a29cd316f598bb7068feccabdc59485\",\"vout\":0,\"scriptPubKey\":\"4d49a71ec9da436f71ec4ee231d04f292a29cd316f598bb7068feccabdc59485\"}]",
+     "set=privatekeys:[\"WWQunBtSfw6ErBMZkjJfLtQ1UkHaArMqwBpcNfvXTQhF7g6PvzVM\"]",
+     "set=prevtxs:[{\"txid\":\"4d49a71ec9da436f71ec4ee231d04f292a29cd316f598bb7068feccabdc59485\",\"vout\":0,\"scriptPubKey\":\"76a91491b24bf9f5288532960ac687abb035127b1d28a588ac\"}]",
      "sign=ALL",
      "outaddr=0.001:WjPuCX1LpZcTJgZbGRpEs9n5tEuBPt88D4"],
     "output_cmp": "txcreatesign.hex"
