@@ -4537,3 +4537,20 @@ UniValue searchdzwgr(const UniValue& params, bool fHelp)
     //todo: better response
     return "done";
 }
+
+UniValue createautomintaddress(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 0)
+        throw runtime_error(
+                "createautomintaddress\n"
+                        "Overview: generates new auto mint address\n"
+                        "\nResult\n"
+                        "\"address\"             160hash of public key\n" +
+                HelpExampleCli("createautomintaddress", "") +
+                HelpExampleRpc("createautomintaddress", ""));
+    LOCK(pwalletMain->cs_wallet);
+    CBitcoinAddress address = pwalletMain->GenerateNewAutoMintKey();
+    UniValue ret(UniValue::VOBJ);
+    ret.push_back(Pair("address", address.ToString()));
+    return ret;
+}

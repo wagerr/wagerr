@@ -268,6 +268,7 @@ extern UniValue getzwgrseed(const UniValue& params, bool fHelp);
 extern UniValue generatemintlist(const UniValue& params, bool fHelp);
 extern UniValue searchdzwgr(const UniValue& params, bool fHelp);
 extern UniValue dzwgrstate(const UniValue& params, bool fHelp);
+extern UniValue createautomintaddress(const UniValue& params, bool fHelp);
 
 /** Betting related RPC methods **/
 extern UniValue listevents(const UniValue& params, bool fHelp);
