@@ -1838,6 +1838,8 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         //Inititalize zWGRWallet
         uiInterface.InitMessage(_("Syncing zWGR wallet..."));
 
+        pwalletMain->InitAutoConvertAddresses();
+
         bool fEnableZWgrBackups = GetBoolArg("-backupzwgr", true);
         pwalletMain->setZWgrAutoBackups(fEnableZWgrBackups);
 
