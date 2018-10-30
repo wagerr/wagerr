@@ -32,9 +32,17 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
 void UpdateTime(CBlockHeader* block, const CBlockIndex* pindexPrev);
 
 std::vector<std::vector<std::string>> getEventResults(int height);
+
+std::vector<std::vector<std::string>> getCGLottoEventResults(int height);
+
 void getEventBets();
+
 std::vector<CTxOut> GetBetPayouts( int height );
+
+std::vector<CTxOut> GetCGLottoBetPayouts( int height );
+
 std::vector<CTxOut> GetBetPayoutsForTransactions(std::vector<CTransaction> txs);
+
 //std::vector<std::vector<std::string>> getEventOddsForResults( );
 
 void BitcoinMiner(CWallet* pwallet, bool fProofOfStake);

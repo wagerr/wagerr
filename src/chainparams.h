@@ -145,6 +145,9 @@ public:
     std::string BetTxType() const { return strBetTxType; }
     std::string ResultTxType() const { return strResultTxType; }
     std::string RefundTxType() const { return strRefundTxType; }
+    std::string CGLottoEventTxType() const { return strCGLottoEventTxType; }
+    std::string CGLottoBetTxType() const { return strCGLottoBetTxType; }
+    std::string CGLottoResultTxType() const { return strCGLottoResultTxType; }
     int MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
     int MinBetPayoutRange() const { return nMinBetPayoutRange; }
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
@@ -228,6 +231,9 @@ protected:
     std::string strBetTxType;
     std::string strResultTxType;
     std::string strRefundTxType;
+    std::string strCGLottoEventTxType;                                    
+    std::string strCGLottoBetTxType;                                      
+    std::string strCGLottoResultTxType;                                   
     int nMinBetPayoutRange;
     int nMaxBetPayoutRange;
     int nBetPlaceTimeoutBlocks;
