@@ -268,6 +268,8 @@ extern UniValue searchdzwgr(const UniValue& params, bool fHelp);
 extern UniValue dzwgrstate(const UniValue& params, bool fHelp);
 
 extern UniValue listevents(const UniValue& params, bool fHelp);
+extern UniValue listchaingamesevents(const UniValue& params, bool fHelp);
+extern UniValue placechaingamesbet(const UniValue& params, bool fHelp);
 extern UniValue placebet(const UniValue& params, bool fHelp);
 extern UniValue listbets(const UniValue& params, bool fHelp);
 

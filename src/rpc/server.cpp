@@ -120,6 +120,7 @@ CAmount AmountFromValue(const UniValue& value)
     CAmount nAmount = roundint64(dAmount * COIN);
     if (!MoneyRange(nAmount))
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
+
     return nAmount;
 }
 
@@ -385,6 +386,8 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "spork", &spork, true, true, false},
         {"wagerr", "getpoolinfo", &getpoolinfo, true, true, false},
         {"wagerr", "listevents", &listevents, false, false, false},
+        {"wagerr", "listchaingamesevents", &listchaingamesevents, false, false, false},
+        {"wagerr", "placechaingamesbet", &placechaingamesbet, false, false, true},
 
 #ifdef ENABLE_WALLET
         /* Wallet */
