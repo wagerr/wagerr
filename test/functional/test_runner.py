@@ -167,7 +167,7 @@ def main():
     parser.add_argument('--help', '-h', '-?', action='store_true', help='print help text and exit')
     parser.add_argument('--jobs', '-j', type=int, default=4, help='how many test scripts to run in parallel. Default=4.')
     parser.add_argument('--keepcache', '-k', action='store_true', help='the default behavior is to flush the cache directory on startup. --keepcache retains the cache from the previous testrun.')
-    parser.add_argument('--quiet', '-q', action='store_true', help='only print results summary and failure logs')
+    parser.add_argument('--quiet', '-q', action='store_true', help='only print dots, results summary and failure logs')
     parser.add_argument('--tmpdirprefix', '-t', default=tempfile.gettempdir(), help="Root directory for datadirs")
     args, unknown_args = parser.parse_known_args()
 
@@ -253,9 +253,9 @@ def main():
     if not args.keepcache:
         shutil.rmtree("%s/test/cache" % config["environment"]["BUILDDIR"], ignore_errors=True)
 
-    run_tests(test_list, config["environment"]["SRCDIR"], config["environment"]["BUILDDIR"], config["environment"]["EXEEXT"], tmpdir, args.jobs, args.coverage, passon_args, args.combinedlogslen, level=logging_level)
+    run_tests(test_list, config["environment"]["SRCDIR"], config["environment"]["BUILDDIR"], config["environment"]["EXEEXT"], tmpdir, args.jobs, args.coverage, passon_args, args.combinedlogslen)
 
-def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_coverage=False, args=[], combined_logs_len=0, level=logging.DEBUG):
+def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_coverage=False, args=[], combined_logs_len=0):
     # Warn if bitcoind is already running (unix only)
     try:
         if subprocess.check_output(["pidof", "wagerrd"]) is not None:
@@ -294,7 +294,7 @@ def run_tests(test_list, src_dir, build_dir, exeext, tmpdir, jobs=1, enable_cove
             raise
 
     #Run Tests
-    job_queue = TestHandler(jobs, tests_dir, tmpdir, test_list, flags, level)
+    job_queue = TestHandler(jobs, tests_dir, tmpdir, test_list, flags)
     time0 = time.time()
     test_results = []
 
@@ -360,14 +360,13 @@ class TestHandler:
     Trigger the test scripts passed in via the list.
     """
 
-    def __init__(self, num_tests_parallel, tests_dir, tmpdir, test_list=None, flags=None, logging_level=logging.DEBUG):
+    def __init__(self, num_tests_parallel, tests_dir, tmpdir, test_list=None, flags=None):
         assert(num_tests_parallel >= 1)
         self.num_jobs = num_tests_parallel
         self.tests_dir = tests_dir
         self.tmpdir = tmpdir
         self.test_list = test_list
         self.flags = flags
-        self.logging_level = logging_level
         self.num_running = 0
         # In case there is a graveyard of zombie wagerrds, we can apply a
         # pseudorandom offset to hopefully jump over them.
@@ -420,14 +419,12 @@ class TestHandler:
                         status = "Failed"
                     self.num_running -= 1
                     self.jobs.remove(j)
-                    if self.logging_level == logging.DEBUG:
-                        clearline = '\r' + (' ' * dot_count) + '\r'
-                        print(clearline, end='', flush=True)
-                        dot_count = 0
+                    clearline = '\r' + (' ' * dot_count) + '\r'
+                    print(clearline, end='', flush=True)
+                    dot_count = 0
                     return TestResult(name, status, int(time.time() - time0)), testdir, stdout, stderr
-            if self.logging_level == logging.DEBUG:
-                print('.', end='', flush=True)
-                dot_count += 1
+            print('.', end='', flush=True)
+            dot_count += 1
 
 class TestResult():
     def __init__(self, name, status, time):
