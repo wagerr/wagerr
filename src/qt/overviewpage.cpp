@@ -282,28 +282,28 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
 
     // WGR Available
     bool showWGRAvailable = settingShowAllBalances || wgrAvailableBalance != nTotalBalance;
-    bool showWatchOnlyWGRAvailable = settingShowAllBalances || nAvailableWatchBalance != nTotalWatchBalance;
+    bool showWatchOnlyWGRAvailable = showWGRAvailable || nAvailableWatchBalance != nTotalWatchBalance;
     ui->labelBalanceText->setVisible(showWGRAvailable || showWatchOnlyWGRAvailable);
     ui->labelBalance->setVisible(showWGRAvailable || showWatchOnlyWGRAvailable);
     ui->labelWatchAvailable->setVisible(showWatchOnlyWGRAvailable && showWatchOnly);
 
     // WGR Pending
     bool showWGRPending = settingShowAllBalances || unconfirmedBalance != 0;
-    bool showWatchOnlyWGRPending = settingShowAllBalances || watchUnconfBalance != 0;
+    bool showWatchOnlyWGRPending = showWGRPending || watchUnconfBalance != 0;
     ui->labelPendingText->setVisible(showWGRPending || showWatchOnlyWGRPending);
     ui->labelUnconfirmed->setVisible(showWGRPending || showWatchOnlyWGRPending);
     ui->labelWatchPending->setVisible(showWatchOnlyWGRPending && showWatchOnly);
 
     // WGR Immature
     bool showWGRImmature = settingShowAllBalances || immatureBalance != 0;
-    bool showWatchOnlyImmature = settingShowAllBalances || watchImmatureBalance != 0;
+    bool showWatchOnlyImmature = showWGRImmature || watchImmatureBalance != 0;
     ui->labelImmatureText->setVisible(showWGRImmature || showWatchOnlyImmature);
     ui->labelImmature->setVisible(showWGRImmature || showWatchOnlyImmature); // for symmetry reasons also show immature label when the watch-only one is shown
     ui->labelWatchImmature->setVisible(showWatchOnlyImmature && showWatchOnly); // show watch-only immature balance
 
     // WGR Locked
     bool showWGRLocked = settingShowAllBalances || nLockedBalance != 0;
-    bool showWatchOnlyWGRLocked = settingShowAllBalances || nWatchOnlyLockedBalance != 0;
+    bool showWatchOnlyWGRLocked = showWGRLocked || nWatchOnlyLockedBalance != 0;
     ui->labelLockedBalanceText->setVisible(showWGRLocked || showWatchOnlyWGRLocked);
     ui->labelLockedBalance->setVisible(showWGRLocked || showWatchOnlyWGRLocked);
     ui->labelWatchLocked->setVisible(showWatchOnlyWGRLocked && showWatchOnly);
