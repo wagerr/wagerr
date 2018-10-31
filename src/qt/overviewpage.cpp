@@ -273,30 +273,42 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     // Only show most balances if they are non-zero for the sake of simplicity
     QSettings settings;
     bool settingShowAllBalances = !settings.value("fHideZeroBalances").toBool();
+
     bool showSumAvailable = settingShowAllBalances || sumTotalBalance != availableTotalBalance;
     ui->labelBalanceTextz->setVisible(showSumAvailable);
     ui->labelBalancez->setVisible(showSumAvailable);
-    bool showWGRAvailable = settingShowAllBalances || wgrAvailableBalance != nTotalBalance;
-    bool showWatchOnlyWGRAvailable = watchOnlyBalance != nTotalWatchBalance;
-    bool showWGRPending = settingShowAllBalances || unconfirmedBalance != 0;
-    bool showWatchOnlyWGRPending = watchUnconfBalance != 0;
-    bool showWGRLocked = settingShowAllBalances || nLockedBalance != 0;
-    bool showWatchOnlyWGRLocked = nWatchOnlyLockedBalance != 0;
-    bool showImmature = settingShowAllBalances || immatureBalance != 0;
-    bool showWatchOnlyImmature = watchImmatureBalance != 0;
+
     bool showWatchOnly = nTotalWatchBalance != 0;
-    ui->labelBalance->setVisible(showWGRAvailable || showWatchOnlyWGRAvailable);
+
+    // WGR Available
+    bool showWGRAvailable = settingShowAllBalances || wgrAvailableBalance != nTotalBalance;
+    bool showWatchOnlyWGRAvailable = settingShowAllBalances || nAvailableWatchBalance != nTotalWatchBalance;
     ui->labelBalanceText->setVisible(showWGRAvailable || showWatchOnlyWGRAvailable);
-    ui->labelWatchAvailable->setVisible(showWGRAvailable && showWatchOnly);
-    ui->labelUnconfirmed->setVisible(showWGRPending || showWatchOnlyWGRPending);
+    ui->labelBalance->setVisible(showWGRAvailable || showWatchOnlyWGRAvailable);
+    ui->labelWatchAvailable->setVisible(showWatchOnlyWGRAvailable && showWatchOnly);
+
+    // WGR Pending
+    bool showWGRPending = settingShowAllBalances || unconfirmedBalance != 0;
+    bool showWatchOnlyWGRPending = settingShowAllBalances || watchUnconfBalance != 0;
     ui->labelPendingText->setVisible(showWGRPending || showWatchOnlyWGRPending);
-    ui->labelWatchPending->setVisible(showWGRPending && showWatchOnly);
-    ui->labelLockedBalance->setVisible(showWGRLocked || showWatchOnlyWGRLocked);
+    ui->labelUnconfirmed->setVisible(showWGRPending || showWatchOnlyWGRPending);
+    ui->labelWatchPending->setVisible(showWatchOnlyWGRPending && showWatchOnly);
+
+    // WGR Immature
+    bool showWGRImmature = settingShowAllBalances || immatureBalance != 0;
+    bool showWatchOnlyImmature = settingShowAllBalances || watchImmatureBalance != 0;
+    ui->labelImmatureText->setVisible(showWGRImmature || showWatchOnlyImmature);
+    ui->labelImmature->setVisible(showWGRImmature || showWatchOnlyImmature); // for symmetry reasons also show immature label when the watch-only one is shown
+    ui->labelWatchImmature->setVisible(showWatchOnlyImmature && showWatchOnly); // show watch-only immature balance
+
+    // WGR Locked
+    bool showWGRLocked = settingShowAllBalances || nLockedBalance != 0;
+    bool showWatchOnlyWGRLocked = settingShowAllBalances || nWatchOnlyLockedBalance != 0;
     ui->labelLockedBalanceText->setVisible(showWGRLocked || showWatchOnlyWGRLocked);
-    ui->labelWatchLocked->setVisible(showWGRLocked && showWatchOnly);
-    ui->labelImmature->setVisible(showImmature || showWatchOnlyImmature); // for symmetry reasons also show immature label when the watch-only one is shown
-    ui->labelImmatureText->setVisible(showImmature || showWatchOnlyImmature);
-    ui->labelWatchImmature->setVisible(showImmature && showWatchOnly); // show watch-only immature balance
+    ui->labelLockedBalance->setVisible(showWGRLocked || showWatchOnlyWGRLocked);
+    ui->labelWatchLocked->setVisible(showWatchOnlyWGRLocked && showWatchOnly);
+
+    // zWGR
     bool showzWGRAvailable = settingShowAllBalances || zerocoinBalance != matureZerocoinBalance;
     bool showzWGRUnconfirmed = settingShowAllBalances || unconfirmedZerocoinBalance != 0;
     bool showzWGRImmature = settingShowAllBalances || immatureZerocoinBalance != 0;
@@ -306,6 +318,8 @@ void OverviewPage::setBalance(const CAmount& balance, const CAmount& unconfirmed
     ui->labelzBalanceUnconfirmedText->setVisible(showzWGRUnconfirmed);
     ui->labelzBalanceImmature->setVisible(showzWGRImmature);
     ui->labelzBalanceImmatureText->setVisible(showzWGRImmature);
+
+    // Percent split
     bool showPercentages = ! (zerocoinBalance == 0 && nTotalBalance == 0);
     ui->labelWGRPercent->setVisible(showPercentages);
     ui->labelzWGRPercent->setVisible(showPercentages);
