@@ -636,7 +636,7 @@ std::vector<std::vector<std::string>> getEventResults( int height ) {
  *
  * @return results vector.
  */
-std::vector<std::vector<std::string>> getCGLottoEventResults(int height) 
+std::vector<std::vector<std::string>> getCGLottoEventResults(int height)
 {
     // Set the Oracle wallet address. 
     std::string OracleWalletAddr = Params().OracleWalletAddr();
@@ -794,7 +794,7 @@ std::vector<std::vector<std::string>> checkResults( std::vector<std::vector<std:
  *
  * @return payout vector.
  */
-std::vector<CTxOut> GetBetPayouts( int height ) {
+std::vector<CTxOut> GetBetPayouts(int height) {
 
     std::vector<CTxOut> vexpectedPayouts;
     int nCurrentHeight = chainActive.Height();
@@ -1013,7 +1013,7 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
  *
  * @return payout vector.
  */
-std::vector<CTxOut> GetCGLottoBetPayouts( int height ) 
+std::vector<CTxOut> GetCGLottoBetPayouts(int height)
 {
     std::vector<CTxOut> vexpectedCGLottoBetPayouts;
     int nCurrentHeight = chainActive.Height();
@@ -1086,7 +1086,7 @@ std::vector<CTxOut> GetCGLottoBetPayouts( int height )
                     std::string s       = txout.scriptPubKey.ToString();
                     CAmount betAmount   = txout.nValue;    
 
-                    if ( match && s.length() > 0 && 0 == strncmp(s.c_str(), "OP_RETURN", 9)) { 
+                    if (match && s.length() > 0 && 0 == strncmp(s.c_str(), "OP_RETURN", 9)) { 
 
                         // Get the OP CODE from the transaction scriptPubKey.
                         vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
@@ -1180,6 +1180,7 @@ std::vector<CTxOut> GetCGLottoBetPayouts( int height )
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
+                // Add winning bet payout to the bet vector.
                 vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()));
             } 
         }   
