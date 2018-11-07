@@ -449,7 +449,6 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 //printf("\nMINER BLOCK: %i \n", nHeight);
 
                 voutPayouts = GetBetPayouts(nHeight - 1);
-                
                 GetBlockPayouts(voutPayouts, nMNBetReward);
 
                 /*
@@ -739,7 +738,6 @@ std::vector<std::vector<std::string>> getCGLottoEventResults(int height)
  */
 std::vector<std::vector<std::string>> checkResults( std::vector<std::vector<std::string>> results)
 {
-
     int nCurrentHeight = chainActive.Height();
 
     // Set the number of blocks we want to look back for results already bpaid out.
@@ -984,10 +982,8 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
                                     LogPrintf("AMOUNT: %li \n", payout);
                                     LogPrintf("ADDRESS: %s \n", CBitcoinAddress( payoutAddress ).ToString().c_str());
 
-                                    // Only add valid payouts to the vector.
                                     if(payout > 0){
                                         // Add wining bet payout to the bet vector.
-
                                         vexpectedPayouts.emplace_back(payout, GetScriptForDestination(CBitcoinAddress(payoutAddress).Get()), betAmount);
                                     }
                                 }
@@ -1019,13 +1015,11 @@ std::vector<CTxOut> GetBetPayouts( int height ) {
  */
 std::vector<CTxOut> GetCGLottoBetPayouts( int height ) 
 {
-
     std::vector<CTxOut> vexpectedCGLottoBetPayouts;
     int nCurrentHeight = chainActive.Height();
     CAmount totalValueOfBlock = 0 * COIN;
 
     std::vector<std::vector<std::string>> results = getCGLottoEventResults(height);
-    //LogPrintf("Results: %u \n", results.size());
 
     // Set the Oracle wallet address. 
     std::string OracleWalletAddr = Params().OracleWalletAddr();
@@ -1178,15 +1172,11 @@ std::vector<CTxOut> GetCGLottoBetPayouts( int height )
             CAmount winnerPayout = totalPot*.50;
             CAmount fee = totalPot*.2;
 
-            //LogPrintf("Event ID: %x \n", results[currResult][2]);
             LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-            //LogPrintf("Winner Index: %u \n", winnerIndex);
             LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerIndex);
             LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);      
             LogPrintf("Entrance fee: %u \n", entranceFee);
             LogPrintf("Total Pot: %u  , Winnings: %u , Fee: %u \n", winnerPayout, totalPot, fee);
-            //LogPrintf("Fee: %u \n", fee);
-            //LogPrintf("Won: %u \n", totalPot*.50);
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
