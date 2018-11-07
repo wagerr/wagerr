@@ -44,7 +44,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
         throw runtime_error(
             "listevents\n"
             "\nGet live Wagerr events.\n"
- 
+
             "\nResult:\n"
             "[\n"
             "  {\n"
@@ -838,16 +838,12 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
     string eventId = params[0].get_str();
 
     // Validate bet amount so its between 1 - 10000 WGR inclusive.
-      if( nAmount < (50 * COIN ) || nAmount > (10000 * COIN)){
-         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 1 - 10000 WGR inclusive.");
-     }
+    if( nAmount < (50 * COIN ) || nAmount > (10000 * COIN)){
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 1 - 10000 WGR inclusive.");
+    }
 
     // TODO Allow comments
     CWalletTx wtx;
-    //if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
-    //    wtx.mapValue["comment"] = params[3].get_str();
-    //if (params.size() > 4 && !params[4].isNull() && !params[4].get_str().empty())
-    //    wtx.mapValue["to"] = params[4].get_str();
 
     // Validate amount
     EnsureWalletIsUnlocked();
@@ -4116,7 +4112,7 @@ UniValue dzwgrstate(const UniValue& params, bool fHelp) {
 
 void static SearchThread(CzWGRWallet* zwallet, int nCountStart, int nCountEnd)
 {
-    
+    LogPrintf("%s: start=%d end=%d\n", __func__, nCountStart, nCountEnd);
     CWalletDB walletDB(pwalletMain->strWalletFile);
     try {
         uint256 seedMaster = zwallet->GetMasterSeed();
