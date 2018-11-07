@@ -159,17 +159,17 @@ UniValue listevents(const UniValue& params, bool fHelp)
 
                     UniValue teams(UniValue::VARR);
                     for (unsigned int t = 6; t <= 8; t++) {
-                       UniValue team(UniValue::VOBJ);
+                        UniValue team(UniValue::VOBJ);
 
                        if (t < 8) {
-                           team.push_back(Pair("name", strs[t]));
-                           team.push_back(Pair("odds", strs[t + 2]));
+                            team.push_back(Pair("name", strs[t]));
+                            team.push_back(Pair("odds", strs[t + 2]));
                         } else {
                             team.push_back(Pair("name", "DRW"));
                             team.push_back(Pair("odds", strs[t + 2]));
                         }
 
-                       teams.push_back(team);
+                        teams.push_back(team);
                     }
 
                     evt.push_back(Pair("teams", teams));
