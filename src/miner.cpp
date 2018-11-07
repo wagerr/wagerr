@@ -540,7 +540,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
  *
  * @return results vector.
  */
-std::vector<std::vector<std::string>> getEventResults( int height ) {
+std::vector<std::vector<std::string>> getEventResults(int height) {
 
     // Set the Oracle wallet address. 
     std::string OracleWalletAddr = Params().OracleWalletAddr();
@@ -583,7 +583,7 @@ std::vector<std::vector<std::string>> getEventResults( int height ) {
             }
         }
 
-        if( validResult ) {
+        if(validResult) {
 
             // Look for result OP RETURN code in the tx vouts.
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
@@ -736,7 +736,7 @@ std::vector<std::vector<std::string>> getCGLottoEventResults(int height)
  * @param results
  * @return
  */
-std::vector<std::vector<std::string>> checkResults( std::vector<std::vector<std::string>> results)
+std::vector<std::vector<std::string>> checkResults(std::vector<std::vector<std::string>> results)
 {
     int nCurrentHeight = chainActive.Height();
 
@@ -868,7 +868,7 @@ std::vector<CTxOut> GetBetPayouts(int height) {
                     std::string s       = txout.scriptPubKey.ToString();
                     CAmount betAmount   = txout.nValue;
 
-                    if( match && s.length() > 0 && 0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+                    if(match && s.length() > 0 && 0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
 
                         // Get the OP CODE from the transaction scriptPubKey.
                         vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
@@ -982,8 +982,9 @@ std::vector<CTxOut> GetBetPayouts(int height) {
                                     LogPrintf("AMOUNT: %li \n", payout);
                                     LogPrintf("ADDRESS: %s \n", CBitcoinAddress( payoutAddress ).ToString().c_str());
 
+                                    // Only add valid payouts to the vector.
                                     if(payout > 0){
-                                        // Add wining bet payout to the bet vector.
+                                        // Add winning bet payout to the bet vector.
                                         vexpectedPayouts.emplace_back(payout, GetScriptForDestination(CBitcoinAddress(payoutAddress).Get()), betAmount);
                                     }
                                 }
