@@ -3097,16 +3097,15 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
      *         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
      * Though if we keep this check for minimum mint, it should be moved to IsBlockValueValid().
      */
-    /*if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= 15195 || pindex->nHeight <= 15220)) {
+    if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= 15195 || pindex->nHeight <= 15220)) {
         LogPrintf("Skipping validation of mint size on testnet subset");
-    }
-    else if (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint)) {
+    } else if (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint)) {
         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
     }
 
     if (!IsBlockPayoutsValid(vExpectedPayouts, block))
         return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
-    */
+
     vExpectedPayouts.clear();
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
