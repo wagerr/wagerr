@@ -5,10 +5,10 @@
 #ifndef WAGERR_BET_H
 #define WAGERR_BET_H
 
-#include <cstdint>
-#include <string>
-#include <sstream>
-#include <iostream>
+#include "chainparams.h"
+
+#include <boost/filesystem/path.hpp>
+#include <map>
 
 // The supported bet outcome types.
 typedef enum OutcomeType {
@@ -25,27 +25,20 @@ typedef enum ResultType {
     ResultTypeRefund = 0x04
 } ResultType;
 
-// Op code string lengths for the various bet transactions.
-typedef enum OpCodeStrLen{
-    PEFromOp  = 49,
-    PEToOp    = 98,
-    PBFromOp  = 13,
-    PBToOp    = 26,
-    PRFromOp  = 13,
-    PRToOp    = 26,
-    PUOFromOp = 22,
-    PUOToOp   = 44,
-    CGEFromOp = 13,
-    CGEToOp   = 26,
-    CGBFromOp = 9,
-    CGBToOp   = 18,
-    CGRFromOp = 9,
-    CGRToOp   = 18
-}OpCodeStringLengths;
+// The supported betting TX types.
+typedef enum BetTxTypes{
+    mappingTxType      = 0x01,  // Mapping transaction type identifier.
+    plEventTxType      = 0x02,  // Peerless event transaction type identifier.
+    plBetTxType        = 0x03,  // Peerless Bet transaction type identifier.
+    plResultTxType     = 0x04,  // Peerless Result transaction type identifier.
+    plUpdateOddsTxType = 0x05,  // Peerless update odds transaction type identifier.
+    cgEventTxType      = 0x06,  // Chain games event transaction type identifier.
+    cgBetTxType        = 0x07,  // Chain games bet transaction type identifier.
+    cgResultTxType     = 0x08   // Chain games result transaction type identifier.
+}BetTxTypes;
 
-/**
- *
- */
+bool IsValidOracleTx(const CTxIn &txin);
+
 class CPeerlessEvent
 {
 public:
@@ -61,7 +54,7 @@ public:
     uint32_t nDrawOdds;
 
     // Default Constructor.
-    // CPeerlessEvent();
+    CPeerlessEvent() {}
 
     static bool ToOpCode(CPeerlessEvent pe, std::string &opCode);
     static bool FromOpCode(std::string opCode, CPeerlessEvent &pe);
@@ -73,11 +66,15 @@ public:
     uint32_t nEventId;
     OutcomeType nOutcome;
 
-    // Default Constructor.
-    // CPeerlessBet();
+    // Default constructor.
+    CPeerlessBet() {}
 
-    // Parametrized Constructor.
-    // CPeerlessBet(int eventId, int outcome);
+    // Parametrized constructor.
+    CPeerlessBet(int eventId, OutcomeType outcome)
+    {
+        nEventId = eventId;
+        nOutcome = outcome;
+    }
 
     static bool ToOpCode(CPeerlessBet pb, std::string &opCode);
     static bool FromOpCode(std::string opCode, CPeerlessBet &pb) ;
@@ -90,10 +87,13 @@ public:
     ResultType nResult;
 
     // Default Constructor.
-    // CPeerlessResult();
+    CPeerlessResult() {}
 
     // Parametrized Constructor.
-    // CPeerlessResult(int eventId, int result);
+    CPeerlessResult(int eventId, ResultType result){
+        nEventId = eventId;
+        nResult  = result;
+    }
 
     static bool ToOpCode(CPeerlessResult pr, std::string &opCode);
     static bool FromOpCode(std::string opCode, CPeerlessResult &pr);
@@ -108,7 +108,7 @@ public:
     uint32_t nDrawOdds;
 
     // Default Constructor.
-    // CPeerlessUpdateOdds();
+    CPeerlessUpdateOdds() {}
 
     static bool ToOpCode(CPeerlessUpdateOdds puo, std::string &opCode);
     static bool FromOpCode(std::string opCode, CPeerlessUpdateOdds &puo);
@@ -121,7 +121,7 @@ public:
     uint32_t nEntryFee;
 
     // Default Constructor.
-    // CChainGamesEvent();
+    CChainGamesEvent() {}
 
     static bool ToOpCode(CChainGamesEvent cge, std::string &opCode);
     static bool FromOpCode(std::string opCode, CChainGamesEvent &cge);
@@ -133,7 +133,12 @@ public:
     uint32_t nEventId;
 
     // Default Constructor.
-    // CChainGamesBet();
+    CChainGamesBet() {}
+
+    // Parametrized Constructor.
+    CChainGamesBet(int eventId) {
+        nEventId = eventId;
+    }
 
     static bool ToOpCode(CChainGamesBet cgb, std::string &opCode);
     static bool FromOpCode(std::string opCode, CChainGamesBet &cgb);
@@ -145,7 +150,7 @@ public:
     uint32_t nEventId;
 
     // Default Constructor.
-    // CChainGamesBet();
+    CChainGamesResult() {}
 
     static bool ToOpCode(CChainGamesResult cgr, std::string &opCode);
     static bool FromOpCode(std::string opCode, CChainGamesResult &cgr);
