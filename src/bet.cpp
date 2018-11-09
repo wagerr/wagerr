@@ -3,20 +3,30 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "bet.h"
-#include "main.h"
-#include "chainparams.h"
+#include <boost/filesystem.hpp>
 
 #ifdef ENABLE_WALLET
 #include "wallet.h"
 #endif
 
-#include <cstring>
-#include <vector>
-#include <string>
-#include <iomanip>
-
 #define BTX_FORMAT_VERSION 0x01
 #define BTX_HEX_PREFIX "425458"
+
+// String lengths for all currently supported op codes.
+#define PE_FROM_OP_STRLEN  49
+#define PE_TO_OP_STRLEN    98
+#define PB_FROM_OP_STRLEN  13
+#define PB_TO_OP_STRLEN    26
+#define PR_FROM_OP_STRLEN  13
+#define PR_TO_OP_STRLEN    26
+#define PUO_FROM_OP_STRLEN 21
+#define PUO_TO_OP_STRLEN   42
+#define CGE_FROM_OP_STRLEN 13
+#define CGE_TO_OP_STRLEN   26
+#define CGB_FROM_OP_STRLEN 9
+#define CGB_TO_OP_STRLEN   18
+#define CGR_FROM_OP_STRLEN 9
+#define CGR_TO_OP_STRLEN   18
 
 /**
  * Validate the transaction to ensure it has been posted by an oracle node.
@@ -24,9 +34,8 @@
  * @param txin  TX vin input hash.
  * @return      Bool
  */
-bool ValidOracleTx(const CTxIn &txin)
+bool IsValidOracleTx(const CTxIn &txin)
 {
-    // Ensure if event TX that has it been posted by Oracle wallet.
     COutPoint prevout = txin.prevout;
 
     uint256 hashBlock;
@@ -81,7 +90,7 @@ int ReadBTXFormatVersion(std::string opCode)
  * @param d Fourth hex char
  * @return  32 bit unsigned integer
  */
-uint32_t FromChars(char a, char b, char c, char d)
+uint32_t FromChars(unsigned char a, unsigned char b, unsigned char c, unsigned char d)
 {
     uint32_t n = a;
     n <<= 8;
@@ -121,13 +130,13 @@ std::string ToHex(uint32_t value, int length)
 bool CPeerlessEvent::FromOpCode(std::string opCode, CPeerlessEvent &pe)
 {
     // Ensure peerless event OpCode string is the correct length.
-    if (opCode.length() != PEFromOp) {
+    if (opCode.length() != PE_FROM_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
 
     // Ensure the peerless event transaction type is correct.
-    if (opCode[4] != Params().PLEventTxType()) {
+    if (opCode[4] != plEventTxType) {
         // TODO - add proper error handling
         return false;
     }
@@ -137,8 +146,6 @@ bool CPeerlessEvent::FromOpCode(std::string opCode, CPeerlessEvent &pe)
         // TODO - add proper error handling
         return false;
     }
-
-    //printf(">2> %d %d %d %d\n", (char) opCode[9], (char) opCode[10], (char) opCode[11], (char) opCode[12]);
 
     pe.nEventId       = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
     uint64_t starting = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
@@ -182,12 +189,10 @@ bool CPeerlessEvent::ToOpCode(CPeerlessEvent pe, std::string &opCode)
              sStage + sHomeTeam + sAwayTeam + sHomeOdds + sAwayOdds + sDrawOdds;
 
     // Ensure peerless Event OpCode string is the correct length.
-    if( opCode.length() != PEToOp){
+    if (opCode.length() != PE_TO_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
-
-    //printf( "To Event OpCode %s \n", opCode.c_str() );
 
     return true;
 }
@@ -203,13 +208,13 @@ bool CPeerlessEvent::ToOpCode(CPeerlessEvent pe, std::string &opCode)
 bool CPeerlessBet::FromOpCode(std::string opCode, CPeerlessBet &pb)
 {
     // Ensure peerless bet OpCode string is the correct length.
-    if (opCode.length() != PBFromOp) {
+    if (opCode.length() != PB_FROM_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
 
     // Ensure the peerless bet transaction type is correct.
-    if (opCode[4] != Params().PLBetTxType()) {
+    if (opCode[4] != plBetTxType) {
         // TODO - add proper error handling
         return false;
     }
@@ -219,8 +224,6 @@ bool CPeerlessBet::FromOpCode(std::string opCode, CPeerlessBet &pb)
         // TODO - add proper error handling
         return false;
     }
-
-    //printf(">2> %d %d %d %d\n", (char) opCode[5], (char) opCode[6], (char) opCode[7], (char) opCode[8]);
 
     pb.nEventId = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
     uint32_t betOutcome = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
@@ -244,12 +247,10 @@ bool CPeerlessBet::ToOpCode(CPeerlessBet pb, std::string &opCode)
     opCode = BTX_HEX_PREFIX "0103" + sEventId + sOutcome;
 
     // Ensure peerless bet OpCode string is the correct length.
-    if (opCode.length() != PBToOp) {
+    if (opCode.length() != PB_TO_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
-
-    //printf( "To Bet OpCode %s \n", opCode.c_str() );
 
     return true;
 }
@@ -265,13 +266,13 @@ bool CPeerlessBet::ToOpCode(CPeerlessBet pb, std::string &opCode)
 bool CPeerlessResult::FromOpCode(std::string opCode, CPeerlessResult &pr)
 {
     // Ensure peerless result OpCode string is the correct length.
-    if (opCode.length() != PRFromOp) {
+    if (opCode.length() != PR_FROM_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
 
     // Ensure the peerless result transaction type is correct.
-    if (opCode[4] != Params().PLResultTxType()) {
+    if (opCode[4] != plResultTxType) {
         // TODO - add proper error handling
         return false;
     }
@@ -281,8 +282,6 @@ bool CPeerlessResult::FromOpCode(std::string opCode, CPeerlessResult &pr)
         // TODO - add proper error handling
         return false;
     }
-
-    //printf(">2> %d %d %d %d\n", (char) opCode[5], (char) opCode[6], (char) opCode[7], (char) opCode[8]);
 
     pr.nEventId = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
     uint32_t eventResult = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
@@ -306,12 +305,10 @@ bool CPeerlessResult::ToOpCode(CPeerlessResult pr, std::string &opCode)
     opCode = BTX_HEX_PREFIX "0104" + sEventId + sResult;
 
     // Ensure peerless result OpCode string is the correct length.
-    if (opCode.length() != PRToOp) {
+    if (opCode.length() != PR_TO_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
-
-    //printf( "To Result OpCode %s \n", opCode.c_str() );
 
     return true;
 }
@@ -327,13 +324,13 @@ bool CPeerlessResult::ToOpCode(CPeerlessResult pr, std::string &opCode)
 bool CPeerlessUpdateOdds::FromOpCode(std::string opCode, CPeerlessUpdateOdds &puo)
 {
     // Ensure peerless update odds OpCode string is the correct length.
-    if (opCode.length() != PUOFromOp) {
+    if (opCode.length() != PUO_FROM_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
 
     // Ensure the peerless update odds transaction type is correct.
-    if (opCode[4] != Params().PLUpdateOddsTxType()) {
+    if (opCode[4] != plUpdateOddsTxType) {
         // TODO - add proper error handling
         return false;
     }
@@ -343,8 +340,6 @@ bool CPeerlessUpdateOdds::FromOpCode(std::string opCode, CPeerlessUpdateOdds &pu
         // TODO - add proper error handling
         return false;
     }
-
-    //printf(">2> %d %d %d %d\n", (char) opCode[5], (char) opCode[6], (char) opCode[7], (char) opCode[8]);
 
     puo.nEventId  = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
     puo.nHomeOdds = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
@@ -371,12 +366,10 @@ bool CPeerlessUpdateOdds::ToOpCode(CPeerlessUpdateOdds puo, std::string &opCode)
     opCode = BTX_HEX_PREFIX "0105" + sEventId + sHomeOdds +  sAwayOdds + sDrawOdds;
 
     // Ensure peerless update odds OpCode string is the correct length.
-    if (opCode.length() != PUOToOp) {
+    if (opCode.length() != PUO_TO_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
-
-    //printf( "To Result OpCode %s \n", opCode.c_str() );
 
     return true;
 }
@@ -392,13 +385,13 @@ bool CPeerlessUpdateOdds::ToOpCode(CPeerlessUpdateOdds puo, std::string &opCode)
 bool CChainGamesEvent::FromOpCode(std::string opCode, CChainGamesEvent &cge)
 {
     // Ensure chain game event OpCode string is the correct length.
-    if (opCode.length() != CGEFromOp) {
+    if (opCode.length() != CGE_FROM_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
 
     // Ensure the chain game event transaction type is correct.
-    if (opCode[4] != Params().CGEventTxType()) {
+    if (opCode[4] != cgEventTxType) {
         // TODO - add proper error handling
         return false;
     }
@@ -408,8 +401,6 @@ bool CChainGamesEvent::FromOpCode(std::string opCode, CChainGamesEvent &cge)
         // TODO - add proper error handling
         return false;
     }
-
-    //printf(">2> %d %d %d %d\n", (char) opCode[5], (char) opCode[6], (char) opCode[7], (char) opCode[8]);
 
     cge.nEventId  = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
     cge.nEntryFee = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
@@ -432,12 +423,10 @@ bool CChainGamesEvent::ToOpCode(CChainGamesEvent cge, std::string &opCode)
     opCode = BTX_HEX_PREFIX "0106" + sEventId + sEntryFee;
 
     // Ensure Chain Games event OpCode string is the correct length.
-    if (opCode.length() != CGEToOp) {
+    if (opCode.length() != CGE_TO_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
-
-    //printf( "To CG Event OpCode %s \n", opCode.c_str() );
 
     return true;
 }
@@ -453,13 +442,13 @@ bool CChainGamesEvent::ToOpCode(CChainGamesEvent cge, std::string &opCode)
 bool CChainGamesBet::FromOpCode(std::string opCode, CChainGamesBet &cgb)
 {
     // Ensure chain game bet OpCode string is the correct length.
-    if (opCode.length() != CGBFromOp) {
+    if (opCode.length() != CGB_FROM_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
 
     // Ensure the chain game bet transaction type is correct.
-    if (opCode[4] != Params().CGBetTxType()) { // OP_CODE type.
+    if (opCode[4] != cgBetTxType) {
         // TODO - add proper error handling
         return false;
     }
@@ -469,8 +458,6 @@ bool CChainGamesBet::FromOpCode(std::string opCode, CChainGamesBet &cgb)
         // TODO - add proper error handling
         return false;
     }
-
-    //printf(">2> %d %d %d %d\n", (char) opCode[5], (char) opCode[6], (char) opCode[7], (char) opCode[8]);
 
     cgb.nEventId = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
 
@@ -491,12 +478,10 @@ bool CChainGamesBet::ToOpCode(CChainGamesBet cgb, std::string &opCode)
     opCode = BTX_HEX_PREFIX "0107" + sEventId;
 
     // Ensure Chain Games bet OpCode string is the correct length.
-    if (opCode.length() != CGBToOp) {
+    if (opCode.length() != CGB_TO_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
-
-    //printf( "To CG bet OpCode %s \n", opCode.c_str() );
 
     return true;
 }
@@ -512,13 +497,13 @@ bool CChainGamesBet::ToOpCode(CChainGamesBet cgb, std::string &opCode)
 bool CChainGamesResult::FromOpCode(std::string opCode, CChainGamesResult &cgr)
 {
     // Ensure chain game result OpCode string is the correct length.
-    if (opCode.length() != CGRFromOp) {
+    if (opCode.length() != CGR_FROM_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
 
     // Ensure the chain game result transaction type is correct.
-    if (opCode[4] != Params().CGResultTxType()) { // OP_CODE type.
+    if (opCode[4] != cgResultTxType) {
         // TODO - add proper error handling
         return false;
     }
@@ -528,8 +513,6 @@ bool CChainGamesResult::FromOpCode(std::string opCode, CChainGamesResult &cgr)
         // TODO - add proper error handling
         return false;
     }
-
-    //printf(">2> %d %d %d %d\n", (char) opCode[5], (char) opCode[6], (char) opCode[7], (char) opCode[8]);
 
     cgr.nEventId = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
 
@@ -550,12 +533,10 @@ bool CChainGamesResult::ToOpCode(CChainGamesResult cgr, std::string &opCode)
     opCode = BTX_HEX_PREFIX "0108" + sEventId;
 
     // Ensure Chain Games result OpCode string is the correct length.
-    if (opCode.length() != CGRToOp) {
+    if (opCode.length() != CGR_TO_OP_STRLEN) {
         // TODO - add proper error handling
         return false;
     }
-
-    //printf( "To CG Result OpCode %s \n", opCode.c_str() );
 
     return true;
 }

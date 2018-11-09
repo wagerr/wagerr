@@ -2,17 +2,9 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include <boost/test/unit_test.hpp>
-#include <stdint.h>
-#include <sstream>
-#include <iomanip>
-#include <limits>
-#include <cmath>
 #include "bet.h"
-#include <string>
-#include "version.h"
 #include "utilstrencodings.h"
-#include <iostream>
+#include <boost/test/unit_test.hpp>
 
 BOOST_AUTO_TEST_SUITE(bet_tests)
 
@@ -71,53 +63,77 @@ const peerless_event_test pe_tests[] = {
                 .opCode = "425458"             // BTX Prefix
                           "01"                 // BTX protocol version
                           "02"                 // BTX transaction type
-                          "00000001"           // Event ID
-                          "000000005BD2D91C"   // Event timestamp
-                          "00000001"           // Sport
-                          "00000001"           // Tournament
-                          "00000001"           // Stage
+                          "80808080"           // Event ID
+                          "000000005BE554F3"   // Event timestamp
+                          "000055FA"           // Sport
+                          "000066FA"           // Tournament
+                          "0000FFAA"           // Stage
                           "00000001"           // Home team
                           "00000002"           // Away team
-                          "7F7F7F7F"           // Home odds
-                          "00000002"           // Away odds
-                          "00000003",          // Draw odds
-                .nEventId    = 1,
-                .nStartTime  = 1540544796,
-                .nSport      = 1,
-                .nTournament = 1,
-                .nStage      = 1,
+                          "000055F0"           // Home odds
+                          "000080E8"           // Away odds
+                          "0000D8CC",          // Draw odds
+                .nEventId    = 2155905152,
+                .nStartTime  = 1541756147,
+                .nSport      = 22010,
+                .nTournament = 26362,
+                .nStage      = 65450,
                 .nHomeTeam   = 1,
                 .nAwayTeam   = 2,
-                .nHomeOdds   = 2139062143,
-                .nAwayOdds   = 2,
-                .nDrawOdds   = 3
-
+                .nHomeOdds   = 22000,
+                .nAwayOdds   = 33000,
+                .nDrawOdds   = 55500
         },
-//        {
-//                .opCode = "425458"
-//                          "01"
-//                          "02"
-//                          "00000101"
-//                          "000000005BD2D91C"
-//                          "00000001"
-//                          "00000001"
-//                          "00000001"
-//                          "00000001"
-//                          "00000002"
-//                          "000057E4"
-//                          "00004C2C"
-//                          "000088B8",
-//                .nEventId    = 1,
-//                .nStartTime  = 1540544796,
-//                .nSport      = 1,
-//                .nTournament = 1,
-//                .nStage      = 1,
-//                .nHomeTeam   = 1,
-//                .nAwayTeam   = 2,
-//                .nHomeOdds   = 2,
-//                .nAwayOdds   = 2,
-//                .nDrawOdds   = 3
-//        },
+        {
+                .opCode = "425458"
+                          "01"
+                          "02"
+                          "00000101"
+                          "000000005BE2EB8B"
+                          "00000001"
+                          "00000006"
+                          "00000007"
+                          "00000008"
+                          "00000002"
+                          "00001F1F"
+                          "00008080"
+                          "00001010",
+                .nEventId    = 257,
+                .nStartTime  = 1541598091,
+                .nSport      = 1,
+                .nTournament = 6,
+                .nStage      = 7,
+                .nHomeTeam   = 8,
+                .nAwayTeam   = 2,
+                .nHomeOdds   = 7967,
+                .nAwayOdds   = 32896,
+                .nDrawOdds   = 4112
+        },
+        {
+                .opCode = "425458"
+                          "01"
+                          "02"
+                          "FFFFFFFF"
+                          "000000005BE55CA0"
+                          "FFFFFFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF",
+                .nEventId    = 4294967295,
+                .nStartTime  = 1541758112,
+                .nSport      = 4294967295,
+                .nTournament = 4294967295,
+                .nStage      = 4294967295,
+                .nHomeTeam   = 4294967295,
+                .nAwayTeam   = 4294967295,
+                .nHomeOdds   = 4294967295,
+                .nAwayOdds   = 4294967295,
+                .nDrawOdds   = 4294967295
+        }
 };
 
 const peerless_bet_test pb_tests[] = {
@@ -125,27 +141,27 @@ const peerless_bet_test pb_tests[] = {
                 .opCode = "425458"    // BTX format
                           "01"        // BTX version number
                           "03"        // TX type
-                          "00000009"  // Event ID
+                          "019A861A"  // Event ID
                           "00000002", // Bet Outcome Type
-                .nEventId = 9,
+                .nEventId = 26904090,
                 .nOutcome = OutcomeTypeLose,
         },
         {
                 .opCode = "425458"
                           "01"
                           "03"
-                          "00000040"
+                          "000FDB6D"
                           "00000001",
-                .nEventId = 64,
+                .nEventId = 1039213,
                 .nOutcome  = OutcomeTypeWin,
         },
         {
                 .opCode = "425458"
                           "01"
                           "03"
-                          "00000040"
+                          "FFFFFFFF"
                           "00000003",
-                .nEventId = 64,
+                .nEventId = 4294967295,
                 .nOutcome  = OutcomeTypeDraw,
         },
 };
@@ -164,28 +180,19 @@ const peerless_result_test pr_tests[] = {
                 .opCode = "425458"
                           "01"
                           "04"
-                          "00000040"
+                          "01FC97A7"
                           "00000002",
-                .nEventId = 64,
+                .nEventId = 33331111,
                 .nResult   = ResultTypeLose,
         },
         {
                 .opCode = "425458"
                           "01"
                           "04"
-                          "00000040"
+                          "FFFFFFFF"
                           "00000003",
-                .nEventId = 64,
+                .nEventId = 4294967295,
                 .nResult   = ResultTypeDraw,
-        },
-        {
-                .opCode = "425458"
-                          "01"
-                          "04"
-                          "00000040"
-                          "00000004",
-                .nEventId = 64,
-                .nResult   = ResultTypeRefund,
         }
 };
 
@@ -194,13 +201,13 @@ const peerless_update_odds_test puo_tests[] = {
                 .opCode = "425458"     // BTX format
                           "01"         // BTX version number
                           "05"         // TX type
-                          "00000009"   // Event ID
-                          "00000001"   // Home Odds
-                          "00000009"   // Away Odds
-                          "00000001",  // Draw Odds
-                .nEventId  = 64,
-                .nHomeOdds = 22000,
-                .nAwayOdds = 22000,
+                          "01FC97A7"   // Event ID
+                          "0000581B"   // Home Odds
+                          "0000D903"   // Away Odds
+                          "000055F0",  // Draw Odds
+                .nEventId  = 33331111,
+                .nHomeOdds = 22555,
+                .nAwayOdds = 55555,
                 .nDrawOdds = 22000,
         },
         {
@@ -208,39 +215,39 @@ const peerless_update_odds_test puo_tests[] = {
                           "01"
                           "05"
                           "00000040"
-                          "00000040"
-                          "00000002"
-                          "00000002",
+                          "000055F0"
+                          "0000AD9C"
+                          "0001046A",
                 .nEventId  = 64,
                 .nHomeOdds = 22000,
-                .nAwayOdds = 22000,
-                .nDrawOdds = 22000,
+                .nAwayOdds = 44444,
+                .nDrawOdds = 66666,
         },
         {
                 .opCode = "425458"
                           "01"
                           "05"
-                          "00000040"
-                          "00000040"
-                          "00000002"
-                          "00000002",
-                .nEventId  = 64,
-                .nHomeOdds = 22000,
-                .nAwayOdds = 22000,
-                .nDrawOdds = 22000,
+                          "020ECD6C"
+                          "00012FD1"
+                          "00003FE4"
+                          "0001689A",
+                .nEventId  = 34524524,
+                .nHomeOdds = 77777,
+                .nAwayOdds = 16356,
+                .nDrawOdds = 92314,
         },
         {
                 .opCode = "425458"
                           "01"
                           "05"
-                          "00000040"
-                          "00000040"
-                          "00000002"
-                          "00000002",
-                .nEventId  = 64,
-                .nHomeOdds = 22000,
-                .nAwayOdds = 22000,
-                .nDrawOdds = 22000,
+                          "FFFFFFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF",
+                .nEventId  = 4294967295,
+                .nHomeOdds = 4294967295,
+                .nAwayOdds = 4294967295,
+                .nDrawOdds = 4294967295,
         }
 };
 
@@ -258,19 +265,19 @@ const chain_games_event_test cge_tests[] = {
                 .opCode = "425458"
                           "01"
                           "06"
-                          "00000009"
-                          "00000064",
-                .nEventId  = 9,
-                .nEntryFee = 100,
+                          "000007D0"
+                          "000000C8",
+                .nEventId  = 2000,
+                .nEntryFee = 200,
         },
         {
                 .opCode = "425458"
                           "01"
                           "06"
-                          "00000009"
-                          "00000064",
-                .nEventId  = 9,
-                .nEntryFee = 100,
+                          "FFFFFFFF"
+                          "FFFFFFFF",
+                .nEventId  = 4294967295,
+                .nEntryFee = 4294967295,
         }
 };
 
@@ -286,8 +293,8 @@ const chain_games_bet_test cgb_tests[] = {
                 .opCode = "425458"
                           "01"
                           "07"
-                          "0000007F",
-                .nEventId = 127
+                          "FFFFFFFF",
+                .nEventId = 4294967295
         }
 };
 
@@ -296,15 +303,15 @@ const chain_games_result_test cgr_tests[] = {
                 .opCode = "425458"      // BTX format
                           "01"          // BTX version number
                           "08"          // TX type
-                          "00000040",   // Event ID
-                .nEventId = 64,
+                          "0001689A",   // Event ID
+                .nEventId = 92314,
         },
         {
                 .opCode = "425458"
                           "01"
                           "08"
-                          "0000003A",
-                .nEventId = 58,
+                          "FFFFFFFF",
+                .nEventId = 4294967295,
         }
 };
 
@@ -317,8 +324,6 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
     for (int i = 0; i < num_tests; i++) {
         peerless_event_test t = pe_tests[i];
         std::string opCodeHex = t.opCode;
-
-        printf("Peerless Event OPCode: %s\n", opCodeHex.c_str());
 
         std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
         std::string OpCode(vOpCode.begin(), vOpCode.end());
@@ -349,8 +354,6 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
         peerless_bet_test t = pb_tests[i];
         std::string opCodeHex = t.opCode;
 
-        printf("Peerless Bet OPCode: %s\n", opCodeHex.c_str());
-
         std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
         std::string OpCode(vOpCode.begin(), vOpCode.end());
 
@@ -371,8 +374,6 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
     for (int i = 0; i < pr_num_tests; i++) {
         peerless_result_test t = pr_tests[i];
         std::string opCodeHex = t.opCode;
-
-        printf("Peerless Result OPCode: %s\n", opCodeHex.c_str());
 
         std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
         std::string OpCode(vOpCode.begin(), vOpCode.end());
@@ -395,8 +396,6 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
         peerless_update_odds_test t = puo_tests[i];
         std::string opCodeHex = t.opCode;
 
-        printf("Peerless Update Odds OPCode: %s\n", opCodeHex.c_str());
-
         std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
         std::string OpCode(vOpCode.begin(), vOpCode.end());
 
@@ -407,7 +406,7 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
         BOOST_CHECK_EQUAL(puo.nAwayOdds, t.nAwayOdds);
         BOOST_CHECK_EQUAL(puo.nDrawOdds, t.nDrawOdds);
 
-    // To OpCode
+        // To OpCode
         std::string opCode;
         BOOST_CHECK(CPeerlessResult::ToOpCode(pr, opCode));
     }
@@ -419,8 +418,6 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
     for (int i = 0; i < cge_num_tests; i++) {
         chain_games_event_test t = cge_tests[i];
         std::string opCodeHex = t.opCode;
-
-        printf("Chain Games Event OPCode: %s\n", opCodeHex.c_str());
 
         std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
         std::string OpCode(vOpCode.begin(), vOpCode.end());
@@ -443,8 +440,6 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
         chain_games_bet_test t = cgb_tests[i];
         std::string opCodeHex = t.opCode;
 
-        printf("Chain Games Bet OPCode: %s\n", opCodeHex.c_str());
-
         std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
         std::string OpCode(vOpCode.begin(), vOpCode.end());
 
@@ -464,8 +459,6 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
     for (int i = 0; i < cgr_num_tests; i++) {
         chain_games_result_test t = cgr_tests[i];
         std::string opCodeHex = t.opCode;
-
-        printf("Chain Games Result OPCode: %s\n", opCodeHex.c_str());
 
         std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
         std::string OpCode(vOpCode.begin(), vOpCode.end());
