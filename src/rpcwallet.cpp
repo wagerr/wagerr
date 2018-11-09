@@ -257,7 +257,7 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
                 const CTxOut &txout = tx.vout[i];
                 std::string scriptPubKey = txout.scriptPubKey.ToString();
             
-                if( scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
 
                     vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
                     std::string evtDescr(v.begin(), v.end());
@@ -272,7 +272,7 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
                     // Create JSON array from data and return
                     UniValue evt(UniValue::VOBJ);
                     
-                    if (strs[0] == Params().CGLottoEventTxType()){
+                    if (strs[0] == Params().CGLottoEventTxType()) {
                         evt.push_back(Pair("tx-id", txHash.ToString().c_str()));
                         evt.push_back(Pair("version", strs[1]));
                         evt.push_back(Pair("type", strs[2]));
@@ -838,7 +838,7 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
     string eventId = params[0].get_str();
 
     // Validate bet amount so its between 1 - 10000 WGR inclusive.
-    if( nAmount < (50 * COIN ) || nAmount > (10000 * COIN)){
+    if (nAmount < (50 * COIN ) || nAmount > (10000 * COIN)) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 1 - 10000 WGR inclusive.");
     }
 

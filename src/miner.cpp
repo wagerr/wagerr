@@ -583,7 +583,7 @@ std::vector<std::vector<std::string>> getEventResults(int height) {
             }
         }
 
-        if(validResult) {
+        if (validResult) {
 
             // Look for result OP RETURN code in the tx vouts.
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
