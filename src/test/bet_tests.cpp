@@ -472,5 +472,51 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
         BOOST_CHECK(CChainGamesResult::ToOpCode(cgr, opCode));
     }
 }
-BOOST_AUTO_TEST_SUITE_END()
 
+BOOST_AUTO_TEST_CASE( serialisation ) // Test the event index map serialisation / deserialization methods.
+{
+    int num_tests = sizeof(pe_tests) / sizeof(*pe_tests);
+    eventIndex_t eventIndex;
+
+    // Build replica event index map.
+    for (int i = 0; i < num_tests; i++) {
+        peerless_event_test t = pe_tests[i];
+        std::string opCodeHex = t.opCode;
+
+        std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
+        std::string opCode(vOpCode.begin(), vOpCode.end());
+
+        CPeerlessEvent pe;
+        CPeerlessEvent::FromOpCode(opCode, pe);
+
+        eventIndex.insert(std::make_pair(pe.nEventId, pe));
+    }
+
+    // Write binary data to file (events.dat)
+    CEventDB pedb;
+    uint256 lasBlockHash = uint256("0x000007b9191bc7a17bfb6cedf96a8dacebb5730b498361bf26d44a9f9dcc1079");
+    pedb.Write(eventIndex, lasBlockHash);
+
+    // Read binary from file (events.dat)
+    eventIndex_t eventIndexNew;
+    uint256 lastBlockHashNew;
+
+    BOOST_CHECK(pedb.Read(eventIndexNew, lastBlockHashNew));
+    BOOST_CHECK_EQUAL(lasBlockHash.ToString(), lastBlockHashNew.ToString());
+
+    // Test the deserialized objects.
+    for (std::map<uint32_t, CPeerlessEvent>::iterator it=eventIndexNew.begin(); it!=eventIndexNew.end(); ++it) {
+        BOOST_CHECK_EQUAL(it->second.nEventId, eventIndex[it->first].nEventId);
+        BOOST_CHECK_EQUAL(it->second.nStartTime, eventIndex[it->first].nStartTime);
+        BOOST_CHECK_EQUAL(it->second.nSport, eventIndex[it->first].nSport);
+        BOOST_CHECK_EQUAL(it->second.nTournament, eventIndex[it->first].nTournament);
+        BOOST_CHECK_EQUAL(it->second.nStage, eventIndex[it->first].nStage);
+        BOOST_CHECK_EQUAL(it->second.nHomeTeam, eventIndex[it->first].nHomeTeam);
+        BOOST_CHECK_EQUAL(it->second.nAwayTeam, eventIndex[it->first].nAwayTeam);
+        BOOST_CHECK_EQUAL(it->second.nHomeOdds, eventIndex[it->first].nHomeOdds);
+        BOOST_CHECK_EQUAL(it->second.nAwayOdds, eventIndex[it->first].nAwayOdds);
+        BOOST_CHECK_EQUAL(it->second.nDrawOdds, eventIndex[it->first].nDrawOdds);
+    }
+}
+
+BOOST_AUTO_TEST_SUITE_END()
