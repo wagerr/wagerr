@@ -12,6 +12,7 @@
 #include "accumulatormap.h"
 #include "addrman.h"
 #include "alert.h"
+#include "bet.h"
 #include "blocksignature.h"
 #include "chainparams.h"
 #include "checkpoints.h"
@@ -4750,6 +4751,40 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
             return error("AcceptBlock() : ReceivedBlockTransactions failed");
     } catch (std::runtime_error& e) {
         return state.Abort(std::string("System error: ") + e.what());
+    }
+
+    bool eiUpdated = false;
+    // Look through the block for any events or results TX.
+    BOOST_FOREACH (CTransaction& tx, block.vtx) {
+        for (unsigned int i = 0; i < tx.vout.size(); i++) {
+            const CTxOut& txout = tx.vout[i];
+            std::string s = txout.scriptPubKey.ToString();
+
+            if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+                vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
+                std::string opCode(v.begin(), v.end());
+
+                // If events found in block add them to the events index.
+                CPeerlessEvent plEvent;
+                if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
+                    eventIndex.insert( std::make_pair( plEvent.nEventId, plEvent));
+                    eiUpdated = true;
+                }
+
+                // If results found in block remove event from event index.
+                CPeerlessResult plResult;
+                if (CPeerlessResult::FromOpCode(opCode, plResult)) {
+                    eventIndex.erase( plResult.nEventId );
+                    eiUpdated = true;
+                }
+            }
+        }
+
+        // Write event index to events.dat file only if it has been updated.
+        if (eiUpdated) {
+            CEventDB pedb;
+            pedb.Write(eventIndex, block.GetHash());
+        }
     }
 
     return true;

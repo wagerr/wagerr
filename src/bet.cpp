@@ -540,3 +540,115 @@ bool CChainGamesResult::ToOpCode(CChainGamesResult cgr, std::string &opCode)
 
     return true;
 }
+
+/**
+ * Constructor for the events database object.
+ */
+CEventDB::CEventDB()
+{
+    pathEvents = GetDataDir() / "events.dat";
+}
+
+/**
+ * Serialises the event index map into binary format and writes to the events.dat file.
+ *
+ * @param eventIndex       The events index map which contains the current live events.
+ * @param latestBlockHash  The latest block hash which we can use a reference as to when data was last saved to the file.
+ * @return                 Bool
+ */
+bool CEventDB::Write(const eventIndex_t& eventIndex, uint256 latestBlockHash)
+{
+    // Generate random temporary filename.
+    unsigned short randv = 0;
+    GetRandBytes((unsigned char*)&randv, sizeof(randv));
+    std::string tmpfn = strprintf("events.dat.%04x", randv);
+
+    // Serialize event index object and latest block hash as a reference.
+    CDataStream ssEvents(SER_DISK, CLIENT_VERSION);
+    ssEvents << latestBlockHash;
+    ssEvents << eventIndex;
+
+    // Checksum added for verification purposes.
+    uint256 hash = Hash(ssEvents.begin(), ssEvents.end());
+    ssEvents << hash;
+
+    // Open output file, and associate with CAutoFile.
+    boost::filesystem::path pathTemp = GetDataDir() / "events.dat";
+    FILE* file = fopen(pathTemp.string().c_str(), "wb");
+    CAutoFile fileout(file, SER_DISK, CLIENT_VERSION);
+
+    if (fileout.IsNull())
+        return error("%s : Failed to open file %s", __func__, pathEvents.string());
+
+    // Write and commit data.
+    try {
+        fileout << ssEvents;
+    }
+    catch (std::exception& e) {
+        return error("%s : Serialize or I/O error - %s", __func__, e.what());
+    }
+
+    FileCommit(fileout.Get());
+    fileout.fclose();
+
+    // Replace existing events.dat, if any, with new events.dat.XXXX
+    if (!RenameOver(pathTemp, pathEvents))
+        return error("%s: Rename-into-place failed", __func__);
+
+    return true;
+}
+
+/**
+ * Reads the events.dat file and deserializes the data to recreate event index map object as well as the last block hash before file was written to.
+ *
+ * @param eventIndex The event index map which will be populated with data from the file.
+ * @return           Bool
+ */
+bool CEventDB::Read(eventIndex_t& eventIndex, uint256& lastBlockHash)
+{
+    // Open input file, and associate with CAutoFile.
+    FILE* file = fopen(pathEvents.string().c_str(), "rb");
+    CAutoFile filein(file, SER_DISK, CLIENT_VERSION);
+
+    if (filein.IsNull())
+        return error("%s : Failed to open file %s", __func__, pathEvents.string());
+
+    // Use file size to size memory buffer.
+    uint64_t fileSize = boost::filesystem::file_size(pathEvents);
+    uint64_t dataSize = fileSize - sizeof(uint256);
+
+    // Don't try to resize to a negative number if file is small.
+    if (fileSize >= sizeof(uint256))
+        dataSize = fileSize - sizeof(uint256);
+
+    vector<unsigned char> vchData;
+    vchData.resize(dataSize);
+    uint256 hashIn;
+
+    // Read data and checksum from file.
+    try {
+        filein.read((char*)&vchData[0], dataSize);
+        filein >> hashIn;
+    }
+    catch (std::exception& e) {
+        return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+    }
+
+    filein.fclose();
+    CDataStream ssEvents(vchData, SER_DISK, CLIENT_VERSION);
+
+    // Verify stored checksum matches input data.
+    uint256 hashTmp = Hash(ssEvents.begin(), ssEvents.end());
+    if (hashIn != hashTmp)
+        return error("%s : Checksum mismatch, data corrupted", __func__);
+
+    try {
+        ssEvents >> lastBlockHash;
+        ssEvents >> eventIndex;
+    }
+    catch (std::exception& e) {
+        return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+    }
+
+    return true;
+}
