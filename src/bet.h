@@ -42,7 +42,6 @@ bool IsValidOracleTx(const CTxIn &txin);
 class CPeerlessEvent
 {
 public:
-    static const int CURRENT_VERSION = 1;
     int nVersion;
 
     uint32_t nEventId;
@@ -195,6 +194,5 @@ public:
     bool Write(const eventIndex_t& eventIndex,  uint256 latestProcessedBlock);
     bool Read(eventIndex_t& eventIndex, uint256& lastBlockHash);
 };
-
 
 #endif // WAGERR_BET_H

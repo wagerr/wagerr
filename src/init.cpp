@@ -199,16 +199,16 @@ void PrepareShutdown()
     // a lock mechanism will have to be implemented to ensure we don't corrupt
     // the events.dat file when we want the write to it.
     // Get the latest block hash.
-    CBlockIndex *resultsBocksIndex = NULL;
-    resultsBocksIndex = chainActive[chainActive.Height()];
+    CBlockIndex *blockIndex = NULL;
+    blockIndex = chainActive[chainActive.Height()];
 
     CBlock block;
-    ReadBlockFromDisk(block, resultsBocksIndex);
-    uint256 latestBlockhash = block.GetHash();
+    ReadBlockFromDisk(block, blockIndex);
+    uint256 latestBlockHash = block.GetHash();
 
     // Write the event index data to disk.
     CEventDB pedb;
-    pedb.Write(eventIndex, latestBlockhash);
+    pedb.Write(eventIndex, latestBlockHash);
 
     /// Note: Shutdown() must be able to handle cases in which AppInit2() failed part of the way,
     /// for example if the data directory was found to be locked.
