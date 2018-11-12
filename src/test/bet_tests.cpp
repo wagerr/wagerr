@@ -494,15 +494,15 @@ BOOST_AUTO_TEST_CASE( serialisation ) // Test the event index map serialisation 
 
     // Write binary data to file (events.dat)
     CEventDB pedb;
-    uint256 lasBlockHash = uint256("0x000007b9191bc7a17bfb6cedf96a8dacebb5730b498361bf26d44a9f9dcc1079");
-    pedb.Write(eventIndex, lasBlockHash);
+    uint256 lastBlockHash = uint256("0x000007b9191bc7a17bfb6cedf96a8dacebb5730b498361bf26d44a9f9dcc1079");
+    BOOST_CHECK(pedb.Write(eventIndex, lastBlockHash));
 
     // Read binary from file (events.dat)
     eventIndex_t eventIndexNew;
     uint256 lastBlockHashNew;
 
     BOOST_CHECK(pedb.Read(eventIndexNew, lastBlockHashNew));
-    BOOST_CHECK_EQUAL(lasBlockHash.ToString(), lastBlockHashNew.ToString());
+    BOOST_CHECK_EQUAL(lastBlockHash.ToString(), lastBlockHashNew.ToString());
 
     // Test the deserialized objects.
     for (std::map<uint32_t, CPeerlessEvent>::iterator it=eventIndexNew.begin(); it!=eventIndexNew.end(); ++it) {
