@@ -4767,14 +4767,14 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                 // If events found in block add them to the events index.
                 CPeerlessEvent plEvent;
                 if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
-                    eventIndex.insert( std::make_pair( plEvent.nEventId, plEvent));
+                    eventIndex.insert(std::make_pair(plEvent.nEventId, plEvent));
                     eiUpdated = true;
                 }
 
                 // If results found in block remove event from event index.
                 CPeerlessResult plResult;
                 if (CPeerlessResult::FromOpCode(opCode, plResult)) {
-                    eventIndex.erase( plResult.nEventId );
+                    eventIndex.erase(plResult.nEventId);
                     eiUpdated = true;
                 }
             }

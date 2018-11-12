@@ -194,10 +194,11 @@ void PrepareShutdown()
     if (!lockShutdown)
         return;
 
-    // TODO - We are assuming that use of locks will not be required when
-    // writing the event index to the events.dat. If this is not the case then
-    // a lock mechanism will have to be implemented to ensure we don't corrupt
-    // the events.dat file when we want the write to it.
+    // TODO - We are assuming that the use of locks will not be required when
+    // writing the event index to the events.dat because all writing to
+    // events.dat should happen on the same thread. If this is not the case
+    // then a lock mechanism will have to be implemented to ensure we don't
+    // corrupt events.dat  when we want the write to it.
     // Get the latest block hash.
     CBlockIndex *blockIndex = NULL;
     blockIndex = chainActive[chainActive.Height()];

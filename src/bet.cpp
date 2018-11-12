@@ -573,12 +573,12 @@ bool CEventDB::Write(const eventIndex_t& eventIndex, uint256 latestBlockHash)
     ssEvents << hash;
 
     // Open output file, and associate with CAutoFile.
-    boost::filesystem::path pathTemp = GetDataDir() / "events.dat";
+    boost::filesystem::path pathTemp = GetDataDir() / tmpfn;
     FILE* file = fopen(pathTemp.string().c_str(), "wb");
     CAutoFile fileout(file, SER_DISK, CLIENT_VERSION);
 
     if (fileout.IsNull())
-        return error("%s : Failed to open file %s", __func__, pathEvents.string());
+        return error("%s : Failed to open file %s", __func__, pathTemp.c_str());
 
     // Write and commit data.
     try {
