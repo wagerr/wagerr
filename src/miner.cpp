@@ -443,6 +443,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         else {
 
             std::vector<CTxOut> voutPayouts;
+            std::vector<CTxOut> vExpectedCGLottoPayouts;
             CAmount nMNBetReward = 0;
 
             if( nHeight > Params().BetStartHeight()) {
@@ -450,6 +451,9 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
                 voutPayouts = GetBetPayouts(nHeight - 1);
                 GetBlockPayouts(voutPayouts, nMNBetReward);
+
+                // TODO this needs to be updated so both the events and chain games can be paid out in the same block.
+                vExpectedCGLottoPayouts = GetCGLottoBetPayouts(nHeight - 1);
 
                 /*
                 for (unsigned int l = 0; l < voutPayouts.size(); l++) {

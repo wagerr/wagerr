@@ -3049,6 +3049,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // Calculate the expected bet payouts.
     std::vector<CTxOut> vExpectedPayouts;
+    std::vector<CTxOut> vExpectedCGLottoPayouts;
     if( pindex->nHeight > Params().BetStartHeight()) {
 
         std::string strBetNetBlockTxt;
@@ -3079,6 +3080,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
         nExpectedMint += nMNBetReward;
 
+        // TODO this needs to be updated so both the events and chain games can be paid out in the same block.
+        vExpectedCGLottoPayouts = GetCGLottoBetPayouts(pindex->nHeight - 1);
+        
         /*
         for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
             printf(BetNetExpectedTxtConst, vExpectedPayouts[l].ToString().c_str());
