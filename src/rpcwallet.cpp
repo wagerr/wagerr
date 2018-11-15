@@ -182,78 +182,42 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
             HelpExampleCli("listchaingamesevents", "") + HelpExampleRpc("listchaingamesevents", ""));
 
     UniValue ret(UniValue::VARR);
-    
+
     // Set the Oracle wallet address. 
     std::string OracleWalletAddr = Params().OracleWalletAddr();
-
-    std::map<uint256, uint32_t> coreWalletVouts;
-
     CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
 
     while (pindex) {
-
         CBlock block;
         ReadBlockFromDisk(block, pindex);
 
-        BOOST_FOREACH(CTransaction& tx, block.vtx) {
-
+        BOOST_FOREACH (CTransaction& tx, block.vtx) {
             uint256 txHash = tx.GetHash();
 
             // Ensure the event TX has come from Oracle wallet.
             const CTxIn &txin = tx.vin[0];
-            COutPoint prevout = txin.prevout;
-            bool validEventTx = false;
+            bool validEventTx = IsValidOracleTx(txin);
 
-            uint256 hashBlock;
-            CTransaction txPrev;
-            
-            if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
+            if (validEventTx) {
+                // loop over all the TX vouts to check them for OP_RETURN.
+                for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                    const CTxOut &txout = tx.vout[i];
+                    std::string scriptPubKey = txout.scriptPubKey.ToString();
 
-                const CTxOut &txout = txPrev.vout[0];
-                std::string scriptPubKey = txout.scriptPubKey.ToString();
+                    if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
 
-                txnouttype type;
-                vector<CTxDestination> addrs;
-                int nRequired;
+                        std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
+                        std::string OpCode(vOpCode.begin(), vOpCode.end());
 
-                if (!ExtractDestinations(txout.scriptPubKey, type, addrs, nRequired)) {
-                    continue;
-                }
+                        CChainGamesEvent cgEvent;
+                        if (!CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
+                            continue;
+                        }
 
-                BOOST_FOREACH (const CTxDestination &addr, addrs) {
-                    if (CBitcoinAddress(addr).ToString() == OracleWalletAddr) {
-                        LogPrintf( "MATCH vinAddr %s Our Addr %s \n", CBitcoinAddress(addr).ToString().c_str(), OracleWalletAddr );
-                        validEventTx = true;
-                        break;
-                    }
-                }
-            }
-
-            // Search all TX's for chain games event and return as JSON
-            for (unsigned int i = 0; i < tx.vout.size(); i++) {
-                const CTxOut &txout = tx.vout[i];
-                std::string scriptPubKey = txout.scriptPubKey.ToString();
-            
-                if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
-
-                    vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
-                    std::string evtDescr(v.begin(), v.end());
-                    std::vector <std::string> strs;
-                    boost::split(strs, evtDescr, boost::is_any_of("|"));
-
-                    //TODO More validation needed in future i.e string length
-                    if (strs[0] != Params().CGLottoEventTxType()) {
-                        continue;
-                    }
-
-                    // Create JSON array from data and return
-                    UniValue evt(UniValue::VOBJ);
-                    
-                    if (strs[0] == Params().CGLottoEventTxType()) {
+                        UniValue evt(UniValue::VOBJ);
                         evt.push_back(Pair("tx-id", txHash.ToString().c_str()));
-                        evt.push_back(Pair("version", strs[1]));
-                        evt.push_back(Pair("type", strs[2]));
-                        evt.push_back(Pair("entry-fee", strs[3]));
+                        evt.push_back(Pair("event-id", (uint64_t) cgEvent.nEventId));
+                        evt.push_back(Pair("entry-fee", (uint64_t) cgEvent.nEntryFee));
                         ret.push_back(evt);
                     }
                 }
@@ -265,6 +229,7 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
 
     return ret;
 }
+
 
 // TODO There is a lot of code shared between `bets` and `listtransactions`.
 // This would ideally be abstracted when time allows.
@@ -347,6 +312,115 @@ UniValue listbets(const UniValue& params, bool fHelp)
                     }
                 }
 
+            }
+        }
+
+        if ((int)ret.size() >= (nCount + nFrom)) break;
+    }
+    // ret is newest to oldest
+
+    if (nFrom > (int)ret.size())
+        nFrom = ret.size();
+    if ((nFrom + nCount) > (int)ret.size())
+        nCount = ret.size() - nFrom;
+
+    vector<UniValue> arrTmp = ret.getValues();
+
+    vector<UniValue>::iterator first = arrTmp.begin();
+    std::advance(first, nFrom);
+    vector<UniValue>::iterator last = arrTmp.begin();
+    std::advance(last, nFrom+nCount);
+
+    if (last != arrTmp.end()) arrTmp.erase(last, arrTmp.end());
+    if (first != arrTmp.begin()) arrTmp.erase(arrTmp.begin(), first);
+
+    std::reverse(arrTmp.begin(), arrTmp.end()); // Return oldest to newest
+
+    ret.clear();
+    ret.setArray();
+    ret.push_backV(arrTmp);
+
+    return ret;
+}
+
+UniValue listchaingamebets(const UniValue& params, bool fHelp)
+{
+    // TODO The command-line parameters for this command aren't handled as.
+    // described, either the documentation or the behaviour of this command
+    // should be corrected when time allows.
+
+    if (fHelp || params.size() > 4)
+        throw runtime_error(
+            "listchaingamebets ( \"account\" count from includeWatchonly)\n"
+            "\nReturns up to 'count' most recent transactions skipping the first 'from' transactions for account 'account'.\n"
+            "\nArguments:\n"
+            "1. \"account\"    (string, optional) The account name. If not included, it will list all transactions for all accounts.\n"
+            "                                     If \"\" is set, it will list transactions for the default account.\n"
+            "2. count          (numeric, optional, default=10) The number of transactions to return\n"
+            "3. from           (numeric, optional, default=0) The number of transactions to skip\n"
+            "4. includeWatchonly (bool, optional, default=false) Include transactions to watchonly addresses (see 'importaddress')\n"
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"event-id\":\"accountname\",       (string) The ID of the event being bet on.\n"
+            "    \"amount\": x.xxx,                  (numeric) The amount bet in WGR.\n"
+            "  }\n"
+            "]\n"
+
+            "\nExamples:\n"
+            "\nList the most recent 10 bets in the systems\n" +
+            HelpExampleCli("listchaingamebets", ""));
+
+    string strAccount = "*";
+    if (params.size() > 0)
+        strAccount = params[0].get_str();
+    int nCount = 10;
+    if (params.size() > 1)
+        nCount = params[1].get_int();
+    int nFrom = 0;
+    if (params.size() > 2)
+        nFrom = params[2].get_int();
+    isminefilter filter = ISMINE_SPENDABLE;
+    if (params.size() > 3)
+        if (params[3].get_bool())
+            filter = filter | ISMINE_WATCH_ONLY;
+
+    if (nCount < 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative count");
+    if (nFrom < 0)
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative from");
+
+    UniValue ret(UniValue::VARR);
+
+    const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
+
+    // iterate backwards until we have nCount items to return:
+    for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
+        CWalletTx* const pwtx = (*it).second.first;
+
+        if (pwtx != 0) {
+
+            uint256 txHash = (*pwtx).GetHash();
+
+            for (unsigned int i = 0; i < (*pwtx).vout.size(); i++) {
+                const CTxOut& txout = (*pwtx).vout[i];
+                std::string scriptPubKey = txout.scriptPubKey.ToString();
+
+                // TODO Remove hard-coded values from this block.
+                if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                    vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
+                    std::string opCode(vOpCode.begin(), vOpCode.end());
+
+                    CChainGamesBet cgBet;
+                    if (CChainGamesBet::FromOpCode(opCode, cgBet)) {
+                        UniValue entry(UniValue::VOBJ);
+                        entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
+                        entry.push_back(Pair("event-id", (uint64_t) cgBet.nEventId));
+                        //entry.push_back(Pair("team-to-win", (uint64_t) plBet.nOutcome));
+                        entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+                        ret.push_back(entry);
+                    }
+                }
             }
         }
 
@@ -776,8 +850,8 @@ UniValue placebet(const UniValue& params, bool fHelp)
 }
 
 UniValue placechaingamesbet(const UniValue& params, bool fHelp)
-{ 
-    if (fHelp || params.size() != 2)
+{
+    if (fHelp || params.size() < 1 || params.size() > 5) {
         throw runtime_error(
             "placechaingamesbet \"event-id\" amount ( \"comment\" \"comment-to\" )\n"
             "\n WARNING!!! - Betting closes 20 minutes before event start time. Any bets placed after this time will be \n"
@@ -797,27 +871,32 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("placechaingamesbet", "\"#000\" 0.1 \"donation\" \"seans outpost\"") +
             HelpExampleRpc("placechaingamesbet", "\"#000\", 0.1, \"donation\", \"seans outpost\""));
-    
-    CAmount nAmount = AmountFromValue(params[1].get_real());
+    }
 
-    string eventId = params[0].get_str();
+    CAmount nAmount = AmountFromValue(params[1]);
 
     // Validate bet amount so its between 1 - 10000 WGR inclusive.
     if (nAmount < (50 * COIN ) || nAmount > (10000 * COIN)) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 1 - 10000 WGR inclusive.");
     }
 
-    // TODO Allow comments
+    // TODO Allow comments for chain games bet
     CWalletTx wtx;
 
     // Validate amount
     EnsureWalletIsUnlocked();
     EnsureEnoughWagerr(nAmount);
 
+    //TODO Respond if amount not correct
     CBitcoinAddress address("");
+    int eventId = params[0].get_int();
+    CChainGamesBet cgBet(eventId);
+
+    std::string opCode;
+    plBet.ToOpCode(cgBet, opCode);
 
     // Process transaction
-    SendMoney(address.Get(), nAmount, wtx, false, "6|1.0|"+eventId);
+    SendMoney(address.Get(), nAmount, wtx, false, opCode);
 
     return wtx.GetHash().GetHex();
 }
