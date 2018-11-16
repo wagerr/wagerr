@@ -4758,7 +4758,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
     }
 
     bool eiUpdated = false;
-    // Look through the block for any events or results TX.
+    // Look through the block for any events, results or mapping TX.
     BOOST_FOREACH (CTransaction& tx, block.vtx) {
         for (unsigned int i = 0; i < tx.vout.size(); i++) {
             const CTxOut& txout = tx.vout[i];
@@ -4780,6 +4780,31 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                 if (CPeerlessResult::FromOpCode(opCode, plResult)) {
                     eventIndex.erase(plResult.nEventId);
                     eiUpdated = true;
+                }
+
+                // If mapping found then add it to the relating map index and write the map index to disk.
+                CMapping cMapping;
+                if (CMapping::FromOpCode(opCode, cMapping)) {
+                    if (cMapping.nMType == sportMapping) {
+                        CMappingDB mdb("sports.dat");
+                        mSportsIndex.insert(std::make_pair(cMapping.nId, cMapping));
+                        mdb.Write(mSportsIndex, block.GetHash());
+                    }
+                    else if (cMapping.nMType == roundMapping) {
+                        CMappingDB mdb("rounds.dat");
+                        mRoundsIndex.insert(std::make_pair(cMapping.nId, cMapping));
+                        mdb.Write(mRoundsIndex, block.GetHash());
+                    }
+                    else if (cMapping.nMType == teamMapping) {
+                        CMappingDB mdb("teamnames.dat");
+                        mTeamNamesIndex.insert(std::make_pair(cMapping.nId, cMapping));
+                        mdb.Write(mTeamNamesIndex, block.GetHash());
+                    }
+                    else if (cMapping.nMType == tournamentMapping) {
+                        CMappingDB mdb("tournaments.dat");
+                        mTournamentsIndex.insert(std::make_pair(cMapping.nId, cMapping));
+                        mdb.Write(mTournamentsIndex, block.GetHash());
+                    }
                 }
             }
         }
