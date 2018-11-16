@@ -5,6 +5,7 @@
 #ifndef WAGERR_BET_H
 #define WAGERR_BET_H
 
+#include "util.h"
 #include "chainparams.h"
 
 #include <boost/filesystem/path.hpp>
@@ -35,7 +36,15 @@ typedef enum BetTxTypes{
     cgEventTxType      = 0x06,  // Chain games event transaction type identifier.
     cgBetTxType        = 0x07,  // Chain games bet transaction type identifier.
     cgResultTxType     = 0x08   // Chain games result transaction type identifier.
-}BetTxTypes;
+} BetTxTypes;
+
+// The supported mapping TX types.
+typedef enum MappingTypes {
+    sportMapping      = 0x01,
+    roundMapping      = 0x02,
+    teamMapping       = 0x03,
+    tournamentMapping = 0x04
+} MappingTypes;
 
 bool IsValidOracleTx(const CTxIn &txin);
 
@@ -180,6 +189,59 @@ public:
 
     static bool ToOpCode(CChainGamesResult cgr, std::string &opCode);
     static bool FromOpCode(std::string opCode, CChainGamesResult &cgr);
+};
+
+class CMapping
+{
+public:
+    int nVersion;
+
+    uint32_t nMType;
+    uint32_t nId;
+    string sName;
+
+    // Default Constructor.
+    CMapping() {}
+
+    static bool ToOpCode(CMapping &mapping, std::string &opCode);
+    static bool FromOpCode(std::string opCode, CMapping &mapping);
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(this->nVersion);
+        nVersion = this->nVersion;
+        READWRITE(nMType);
+        READWRITE(nId);
+        READWRITE(sName);
+    }
+};
+
+// Define new map type to store Wagerr mappings.
+typedef std::map<uint32_t, CMapping> mappingIndex_t;
+
+// Global variables that stores the different Wagerr mappings.
+mappingIndex_t mSportsIndex;
+mappingIndex_t mRoundsIndex;
+mappingIndex_t mTeamNamesIndex;
+mappingIndex_t mTournamentsIndex;
+
+class CMappingDB
+{
+private:
+    std::string mDBFileName;
+    boost::filesystem::path mFilePath;
+
+public:
+    // Default constructor.
+    CMappingDB() {}
+
+    // Parametrized Constructor.
+    CMappingDB(std::string fileName);
+
+    bool Write(const mappingIndex_t& mappingIndex,  uint256 latestBlockHash);
+    bool Read(mappingIndex_t& mappingIndex, uint256& lastBlockHash);
 };
 
 class CEventDB

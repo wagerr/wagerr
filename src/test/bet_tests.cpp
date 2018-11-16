@@ -58,6 +58,13 @@ typedef struct _chain_games_result_test {
     uint32_t nEventId;
 } chain_games_result_test;
 
+typedef struct _mapping_test {
+    std::string opCode;
+    uint32_t nMType;
+    uint32_t nId;
+    std::string sName;
+} mapping_test;
+
 const peerless_event_test pe_tests[] = {
         {
                 .opCode = "425458"             // BTX Prefix
@@ -315,8 +322,73 @@ const chain_games_result_test cgr_tests[] = {
         }
 };
 
-BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
+const mapping_test cm_tests[] = {
+        {
+                .opCode = "425458"             // BTX format
+                          "01"                 // BTX version number
+                          "01"                 // TX type
+                          "00000001"           // Mapping type
+                          "0160D4B3"           // Mapping ID
+                          "536f63636572",      // Hex encoded string
+                .nMType = 1,
+                .nId    = 23123123,
+                .sName  = "Soccer"
+        },
+        {
+                .opCode = "425458"
+                          "01"
+                          "01"
+                          "00000002"
+                          "00007FFE"
+                          "526f756e642031",
+                .nMType = 2,
+                .nId    = 32766,
+                .sName  = "Round 1"
+        },
+        {
+                .opCode = "425458"
+                          "01"
+                          "01"
+                          "00000003"
+                          "02A65A08"
+                          "4c69766572706f6f6c",
+                .nMType = 3,
+                .nId    = 44456456,
+                .sName  = "Liverpool"
+        },
+        {
+                .opCode = "425458"
+                          "01"
+                          "01"
+                          "00000004"
+                          "FFFFFFFF"
+                          "576f726c64204375702032303138",
+                .nMType = 4,
+                .nId    = 4294967295,
+                .sName  = "World Cup 2018"
+        }
+};
+
+BOOST_AUTO_TEST_CASE(basics) // constructors, equality, inequality
 {
+    // Test CMapping OpCodes.
+    CMapping cm;
+    int cm_num_tests = sizeof(cm_tests) / sizeof(*cm_tests);
+
+    for (int i = 0; i < cm_num_tests; i++) {
+        mapping_test t = cm_tests[i];
+        std::string opCodeHex = t.opCode;
+
+        std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
+        std::string OpCode(vOpCode.begin(), vOpCode.end());
+
+        // From OpCode
+        BOOST_CHECK(CMapping::FromOpCode(OpCode, cm));
+        BOOST_CHECK_EQUAL(cm.nMType, t.nMType);
+        BOOST_CHECK_EQUAL(cm.nId, t.nId);
+        BOOST_CHECK_EQUAL(cm.sName, t.sName);
+    }
+
     // Test CPeerLessEvent OpCodes.
     CPeerlessEvent pe;
     int num_tests = sizeof(pe_tests) / sizeof(*pe_tests);
@@ -473,8 +545,9 @@ BOOST_AUTO_TEST_CASE( basics ) // constructors, equality, inequality
     }
 }
 
-BOOST_AUTO_TEST_CASE( serialisation ) // Test the event index map serialisation / deserialization methods.
+BOOST_AUTO_TEST_CASE(serialisation) // Test the event index map serialisation / deserialization methods.
 {
+    /*** TEST THE EVENTS INDEX SERIALIZATION AND DESERIALIZATION. ***/
     int num_tests = sizeof(pe_tests) / sizeof(*pe_tests);
     eventIndex_t eventIndex;
 
@@ -516,6 +589,105 @@ BOOST_AUTO_TEST_CASE( serialisation ) // Test the event index map serialisation 
         BOOST_CHECK_EQUAL(it->second.nHomeOdds, eventIndex[it->first].nHomeOdds);
         BOOST_CHECK_EQUAL(it->second.nAwayOdds, eventIndex[it->first].nAwayOdds);
         BOOST_CHECK_EQUAL(it->second.nDrawOdds, eventIndex[it->first].nDrawOdds);
+    }
+
+
+    /*** TEST THE MAPPING INDEXES SERIALIZATION AND DESERIALIZATION. ***/
+    mappingIndex_t mSportsIndex;
+    mappingIndex_t mRoundsIndex;
+    mappingIndex_t mTeamNamesIndex;
+    mappingIndex_t mTournamentsIndex;
+
+    int cm_num_tests = sizeof(cm_tests) / sizeof(*cm_tests);
+
+    for (int i = 0; i < cm_num_tests; i++) {
+        mapping_test t = cm_tests[i];
+        std::vector<unsigned char> vOpCode = ParseHex(t.opCode);
+        std::string opCode(vOpCode.begin(), vOpCode.end());
+
+        CMapping cm;
+        CMapping::FromOpCode(opCode, cm);
+
+        if (cm.nMType == sportMapping) {
+            mSportsIndex.insert(std::make_pair(cm.nId, cm));
+
+            // Write binary data to file (sports.dat)
+            CMappingDB cmdb("sports.dat");
+            BOOST_CHECK(cmdb.Write(mSportsIndex, lastBlockHash));
+
+            // Read binary from file (sports.dat)
+            mappingIndex_t mSportIndexNew;
+
+            BOOST_CHECK(cmdb.Read(mSportIndexNew, lastBlockHashNew));
+            BOOST_CHECK_EQUAL(lastBlockHash.ToString(), lastBlockHashNew.ToString());
+
+            // Test the deserialized objects.
+            for (std::map<uint32_t, CMapping>::iterator it=mSportIndexNew.begin(); it!=mSportIndexNew.end(); ++it) {
+                BOOST_CHECK_EQUAL(it->second.nMType, mSportsIndex[it->first].nMType);
+                BOOST_CHECK_EQUAL(it->second.nId, mSportsIndex[it->first].nId);
+                BOOST_CHECK_EQUAL(it->second.sName, mSportsIndex[it->first].sName);
+            }
+        }
+        else if (cm.nMType == roundMapping) {
+            mRoundsIndex.insert(std::make_pair(cm.nId, cm));
+
+            // Write binary data to file (rounds.dat)
+            CMappingDB cmdb("rounds.dat");
+            BOOST_CHECK(cmdb.Write(mRoundsIndex, lastBlockHash));
+
+            // Read binary from file (rounds.dat)
+            mappingIndex_t mRoundsIndexNew;
+
+            BOOST_CHECK(cmdb.Read(mRoundsIndexNew, lastBlockHashNew));
+            BOOST_CHECK_EQUAL(lastBlockHash.ToString(), lastBlockHashNew.ToString());
+
+            // Test the deserialized objects.
+            for (std::map<uint32_t, CMapping>::iterator it=mRoundsIndexNew.begin(); it!=mRoundsIndexNew.end(); ++it) {
+                BOOST_CHECK_EQUAL(it->second.nMType, mRoundsIndex[it->first].nMType);
+                BOOST_CHECK_EQUAL(it->second.nId, mRoundsIndex[it->first].nId);
+                BOOST_CHECK_EQUAL(it->second.sName, mRoundsIndex[it->first].sName);
+            }
+        }
+        else if (cm.nMType == teamMapping) {
+            mTeamNamesIndex.insert(std::make_pair(cm.nId, cm));
+
+            // Write binary data to file (teamnames.dat)
+            CMappingDB cmdb("teamnames.dat");
+            BOOST_CHECK(cmdb.Write(mTeamNamesIndex, lastBlockHash));
+
+            // Read binary from file (teamnames.dat)
+            mappingIndex_t mTeamNamesIndexNew;
+
+            BOOST_CHECK(cmdb.Read(mTeamNamesIndexNew, lastBlockHashNew));
+            BOOST_CHECK_EQUAL(lastBlockHash.ToString(), lastBlockHashNew.ToString());
+
+            // Test the deserialized objects.
+            for (std::map<uint32_t, CMapping>::iterator it=mTeamNamesIndexNew.begin(); it!=mTeamNamesIndexNew.end(); ++it) {
+                BOOST_CHECK_EQUAL(it->second.nMType, mTeamNamesIndex[it->first].nMType);
+                BOOST_CHECK_EQUAL(it->second.nId, mTeamNamesIndex[it->first].nId);
+                BOOST_CHECK_EQUAL(it->second.sName, mTeamNamesIndex[it->first].sName);
+            }
+        }
+        else if (cm.nMType == tournamentMapping) {
+            mTournamentsIndex.insert(std::make_pair(cm.nId, cm));
+
+            // Write binary data to file (tournaments.dat)
+            CMappingDB cmdb("tournaments.dat");
+            BOOST_CHECK(cmdb.Write(mTournamentsIndex, lastBlockHash));
+
+            // Read binary from file (tournaments.dat)
+            mappingIndex_t mTournamentsIndexNew;
+
+            BOOST_CHECK(cmdb.Read(mTournamentsIndexNew, lastBlockHashNew));
+            BOOST_CHECK_EQUAL(lastBlockHash.ToString(), lastBlockHashNew.ToString());
+
+            // Test the deserialized objects.
+            for (std::map<uint32_t, CMapping>::iterator it=mTournamentsIndexNew.begin(); it!=mTournamentsIndexNew.end(); ++it) {
+                BOOST_CHECK_EQUAL(it->second.nMType, mTournamentsIndex[it->first].nMType);
+                BOOST_CHECK_EQUAL(it->second.nId, mTournamentsIndex[it->first].nId);
+                BOOST_CHECK_EQUAL(it->second.sName, mTournamentsIndex[it->first].sName);
+            }
+        }
     }
 }
 

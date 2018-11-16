@@ -195,10 +195,10 @@ void PrepareShutdown()
         return;
 
     // TODO - We are assuming that the use of locks will not be required when
-    // writing the event index to the events.dat because all writing to
-    // events.dat should happen on the same thread. If this is not the case
+    // writing a map index to a .dat file because all writing to a
+    // .dat should happen on the same thread. If this is not the case
     // then a lock mechanism will have to be implemented to ensure we don't
-    // corrupt events.dat  when we want the write to it.
+    // corrupt any .dat when we want the write to it.
     // Get the latest block hash.
     CBlockIndex *blockIndex = NULL;
     blockIndex = chainActive[chainActive.Height()];
@@ -207,9 +207,19 @@ void PrepareShutdown()
     ReadBlockFromDisk(block, blockIndex);
     uint256 latestBlockHash = block.GetHash();
 
-    // Write the event index data to disk.
+    // Write the event index to disk.
     CEventDB pedb;
     pedb.Write(eventIndex, latestBlockHash);
+
+    // Write the mapping indexes to disk.
+    CMappingDB cmSportsDb("sports.dat");
+    cmSportsDb.Write(mSportsIndex, latestBlockHash);
+    CMappingDB cmRoundsDb("rounds.dat");
+    cmRoundsDb.Write(mRoundsIndex, latestBlockHash);
+    CMappingDB cmTeamsDb("teamnames.dat");
+    cmTeamsDb.Write(mTeamNamesIndex, latestBlockHash);
+    CMappingDB cmTournamentsDb("tournaments.dat");
+    cmTournamentsDb.Write(mTournamentsIndex, latestBlockHash);
 
     /// Note: Shutdown() must be able to handle cases in which AppInit2() failed part of the way,
     /// for example if the data directory was found to be locked.
@@ -1439,6 +1449,20 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 CEventDB pedb;
                 uint256 lastBlockHash;
                 pedb.Read(eventIndex, lastBlockHash);
+
+                uint256 sportsLastBlockHash;
+                uint256 roundsLastBlockHash;
+                uint256 teamsLastBlockHash;
+                uint256 tournamentsLastBlockHash;
+
+                CMappingDB cmSportsDb("sports.dat");
+                cmSportsDb.Read(mSportsIndex, sportsLastBlockHash);
+                CMappingDB cmRoundsDb("rounds.dat");
+                cmRoundsDb.Read(mRoundsIndex, roundsLastBlockHash);
+                CMappingDB cmTeamsDb("teamnames.dat");
+                cmTeamsDb.Read(mTeamNamesIndex, teamsLastBlockHash);
+                CMappingDB cmTournamentsDb("tournaments.dat");
+                cmTournamentsDb.Read(mTournamentsIndex, tournamentsLastBlockHash);
 
                 if (fReindex)
                     pblocktree->WriteReindexing(true);

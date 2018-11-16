@@ -542,6 +542,158 @@ bool CChainGamesResult::ToOpCode(CChainGamesResult cgr, std::string &opCode)
 }
 
 /**
+ * Split a CMapping OpCode string into byte components and store in CMapping object.
+ *
+ * @param opCode The CMapping op code string.
+ * @param cm     The CMapping object.
+ * @return       Bool
+ */
+bool CMapping::FromOpCode(std::string opCode, CMapping &cm)
+{
+    // Ensure the mapping transaction type is correct.
+    if (opCode[4] != mappingTxType) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    // Ensure the mapping OpCode has the correct BTX format version number.
+    if (ReadBTXFormatVersion(opCode) != BTX_FORMAT_VERSION) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    cm.nMType = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
+    cm.nId    = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+
+    // Decode the the rest of the mapping OP Code to get the name.
+    std::string name;
+    int nextOpIndex = 13;
+
+    while (opCode[nextOpIndex]) {
+        unsigned char chr = opCode[nextOpIndex];
+        name.push_back(chr);
+        nextOpIndex++;
+    }
+
+    cm.sName = name;
+
+    return true;
+}
+
+/**
+ * Constructor for the CMapping database object.
+ */
+CMappingDB::CMappingDB(std::string fileName)
+{
+    mDBFileName = fileName;
+    mFilePath   = GetDataDir() / fileName;
+}
+
+/**
+ * Serialise a mapping index map into binary format and write to the related .dat file.
+ *
+ * @param mappingIndex    The index map which contains Wagerr mappings.
+ * @param latestBlockHash The latest block hash which we can use a reference as to when data was last saved to the file.
+ * @return                Bool
+ */
+bool CMappingDB::Write(const mappingIndex_t& mappingIndex, uint256 latestBlockHash)
+{
+    // Generate random temporary filename.
+    unsigned short randv = 0;
+    GetRandBytes((unsigned char*)&randv, sizeof(randv));
+    std::string tmpfn = strprintf( mDBFileName + ".%04x", randv);
+
+    // Serialize map index object and latest block hash as a reference.
+    CDataStream ssMappings(SER_DISK, CLIENT_VERSION);
+    ssMappings << latestBlockHash;
+    ssMappings << mappingIndex;
+
+    // Checksum added for verification purposes.
+    uint256 hash = Hash(ssMappings.begin(), ssMappings.end());
+    ssMappings << hash;
+
+    // Open output file, and associate with CAutoFile.
+    boost::filesystem::path pathTemp = GetDataDir() / tmpfn;
+    FILE* file = fopen(pathTemp.string().c_str(), "wb");
+    CAutoFile fileout(file, SER_DISK, CLIENT_VERSION);
+
+    if (fileout.IsNull())
+        return error("%s : Failed to open file %s", __func__, pathTemp.c_str());
+
+    // Write and commit data.
+    try {
+        fileout << ssMappings;
+    }
+    catch (std::exception& e) {
+        return error("%s : Serialize or I/O error - %s", __func__, e.what());
+    }
+
+    FileCommit(fileout.Get());
+    fileout.fclose();
+
+    // Replace existing .dat, if any, with new .dat.XXXX
+    if (!RenameOver(pathTemp, mFilePath))
+        return error("%s: Rename-into-place failed", __func__);
+
+    return true;
+}
+
+/**
+ * Reads a .dat file and deserializes the data to recreate an index map object.
+ *
+ * @param mappingIndex The index map which will be populated with data from the file.
+ * @return             Bool
+ */
+bool CMappingDB::Read(mappingIndex_t& mappingIndex, uint256& lastBlockHash)
+{
+    // Open input file, and associate with CAutoFile.
+    FILE* file = fopen(mFilePath.string().c_str(), "rb");
+    CAutoFile filein(file, SER_DISK, CLIENT_VERSION);
+
+    if (filein.IsNull())
+        return error("%s : Failed to open file %s", __func__, mFilePath.string());
+
+    // Use file size to size memory buffer.
+    uint64_t fileSize = boost::filesystem::file_size(mFilePath);
+    uint64_t dataSize = fileSize - sizeof(uint256);
+
+    // Don't try to resize to a negative number if file is small.
+    if (fileSize >= sizeof(uint256))
+        dataSize = fileSize - sizeof(uint256);
+
+    vector<unsigned char> vchData;
+    vchData.resize(dataSize);
+    uint256 hashIn;
+
+    // Read data and checksum from file.
+    try {
+        filein.read((char*)&vchData[0], dataSize);
+        filein >> hashIn;
+    }
+    catch (std::exception& e) {
+        return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+    }
+
+    filein.fclose();
+    CDataStream ssMappings(vchData, SER_DISK, CLIENT_VERSION);
+
+    // Verify stored checksum matches input data.
+    uint256 hashTmp = Hash(ssMappings.begin(), ssMappings.end());
+    if (hashIn != hashTmp)
+        return error("%s : Checksum mismatch, data corrupted", __func__);
+
+    try {
+        ssMappings >> lastBlockHash;
+        ssMappings >> mappingIndex;
+    }
+    catch (std::exception& e) {
+        return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+    }
+
+    return true;
+}
+
+/**
  * Constructor for the events database object.
  */
 CEventDB::CEventDB()
