@@ -327,7 +327,7 @@ const mapping_test cm_tests[] = {
                 .opCode = "425458"             // BTX format
                           "01"                 // BTX version number
                           "01"                 // TX type
-                          "00000001"           // Mapping type
+                          "01"                 // Mapping type
                           "0160D4B3"           // Mapping ID
                           "536f63636572",      // Hex encoded string
                 .nMType = 1,
@@ -338,7 +338,7 @@ const mapping_test cm_tests[] = {
                 .opCode = "425458"
                           "01"
                           "01"
-                          "00000002"
+                          "02"
                           "00007FFE"
                           "526f756e642031",
                 .nMType = 2,
@@ -349,7 +349,7 @@ const mapping_test cm_tests[] = {
                 .opCode = "425458"
                           "01"
                           "01"
-                          "00000003"
+                          "03"
                           "02A65A08"
                           "4c69766572706f6f6c",
                 .nMType = 3,
@@ -360,7 +360,7 @@ const mapping_test cm_tests[] = {
                 .opCode = "425458"
                           "01"
                           "01"
-                          "00000004"
+                          "04"
                           "FFFFFFFF"
                           "576f726c64204375702032303138",
                 .nMType = 4,

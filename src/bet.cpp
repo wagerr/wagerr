@@ -562,12 +562,12 @@ bool CMapping::FromOpCode(std::string opCode, CMapping &cm)
         return false;
     }
 
-    cm.nMType = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
-    cm.nId    = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+    cm.nMType = (unsigned char) opCode[5];
+    cm.nId    = FromChars(opCode[6], opCode[7], opCode[8], opCode[9]);
 
     // Decode the the rest of the mapping OP Code to get the name.
     std::string name;
-    int nextOpIndex = 13;
+    int nextOpIndex = 10;
 
     while (opCode[nextOpIndex]) {
         unsigned char chr = opCode[nextOpIndex];
