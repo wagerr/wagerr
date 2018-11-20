@@ -93,7 +93,7 @@ public:
 typedef std::map<uint32_t, CPeerlessEvent> eventIndex_t;
 
 // Global variable that stores the current live Wagerr events.
-eventIndex_t eventIndex;
+static eventIndex_t eventIndex;
 
 class CPeerlessBet
 {
@@ -222,10 +222,10 @@ public:
 typedef std::map<uint32_t, CMapping> mappingIndex_t;
 
 // Global variables that stores the different Wagerr mappings.
-mappingIndex_t mSportsIndex;
-mappingIndex_t mRoundsIndex;
-mappingIndex_t mTeamNamesIndex;
-mappingIndex_t mTournamentsIndex;
+static mappingIndex_t mSportsIndex;
+static mappingIndex_t mRoundsIndex;
+static mappingIndex_t mTeamNamesIndex;
+static mappingIndex_t mTournamentsIndex;
 
 class CMappingDB
 {
