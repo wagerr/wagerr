@@ -388,6 +388,9 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "listevents", &listevents, false, false, false},
         {"wagerr", "listchaingamesevents", &listchaingamesevents, false, false, false},
         {"wagerr", "placechaingamesbet", &placechaingamesbet, false, false, true},
+        {"wagerr", "getmappingid", &getmappingid, false, false, true},
+        {"wagerr", "getmappingname", &getmappingname, false, false, true},
+
 
 #ifdef ENABLE_WALLET
         /* Wallet */
