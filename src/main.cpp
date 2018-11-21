@@ -2826,9 +2826,6 @@ static int64_t nTimeTotal = 0;
 
 bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool fJustCheck, bool fAlreadyChecked)
 {
-
-    //std::vector<CTxOut> GetBetPayouts();
-
     AssertLockHeld(cs_main);
     // Check it again in case a previous version let a bad block in
     if (!fAlreadyChecked && !CheckBlock(block, state, !fJustCheck, !fJustCheck))
@@ -3048,10 +3045,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         nExpectedMint += nFees;
 
     // Calculate the expected bet payouts.
-    std::vector<CTxOut> vExpectedPayouts;
+    std::vector<CTxOut> vExpectedAllPayouts;
+    std::vector<CTxOut> vExpectedPLPayouts;
     std::vector<CTxOut> vExpectedCGLottoPayouts;
-    if( pindex->nHeight > Params().BetStartHeight()) {
 
+    if( pindex->nHeight > Params().BetStartHeight()) {
         std::string strBetNetBlockTxt;
         std::ostringstream BetNetBlockTxt;
         std::ostringstream BetNetExpectedTxt;
@@ -3074,20 +3072,15 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 	    //const char * BetNetBlockTxtConst = strBetNetBlockTmp.c_str();
         //const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
 
-        //printf(BetNetBlockTxtConst, (pindex->nHeight));
-
-        vExpectedPayouts = GetBetPayouts(pindex->nHeight - 1);
-        nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
-        nExpectedMint += nMNBetReward;
-
-        // TODO this needs to be updated so both the events and chain games can be paid out in the same block.
+        vExpectedPLPayouts = GetBetPayouts(pindex->nHeight - 1);
         vExpectedCGLottoPayouts = GetCGLottoBetPayouts(pindex->nHeight - 1);
-        
-        /*
-        for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
-            printf(BetNetExpectedTxtConst, vExpectedPayouts[l].ToString().c_str());
-        }
-        */
+
+        // Merge vectors into single payout vector.
+        vExpectedAllPayouts = vExpectedPLPayouts;
+        vExpectedAllPayouts.insert(vExpectedAllPayouts.end(), vExpectedCGLottoPayouts.begin(), vExpectedCGLottoPayouts.end());
+
+        nExpectedMint += GetBlockPayouts(vExpectedAllPayouts, nMNBetReward);
+        nExpectedMint += nMNBetReward;
     }
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
@@ -3108,10 +3101,13 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
     }
 
-    if (!IsBlockPayoutsValid(vExpectedPayouts, block))
+    if (!IsBlockPayoutsValid(vExpectedAllPayouts, block))
         return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
 
-    vExpectedPayouts.clear();
+    // Clear all the payout vectors.
+    vExpectedAllPayouts.clear();
+    vExpectedPLPayouts.clear();
+    vExpectedCGLottoPayouts.clear();
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().Zerocoin_Block_V2_Start()));
