@@ -4756,59 +4756,68 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
     bool eiUpdated = false;
     // Look through the block for any events, results or mapping TX.
     BOOST_FOREACH (CTransaction& tx, block.vtx) {
-        for (unsigned int i = 0; i < tx.vout.size(); i++) {
-            const CTxOut& txout = tx.vout[i];
-            std::string s = txout.scriptPubKey.ToString();
 
-            if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
-                vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
-                std::string opCode(v.begin(), v.end());
+        // Ensure the event TX has come from Oracle wallet.
+        const CTxIn &txin = tx.vin[0];
+        bool validOracleTx = IsValidOracleTx(txin);
 
-                // If events found in block add them to the events index.
-                CPeerlessEvent plEvent;
-                if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
-                    eventIndex.insert(std::make_pair(plEvent.nEventId, plEvent));
-                    eiUpdated = true;
-                }
+        // If a valid OMNO transaction.
+        if (validOracleTx) {
 
-                // If results found in block remove event from event index.
-                CPeerlessResult plResult;
-                if (CPeerlessResult::FromOpCode(opCode, plResult)) {
-                    eventIndex.erase(plResult.nEventId);
-                    eiUpdated = true;
-                }
+            for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                const CTxOut& txout = tx.vout[i];
+                std::string s = txout.scriptPubKey.ToString();
 
-                // If mapping found then add it to the relating map index and write the map index to disk.
-                CMapping cMapping;
-                if (CMapping::FromOpCode(opCode, cMapping)) {
-                    if (cMapping.nMType == sportMapping) {
-                        CMappingDB mdb("sports.dat");
-                        mSportsIndex.insert(std::make_pair(cMapping.nId, cMapping));
-                        mdb.Write(mSportsIndex, block.GetHash());
+                if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+                    vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
+                    std::string opCode(v.begin(), v.end());
+
+                    // If events found in block add them to the events index.
+                    CPeerlessEvent plEvent;
+                    if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
+                        eventIndex.insert(std::make_pair(plEvent.nEventId, plEvent));
+                        eiUpdated = true;
                     }
-                    else if (cMapping.nMType == roundMapping) {
-                        CMappingDB mdb("rounds.dat");
-                        mRoundsIndex.insert(std::make_pair(cMapping.nId, cMapping));
-                        mdb.Write(mRoundsIndex, block.GetHash());
+
+                    // If results found in block remove event from event index.
+                    CPeerlessResult plResult;
+                    if (CPeerlessResult::FromOpCode(opCode, plResult)) {
+                        eventIndex.erase(plResult.nEventId);
+                        eiUpdated = true;
                     }
-                    else if (cMapping.nMType == teamMapping) {
-                        CMappingDB mdb("teamnames.dat");
-                        mTeamNamesIndex.insert(std::make_pair(cMapping.nId, cMapping));
-                        mdb.Write(mTeamNamesIndex, block.GetHash());
-                    }
-                    else if (cMapping.nMType == tournamentMapping) {
-                        CMappingDB mdb("tournaments.dat");
-                        mTournamentsIndex.insert(std::make_pair(cMapping.nId, cMapping));
-                        mdb.Write(mTournamentsIndex, block.GetHash());
+
+                    // If mapping found then add it to the relating map index and write the map index to disk.
+                    CMapping cMapping;
+                    if (CMapping::FromOpCode(opCode, cMapping)) {
+                        if (cMapping.nMType == sportMapping) {
+                            CMappingDB mdb("sports.dat");
+                            mSportsIndex.insert(std::make_pair(cMapping.nId, cMapping));
+                            mdb.Write(mSportsIndex, block.GetHash());
+                        }
+                        else if (cMapping.nMType == roundMapping) {
+                            CMappingDB mdb("rounds.dat");
+                            mRoundsIndex.insert(std::make_pair(cMapping.nId, cMapping));
+                            mdb.Write(mRoundsIndex, block.GetHash());
+                        }
+                        else if (cMapping.nMType == teamMapping) {
+                            CMappingDB mdb("teamnames.dat");
+                            mTeamNamesIndex.insert(std::make_pair(cMapping.nId, cMapping));
+                            mdb.Write(mTeamNamesIndex, block.GetHash());
+                        }
+                        else if (cMapping.nMType == tournamentMapping) {
+                            CMappingDB mdb("tournaments.dat");
+                            mTournamentsIndex.insert(std::make_pair(cMapping.nId, cMapping));
+                            mdb.Write(mTournamentsIndex, block.GetHash());
+                        }
                     }
                 }
             }
-        }
 
-        // Write event index to events.dat file only if it has been updated.
-        if (eiUpdated) {
-            CEventDB pedb;
-            pedb.Write(eventIndex, block.GetHash());
+            // Write event index to events.dat file only if it has been updated.
+            if (eiUpdated) {
+                CEventDB pedb;
+                pedb.Write(eventIndex, block.GetHash());
+            }
         }
     }
 
