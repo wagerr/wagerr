@@ -441,30 +441,27 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             }
         }
         else {
-
-            std::vector<CTxOut> voutPayouts;
-            std::vector<CTxOut> vExpectedCGLottoPayouts;
+            // Calculate the bet payouts.
+            std::vector<CTxOut> vAllPayouts;
+            std::vector<CTxOut> vPLPayouts;
+            std::vector<CTxOut> vCGLottoPayouts;
             CAmount nMNBetReward = 0;
 
             if( nHeight > Params().BetStartHeight()) {
-                //printf("\nMINER BLOCK: %i \n", nHeight);
+                vPLPayouts = GetBetPayouts(nHeight - 1);
+                vCGLottoPayouts = GetCGLottoBetPayouts(nHeight - 1);
 
-                voutPayouts = GetBetPayouts(nHeight - 1);
-                GetBlockPayouts(voutPayouts, nMNBetReward);
+                // Merge vectors into single payout vector.
+                vAllPayouts = vPLPayouts;
+                vAllPayouts.insert(vAllPayouts.end(), vCGLottoPayouts.begin(), vCGLottoPayouts.end());
 
-                // TODO this needs to be updated so both the events and chain games can be paid out in the same block.
-                vExpectedCGLottoPayouts = GetCGLottoBetPayouts(nHeight - 1);
-
-                /*
-                for (unsigned int l = 0; l < voutPayouts.size(); l++) {
-                    printf("MINER EXPECTED: %s \n", voutPayouts[l].ToString().c_str());
-                }
-                */
+                // Get the total amount of WGR that needs to be minted to payout all bets.
+                GetBlockPayouts(vAllPayouts, nMNBetReward);
             }
 
             // Fill coin stake transaction.
             // pwallet->FillCoinStake(txCoinStake, nMNBetReward, voutPayouts); // Kokary: add betting fee
-            if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, voutPayouts, stakeInput)) {
+            if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, vAllPayouts, stakeInput)) {
                 LogPrintf("%s: filled coin stake tx [%s]\n", __func__, txCoinStake.ToString());
             }
             else {
@@ -474,7 +471,11 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
             // Sign with updated tx.
             // pwallet->SignCoinStake(txCoinStake, vwtxPrev);
-            voutPayouts.clear();
+
+            // Clear all vectors after a payout.
+            vAllPayouts.clear();
+            vPLPayouts.clear();
+            vCGLottoPayouts.clear();
         }
 
         nLastBlockTx = nBlockTx;
