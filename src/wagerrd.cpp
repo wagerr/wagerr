@@ -107,6 +107,14 @@ bool AppInit(int argc, char* argv[])
             return false;
         }
 
+        // We require `-devnet` to be used with `-testnet` because using the
+        // `-devnet` flag when running on mainnet has the potential to get the
+        // node banned, due to incorrect knowledge about its own synced status.
+        if (GetBoolArg("-devnet", false) && !GetBoolArg("-testnet", false)) {
+            fprintf(stderr, "Error: -devnet requires -testnet.\n");
+            return false;
+        }
+
         // parse masternode.conf
         std::string strErr;
         if (!masternodeConfig.read(strErr)) {

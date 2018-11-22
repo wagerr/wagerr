@@ -538,6 +538,9 @@ std::string HelpMessage(HelpMessageMode mode)
         strUsage += HelpMessageOpt("-regtest", _("Enter regression test mode, which uses a special chain in which blocks can be solved instantly.") + " " +
             _("This is intended for regression testing tools and app development.") + " " +
             _("In this mode -genproclimit controls how many blocks are generated immediately."));
+        strUsage += HelpMessageOpt("-devnet", _("Enter devnet mode, which is used to bootstrap a development network.") + " " +
+            _("This makes a node believe that it is downloading its initial blockchain, and that it is fully synced, which allows it to start staking.") + " " +
+            _("This must be used with -testnet."));
     }
     strUsage += HelpMessageOpt("-shrinkdebugfile", _("Shrink debug.log file on client startup (default: 1 when no -debug)"));
     strUsage += HelpMessageOpt("-testnet", _("Use the test network"));
