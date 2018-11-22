@@ -42,7 +42,7 @@ bool IsValidOracleTx(const CTxIn &txin)
     CTransaction txPrev;
     if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
 
-        const CTxOut &prevTxOut = txPrev.vout[0];
+        const CTxOut &prevTxOut = txPrev.vout[prevout.n];
         std::string scriptPubKey = prevTxOut.scriptPubKey.ToString();
 
         txnouttype type;
