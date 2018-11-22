@@ -843,7 +843,7 @@ UniValue placebet(const UniValue& params, bool fHelp)
     // blockchain incorrectly if its length is less than 5. This behaviour would
     // ideally be investigated and corrected/justified when time allows.
     std::string opCode;
-    plBet.ToOpCode(plBet, opCode);
+    CPeerlessBet::ToOpCode(plBet, opCode);
     SendMoney(address.Get(), nAmount, wtx, false, opCode);
 
     return wtx.GetHash().GetHex();
@@ -893,7 +893,7 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
     CChainGamesBet cgBet(eventId);
 
     std::string opCode;
-    plBet.ToOpCode(cgBet, opCode);
+    CChainGamesBet::ToOpCode(cgBet, opCode);
 
     // Process transaction
     SendMoney(address.Get(), nAmount, wtx, false, opCode);
