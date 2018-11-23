@@ -130,7 +130,6 @@ public:
     int Zerocoin_AccumulationStartHeight() const { return nZerocoinAccumulationStartHeight; }
 
     /** Betting on blockchain **/
-    std::string OpCodeProtocolVersion() const { return strOpCodeProtocolVersion; }
     std::string OracleWalletAddr() const { return strOracleWalletAddr; }
     int BetBlocksIndexTimespan() const { return nBetBlocksIndexTimespan; }
     int BetStartHeight() const { return nBetStartHeight; }
@@ -141,13 +140,6 @@ public:
     int OddsDivisor() const { return nOddsDivisor; }
     int BetXPermille() const { return nBetXPermille; }
     int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; }
-    std::string EventTxType() const { return strEventTxType; }
-    std::string BetTxType() const { return strBetTxType; }
-    std::string ResultTxType() const { return strResultTxType; }
-    std::string RefundTxType() const { return strRefundTxType; }
-    std::string CGLottoEventTxType() const { return strCGLottoEventTxType; }
-    std::string CGLottoBetTxType() const { return strCGLottoBetTxType; }
-    std::string CGLottoResultTxType() const { return strCGLottoResultTxType; }
     int MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
     int MinBetPayoutRange() const { return nMinBetPayoutRange; }
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
@@ -226,14 +218,6 @@ protected:
     int nOddsDivisor;
     int nBetXPermille;
     int nBetBlockPayoutAmount;
-    std::string strOpCodeProtocolVersion;
-    std::string strEventTxType;
-    std::string strBetTxType;
-    std::string strResultTxType;
-    std::string strRefundTxType;
-    std::string strCGLottoEventTxType;                                    
-    std::string strCGLottoBetTxType;                                      
-    std::string strCGLottoResultTxType;                                   
     int nMinBetPayoutRange;
     int nMaxBetPayoutRange;
     int nBetPlaceTimeoutBlocks;
