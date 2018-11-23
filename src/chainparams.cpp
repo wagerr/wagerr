@@ -161,7 +161,6 @@ public:
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
         /** Bet related parameters **/
-        strOpCodeProtocolVersion = "1.0";                               // Betting OP Code protocol version number.
         nBetStartHeight = 298386;                                       // The block that betting protocols become active.
         strOracleWalletAddr = "WWxqQtNnkYkde5UkmjF42VK7aGtkANPt4K";     // Oracle Masternode Event & Result Posting Wallet Address.
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
@@ -172,13 +171,6 @@ public:
         nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
         nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        strEventTxType = "1";                                           // Event transaction type ID.
-        strBetTxType = "2";                                             // Bet transaction type ID.
-        strResultTxType = "3";                                          // Result transaction type ID.
-        strRefundTxType = "4";                                          // Refund bets transaction type ID.
-        strCGLottoEventTxType = "5";                                    // Chain game Lotto event transaction type ID
-        strCGLottoBetTxType = "6";                                      // Chain game Lotto bet transaction type ID
-        strCGLottoResultTxType = "7";                                   // Chain game Lotto result transaction type ID
         nMinBetPayoutRange = 50;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 50 - 10000 WRG inclusive).
         nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 50 - 10000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 1200;                                  // Discard bets placed less than 1200 seconds (approx. 20 mins) before event start time
@@ -311,7 +303,6 @@ public:
         nZerocoinStartHeight = 50;            // Start accumulation coins here - first zerocoin mint occurs at block 87
 
         /** Bet related parameters **/
-        strOpCodeProtocolVersion = "1.0";                               // Betting OP Code protocol version number (Testnet).
         nBetStartHeight = 26150;                                        // The block that betting protocols become active (Testnet).
         strOracleWalletAddr = "TEbJasoZZKVFiTB9VGj77JW37Nmakb5C4i";     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
@@ -322,13 +313,6 @@ public:
         nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
         nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        strEventTxType = "1";                                           // Event transaction type ID.
-        strBetTxType = "2";                                             // Bet transaction type ID.
-        strResultTxType = "3";                                          // Result transaction type ID.
-        strRefundTxType = "4";                                          // Refund bets transaction type ID.
-        strCGLottoEventTxType = "5";                                    // Chain game Lotto event transaction type ID
-        strCGLottoBetTxType = "6";                                      // Chain game Lotto bet transaction type ID
-        strCGLottoResultTxType = "7";                                   // Chain game Lotto result transaction type ID
         nMinBetPayoutRange = 50;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 50 - 10000 WRG inclusive).
         nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 50 - 10000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 1200;                                  // Discard bets placed less than 1200 seconds (approx. 20 mins) before event start time,

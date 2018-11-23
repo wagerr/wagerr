@@ -408,7 +408,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                     std::vector<std::string> strs;
                     boost::split(strs, evtDescr, boost::is_any_of("|"));
 
-                    if (strs.size() != 11 || strs[0] != Params().EventTxType() || strs[1] != Params().OpCodeProtocolVersion() ) {
+                    if (strs.size() != 11 ) {
                         continue;
                     }
 
