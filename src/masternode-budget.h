@@ -368,8 +368,8 @@ public:
         return true;
     }
 
-    //check to see if we should vote on this
-    void AutoCheck();
+    // Verify and vote on finalized budget
+    void CheckAndVote();
     //total wagerr paid out by this budget
     CAmount GetTotalPayout();
     //vote on this finalized budget as a masternode
@@ -525,7 +525,7 @@ public:
 
     void CleanAndRemove(bool fSignatureCheck);
 
-    uint256 GetHash()
+    uint256 GetHash() const
     {
         CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
         ss << strProposalName;
