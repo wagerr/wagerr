@@ -4638,14 +4638,14 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                     // If events found in block add them to the events index.
                     CPeerlessEvent plEvent;
                     if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
-                        eventIndex.insert(std::make_pair(plEvent.nEventId, plEvent));
+                        CEventDB::AddEvent(plEvent);
                         eiUpdated = true;
                     }
 
                     // If results found in block remove event from event index.
                     CPeerlessResult plResult;
                     if (CPeerlessResult::FromOpCode(opCode, plResult)) {
-                        eventIndex.erase(plResult.nEventId);
+                        CEventDB::RemoveEvent(plEvent);
                         eiUpdated = true;
                     }
 
@@ -4653,24 +4653,32 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                     CMapping cMapping;
                     if (CMapping::FromOpCode(opCode, cMapping)) {
                         if (cMapping.nMType == sportMapping) {
+                            CMappingDB::AddSport(cMapping);
+
+                            mappingIndex_t sportsIndex;
                             CMappingDB mdb("sports.dat");
-                            mSportsIndex.insert(std::make_pair(cMapping.nId, cMapping));
-                            mdb.Write(mSportsIndex, block.GetHash());
+                            mdb.Write(sportsIndex, block.GetHash());
                         }
                         else if (cMapping.nMType == roundMapping) {
+                            CMappingDB::AddRound(cMapping);
+
+                            mappingIndex_t roundsIndex;
                             CMappingDB mdb("rounds.dat");
-                            mRoundsIndex.insert(std::make_pair(cMapping.nId, cMapping));
-                            mdb.Write(mRoundsIndex, block.GetHash());
+                            mdb.Write(roundsIndex, block.GetHash());
                         }
                         else if (cMapping.nMType == teamMapping) {
-                            CMappingDB mdb("teamnames.dat");
-                            mTeamNamesIndex.insert(std::make_pair(cMapping.nId, cMapping));
-                            mdb.Write(mTeamNamesIndex, block.GetHash());
+                            CMappingDB::AddTeam(cMapping);
+
+                            mappingIndex_t teamsIndex;
+                            CMappingDB mdb("teams.dat");
+                            mdb.Write(teamsIndex, block.GetHash());
                         }
                         else if (cMapping.nMType == tournamentMapping) {
+                            CMappingDB::AddTournament(cMapping);
+
+                            mappingIndex_t tournamentsIndex;
                             CMappingDB mdb("tournaments.dat");
-                            mTournamentsIndex.insert(std::make_pair(cMapping.nId, cMapping));
-                            mdb.Write(mTournamentsIndex, block.GetHash());
+                            mdb.Write(tournamentsIndex, block.GetHash());
                         }
                     }
                 }
@@ -4678,8 +4686,10 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
 
             // Write event index to events.dat file only if it has been updated.
             if (eiUpdated) {
-                CEventDB pedb;
-                pedb.Write(eventIndex, block.GetHash());
+                CEventDB edb;
+                eventIndex_t eventIndex;
+                edb.GetEvents(eventIndex);
+                edb.Write(eventIndex, block.GetHash());
             }
         }
     }

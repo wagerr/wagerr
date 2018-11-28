@@ -52,19 +52,23 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
 
     // Select the map we want to look up based on user input.
     if (mIndex == "sports") {
-        mappingIndex = mSportsIndex;
+        CMappingDB cmdb("sports.dat");
+        cmdb.GetSports(mappingIndex);
         type = sportMapping;
     }
     else if (mIndex == "rounds") {
-        mappingIndex = mRoundsIndex;
+        CMappingDB cmdb("rounds.dat");
+        cmdb.GetRounds(mappingIndex);
         type = roundMapping;
     }
     else if (mIndex == "teamnames") {
-        mappingIndex = mTeamNamesIndex;
+        CMappingDB cmdb("teams.dat");
+        cmdb.GetTeams(mappingIndex);
         type = teamMapping;
     }
     else if (mIndex == "tournaments") {
-        mappingIndex = mTournamentsIndex;
+        CMappingDB cmdb("tournaments.dat");
+        cmdb.GetTournaments(mappingIndex);
         type = tournamentMapping;
     }
     else{
@@ -92,17 +96,19 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
         cm.nId = newId;
         cm.sName = name;
 
+        CMappingDB cmdb;
+
         if (mIndex == "sports") {
-            mSportsIndex.insert(std::make_pair(cm.nId, cm));
+            cmdb.AddSport(cm);
         }
         else if (mIndex == "rounds") {
-            mRoundsIndex.insert(std::make_pair(cm.nId, cm));
+            cmdb.AddRound(cm);
         }
         else if (mIndex == "teamnames") {
-            mTeamNamesIndex.insert(std::make_pair(cm.nId, cm));
+            cmdb.AddTeam(cm);
         }
         else if (mIndex == "tournaments") {
-            mTournamentsIndex.insert(std::make_pair(cm.nId, cm));
+            cmdb.AddTournament(cm);
         }
 
         mapping.push_back(Pair("mapping-id",  (uint64_t) newId));
@@ -148,25 +154,30 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
     bool mappingFound = false;
     uint32_t type = 0;
     mappingIndex_t mappingIndex;
+    CMappingDB cmdb;
 
     UniValue ret(UniValue::VARR);
     UniValue mapping(UniValue::VOBJ);
 
     // Select the map we want to look up based on user input.
     if (mIndex == "sports") {
-        mappingIndex = mSportsIndex;
+        CMappingDB cmdb("sports.dat");
+        cmdb.GetSports(mappingIndex);
         type = sportMapping;
     }
     else if (mIndex == "rounds") {
-        mappingIndex = mRoundsIndex;
+        CMappingDB cmdb("rounds.dat");
+        cmdb.GetRounds(mappingIndex);
         type = roundMapping;
     }
     else if (mIndex == "teamnames") {
-        mappingIndex = mTeamNamesIndex;
+        CMappingDB cmdb("teams.dat");
+        cmdb.GetTeams(mappingIndex);
         type = teamMapping;
     }
     else if (mIndex == "tournaments") {
-        mappingIndex = mTournamentsIndex;
+        CMappingDB cmdb("tournaments.dat");
+        cmdb.GetTournaments(mappingIndex);
         type = tournamentMapping;
     }
     else{

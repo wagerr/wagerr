@@ -99,9 +99,6 @@ public:
 // Define new map type to store Wagerr events.
 typedef std::map<uint32_t, CPeerlessEvent> eventIndex_t;
 
-// Global variable that stores the current live Wagerr events.
-static eventIndex_t eventIndex;
-
 class CPeerlessBet
 {
 public:
@@ -228,14 +225,15 @@ public:
 // Define new map type to store Wagerr mappings.
 typedef std::map<uint32_t, CMapping> mappingIndex_t;
 
-// Global variables that stores the different Wagerr mappings.
-static mappingIndex_t mSportsIndex;
-static mappingIndex_t mRoundsIndex;
-static mappingIndex_t mTeamNamesIndex;
-static mappingIndex_t mTournamentsIndex;
-
 class CMappingDB
 {
+protected:
+    // Global variables that stores the different Wagerr mappings.
+    static mappingIndex_t mSportsIndex;
+    static mappingIndex_t mRoundsIndex;
+    static mappingIndex_t mTeamsIndex;
+    static mappingIndex_t mTournamentsIndex;
+
 private:
     std::string mDBFileName;
     boost::filesystem::path mFilePath;
@@ -249,10 +247,30 @@ public:
 
     bool Write(const mappingIndex_t& mappingIndex,  uint256 latestBlockHash);
     bool Read(mappingIndex_t& mappingIndex, uint256& lastBlockHash);
+
+    static void GetSports(mappingIndex_t &sportsIndex);
+    static void SetSports(const mappingIndex_t &sportsIndex);
+    static void AddSport(CMapping sm);
+
+    static void GetRounds(mappingIndex_t &roundsIndex);
+    static void SetRounds(const mappingIndex_t &roundsIndex);
+    static void AddRound(CMapping rm);
+
+    static void GetTeams(mappingIndex_t &teamsIndex);
+    static void SetTeams(const mappingIndex_t &teamsIndex);
+    static void AddTeam(CMapping ts);
+
+    static void GetTournaments(mappingIndex_t &tournamentsIndex);
+    static void SetTournaments(const mappingIndex_t &tournamentsIndex);
+    static void AddTournament(CMapping ts);
 };
 
 class CEventDB
 {
+protected:
+    // Global variable that stores the current live Wagerr events.
+    static eventIndex_t eventsIndex;
+
 private:
     boost::filesystem::path pathEvents;
 
@@ -262,6 +280,12 @@ public:
 
     bool Write(const eventIndex_t& eventIndex,  uint256 latestProcessedBlock);
     bool Read(eventIndex_t& eventIndex, uint256& lastBlockHash);
+
+    static void GetEvents(eventIndex_t &eventIndex);
+    static void SetEvents(const eventIndex_t &eventIndex);
+
+    static void AddEvent(CPeerlessEvent pe);
+    static void RemoveEvent(CPeerlessEvent pe);
 };
 
 /** Find peerless events. **/
