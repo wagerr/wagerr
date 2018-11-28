@@ -387,6 +387,8 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "getpoolinfo", &getpoolinfo, true, true, false},
         {"wagerr", "listevents", &listevents, false, false, false},
         {"wagerr", "listchaingamesevents", &listchaingamesevents, false, false, false},
+        {"wagerr", "listchaingamesbets", &listchaingamesbets, false, false, false},
+        {"wagerr", "getchaingamesinfo", &getchaingamesinfo, false, false, false},
         {"wagerr", "placechaingamesbet", &placechaingamesbet, false, false, true},
         {"wagerr", "getmappingid", &getmappingid, false, false, true},
         {"wagerr", "getmappingname", &getmappingname, false, false, true},
