@@ -700,6 +700,132 @@ CMappingDB::CMappingDB(std::string fileName)
     mFilePath   = GetDataDir() / fileName;
 }
 
+/** Global mapping indexes to store sports, rounds, team names and tournaments. **/
+mappingIndex_t CMappingDB::mSportsIndex;
+mappingIndex_t CMappingDB::mRoundsIndex;
+mappingIndex_t CMappingDB::mTeamsIndex;
+mappingIndex_t CMappingDB::mTournamentsIndex;
+
+/**
+ * Returns then global sports index.
+ *
+ * @param sportsIndex
+ */
+void CMappingDB::GetSports(mappingIndex_t &sportsIndex)
+{
+    sportsIndex = mSportsIndex;
+}
+
+/**
+ * Set the current sports index.
+ *
+ * @param sportsIndex
+ */
+void CMappingDB::SetSports(const mappingIndex_t &sportsIndex)
+{
+    mSportsIndex = sportsIndex;
+}
+
+/**
+ * Add a sport to the sports index.
+ *
+ * @param sm  Sport mapping object.
+ */
+void CMappingDB::AddSport(const CMapping sm)
+{
+    mSportsIndex.insert(make_pair(sm.nId, sm));
+}
+
+/**
+ * Return the current rounds index.
+ *
+ * @param roundsIndex  Rounds mapping index.
+ */
+void CMappingDB::GetRounds(mappingIndex_t &roundsIndex)
+{
+    roundsIndex = mRoundsIndex;
+}
+
+/**
+ * Set the current rounds index.
+ *
+ * @param roundsIndex  Rounds mapping index.
+ */
+void CMappingDB::SetRounds(const mappingIndex_t &roundsIndex)
+{
+    mRoundsIndex = roundsIndex;
+}
+
+/**
+ * Add a round object to the rounds index.
+ *
+ * @param rm  Rounds mapping object.
+ */
+void CMappingDB::AddRound(const CMapping rm)
+{
+    mRoundsIndex.insert(make_pair(rm.nId, rm));
+}
+
+/**
+ * Returns the current teams index.
+ *
+ * @param teamsIndex  Teams mapping index.
+ */
+void CMappingDB::GetTeams(mappingIndex_t &teamsIndex)
+{
+    teamsIndex = mTeamsIndex;
+}
+
+/**
+ * Set the current teams index.
+ *
+ * @param teamsIndex  Teams mapping object.
+ */
+void CMappingDB::SetTeams(const mappingIndex_t &teamsIndex)
+{
+    mTeamsIndex = teamsIndex;
+}
+
+/**
+ * Add a team object to the teams index.
+ *
+ * @param tm Teams mapping object.
+ */
+void CMappingDB::AddTeam(const CMapping tm)
+{
+    mTeamsIndex.insert(make_pair(tm.nId, tm));
+}
+
+/**
+ * Return the current tournaments index.
+ *
+ * @param tournamentsIndex  Tournaments mapping index.
+ */
+void CMappingDB::GetTournaments(mappingIndex_t &tournamentsIndex)
+{
+    tournamentsIndex = mTournamentsIndex;
+}
+
+/**
+ * Set the current tournaments index.
+ *
+ * @param tournamentsIndex  Tournaments mapping index.
+ */
+void CMappingDB::SetTournaments(const mappingIndex_t &tournamentsIndex)
+{
+    mTournamentsIndex = tournamentsIndex;
+}
+
+/**
+ * Adds a tournament object to the tournaments index.
+ *
+ * @param tm Tournament mapping object.
+ */
+void CMappingDB::AddTournament(const CMapping tm)
+{
+    mTournamentsIndex.insert(make_pair(tm.nId, tm));
+}
+
 /**
  * Serialise a mapping index map into binary format and write to the related .dat file.
  *
@@ -812,6 +938,49 @@ CEventDB::CEventDB()
     pathEvents = GetDataDir() / "events.dat";
 }
 
+/** The global events index. **/
+eventIndex_t CEventDB::eventsIndex;
+
+/**
+ * Returns the current events list.
+ *
+ * @param eventIndex
+ */
+void CEventDB::GetEvents(eventIndex_t &eventIndex)
+{
+    eventIndex = eventsIndex;
+}
+
+/**
+ * Set the events list.
+ *
+ * @param eventIndex
+ */
+void CEventDB::SetEvents(const eventIndex_t &eventIndex)
+{
+    eventsIndex = eventIndex;
+}
+
+/**
+ * Add a new event to the event index.
+ *
+ * @param pe CPeerless Event object.
+ */
+void CEventDB::AddEvent(CPeerlessEvent pe)
+{
+    eventsIndex.insert(make_pair(pe.nEventId, pe));
+}
+
+/**
+ * Remove and event from the event index.
+ *
+ * @param pe
+ */
+void CEventDB::RemoveEvent(CPeerlessEvent pe)
+{
+    eventsIndex.erase(pe.nEventId);
+}
+
 /**
  * Serialises the event index map into binary format and writes to the events.dat file.
  *
@@ -862,7 +1031,8 @@ bool CEventDB::Write(const eventIndex_t& eventIndex, uint256 latestBlockHash)
 }
 
 /**
- * Reads the events.dat file and deserializes the data to recreate event index map object as well as the last block hash before file was written to.
+ * Reads the events.dat file and deserializes the data to recreate event index map object as well as the last
+ * block hash before file was written to.
  *
  * @param eventIndex The event index map which will be populated with data from the file.
  * @return           Bool
@@ -917,7 +1087,7 @@ bool CEventDB::Read(eventIndex_t& eventIndex, uint256& lastBlockHash)
 }
 
 /**
- * Check a given block to see if it contains a betting result TX.
+ * Check a given block to see if it contains a Peerless result TX.
  *
  * @return results vector.
  */
@@ -971,7 +1141,7 @@ std::vector<CPeerlessResult> getEventResults( int height ) {
 }
 
 /**
- * Creates the bet payout vector for all winning bets.
+ * Creates the bet payout vector for all winning CPeerless bets.
  *
  * @return payout vector.
  */
@@ -1153,7 +1323,7 @@ std::vector<CTxOut> GetBetPayouts(int height) {
 /**
  * Checks a given block for any Chain Games results.
  *
- * @param height The block we want to check for the
+ * @param height The block we want to check for the result.
  * @return results array.
  */
 std::pair<std::vector<CChainGamesEvent>,std::vector<std::string>> getCGLottoEventResults(int height)

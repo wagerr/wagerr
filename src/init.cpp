@@ -200,26 +200,51 @@ void PrepareShutdown()
     // then a lock mechanism will have to be implemented to ensure we don't
     // corrupt any .dat when we want the write to it.
     // Get the latest block hash.
-    CBlockIndex *blockIndex = NULL;
-    blockIndex = chainActive[chainActive.Height()];
+    CBlockIndex *blockIndex = chainActive[chainActive.Height()];
 
     CBlock block;
     ReadBlockFromDisk(block, blockIndex);
-    uint256 latestBlockHash = block.GetHash();
+    uint256 lastBlockHash = block.GetHash();
 
-    // Write the event index to disk.
-    CEventDB pedb;
-    pedb.Write(eventIndex, latestBlockHash);
+    // Write the events index to disk.
+    eventIndex_t eventIndex;
+    CEventDB::GetEvents(eventIndex);
+    CEventDB edb;
 
-    // Write the mapping indexes to disk.
-    CMappingDB cmSportsDb("sports.dat");
-    cmSportsDb.Write(mSportsIndex, latestBlockHash);
-    CMappingDB cmRoundsDb("rounds.dat");
-    cmRoundsDb.Write(mRoundsIndex, latestBlockHash);
-    CMappingDB cmTeamsDb("teamnames.dat");
-    cmTeamsDb.Write(mTeamNamesIndex, latestBlockHash);
-    CMappingDB cmTournamentsDb("tournaments.dat");
-    cmTournamentsDb.Write(mTournamentsIndex, latestBlockHash);
+    if (!edb.Write(eventIndex, lastBlockHash))
+        LogPrintf("Failed to write to the events.dat\n");
+
+    // Write the sports mapping index to sports.dat.
+    mappingIndex_t sportsIndex;
+    CMappingDB msdb("sports.dat");
+    msdb.GetSports(sportsIndex);
+
+    if (!msdb.Write(sportsIndex, lastBlockHash))
+        LogPrintf("Failed to write to the sports.dat\n");
+
+    // Write the rounds mapping index to rounds.dat.
+    mappingIndex_t roundsIndex;
+    CMappingDB mrdb("rounds.dat");
+    mrdb.GetRounds(roundsIndex);
+
+    if (!mrdb.Write(roundsIndex, lastBlockHash))
+        LogPrintf("Failed to write to the rounds.dat\n");
+
+    // Write the teams mapping index to teams.dat.
+    mappingIndex_t teamsIndex;
+    CMappingDB mtdb("teams.dat");
+    mtdb.GetTeams(teamsIndex);
+
+    if (!mtdb.Write(teamsIndex, lastBlockHash))
+        LogPrintf("Failed to write to the teams.dat\n");
+
+    // Write the tournaments mapping index to tournaments.dat.
+    mappingIndex_t tournamentsIndex;
+    CMappingDB mtodb("tournaments.dat");
+    mtodb.GetTournaments(tournamentsIndex);
+
+    if (!mtodb.Write(tournamentsIndex, lastBlockHash))
+        LogPrintf("Failed to write to the tournaments.dat\n");
 
     /// Note: Shutdown() must be able to handle cases in which AppInit2() failed part of the way,
     /// for example if the data directory was found to be locked.
@@ -1449,23 +1474,51 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 // from that block and update the event index with any missing data.
                 // AcceptBlock() already does this, but if this is not good enough
                 // then we may have to implement the solution outlined above.
-                CEventDB pedb;
+                // Load up the events from the events.dat.
+                eventIndex_t eventIndex;
                 uint256 lastBlockHash;
-                pedb.Read(eventIndex, lastBlockHash);
+                CEventDB edb;
 
-                uint256 sportsLastBlockHash;
-                uint256 roundsLastBlockHash;
-                uint256 teamsLastBlockHash;
-                uint256 tournamentsLastBlockHash;
+                if (!edb.Read(eventIndex, lastBlockHash))
+                    LogPrintf("Invalid or missing events.dat; recreating\n");
 
+                CEventDB::SetEvents(eventIndex);
+
+                // Load up the sports from the sports.dat.
                 CMappingDB cmSportsDb("sports.dat");
-                cmSportsDb.Read(mSportsIndex, sportsLastBlockHash);
+                mappingIndex_t sportsIndex;
+                uint256 sportsLastBlockHash;
+                if (!cmSportsDb.Read(sportsIndex, sportsLastBlockHash))
+                    LogPrintf("Invalid or missing sports.dat; recreating\n");
+
+                cmSportsDb.SetSports(sportsIndex);
+
+                // Load up the rounds from the rounds.dat.
                 CMappingDB cmRoundsDb("rounds.dat");
-                cmRoundsDb.Read(mRoundsIndex, roundsLastBlockHash);
-                CMappingDB cmTeamsDb("teamnames.dat");
-                cmTeamsDb.Read(mTeamNamesIndex, teamsLastBlockHash);
+                mappingIndex_t roundsIndex;
+                uint256 roundsLastBlockHash;
+                if (!cmRoundsDb.Read(roundsIndex, roundsLastBlockHash))
+                    LogPrintf("Invalid or missing rounds.dat; recreating\n");
+
+                cmRoundsDb.SetRounds(roundsIndex);
+
+                // Load up the teams from the teams.dat.
+                CMappingDB cmTeamsDb("teams.dat");
+                mappingIndex_t teamsIndex;
+                uint256 teamsLastBlockHash;
+                if (!cmTeamsDb.Read(teamsIndex, teamsLastBlockHash))
+                    LogPrintf("Invalid or missing teams.dat; recreating\n");
+
+                cmTeamsDb.SetTeams(teamsIndex);
+
+                // Load up the tournaments from the tournaments.dat.
                 CMappingDB cmTournamentsDb("tournaments.dat");
-                cmTournamentsDb.Read(mTournamentsIndex, tournamentsLastBlockHash);
+                mappingIndex_t tournamentsIndex;
+                uint256 tournamentsLastBlockHash;
+                if (!cmTournamentsDb.Read(tournamentsIndex, tournamentsLastBlockHash))
+                    LogPrintf("Invalid or missing tournaments.dat; recreating\n");
+
+                cmTournamentsDb.SetTournaments(tournamentsIndex);
 
                 if (fReindex)
                     pblocktree->WriteReindexing(true);
