@@ -30,6 +30,7 @@
 #include "primitives/deterministicmint.h"
 #include <boost/assign/list_of.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/algorithm/hex.hpp>
 
 #include <univalue.h>
 
@@ -334,7 +335,7 @@ UniValue listbets(const UniValue& params, bool fHelp)
     return ret;
 }
 
-UniValue listchaingamebets(const UniValue& params, bool fHelp)
+UniValue listchaingamesbets(const UniValue& params, bool fHelp)
 {
     // TODO The command-line parameters for this command aren't handled as.
     // described, either the documentation or the behaviour of this command
@@ -890,6 +891,100 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
     SendMoney(address.Get(), nAmount, wtx, false, opCode);
 
     return wtx.GetHash().GetHex();
+}
+
+/**
+ * Looks up a chain game info for a given ID.
+ *
+ * @param params The RPC params consisting of the event id.
+ * @param fHelp  Help text
+ * @return
+ */
+UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
+{
+    UniValue ret(UniValue::VARR);
+    UniValue obj(UniValue::VOBJ);
+
+    // Set the Oracle wallet address.
+    std::string OracleWalletAddr = Params().OracleWalletAddr();
+
+    // Set default return values
+    unsigned int eventID = params[0].get_int();
+    int entryFee = 0;
+    int totalFoundCGBets = 0;
+    int gameStartTime = 0;
+    int gameStartBlock = 0;
+
+    CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
+
+    while (pindex) {
+        CBlock block;
+        ReadBlockFromDisk(block, pindex);
+
+        BOOST_FOREACH (CTransaction& tx, block.vtx) {
+            uint256 txHash = tx.GetHash();
+
+            // Check each TX out for values
+            for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                const CTxOut &txout = tx.vout[i];
+                std::string scriptPubKey = txout.scriptPubKey.ToString();
+
+                // Find OP_RETURN transactions
+                if(scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+
+                    std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
+                    std::string OpCode(vOpCode.begin(), vOpCode.end());
+
+                    // Find any CChainGameEvents matching the specified id
+                    CChainGamesEvent cgEvent;
+                    if (CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
+                        if (((unsigned int)cgEvent.nEventId) == eventID){
+                            entryFee = cgEvent.nEntryFee;
+                            gameStartTime = block.GetBlockTime();
+                            gameStartBlock = pindex -> nHeight;
+                        }
+                    }
+
+                    // Check if this transaction contains a bet id
+                    std::string rawOpcode = scriptPubKey.substr(9, string::npos);
+                    std::string betPrefix("343235343538");
+                    vector<unsigned char> vectorValue;
+                    std::string newOpCode;
+
+                    if (rawOpcode.find(betPrefix) != std::string::npos) {
+
+                        // Unhex and check if valid bet
+                        string stringValue(OpCode);
+                        //boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+                        std::vector<unsigned char> vectorValue = ParseHex(stringValue);
+                        std::string newOpCode(vectorValue.begin(), vectorValue.end());
+                        LogPrintf("\n newOpCode:  %s", newOpCode);
+
+                        CChainGamesBet cgBet;
+                        if (!CChainGamesBet::FromOpCode(newOpCode, cgBet)) {
+                            continue;
+                        }
+
+                        if (((unsigned int)cgBet.nEventId) == eventID){
+                            totalFoundCGBets = totalFoundCGBets + 1;
+                        }
+                    }
+                }
+            }
+        }
+
+        pindex = chainActive.Next(pindex);
+    }
+
+    int potSize = totalFoundCGBets*entryFee;
+
+    obj.push_back(Pair("pot-size", potSize));
+    obj.push_back(Pair("entry-fee", entryFee));
+    obj.push_back(Pair("start-block", gameStartBlock));
+    obj.push_back(Pair("start-time", gameStartTime));
+    obj.push_back(Pair("total-bets", totalFoundCGBets));
+
+    return obj;
 }
 
 UniValue sendtoaddress(const UniValue& params, bool fHelp)

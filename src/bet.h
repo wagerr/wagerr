@@ -292,7 +292,7 @@ public:
 std::vector<CPeerlessResult> getEventResults(int height);
 
 /** Find chain games lotto result. **/
-std::pair<std::vector<CChainGamesEvent>,std::vector<std::string>> getCGLottoEventResults(int height);
+std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEventResults(int height);
 
 /** Get the peerless winning bets from the block chain and return the payout vector. **/
 std::vector<CTxOut> GetBetPayouts(int height);

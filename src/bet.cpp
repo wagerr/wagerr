@@ -21,12 +21,12 @@
 #define PR_TO_OP_STRLEN    26
 #define PUO_FROM_OP_STRLEN 21
 #define PUO_TO_OP_STRLEN   42
-#define CGE_FROM_OP_STRLEN 13
-#define CGE_TO_OP_STRLEN   26
-#define CGB_FROM_OP_STRLEN 9
-#define CGB_TO_OP_STRLEN   18
-#define CGR_FROM_OP_STRLEN 9
-#define CGR_TO_OP_STRLEN   18
+#define CGE_FROM_OP_STRLEN 9
+#define CGE_TO_OP_STRLEN   18
+#define CGB_FROM_OP_STRLEN 7
+#define CGB_TO_OP_STRLEN   14
+#define CGR_FROM_OP_STRLEN 7
+#define CGR_TO_OP_STRLEN   14
 
 /**
  * Validate the transaction to ensure it has been posted by an oracle node.
@@ -210,6 +210,22 @@ uint32_t FromChars(unsigned char a, unsigned char b, unsigned char c, unsigned c
     n += c;
     n <<= 8;
     n += d;
+
+    return n;
+}
+
+/**
+ * Convert the hex chars for 2 bytes of opCode into uint32_t integer value.
+ *
+ * @param a First hex char
+ * @param b Second hex char
+ * @return  32 bit unsigned integer
+ */
+uint32_t FromChars(unsigned char a, unsigned char b)
+{
+    uint32_t n = a;
+    n <<= 8;
+    n += b;
 
     return n;
 }
@@ -513,8 +529,9 @@ bool CChainGamesEvent::FromOpCode(std::string opCode, CChainGamesEvent &cge)
         return false;
     }
 
-    cge.nEventId  = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
-    cge.nEntryFee = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+    cge.nEventId  = FromChars(opCode[5], opCode[6]);
+    cge.nEntryFee = FromChars(opCode[7], opCode[8]);
+
 
     return true;
 }
@@ -528,8 +545,8 @@ bool CChainGamesEvent::FromOpCode(std::string opCode, CChainGamesEvent &cge)
  */
 bool CChainGamesEvent::ToOpCode(CChainGamesEvent cge, std::string &opCode)
 {
-    std::string sEventId  = ToHex(cge.nEventId, 8);
-    std::string sEntryFee = ToHex(cge.nEntryFee, 8);
+    std::string sEventId  = ToHex(cge.nEventId, 4);
+    std::string sEntryFee = ToHex(cge.nEntryFee, 4);
 
     opCode = BTX_HEX_PREFIX "0106" + sEventId + sEntryFee;
 
@@ -570,7 +587,7 @@ bool CChainGamesBet::FromOpCode(std::string opCode, CChainGamesBet &cgb)
         return false;
     }
 
-    cgb.nEventId = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
+    cgb.nEventId = FromChars(opCode[5], opCode[6]);
 
     return true;
 }
@@ -584,7 +601,7 @@ bool CChainGamesBet::FromOpCode(std::string opCode, CChainGamesBet &cgb)
  */
 bool CChainGamesBet::ToOpCode(CChainGamesBet cgb, std::string &opCode)
 {
-    std::string sEventId  = ToHex(cgb.nEventId, 8);
+    std::string sEventId  = ToHex(cgb.nEventId, 4);
 
     opCode = BTX_HEX_PREFIX "0107" + sEventId;
 
@@ -625,7 +642,7 @@ bool CChainGamesResult::FromOpCode(std::string opCode, CChainGamesResult &cgr)
         return false;
     }
 
-    cgr.nEventId = FromChars(opCode[5], opCode[6], opCode[7], opCode[8]);
+    cgr.nEventId = FromChars(opCode[5], opCode[6]);
 
     return true;
 }
@@ -639,7 +656,7 @@ bool CChainGamesResult::FromOpCode(std::string opCode, CChainGamesResult &cgr)
  */
 bool CChainGamesResult::ToOpCode(CChainGamesResult cgr, std::string &opCode)
 {
-    std::string sEventId  = ToHex(cgr.nEventId, 8);
+    std::string sEventId  = ToHex(cgr.nEventId, 4);
 
     opCode = BTX_HEX_PREFIX "0108" + sEventId;
 
@@ -1198,14 +1215,14 @@ std::vector<CTxOut> GetBetPayouts(int height) {
                     std::string scriptPubKey = txout.scriptPubKey.ToString();
                     CAmount betAmount = txout.nValue;
 
-                    if (validResultTx && scriptPubKey.length() > 0 && 0 == strncmp(scriptPubKey.c_str(), "OP_RETURN", 9)) {
+                    if (scriptPubKey.length() > 0 && 0 == strncmp(scriptPubKey.c_str(), "OP_RETURN", 9)) {
 
                         // Get the OP CODE from the transaction scriptPubKey.
                         vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
                         std::string opCode(vOpCode.begin(), vOpCode.end());
 
                         CPeerlessEvent pe;
-                        if (CPeerlessEvent::FromOpCode(opCode, pe)) {
+                        if (validResultTx && CPeerlessEvent::FromOpCode(opCode, pe)) {
 
                             CTxDestination address;
                             ExtractDestination(tx.vout[0].scriptPubKey, address);
@@ -1326,11 +1343,11 @@ std::vector<CTxOut> GetBetPayouts(int height) {
  * @param height The block we want to check for the result.
  * @return results array.
  */
-std::pair<std::vector<CChainGamesEvent>,std::vector<std::string>> getCGLottoEventResults(int height)
+std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEventResults(int height)
 {
     // Set the Oracle wallet address.
     std::string OracleWalletAddr = Params().OracleWalletAddr();
-    std::vector<CChainGamesEvent> chainGameResults;
+    std::vector<CChainGamesResult> chainGameResults;
     std::vector<std::string> blockTotalValues;
     CAmount totalBlockValue = 0;
 
@@ -1364,8 +1381,8 @@ std::pair<std::vector<CChainGamesEvent>,std::vector<std::string>> getCGLottoEven
                     vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
                     std::string opCode(vOpCode.begin(), vOpCode.end());
 
-                    CChainGamesEvent plResult;
-                    if (!CChainGamesEvent::FromOpCode(opCode, plResult)) {
+                    CChainGamesResult plResult;
+                    if (!CChainGamesResult::FromOpCode(opCode, plResult)) {
                         continue;
                     }
 
@@ -1401,8 +1418,8 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
     int nCurrentHeight = chainActive.Height();
     CAmount totalValueOfBlock = 0 * COIN;
 
-    std::pair<std::vector<CChainGamesEvent>,std::vector<std::string>> resultArray = getCGLottoEventResults(height);
-    std::vector<CChainGamesEvent> allChainGames = resultArray.first;
+    std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> resultArray = getCGLottoEventResults(height);
+    std::vector<CChainGamesResult> allChainGames = resultArray.first;
     std::vector<std::string> blockSizeArray = resultArray.second;
     LogPrintf("Chain game Results: %u \n", resultArray.second.size());
 
@@ -1412,7 +1429,7 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
     // Find payout for each CGLotto game
     for (unsigned int currResult = 0; currResult < resultArray.second.size(); currResult++) {
 
-        CChainGamesEvent currentChainGame = allChainGames[currResult];
+        CChainGamesResult currentChainGame = allChainGames[currResult];
         int currentEventID = currentChainGame.nEventId;
         CAmount eventFee = 0;
 
@@ -1451,7 +1468,7 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
                     std::string scriptPubKey = txout.scriptPubKey.ToString();
                     CAmount betAmount = txout.nValue;
 
-                    if (validTX && scriptPubKey.length() > 0 && 0 == strncmp(scriptPubKey.c_str(), "OP_RETURN", 9)) {
+                    if (scriptPubKey.length() > 0 && 0 == strncmp(scriptPubKey.c_str(), "OP_RETURN", 9)) {
                         // Get the OP CODE from the transaction scriptPubKey.
                         vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
                         std::string opCode(vOpCode.begin(), vOpCode.end());
@@ -1464,14 +1481,16 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
 
                         // Find most recent CGLotto event
                         CChainGamesEvent chainGameEvt;
-                        if (CChainGamesEvent::FromOpCode(opCode, chainGameEvt)) {
+                        if (validTX && CChainGamesEvent::FromOpCode(opCode, chainGameEvt)) {
                             eventFee = chainGameEvt.nEntryFee * COIN;
                             LogPrintf("\nFound chain games event (%s), setting entry price: %i \n", chainGameEvt.nEventId, eventFee);
                         }
 
+                        //TODO - ADD BRIANS DEHEX THE DOUBLE HEX.
+
                         // Find most recent CGLotto bet once the event has been found
-                        CChainGamesBet chainGamesBet(0);
-                        if (CChainGamesBet::FromOpCode(opCode, chainGamesBet)) { //TODO: This condition had  && eventFee != 0
+                        CChainGamesBet chainGamesBet;
+                        if (CChainGamesBet::FromOpCode(opCode, chainGamesBet)) {
 
                             LogPrintf("\nFound chain games bet (%i), searching for id: %i \n", chainGamesBet.nEventId, currentEventID);
 
@@ -1530,8 +1549,8 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
             std::string winnerAddress = candidates[winnerIndex];
             CAmount entranceFee = eventFee;
             CAmount totalPot = (noOfBets*entranceFee);
-            CAmount winnerPayout = totalPot*.50;
-            CAmount fee = totalPot*.2;
+            CAmount winnerPayout = totalPot / 10 * 8;
+            CAmount fee = totalPot / 50;
 
             LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
             LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
@@ -1539,7 +1558,6 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
             LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
             LogPrintf("Entrance fee: %u \n", entranceFee);
             LogPrintf("Total Pot: %u  , Winnings: %u , Fee: %u \n", winnerPayout, totalPot, fee);
-            LogPrintf("Won: %u \n", totalPot*.50);
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
