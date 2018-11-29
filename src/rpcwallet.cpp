@@ -836,7 +836,14 @@ UniValue placebet(const UniValue& params, bool fHelp)
     // ideally be investigated and corrected/justified when time allows.
     std::string opCode;
     CPeerlessBet::ToOpCode(plBet, opCode);
-    SendMoney(address.Get(), nAmount, wtx, false, opCode);
+
+    // Unhex the validated bet opcode
+    vector<unsigned char> vectorValue;
+    string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
 
     return wtx.GetHash().GetHex();
 }
@@ -887,8 +894,13 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
     std::string opCode;
     CChainGamesBet::ToOpCode(cgBet, opCode);
 
+    // Unhex the validated bet opcode
+    vector<unsigned char> vectorValue;
+    boost::algorithm::unhex(opCode, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
     // Process transaction
-    SendMoney(address.Get(), nAmount, wtx, false, opCode);
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
 
     return wtx.GetHash().GetHex();
 }
@@ -945,30 +957,15 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
                         }
                     }
 
-                    // Check if this transaction contains a bet id
-                    std::string rawOpcode = scriptPubKey.substr(9, string::npos);
-                    std::string betPrefix("343235343538");
-                    vector<unsigned char> vectorValue;
-                    std::string newOpCode;
-
-                    if (rawOpcode.find(betPrefix) != std::string::npos) {
-
-                        // Unhex and check if valid bet
-                        string stringValue(OpCode);
-                        //boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
-                        std::vector<unsigned char> vectorValue = ParseHex(stringValue);
-                        std::string newOpCode(vectorValue.begin(), vectorValue.end());
-                        LogPrintf("\n newOpCode:  %s", newOpCode);
-
-                        CChainGamesBet cgBet;
-                        if (!CChainGamesBet::FromOpCode(newOpCode, cgBet)) {
-                            continue;
-                        }
-
-                        if (((unsigned int)cgBet.nEventId) == eventID){
-                            totalFoundCGBets = totalFoundCGBets + 1;
-                        }
+                    CChainGamesBet cgBet;
+                    if (!CChainGamesBet::FromOpCode(OpCode, cgBet)) {
+                        continue;
                     }
+
+                    if (((unsigned int)cgBet.nEventId) == eventID){
+                        totalFoundCGBets = totalFoundCGBets + 1;
+                    }
+
                 }
             }
         }
