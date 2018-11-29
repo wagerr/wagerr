@@ -175,37 +175,34 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
 
     UniValue ret(UniValue::VARR);
 
-    // Set the Oracle wallet address. 
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
-    CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
+    //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
+    CBlockIndex *BlocksIndex = NULL;
+    BlocksIndex = chainActive[chainActive.Height() - 14400];
 
-    while (pindex) {
+    while (BlocksIndex) {
         CBlock block;
-        ReadBlockFromDisk(block, pindex);
+        ReadBlockFromDisk(block, BlocksIndex);
 
         BOOST_FOREACH (CTransaction& tx, block.vtx) {
             uint256 txHash = tx.GetHash();
 
-            // Ensure the event TX has come from Oracle wallet.
             const CTxIn &txin = tx.vin[0];
-            bool validEventTx = IsValidOracleTx(txin);
+            bool validTx = IsValidOracleTx(txin);
 
-            if (validEventTx) {
-                // loop over all the TX vouts to check them for OP_RETURN.
-                for (unsigned int i = 0; i < tx.vout.size(); i++) {
-                    const CTxOut &txout = tx.vout[i];
-                    std::string scriptPubKey = txout.scriptPubKey.ToString();
+            // Check each TX out for values
+            for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                const CTxOut &txout = tx.vout[i];
+                std::string scriptPubKey = txout.scriptPubKey.ToString();
 
-                    if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                // Find OP_RETURN transactions
+                if(scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
 
-                        std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
-                        std::string OpCode(vOpCode.begin(), vOpCode.end());
+                    std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
+                    std::string OpCode(vOpCode.begin(), vOpCode.end());
 
-                        CChainGamesEvent cgEvent;
-                        if (!CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
-                            continue;
-                        }
-
+                    // Find any CChainGameEvents matching the specified id
+                    CChainGamesEvent cgEvent;
+                    if (validTx && CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
                         UniValue evt(UniValue::VOBJ);
                         evt.push_back(Pair("tx-id", txHash.ToString().c_str()));
                         evt.push_back(Pair("event-id", (uint64_t) cgEvent.nEventId));
@@ -216,7 +213,7 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
             }
         }
 
-        pindex = chainActive.Next(pindex);
+        BlocksIndex = chainActive.Next(BlocksIndex);
     }
 
     return ret;
@@ -289,7 +286,7 @@ UniValue listbets(const UniValue& params, bool fHelp)
                 std::string scriptPubKey = txout.scriptPubKey.ToString();
 
                 // TODO Remove hard-coded values from this block.
-                if ( scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
                     vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
                     std::string opCode(vOpCode.begin(), vOpCode.end());
 
@@ -408,7 +405,6 @@ UniValue listchaingamesbets(const UniValue& params, bool fHelp)
                         UniValue entry(UniValue::VOBJ);
                         entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
                         entry.push_back(Pair("event-id", (uint64_t) cgBet.nEventId));
-                        //entry.push_back(Pair("team-to-win", (uint64_t) plBet.nOutcome));
                         entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
                         ret.push_back(entry);
                     }
@@ -917,9 +913,6 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     UniValue ret(UniValue::VARR);
     UniValue obj(UniValue::VOBJ);
 
-    // Set the Oracle wallet address.
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
-
     // Set default return values
     unsigned int eventID = params[0].get_int();
     int entryFee = 0;
@@ -927,14 +920,19 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     int gameStartTime = 0;
     int gameStartBlock = 0;
 
-    CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
+    //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
+    CBlockIndex *BlocksIndex = NULL;
+    BlocksIndex = chainActive[chainActive.Height() - 14400];
 
-    while (pindex) {
+    while (BlocksIndex) {
         CBlock block;
-        ReadBlockFromDisk(block, pindex);
+        ReadBlockFromDisk(block, BlocksIndex);
 
         BOOST_FOREACH (CTransaction& tx, block.vtx) {
             uint256 txHash = tx.GetHash();
+
+            const CTxIn &txin = tx.vin[0];
+            bool validTx = IsValidOracleTx(txin);
 
             // Check each TX out for values
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
@@ -949,11 +947,11 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
 
                     // Find any CChainGameEvents matching the specified id
                     CChainGamesEvent cgEvent;
-                    if (CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
+                    if (validTx && CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
                         if (((unsigned int)cgEvent.nEventId) == eventID){
                             entryFee = cgEvent.nEntryFee;
                             gameStartTime = block.GetBlockTime();
-                            gameStartBlock = pindex -> nHeight;
+                            gameStartBlock = BlocksIndex -> nHeight;
                         }
                     }
 
@@ -970,7 +968,7 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
             }
         }
 
-        pindex = chainActive.Next(pindex);
+        BlocksIndex = chainActive.Next(BlocksIndex);
     }
 
     int potSize = totalFoundCGBets*entryFee;
