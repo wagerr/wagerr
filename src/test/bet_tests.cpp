@@ -67,19 +67,19 @@ typedef struct _mapping_test {
 
 const peerless_event_test pe_tests[] = {
         {
-                .opCode = "425458"             // BTX Prefix
-                          "01"                 // BTX protocol version
-                          "02"                 // BTX transaction type
-                          "80808080"           // Event ID
-                          "000000005BE554F3"   // Event timestamp
-                          "000055FA"           // Sport
-                          "000066FA"           // Tournament
-                          "0000FFAA"           // Stage
-                          "00000001"           // Home team
-                          "00000002"           // Away team
-                          "000055F0"           // Home odds
-                          "000080E8"           // Away odds
-                          "0000D8CC",          // Draw odds
+                .opCode = "42"           // BTX Prefix
+                          "01"           // BTX protocol version
+                          "02"           // BTX transaction type
+                          "80808080"     // Event ID
+                          "5BE554F3"     // Event timestamp
+                          "55FA"         // Sport
+                          "66FA"         // Tournament
+                          "FFAA"         // Stage
+                          "00000001"     // Home team
+                          "00000002"     // Away team
+                          "000055F0"     // Home odds
+                          "000080E8"     // Away odds
+                          "0000D8CC",    // Draw odds
                 .nEventId    = 2155905152,
                 .nStartTime  = 1541756147,
                 .nSport      = 22010,
@@ -92,14 +92,14 @@ const peerless_event_test pe_tests[] = {
                 .nDrawOdds   = 55500
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "02"
                           "00000101"
-                          "000000005BE2EB8B"
-                          "00000001"
-                          "00000006"
-                          "00000007"
+                          "5BE2EB8B"
+                          "0001"
+                          "0006"
+                          "0007"
                           "00000008"
                           "00000002"
                           "00001F1F"
@@ -117,14 +117,14 @@ const peerless_event_test pe_tests[] = {
                 .nDrawOdds   = 4112
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "02"
                           "FFFFFFFF"
-                          "000000005BE55CA0"
-                          "FFFFFFFF"
-                          "FFFFFFFF"
-                          "FFFFFFFF"
+                          "5BE55CA0"
+                          "FFFF"
+                          "FFFF"
+                          "FFFF"
                           "FFFFFFFF"
                           "FFFFFFFF"
                           "FFFFFFFF"
@@ -132,9 +132,9 @@ const peerless_event_test pe_tests[] = {
                           "FFFFFFFF",
                 .nEventId    = 4294967295,
                 .nStartTime  = 1541758112,
-                .nSport      = 4294967295,
-                .nTournament = 4294967295,
-                .nStage      = 4294967295,
+                .nSport      = 65535,
+                .nTournament = 65535,
+                .nStage      = 65535,
                 .nHomeTeam   = 4294967295,
                 .nAwayTeam   = 4294967295,
                 .nHomeOdds   = 4294967295,
@@ -145,29 +145,29 @@ const peerless_event_test pe_tests[] = {
 
 const peerless_bet_test pb_tests[] = {
         {
-                .opCode = "425458"    // BTX format
+                .opCode = "42"        // BTX format
                           "01"        // BTX version number
                           "03"        // TX type
                           "019A861A"  // Event ID
-                          "00000002", // Bet Outcome Type
+                          "02",       // Bet Outcome Type
                 .nEventId = 26904090,
                 .nOutcome = OutcomeTypeLose,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "03"
                           "000FDB6D"
-                          "00000001",
+                          "01",
                 .nEventId = 1039213,
                 .nOutcome  = OutcomeTypeWin,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "03"
                           "FFFFFFFF"
-                          "00000003",
+                          "03",
                 .nEventId = 4294967295,
                 .nOutcome  = OutcomeTypeDraw,
         },
@@ -175,29 +175,29 @@ const peerless_bet_test pb_tests[] = {
 
 const peerless_result_test pr_tests[] = {
         {
-                .opCode = "425458"     // BTX format
+                .opCode = "42"         // BTX format
                           "01"         // BTX version number
                           "04"         // TX type
                           "00000009"   // Event ID
-                          "00000001",  // Event result type
+                          "01",        // Event result type
                 .nEventId = 9,
                 .nResult  = ResultTypeWin,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "04"
                           "01FC97A7"
-                          "00000002",
+                          "02",
                 .nEventId = 33331111,
                 .nResult   = ResultTypeLose,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "04"
                           "FFFFFFFF"
-                          "00000003",
+                          "03",
                 .nEventId = 4294967295,
                 .nResult   = ResultTypeDraw,
         }
@@ -205,7 +205,7 @@ const peerless_result_test pr_tests[] = {
 
 const peerless_update_odds_test puo_tests[] = {
         {
-                .opCode = "425458"     // BTX format
+                .opCode = "42"         // BTX format
                           "01"         // BTX version number
                           "05"         // TX type
                           "01FC97A7"   // Event ID
@@ -218,7 +218,7 @@ const peerless_update_odds_test puo_tests[] = {
                 .nDrawOdds = 22000,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "05"
                           "00000040"
@@ -231,7 +231,7 @@ const peerless_update_odds_test puo_tests[] = {
                 .nDrawOdds = 66666,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "05"
                           "020ECD6C"
@@ -244,7 +244,7 @@ const peerless_update_odds_test puo_tests[] = {
                 .nDrawOdds = 92314,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "05"
                           "FFFFFFFF"
@@ -260,93 +260,93 @@ const peerless_update_odds_test puo_tests[] = {
 
 const chain_games_event_test cge_tests[] = {
         {
-                .opCode = "425458"     // BTX format
+                .opCode = "42"         // BTX format
                           "01"         // BTX version number
                           "06"         // TX type
-                          "00000009"   // Event ID
-                          "00000064",  // Entry Price
+                          "0009"       // Event ID
+                          "0064",      // Entry Price
                 .nEventId  = 9,
                 .nEntryFee = 100,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "06"
-                          "000007D0"
-                          "000000C8",
+                          "07D0"
+                          "00C8",
                 .nEventId  = 2000,
                 .nEntryFee = 200,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "06"
-                          "FFFFFFFF"
-                          "FFFFFFFF",
-                .nEventId  = 4294967295,
-                .nEntryFee = 4294967295,
+                          "FFFF"
+                          "FFFF",
+                .nEventId  = 65535,
+                .nEntryFee = 65535,
         }
 };
 
 const chain_games_bet_test cgb_tests[] = {
         {
-                .opCode = "425458"      // BTX format
-                          "01"          // BTX version number
-                          "07"          // TX type
-                          "75757575",   // Event ID
-                .nEventId = 1970632053
+                .opCode = "42"         // BTX format
+                          "01"         // BTX version number
+                          "07"         // TX type
+                          "7575",      // Event ID
+                .nEventId = 30069
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "07"
-                          "FFFFFFFF",
-                .nEventId = 4294967295
+                          "FFFF",
+                .nEventId = 65535
         }
 };
 
 const chain_games_result_test cgr_tests[] = {
         {
-                .opCode = "425458"      // BTX format
-                          "01"          // BTX version number
-                          "08"          // TX type
-                          "0001689A",   // Event ID
-                .nEventId = 92314,
+                .opCode = "42"         // BTX format
+                          "01"         // BTX version number
+                          "08"         // TX type
+                          "689A",      // Event ID
+                .nEventId = 26778,
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "08"
-                          "FFFFFFFF",
-                .nEventId = 4294967295,
+                          "FFFF",
+                .nEventId = 65535,
         }
 };
 
 const mapping_test cm_tests[] = {
-        {
-                .opCode = "425458"             // BTX format
-                          "01"                 // BTX version number
-                          "01"                 // TX type
-                          "01"                 // Mapping type
-                          "0160D4B3"           // Mapping ID
-                          "536f63636572",      // Hex encoded string
+        {       // Sport mapping.
+                .opCode = "42"            // BTX format
+                          "01"            // BTX version number
+                          "01"            // TX type
+                          "01"            // Mapping type
+                          "D4B3"          // Mapping ID
+                          "536f63636572", // Hex encoded string
                 .nMType = 1,
-                .nId    = 23123123,
+                .nId    = 54451,
                 .sName  = "Soccer"
         },
-        {
-                .opCode = "425458"
+        {       // Round mapping.
+                .opCode = "42"
                           "01"
                           "01"
                           "02"
-                          "00007FFE"
+                          "7FFE"
                           "526f756e642031",
                 .nMType = 2,
                 .nId    = 32766,
                 .sName  = "Round 1"
         },
-        {
-                .opCode = "425458"
+        {       // Team mapping.
+                .opCode = "42"
                           "01"
                           "01"
                           "03"
@@ -357,14 +357,14 @@ const mapping_test cm_tests[] = {
                 .sName  = "Liverpool"
         },
         {
-                .opCode = "425458"
+                .opCode = "42"
                           "01"
                           "01"
                           "04"
-                          "FFFFFFFF"
+                          "FFFF"
                           "576f726c64204375702032303138",
                 .nMType = 4,
-                .nId    = 4294967295,
+                .nId    = 65535,
                 .sName  = "World Cup 2018"
         }
 };
