@@ -1144,8 +1144,6 @@ std::vector<CPeerlessResult> getEventResults( int height )
                     vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
                     std::string opCode(v.begin(), v.end());
 
-                    LogPrintf("RESULT OP_RETURN -> %s \n", opCode.c_str());
-
                     CPeerlessResult plResult;
                     if (!CPeerlessResult::FromOpCode(opCode, plResult)) {
                         continue;
@@ -1420,12 +1418,11 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
 {
     std::vector<CTxOut> vexpectedCGLottoBetPayouts;
     int nCurrentHeight = chainActive.Height();
-    CAmount totalValueOfBlock = 0 * COIN;
+    long long totalValueOfBlock = 0;
 
     std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> resultArray = getCGLottoEventResults(height);
     std::vector<CChainGamesResult> allChainGames = resultArray.first;
     std::vector<std::string> blockSizeArray = resultArray.second;
-    LogPrintf("Chain game Results: %u \n", resultArray.second.size());
 
     // Set the Oracle wallet address.
     std::string OracleWalletAddr = Params().OracleWalletAddr();
@@ -1437,13 +1434,15 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
         int currentEventID = currentChainGame.nEventId;
         CAmount eventFee = 0;
 
+        totalValueOfBlock = stoll(blockSizeArray[0]);
+
         //reset total bet amount and candidate array for this event
         std::vector<std::string> candidates;
         CAmount totalBetAmount = 0 * COIN;
 
-        // Look back the chain 14 days for any events and bets.
+        // Look back the chain 10 days for any events and bets.
         CBlockIndex *BlocksIndex = NULL;
-        BlocksIndex = chainActive[nCurrentHeight - Params().BetBlocksIndexTimespan()];
+        BlocksIndex = chainActive[nCurrentHeight - 14400];
 
         time_t eventStart = 0;
         bool eventStartedFlag = false;
@@ -1487,14 +1486,11 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
                         CChainGamesEvent chainGameEvt;
                         if (validTX && CChainGamesEvent::FromOpCode(opCode, chainGameEvt)) {
                             eventFee = chainGameEvt.nEntryFee * COIN;
-                            LogPrintf("\nFound chain games event (%s), setting entry price: %i \n", chainGameEvt.nEventId, eventFee);
                         }
 
                         // Find most recent CGLotto bet once the event has been found
                         CChainGamesBet chainGamesBet;
                         if (CChainGamesBet::FromOpCode(opCode, chainGamesBet)) {
-
-                            LogPrintf("\nFound chain games bet (%i), searching for id: %i \n", chainGamesBet.nEventId, currentEventID);
 
                             int eventId = chainGamesBet.nEventId;
 
@@ -1503,7 +1499,6 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
 
                                 CTxDestination address;
                                 ExtractDestination(tx.vout[0].scriptPubKey, address);
-                                LogPrintf("EVENT OP CODE - %s \n", opCode.c_str());
 
                                 //Check Entry fee matches the bet amount
                                 if (eventFee == betAmount) {
@@ -1517,7 +1512,6 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
 
                                     // Add the payout address of each candidate to array
                                     candidates.push_back(CBitcoinAddress( payoutAddress ).ToString().c_str());
-                                    LogPrintf("Adding bettor to candidates array. Total pot is now %u \n", totalBetAmount);
                                 }
                             }
                         }
@@ -1559,11 +1553,11 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
             LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerIndex);
             LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
             LogPrintf("Entrance fee: %u \n", entranceFee);
-            LogPrintf("Total Pot: %u  , Winnings: %u , Fee: %u \n", winnerPayout, totalPot, fee);
+            LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
-                vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()));
+                vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee);
             }
         }
     }
