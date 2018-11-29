@@ -1486,8 +1486,6 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
                             LogPrintf("\nFound chain games event (%s), setting entry price: %i \n", chainGameEvt.nEventId, eventFee);
                         }
 
-                        //TODO - ADD BRIANS DEHEX THE DOUBLE HEX.
-
                         // Find most recent CGLotto bet once the event has been found
                         CChainGamesBet chainGamesBet;
                         if (CChainGamesBet::FromOpCode(opCode, chainGamesBet)) {
