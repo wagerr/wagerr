@@ -152,7 +152,6 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
     uint32_t id        = std::stoi(params[1].get_str());
 
     bool mappingFound = false;
-    uint32_t type = 0;
     mappingIndex_t mappingIndex;
     CMappingDB cmdb;
 
@@ -163,22 +162,18 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
     if (mIndex == "sports") {
         CMappingDB cmdb("sports.dat");
         cmdb.GetSports(mappingIndex);
-        type = sportMapping;
     }
     else if (mIndex == "rounds") {
         CMappingDB cmdb("rounds.dat");
         cmdb.GetRounds(mappingIndex);
-        type = roundMapping;
     }
     else if (mIndex == "teamnames") {
         CMappingDB cmdb("teams.dat");
         cmdb.GetTeams(mappingIndex);
-        type = teamMapping;
     }
     else if (mIndex == "tournaments") {
         CMappingDB cmdb("tournaments.dat");
         cmdb.GetTournaments(mappingIndex);
-        type = tournamentMapping;
     }
     else{
         throw runtime_error("Currently no mapping index exists for the mapping index you provided.");

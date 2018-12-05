@@ -345,7 +345,7 @@ void PlaceBetDialog::send(CAmount amount, const std::string& eventId, const std:
         QString questionString1 = tr("Betting expired! Please ensure you bet more than 20 minutes before the event start time!");
         questionString1.append("<br /><br />%1");
 
-        QMessageBox::StandardButton retval = QMessageBox::question(this, tr("Cannot Bet!"),
+        QMessageBox::question(this, tr("Cannot Bet!"),
         questionString1.arg(""),
         QMessageBox::Yes | QMessageBox::Cancel,
         QMessageBox::Cancel);
