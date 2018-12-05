@@ -1178,9 +1178,6 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
     // Traverse the blockchain for an event to match a result and all the bets on a result.
     for (const auto& result : results) {
-
-        bool eventFound = false;
-
         // Look back the chain 14 days for any events and bets.
         CBlockIndex *BlocksIndex = NULL;
         BlocksIndex = chainActive[nCurrentHeight - Params().BetBlocksIndexTimespan()];
@@ -1244,7 +1241,6 @@ std::vector<CTxOut> GetBetPayouts(int height)
                                     latestEvent.nAwayOdds  = pe.nAwayOdds;
                                     latestEvent.nDrawOdds  = pe.nAwayOdds;
                                     latestEvent.nStartTime = pe.nStartTime;
-                                    eventFound = true;
 
                                     LogPrintf("latestHomeOdds = %u & latestAwayOdds = %u & latestDrawOdds = %u \n", latestEvent.nHomeOdds, latestEvent.nAwayOdds, latestEvent.nDrawOdds);
                                 }
@@ -1261,7 +1257,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
                                 CAmount payout = 0 * COIN;
 
                                 // If bet was placed less than 20 mins before event start or after event start discard it.
-                                if (latestEvent.nStartTime > 0 && transactionTime > (latestEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                                if (latestEvent.nStartTime > 0 && (unsigned int) transactionTime > (latestEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
                                     eventStartedFlag = true;
                                     break;
                                 }
@@ -1364,7 +1360,6 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
     BOOST_FOREACH(CTransaction& tx, block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet by looking at the TX vins.
         const CTxIn &txin = tx.vin[0];
-        COutPoint prevout = txin.prevout;
 
         uint256 hashBlock;
         CTransaction txPrev;
@@ -1400,7 +1395,7 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
 
     // If a CGLotto result is found, append total block value to each result
     if (chainGameResults.size() != 0) {
-        for (int i = 0; i < chainGameResults.size(); i++) {
+        for (unsigned int i = 0; i < chainGameResults.size(); i++) {
             blockTotalValues.emplace_back(strTotal);
         }
     }
