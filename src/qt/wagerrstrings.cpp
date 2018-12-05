@@ -192,6 +192,9 @@ QT_TRANSLATE_NOOP("wagerr-core", ""
 "the OpenSSL Toolkit <https://www.openssl.org/> and cryptographic software "
 "written by Eric Young and UPnP software written by Thomas Bernard."),
 QT_TRANSLATE_NOOP("wagerr-core", ""
+"Total length of network version string (%i) exceeds maximum length (%i). "
+"Reduce the number or size of uacomments."),
+QT_TRANSLATE_NOOP("wagerr-core", ""
 "Unable to bind to %s on this computer. Wagerr Core is probably already running."),
 QT_TRANSLATE_NOOP("wagerr-core", ""
 "Unable to locate enough Obfuscation denominated funds for this transaction."),
@@ -247,6 +250,7 @@ QT_TRANSLATE_NOOP("wagerr-core", "Add a node to connect to and attempt to keep t
 QT_TRANSLATE_NOOP("wagerr-core", "Allow DNS lookups for -addnode, -seednode and -connect"),
 QT_TRANSLATE_NOOP("wagerr-core", "Already have that input."),
 QT_TRANSLATE_NOOP("wagerr-core", "Always query for peer addresses via DNS lookup (default: %u)"),
+QT_TRANSLATE_NOOP("wagerr-core", "Append comment to the user agent string"),
 QT_TRANSLATE_NOOP("wagerr-core", "Attempt to force blockchain corruption recovery"),
 QT_TRANSLATE_NOOP("wagerr-core", "Attempt to recover private keys from a corrupt wallet.dat"),
 QT_TRANSLATE_NOOP("wagerr-core", "Automatically create Tor hidden service (default: %d)"),
@@ -499,6 +503,7 @@ QT_TRANSLATE_NOOP("wagerr-core", "Use UPnP to map the listening port (default: %
 QT_TRANSLATE_NOOP("wagerr-core", "Use UPnP to map the listening port (default: 1 when listening)"),
 QT_TRANSLATE_NOOP("wagerr-core", "Use a custom max chain reorganization depth (default: %u)"),
 QT_TRANSLATE_NOOP("wagerr-core", "Use the test network"),
+QT_TRANSLATE_NOOP("wagerr-core", "User Agent comment (%s) contains unsafe characters."),
 QT_TRANSLATE_NOOP("wagerr-core", "Username for JSON-RPC connections"),
 QT_TRANSLATE_NOOP("wagerr-core", "Value is below the smallest available denomination (= 1) of zWGR"),
 QT_TRANSLATE_NOOP("wagerr-core", "Value more than Obfuscation pool maximum allows."),
