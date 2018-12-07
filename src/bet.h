@@ -28,14 +28,16 @@ typedef enum ResultType {
 
 // The supported betting TX types.
 typedef enum BetTxTypes{
-    mappingTxType      = 0x01,  // Mapping transaction type identifier.
-    plEventTxType      = 0x02,  // Peerless event transaction type identifier.
-    plBetTxType        = 0x03,  // Peerless Bet transaction type identifier.
-    plResultTxType     = 0x04,  // Peerless Result transaction type identifier.
-    plUpdateOddsTxType = 0x05,  // Peerless update odds transaction type identifier.
-    cgEventTxType      = 0x06,  // Chain games event transaction type identifier.
-    cgBetTxType        = 0x07,  // Chain games bet transaction type identifier.
-    cgResultTxType     = 0x08   // Chain games result transaction type identifier.
+    mappingTxType           = 0x01,  // Mapping transaction type identifier.
+    plEventTxType           = 0x02,  // Peerless event transaction type identifier.
+    plBetTxType             = 0x03,  // Peerless Bet transaction type identifier.
+    plResultTxType          = 0x04,  // Peerless Result transaction type identifier.
+    plUpdateOddsTxType      = 0x05,  // Peerless update odds transaction type identifier.
+    cgEventTxType           = 0x06,  // Chain games event transaction type identifier.
+    cgBetTxType             = 0x07,  // Chain games bet transaction type identifier.
+    cgResultTxType          = 0x08,   // Chain games result transaction type identifier.
+    plSpreadsEventTxType    = 0x09,  // Chain games result transaction type identifier.
+    plTotalsEventTxType     = 0x0a   // Chain games result transaction type identifier.
 } BetTxTypes;
 
 // The supported mapping TX types.
@@ -193,6 +195,36 @@ public:
 
     static bool ToOpCode(CChainGamesResult cgr, std::string &opCode);
     static bool FromOpCode(std::string opCode, CChainGamesResult &cgr);
+};
+
+class CPeerlessSpreadsEvent
+{
+public:
+    uint32_t nEventId;
+    uint32_t nPoints;
+    uint32_t nOverOdds;
+    uint32_t nUnderOdds;
+
+    // Default Constructor.
+    CPeerlessSpreadsEvent() {}
+
+    static bool ToOpCode(CPeerlessSpreadsEvent pse, std::string &opCode);
+    static bool FromOpCode(std::string opCode, CPeerlessSpreadsEvent &pse);
+};
+
+class CPeerlessTotalsEvent
+{
+public:
+    uint32_t nEventId;
+    uint32_t nPoints;
+    uint32_t nOverOdds;
+    uint32_t nUnderOdds;
+
+    // Default Constructor.
+    CPeerlessTotalsEvent() {}
+
+    static bool ToOpCode(CPeerlessTotalsEvent pte, std::string &opCode);
+    static bool FromOpCode(std::string opCode, CPeerlessTotalsEvent &pte);
 };
 
 class CMapping

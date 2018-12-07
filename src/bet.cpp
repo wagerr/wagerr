@@ -20,6 +20,8 @@
 #define CGE_OP_STRLEN 14
 #define CGB_OP_STRLEN 10
 #define CGR_OP_STRLEN 10
+#define PSE_OP_STRLEN 34
+#define PTE_OP_STRLEN 34
 
 /**
  * Validate the transaction to ensure it has been posted by an oracle node.
@@ -663,6 +665,130 @@ bool CChainGamesResult::ToOpCode(CChainGamesResult cgr, std::string &opCode)
 
     return true;
 }
+
+
+/**
+ * Split a CPeerlessSpreadsEvent OpCode string into byte components and store in peerless spreads
+ * event object.
+ *
+ * @param opCode The CPeerlessSpreadsEvent OpCode string
+ * @param pse     The CPeerlessSpreadsEvent object
+ * @return       Bool
+ */
+bool CPeerlessSpreadsEvent::FromOpCode(std::string opCode, CPeerlessSpreadsEvent &pse)
+{
+    // Ensure peerless result OpCode string is the correct length.
+    if (opCode.length() != PSE_OP_STRLEN / 2) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    // Ensure the peerless result transaction type is correct.
+    if (opCode[2] != plSpreadsEventTxType) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    // Ensure the peerless result OpCode has the correct BTX format version number.
+    if (ReadBTXFormatVersion(opCode) != BTX_FORMAT_VERSION) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    pse.nEventId = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
+    pse.nPoints = FromChars(opCode[7], opCode[8]);
+    pse.nOverOdds = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+    pse.nUnderOdds = FromChars(opCode[13], opCode[14], opCode[15], opCode[16]);
+
+    return true;
+}
+
+/**
+ * Convert CPeerlessSpreadsEvent object data into hex OPCode string.
+ *
+ * @param pse     The CPeerlessSpreadsEvent Object
+ * @param opCode The CPeerlessSpreadsEvent OpCode string
+ * @return       Bool
+ */
+bool CPeerlessSpreadsEvent::ToOpCode(CPeerlessSpreadsEvent pse, std::string &opCode)
+{
+    std::string sEventId = ToHex(pse.nEventId, 8);
+    std::string sPoints  = ToHex(pse.nPoints, 4);
+    std::string sOverOdds = ToHex(pse.nOverOdds, 8);
+    std::string sUnderOdds  = ToHex(pse.nUnderOdds, 8);
+
+    opCode = BTX_HEX_PREFIX "0109" + sEventId + sPoints + sOverOdds + sUnderOdds;
+
+    // Ensure peerless result OpCode string is the correct length.
+    if (opCode.length() != PSE_OP_STRLEN) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    return true;
+}
+
+/**
+ * Split a CPeerlessTotalsEvent OpCode string into byte components and store in peerless totals
+ * event object.
+ *
+ * @param opCode The CPeerlessTotalsEvent OpCode string
+ * @param pte    The CPeerlessTotalsEvent object
+ * @return       Bool
+ */
+bool CPeerlessTotalsEvent::FromOpCode(std::string opCode, CPeerlessTotalsEvent &pte)
+{
+    // Ensure peerless result OpCode string is the correct length.
+    if (opCode.length() != PTE_OP_STRLEN / 2) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    // Ensure the peerless result transaction type is correct.
+    if (opCode[2] != plTotalsEventTxType) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    // Ensure the peerless result OpCode has the correct BTX format version number.
+    if (ReadBTXFormatVersion(opCode) != BTX_FORMAT_VERSION) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    pte.nEventId = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
+    pte.nPoints = FromChars(opCode[7], opCode[8]);
+    pte.nOverOdds = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+    pte.nUnderOdds = FromChars(opCode[13], opCode[14], opCode[15], opCode[16]);
+
+    return true;
+}
+
+/**
+ * Convert CPeerlessCPeerlessTotalsEventSpreadEvent object data into hex OPCode string.
+ *
+ * @param pte    The CPeerlessTotalsEvent Object
+ * @param opCode The CPeerlessTotalsEvent OpCode string
+ * @return       Bool
+ */
+bool CPeerlessTotalsEvent::ToOpCode(CPeerlessTotalsEvent pte, std::string &opCode)
+{
+    std::string sEventId = ToHex(pte.nEventId, 8);
+    std::string sPoints  = ToHex(pte.nPoints, 4);
+    std::string sOverOdds = ToHex(pte.nOverOdds, 8);
+    std::string sUnderOdds  = ToHex(pte.nUnderOdds, 8);
+
+    opCode = BTX_HEX_PREFIX "010a" + sEventId + sPoints + sOverOdds + sUnderOdds;
+
+    // Ensure peerless result OpCode string is the correct length.
+    if (opCode.length() != PTE_OP_STRLEN) {
+        // TODO - add proper error handling
+        return false;
+    }
+
+    return true;
+}
+
 
 /**
  * Split a CMapping OpCode string into byte components and store in CMapping object.
