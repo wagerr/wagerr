@@ -42,6 +42,22 @@ typedef struct _peerless_update_odds_test {
     uint32_t nDrawOdds;
 } peerless_update_odds_test;
 
+typedef struct _peerless_spreads_event_test {
+    std::string opCode;
+    uint32_t nEventId;
+    uint32_t nPoints;
+    uint32_t nOverOdds;
+    uint32_t nUnderOdds;
+} peerless_spreads_event_test;
+
+typedef struct _peerless_totals_event_test {
+    std::string opCode;
+    uint32_t nEventId;
+    uint32_t nPoints;
+    uint32_t nOverOdds;
+    uint32_t nUnderOdds;
+} peerless_totals_event_test;
+
 typedef struct _chain_games_event_test {
     std::string opCode;
     uint32_t nEventId;
@@ -255,6 +271,116 @@ const peerless_update_odds_test puo_tests[] = {
                 .nHomeOdds = 4294967295,
                 .nAwayOdds = 4294967295,
                 .nDrawOdds = 4294967295,
+        }
+};
+
+const peerless_spreads_event_test pse_tests[] = {
+        {
+                .opCode = "42"         // BTX format
+                          "01"         // BTX version number
+                          "09"         // TX type
+                          "01FC97A7"   // Event ID
+                          "581B"       // Spread Points
+                          "0000D903"   // Over Odds
+                          "000055F0",  // Under Odds
+                .nEventId  = 33331111,
+                .nPoints = 22555,
+                .nOverOdds = 55555,
+                .nUnderOdds = 22000,
+        },
+        {
+                .opCode = "42"
+                          "01"
+                          "09"
+                          "00000040"
+                          "55F0"
+                          "0000AD9C"
+                          "0001046A",
+                .nEventId  = 64,
+                .nPoints = 22000,
+                .nOverOdds = 44444,
+                .nUnderOdds = 66666,
+        },
+        {
+                .opCode = "42"
+                          "01"
+                          "09"
+                          "020ECD6C"
+                          "2FD1"
+                          "00003FE4"
+                          "0001689A",
+                .nEventId  = 34524524,
+                .nPoints = 12241,
+                .nOverOdds = 16356,
+                .nUnderOdds = 92314,
+        },
+        {
+                .opCode = "42"
+                          "01"
+                          "09"
+                          "FFFFFFFF"
+                          "FFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF",
+                .nEventId  = 4294967295,
+                .nPoints = 65535,
+                .nOverOdds = 4294967295,
+                .nUnderOdds = 4294967295,
+        }
+};
+
+const peerless_totals_event_test pte_tests[] = {
+        {
+                .opCode = "42"         // BTX format
+                          "01"         // BTX version number
+                          "0a"         // TX type
+                          "01FC97A7"   // Event ID
+                          "581B"       // Totals Points
+                          "0000D903"   // Over Odds
+                          "000055F0",  // Under Odds
+                .nEventId  = 33331111,
+                .nPoints = 22555,
+                .nOverOdds = 55555,
+                .nUnderOdds = 22000,
+        },
+        {
+                .opCode = "42"
+                          "01"
+                          "0a"
+                          "00000040"
+                          "55F0"
+                          "0000AD9C"
+                          "0001046A",
+                .nEventId  = 64,
+                .nPoints = 22000,
+                .nOverOdds = 44444,
+                .nUnderOdds = 66666,
+        },
+        {
+                .opCode = "42"
+                          "01"
+                          "0a"
+                          "020ECD6C"
+                          "2FD1"
+                          "00003FE4"
+                          "0001689A",
+                .nEventId  = 34524524,
+                .nPoints = 12241,
+                .nOverOdds = 16356,
+                .nUnderOdds = 92314,
+        },
+        {
+                .opCode = "42"
+                          "01"
+                          "0a"
+                          "FFFFFFFF"
+                          "FFFF"
+                          "FFFFFFFF"
+                          "FFFFFFFF",
+                .nEventId  = 4294967295,
+                .nPoints = 65535,
+                .nOverOdds = 4294967295,
+                .nUnderOdds = 4294967295,
         }
 };
 
