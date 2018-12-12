@@ -414,8 +414,8 @@ UniValue listchaingamesbets(const UniValue& params, bool fHelp)
 
         if ((int)ret.size() >= (nCount + nFrom)) break;
     }
-    // ret is newest to oldest
 
+    // ret is newest to oldest
     if (nFrom > (int)ret.size())
         nFrom = ret.size();
     if ((nFrom + nCount) > (int)ret.size())
@@ -929,7 +929,6 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
         ReadBlockFromDisk(block, BlocksIndex);
 
         BOOST_FOREACH (CTransaction& tx, block.vtx) {
-            uint256 txHash = tx.GetHash();
 
             const CTxIn &txin = tx.vin[0];
             bool validTx = IsValidOracleTx(txin);
