@@ -164,9 +164,9 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
             "[\n"
             "  {\n"
             "    \"id\": \"xxx\",         (string) The event ID\n"
-            "    \"version\": \"xxx\",       (string) The current version\n"
-            "    \"event-id\": \"xxx\",      (string) The transaction type \n"
-            "    \"entry-fee\": n          (numeric) Fee to join game\n"
+            "    \"version\": \"xxx\",    (string) The current version\n"
+            "    \"event-id\": \"xxx\",   (string) The ID of the chain games event\n"
+            "    \"entry-fee\": n         (numeric) Fee to join game\n"
             "  }\n"
             "]\n"
 
@@ -184,6 +184,7 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
         ReadBlockFromDisk(block, BlocksIndex);
 
         BOOST_FOREACH (CTransaction& tx, block.vtx) {
+
             uint256 txHash = tx.GetHash();
 
             const CTxIn &txin = tx.vin[0];
@@ -230,7 +231,7 @@ UniValue listbets(const UniValue& params, bool fHelp)
 
     if (fHelp || params.size() > 4)
         throw runtime_error(
-            "listtransactions ( \"account\" count from includeWatchonly)\n"
+            "listbets ( \"account\" count from includeWatchonly)\n"
             "\nReturns up to 'count' most recent transactions skipping the first 'from' transactions for account 'account'.\n"
             "\nArguments:\n"
             "1. \"account\"    (string, optional) The account name. If not included, it will list all transactions for all accounts.\n"
@@ -776,15 +777,17 @@ UniValue placebet(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 3 || params.size() > 5)
         throw runtime_error(
-            "placebet \"event-id\" \"team\" amount ( \"comment\" \"comment-to\" )\n"
-            "\n WARNING!!! - Betting closes 20 minutes before event start time. Any bets placed after this time will be \n"
-            "invalid and will not be paid out! \n"
+            "placebet \"event-id\" outcome amount ( \"comment\" \"comment-to\" )\n"
+            "\nWARNING - Betting closes 20 minutes before event start time.\n"
+            "Any bets placed after this time will be invalid and will not be paid out! \n"
             "\nPlace an amount as a bet on an event. The amount is rounded to the nearest 0.00000001\n" +
             HelpRequiringPassphrase() +
             "\nArguments:\n"
             "1. \"event-id\"    (numeric, required) The event to bet on.\n"
-            "2. \"team\"        (numeric, required) The team to win.\n"
-            "3. \"amount\"      (numeric, required) The amount in wgr to send. eg 0.1\n"
+            "2. outcome         (numeric, required) 1 means home team win,\n"
+            "                                       2 means away team win,\n"
+            "                                       3 means a draw."
+            "3. amount          (numeric, required) The amount in wgr to send. eg 10\n"
             "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
             "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
@@ -854,8 +857,8 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
             "\nPlace an amount as a bet on a chain games event. The amount is rounded to the nearest 0.00000001\n" +
             HelpRequiringPassphrase() +
             "\nArguments:\n"
-            "1. \"event-id\"    (string, required) The event to bet on (Must be 4 characters in length e.g. \"#000\").\n"
-            "2. \"amount\"      (numeric, required) The amount in wgr to send. eg 0.1\n"
+            "1. event-id        (numeric, required) The event to bet on.\n"
+            "2. amount          (numeric, required) The amount in wgr to send. eg 0.1\n"
             "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
             "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
