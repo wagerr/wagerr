@@ -20,7 +20,7 @@ apps:
     aliases: [wagerrd]
   qt:
     command: desktop-launch wagerr-qt
-    plugs: [network, network-bind, unity7]
+    plugs: [network, network-bind, unity7, desktop, desktop-legacy, wayland, x11]
     aliases: [wagerr-qt]
     desktop: wagerr.desktop
   cli:
@@ -61,6 +61,13 @@ parts:
       - qttools5-dev-tools
       - libprotobuf-dev
       - protobuf-compiler
+      # Files from the build host were migrated into the snap to satisfy dependencies that would otherwise not be met. This feature will be removed in a future release thats why we need to include them here
+      - libxcursor-dev
+      - libxinerama-dev
+      - libxrandr-dev
+      - libatk1.0-dev
+      #- libgdk2.0-cil
+      - libgtk2.0-dev
       # Optional.
       - libqrencode-dev
     stage-packages: [ca-certificates]
@@ -79,13 +86,21 @@ parts:
       - libgdk-pixbuf2.0-0
       - libqt5svg5 # for loading icon themes which are svg
       - locales-all
-
+      - qtwayland5
   berkeleydb:
     source: http://download.oracle.com/berkeley-db/db-4.8.30.tar.gz
     plugin: nil
     build: |
+      # Apply a patch necessary when building with clang and c++11 (see https://community.oracle.com/thread/3952592)
+      CLANG_CXX11_PATCH_URL='https://gist.githubusercontent.com/LnL7/5153b251fd525fe15de69b67e63a6075/raw/7778e9364679093a32dec2908656738e16b6bdcb/clang.patch'
+      CLANG_CXX11_PATCH_HASH='7a9a47b03fd5fb93a16ef42235fa9512db9b0829cfc3bdf90edd3ec1f44d637c'
+      wget --no-check-certificate "${CLANG_CXX11_PATCH_URL}" -O "clang.patch"
+      echo "${CLANG_CXX11_PATCH_HASH} clang.patch" | sha256sum -c
+      patch -p2 < clang.patch
+      cp $SNAPCRAFT_STAGE/../depends/config.guess ./dist
+      cp $SNAPCRAFT_STAGE/../depends/config.sub ./dist
       cd build_unix
-      ../dist/configure --enable-cxx --disable-shared --with-pic --prefix=$SNAPCRAFT_PART_INSTALL
+      ../dist/configure --enable-cxx --disable-shared --disable-replication --with-pic --prefix=$SNAPCRAFT_PART_INSTALL "${@}"
     install: |
       cd build_unix
       make install
