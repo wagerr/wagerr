@@ -195,7 +195,7 @@
                   <verstretch>1</verstretch>
                  </sizepolicy>
                 </property>
-                <layout class="QGridLayout" name="proposalGrid" rowstretch="0" columnstretch="0">
+                <layout class="QVBoxLayout" name="proposalGrid" rowstretch="0" columnstretch="0">
                  <property name="sizeConstraint">
                   <enum>QLayout::SetDefaultConstraint</enum>
                  </property>
@@ -206,7 +206,7 @@
                   <number>0</number>
                  </property>
                  <property name="rightMargin">
-                  <number>50</number>
+                  <number>0</number>
                  </property>
                  <property name="bottomMargin">
                   <number>0</number>
