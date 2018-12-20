@@ -110,7 +110,7 @@ void GovernancePage::updateProposalList(bool fForce)
 {
     int nCountMyMasternodes = masternodeConfig.getCount();
     std::vector<CBudgetProposal*> winningProps = budget.GetAllProposals();
-    int nGridRow = 0, nGridCol = 0;
+    int nRow = 0;
     for (CBudgetProposal* pbudgetProposal : winningProps) {
         if (!pbudgetProposal->fValid) continue;
         if (pbudgetProposal->GetRemainingPaymentCount() < 1) continue;
@@ -185,13 +185,9 @@ void GovernancePage::updateProposalList(bool fForce)
         proposalItem->addLayout(proposalVotes);
 
         proposalFrame->setMaximumHeight(150);
-        ui->proposalGrid->addWidget(proposalFrame, nGridRow, nGridCol);
-        
-        if (nGridCol == 1 ) {
-            ++nGridRow;
-            nGridCol = -1;
-        }
-        ++nGridCol;
+        ui->proposalGrid->addWidget(proposalFrame, nRow);
+
+        ++nRow;
     }
 }
 
