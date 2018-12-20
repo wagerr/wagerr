@@ -118,6 +118,18 @@ Once the source code is ready the build steps are below.
     CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/
     make
 
+If Makefile fails to build. Try exporting the ACLOCAL_PATH via this SO post
+https://askubuntu.com/questions/468661/how-to-fix-pkg-prog-pkg-config-command-not-found-error
+
+    PATH=$(echo "$PATH" | sed -e 's/:\/mnt.*//g') # strip out problematic Windows %PATH% imported var
+    cd depends
+    make HOST=x86_64-w64-mingw32
+    cd ..
+    export ACLOCAL_PATH=/usr/src/wagerr
+    ./autogen.sh # not required when building from tarball
+    CONFIG_SITE=$PWD/depends/x86_64-w64-mingw32/share/config.site ./configure --prefix=/
+    make
+    
 ## Building for 32-bit Windows
 
 To build executables for Windows 32-bit, install the following dependencies:
