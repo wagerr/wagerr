@@ -108,6 +108,10 @@ void GovernancePage::SendVote(std::string strHash, int nVote)
 
 void GovernancePage::updateProposalList(bool fForce)
 {
+    QLayoutItem *item;
+    while ((item = ui->proposalGrid->takeAt(0)))
+        delete item;
+
     int nCountMyMasternodes = masternodeConfig.getCount();
     std::vector<CBudgetProposal*> winningProps = budget.GetAllProposals();
     int nRow = 0;
