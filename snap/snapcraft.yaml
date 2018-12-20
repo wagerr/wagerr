@@ -38,11 +38,17 @@ parts:
     # Also, it would be better if we could split the wallet from the blockchain
     prepare: git apply $SNAPCRAFT_STAGE/default_data_dir.patch
     build-packages:
+      - curl
+      - wget
       - g++
+      - gcc
+      - autoconf
+      - automake
       - pkg-config
       - libssl-dev
       - libevent-dev
       - bsdmainutils
+      - libgmp-dev
       # Boost.
       - libboost-system-dev
       - libboost-filesystem-dev
