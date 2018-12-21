@@ -106,6 +106,16 @@ void GovernancePage::SendVote(std::string strHash, int nVote)
     
 }
 
+struct sortProposalsByVotes
+{
+    bool operator() (const CBudgetProposal* left, const CBudgetProposal* right)
+    {
+        if (left != right)
+            return (left->GetYeas() - left->GetNays() > right->GetYeas() - right->GetNays());
+        return (left->nFeeTXHash > right->nFeeTXHash);
+    }
+};
+
 void GovernancePage::updateProposalList(bool fForce)
 {
     QLayoutItem *item;
@@ -113,19 +123,21 @@ void GovernancePage::updateProposalList(bool fForce)
         delete item;
 
     int nCountMyMasternodes = masternodeConfig.getCount();
-    std::vector<CBudgetProposal*> winningProps = budget.GetAllProposals();
+    std::vector<CBudgetProposal*> proposalsList = budget.GetAllProposals();
+	std::sort (proposalsList.begin(), proposalsList.end(), sortProposalsByVotes());
     int nRow = 0;
-    for (CBudgetProposal* pbudgetProposal : winningProps) {
+    for (CBudgetProposal* pbudgetProposal : proposalsList) {
         if (!pbudgetProposal->fValid) continue;
         if (pbudgetProposal->GetRemainingPaymentCount() < 1) continue;
+
         QFrame* proposalFrame = new QFrame();
         proposalFrame->setObjectName(QStringLiteral("proposalFrame"));
         proposalFrame->setFrameShape(QFrame::StyledPanel);
-        
+
         QVBoxLayout* proposalItem = new QVBoxLayout(proposalFrame);
         proposalItem->setSpacing(0);
         proposalItem->setObjectName(QStringLiteral("proposalItem"));
-        
+
         QHBoxLayout* proposalInfo = new QHBoxLayout();
         proposalInfo->setSpacing(0);
         proposalInfo->setObjectName(QStringLiteral("proposalInfo"));
@@ -147,7 +159,7 @@ void GovernancePage::updateProposalList(bool fForce)
         proposalInfo->addStretch();
         proposalInfo->addWidget(strMonthlyPayout);
         proposalItem->addLayout(proposalInfo);
-        
+
         QLabel* strProposalURL = new QLabel();
         strProposalURL->setObjectName(QStringLiteral("strProposalURL"));
         QString strURL = QString::fromStdString(pbudgetProposal->GetURL());
@@ -156,9 +168,9 @@ void GovernancePage::updateProposalList(bool fForce)
         strProposalURL->setTextInteractionFlags(Qt::TextBrowserInteraction);
         strProposalURL->setOpenExternalLinks(true);
         proposalItem->addWidget(strProposalURL);
-        
+
         QHBoxLayout* proposalVotes = new QHBoxLayout();
-        
+
         QToolButton* yesButton = new QToolButton();
         yesButton->setIcon(QIcon(":/icons/yesvote"));
         if (nCountMyMasternodes < 0)
@@ -178,7 +190,7 @@ void GovernancePage::updateProposalList(bool fForce)
         labelNoVotes->setText(tr("No:"));
         QLabel* noVotes = new QLabel();
         noVotes->setText(QString::number(pbudgetProposal->GetNays()));
-        
+
         proposalVotes->addWidget(yesButton);
         proposalVotes->addWidget(labelYesVotes);
         proposalVotes->addWidget(yesVotes);
@@ -193,6 +205,29 @@ void GovernancePage::updateProposalList(bool fForce)
 
         ++nRow;
     }
+
+    std::vector<CBudgetProposal*> allotedProposals = budget.GetBudget();
+    CAmount nTotalAllotted = 0;
+    for (CBudgetProposal* pbudgetProposal : allotedProposals) {
+        nTotalAllotted += pbudgetProposal->GetAllotted();
+    }
+
+    CBlockIndex* pindexPrev = chainActive.Tip();
+    int nNext, nLeft;
+    if (!pindexPrev) {
+        nNext = 0;
+        nLeft = 43200;
+    }
+    else {
+        nNext = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+	    nLeft = nNext - pindexPrev->nHeight;
+    }
+
+    ui->next_superblock_value->setText(QString::number(nNext));
+    ui->blocks_before_super_value->setText(QString::number(nLeft));
+    ui->alloted_budget_value->setText(QString::number((int)(nTotalAllotted/COIN)));
+    ui->unallocated_budget_value->setText(QString::number(43200 - (int)(nTotalAllotted/COIN)));
+    ui->masternode_count_value->setText(QString::number(mnodeman.stable_size()));
 }
 
 void GovernancePage::voteButton_clicked(int nVote)
