@@ -517,9 +517,9 @@ public:
     int GetBlockCurrentCycle();
     int GetBlockEndCycle();
     double GetRatio();
-    int GetYeas();
-    int GetNays();
-    int GetAbstains();
+    int GetYeas() const;
+    int GetNays() const;
+    int GetAbstains() const;
     CAmount GetAmount() { return nAmount; }
     void SetAllotted(CAmount nAllotedIn) { nAlloted = nAllotedIn; }
     CAmount GetAllotted() { return nAlloted; }
