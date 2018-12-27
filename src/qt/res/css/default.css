@@ -1707,19 +1707,27 @@ QWidget#GovernancePage .QFrame#frame_Content {
     background-color:#ffffff;
 }
 
-QWidget#GovernancePage .QFrame#proposalFrame {
-    background-color:qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #9179c7, stop: 1 #b396f6);
-    border:1px solid #b396f6;
+QWidget#GovernancePage .ProposalFrame {
     border-radius:5px;
     margin:2px;
     max-height:250px;
 }
 
-QWidget#GovernancePage .QFrame#proposalFrame > QLabel#strProposalName, QLabel#strMonthlyPayout {
+QWidget#GovernancePage .ProposalFrame#proposalFrame {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #9179c7, stop: 1 #b396f6);
+    border:1px solid #b396f6;
+}
+
+QWidget#GovernancePage .ProposalFrame#proposalFramePassing {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #00cc00, stop: 1 #00ef00);
+    border:1px solid #00ef00;
+}
+
+QWidget#GovernancePage .ProposalFrame > QLabel#strProposalName, QLabel#strMonthlyPayout, QLabel#strRemainingPaymentCount {
     font-size:18pt;
 }
 
-QWidget#GovernancePage .QFrame#proposalFrame > QLabel#strProposalURL {
+QWidget#GovernancePage .ProposalFrame > QLabel#strProposalURL {
     font-size:14pt;
 }
 

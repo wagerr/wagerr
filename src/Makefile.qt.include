@@ -107,6 +107,7 @@ QT_MOC_CPP = \
   qt/moc_placebetdialog.cpp \
   qt/moc_placebetevent.cpp \
   qt/moc_privacydialog.cpp \
+  qt/moc_proposalframe.cpp \
   qt/moc_receiverequestdialog.cpp \
   qt/moc_recentrequeststablemodel.cpp \
   qt/moc_rpcconsole.cpp \
@@ -182,6 +183,7 @@ BITCOIN_QT_H = \
   qt/paymentserver.h \
   qt/peertablemodel.h \
   qt/platformstyle.h \
+  qt/proposalframe.h \
   qt/qvalidatedlineedit.h \
   qt/qvaluecombobox.h \
   qt/receivecoinsdialog.h \
@@ -257,6 +259,8 @@ RES_ICONS = \
   qt/res/icons/remove.png \
   qt/res/icons/send.png \
   qt/res/icons/send_dark.png \
+  qt/res/icons/governance.png \
+  qt/res/icons/governance_dark.png \
   qt/res/icons/staking_active.png \
   qt/res/icons/staking_inactive.png \
   qt/res/icons/synced.png \
@@ -275,7 +279,8 @@ RES_ICONS = \
   qt/res/icons/unit_tmwagerr.png \
   qt/res/icons/unit_tuwagerr.png \
   qt/res/icons/yesvote.png \
-  qt/res/icons/novote.png
+  qt/res/icons/novote.png \
+  qt/res/icons/abstainvote.png
 
 BITCOIN_QT_BASE_CPP = \
   qt/bantablemodel.cpp \
@@ -326,6 +331,7 @@ BITCOIN_QT_WALLET_CPP = \
   qt/placebetdialog.cpp \
   qt/placebetevent.cpp \
   qt/privacydialog.cpp \
+  qt/proposalframe.cpp \
   qt/receiverequestdialog.cpp \
   qt/recentrequeststablemodel.cpp \
   qt/sendcoinsdialog.cpp \

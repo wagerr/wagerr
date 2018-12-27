@@ -20,6 +20,7 @@
 
 class ClientModel;
 class WalletModel;
+class CBudgetProposal;
 
 namespace Ui
 {
@@ -30,7 +31,6 @@ QT_BEGIN_NAMESPACE
 class QModelIndex;
 QT_END_NAMESPACE
 
-/** Dialog for requesting payment of bitcoins */
 class GovernancePage : public QWidget
 {
     Q_OBJECT
@@ -41,15 +41,17 @@ public:
 
     void setClientModel(ClientModel* clientModel);
     void setWalletModel(WalletModel* walletModel);
-    void SendVote(std::string strHash, int nVote);
+    void setExtendedProposal(CBudgetProposal* proposal);
+    void lockUpdating(bool lock);
 
 private:
     QMenu* contextMenu;
     int64_t nTimeFilterUpdated;
     bool fFilterUpdated;
+    bool fLockUpdating;
 
 public Q_SLOTS:
-    void updateProposalList(bool fForce = false);
+    void updateProposalList();
 
 Q_SIGNALS:
 
@@ -59,11 +61,10 @@ private:
     ClientModel* clientModel;
     WalletModel* walletModel;
     QString strCurrentFilter;
+    CBudgetProposal* extendedProposal;
 
 private Q_SLOTS:
-    void voteButton_clicked(int nVote);
-    //void noButton_clicked();
     void on_UpdateButton_clicked();
 };
- 
+
 #endif // BITCOIN_QT_GOVERNANCEPAGE_H
