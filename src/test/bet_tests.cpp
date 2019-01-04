@@ -31,7 +31,7 @@ typedef struct _peerless_bet_test {
 typedef struct _peerless_result_test {
     std::string opCode;
     uint32_t nEventId;
-    ResultType nResult;
+    ResultType nMoneyLineResult;
 } peerless_result_test;
 
 typedef struct _peerless_update_odds_test {
@@ -167,7 +167,7 @@ const peerless_bet_test pb_tests[] = {
                           "019A861A"  // Event ID
                           "02",       // Bet Outcome Type
                 .nEventId = 26904090,
-                .nOutcome = OutcomeTypeLose,
+                .nOutcome = moneyLineLose,
         },
         {
                 .opCode = "42"
@@ -176,7 +176,7 @@ const peerless_bet_test pb_tests[] = {
                           "000FDB6D"
                           "01",
                 .nEventId = 1039213,
-                .nOutcome  = OutcomeTypeWin,
+                .nOutcome  = moneyLineWin,
         },
         {
                 .opCode = "42"
@@ -185,7 +185,7 @@ const peerless_bet_test pb_tests[] = {
                           "FFFFFFFF"
                           "03",
                 .nEventId = 4294967295,
-                .nOutcome  = OutcomeTypeDraw,
+                .nOutcome  = moneyLineDraw,
         },
 };
 
@@ -197,7 +197,7 @@ const peerless_result_test pr_tests[] = {
                           "00000009"   // Event ID
                           "01",        // Event result type
                 .nEventId = 9,
-                .nResult  = ResultTypeWin,
+                .nMoneyLineResult = homeWin,
         },
         {
                 .opCode = "42"
@@ -206,7 +206,7 @@ const peerless_result_test pr_tests[] = {
                           "01FC97A7"
                           "02",
                 .nEventId = 33331111,
-                .nResult   = ResultTypeLose,
+                .nMoneyLineResult   = awayWin,
         },
         {
                 .opCode = "42"
@@ -215,7 +215,7 @@ const peerless_result_test pr_tests[] = {
                           "FFFFFFFF"
                           "03",
                 .nEventId = 4294967295,
-                .nResult   = ResultTypeDraw,
+                .nMoneyLineResult   = draw,
         }
 };
 
@@ -579,7 +579,7 @@ BOOST_AUTO_TEST_CASE(basics) // constructors, equality, inequality
         // From OpCode
         BOOST_CHECK(CPeerlessResult::FromOpCode(OpCode, pr));
         BOOST_CHECK_EQUAL(pr.nEventId, t.nEventId);
-        BOOST_CHECK_EQUAL(pr.nResult, t.nResult);
+        BOOST_CHECK_EQUAL(pr.nMoneyLineResult, t.nMoneyLineResult);
 
         // To OpCode
         std::string opCode;
