@@ -32,6 +32,8 @@ typedef struct _peerless_result_test {
     std::string opCode;
     uint32_t nEventId;
     ResultType nMoneyLineResult;
+    ResultType nSpreadResult;
+    ResultType nTotalResult;
 } peerless_result_test;
 
 typedef struct _peerless_update_odds_test {
@@ -176,7 +178,7 @@ const peerless_bet_test pb_tests[] = {
                           "000FDB6D"
                           "01",
                 .nEventId = 1039213,
-                .nOutcome  = moneyLineWin,
+                .nOutcome = moneyLineWin,
         },
         {
                 .opCode = "42"
@@ -185,7 +187,7 @@ const peerless_bet_test pb_tests[] = {
                           "FFFFFFFF"
                           "03",
                 .nEventId = 4294967295,
-                .nOutcome  = moneyLineDraw,
+                .nOutcome = moneyLineDraw,
         },
 };
 
@@ -195,27 +197,39 @@ const peerless_result_test pr_tests[] = {
                           "01"         // BTX version number
                           "04"         // TX type
                           "00000009"   // Event ID
-                          "01",        // Event result type
-                .nEventId = 9,
+                          "01"         // MoneyLine result
+                          "01"         // Spread result
+                          "01",        // Totals result
+                .nEventId         = 9,
                 .nMoneyLineResult = homeWin,
+                .nSpreadResult    = homeWin,
+                .nTotalResult     = homeWin
         },
         {
                 .opCode = "42"
                           "01"
                           "04"
                           "01FC97A7"
+                          "02"
+                          "02"
                           "02",
-                .nEventId = 33331111,
-                .nMoneyLineResult   = awayWin,
+                .nEventId         = 33331111,
+                .nMoneyLineResult = awayWin,
+                .nSpreadResult    = awayWin,
+                .nTotalResult     = awayWin
         },
         {
                 .opCode = "42"
                           "01"
                           "04"
                           "FFFFFFFF"
+                          "03"
+                          "03"
                           "03",
-                .nEventId = 4294967295,
-                .nMoneyLineResult   = draw,
+                .nEventId         = 4294967295,
+                .nMoneyLineResult = draw,
+                .nSpreadResult    = awayWin,
+                .nTotalResult     = awayWin
         }
 };
 
