@@ -1060,7 +1060,7 @@ bool CMappingDB::Write(const mappingIndex_t& mappingIndex, uint256 latestBlockHa
     CAutoFile fileout(file, SER_DISK, CLIENT_VERSION);
 
     if (fileout.IsNull())
-        return error("%s : Failed to open file %s", __func__, pathTemp.c_str());
+        return error("%s : Failed to open file %s", __func__, pathTemp.string());
 
     // Write and commit data.
     try {
@@ -1215,7 +1215,7 @@ bool CEventDB::Write(const eventIndex_t& eventIndex, uint256 latestBlockHash)
     CAutoFile fileout(file, SER_DISK, CLIENT_VERSION);
 
     if (fileout.IsNull())
-        return error("%s : Failed to open file %s", __func__, pathTemp.c_str());
+        return error("%s : Failed to open file %s", __func__, pathTemp.string());
 
     // Write and commit data.
     try {
