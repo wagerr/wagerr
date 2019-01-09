@@ -1378,15 +1378,8 @@ std::vector<CTxOut> GetBetPayouts(int height)
         unsigned int nSpreadsOdds = 0;
         unsigned int nTotalsOdds = 0;
 
-        CPeerlessEvent latestEvent;
-        latestEvent.nEventId  = 0;
-        latestEvent.nHomeOdds = 0;
-        latestEvent.nAwayOdds = 0;
-        latestEvent.nDrawOdds = 0;
-        latestEvent.nHomeTeam = 0;
-        latestEvent.nAwayTeam = 0;
-        latestEvent.nStartTime = 0;
-        bool eventStartedFlag = false;
+        time_t latestEventStartTime = 0;
+        bool eventFound = false;
 
         /** TODO - Code below needs to be refactored and added to a function or something **/
         // Find peerless outcome (result).
@@ -1458,30 +1451,25 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
                             LogPrintf("EVENT OP CODE - %s \n", opCode.c_str());
 
-                            if (result.nEventId == pe.nEventId) {
-                                latestEvent.nEventId = pe.nEventId;
-                            }
-
                             // If current event ID matches result ID set the teams and odds.
-                            if (result.nEventId == latestEvent.nEventId && nMoneylineResult == moneyLineWin) {
+                            if (result.nEventId == pe.nEventId && nMoneylineResult == moneyLineWin) {
                                 nMoneylineOdds = pe.nHomeOdds;
                             }
-                            else if (result.nEventId == latestEvent.nEventId && nMoneylineResult == moneyLineLose) {
+                            else if (result.nEventId == pe.nEventId && nMoneylineResult == moneyLineLose) {
                                 nMoneylineOdds = pe.nAwayOdds;
                             }
-                            else if (result.nEventId == latestEvent.nEventId && nMoneylineResult == moneyLineDraw) {
+                            else if (result.nEventId == pe.nEventId && nMoneylineResult == moneyLineDraw) {
                                 nMoneylineOdds = pe.nDrawOdds;
                             }
 
-                            // Set the latest event start time.
-                            if (result.nEventId == latestEvent.nEventId) {
-                                latestEvent.nStartTime = pe.nStartTime;
-                            }
+                            // Set the latest event start time and eventFound flags  .
+                            latestEventStartTime = pe.nStartTime;
+                            eventFound = true;
                         }
 
                         // Peerless update odds OP RETURN transaction.
                         CPeerlessUpdateOdds puo;
-                        if (validResultTx && CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
+                        if (validResultTx && CPeerlessUpdateOdds::FromOpCode(opCode, puo) && eventFound) {
 
                             LogPrintf("PUO EVENT OP CODE - %s \n", opCode.c_str());
 
@@ -1499,7 +1487,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
                         // Handle PSE, when we find an Spreads event on chain we need to update the Spreads odds.
                         CPeerlessSpreadsEvent pse;
-                        if (validResultTx && CPeerlessSpreadsEvent::FromOpCode(opCode, pse)) {
+                        if (validResultTx && CPeerlessSpreadsEvent::FromOpCode(opCode, pse) && eventFound) {
 
                             LogPrintf("PSE EVENT OP CODE - %s \n", opCode.c_str());
 
@@ -1517,7 +1505,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
                         // Handle PTE, when we find an Totals event on chain we need to update the Totals odds.
                         CPeerlessTotalsEvent pte;
-                        if (validResultTx && CPeerlessTotalsEvent::FromOpCode(opCode, pte)) {
+                        if (validResultTx && CPeerlessTotalsEvent::FromOpCode(opCode, pte) && eventFound) {
 
                             LogPrintf("PTE EVENT OP CODE - %s \n", opCode.c_str());
 
@@ -1534,7 +1522,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
                         }
 
                         // Only payout bets that are between 50 - 10000 WRG inclusive (MaxBetPayoutRange).
-                        if (betAmount >= (Params().MinBetPayoutRange() * COIN) && betAmount <= (Params().MaxBetPayoutRange() * COIN)) {
+                        if (eventFound && betAmount >= (Params().MinBetPayoutRange() * COIN) && betAmount <= (Params().MaxBetPayoutRange() * COIN)) {
 
                             // Bet OP RETURN transaction.
                             CPeerlessBet pb;
@@ -1543,9 +1531,8 @@ std::vector<CTxOut> GetBetPayouts(int height)
                                 CAmount payout = 0 * COIN;
 
                                 // If bet was placed less than 20 mins before event start or after event start discard it.
-                                if (latestEvent.nStartTime > 0 && (unsigned int) transactionTime > (latestEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
-                                    eventStartedFlag = true;
-                                    break;
+                                if (latestEventStartTime > 0 && (unsigned int) transactionTime > (latestEventStartTime - Params().BetPlaceTimeoutBlocks())) {
+                                    continue;
                                 }
 
                                 // Is the bet a winning bet?
@@ -1604,14 +1591,6 @@ std::vector<CTxOut> GetBetPayouts(int height)
                         }
                     }
                 }
-
-                if(eventStartedFlag){
-                    break;
-                }
-            }
-
-            if(eventStartedFlag){
-                break;
             }
 
             BlocksIndex = chainActive.Next(BlocksIndex);
@@ -1688,7 +1667,6 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
 
     return std::make_pair(chainGameResults,blockTotalValues);
 }
-
 
 /**
  * Creates the bet payout vector for all winning CGLotto events.
