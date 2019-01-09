@@ -107,7 +107,13 @@ UniValue listevents(const UniValue& params, bool fHelp)
         CPeerlessEvent plEvent = it->second;
         std::string sport = sportsIndex.find(plEvent.nSport)->second.sName;
 
+        // if event filter is set the don't list event if it doesn't match the filter.
         if (params.size() > 0 && sportFilter != sport) {
+            continue;
+        }
+
+        // Only list active events.
+        if ((time_t) plEvent.nStartTime < std::time(0)) {
             continue;
         }
 
