@@ -118,34 +118,44 @@ UniValue listevents(const UniValue& params, bool fHelp)
 
         UniValue evt(UniValue::VOBJ);
 
-        evt.push_back(Pair("event-id", (uint64_t) plEvent.nEventId));
+        evt.push_back(Pair("event_id", (uint64_t) plEvent.nEventId));
         evt.push_back(Pair("sport", sport));
         evt.push_back(Pair("tournament", tournament));
-        evt.push_back(Pair("round", ""));
+        //evt.push_back(Pair("round", ""));
 
         evt.push_back(Pair("starting", (uint64_t) plEvent.nStartTime));
+        evt.push_back(Pair("tester", (uint64_t) plEvent.nAwayTeam));
 
-        UniValue teams(UniValue::VARR);
+        UniValue teams(UniValue::VOBJ);
 
-        UniValue home(UniValue::VOBJ);
-        home.push_back(Pair("name", homeTeam));
-        home.push_back(Pair("odds", (uint64_t) plEvent.nHomeOdds));
-        teams.push_back(home);
-
-        UniValue away(UniValue::VOBJ);
-        away.push_back(Pair("name",  awayTeam));
-        away.push_back(Pair("odds", (uint64_t) plEvent.nAwayOdds));
-        teams.push_back(away);
-
-        // TODO Investigate whether a "draw" should be included as a
-        // team. It may make more sense to name the parent property
-        // "outcomes".
-        UniValue draw(UniValue::VOBJ);
-        draw.push_back(Pair("id", "Draw"));
-        draw.push_back(Pair("odds", (uint64_t) plEvent.nDrawOdds));
-        teams.push_back(draw);
+        teams.push_back(Pair("home", homeTeam));
+        teams.push_back(Pair("away", awayTeam));
 
         evt.push_back(Pair("teams", teams));
+
+        UniValue odds(UniValue::VARR);
+
+        UniValue mlOdds(UniValue::VOBJ);
+        UniValue spreadOdds(UniValue::VOBJ);
+        UniValue totalsOdds(UniValue::VOBJ);
+
+        mlOdds.push_back(Pair("mlHome", (uint64_t) plEvent.nHomeOdds));
+        mlOdds.push_back(Pair("mlAway", (uint64_t) plEvent.nAwayOdds));
+        mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
+
+        spreadOdds.push_back(Pair("spreadPoints", (uint64_t) plEvent.nSpreadPoints));
+        spreadOdds.push_back(Pair("spreadOver", (uint64_t) plEvent.nSpreadOverOdds));
+        spreadOdds.push_back(Pair("spreadUnder", (uint64_t) plEvent.nSpreadUnderOdds));
+
+        totalsOdds.push_back(Pair("totalsPoints", (uint64_t) plEvent.nTotalPoints));
+        totalsOdds.push_back(Pair("totalsOver", (uint64_t) plEvent.nTotalOverOdds));
+        totalsOdds.push_back(Pair("totalsUnder", (uint64_t) plEvent.nTotalUnderOdds));
+
+        odds.push_back(mlOdds);
+        odds.push_back(spreadOdds);
+        odds.push_back(totalsOdds);
+
+        evt.push_back(Pair("odds", odds));
 
         ret.push_back(evt);
     }
@@ -796,14 +806,14 @@ UniValue placebet(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
             "\nExamples:\n" +
-            HelpExampleCli("placebet", "\"#000\" \"RUS\" 0.1 \"donation\" \"seans outpost\"") +
-            HelpExampleRpc("placebet", "\"#000\", \"RUS\", 0.1, \"donation\", \"seans outpost\""));
+            HelpExampleCli("placebet", "\"000\" \"1\" 50\"donation\" \"seans outpost\"") +
+            HelpExampleRpc("placebet", "\"000\", \"1\", 50, \"donation\", \"seans outpost\""));
 
     CAmount nAmount = AmountFromValue(params[2]);
 
     // Validate bet amount so its between 1 - 10000 WGR inclusive.
     if (nAmount < (50 * COIN ) || nAmount > (10000 * COIN)) {
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 1 - 10000 WGR inclusive.");
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 1 - 10000 WGR inclusive.");
     }
 
     // Wallet comments

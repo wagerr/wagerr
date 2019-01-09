@@ -760,7 +760,8 @@ void SetEventSpreadOdds (CPeerlessSpreadsEvent spreadEvent) {
         plEvent.nSpreadUnderOdds = spreadEvent.nUnderOdds;
 
         // Update the event in the event index.
-        CEventDB::AddEvent(plEvent);
+        eventIndex[spreadEvent.nEventId] = plEvent;
+        CEventDB::SetEvents(eventIndex);
     }
 }
 
@@ -844,7 +845,8 @@ void SetEventTotalOdds (CPeerlessTotalsEvent totalsEvent) {
         plEvent.nTotalUnderOdds = totalsEvent.nUnderOdds;
 
         // Update the event in the event index.
-        CEventDB::AddEvent(plEvent);
+        eventIndex[totalsEvent.nEventId] = plEvent;
+        CEventDB::SetEvents(eventIndex);
     }
 }
 
@@ -1377,6 +1379,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
         unsigned int nTotalsOdds = 0;
 
         CPeerlessEvent latestEvent;
+        latestEvent.nEventId  = 0;
         latestEvent.nHomeOdds = 0;
         latestEvent.nAwayOdds = 0;
         latestEvent.nDrawOdds = 0;
@@ -1388,13 +1391,13 @@ std::vector<CTxOut> GetBetPayouts(int height)
         /** TODO - Code below needs to be refactored and added to a function or something **/
         // Find peerless outcome (result).
         if (result.nMoneyLineResult == homeWin) {
-            nMoneylineResult = (OutcomeType) moneyLineWin;
+            nMoneylineResult = moneyLineWin;
         }
         else if (result.nMoneyLineResult == awayWin) {
-            nMoneylineResult = (OutcomeType) moneyLineLose;
+            nMoneylineResult = moneyLineLose;
         }
         else if (result.nMoneyLineResult == draw) {
-            nMoneylineResult = (OutcomeType) moneyLineDraw;
+            nMoneylineResult = moneyLineDraw;
         }
 
         // Find spreads outcome (result).
@@ -1455,19 +1458,25 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
                             LogPrintf("EVENT OP CODE - %s \n", opCode.c_str());
 
+                            if (result.nEventId == pe.nEventId) {
+                                latestEvent.nEventId = pe.nEventId;
+                            }
+
                             // If current event ID matches result ID set the teams and odds.
-                            if (result.nEventId == pe.nEventId && nMoneylineResult == moneyLineWin) {
+                            if (result.nEventId == latestEvent.nEventId && nMoneylineResult == moneyLineWin) {
                                 nMoneylineOdds = pe.nHomeOdds;
                             }
-                            else if (result.nEventId == pe.nEventId && nMoneylineResult == moneyLineLose) {
+                            else if (result.nEventId == latestEvent.nEventId && nMoneylineResult == moneyLineLose) {
                                 nMoneylineOdds = pe.nAwayOdds;
                             }
-                            else if (result.nEventId == pe.nEventId && nMoneylineResult == moneyLineDraw) {
+                            else if (result.nEventId == latestEvent.nEventId && nMoneylineResult == moneyLineDraw) {
                                 nMoneylineOdds = pe.nDrawOdds;
                             }
 
                             // Set the latest event start time.
-                            latestEvent.nStartTime = pe.nStartTime;
+                            if (result.nEventId == latestEvent.nEventId) {
+                                latestEvent.nStartTime = pe.nStartTime;
+                            }
                         }
 
                         // Peerless update odds OP RETURN transaction.
