@@ -89,11 +89,6 @@ Accumulator& Accumulator::operator += (const PublicCoin& c) {
 	return *this;
 }
 
-Accumulator& Accumulator::operator = (Accumulator rhs) {
-    if (this != &rhs) std::swap(*this, rhs);
-    return *this;
-}
-
 bool Accumulator::operator == (const Accumulator rhs) const {
 	return this->value == rhs.value;
 }
@@ -140,13 +135,6 @@ bool AccumulatorWitness::VerifyWitness(const Accumulator& a, const PublicCoin &p
 AccumulatorWitness& AccumulatorWitness::operator +=(
     const PublicCoin& rhs) {
 	this->AddElement(rhs);
-	return *this;
-}
-
-AccumulatorWitness& AccumulatorWitness::operator =(AccumulatorWitness rhs) {
-    // Not pretty, but seems to work (SPOCK)
-    if (&witness != &rhs.witness) this->witness = rhs.witness;
-    if (&element != &rhs.element) std::swap(element, rhs.element);
 	return *this;
 }
 
