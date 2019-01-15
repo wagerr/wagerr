@@ -144,18 +144,18 @@ if __name__ == '__main__':
         # Check imported symbols
         for sym,version in read_symbols(filename, True):
             if version and not check_version(MAX_VERSIONS, version):
-                print('%s: symbol %s from unsupported version %s' % (filename, cppfilt(sym).decode('utf-8'), version.decode('utf-8')))
+                print('%s: symbol %s from unsupported version %s' % (filename, cppfilt(sym), version))
                 retval = 1
         # Check exported symbols
         for sym,version in read_symbols(filename, False):
             if sym in IGNORE_EXPORTS:
                 continue
-            print('%s: export of symbol %s not allowed' % (filename, cppfilt(sym).decode('utf-8')))
+            print('%s: export of symbol %s not allowed' % (filename, cppfilt(sym)))
             retval = 1
         # Check dependency libraries
         for library_name in read_libraries(filename):
             if library_name not in ALLOWED_LIBRARIES:
-                print('%s: NEEDED library %s is not allowed' % (filename, library_name.decode('utf-8')))
+                print('%s: NEEDED library %s is not allowed' % (filename, library_name))
                 retval = 1
 
     sys.exit(retval)
