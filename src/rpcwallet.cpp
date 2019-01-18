@@ -104,66 +104,71 @@ UniValue listevents(const UniValue& params, bool fHelp)
     map<uint32_t, CPeerlessEvent>::iterator it;
     for (it = eventsIndex.begin(); it != eventsIndex.end(); it++) {
 
-        CPeerlessEvent plEvent = it->second;
-        std::string sport = sportsIndex.find(plEvent.nSport)->second.sName;
+        try {
+            CPeerlessEvent plEvent = it->second;
+            std::string sport = sportsIndex.find(plEvent.nSport)->second.sName;
 
-        // if event filter is set the don't list event if it doesn't match the filter.
-        if (params.size() > 0 && sportFilter != sport) {
-            continue;
+            // if event filter is set the don't list event if it doesn't match the filter.
+            if (params.size() > 0 && sportFilter != sport) {
+                continue;
+            }
+
+            // Only list active events.
+            if ((time_t) plEvent.nStartTime < std::time(0)) {
+                continue;
+            }
+
+            //std::string round      = roundsIndex.find(plEvent.nStage)->second.sName;
+            std::string tournament = tournamentsIndex.find(plEvent.nTournament)->second.sName;
+            std::string homeTeam = teamsIndex.find(plEvent.nHomeTeam)->second.sName;
+            std::string awayTeam = teamsIndex.find(plEvent.nAwayTeam)->second.sName;
+
+            UniValue evt(UniValue::VOBJ);
+
+            evt.push_back(Pair("event_id", (uint64_t) plEvent.nEventId));
+            evt.push_back(Pair("sport", sport));
+            evt.push_back(Pair("tournament", tournament));
+            //evt.push_back(Pair("round", ""));
+
+            evt.push_back(Pair("starting", (uint64_t) plEvent.nStartTime));
+            evt.push_back(Pair("tester", (uint64_t) plEvent.nAwayTeam));
+
+            UniValue teams(UniValue::VOBJ);
+
+            teams.push_back(Pair("home", homeTeam));
+            teams.push_back(Pair("away", awayTeam));
+
+            evt.push_back(Pair("teams", teams));
+
+            UniValue odds(UniValue::VARR);
+
+            UniValue mlOdds(UniValue::VOBJ);
+            UniValue spreadOdds(UniValue::VOBJ);
+            UniValue totalsOdds(UniValue::VOBJ);
+
+            mlOdds.push_back(Pair("mlHome", (uint64_t) plEvent.nHomeOdds));
+            mlOdds.push_back(Pair("mlAway", (uint64_t) plEvent.nAwayOdds));
+            mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
+
+            spreadOdds.push_back(Pair("spreadPoints", (uint64_t) plEvent.nSpreadPoints));
+            spreadOdds.push_back(Pair("spreadOver", (uint64_t) plEvent.nSpreadOverOdds));
+            spreadOdds.push_back(Pair("spreadUnder", (uint64_t) plEvent.nSpreadUnderOdds));
+
+            totalsOdds.push_back(Pair("totalsPoints", (uint64_t) plEvent.nTotalPoints));
+            totalsOdds.push_back(Pair("totalsOver", (uint64_t) plEvent.nTotalOverOdds));
+            totalsOdds.push_back(Pair("totalsUnder", (uint64_t) plEvent.nTotalUnderOdds));
+
+            odds.push_back(mlOdds);
+            odds.push_back(spreadOdds);
+            odds.push_back(totalsOdds);
+
+            evt.push_back(Pair("odds", odds));
+
+            ret.push_back(evt);
         }
-
-        // Only list active events.
-        if ((time_t) plEvent.nStartTime < std::time(0)) {
-            continue;
+        catch (std::exception& e) {
+            LogPrintf("ListEvents() failed to pull event data from .dats ");
         }
-
-        std::string round      = roundsIndex.find(plEvent.nStage)->second.sName;
-        std::string tournament = tournamentsIndex.find(plEvent.nTournament)->second.sName;
-        std::string homeTeam   = teamsIndex.find(plEvent.nHomeTeam)->second.sName;
-        std::string awayTeam   = teamsIndex.find(plEvent.nAwayTeam)->second.sName;
-
-        UniValue evt(UniValue::VOBJ);
-
-        evt.push_back(Pair("event_id", (uint64_t) plEvent.nEventId));
-        evt.push_back(Pair("sport", sport));
-        evt.push_back(Pair("tournament", tournament));
-        //evt.push_back(Pair("round", ""));
-
-        evt.push_back(Pair("starting", (uint64_t) plEvent.nStartTime));
-        evt.push_back(Pair("tester", (uint64_t) plEvent.nAwayTeam));
-
-        UniValue teams(UniValue::VOBJ);
-
-        teams.push_back(Pair("home", homeTeam));
-        teams.push_back(Pair("away", awayTeam));
-
-        evt.push_back(Pair("teams", teams));
-
-        UniValue odds(UniValue::VARR);
-
-        UniValue mlOdds(UniValue::VOBJ);
-        UniValue spreadOdds(UniValue::VOBJ);
-        UniValue totalsOdds(UniValue::VOBJ);
-
-        mlOdds.push_back(Pair("mlHome", (uint64_t) plEvent.nHomeOdds));
-        mlOdds.push_back(Pair("mlAway", (uint64_t) plEvent.nAwayOdds));
-        mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
-
-        spreadOdds.push_back(Pair("spreadPoints", (uint64_t) plEvent.nSpreadPoints));
-        spreadOdds.push_back(Pair("spreadOver", (uint64_t) plEvent.nSpreadOverOdds));
-        spreadOdds.push_back(Pair("spreadUnder", (uint64_t) plEvent.nSpreadUnderOdds));
-
-        totalsOdds.push_back(Pair("totalsPoints", (uint64_t) plEvent.nTotalPoints));
-        totalsOdds.push_back(Pair("totalsOver", (uint64_t) plEvent.nTotalOverOdds));
-        totalsOdds.push_back(Pair("totalsUnder", (uint64_t) plEvent.nTotalUnderOdds));
-
-        odds.push_back(mlOdds);
-        odds.push_back(spreadOdds);
-        odds.push_back(totalsOdds);
-
-        evt.push_back(Pair("odds", odds));
-
-        ret.push_back(evt);
     }
 
     return ret;
