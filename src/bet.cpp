@@ -291,8 +291,8 @@ bool CPeerlessEvent::FromOpCode(std::string opCode, CPeerlessEvent &pe)
 
     // Set default values for the spread and total market odds as we don't know them yet.
     pe.nSpreadPoints    = 0;
-    pe.nSpreadOverOdds  = 0;
-    pe.nSpreadUnderOdds = 0;
+    pe.nSpreadHomeOdds  = 0;
+    pe.nSpreadAwayOdds  = 0;
     pe.nTotalPoints     = 0;
     pe.nTotalOverOdds   = 0;
     pe.nTotalUnderOdds  = 0;
@@ -710,8 +710,8 @@ bool CPeerlessSpreadsEvent::FromOpCode(std::string opCode, CPeerlessSpreadsEvent
 
     pse.nEventId   = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
     pse.nPoints    = FromChars(opCode[7], opCode[8]);
-    pse.nOverOdds  = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
-    pse.nUnderOdds = FromChars(opCode[13], opCode[14], opCode[15], opCode[16]);
+    pse.nHomeOdds  = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+    pse.nAwayOdds  = FromChars(opCode[13], opCode[14], opCode[15], opCode[16]);
 
     return true;
 }
@@ -725,12 +725,12 @@ bool CPeerlessSpreadsEvent::FromOpCode(std::string opCode, CPeerlessSpreadsEvent
  */
 bool CPeerlessSpreadsEvent::ToOpCode(CPeerlessSpreadsEvent pse, std::string &opCode)
 {
-    std::string sEventId    = ToHex(pse.nEventId, 8);
-    std::string sPoints     = ToHex(pse.nPoints, 4);
-    std::string sOverOdds   = ToHex(pse.nOverOdds, 8);
-    std::string sUnderOdds  = ToHex(pse.nUnderOdds, 8);
+    std::string sEventId  = ToHex(pse.nEventId, 8);
+    std::string sPoints   = ToHex(pse.nPoints, 4);
+    std::string sHomeOdds = ToHex(pse.nHomeOdds, 8);
+    std::string sAwayOdds = ToHex(pse.nAwayOdds, 8);
 
-    opCode = BTX_HEX_PREFIX "0109" + sEventId + sPoints + sOverOdds + sUnderOdds;
+    opCode = BTX_HEX_PREFIX "0109" + sEventId + sPoints + sHomeOdds + sAwayOdds;
 
     // Ensure peerless result OpCode string is the correct length.
     if (opCode.length() != PSE_OP_STRLEN) {
@@ -756,8 +756,8 @@ void SetEventSpreadOdds (CPeerlessSpreadsEvent spreadEvent) {
         CPeerlessEvent plEvent = eventIndex.find(spreadEvent.nEventId)->second;
 
         plEvent.nSpreadPoints    = spreadEvent.nPoints;
-        plEvent.nSpreadOverOdds  = spreadEvent.nOverOdds;
-        plEvent.nSpreadUnderOdds = spreadEvent.nUnderOdds;
+        plEvent.nSpreadHomeOdds  = spreadEvent.nHomeOdds;
+        plEvent.nSpreadAwayOdds  = spreadEvent.nAwayOdds;
 
         // Update the event in the event index.
         eventIndex[spreadEvent.nEventId] = plEvent;
@@ -1395,16 +1395,16 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
         // Find spreads outcome (result).
         if (result.nSpreadResult == homeWin) {
-            vSpreadsResult.emplace_back(spreadOver);
-            vSpreadsResult.emplace_back(spreadOver);
+            vSpreadsResult.emplace_back(spreadHome);
+            vSpreadsResult.emplace_back(spreadHome);
         }
         else if (result.nSpreadResult == awayWin) {
-            vSpreadsResult.emplace_back(spreadUnder);
-            vSpreadsResult.emplace_back(spreadUnder);
+            vSpreadsResult.emplace_back(spreadAway);
+            vSpreadsResult.emplace_back(spreadAway);
         }
         else {
-            vSpreadsResult.emplace_back(spreadOver);
-            vSpreadsResult.emplace_back(spreadUnder);
+            vSpreadsResult.emplace_back(spreadHome);
+            vSpreadsResult.emplace_back(spreadAway);
         }
 
         // Find totals outcome (result).
@@ -1492,13 +1492,13 @@ std::vector<CTxOut> GetBetPayouts(int height)
                             LogPrintf("PSE EVENT OP CODE - %s \n", opCode.c_str());
 
                             // If current event ID matches result ID set the odds.
-                            if (result.nEventId == pse.nEventId && vSpreadsResult.at(0) == spreadOver && vSpreadsResult.at(1) == spreadOver) {
-                                nSpreadsOdds = pse.nOverOdds;
+                            if (result.nEventId == pse.nEventId && vSpreadsResult.at(0) == spreadHome && vSpreadsResult.at(1) == spreadHome) {
+                                nSpreadsOdds = pse.nHomeOdds;
                             }
-                            else if (result.nEventId == pse.nEventId && vSpreadsResult.at(0) == spreadUnder && vSpreadsResult.at(1) == spreadUnder) {
-                                nSpreadsOdds = pse.nUnderOdds;
+                            else if (result.nEventId == pse.nEventId && vSpreadsResult.at(0) == spreadAway && vSpreadsResult.at(1) == spreadAway) {
+                                nSpreadsOdds = pse.nAwayOdds;
                             }
-                            else if (result.nEventId == pse.nEventId && vSpreadsResult.at(0) == spreadOver && vSpreadsResult.at(1) == spreadUnder) {
+                            else if (result.nEventId == pse.nEventId && vSpreadsResult.at(0) == spreadHome && vSpreadsResult.at(1) == spreadAway) {
                                 nSpreadsOdds = Params().OddsDivisor();
                             }
                         }

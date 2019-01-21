@@ -151,8 +151,8 @@ UniValue listevents(const UniValue& params, bool fHelp)
             mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
 
             spreadOdds.push_back(Pair("spreadPoints", (uint64_t) plEvent.nSpreadPoints));
-            spreadOdds.push_back(Pair("spreadOver", (uint64_t) plEvent.nSpreadOverOdds));
-            spreadOdds.push_back(Pair("spreadUnder", (uint64_t) plEvent.nSpreadUnderOdds));
+            spreadOdds.push_back(Pair("spreadHome", (uint64_t) plEvent.nSpreadHomeOdds));
+            spreadOdds.push_back(Pair("spreadAway", (uint64_t) plEvent.nSpreadAwayOdds));
 
             totalsOdds.push_back(Pair("totalsPoints", (uint64_t) plEvent.nTotalPoints));
             totalsOdds.push_back(Pair("totalsOver", (uint64_t) plEvent.nTotalOverOdds));
