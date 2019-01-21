@@ -16,8 +16,8 @@ typedef enum OutcomeType {
     moneyLineWin  = 0x01,
     moneyLineLose = 0x02,
     moneyLineDraw = 0x03,
-    spreadOver    = 0x04,
-    spreadUnder   = 0x05,
+    spreadHome    = 0x04,
+    spreadAway    = 0x05,
     totalOver     = 0x06,
     totalUnder    = 0x07
 } OutcomeType;
@@ -77,8 +77,8 @@ public:
     uint32_t nAwayOdds;
     uint32_t nDrawOdds;
     uint32_t nSpreadPoints;
-    uint32_t nSpreadOverOdds;
-    uint32_t nSpreadUnderOdds;
+    uint32_t nSpreadHomeOdds;
+    uint32_t nSpreadAwayOdds;
     uint32_t nTotalPoints;
     uint32_t nTotalOverOdds;
     uint32_t nTotalUnderOdds;
@@ -106,8 +106,8 @@ public:
         READWRITE(nAwayOdds);
         READWRITE(nDrawOdds);
         READWRITE(nSpreadPoints);
-        READWRITE(nSpreadOverOdds);
-        READWRITE(nSpreadUnderOdds);
+        READWRITE(nSpreadHomeOdds);
+        READWRITE(nSpreadAwayOdds);
         READWRITE(nTotalPoints);
         READWRITE(nTotalOverOdds);
         READWRITE(nTotalUnderOdds);
@@ -223,8 +223,8 @@ class CPeerlessSpreadsEvent
 public:
     uint32_t nEventId;
     uint32_t nPoints;
-    uint32_t nOverOdds;
-    uint32_t nUnderOdds;
+    uint32_t nHomeOdds;
+    uint32_t nAwayOdds;
 
     // Default Constructor.
     CPeerlessSpreadsEvent() {}
