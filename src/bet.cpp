@@ -937,6 +937,11 @@ mappingIndex_t CMappingDB::mRoundsIndex;
 mappingIndex_t CMappingDB::mTeamsIndex;
 mappingIndex_t CMappingDB::mTournamentsIndex;
 
+CCriticalSection CMappingDB::cs_setSports;
+CCriticalSection CMappingDB::cs_setRounds;
+CCriticalSection CMappingDB::cs_setTeams;
+CCriticalSection CMappingDB::cs_setTournaments;
+
 /**
  * Returns then global sports index.
  *
@@ -944,6 +949,7 @@ mappingIndex_t CMappingDB::mTournamentsIndex;
  */
 void CMappingDB::GetSports(mappingIndex_t &sportsIndex)
 {
+    LOCK(cs_setSports);
     sportsIndex = mSportsIndex;
 }
 
@@ -954,6 +960,7 @@ void CMappingDB::GetSports(mappingIndex_t &sportsIndex)
  */
 void CMappingDB::SetSports(const mappingIndex_t &sportsIndex)
 {
+    LOCK(cs_setSports);
     mSportsIndex = sportsIndex;
 }
 
@@ -964,6 +971,7 @@ void CMappingDB::SetSports(const mappingIndex_t &sportsIndex)
  */
 void CMappingDB::AddSport(const CMapping sm)
 {
+    LOCK(cs_setSports);
     mSportsIndex.insert(make_pair(sm.nId, sm));
 }
 
@@ -974,6 +982,7 @@ void CMappingDB::AddSport(const CMapping sm)
  */
 void CMappingDB::GetRounds(mappingIndex_t &roundsIndex)
 {
+    LOCK(cs_setRounds);
     roundsIndex = mRoundsIndex;
 }
 
@@ -984,6 +993,7 @@ void CMappingDB::GetRounds(mappingIndex_t &roundsIndex)
  */
 void CMappingDB::SetRounds(const mappingIndex_t &roundsIndex)
 {
+    LOCK(cs_setRounds);
     mRoundsIndex = roundsIndex;
 }
 
@@ -994,6 +1004,7 @@ void CMappingDB::SetRounds(const mappingIndex_t &roundsIndex)
  */
 void CMappingDB::AddRound(const CMapping rm)
 {
+    LOCK(cs_setRounds);
     mRoundsIndex.insert(make_pair(rm.nId, rm));
 }
 
@@ -1004,6 +1015,7 @@ void CMappingDB::AddRound(const CMapping rm)
  */
 void CMappingDB::GetTeams(mappingIndex_t &teamsIndex)
 {
+    LOCK(cs_setTeams);
     teamsIndex = mTeamsIndex;
 }
 
@@ -1014,6 +1026,7 @@ void CMappingDB::GetTeams(mappingIndex_t &teamsIndex)
  */
 void CMappingDB::SetTeams(const mappingIndex_t &teamsIndex)
 {
+    LOCK(cs_setTeams);
     mTeamsIndex = teamsIndex;
 }
 
@@ -1024,6 +1037,7 @@ void CMappingDB::SetTeams(const mappingIndex_t &teamsIndex)
  */
 void CMappingDB::AddTeam(const CMapping tm)
 {
+    LOCK(cs_setTeams);
     mTeamsIndex.insert(make_pair(tm.nId, tm));
 }
 
@@ -1034,6 +1048,7 @@ void CMappingDB::AddTeam(const CMapping tm)
  */
 void CMappingDB::GetTournaments(mappingIndex_t &tournamentsIndex)
 {
+    LOCK(cs_setTournaments);
     tournamentsIndex = mTournamentsIndex;
 }
 
@@ -1044,6 +1059,7 @@ void CMappingDB::GetTournaments(mappingIndex_t &tournamentsIndex)
  */
 void CMappingDB::SetTournaments(const mappingIndex_t &tournamentsIndex)
 {
+    LOCK(cs_setTournaments);
     mTournamentsIndex = tournamentsIndex;
 }
 
@@ -1054,6 +1070,7 @@ void CMappingDB::SetTournaments(const mappingIndex_t &tournamentsIndex)
  */
 void CMappingDB::AddTournament(const CMapping tm)
 {
+    LOCK(cs_setTournaments);
     mTournamentsIndex.insert(make_pair(tm.nId, tm));
 }
 
@@ -1171,6 +1188,7 @@ CEventDB::CEventDB()
 
 /** The global events index. **/
 eventIndex_t CEventDB::eventsIndex;
+CCriticalSection CEventDB::cs_setEvents;
 
 /**
  * Returns the current events list.
@@ -1179,6 +1197,7 @@ eventIndex_t CEventDB::eventsIndex;
  */
 void CEventDB::GetEvents(eventIndex_t &eventIndex)
 {
+    LOCK(cs_setEvents);
     eventIndex = eventsIndex;
 }
 
@@ -1189,6 +1208,7 @@ void CEventDB::GetEvents(eventIndex_t &eventIndex)
  */
 void CEventDB::SetEvents(const eventIndex_t &eventIndex)
 {
+    LOCK(cs_setEvents);
     eventsIndex = eventIndex;
 }
 
@@ -1199,6 +1219,7 @@ void CEventDB::SetEvents(const eventIndex_t &eventIndex)
  */
 void CEventDB::AddEvent(CPeerlessEvent pe)
 {
+    LOCK(cs_setEvents);
     eventsIndex.insert(make_pair(pe.nEventId, pe));
 }
 
@@ -1209,6 +1230,7 @@ void CEventDB::AddEvent(CPeerlessEvent pe)
  */
 void CEventDB::RemoveEvent(CPeerlessEvent pe)
 {
+    LOCK(cs_setEvents);
     eventsIndex.erase(pe.nEventId);
 }
 

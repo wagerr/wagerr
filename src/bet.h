@@ -287,6 +287,11 @@ protected:
     static mappingIndex_t mTeamsIndex;
     static mappingIndex_t mTournamentsIndex;
 
+    static CCriticalSection cs_setSports;
+    static CCriticalSection cs_setRounds;
+    static CCriticalSection cs_setTeams;
+    static CCriticalSection cs_setTournaments;
+
 private:
     std::string mDBFileName;
     boost::filesystem::path mFilePath;
@@ -323,6 +328,7 @@ class CEventDB
 protected:
     // Global variable that stores the current live Wagerr events.
     static eventIndex_t eventsIndex;
+    static CCriticalSection cs_setEvents;
 
 private:
     boost::filesystem::path pathEvents;
