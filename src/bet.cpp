@@ -512,6 +512,30 @@ bool CPeerlessUpdateOdds::ToOpCode(CPeerlessUpdateOdds puo, std::string &opCode)
 }
 
 /**
+ * Updates a peerless event object with new money line odds.
+ */
+void SetEventMLOdds (CPeerlessUpdateOdds puo) {
+    CEventDB edb;
+    eventIndex_t eventIndex;
+    edb.GetEvents(eventIndex);
+
+    // First check a peerless event exists in the event index.
+    if (eventIndex.count(puo.nEventId) > 0) {
+
+        // Get the event object from the index and update the money line odds values.
+        CPeerlessEvent plEvent = eventIndex.find(puo.nEventId)->second;
+
+        plEvent.nHomeOdds = puo.nHomeOdds;
+        plEvent.nAwayOdds = puo.nAwayOdds;
+        plEvent.nDrawOdds = puo.nDrawOdds;
+
+        // Update the event in the event index.
+        eventIndex[puo.nEventId] = plEvent;
+        CEventDB::SetEvents(eventIndex);
+    }
+}
+
+/**
  * Split a CChainGamesEvent OpCode string into byte components and store in chain games
  * result object.
  *

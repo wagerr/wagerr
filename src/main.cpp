@@ -4635,6 +4635,9 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                     vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
                     std::string opCode(v.begin(), v.end());
 
+                    // TODO - Optimise the OP code validation, we don't need to compare current OP code against all TX types.
+                    // if it matches any TX type the rest should be skipped.
+
                     // If events found in block add them to the events index.
                     CPeerlessEvent plEvent;
                     if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
@@ -4646,6 +4649,13 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                     CPeerlessResult plResult;
                     if (CPeerlessResult::FromOpCode(opCode, plResult)) {
                         CEventDB::RemoveEvent(plEvent);
+                        eiUpdated = true;
+                    }
+
+                    // If update money line odds TX found in block, update the event index.
+                    CPeerlessUpdateOdds puo;
+                    if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
+                        SetEventMLOdds(puo);
                         eiUpdated = true;
                     }
 

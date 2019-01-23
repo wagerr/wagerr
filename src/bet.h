@@ -359,4 +359,7 @@ void SetEventSpreadOdds(CPeerlessSpreadsEvent sEventOdds);
 /** Set a peerless event total odds **/
 void SetEventTotalOdds(CPeerlessTotalsEvent tEventOdds);
 
+/** Set a peerless event money line odds **/
+void SetEventMLOdds(CPeerlessUpdateOdds mEventOdds);
+
 #endif // WAGERR_BET_H
