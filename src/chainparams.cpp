@@ -303,7 +303,7 @@ public:
         nZerocoinStartHeight = 50;            // Start accumulation coins here - first zerocoin mint occurs at block 87
 
         /** Bet related parameters **/
-        nBetStartHeight = 26150;                                        // The block that betting protocols become active (Testnet).
+        nBetStartHeight = 20600;                                        // The block that betting protocols become active (Testnet).
         strOracleWalletAddr = "TJtBqooSnYGhatyefH1Th9MyMXowi1xfKf";     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
         strDevPayoutAddr = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";        // Development fund payout address (Testnet).
