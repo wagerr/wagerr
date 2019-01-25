@@ -1032,6 +1032,21 @@ bool ContextualCheckZerocoinMint(const CTransaction& tx, const PublicCoin& coin,
 
 bool ContextualCheckZerocoinSpend(const CTransaction& tx, const CoinSpend& spend, CBlockIndex* pindex, const uint256& hashBlock)
 {
+    if(!ContextualCheckZerocoinSpendNoSerialCheck(tx, spend, pindex, hashBlock)){
+        return false;
+    }
+
+    //Reject serial's that are already in the blockchain
+    int nHeightTx = 0;
+    if (IsSerialInBlockchain(spend.getCoinSerialNumber(), nHeightTx))
+        return error("%s : zWGR spend with serial %s is already in block %d\n", __func__,
+                     spend.getCoinSerialNumber().GetHex(), nHeightTx);
+
+    return true;
+}
+
+bool ContextualCheckZerocoinSpendNoSerialCheck(const CTransaction& tx, const CoinSpend& spend, CBlockIndex* pindex, const uint256& hashBlock)
+{
     //Check to see if the zWGR is properly signed
     if (pindex->nHeight >= Params().Zerocoin_Block_V2_Start()) {
         if (!spend.HasValidSignature())
@@ -1045,12 +1060,6 @@ bool ContextualCheckZerocoinSpend(const CTransaction& tx, const CoinSpend& spend
                          tx.GetHash().GetHex());
         }
     }
-
-    //Reject serial's that are already in the blockchain
-    int nHeightTx = 0;
-    if (IsSerialInBlockchain(spend.getCoinSerialNumber(), nHeightTx))
-        return error("%s : zWGR spend with serial %s is already in block %d\n", __func__,
-                     spend.getCoinSerialNumber().GetHex(), nHeightTx);
 
     //Reject serial's that are not in the acceptable value range
     bool fUseV1Params = spend.getVersion() < libzerocoin::PrivateCoin::PUBKEY_VERSION;
@@ -4540,17 +4549,39 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
     }
 
     int nHeight = pindex->nHeight;
-
+    int splitHeight = -1;
 
     if (isPoS) {
         LOCK(cs_main);
 
+        const bool isBlockFromFork = pindexPrev != nullptr && !chainActive.Contains(pindexPrev);
+        CTransaction &stakeTxIn = block.vtx[1];
+
+        // Check validity of the coinStake.
+        if(!stakeTxIn.IsCoinStake())
+            return error("%s: no coin stake on vtx pos 1", __func__);
+
+
         // Check whether is a fork or not
-        if (pindexPrev != nullptr && !chainActive.Contains(pindexPrev)) {
+        if (isBlockFromFork) {
 
             // Start at the block we're adding on to
             CBlockIndex *prev = pindexPrev;
-            CTransaction &stakeTxIn = block.vtx[1];
+
+            // Inputs
+            std::vector<CTxIn> wgrInputs;
+            std::vector<CTxIn> zWGRInputs;
+
+            for (CTxIn stakeIn : stakeTxIn.vin) {
+                if(stakeIn.scriptSig.IsZerocoinSpend()){
+                    zWGRInputs.push_back(stakeIn);
+                }else{
+                    wgrInputs.push_back(stakeIn);
+                }
+            }
+            const bool hasWGRInputs = !wgrInputs.empty();
+            const bool hasZWGRInputs = !zWGRInputs.empty();
+            vector<CBigNum> vBlockSerials;
             CBlock bl;
             // Go backwards on the forked chain up to the split
             do {
@@ -4563,20 +4594,101 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                 for (CTransaction t : bl.vtx) {
                     for (CTxIn in: t.vin) {
                         // Loop through every input of the staking tx
-                        for (CTxIn stakeIn : stakeTxIn.vin) {
+                        for (CTxIn stakeIn : wgrInputs) {
                             // if it's already spent
-                            if (stakeIn.prevout == in.prevout) {
-                                // reject the block
-                                return state.DoS(100,
-                                                 error("%s: input already spent on a previous block", __func__));
+                            // First regular staking check
+                            if(hasWGRInputs) {
+                                if (stakeIn.prevout == in.prevout) {
+                                    // reject the block
+                                    return state.DoS(100,
+                                                     error("%s: input already spent on a previous block",
+                                                           __func__));
+                                }
+                            }
+                            // Second, if there is zPoS staking then store the serials for later check
+                            if(hasZWGRInputs) {
+                                if(in.scriptSig.IsZerocoinSpend()){
+                                    CoinSpend spend = TxInToZerocoinSpend(in);
+                                    vBlockSerials.push_back(spend.getCoinSerialNumber());
+                                }
                             }
                         }
                     }
                 }
+
                 prev = prev->pprev;
 
             } while (!chainActive.Contains(prev));
+
+            // Split height
+            splitHeight = prev->nHeight;
+
+            // Now that this loop if completed. Check if we have zWGR inputs.
+            if(hasZWGRInputs){
+
+                for (CTxIn zWgrInput : zWGRInputs) {
+                    CoinSpend spend = TxInToZerocoinSpend(zWgrInput);
+
+                    // First check if the serials were not already spent on the forked blocks.
+                    CBigNum coinSerial = spend.getCoinSerialNumber();
+                    for(CBigNum serial : vBlockSerials){
+                        if(serial == coinSerial){
+                            return state.DoS(100,
+                                             error("%s: serial double spent on fork",
+                                                   __func__));
+                        }
+                    }
+                    // Now check if the serial exists before the chain split.
+                    int nHeightTx = 0;
+                    if (IsSerialInBlockchain(spend.getCoinSerialNumber(), nHeightTx)){
+                        // if the height is nHeightTx > chainSplit means that the spent occurred after the chain split
+                        if(nHeightTx <= splitHeight){
+                            return state.DoS(100,
+                                             error("%s: serial double spent on main chain",
+                                                   __func__));
+                        }
+                    }
+
+                    if (!ContextualCheckZerocoinSpendNoSerialCheck(stakeTxIn, spend, pindex, 0))
+                        return state.DoS(100,error("%s: ContextualCheckZerocoinSpend failed for tx %s", __func__,
+                                                   stakeTxIn.GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-zwgr");
+
+                    // Now only the ZKP left..
+                    // As the spend maturity is 200, the acc value must be accumulated, otherwise it's not ready to be spent
+                    CBigNum bnAccumulatorValue = 0;
+                    if (!zerocoinDB->ReadAccumulatorValue(spend.getAccumulatorChecksum(), bnAccumulatorValue)) {
+                        return state.DoS(100, error("%s: stake zerocoinspend not ready to be spent", __func__));
+                    }
+
+                    Accumulator accumulator(Params().Zerocoin_Params(chainActive.Height() < Params().Zerocoin_Block_V2_Start()),
+                                            spend.getDenomination(), bnAccumulatorValue);
+
+                    //Check that the coinspend is valid
+                    if(!spend.Verify(accumulator))
+                        return state.DoS(100, error("%s: zerocoin spend did not verify", __func__));
+
+                }
+            }
+
         }
+
+
+        // If the stake is not a zPoS then let's check if the inputs were spent on the main chain
+        const CCoinsViewCache coins(pcoinsTip);
+        if(!stakeTxIn.IsZerocoinSpend()) {
+            for (CTxIn in: stakeTxIn.vin) {
+                const CCoins* coin = coins.AccessCoins(in.prevout.hash);
+                if(coin && !coin->IsAvailable(in.prevout.n)){
+                    // If this is not available get the height of the spent and validate it with the forked height
+                    // Check if this occurred before the chain split
+                    if(!(isBlockFromFork && coin->nHeight > splitHeight)){
+                        // Coins not available
+                        return error("%s: coin stake inputs already spent in main chain", __func__);
+                    }
+                }
+            }
+        }
+
     }
 
     // Write block to history file
