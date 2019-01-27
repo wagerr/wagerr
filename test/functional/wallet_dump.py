@@ -27,31 +27,15 @@ def read_dump(file_name, addrs, hd_master_addr_old):
                 key_label, comment = line.split("#")
                 # key = key_label.split(" ")[0]
                 keytype = key_label.split(" ")[2]
-                if len(comment) > 1:
-                    addr_keypath = comment.split(" addr=")[1]
-                    addr = addr_keypath.split(" ")[0]
-                    keypath = None
-                    if keytype == "inactivehdmaster=1":
-                        # ensure the old master is still available
-                        assert(hd_master_addr_old == addr)
-                    elif keytype == "hdmaster=1":
-                        # ensure we have generated a new hd master key
-                        assert(hd_master_addr_old != addr)
-                        hd_master_addr_ret = addr
-                    else:
-                        keypath = addr_keypath.rstrip().split("hdkeypath=")[1]
+                addr = comment.split(" addr=")[1].strip()
 
-                    # count key types
-                    for addrObj in addrs:
-                        if addrObj['address'] == addr and addrObj['hdkeypath'] == keypath and keytype == "label=":
-                            found_addr += 1
-                            break
-                        elif keytype == "change=1":
-                            found_addr_chg += 1
-                            break
-                        elif keytype == "reserve=1":
-                            found_addr_rsv += 1
-                            break
+                # count key types
+                if addr in addrs:
+                    found_addr += 1
+                elif keytype == "change=1":
+                    found_addr_chg += 1
+                elif keytype == "reserve=1":
+                    found_addr_rsv += 1
         return found_addr, found_addr_chg, found_addr_rsv, hd_master_addr_ret
 
 
@@ -76,8 +60,8 @@ class WalletDumpTest(BitcoinTestFramework):
         addrs = []
         for i in range(0,test_addr_count):
             addr = self.nodes[0].getnewaddress()
-            vaddr= self.nodes[0].validateaddress(addr) #required to get hd keypath
-            addrs.append(vaddr)
+            #vaddr= self.nodes[0].validateaddress(addr) #required to get hd keypath
+            addrs.append(addr)
         # Should be a no-op:
         self.nodes[0].keypoolrefill()
 
@@ -88,13 +72,12 @@ class WalletDumpTest(BitcoinTestFramework):
         found_addr, found_addr_chg, found_addr_rsv, hd_master_addr_unenc = \
             read_dump(tmpdir + "/node0/wallet.unencrypted.dump", addrs, None)
         assert_equal(found_addr, test_addr_count)  # all keys must be in the dump
-        assert_equal(found_addr_chg, 50)  # 50 blocks where mined
+        assert_equal(found_addr_chg, 0)  # 0 blocks where mined
         assert_equal(found_addr_rsv, 90 + 1)  # keypool size (TODO: fix off-by-one)
 
         #encrypt wallet, restart, unlock and dump
-        self.nodes[0].encryptwallet('test')
-        bitcoind_processes[0].wait()
-        self.nodes[0] = start_node(0, self.options.tmpdir, self.extra_args[0])
+        self.nodes[0].node_encrypt_wallet('test')
+        self.start_node(0)
         self.nodes[0].walletpassphrase('test', 10)
         # Should be a no-op:
         self.nodes[0].keypoolrefill()
@@ -103,7 +86,7 @@ class WalletDumpTest(BitcoinTestFramework):
         found_addr, found_addr_chg, found_addr_rsv, hd_master_addr_enc = \
             read_dump(tmpdir + "/node0/wallet.encrypted.dump", addrs, hd_master_addr_unenc)
         assert_equal(found_addr, test_addr_count)
-        assert_equal(found_addr_chg, 90 + 1 + 50)  # old reserve keys are marked as change now
+        assert_equal(found_addr_chg, 90 + 1)  # old reserve keys are marked as change now
         assert_equal(found_addr_rsv, 90 + 1)  # keypool size (TODO: fix off-by-one)
 
 if __name__ == '__main__':
