@@ -453,6 +453,25 @@ class CBlockHeader():
         self.calc_sha256()
         return self.sha256
 
+    def solve_stake(self, stakeModifier, prevouts):
+        target = uint256_from_compact(self.nBits)
+        loop = True
+        while loop:
+            for prevout in prevouts:
+                nvalue, txBlockTime = prevouts[prevout]
+                data = b""
+                data += ser_uint256(stakeModifier)
+                data += struct.pack("<I", txBlockTime)
+                data += prevout.serialize()
+                data += struct.pack("<I", self.nTime)
+                posHash = uint256_from_str(hash256(data))
+                if posHash <= target:
+                    self.prevoutStake = prevout
+                    loop = False
+                    break
+            self.nTime += 1
+        return True
+
     def __repr__(self):
         return "CBlockHeader(nVersion=%i hashPrevBlock=%064x hashMerkleRoot=%064x nTime=%s nBits=%08x nNonce=%08x)" \
             % (self.nVersion, self.hashPrevBlock, self.hashMerkleRoot,
@@ -524,6 +543,18 @@ class CBlock(CBlockHeader):
         while self.sha256 > target:
             self.nNonce += 1
             self.rehash()
+
+    def sign_block(self, key, low_s=True):
+        data = b""
+        data += struct.pack("<i", self.nVersion)
+        data += ser_uint256(self.hashPrevBlock)
+        data += ser_uint256(self.hashMerkleRoot)
+        data += struct.pack("<I", self.nTime)
+        data += struct.pack("<I", self.nBits)
+        data += struct.pack("<I", self.nNonce)
+        data += ser_uint256(self.nAccumulatorCheckpoint)
+        sha256NoSig = hash256(data)
+        self.vchBlockSig = key.sign(sha256NoSig, low_s=low_s)
 
     def __repr__(self):
         return "CBlock(nVersion=%i hashPrevBlock=%064x hashMerkleRoot=%064x nTime=%s nBits=%08x nNonce=%08x vtx=%s)" \
