@@ -98,18 +98,18 @@ def create_transaction(prevtx, n, sig, value, nTime, scriptPubKey=CScript()):
 
 
 def dir_size(path):
-    size = subprocess.check_output(['du','-sh', path]).split()[0].decode('utf-8')
+    size = subprocess.check_output(['du','-shk', path]).split()[0].decode('utf-8')
     return size
 
 
-NUM_TRANSACTIONS_IN_BLOCK = 1  #6500
+NUM_TRANSACTIONS_IN_BLOCK = 6500
 
 
 class StratiXDOSTest(BitcoinTestFramework):
 
     def create_main_block(self, hashPrevBlock, block_height):
         current_time = int(time.time())
-        nTime = current_time
+        nTime = current_time & 0xfffffff0
 
         coinbase = create_coinbase(block_height+1)
         coinbase.vout[0].nValue = 0
@@ -129,9 +129,9 @@ class StratiXDOSTest(BitcoinTestFramework):
         del self.staking_prevouts[block.prevoutStake]
 
         # create spam for the block. random transactions
-        #for j in range(NUM_TRANSACTIONS_IN_BLOCK):
-        #    tx = create_transaction(block.vtx[0], 0, b"1729", j, nTime, scriptPubKey=CScript([self.block_sig_key.get_pubkey(), OP_CHECKSIG]))
-        #    block.vtx.append(tx)
+        for j in range(NUM_TRANSACTIONS_IN_BLOCK):
+            tx = create_transaction(block.vtx[0], 0, b"1729", j, nTime, scriptPubKey=CScript([self.block_sig_key.get_pubkey(), OP_CHECKSIG]))
+            block.vtx.append(tx)
         block.hashMerkleRoot = block.calc_merkle_root()
 
         block.rehash()
@@ -163,14 +163,12 @@ class StratiXDOSTest(BitcoinTestFramework):
         stake_tx_unsigned = CTransaction()
         stake_tx_unsigned.nTime = nTime
         stake_tx_unsigned.vin.append(CTxIn(prev_outpoint))
+        stake_tx_unsigned.vin[0].nSequence = 0xffffffff
         stake_tx_unsigned.vout.append(CTxOut())
         stake_tx_unsigned.vout.append(CTxOut(int(outNValue*COIN), scriptPubKey))
         #stake_tx_unsigned.vout.append(CTxOut(int(outNValue*COIN), scriptPubKey))
-        print(bytes_to_hex_str(stake_tx_unsigned.serialize()))
-        print("\n\n")
 
         stake_tx_signed_raw_hex = self.node.signrawtransaction(bytes_to_hex_str(stake_tx_unsigned.serialize()))['hex']
-        print(stake_tx_signed_raw_hex)
         # print(stake_tx_signed_raw_hex)
         # f = io.BytesIO(hex_str_to_bytes(stake_tx_signed_raw_hex))
         # print(f)
@@ -201,10 +199,17 @@ class StratiXDOSTest(BitcoinTestFramework):
     def setup_network(self):
         # Can't rely on syncing all the nodes when staking=1
         self.setup_nodes()
+        for i in range(self.num_nodes - 1):
+            for j in range(i+1, self.num_nodes):
+                connect_nodes_bi(self.nodes, i, j)
 
     def run_test(self):
         # Setup the p2p connections and start up the network thread.
-        self.nodes[0].add_p2p_connection(TestNode())
+        self.test_nodes = []
+        for i in range(self.num_nodes):
+            self.test_nodes.append(TestNode())
+            self.test_nodes[i].peer_connect('127.0.0.1', p2p_port(i))
+        #self.nodes[0].add_p2p_connection(TestNode())
 
         network_thread_start()  # Start up network handling in another thread
 
@@ -212,13 +217,13 @@ class StratiXDOSTest(BitcoinTestFramework):
 
         # Let the test nodes get in sync
         for i in range(self.num_nodes):
-            self.nodes[i].p2p.wait_for_verack()
+            self.test_nodes[i].wait_for_verack()
 
         FORK_DEPTH = 2  # Depth at which we are creating a fork. We are mining
 
         # 1) Starting mining blocks
-        self.log.info("Mining 200 blocks..")
-        self.node.generate(200)
+        self.log.info("Mining 150 blocks..")
+        self.node.generate(150)
 
         # 2) Collect the possible prevouts and spend them
         self.log.info("Collecting all unspent coins which we generated from mining..")
@@ -229,8 +234,8 @@ class StratiXDOSTest(BitcoinTestFramework):
         self.spend_tx()
 
         # 3) Start mining again so that spent prevouts get confirmted in a block.
-        self.log.info("Mining 150 more blocks to confirm the transactions..")
-        self.node.generate(150)
+        self.log.info("Mining 20 more blocks to confirm the transactions..")
+        self.node.generate(20)
 
         self.log.info("Sleeping 5 sec. Now mining PoS blocks based on already spent transactions..")
         time.sleep(5)
@@ -241,7 +246,8 @@ class StratiXDOSTest(BitcoinTestFramework):
 
         pastBlockHash = self.node.getblockhash(block_count - FORK_DEPTH - 1)
 
-        self.log.info("Initial size of data dir: %s" % dir_size(self.node.datadir))
+        init_size = dir_size(self.node.datadir + "/regtest/blocks")
+        self.log.info("Initial size of data dir: %s kilobytes" % str(init_size))
         MAX_BLOCKS = 30
         for i in range(0, MAX_BLOCKS):
             if i % 5 == 0:
@@ -250,11 +256,14 @@ class StratiXDOSTest(BitcoinTestFramework):
             block = self.create_main_block(pastBlockHash, height)
             # print(bytes(block.serialize()).hex())
             msg = msg_block(block)
-            self.nodes[0].p2p.send_and_ping(msg)
+            self.test_nodes[0].send_message(msg)
             # In each iteration, send a `block` message with the maximum number of entries
         self.log.info("Sent %s blocks out of %s" % (str(i), str(MAX_BLOCKS)))
-        time.sleep(2)
-        self.log.info("Final size of data dir: %s" % dir_size(self.node.datadir))
+        self.stop_node(0)
+        time.sleep(5)
+        final_size = dir_size(self.node.datadir + "/regtest/blocks")
+        self.log.info("Final size of data dir: %s kilobytes" % str(final_size))
+        assert_equal(final_size, init_size)
 
 
 if __name__ == '__main__':
