@@ -644,6 +644,23 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
     CMutableTransaction mergedTx(txVariants[0]);
 
     // Fetch previous transactions (inputs):
+    std::map<COutPoint, CScript> mapPrevOut;
+    if (Params().NetworkID() == CBaseChainParams::REGTEST) {
+        for (const CTxIn &txbase : mergedTx.vin)
+        {
+            CTransaction tempTx;
+            uint256 hashBlock;
+            if (GetTransaction(txbase.prevout.hash, tempTx, hashBlock, true)) {
+                // Copy results into mapPrevOut:
+                BOOST_FOREACH(const CTxIn &txin, tempTx.vin) {
+                    if (!txin.prevout.IsNull())
+                        mapPrevOut[txin.prevout] = tempTx.vout[txin.prevout.n].scriptPubKey;
+                    else
+                        mapPrevOut[txbase.prevout] = tempTx.vout[txbase.prevout.n].scriptPubKey;
+                }
+            }
+        }
+    }
     CCoinsView viewDummy;
     CCoinsViewCache view(&viewDummy);
     {
@@ -758,11 +775,19 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
     for (unsigned int i = 0; i < mergedTx.vin.size(); i++) {
         CTxIn& txin = mergedTx.vin[i];
         const CCoins* coins = view.AccessCoins(txin.prevout.hash);
-        if (coins == NULL || !coins->IsAvailable(txin.prevout.n)) {
-            TxInErrorToJSON(txin, vErrors, "Input not found or already spent");
-            continue;
+        if (Params().NetworkID() == CBaseChainParams::REGTEST) {
+            if (mapPrevOut.count(txin.prevout) == 0)
+            {
+                TxInErrorToJSON(txin, vErrors, "Input not found");
+                continue;
+            }
+        } else {
+            if (coins == NULL || !coins->IsAvailable(txin.prevout.n)) {
+                TxInErrorToJSON(txin, vErrors, "Input not found or already spent");
+                continue;
+            }
         }
-        const CScript& prevPubKey = coins->vout[txin.prevout.n].scriptPubKey;
+        const CScript& prevPubKey = (Params().NetworkID() == CBaseChainParams::REGTEST ? mapPrevOut[txin.prevout] : coins->vout[txin.prevout.n].scriptPubKey);
 
         txin.scriptSig.clear();
         // Only sign SIGHASH_SINGLE if there's a corresponding output:
