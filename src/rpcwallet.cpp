@@ -829,8 +829,8 @@ UniValue placebet(const UniValue& params, bool fHelp)
     CAmount nAmount = AmountFromValue(params[2]);
 
     // Validate bet amount so its between 1 - 10000 WGR inclusive.
-    if (nAmount < (50 * COIN ) || nAmount > (10000 * COIN)) {
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 1 - 10000 WGR inclusive.");
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 50 - 10000 WGR inclusive.");
     }
 
     // Wallet comments
