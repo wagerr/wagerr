@@ -106,6 +106,12 @@ UniValue listevents(const UniValue& params, bool fHelp)
 
         try {
             CPeerlessEvent plEvent = it->second;
+
+            // Ensure all the mapping indexes for this event are set. Discard the event is any mappings are not set.
+            if (!sportsIndex.count(plEvent.nSport) && !tournamentsIndex.count(plEvent.nTournament) && !teamsIndex.count(plEvent.nHomeTeam) && !teamsIndex.count(plEvent.nAwayTeam)) {
+                continue;
+            }
+
             std::string sport = sportsIndex.find(plEvent.nSport)->second.sName;
 
             // if event filter is set the don't list event if it doesn't match the filter.
