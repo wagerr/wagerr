@@ -77,12 +77,13 @@ static const Checkpoints::CCheckpointData data = {
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
     boost::assign::map_list_of
     (       1, uint256("0x00000385558ec1b9af7f939e1626a3116b9fb988c86c2f915e6451e8efcd0521"))        // First PoW block
-    (   20040, uint256("0x03a92984c2deba55ac8f9e8194b1bc745fbad9f7a0f3ed94ebb8c372935bed9c"))        // tx=40878 timestamp=1535653584 Fork September 2018 - after restarted testnet
-    (   25490, uint256("0xa87c169c9317a8474c44846a9409e775313b769bfa290298b0054abbfd570733"));       // tx=52013 timestamp=1535967610 Fork September 2018 - after enabling zerocoin maintenence mode
+    (   20040, uint256("0x03a92984c2deba55ac8f9e8194b1bc745fbad9f7a0f3ed94ebb8c372935bed9c"));        // tx=40878 timestamp=1535653584 Fork September 2018 - after restarted testnet
+    //(   25490, uint256("0xa87c169c9317a8474c44846a9409e775313b769bfa290298b0054abbfd570733"));     // tx=52013 timestamp=1535967610 Fork September 2018 - after enabling zerocoin maintenence mode.
+    // Commented out so testnet blockchain could be forked back below the 25940 block without stalling the chain.
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
     1535967610,
-    52013,
+    40878,
     3000};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
