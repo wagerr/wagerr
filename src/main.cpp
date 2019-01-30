@@ -4597,15 +4597,22 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
             const bool hasWGRInputs = !wgrInputs.empty();
             const bool hasZWGRInputs = !zWGRInputs.empty();
 
+            int readBlock = 0;
             vector<CBigNum> vBlockSerials;
             CBlock bl;
             // Go backwards on the forked chain up to the split
             do {
+                // Check if the forked chain is longer than the max reorg limit
+                if(readBlock == Params().MaxReorganizationDepth()){
+                    // TODO: Remove this chain from disk.
+                    return error("%s: forked chain longer than maximum reorg limit", __func__);
+                }
+
                 if(!ReadBlockFromDisk(bl, prev))
                     // Previous block not on disk
                     return error("%s: previous block %s not on disk", __func__, prev->GetBlockHash().GetHex());
-
-
+                // Increase amount of read blocks
+                readBlock++;
                 // Loop through every input from said block
                 for (CTransaction t : bl.vtx) {
                     for (CTxIn in: t.vin) {
