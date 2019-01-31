@@ -108,7 +108,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
             CPeerlessEvent plEvent = it->second;
 
             // Ensure all the mapping indexes for this event are set. Discard the event is any mappings are not set.
-            if (!sportsIndex.count(plEvent.nSport) && !tournamentsIndex.count(plEvent.nTournament) && !teamsIndex.count(plEvent.nHomeTeam) && !teamsIndex.count(plEvent.nAwayTeam)) {
+            if (!sportsIndex.count(plEvent.nSport) || !tournamentsIndex.count(plEvent.nTournament) || !teamsIndex.count(plEvent.nHomeTeam) || !teamsIndex.count(plEvent.nAwayTeam)) {
                 continue;
             }
 
