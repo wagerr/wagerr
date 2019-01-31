@@ -494,7 +494,7 @@ class CBlock(CBlockHeader):
             r += ser_vector(self.vtx, "serialize_with_witness")
         else:
             r += ser_vector(self.vtx, "serialize_without_witness")
-            if self.vchBlockSig:
+            if hasattr(self, 'vchBlockSig'):
                 r += ser_string(self.vchBlockSig)
         return r
 
