@@ -4554,7 +4554,10 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
     if (isPoS) {
         LOCK(cs_main);
 
-        const bool isBlockFromFork = pindexPrev != nullptr && !chainActive.Contains(pindexPrev);
+        // Blocks arrives in order, so if prev block is not the tip then we are on a fork.
+        // Extra info: duplicated blocks are skipping this checks, so we don't have to worry about those here.
+        bool isBlockFromFork = pindexPrev != nullptr && chainActive.Tip() == pindexPrev;
+
         CTransaction &stakeTxIn = block.vtx[1];
 
         // ZC started after PoS.
