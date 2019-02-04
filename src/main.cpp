@@ -4855,18 +4855,20 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
             // Check spamming
             if(pfrom && GetBoolArg("-blockspamfilter", DEFAULT_BLOCK_SPAM_FILTER)) {
                 CNodeState *nodestate = State(pfrom->GetId());
-                nodestate->nodeBlocks.onBlockReceived(pindex->nHeight);
-                bool nodeStatus = true;
-                // UpdateState will return false if the node is attacking us or update the score and return true.
-                nodeStatus = nodestate->nodeBlocks.updateState(state, nodeStatus);
-                int nDoS = 0;
-                if (state.IsInvalid(nDoS)) {
-                    if (nDoS > 0)
-                        Misbehaving(pfrom->GetId(), nDoS);
-                    nodeStatus = false;
+                if(nodestate != nullptr) {
+                    nodestate->nodeBlocks.onBlockReceived(pindex->nHeight);
+                    bool nodeStatus = true;
+                    // UpdateState will return false if the node is attacking us or update the score and return true.
+                    nodeStatus = nodestate->nodeBlocks.updateState(state, nodeStatus);
+                    int nDoS = 0;
+                    if (state.IsInvalid(nDoS)) {
+                        if (nDoS > 0)
+                            Misbehaving(pfrom->GetId(), nDoS);
+                        nodeStatus = false;
+                    }
+                    if (!nodeStatus)
+                        return error("%s : AcceptBlock FAILED - block spam protection", __func__);
                 }
-                if(!nodeStatus)
-                    return error("%s : AcceptBlock FAILED - block spam protection", __func__);
             }
             return error("%s : AcceptBlock FAILED", __func__);
         }
