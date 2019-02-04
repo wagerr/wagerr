@@ -59,7 +59,7 @@ class Test_01(WAGERR_FakeStakeTest):
             block_count = self.node.getblockcount()
             randomCount = randint(block_count-FORK_DEPTH-1, block_count)
             pastBlockHash = self.node.getblockhash(randomCount)
-            block = self.create_spam_block(pastBlockHash, stakingPrevOuts)
+            block = self.create_spam_block(pastBlockHash, stakingPrevOuts, randomCount+1)
             timeStamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(block.nTime))
             self.log.info("Created PoS block with nTime %s: %s", timeStamp, block.hash)
             msg = msg_block(block)

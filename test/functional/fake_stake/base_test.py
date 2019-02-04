@@ -76,7 +76,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         return
 
 
-    def create_spam_block(self, hashPrevBlock, stakingPrevOuts):
+    def create_spam_block(self, hashPrevBlock, stakingPrevOuts, height):
         ''' creates a spam block filled with num_of_txes transactions
         :param   hashPrevBlock:    (hex string) hash of previous block
                  stakingPrevOuts:  ({COutPoint --> (int, int)} dictionary)
@@ -88,7 +88,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         nTime = current_time & 0xfffffff0
 
         # PoS blocks have empty coinbase so we don't need to specify block number
-        coinbase = create_coinbase(1)
+        coinbase = create_coinbase(height)
         coinbase.vout[0].nValue = 0
         coinbase.vout[0].scriptPubKey = b""
         coinbase.nTime = nTime
