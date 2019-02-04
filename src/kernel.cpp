@@ -302,12 +302,15 @@ bool CheckStake(const CDataStream& ssUniqueID, CAmount nValueIn, const uint64_t 
 
 bool Stake(CStakeInput* stakeInput, unsigned int nBits, unsigned int nTimeBlockFrom, unsigned int& nTimeTx, uint256& hashProofOfStake)
 {
-    if (nTimeTx < nTimeBlockFrom)
-        return error("CheckStakeKernelHash() : nTime violation");
+    if(Params().NetworkID() != CBaseChainParams::REGTEST) {
+        if (nTimeTx < nTimeBlockFrom)
+            return error("CheckStakeKernelHash() : nTime violation");
 
-    if ((nTimeBlockFrom + nStakeMinAge > nTimeTx) && Params().NetworkID() != CBaseChainParams::REGTEST) // Min age requirement
-        return error("CheckStakeKernelHash() : min age violation - nTimeBlockFrom=%d nStakeMinAge=%d nTimeTx=%d",
-                     nTimeBlockFrom, nStakeMinAge, nTimeTx);
+        if ((nTimeBlockFrom + nStakeMinAge > nTimeTx)) // Min age requirement
+            return error("CheckStakeKernelHash() : min age violation - nTimeBlockFrom=%d nStakeMinAge=%d nTimeTx=%d",
+                         nTimeBlockFrom, nStakeMinAge, nTimeTx);
+
+    }
 
     //grab difficulty
     uint256 bnTargetPerCoinDay;
