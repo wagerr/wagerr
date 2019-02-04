@@ -87,7 +87,6 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         current_time = int(time.time())
         nTime = current_time & 0xfffffff0
 
-        # PoS blocks have empty coinbase so we don't need to specify block number
         coinbase = create_coinbase(height)
         coinbase.vout[0].nValue = 0
         coinbase.vout[0].scriptPubKey = b""
@@ -102,7 +101,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         if not block.solve_stake(parent_block_stake_modifier, stakingPrevOuts):
             raise Exception("Not able to solve for any prev_outpoint")
 
-        signed_stake_tx = self.sign_stake_tx(block)
+        signed_stake_tx = self.sign_stake_tx(block, stakingPrevOuts[block.prevoutStake][0])
         block.vtx.append(signed_stake_tx)
         del stakingPrevOuts[block.prevoutStake]
 
@@ -211,7 +210,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
 
 
 
-    def sign_stake_tx(self, block):
+    def sign_stake_tx(self, block, stake_in_value):
         ''' signs a coinstake transaction (non zPOS)
         :param      block:  (CBlock) block with stake to sign
         :return:            (CTransaction) signed tx
@@ -220,14 +219,14 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         self.block_sig_key.set_secretbytes(hash256(pack('<I', 0xffff)))
         pubkey = self.block_sig_key.get_pubkey()
         scriptPubKey = CScript([pubkey, OP_CHECKSIG])
-        outNValue = 2
+        outNValue = int(stake_in_value + 2*COIN)
 
         stake_tx_unsigned = CTransaction()
         stake_tx_unsigned.nTime = block.nTime
         stake_tx_unsigned.vin.append(CTxIn(block.prevoutStake))
         stake_tx_unsigned.vin[0].nSequence = 0xffffffff
         stake_tx_unsigned.vout.append(CTxOut())
-        stake_tx_unsigned.vout.append(CTxOut(int(outNValue*COIN), scriptPubKey))
+        stake_tx_unsigned.vout.append(CTxOut(outNValue, scriptPubKey))
         stake_tx_signed_raw_hex = self.node.signrawtransaction(bytes_to_hex_str(stake_tx_unsigned.serialize()))['hex']
         stake_tx_signed = CTransaction()
         stake_tx_signed.deserialize(BytesIO(hex_str_to_bytes(stake_tx_signed_raw_hex)))
