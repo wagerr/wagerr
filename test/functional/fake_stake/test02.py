@@ -4,10 +4,9 @@ from random import randint
 import time
 
 from test_framework.messages import msg_block
+from test_framework.util import bytes_to_hex_str,assert_equal
 
 from base_test import WAGERR_FakeStakeTest
-
-from test_framework.util import bytes_to_hex_str,assert_equal
 from util import utxos_to_stakingPrevOuts, dir_size
 
 class Test_02(WAGERR_FakeStakeTest):
@@ -16,7 +15,7 @@ class Test_02(WAGERR_FakeStakeTest):
         self.init_test()
         INITAL_MINED_BLOCKS = 950
         MORE_MINED_BLOCKS = 50
-        self.NUM_BLOCKS = 3
+        self.NUM_BLOCKS = 10
 
         # 1) Starting mining blocks
         self.log.info("Mining %d blocks.." % INITAL_MINED_BLOCKS)
