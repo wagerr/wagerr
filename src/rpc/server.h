@@ -281,6 +281,7 @@ extern UniValue decoderawtransaction(const UniValue& params, bool fHelp);
 extern UniValue decodescript(const UniValue& params, bool fHelp);
 extern UniValue signrawtransaction(const UniValue& params, bool fHelp);
 extern UniValue sendrawtransaction(const UniValue& params, bool fHelp);
+extern UniValue createrawzerocoinstake(const UniValue& params, bool fHelp);
 
 extern UniValue findserial(const UniValue& params, bool fHelp); // in rpc/blockchain.cpp
 extern UniValue getblockcount(const UniValue& params, bool fHelp);
