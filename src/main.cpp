@@ -4558,26 +4558,52 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
         // Extra info: duplicated blocks are skipping this checks, so we don't have to worry about those here.
         bool isBlockFromFork = pindexPrev != nullptr && chainActive.Tip() != pindexPrev;
 
+        // Coin stake
         CTransaction &stakeTxIn = block.vtx[1];
+
+        // Inputs
+        std::vector<CTxIn> wgrInputs;Fv
+        std::vector<CTxIn> zWGRInputs;
+
+        for (CTxIn stakeIn : stakeTxIn.vin) {
+            if(stakeIn.scriptSig.IsZerocoinSpend()){
+                zWGRInputs.push_back(stakeIn);
+            }else{
+                wgrInputs.push_back(stakeIn);
+            }
+        }
+        const bool hasWGRInputs = !wgrInputs.empty();
+        const bool hasZWGRInputs = !zWGRInputs.empty();
 
         // ZC started after PoS.
         // Check for serial double spent on the same block, TODO: Move this to the proper method..
-        if(nHeight >= Params().Zerocoin_StartHeight()) {
-            vector<CBigNum> inBlockSerials;
-            for (CTransaction tx : block.vtx) {
-                for (CTxIn in: tx.vin) {
+
+        vector<CBigNum> inBlockSerials;
+        for (CTransaction tx : block.vtx) {
+            for (CTxIn in: tx.vin) {
+                if(nHeight >= Params().Zerocoin_StartHeight()) {
                     if (in.scriptSig.IsZerocoinSpend()) {
                         CoinSpend spend = TxInToZerocoinSpend(in);
                         // Check for serials double spending in the same block
-                        if (std::find(inBlockSerials.begin(), inBlockSerials.end(), spend.getCoinSerialNumber()) != inBlockSerials.end()) {
+                        if (std::find(inBlockSerials.begin(), inBlockSerials.end(), spend.getCoinSerialNumber()) !=
+                            inBlockSerials.end()) {
                             return state.DoS(100, error("%s: serial double spent on the same block", __func__));
                         }
                         inBlockSerials.push_back(spend.getCoinSerialNumber());
                     }
                 }
+                if(tx.IsCoinStake()) continue;
+                if(hasWGRInputs)
+                    // Check if coinstake input is double spent inside the same block
+                    for (CTxIn wgrIn : wgrInputs){
+                        if(wgrIn.prevout == in.prevout){
+                            // double spent coinstake input inside block
+                            return error("%s: double spent coinstake input inside block", __func__);
+                        }
+                    }
             }
-            inBlockSerials.clear();
         }
+        inBlockSerials.clear();
 
 
         // Check whether is a fork or not
@@ -4585,20 +4611,6 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
 
             // Start at the block we're adding on to
             CBlockIndex *prev = pindexPrev;
-
-            // Inputs
-            std::vector<CTxIn> wgrInputs;
-            std::vector<CTxIn> zWGRInputs;
-
-            for (CTxIn stakeIn : stakeTxIn.vin) {
-                if(stakeIn.scriptSig.IsZerocoinSpend()){
-                    zWGRInputs.push_back(stakeIn);
-                }else{
-                    wgrInputs.push_back(stakeIn);
-                }
-            }
-            const bool hasWGRInputs = !wgrInputs.empty();
-            const bool hasZWGRInputs = !zWGRInputs.empty();
 
             int readBlock = 0;
             vector<CBigNum> vBlockSerials;
