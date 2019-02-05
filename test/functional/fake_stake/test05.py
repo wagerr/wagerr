@@ -53,28 +53,41 @@ class Test_05(WAGERR_FakeStakeTest):
         blocktime = self.node.getrawtransaction(tx['txid'], 1)['blocktime']
 
         staking_prev_outs = utxos_to_stakingPrevOuts(utxo_list_simplified, blocktime)
-        self.stakingPrevOutsCopy = staking_prev_outs
         self.log_data_dir_size()
-        
+
         # Create PoS blocks with double spent coinstake and send them
         ####### Invalid PoS block on the main chain
         block_count = self.node.getblockcount()
         staking_prev_outs = utxos_to_stakingPrevOuts(utxo_list_simplified, blocktime)
         block = self.create_new_block(block_count, staking_prev_outs, utxo_list_simplified, blocktime)
-        var = self.node.submitblock(bytes_to_hex_str(block.serialize()))
-        # Response needs to be bad-txns-inputs-missingorspent.
-        assert_equal(var, "bad-txns-inputs-missingorspent")
+        blockHex = bytes_to_hex_str(block.serialize())
+        var = self.node.submitblock(blockHex)
+        assert_equal(var, None)
         self.log.info("All good on the main chain")
         self.log_data_dir_size()
+
+        try:
+            block_ret = self.node.getblock(block.hash)
+            if block_ret is not None:
+                raise AssertionError("Error, block stored in main chain")
+        except JSONRPCException as error:
+            self.log.info(error)
 
         ####### Now on a forked chain
 
         self.log.info("Starting forked chain invalid double spend coin stake..")
         block_count = self.node.getblockcount() - 20
-        block = self.create_new_block(block_count, self.stakingPrevOutsCopy, utxo_list_simplified, blocktime)
-        var = self.node.submitblock(bytes_to_hex_str(block.serialize()))
-        if var != "bad-txns-inputs-missingorspent":
-            raise AssertionError("Error, block stored in forked chain")
+        staking_prev_outs = utxos_to_stakingPrevOuts(utxo_list_simplified, blocktime)
+        block = self.create_new_block(block_count, staking_prev_outs, utxo_list_simplified, blocktime)
+        self.log.info("Sending block %d", block_count)
+        self.node.submitblock(bytes_to_hex_str(block.serialize()))
+
+        try:
+            block_ret = self.node.getblock(block.hash)
+            if block_ret is not None:
+                raise AssertionError("Error, block stored in forked chain")
+        except JSONRPCException as error:
+            self.log.info(error)
 
         self.log_data_dir_size()
 
@@ -84,9 +97,8 @@ class Test_05(WAGERR_FakeStakeTest):
         self.log.info("Size of data dir: %s kilobytes" % str(init_size))
 
     def create_new_block(self, block_count, stakingPrevOuts, utxo_list_simplified, blocktime):
-        # block_count = self.node.getblockcount() - 20
         pastBlockHash = self.node.getblockhash(block_count)
-        block = self.create_spam_block(pastBlockHash, stakingPrevOuts, block_count)
+        block = self.create_spam_block(pastBlockHash, stakingPrevOuts, block_count + 1)
 
         # add invalid tx
         stakingPrevOuts = utxos_to_stakingPrevOuts(utxo_list_simplified, blocktime)
