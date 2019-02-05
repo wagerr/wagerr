@@ -7,15 +7,20 @@ from test_framework.messages import msg_block
 from test_framework.util import bytes_to_hex_str,assert_equal
 
 from base_test import WAGERR_FakeStakeTest
+
+from functional.fake_stake.util import TestNode
 from util import utxos_to_stakingPrevOuts, dir_size
+#from .test_node import TestNode
 
 class Test_02(WAGERR_FakeStakeTest):
 
     def run_test(self):
         self.init_test()
-        INITAL_MINED_BLOCKS = 950
+        INITAL_MINED_BLOCKS = 200
         MORE_MINED_BLOCKS = 50
         self.NUM_BLOCKS = 10
+
+#        self.log.info("Furszy: " + str(self.furszy_node.getblockcount()))
 
         # 1) Starting mining blocks
         self.log.info("Mining %d blocks.." % INITAL_MINED_BLOCKS)
@@ -60,9 +65,11 @@ class Test_02(WAGERR_FakeStakeTest):
             timeStamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(block.nTime))
             self.log.info("Created PoS block [%d] with nTime %s: %s", randomCount+1, timeStamp, block.hash)
             self.log.info("Sending block (size: %.2f Kbytes)...", len(block.serialize())/1000)
-            assert_equal(self.node.submitblock(bytes_to_hex_str(block.serialize())), None)
-            # msg = msg_block(block)
-            #self.test_nodes[0].send_message(msg)
+            blockHex = bytes_to_hex_str(block.serialize())
+            var = self.node.submitblock(blockHex)
+            self.log.info("block status: " + var)
+            # Answer needs to be "inconclusive" because this is a forked block.
+            assert_equal(var, "inconclusive")
 
 
         self.log.info("Sent all %s blocks." % str(self.NUM_BLOCKS))
