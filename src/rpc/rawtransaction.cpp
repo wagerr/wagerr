@@ -13,6 +13,7 @@
 #include "main.h"
 #include "net.h"
 #include "primitives/transaction.h"
+#include "primitives/deterministicmint.h"
 #include "rpc/server.h"
 #include "script/script.h"
 #include "script/script_error.h"
@@ -926,3 +927,74 @@ UniValue getspentzerocoinamount(const UniValue& params, bool fHelp)
     CAmount nValue = libzerocoin::ZerocoinDenominationToAmount(spend.getDenomination());
     return FormatMoney(nValue);
 }
+
+#ifdef ENABLE_WALLET
+UniValue createrawzerocoinstake(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw runtime_error(
+            "createrawzerocoinstake mint_input \n"
+            "\nCreates raw zWGR coinstakes (without MN output).\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nArguments:\n"
+            "1. mint_input      (hex string, required) serial hash of the mint used as input\n"
+
+            "\nResult:\n"
+            "\"transaction\"            (string) hex string of the transaction\n"
+
+            "\nExamples\n" +
+            HelpExampleCli("createrawzerocoinstake", "0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f") +
+            HelpExampleRpc("createrawzerocoinstake", "0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f"));
+
+
+    assert(pwalletMain != NULL);
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
+        throw JSONRPCError(RPC_WALLET_ERROR, "zWGR is currently disabled due to maintenance.");
+
+    std::string serial_hash = params[0].get_str();
+    if (!IsHex(serial_hash))
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected hex serial hash");
+
+    EnsureWalletIsUnlocked();
+
+    uint256 hashSerial(serial_hash);
+    CZerocoinMint input_mint;
+    if (!pwalletMain->GetMint(hashSerial, input_mint)) {
+        std::string strErr = "Failed to fetch mint associated with serial hash " + serial_hash;
+        throw JSONRPCError(RPC_WALLET_ERROR, strErr);
+    }
+
+    CMutableTransaction coinstake_tx;
+
+    // create the zerocoinmint output (one spent denom + three 1-zWGR denom)
+    libzerocoin::CoinDenomination staked_denom = input_mint.GetDenomination();
+    std::vector<CTxOut> vOutMint(4);
+    CDeterministicMint dMint;
+    if (!pwalletMain->CreateZWGROutPut(staked_denom, vOutMint[0], dMint))
+        throw JSONRPCError(RPC_WALLET_ERROR, "failed to create new zwgr output");
+
+    for (int i=1; i<4; i++) {
+        if (!pwalletMain->CreateZWGROutPut(libzerocoin::ZQ_ONE, vOutMint[i], dMint))
+            throw JSONRPCError(RPC_WALLET_ERROR, "failed to create new zwgr output");
+    }
+    coinstake_tx.vout = vOutMint;
+
+    //hash with only the output info in it to be used in Signature of Knowledge
+    uint256 hashTxOut = coinstake_tx.GetHash();
+    CZerocoinSpendReceipt receipt;
+
+    // create the zerocoinspend input
+    CTxIn newTxIn;
+    // !TODO: mint checks
+    if (!pwalletMain->MintToTxIn(input_mint, 100, hashTxOut, newTxIn, receipt, libzerocoin::SpendType::SPEND))
+        throw JSONRPCError(RPC_WALLET_ERROR, "failed to create zc-spend stake input");
+
+    coinstake_tx.vin.push_back(newTxIn);
+
+    return EncodeHexTx(coinstake_tx);
+
+}
+#endif
