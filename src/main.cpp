@@ -4556,7 +4556,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
 
         // Blocks arrives in order, so if prev block is not the tip then we are on a fork.
         // Extra info: duplicated blocks are skipping this checks, so we don't have to worry about those here.
-        bool isBlockFromFork = pindexPrev != nullptr && chainActive.Tip() == pindexPrev;
+        bool isBlockFromFork = pindexPrev != nullptr && chainActive.Tip() != pindexPrev;
 
         CTransaction &stakeTxIn = block.vtx[1];
 
@@ -4705,7 +4705,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
 
                 if(!coin && !isBlockFromFork){
                     // No coins on the main chain
-                    return error("%s: coin stake inputs not available on main chain", __func__);
+                    return error("%s: coin stake inputs not available on main chain, received height %d vs current %d", __func__, nHeight, chainActive.Height());
                 }
                 if(coin && !coin->IsAvailable(in.prevout.n)){
                     // If this is not available get the height of the spent and validate it with the forked height
