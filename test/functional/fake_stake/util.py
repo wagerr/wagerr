@@ -128,8 +128,3 @@ def utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime):
         stakingPrevOuts[outPoint] = (int(utxo['amount'])*COIN, txBlocktime)
 
     return
-
-
-def assert_not_equal(thing1, thing2):
-    if thing1 == thing2:
-        raise AssertionError("not(%s)" % " != ".join(str(arg) for arg in (thing1, thing2)))

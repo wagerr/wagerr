@@ -4,10 +4,9 @@ from random import randint
 import time
 
 from test_framework.messages import msg_block
-from test_framework.util import bytes_to_hex_str
 
 from base_test import WAGERR_FakeStakeTest
-from util import utxos_to_stakingPrevOuts, dir_size, assert_not_equal
+from util import dir_size
 
 class Test_01(WAGERR_FakeStakeTest):
 
@@ -38,8 +37,7 @@ class Test_01(WAGERR_FakeStakeTest):
 
         # 4) collect the prevouts
         self.log.info("Collecting inputs...")
-        tx_block_time = int(time.time())
-        stakingPrevOuts = utxos_to_stakingPrevOuts(utxo_list, tx_block_time)
+        stakingPrevOuts = self.get_prevouts(utxo_list)
         time.sleep(1)
 
         # 5) Start mining again so that spent prevouts get confirmted in a block.
