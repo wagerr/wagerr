@@ -67,6 +67,7 @@ class Test_05(WAGERR_FakeStakeTest):
         for i in range(0, self.NUM_BLOCKS):
             if i !=0:
                 self.log.info("Sent %s blocks out of %s" % (str(i), str(self.NUM_BLOCKS)))
+            block_count = self.node.getblockcount()
             randomCount = randint(block_count - 30, block_count)
             pastBlockHash = self.node.getblockhash(randomCount)
             block = self.create_spam_block(pastBlockHash, stakingPrevOuts, randomCount + 1, True)
