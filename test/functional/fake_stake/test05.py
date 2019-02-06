@@ -1,15 +1,12 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from io import BytesIO
+
 import time
 
 from test_framework.authproxy import JSONRPCException
-from test_framework.messages import CTransaction, COIN
-from test_framework.script import CScript, OP_CHECKSIG
-from test_framework.util import bytes_to_hex_str, assert_equal, hex_str_to_bytes
+from test_framework.util import bytes_to_hex_str, assert_equal
 
 from base_test import WAGERR_FakeStakeTest
-from util import create_transaction, dir_size
 
 
 '''
@@ -35,39 +32,44 @@ class Test_05(WAGERR_FakeStakeTest):
 
         # 3) Spam Blocks on the main chain
         self.log_data_dir_size()
-        block_count = self.node.getblockcount()
-        pastBlockHash = self.node.getblockhash(block_count)
-        block = self.create_spam_block(pastBlockHash, stakingPrevOuts, block_count + 1, True)
-        self.log.info("Sending block %d", block_count + 1)
-        var = self.node.submitblock(bytes_to_hex_str(block.serialize()))
-        assert_equal(var, None)
-        self.log_data_dir_size()
+        for i in range(0, self.NUM_BLOCKS):
+            if i != 0:
+                self.log.info("Sent %s blocks out of %s" % (str(i), str(self.NUM_BLOCKS)))
+            block_count = self.node.getblockcount()
+            pastBlockHash = self.node.getblockhash(block_count)
+            block = self.create_spam_block(pastBlockHash, stakingPrevOuts, block_count + 1, True)
+            self.log.info("Sending block %d", block_count + 1)
+            var = self.node.submitblock(bytes_to_hex_str(block.serialize()))
+            assert_equal(var, None)
+            self.log_data_dir_size()
 
-        try:
-            block_ret = self.node.getblock(block.hash)
-            if block_ret is not None:
-                raise AssertionError("Error, block stored in main chain")
-        except JSONRPCException as error:
-            self.log.info(error)
+            try:
+                block_ret = self.node.getblock(block.hash)
+                if block_ret is not None:
+                    raise AssertionError("Error, block stored in main chain")
+            except JSONRPCException as error:
+                self.log.info(error)
+
+        self.log.info("Sent all %s blocks." % str(self.NUM_BLOCKS))
+        time.sleep(3)
 
         # 4) Spam Blocks on a forked chain
-        self.log.info("Starting forked chain invalid double spend coin stake..")
-        block_count = self.node.getblockcount() - 20
-        pastBlockHash = self.node.getblockhash(block_count)
-        block = self.create_spam_block(pastBlockHash, stakingPrevOuts, block_count + 1, True)
-        self.log.info("Sending block %d", block_count + 1)
-        var = self.node.submitblock(bytes_to_hex_str(block.serialize()))
-        assert_equal(var, None)
-        self.log_data_dir_size()
+        for i in range(0, self.NUM_BLOCKS):
+            if i !=0:
+                self.log.info("Sent %s blocks out of %s" % (str(i), str(self.NUM_BLOCKS)))
+            block_count = self.node.getblockcount() - 20
+            pastBlockHash = self.node.getblockhash(block_count)
+            block = self.create_spam_block(pastBlockHash, stakingPrevOuts, block_count + 1, True)
+            self.log.info("Sending block %d", block_count + 1)
+            var = self.node.submitblock(bytes_to_hex_str(block.serialize()))
+            assert_equal(var, None)
+            self.log_data_dir_size()
 
-        try:
-            block_ret = self.node.getblock(block.hash)
-            if block_ret is not None:
-                raise AssertionError("Error, block stored in forked chain")
-        except JSONRPCException as error:
-            self.log.info(error)
+            try:
+                block_ret = self.node.getblock(block.hash)
+                if block_ret is not None:
+                    raise AssertionError("Error, block stored in forked chain")
+            except JSONRPCException as error:
+                self.log.info(error)
 
-
-    def log_data_dir_size(self):
-        init_size = dir_size(self.node.datadir + "/regtest/blocks")
-        self.log.info("Size of data dir: %s kilobytes" % str(init_size))
+        self.log.info("Sent all %s blocks." % str(self.NUM_BLOCKS))
