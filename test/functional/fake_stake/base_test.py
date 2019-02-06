@@ -14,7 +14,7 @@ from test_framework.test_framework import BitcoinTestFramework
 from test_framework.script import CScript, OP_CHECKSIG
 from test_framework.util import hash256, bytes_to_hex_str, hex_str_to_bytes, connect_nodes_bi, p2p_port
 
-from util import TestNode, create_transaction
+from util import TestNode, create_transaction, utxo_to_stakingPrevOuts
 ''' -------------------------------------------------------------------------
 WAGERR_FakeStakeTest CLASS ----------------------------------------------------
 
@@ -76,12 +76,13 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         return
 
 
-    def create_spam_block(self, hashPrevBlock, stakingPrevOuts, height):
+    def create_spam_block(self, hashPrevBlock, stakingPrevOuts, height, fStakeDoubleSpent=False):
         ''' creates a spam block filled with num_of_txes transactions
-        :param   hashPrevBlock:    (hex string) hash of previous block
-                 stakingPrevOuts:  ({COutPoint --> (int, int)} dictionary)
+        :param   hashPrevBlock:      (hex string) hash of previous block
+                 stakingPrevOuts:    ({COutPoint --> (int, int)} dictionary)
                          map outpoints to (be used as staking inputs) to amount, block_time
-                 num_of_txes:      (int) number of transactions to include in the block
+                 num_of_txes:        (int) number of transactions to include in the block
+                 fStakeDoubleSpent:  (bool) spend the coinstake input inside the block
         :return  block:            (CBlock) generated block
         '''
         current_time = int(time.time())
@@ -103,7 +104,10 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
 
         signed_stake_tx = self.sign_stake_tx(block, stakingPrevOuts[block.prevoutStake][0])
         block.vtx.append(signed_stake_tx)
-        del stakingPrevOuts[block.prevoutStake]
+
+        # remove coinstake input prevout
+        if not fStakeDoubleSpent:
+            del stakingPrevOuts[block.prevoutStake]
 
         # create spam for the block. random transactions
         for outPoint in stakingPrevOuts:
@@ -208,8 +212,6 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
 
 
 
-
-
     def sign_stake_tx(self, block, stake_in_value):
         ''' signs a coinstake transaction (non zPOS)
         :param      block:  (CBlock) block with stake to sign
@@ -232,3 +234,16 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         stake_tx_signed.deserialize(BytesIO(hex_str_to_bytes(stake_tx_signed_raw_hex)))
         return stake_tx_signed
 
+
+    def get_prevouts(self, utxo_list):
+        ''' get prevouts for each utxo in a list
+        :param      utxo_list:   (JSON list) returned from listunspent used as input
+        :return:    stakingPrevOuts:    ({COutPoint --> (int, int)} dictionary)
+                         map outpoints to (be used as staking inputs) to amount, block_time
+        '''
+        stakingPrevOuts = {}
+        for utxo in utxo_list:
+            txBlocktime = self.node.getrawtransaction(utxo['txid'], 1)['blocktime']
+            utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime)
+
+        return stakingPrevOuts

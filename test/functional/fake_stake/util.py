@@ -113,20 +113,21 @@ def create_transaction(outPoint, sig, value, nTime, scriptPubKey=CScript()):
     return tx
 
 
-def utxos_to_stakingPrevOuts(utxolist, blocktime):
+def utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime):
     '''
-    Creates a map of unspent outputs to (amount, blocktime) to be used as stake inputs
-    :param   utxolist:          list of JSON object returned from listunspent
-    :return  stakingPrevOuts:   ({COutPoint --> (int, int)} dictionary)
+    Updates a map of unspent outputs to (amount, blocktime) to be used as stake inputs
+    :param   utxo:              (map) utxo JSON object returned from listunspent
+             stakingPrevOuts:   ({COutPoint --> (int, int)} dictionary)
+             txBlocktime:       (int) transaction block time
+    :return
     '''
-    stakingPrevOuts = {}
-    COINBASE_MATURITY = 100
-    for utxo in utxolist:
-        if utxo['confirmations'] > COINBASE_MATURITY:
-            outPoint = COutPoint(int(utxo['txid'], 16), utxo['vout'])
-            stakingPrevOuts[outPoint] = (int(utxo['amount'])*COIN, blocktime)
 
-    return stakingPrevOuts
+    COINBASE_MATURITY = 100
+    if utxo['confirmations'] > COINBASE_MATURITY:
+        outPoint = COutPoint(int(utxo['txid'], 16), utxo['vout'])
+        stakingPrevOuts[outPoint] = (int(utxo['amount'])*COIN, txBlocktime)
+
+    return
 
 
 def assert_not_equal(thing1, thing2):
