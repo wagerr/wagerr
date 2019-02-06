@@ -3,14 +3,10 @@
 from random import randint
 import time
 
-from test_framework.messages import msg_block
 from test_framework.util import bytes_to_hex_str,assert_equal
 
 from base_test import WAGERR_FakeStakeTest
-
-from functional.fake_stake.util import TestNode
-from util import utxos_to_stakingPrevOuts, dir_size
-#from .test_node import TestNode
+from util import dir_size
 
 class Test_02(WAGERR_FakeStakeTest):
 
@@ -38,8 +34,7 @@ class Test_02(WAGERR_FakeStakeTest):
 
         # 4) Spend the coins collected in 2 (mined in the first 100 blocks)
         self.log.info("Spending the coins mined in the first %d blocks..." % INITAL_MINED_BLOCKS)
-        tx_block_time = int(time.time())
-        stakingPrevOuts = utxos_to_stakingPrevOuts(utxo_list, tx_block_time)
+        stakingPrevOuts = self.get_prevouts(utxo_list)
         tx_hashes = self.spend_utxos(utxo_list)
         self.log.info("Spent %d transactions" % len(tx_hashes))
         time.sleep(2)
