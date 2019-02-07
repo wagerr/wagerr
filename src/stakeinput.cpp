@@ -72,15 +72,22 @@ CAmount CZWgrStake::GetValue()
 }
 
 //Use the first accumulator checkpoint that occurs 60 minutes after the block being staked from
+// In case of regtest, next accumulator of 60 blocks after the block being staked from
 bool CZWgrStake::GetModifier(uint64_t& nStakeModifier)
 {
     CBlockIndex* pindex = GetIndexFrom();
     if (!pindex)
-        return false;
+        return error("%s: failed to get index from", __func__);
+
+    if(Params().NetworkID() != CBaseChainParams::REGTEST) {
+        // Stake modifier is fixed for now, move it to 60 blocks after this pindex in the future..
+        nStakeModifier = pindexFrom->nStakeModifier;
+        return true;
+    }
 
     int64_t nTimeBlockFrom = pindex->GetBlockTime();
     while (true) {
-        if (pindex->GetBlockTime() - nTimeBlockFrom > 60*60) {
+        if (pindex->GetBlockTime() - nTimeBlockFrom > 60 * 60) {
             nStakeModifier = pindex->nAccumulatorCheckpoint.Get64();
             return true;
         }
