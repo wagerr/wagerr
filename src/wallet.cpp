@@ -4574,7 +4574,7 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
     //LogPrintf("%s : selected mint %s\n pubcoinhash=%s\n", __func__, zerocoinSelected.ToString(), GetPubCoinHash(zerocoinSelected.GetValue()).GetHex());
     if (!pubCoinSelected.validate()) {
         receipt.SetStatus(_("The selected mint coin is an invalid coin"), ZWGR_INVALID_COIN);
-        return false;
+        return error("%s : %s", __func__, receipt.GetStatusMessage());
     }
 
     // 3. Compute Accumulator and Witness
@@ -4624,7 +4624,7 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
             libzerocoin::CoinSpend spend2(Params().Zerocoin_Params(true), paramsAccumulator, privateCoin, accumulator,
                                           nChecksum, witness, hashTxOut, libzerocoin::SpendType::SPEND);
             LogPrintf("*** spend2 valid=%d\n", spend2.Verify(accumulator));
-            return false;
+            return error("%s : %s", __func__, receipt.GetStatusMessage());
         }
 
         // Deserialize the CoinSpend intro a fresh object
@@ -4647,13 +4647,13 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
             serializedCoinSpendChecking << spend;
         } catch (...) {
             receipt.SetStatus(_("Failed to deserialize"), ZWGR_BAD_SERIALIZATION);
-            return false;
+            return error("%s : %s", __func__, receipt.GetStatusMessage());
         }
 
         libzerocoin::CoinSpend newSpendChecking(paramsCoin, paramsAccumulator, serializedCoinSpendChecking);
         if (!newSpendChecking.Verify(accumulator)) {
             receipt.SetStatus(_("The transaction did not verify"), ZWGR_BAD_SERIALIZATION);
-            return false;
+            return error("%s : %s", __func__, receipt.GetStatusMessage());
         }
 
         if (IsSerialKnown(spend.getCoinSerialNumber())) {
@@ -4670,7 +4670,7 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
                 LogPrintf("%s: failed to write zerocoinmint\n", __func__);
 
             pwalletMain->NotifyZerocoinChanged(pwalletMain, zerocoinSelected.GetValue().GetHex(), "Used", CT_UPDATED);
-            return false;
+            return error("%s : %s", __func__, receipt.GetStatusMessage());
         }
 
         uint32_t nAccumulatorChecksum = GetChecksum(accumulator.getValue());
@@ -4679,7 +4679,7 @@ bool CWallet::MintToTxIn(CZerocoinMint zerocoinSelected, int nSecurityLevel, con
         receipt.AddSpend(zcSpend);
     } catch (const std::exception&) {
         receipt.SetStatus(_("CoinSpend: Accumulator witness does not verify"), ZWGR_INVALID_WITNESS);
-        return false;
+        return error("%s : %s", __func__, receipt.GetStatusMessage());
     }
 
     receipt.SetStatus(_("Spend Valid"), ZWGR_SPEND_OKAY); // Everything okay
