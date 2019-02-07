@@ -941,8 +941,11 @@ UniValue createrawzerocoinstake(const UniValue& params, bool fHelp)
             "1. mint_input      (hex string, required) serial hash of the mint used as input\n"
 
             "\nResult:\n"
-            "\"transaction\"            (string) hex string of the transaction\n"
-
+            "{\n"
+            "   \"hex\": \"xxx\",           (hex string) raw coinstake transaction\n"
+            "   \"private-key\": \"xxx\"    (hex string) private key of the input mint [needed to\n"
+            "                                            sign a block with this stake]"
+            "}\n"
             "\nExamples\n" +
             HelpExampleCli("createrawzerocoinstake", "0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f") +
             HelpExampleRpc("createrawzerocoinstake", "0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f"));
@@ -972,6 +975,10 @@ UniValue createrawzerocoinstake(const UniValue& params, bool fHelp)
     // create the zerocoinmint output (one spent denom + three 1-zWGR denom)
     libzerocoin::CoinDenomination staked_denom = input_mint.GetDenomination();
     std::vector<CTxOut> vOutMint(5);
+    // Mark coin stake transaction
+    CScript scriptEmpty;
+    scriptEmpty.clear();
+    vOutMint[0] = CTxOut(0, scriptEmpty);
     CDeterministicMint dMint;
     if (!pwalletMain->CreateZWGROutPut(staked_denom, vOutMint[1], dMint))
         throw JSONRPCError(RPC_WALLET_ERROR, "failed to create new zwgr output");
@@ -989,12 +996,18 @@ UniValue createrawzerocoinstake(const UniValue& params, bool fHelp)
     // create the zerocoinspend input
     CTxIn newTxIn;
     // !TODO: mint checks
-    if (!pwalletMain->MintToTxIn(input_mint, 100, hashTxOut, newTxIn, receipt, libzerocoin::SpendType::SPEND))
+    if (!pwalletMain->MintToTxIn(input_mint, 100, hashTxOut, newTxIn, receipt, libzerocoin::SpendType::STAKE))
         throw JSONRPCError(RPC_WALLET_ERROR, "failed to create zc-spend stake input");
 
     coinstake_tx.vin.push_back(newTxIn);
 
-    return EncodeHexTx(coinstake_tx);
+    UniValue ret(UniValue::VOBJ);
+    ret.push_back(Pair("hex", EncodeHexTx(coinstake_tx)));
+    CPrivKey pk = input_mint.GetPrivKey();
+    CKey key;
+    key.SetPrivKey(pk, true);
+    ret.push_back(Pair("private-key", HexStr(key)));
+    return ret;
 
 }
 #endif
