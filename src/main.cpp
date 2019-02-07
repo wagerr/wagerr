@@ -4465,7 +4465,7 @@ bool ContextualCheckZerocoinStake(int nHeight, CStakeInput* stake)
             return error("%s: failed to get index associated with zWGR stake checksum", __func__);
 
         if (chainActive.Height() - pindexFrom->nHeight < Params().Zerocoin_RequiredStakeDepth())
-            return error("%s: zWGR stake does not have required confirmation depth", __func__);
+            return error("%s: zWGR stake does not have required confirmation depth. Current height %d,  stakeInput height %d.", __func__, chainActive.Height(), pindexFrom->nHeight);
 
         //The checksum needs to be the exact checksum from 200 blocks ago
         uint256 nCheckpoint200 = chainActive[nHeight - Params().Zerocoin_RequiredStakeDepth()]->nAccumulatorCheckpoint;
@@ -4865,7 +4865,7 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
         CheckBlockIndex ();
         if (!ret) {
             // Check spamming
-            if(pfrom && GetBoolArg("-blockspamfilter", DEFAULT_BLOCK_SPAM_FILTER)) {
+            if(pindex && pfrom && GetBoolArg("-blockspamfilter", DEFAULT_BLOCK_SPAM_FILTER)) {
                 CNodeState *nodestate = State(pfrom->GetId());
                 if(nodestate != nullptr) {
                     nodestate->nodeBlocks.onBlockReceived(pindex->nHeight);
@@ -4883,6 +4883,9 @@ bool ProcessNewBlock(CValidationState& state, CNode* pfrom, CBlock* pblock, CDis
                 }
             }
             return error("%s : AcceptBlock FAILED", __func__);
+        }
+        else {
+            LogPrintf("%s : AccpetBlock PASSED!", __func__);
         }
     }
 
