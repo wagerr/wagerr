@@ -79,7 +79,7 @@ bool CZWgrStake::GetModifier(uint64_t& nStakeModifier)
     if (!pindex)
         return error("%s: failed to get index from", __func__);
 
-    if(Params().NetworkID() != CBaseChainParams::REGTEST) {
+    if(Params().NetworkID() == CBaseChainParams::REGTEST) {
         // Stake modifier is fixed for now, move it to 60 blocks after this pindex in the future..
         nStakeModifier = pindexFrom->nStakeModifier;
         return true;
