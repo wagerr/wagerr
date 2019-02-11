@@ -217,6 +217,7 @@ RES_ICONS = \
   qt/res/icons/wagerr.png \
   qt/res/icons/wagerr_testnet.ico \
   qt/res/icons/wagerr_testnet.png \
+  qt/res/icons/wagerr_regtest.png \
   qt/res/icons/browse.png \
   qt/res/icons/clock1.png \
   qt/res/icons/clock2.png \
@@ -349,6 +350,7 @@ RES_IMAGES = \
   qt/res/images/about.png \
   qt/res/images/splash.png \
   qt/res/images/splash_testnet.png \
+  qt/res/images/splash_regtest.png \
   qt/res/images/wagerr_logo_horizontal.png \
   qt/res/images/downArrow_dark.png \
   qt/res/images/downArrow_small_dark.png \

@@ -385,7 +385,6 @@ public:
     {
         networkID = CBaseChainParams::REGTEST;
         strNetworkID = "regtest";
-        strNetworkID = "regtest";
         pchMessageStart[0] = 0x12;
         pchMessageStart[1] = 0x76;
         pchMessageStart[2] = 0xa1;
@@ -401,6 +400,18 @@ public:
         genesis.nTime = 1518696183;             // GMT: Thursday, 15. February 2018 12:03:03
         genesis.nBits = 0x207fffff;
         genesis.nNonce = 574752;                // hex 57 47 52 in text = WGR
+
+        nLastPOWBlock = 200000;
+        nMaturity = 100;
+        nMasternodeCountDrift = 4;
+        nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMT
+        nMaxMoneyOut = 43199500 * COIN;
+        nZerocoinStartHeight = 100000;
+        nZerocoinStartTime = 1518696283;
+        nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
+        nBlockRecalculateAccumulators = 999999999; //Trigger a recalculation of accumulators
+        nBlockFirstFraudulent = 999999999; //First block that bad serials emerged
+        nBlockLastGoodCheckpoint = 999999999; //Last valid accumulator checkpoint
 
         hashGenesisBlock = genesis.GetHash();
         nDefaultPort = 55006;
