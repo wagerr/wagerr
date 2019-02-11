@@ -145,6 +145,9 @@ script: |
   find wagerr-* | sort | tar --no-recursion --mode='u+rw,go+r-w,a+X' --owner=0 --group=0 -c -T - | gzip -9n > ../$SOURCEDIST
   popd
 
+  # Workaround for tarball not building with the bare tag version (prep)
+  make -C src obj/build.h
+
   ORIGPATH="$PATH"
   # Extract the release tarball into a dir for each host and build
   for i in ${HOSTS}; do
