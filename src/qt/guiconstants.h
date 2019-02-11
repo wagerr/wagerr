@@ -55,5 +55,6 @@ static const int MAX_URI_LENGTH = 255;
 #define QAPP_ORG_DOMAIN "wagerr.com"
 #define QAPP_APP_NAME_DEFAULT "Wagerr-Qt"
 #define QAPP_APP_NAME_TESTNET "Wagerr-Qt-testnet"
+#define QAPP_APP_NAME_REGTEST "Wagerr-Qt-regtest"
 
 #endif // BITCOIN_QT_GUICONSTANTS_H
