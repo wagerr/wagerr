@@ -653,12 +653,7 @@ UniValue signrawtransaction(const UniValue& params, bool fHelp)
             uint256 hashBlock;
             if (GetTransaction(txbase.prevout.hash, tempTx, hashBlock, true)) {
                 // Copy results into mapPrevOut:
-                BOOST_FOREACH(const CTxIn &txin, tempTx.vin) {
-                    if (!txin.prevout.IsNull())
-                        mapPrevOut[txin.prevout] = tempTx.vout[txin.prevout.n].scriptPubKey;
-                    else
-                        mapPrevOut[txbase.prevout] = tempTx.vout[txbase.prevout.n].scriptPubKey;
-                }
+                mapPrevOut[txbase.prevout] = tempTx.vout[txbase.prevout.n].scriptPubKey;
             }
         }
     }
