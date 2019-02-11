@@ -206,10 +206,10 @@ RES_ICONS = \
   qt/res/icons/address-book.png \
   qt/res/icons/automint_active.png \
   qt/res/icons/automint_inactive.png \
-  qt/res/icons/bitcoin.ico \
-  qt/res/icons/bitcoin.png \
-  qt/res/icons/bitcoin_testnet.ico \
-  qt/res/icons/bitcoin_testnet.png \
+  qt/res/icons/wagerr.ico \
+  qt/res/icons/wagerr.png \
+  qt/res/icons/wagerr_testnet.ico \
+  qt/res/icons/wagerr_testnet.png \
   qt/res/icons/browse.png \
   qt/res/icons/clock1.png \
   qt/res/icons/clock2.png \
