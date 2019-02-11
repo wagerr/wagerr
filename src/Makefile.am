@@ -184,7 +184,6 @@ BITCOIN_CORE_H = \
   zwgrchain.h \
   zwgrtracker.h \
   zwgrwallet.h \
-  genwit.h \
   concurrentqueue.h \
   lightzwgrthread.h \
   zmq/zmqabstractnotifier.h \
@@ -277,7 +276,6 @@ libbitcoin_wallet_a_SOURCES = \
   zwgrwallet.cpp \
   zwgrtracker.cpp \
   stakeinput.cpp \
-  genwit.cpp \
   lightzwgrthread.cpp \
   $(BITCOIN_CORE_H)
 
