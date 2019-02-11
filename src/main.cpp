@@ -4563,7 +4563,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
         CTransaction &stakeTxIn = block.vtx[1];
 
         // Inputs
-        std::vector<CTxIn> wgrInputs;Fv
+        std::vector<CTxIn> wgrInputs;
         std::vector<CTxIn> zWGRInputs;
 
         for (CTxIn stakeIn : stakeTxIn.vin) {
