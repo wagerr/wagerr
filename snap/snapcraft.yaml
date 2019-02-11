@@ -1,3 +1,5 @@
+# Copyright (c) 2018-2019 The Ion developers
+# Copyright (c) 2018-2019 The Wagerr developers
 name: wagerr
 version: master
 summary:   peer-to-peer network based digital currency
@@ -10,75 +12,105 @@ description: |
 
 grade: devel
 confinement: strict
-
+icon: share/pixmaps/wagerr256.png
 apps:
   daemon:
     command: wagerrd
-    plugs: [network, network-bind]
+    plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
-    aliases: [wagerrd]
+  daemon-testnet:
+    command: wagerrd --testnet
+    plugs: [network, network-bind, home, removable-media]
+    environment:
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+  daemon-regtest:
+    command: wagerrd --regtest
+    plugs: [network, network-bind, home, removable-media]
   qt:
     command: desktop-launch wagerr-qt
-    plugs: [network, network-bind, unity7, desktop, desktop-legacy, wayland, x11]
-    aliases: [wagerr-qt]
-    desktop: wagerr.desktop
+    plugs: [network, network-bind, unity7, unity8-calendar, unity8-contacts, desktop, desktop-legacy, wayland, x11, mir, opengl, home, removable-media]
+    desktop: qt.desktop
+  qt-testnet:
+    command: desktop-launch wagerr-qt --testnet
+    plugs: [network, network-bind, unity7, unity8-calendar, unity8-contacts, desktop, desktop-legacy, wayland, x11, mir, opengl, home, removable-media]
+    desktop: qt-testnet.desktop
+  qt-regtest:
+    command: desktop-launch wagerr-qt --regtest
+    plugs: [network, network-bind, unity7, unity8-calendar, unity8-contacts, desktop, desktop-legacy, wayland, x11, mir, opengl, home, removable-media]
+    desktop: qt-regtest.desktop
   cli:
     command: wagerr-cli
-    aliases: [wagerr-cli]
+    plugs: [network, network-bind, home]
+  cli-testnet:
+    command: wagerr-cli --testnet
+    plugs: [network, network-bind, home]
+  cli-regtest:
+    command: wagerr-cli --regtest
+    plugs: [network, network-bind, home]
+  tx:
+    command: wagerr-tx
+    plugs: [home]
 
 parts:
   wagerr:
     source: https://github.com/wagerr/wagerr
     source-type: git
     source-tag: master
-    plugin: autotools
-    # XXX We don't want to copy the full blockchain every time that the snap is
-    # updated, but there's no way to define a default data dir in bitcoin-qt.
-    # Also, it would be better if we could split the wallet from the blockchain
-    prepare: git apply $SNAPCRAFT_STAGE/default_data_dir.patch
+    plugin: nil
+    override-build: |
+      # Patch - Default home folder
+      ## We don't want to copy the full blockchain every time that the snap is   
+      ## updated, but there's no way to define a default data dir in wagerr-qt.
+      ## Additionaly we fix funcs.mk
+      git apply $SNAPCRAFT_STAGE/default_data_dir.patch
+      git apply $SNAPCRAFT_STAGE/fix-bdb-tmp-folder.patch
+      ## Patch - Fix Bug extracting sources without ownership
+      sed -i 's/tar --strip-components/tar --no-same-owner --strip-components/' $SNAPCRAFT_PART_BUILD/depends/funcs.mk
+      # Build Dependencies
+      echo "START BUILDING FOR $SNAPCRAFT_ARCH_TRIPLET architecture"
+      cd $SNAPCRAFT_PART_BUILD/depends
+      # Fix building ARM and AARCh64, as on some point they fail with, predownload all packages
+      #   curl: (22) The requested URL returned error: 407
+      make download-linux
+      if [ $SNAPCRAFT_ARCH_TRIPLET = "i386-linux-gnu" ]
+      then
+        make HOST=i686-linux-gnu
+      else
+        make HOST=$SNAPCRAFT_ARCH_TRIPLET
+      fi
+      # Configure Wagerr Core
+      cd $SNAPCRAFT_PART_BUILD
+      ./autogen.sh
+      if [ $SNAPCRAFT_ARCH_TRIPLET = "i386-linux-gnu" ]
+      then
+        ./configure --prefix=`pwd`/depends/i686-linux-gnu
+      else
+        ./configure --prefix=`pwd`/depends/$SNAPCRAFT_ARCH_TRIPLET
+      fi
+      # Compile Wagerr Core
+      make
+      # Install Wagerr Core
+      make install prefix=$SNAPCRAFT_PART_INSTALL
+      # print in log which files are installed
+      echo "Installed files:"
+      find $SNAPCRAFT_PART_INSTALL -type f
     build-packages:
       - curl
       - wget
       - g++
       - gcc
+      - make
       - autoconf
       - automake
+      - cmake
       - pkg-config
-      - libssl-dev
-      - libevent-dev
+      - libtool
       - bsdmainutils
-      - libgmp-dev
-      # Boost.
-      - libboost-system-dev
-      - libboost-filesystem-dev
-      - libboost-chrono-dev
-      - libboost-program-options-dev
-      - libboost-test-dev
-      - libboost-thread-dev
-      # Optional.
-      - libminiupnpc-dev
-      - libzmq3-dev
-      # GUI.
-      - libqt5gui5
-      - libqt5core5a
-      - libqt5dbus5
-      - qttools5-dev
-      - qttools5-dev-tools
-      - libprotobuf-dev
-      - protobuf-compiler
-      # Files from the build host were migrated into the snap to satisfy dependencies that would otherwise not be met. This feature will be removed in a future release thats why we need to include them here
-      - libxcursor-dev
-      - libxinerama-dev
-      - libxrandr-dev
-      - libatk1.0-dev
-      #- libgdk2.0-cil
-      - libgtk2.0-dev
-      # Optional.
-      - libqrencode-dev
+      - binutils
+      - python3
     stage-packages: [ca-certificates]
     after:
-      - berkeleydb
       - desktop-qt5
       - patches
   desktop-qt5:
@@ -93,30 +125,11 @@ parts:
       - libqt5svg5 # for loading icon themes which are svg
       - locales-all
       - qtwayland5
-  berkeleydb:
-    source: http://download.oracle.com/berkeley-db/db-4.8.30.tar.gz
-    plugin: nil
-    build: |
-      # Apply a patch necessary when building with clang and c++11 (see https://community.oracle.com/thread/3952592)
-      CLANG_CXX11_PATCH_URL='https://gist.githubusercontent.com/LnL7/5153b251fd525fe15de69b67e63a6075/raw/7778e9364679093a32dec2908656738e16b6bdcb/clang.patch'
-      CLANG_CXX11_PATCH_HASH='7a9a47b03fd5fb93a16ef42235fa9512db9b0829cfc3bdf90edd3ec1f44d637c'
-      wget --no-check-certificate "${CLANG_CXX11_PATCH_URL}" -O "clang.patch"
-      echo "${CLANG_CXX11_PATCH_HASH} clang.patch" | sha256sum -c
-      patch -p2 < clang.patch
-      cp $SNAPCRAFT_STAGE/../depends/config.guess ./dist
-      cp $SNAPCRAFT_STAGE/../depends/config.sub ./dist
-      cd build_unix
-      ../dist/configure --enable-cxx --disable-shared --disable-replication --with-pic --prefix=$SNAPCRAFT_PART_INSTALL "${@}"
-    install: |
-      cd build_unix
-      make install
-    prime:
-      - -*
   patches:
     source: snap/patches
     plugin: dump
     prime:
       - -*
   desktop:
-    source: snap/gui
+    source: snap/usr/share/applications
     plugin: dump

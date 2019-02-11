@@ -1,0 +1,14 @@
+# http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.0.html
+
+[Desktop Entry]
+Type=Application
+Version=2.0.99
+Encoding=UTF-8
+Name=Wagerr Qt Testnet
+Icon=${SNAP}/qt-testnet.png
+MimeType=x-scheme-handler/wagerr;
+Exec=wagerr.qt-testnet %u
+Terminal=false
+Categories=Office;Finance;Games;
+Comment=Wagerr Digital Currency QT Official release
+Keywords=internet;wagerr;testnet;qt;crypto;currency;snap;snapcraft;wgr
