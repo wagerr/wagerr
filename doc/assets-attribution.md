@@ -99,7 +99,7 @@ WagerrTor, XXXX
 ### Assets Used
 	src/qt/css/default.css, src/qt/icons/add.png,
 	src/qt/icons/address-book.png, src/qt/icons/betting.png,
-	src/qt/icons/bitcoin.icns, src/qt/icons/bitcoin.ico,
+	src/qt/icons/wagerr.icns, src/qt/icons/bitcoin.ico,
 	src/qt/icons/bitcoin.png, src/qt/icons/bitcoin_testnet.ico,
 	src/qt/icons/bitcoin_testnet.png, src/qt/icons/bittrex.png,
 	src/qt/icons/browse.png, src/qt/icons/clock1.png,
