@@ -14,8 +14,8 @@ class Test_01(WAGERR_FakeStakeTest):
         self.description = "Covers the scenario of a PoS block where the coinstake input prevout is already spent."
         self.init_test()
 
-        FORK_DEPTH = 10  # Depth at which we are creating a fork. We are mining
-        INITAL_MINED_BLOCKS = 150
+        INITAL_MINED_BLOCKS = 150 # First mined blocks (rewards collected to spend)
+        MORE_MINED_BLOCKS = 100
         self.NUM_BLOCKS = 3
 
         # 1) Starting mining blocks
@@ -42,8 +42,8 @@ class Test_01(WAGERR_FakeStakeTest):
         sleep(1)
 
         # 5) Start mining again so that spent prevouts get confirmted in a block.
-        self.log.info("Mining %d more blocks..." % FORK_DEPTH)
-        self.node.generate(FORK_DEPTH)
+        self.log.info("Mining %d more blocks..." % MORE_MINED_BLOCKS)
+        self.node.generate(MORE_MINED_BLOCKS)
         sleep(2)
 
         # 6) Create "Fake Stake" blocks and send them
