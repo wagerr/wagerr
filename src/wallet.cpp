@@ -2980,8 +2980,15 @@ bool CWallet::FindCoinStake(const CKeyStore& keystore, unsigned int nBits, int64
     if (listInputs.empty())
         return false;
 
-    if (GetAdjustedTime() - chainActive.Tip()->GetBlockTime() < 60)
-        MilliSleep(10000);
+    if (GetAdjustedTime() - chainActive.Tip()->GetBlockTime() < 60){
+
+        if(Params().NetworkID() != CBaseChainParams::REGTEST){
+            MilliSleep(10000);
+        }else{
+            MilliSleep(1000);
+        }
+
+    }
 
     CAmount nCredit = 0;
     CScript scriptPubKeyKernel;
