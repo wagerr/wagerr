@@ -84,6 +84,10 @@ void Accumulator::setValue(CBigNum bnValue) {
 	this->value = bnValue;
 }
 
+void Accumulator::setInitialValue() {
+    this->value = this->params->accumulatorBase;
+}
+
 Accumulator& Accumulator::operator += (const PublicCoin& c) {
 	this->accumulate(c);
 	return *this;
