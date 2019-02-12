@@ -454,12 +454,12 @@ class CBlockHeader():
         return self.sha256
 
     def solve_stake(self, stakeModifier, prevouts):
-        target = uint256_from_compact(self.nBits)
+        target0 = uint256_from_compact(self.nBits)
         loop = True
         while loop:
-
             for prevout in prevouts:
                 nvalue, txBlockTime = prevouts[prevout]
+                target = int(target0 * nvalue / 100) % 2**256
                 data = b""
                 data += ser_uint256(stakeModifier)
                 data += struct.pack("<I", txBlockTime)
