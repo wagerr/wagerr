@@ -13,31 +13,35 @@
 
 // The supported bet outcome types.
 typedef enum OutcomeType {
-    OutcomeTypeWin   = 0x01,
-    OutcomeTypeLose  = 0x02,
-    OutcomeTypeDraw  = 0x03
+    moneyLineWin  = 0x01,
+    moneyLineLose = 0x02,
+    moneyLineDraw = 0x03,
+    spreadOver    = 0x04,
+    spreadUnder   = 0x05,
+    totalOver     = 0x06,
+    totalUnder    = 0x07
 } OutcomeType;
 
 // The supported result types.
 typedef enum ResultType {
-    ResultTypeWin    = 0x01,
-    ResultTypeLose   = 0x02,
-    ResultTypeDraw   = 0x03,
-    ResultTypeRefund = 0x04
+    homeWin = 0x01,
+    awayWin = 0x02,
+    draw    = 0x03,
+    refund  = 0x04
 } ResultType;
 
 // The supported betting TX types.
 typedef enum BetTxTypes{
-    mappingTxType           = 0x01,  // Mapping transaction type identifier.
-    plEventTxType           = 0x02,  // Peerless event transaction type identifier.
-    plBetTxType             = 0x03,  // Peerless Bet transaction type identifier.
-    plResultTxType          = 0x04,  // Peerless Result transaction type identifier.
-    plUpdateOddsTxType      = 0x05,  // Peerless update odds transaction type identifier.
-    cgEventTxType           = 0x06,  // Chain games event transaction type identifier.
-    cgBetTxType             = 0x07,  // Chain games bet transaction type identifier.
-    cgResultTxType          = 0x08,   // Chain games result transaction type identifier.
-    plSpreadsEventTxType    = 0x09,  // Chain games result transaction type identifier.
-    plTotalsEventTxType     = 0x0a   // Chain games result transaction type identifier.
+    mappingTxType        = 0x01,  // Mapping transaction type identifier.
+    plEventTxType        = 0x02,  // Peerless event transaction type identifier.
+    plBetTxType          = 0x03,  // Peerless Bet transaction type identifier.
+    plResultTxType       = 0x04,  // Peerless Result transaction type identifier.
+    plUpdateOddsTxType   = 0x05,  // Peerless update odds transaction type identifier.
+    cgEventTxType        = 0x06,  // Chain games event transaction type identifier.
+    cgBetTxType          = 0x07,  // Chain games bet transaction type identifier.
+    cgResultTxType       = 0x08,  // Chain games result transaction type identifier.
+    plSpreadsEventTxType = 0x09,  // Spread odds transaction type identifier.
+    plTotalsEventTxType  = 0x0a   // Totals odds transaction type identifier.
 } BetTxTypes;
 
 // The supported mapping TX types.
@@ -72,6 +76,12 @@ public:
     uint32_t nHomeOdds;
     uint32_t nAwayOdds;
     uint32_t nDrawOdds;
+    uint32_t nSpreadPoints;
+    uint32_t nSpreadOverOdds;
+    uint32_t nSpreadUnderOdds;
+    uint32_t nTotalPoints;
+    uint32_t nTotalOverOdds;
+    uint32_t nTotalUnderOdds;
 
     // Default Constructor.
     CPeerlessEvent() {}
@@ -95,6 +105,12 @@ public:
         READWRITE(nHomeOdds);
         READWRITE(nAwayOdds);
         READWRITE(nDrawOdds);
+        READWRITE(nSpreadPoints);
+        READWRITE(nSpreadOverOdds);
+        READWRITE(nSpreadUnderOdds);
+        READWRITE(nTotalPoints);
+        READWRITE(nTotalOverOdds);
+        READWRITE(nTotalUnderOdds);
     }
 };
 
@@ -118,22 +134,27 @@ public:
     }
 
     static bool ToOpCode(CPeerlessBet pb, std::string &opCode);
-    static bool FromOpCode(std::string opCode, CPeerlessBet &pb) ;
+    static bool FromOpCode(std::string opCode, CPeerlessBet &pb);
 };
 
 class CPeerlessResult
 {
 public:
     uint32_t nEventId;
-    ResultType nResult;
+    ResultType nMoneyLineResult;
+    ResultType nSpreadResult;
+    ResultType nTotalResult;
 
     // Default Constructor.
     CPeerlessResult() {}
 
     // Parametrized Constructor.
-    CPeerlessResult(int eventId, ResultType result){
-        nEventId = eventId;
-        nResult  = result;
+    CPeerlessResult(int eventId, ResultType mlResult, ResultType sResult, ResultType tResult)
+    {
+        nEventId         = eventId;
+        nMoneyLineResult = mlResult;
+        nSpreadResult    = sResult;
+        nTotalResult     = tResult;
     }
 
     static bool ToOpCode(CPeerlessResult pr, std::string &opCode);
@@ -331,5 +352,11 @@ std::vector<CTxOut> GetBetPayouts(int height);
 
 /** Get the chain games winner and return the payout vector. **/
 std::vector<CTxOut> GetCGLottoBetPayouts(int height);
+
+/** Set a peerless event spread odds **/
+void SetEventSpreadOdds(CPeerlessSpreadsEvent sEventOdds);
+
+/** Set a peerless event total odds **/
+void SetEventTotalOdds(CPeerlessTotalsEvent tEventOdds);
 
 #endif // WAGERR_BET_H
