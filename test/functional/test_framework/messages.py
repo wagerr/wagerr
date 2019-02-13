@@ -453,6 +453,13 @@ class CBlockHeader():
         self.calc_sha256()
         return self.sha256
 
+    # WGR Uniqueness
+    def get_uniqueness(self, prevout):
+        r = b""
+        r += struct.pack("<I", prevout.n)
+        r += ser_uint256(prevout.hash)
+        return r
+
     def solve_stake(self, stakeModifier, prevouts):
         target0 = uint256_from_compact(self.nBits)
         loop = True
@@ -467,7 +474,7 @@ class CBlockHeader():
                 if isinstance(prevout, str):
                     data += ser_uint256(uint256_from_str(bytes.fromhex(prevout)))
                 else:
-                    data += prevout.serialize()
+                    data += self.get_uniqueness(prevout)
                 data += struct.pack("<I", self.nTime)
                 posHash = uint256_from_str(hash256(data))
                 if posHash <= target:
