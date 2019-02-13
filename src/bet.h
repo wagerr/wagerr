@@ -46,7 +46,14 @@ typedef enum MappingTypes {
     tournamentMapping = 0x04
 } MappingTypes;
 
+/** Ensures a TX has come from an OMNO wallet. **/
 bool IsValidOracleTx(const CTxIn &txin);
+
+/** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
+int64_t GetBlockPayouts(std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetReward);
+
+/** Validating the payout block using the payout vector. **/
+bool IsBlockPayoutsValid(std::vector<CTxOut> vExpectedPayouts, CBlock block);
 
 class CPeerlessEvent
 {
@@ -256,5 +263,17 @@ public:
     bool Write(const eventIndex_t& eventIndex,  uint256 latestProcessedBlock);
     bool Read(eventIndex_t& eventIndex, uint256& lastBlockHash);
 };
+
+/** Find peerless events. **/
+std::vector<CPeerlessResult> getEventResults(int height);
+
+/** Find chain games lotto result. **/
+std::pair<std::vector<CChainGamesEvent>,std::vector<std::string>> getCGLottoEventResults(int height);
+
+/** Get the peerless winning bets from the block chain and return the payout vector. **/
+std::vector<CTxOut> GetBetPayouts(int height);
+
+/** Get the chain games winner and return the payout vector. **/
+std::vector<CTxOut> GetCGLottoBetPayouts(int height);
 
 #endif // WAGERR_BET_H
