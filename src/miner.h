@@ -33,7 +33,7 @@ void IncrementExtraNonce(CBlock* pblock, CBlockIndex* pindexPrev, unsigned int& 
 void UpdateTime(CBlockHeader* block, const CBlockIndex* pindexPrev);
 
 std::vector<CPeerlessResult> getEventResults(int height);
-std::vector<std::vector<std::string>> getCGLottoEventResults(int height);
+std::pair<std::vector<CChainGamesEvent>,std::vector<std::string>> getCGLottoEventResults(int height);
 std::vector<CTxOut> GetBetPayouts(int height);
 std::vector<CTxOut> GetCGLottoBetPayouts(int height);
 
