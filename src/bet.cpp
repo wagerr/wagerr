@@ -15,7 +15,7 @@
 // String lengths for all currently supported op codes.
 #define PE_OP_STRLEN  74
 #define PB_OP_STRLEN  16
-#define PR_OP_STRLEN  16
+#define PR_OP_STRLEN  20
 #define PUO_OP_STRLEN 38
 #define CGE_OP_STRLEN 14
 #define CGB_OP_STRLEN 10
@@ -277,6 +277,7 @@ bool CPeerlessEvent::FromOpCode(std::string opCode, CPeerlessEvent &pe)
         return false;
     }
 
+    // Parse the OPCODE hex data.
     pe.nEventId    = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
     pe.nStartTime  = FromChars(opCode[7], opCode[8], opCode[9], opCode[10]);
     pe.nSport      = FromChars(opCode[11], opCode[12]);
@@ -287,6 +288,14 @@ bool CPeerlessEvent::FromOpCode(std::string opCode, CPeerlessEvent &pe)
     pe.nHomeOdds   = FromChars(opCode[25], opCode[26], opCode[27], opCode[28]);
     pe.nAwayOdds   = FromChars(opCode[29], opCode[30], opCode[31], opCode[32]);
     pe.nDrawOdds   = FromChars(opCode[33], opCode[34], opCode[35], opCode[36]);
+
+    // Set default values for the spread and total market odds as we don't know them yet.
+    pe.nSpreadPoints    = 0;
+    pe.nSpreadOverOdds  = 0;
+    pe.nSpreadUnderOdds = 0;
+    pe.nTotalPoints     = 0;
+    pe.nTotalOverOdds   = 0;
+    pe.nTotalUnderOdds  = 0;
 
     return true;
 }
@@ -408,8 +417,10 @@ bool CPeerlessResult::FromOpCode(std::string opCode, CPeerlessResult &pr)
         return false;
     }
 
-    pr.nEventId = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
-    pr.nResult = (ResultType) opCode[7];
+    pr.nEventId         = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
+    pr.nMoneyLineResult = (ResultType) opCode[7];
+    pr.nSpreadResult    = (ResultType) opCode[8];
+    pr.nTotalResult     = (ResultType) opCode[9];
 
     return true;
 }
@@ -423,10 +434,12 @@ bool CPeerlessResult::FromOpCode(std::string opCode, CPeerlessResult &pr)
  */
 bool CPeerlessResult::ToOpCode(CPeerlessResult pr, std::string &opCode)
 {
-    std::string sEventId = ToHex(pr.nEventId, 8);
-    std::string sResult  = ToHex(pr.nResult, 2);
+    std::string sEventId         = ToHex(pr.nEventId, 8);
+    std::string sMoneyLineResult = ToHex(pr.nMoneyLineResult, 2);
+    std::string sSpreadResult    = ToHex(pr.nSpreadResult, 2);
+    std::string sTotalResult     = ToHex(pr.nTotalResult, 2);
 
-    opCode = BTX_HEX_PREFIX "0104" + sEventId + sResult;
+    opCode = BTX_HEX_PREFIX "0104" + sEventId + sMoneyLineResult + sSpreadResult + sTotalResult;
 
     // Ensure peerless result OpCode string is the correct length.
     if (opCode.length() != PR_OP_STRLEN) {
@@ -695,9 +708,9 @@ bool CPeerlessSpreadsEvent::FromOpCode(std::string opCode, CPeerlessSpreadsEvent
         return false;
     }
 
-    pse.nEventId = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
-    pse.nPoints = FromChars(opCode[7], opCode[8]);
-    pse.nOverOdds = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+    pse.nEventId   = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
+    pse.nPoints    = FromChars(opCode[7], opCode[8]);
+    pse.nOverOdds  = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
     pse.nUnderOdds = FromChars(opCode[13], opCode[14], opCode[15], opCode[16]);
 
     return true;
@@ -712,9 +725,9 @@ bool CPeerlessSpreadsEvent::FromOpCode(std::string opCode, CPeerlessSpreadsEvent
  */
 bool CPeerlessSpreadsEvent::ToOpCode(CPeerlessSpreadsEvent pse, std::string &opCode)
 {
-    std::string sEventId = ToHex(pse.nEventId, 8);
-    std::string sPoints  = ToHex(pse.nPoints, 4);
-    std::string sOverOdds = ToHex(pse.nOverOdds, 8);
+    std::string sEventId    = ToHex(pse.nEventId, 8);
+    std::string sPoints     = ToHex(pse.nPoints, 4);
+    std::string sOverOdds   = ToHex(pse.nOverOdds, 8);
     std::string sUnderOdds  = ToHex(pse.nUnderOdds, 8);
 
     opCode = BTX_HEX_PREFIX "0109" + sEventId + sPoints + sOverOdds + sUnderOdds;
@@ -726,6 +739,29 @@ bool CPeerlessSpreadsEvent::ToOpCode(CPeerlessSpreadsEvent pse, std::string &opC
     }
 
     return true;
+}
+
+/**
+ * Updates a peerless event object with spread odds for the given event ID.
+ */
+void SetEventSpreadOdds (CPeerlessSpreadsEvent spreadEvent) {
+    CEventDB edb;
+    eventIndex_t eventIndex;
+    edb.GetEvents(eventIndex);
+
+    // First check a peerless event exists in the event index.
+    if (eventIndex.count(spreadEvent.nEventId) > 0) {
+
+        // Get the event object from the index and update the spread odds values.
+        CPeerlessEvent plEvent = eventIndex.find(spreadEvent.nEventId)->second;
+
+        plEvent.nSpreadPoints    = spreadEvent.nPoints;
+        plEvent.nSpreadOverOdds  = spreadEvent.nOverOdds;
+        plEvent.nSpreadUnderOdds = spreadEvent.nUnderOdds;
+
+        // Update the event in the event index.
+        CEventDB::AddEvent(plEvent);
+    }
 }
 
 /**
@@ -756,9 +792,9 @@ bool CPeerlessTotalsEvent::FromOpCode(std::string opCode, CPeerlessTotalsEvent &
         return false;
     }
 
-    pte.nEventId = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
-    pte.nPoints = FromChars(opCode[7], opCode[8]);
-    pte.nOverOdds = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+    pte.nEventId   = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
+    pte.nPoints    = FromChars(opCode[7], opCode[8]);
+    pte.nOverOdds  = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
     pte.nUnderOdds = FromChars(opCode[13], opCode[14], opCode[15], opCode[16]);
 
     return true;
@@ -773,10 +809,10 @@ bool CPeerlessTotalsEvent::FromOpCode(std::string opCode, CPeerlessTotalsEvent &
  */
 bool CPeerlessTotalsEvent::ToOpCode(CPeerlessTotalsEvent pte, std::string &opCode)
 {
-    std::string sEventId = ToHex(pte.nEventId, 8);
-    std::string sPoints  = ToHex(pte.nPoints, 4);
-    std::string sOverOdds = ToHex(pte.nOverOdds, 8);
-    std::string sUnderOdds  = ToHex(pte.nUnderOdds, 8);
+    std::string sEventId   = ToHex(pte.nEventId, 8);
+    std::string sPoints    = ToHex(pte.nPoints, 4);
+    std::string sOverOdds  = ToHex(pte.nOverOdds, 8);
+    std::string sUnderOdds = ToHex(pte.nUnderOdds, 8);
 
     opCode = BTX_HEX_PREFIX "010a" + sEventId + sPoints + sOverOdds + sUnderOdds;
 
@@ -789,6 +825,28 @@ bool CPeerlessTotalsEvent::ToOpCode(CPeerlessTotalsEvent pte, std::string &opCod
     return true;
 }
 
+/**
+ * Updates a peerless event object with totals odds.
+ */
+void SetEventTotalOdds (CPeerlessTotalsEvent totalsEvent) {
+    CEventDB edb;
+    eventIndex_t eventIndex;
+    edb.GetEvents(eventIndex);
+
+    // First check a peerless event exists in the event index.
+    if (eventIndex.count(totalsEvent.nEventId) > 0) {
+
+        // Get the event object from the index and update the totals odds values.
+        CPeerlessEvent plEvent = eventIndex.find(totalsEvent.nEventId)->second;
+
+        plEvent.nTotalPoints    = totalsEvent.nPoints;
+        plEvent.nTotalOverOdds  = totalsEvent.nOverOdds;
+        plEvent.nTotalUnderOdds = totalsEvent.nUnderOdds;
+
+        // Update the event in the event index.
+        CEventDB::AddEvent(plEvent);
+    }
+}
 
 /**
  * Split a CMapping OpCode string into byte components and store in CMapping object.
@@ -1311,6 +1369,13 @@ std::vector<CTxOut> GetBetPayouts(int height)
         unsigned int oddsDivisor  = Params().OddsDivisor();
         unsigned int betXPermille = Params().BetXPermille();
 
+        OutcomeType nMoneylineResult = (OutcomeType) 0;
+        std::vector<OutcomeType> vSpreadsResult;
+        std::vector<OutcomeType> vTotalsResult;
+        unsigned int nMoneylineOdds = 0;
+        unsigned int nSpreadsOdds = 0;
+        unsigned int nTotalsOdds = 0;
+
         CPeerlessEvent latestEvent;
         latestEvent.nHomeOdds = 0;
         latestEvent.nAwayOdds = 0;
@@ -1320,19 +1385,53 @@ std::vector<CTxOut> GetBetPayouts(int height)
         latestEvent.nStartTime = 0;
         bool eventStartedFlag = false;
 
+        /** TODO - Code below needs to be refactored and added to a function or something **/
+        // Find peerless outcome (result).
+        if (result.nMoneyLineResult == homeWin) {
+            nMoneylineResult = (OutcomeType) moneyLineWin;
+        }
+        else if (result.nMoneyLineResult == awayWin) {
+            nMoneylineResult = (OutcomeType) moneyLineLose;
+        }
+        else if (result.nMoneyLineResult == draw) {
+            nMoneylineResult = (OutcomeType) moneyLineDraw;
+        }
+
+        // Find spreads outcome (result).
+        if (result.nSpreadResult == homeWin) {
+            vSpreadsResult.emplace_back(spreadOver);
+            vSpreadsResult.emplace_back(spreadOver);
+        }
+        else if (result.nSpreadResult == awayWin) {
+            vSpreadsResult.emplace_back(spreadUnder);
+            vSpreadsResult.emplace_back(spreadUnder);
+        }
+        else {
+            vSpreadsResult.emplace_back(spreadOver);
+            vSpreadsResult.emplace_back(spreadUnder);
+        }
+
+        // Find totals outcome (result).
+        if (result.nTotalResult == homeWin) {
+            vTotalsResult.emplace_back(totalOver);
+            vTotalsResult.emplace_back(totalOver);
+        }
+        else if (result.nTotalResult == awayWin) {
+            vTotalsResult.emplace_back(totalUnder);
+            vTotalsResult.emplace_back(totalUnder);
+        }
+        else {
+            vTotalsResult.emplace_back(totalOver);
+            vTotalsResult.emplace_back(totalUnder);
+        }
+
         // Traverse the block chain to find events and bets.
         while (BlocksIndex) {
-
             CBlock block;
             ReadBlockFromDisk(block, BlocksIndex);
             time_t transactionTime = block.nTime;
 
             BOOST_FOREACH(CTransaction &tx, block.vtx) {
-
-                // Ensure if event TX that has it been posted by Oracle wallet.
-                const CTxIn &txin = tx.vin[0];
-                bool validResultTx = IsValidOracleTx(txin);
-
                 // Check all TX vouts for an OP RETURN.
                 for (unsigned int i = 0; i < tx.vout.size(); i++) {
 
@@ -1342,34 +1441,86 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
                     if (scriptPubKey.length() > 0 && 0 == strncmp(scriptPubKey.c_str(), "OP_RETURN", 9)) {
 
+                        // Ensure TX has it been posted by Oracle wallet.
+                        const CTxIn &txin = tx.vin[0];
+                        bool validResultTx = IsValidOracleTx(txin);
+
                         // Get the OP CODE from the transaction scriptPubKey.
                         vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
                         std::string opCode(vOpCode.begin(), vOpCode.end());
 
+                        // Peerless event OP RETURN transaction.
                         CPeerlessEvent pe;
                         if (validResultTx && CPeerlessEvent::FromOpCode(opCode, pe)) {
 
-                            CTxDestination address;
-                            ExtractDestination(tx.vout[0].scriptPubKey, address);
-
                             LogPrintf("EVENT OP CODE - %s \n", opCode.c_str());
 
-                            if (CBitcoinAddress(address).ToString() == OracleWalletAddr) {
+                            // If current event ID matches result ID set the teams and odds.
+                            if (result.nEventId == pe.nEventId && nMoneylineResult == moneyLineWin) {
+                                nMoneylineOdds = pe.nHomeOdds;
+                            }
+                            else if (result.nEventId == pe.nEventId && nMoneylineResult == moneyLineLose) {
+                                nMoneylineOdds = pe.nAwayOdds;
+                            }
+                            else if (result.nEventId == pe.nEventId && nMoneylineResult == moneyLineDraw) {
+                                nMoneylineOdds = pe.nDrawOdds;
+                            }
 
-                                // If current event ID matches result ID set the teams and odds.
-                                if (result.nEventId == pe.nEventId) {
-                                    latestEvent.nHomeTeam = pe.nHomeTeam;
-                                    latestEvent.nAwayTeam = pe.nAwayTeam;
+                            // Set the latest event start time.
+                            latestEvent.nStartTime = pe.nStartTime;
+                        }
 
-                                    LogPrintf("HomeTeam = %s & AwayTeam = %s \n", latestEvent.nHomeTeam, latestEvent.nAwayTeam);
+                        // Peerless update odds OP RETURN transaction.
+                        CPeerlessUpdateOdds puo;
+                        if (validResultTx && CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
 
-                                    latestEvent.nHomeOdds  = pe.nHomeOdds;
-                                    latestEvent.nAwayOdds  = pe.nAwayOdds;
-                                    latestEvent.nDrawOdds  = pe.nAwayOdds;
-                                    latestEvent.nStartTime = pe.nStartTime;
+                            LogPrintf("PUO EVENT OP CODE - %s \n", opCode.c_str());
 
-                                    LogPrintf("latestHomeOdds = %u & latestAwayOdds = %u & latestDrawOdds = %u \n", latestEvent.nHomeOdds, latestEvent.nAwayOdds, latestEvent.nDrawOdds);
-                                }
+                            // If current event ID matches result ID set the odds.
+                            if (result.nEventId == puo.nEventId && nMoneylineResult == moneyLineWin) {
+                                nMoneylineOdds = puo.nHomeOdds;
+                            }
+                            else if (result.nEventId == puo.nEventId && nMoneylineResult == moneyLineLose) {
+                                nMoneylineOdds = puo.nAwayOdds;
+                            }
+                            else if (result.nEventId == puo.nEventId && nMoneylineResult == moneyLineDraw) {
+                                nMoneylineOdds = puo.nDrawOdds;
+                            }
+                        }
+
+                        // Handle PSE, when we find an Spreads event on chain we need to update the Spreads odds.
+                        CPeerlessSpreadsEvent pse;
+                        if (validResultTx && CPeerlessSpreadsEvent::FromOpCode(opCode, pse)) {
+
+                            LogPrintf("PSE EVENT OP CODE - %s \n", opCode.c_str());
+
+                            // If current event ID matches result ID set the odds.
+                            if (result.nEventId == pse.nEventId && vSpreadsResult.at(0) == spreadOver && vSpreadsResult.at(1) == spreadOver) {
+                                nSpreadsOdds = pse.nOverOdds;
+                            }
+                            else if (result.nEventId == pse.nEventId && vSpreadsResult.at(0) == spreadUnder && vSpreadsResult.at(1) == spreadUnder) {
+                                nSpreadsOdds = pse.nUnderOdds;
+                            }
+                            else if (result.nEventId == pse.nEventId && vSpreadsResult.at(0) == spreadOver && vSpreadsResult.at(1) == spreadUnder) {
+                                nSpreadsOdds = Params().OddsDivisor();
+                            }
+                        }
+
+                        // Handle PTE, when we find an Totals event on chain we need to update the Totals odds.
+                        CPeerlessTotalsEvent pte;
+                        if (validResultTx && CPeerlessTotalsEvent::FromOpCode(opCode, pte)) {
+
+                            LogPrintf("PTE EVENT OP CODE - %s \n", opCode.c_str());
+
+                            // If current event ID matches result ID set the odds.
+                            if (result.nEventId == pte.nEventId && vTotalsResult.at(0) == totalOver && vTotalsResult.at(1) == totalOver) {
+                                nTotalsOdds = pte.nOverOdds;
+                            }
+                            else if (result.nEventId == pte.nEventId && vTotalsResult.at(0) == totalUnder && vTotalsResult.at(1) == totalUnder) {
+                                nTotalsOdds = pte.nUnderOdds;
+                            }
+                            else if (result.nEventId == pte.nEventId && vTotalsResult.at(0) == totalOver && vTotalsResult.at(1) == totalUnder) {
+                                nTotalsOdds = Params().OddsDivisor();
                             }
                         }
 
@@ -1393,21 +1544,21 @@ std::vector<CTxOut> GetBetPayouts(int height)
                                     CAmount winnings = 0;
 
                                     // If bet payout result.
-                                    if (result.nResult != ResultTypeRefund) {
+                                    if (result.nMoneyLineResult != refund) {
 
                                         // Calculate winnings.
-                                        if (pb.nOutcome == (OutcomeType) ResultTypeRefund) {
-                                            winnings = betAmount * latestEvent.nHomeOdds;
+                                        if (pb.nOutcome == nMoneylineResult) {
+                                            winnings = betAmount * nMoneylineOdds;
                                         }
-                                        else if (pb.nOutcome == (OutcomeType) OutcomeTypeLose) {
-                                            winnings = betAmount * latestEvent.nAwayOdds;
+                                        else if (pb.nOutcome == vSpreadsResult.at(0) || pb.nOutcome == vSpreadsResult.at(1)) {
+                                            winnings = betAmount * nSpreadsOdds;
                                         }
-                                        else {
-                                            winnings = betAmount * latestEvent.nDrawOdds;
+                                        else if (pb.nOutcome == vTotalsResult.at(0) || pb.nOutcome == vTotalsResult.at(1)) {
+                                            winnings = betAmount * nTotalsOdds;
                                         }
 
                                         // Calculate the bet winnings for the current bet.
-                                        if( winnings > 0) {
+                                        if (winnings > 0) {
                                             payout = (winnings - ((winnings - betAmount*oddsDivisor) * betXPermille / 1000)) / oddsDivisor;
                                         }
                                         else{
@@ -1684,4 +1835,6 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
     }
 
     return vexpectedCGLottoBetPayouts;
-} 
+}
+
+

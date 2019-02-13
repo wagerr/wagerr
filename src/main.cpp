@@ -4649,6 +4649,20 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                         eiUpdated = true;
                     }
 
+                    // If spread odds TX found then update the spread odds for that event object.
+                    CPeerlessSpreadsEvent spreadEvent;
+                    if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
+                        SetEventSpreadOdds(spreadEvent);
+                        eiUpdated = true;
+                    }
+
+                    // If total odds TX found then update the total odds for that event object.
+                    CPeerlessTotalsEvent totalsEvent;
+                    if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
+                        SetEventTotalOdds(totalsEvent);
+                        eiUpdated = true;
+                    }
+
                     // If mapping found then add it to the relating map index and write the map index to disk.
                     CMapping cMapping;
                     if (CMapping::FromOpCode(opCode, cMapping)) {
