@@ -114,7 +114,7 @@ def create_transaction(outPoint, sig, value, nTime, scriptPubKey=CScript()):
     return tx
 
 
-def utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime):
+def utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime, stakeModifier):
     '''
     Updates a map of unspent outputs to (amount, blocktime) to be used as stake inputs
     :param   utxo:              (map) utxo JSON object returned from listunspent
@@ -126,7 +126,7 @@ def utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime):
     COINBASE_MATURITY = 100
     if utxo['confirmations'] > COINBASE_MATURITY:
         outPoint = COutPoint(int(utxo['txid'], 16), utxo['vout'])
-        stakingPrevOuts[outPoint] = (int(utxo['amount'])*COIN, txBlocktime)
+        stakingPrevOuts[outPoint] = (int(utxo['amount'])*COIN, txBlocktime, stakeModifier)
 
     return
 
