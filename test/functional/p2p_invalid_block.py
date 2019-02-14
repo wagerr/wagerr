@@ -22,8 +22,10 @@ re-requested.
 # Use the ComparisonTestFramework with 1 node: only use --testbinary.
 class InvalidBlockRequestTest(ComparisonTestFramework):
 
-    ''' Can either run this test as 1 node with expected answers, or two and compare them. 
-        Change the "outcome" variable from each TestInstance object to only do the comparison. '''
+    '''
+    Can either run this test as 1 node with expected answers, or two and compare them.
+    Change the "outcome" variable from each TestInstance object to only do the comparison.
+    '''
     def __init__(self):
         super().__init__()
         self.num_nodes = 1
@@ -71,7 +73,7 @@ class InvalidBlockRequestTest(ComparisonTestFramework):
         Now we use merkle-root malleability to generate an invalid block with
         same blockheader.
         Manufacture a block with 3 transactions (coinbase, spend of prior
-        coinbase, spend of that spend).  Duplicate the 3rd transaction to 
+        coinbase, spend of that spend).  Duplicate the 3rd transaction to
         leave merkle root and blockheader unchanged but invalidate the block.
         '''
         block2 = create_block(self.tip, create_coinbase(height), self.block_time)

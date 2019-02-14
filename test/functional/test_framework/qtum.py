@@ -12,7 +12,7 @@ def make_transaction(node, vin, vout):
     tx.vin = vin
     tx.vout = vout
     tx.rehash()
-    
+
     unsigned_raw_tx = bytes_to_hex_str(tx.serialize_without_witness())
     signed_raw_tx = node.signrawtransaction(unsigned_raw_tx)['hex']
     return signed_raw_tx
@@ -65,7 +65,7 @@ def p2pkh_to_hex_hash(address):
     return str(base58_to_byte(address, 25)[1])[2:-1]
 
 def hex_hash_to_p2pkh(hex_hash):
-    return keyhash_to_p2pkh(hex_str_to_bytes(hex_hash))    
+    return keyhash_to_p2pkh(hex_str_to_bytes(hex_hash))
 
 def assert_vin(tx, expected_vin):
     assert_equal(len(tx['vin']), len(expected_vin))
@@ -214,7 +214,7 @@ class DGPState:
         for type1, arr1 in enumerate(self.current_on_vote_address_proposals):
             for type2, current_on_vote_address_proposal in enumerate(arr1):
                 self._assert_current_on_vote_address_proposal(type1, type2, current_on_vote_address_proposal)
-                
+
     """
     function getRequiredVotes(uint _type) constant returns (uint val){
         // type 0: adminVotesForParams
@@ -234,7 +234,7 @@ class DGPState:
    function getCurrentOnVoteStatus(uint _type, uint _type2) constant returns (bool val){
         // type 0: addAddress
         // type 1: changeValue
-        // type 2: removeAddress    
+        // type 2: removeAddress
 
         // type2 0: adminKey
         // type2 1: govKey
