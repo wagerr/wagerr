@@ -468,12 +468,12 @@ class CBlockHeader():
         r += ser_uint256(prevout.hash)
         return r
 
-    def solve_stake(self, stakeModifier, prevouts):
+    def solve_stake(self, prevouts):
         target0 = uint256_from_compact(self.nBits)
         loop = True
         while loop:
             for prevout in prevouts:
-                nvalue, txBlockTime = prevouts[prevout]
+                nvalue, txBlockTime, stakeModifier = prevouts[prevout]
                 target = int(target0 * nvalue / 100) % 2**256
                 data = b""
                 data += ser_uint64(stakeModifier)

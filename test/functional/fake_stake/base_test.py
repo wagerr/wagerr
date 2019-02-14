@@ -107,8 +107,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
 
         # create a new private key used for block signing.
         # solve for the block here
-        parent_block_stake_modifier = int(self.node.getblock(hashPrevBlock)['modifier'], 16)
-        if not block.solve_stake(parent_block_stake_modifier, stakingPrevOuts):
+        if not block.solve_stake(stakingPrevOuts):
             raise Exception("Not able to solve for any prev_outpoint")
 
         self.log.info("Stake found. Signing block...")
@@ -267,8 +266,11 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         '''
         stakingPrevOuts = {}
         for utxo in utxo_list:
-            txBlocktime = self.node.getrawtransaction(utxo['txid'], 1)['blocktime']
-            utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime)
+            utxo_tx = self.node.getrawtransaction(utxo['txid'], 1)
+            txBlocktime = utxo_tx['blocktime']
+            txBlockhash = utxo_tx['blockhash']
+            stakeModifier = int(self.node.getblock(txBlockhash)['modifier'], 16)
+            utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime, stakeModifier)
 
         return stakingPrevOuts
 
