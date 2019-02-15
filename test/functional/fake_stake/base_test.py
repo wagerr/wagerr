@@ -92,7 +92,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         :return  block:              (CBlock) generated block
         '''
         self.log.info("Creating Spam Block")
-        if spendingPrevOuts == []:
+        if spendingPrevOuts == {}:
             spendingPrevOuts = stakingPrevOuts
         current_time = int(time.time())
         nTime = current_time & 0xfffffff0
