@@ -206,7 +206,7 @@ HEADERS += src/activemasternode.h \
            src/qt/transactiondesc.h \
            src/qt/transactiondescdialog.h \
            src/qt/transactionfilterproxy.h \
-           src/qt/transactionrecord.h \
+           src/transactionrecord.h \
            src/qt/transactiontablemodel.h \
            src/qt/transactionview.h \
            src/qt/utilitydialog.h \
@@ -499,7 +499,7 @@ SOURCES += src/activemasternode.cpp \
            src/qt/transactiondesc.cpp \
            src/qt/transactiondescdialog.cpp \
            src/qt/transactionfilterproxy.cpp \
-           src/qt/transactionrecord.cpp \
+           src/transactionrecord.cpp \
            src/qt/transactiontablemodel.cpp \
            src/qt/transactionview.cpp \
            src/qt/utilitydialog.cpp \

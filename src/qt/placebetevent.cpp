@@ -56,7 +56,7 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
     std::vector<std::string> fields;
     boost::split(fields, descr, boost::is_any_of("|"));
 
-    if (fields.size() != 11 || fields[0] != Params().EventTxType() || fields[1] != Params().OpCodeProtocolVersion()) {
+    if (fields.size() != 11) {
         return nullptr;
     }
 
