@@ -3259,9 +3259,11 @@ void static UpdateTip(CBlockIndex* pindexNew)
 {
     chainActive.SetTip(pindexNew);
 
+#ifdef ENABLE_WALLET
     // If turned on AutoZeromint will automatically convert WGR to zWGR
-    if (pwalletMain->isZeromintEnabled ())
-        pwalletMain->AutoZeromint ();
+    if (pwalletMain && pwalletMain->isZeromintEnabled())
+        pwalletMain->AutoZeromint();
+#endif // ENABLE_WALLET
 
     // New best block
     nTimeBestReceived = GetTime();

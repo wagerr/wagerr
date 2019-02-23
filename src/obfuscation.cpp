@@ -432,6 +432,9 @@ bool CObfuscationPool::SetCollateralAddress(std::string strAddress)
 //
 void CObfuscationPool::UnlockCoins()
 {
+    if (!pwalletMain)
+        return;
+
     while (true) {
         TRY_LOCK(pwalletMain->cs_wallet, lockWallet);
         if (!lockWallet) {
