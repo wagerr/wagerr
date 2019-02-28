@@ -315,8 +315,6 @@ public:
         return state;
     }
 
-    std::string GetStatus();
-
     int GetEntriesCount() const
     {
         return entries.size();
