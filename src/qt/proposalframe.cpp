@@ -17,6 +17,7 @@
 #include <QClipboard>
 #include <QUrl>
 #include <QSpacerItem>
+#include <QMouseEvent>
 
 ProposalFrame::ProposalFrame(QWidget* parent) : QFrame(parent)
 {
@@ -214,6 +215,8 @@ void ProposalFrame::close()
 void ProposalFrame::mouseReleaseEvent(QMouseEvent* event)
 {
     if (!governancePage) //TODO implement an error
+        return;
+    if (event->button() == Qt::RightButton)
         return;
     extended = !extended;
     if (extended)
