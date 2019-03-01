@@ -423,7 +423,7 @@ public:
     bool AddToWalletIfInvolvingMe(const CTransaction& tx, const CBlock* pblock, bool fUpdate);
     void EraseFromWallet(const uint256& hash);
     int ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate = false, bool fromStartup = false);
-    void ReacceptWalletTransactions();
+    void ReacceptWalletTransactions(bool fFirstLoad = false);
     void ResendWalletTransactions();
     CAmount GetBalance() const;
     CAmount GetZerocoinBalance(bool fMatureOnly) const;
