@@ -125,14 +125,14 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     privacyPage = new PrivacyDialog();
     receiveCoinsPage = new ReceiveCoinsDialog();
     sendCoinsPage = new SendCoinsDialog();
-    placeBetPage = new PlaceBetDialog();
+    //placeBetPage = new PlaceBetDialog();
 
     addWidget(overviewPage);
     addWidget(transactionsPage);
     addWidget(privacyPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
-    addWidget(placeBetPage);
+    //addWidget(placeBetPage);
     addWidget(explorerWindow);
 
     QSettings settings;
@@ -157,7 +157,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     connect(sendCoinsPage, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
 
     // Pass through messages from sendCoinsPage
-    connect(placeBetPage, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
+    //connect(placeBetPage, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
 
     // Pass through messages from transactionView
     connect(transactionView, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
@@ -210,7 +210,7 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     privacyPage->setModel(walletModel);
     receiveCoinsPage->setModel(walletModel);
     sendCoinsPage->setModel(walletModel);
-    placeBetPage->setModel(walletModel);
+    //placeBetPage->setModel(walletModel);
 
     if (walletModel) {
         // Receive and pass through messages from wallet model
