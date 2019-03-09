@@ -205,7 +205,9 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
 
     //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     CBlockIndex *BlocksIndex = NULL;
-    BlocksIndex = chainActive[chainActive.Height() - 14400];
+
+    int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
+    BlocksIndex = chainActive[height];
 
     while (BlocksIndex) {
         CBlock block;
@@ -953,7 +955,8 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
 
     //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     CBlockIndex *BlocksIndex = NULL;
-    BlocksIndex = chainActive[chainActive.Height() - 14400];
+    int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
+    BlocksIndex = chainActive[height];
 
     while (BlocksIndex) {
         CBlock block;
@@ -1008,6 +1011,7 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("start-block", gameStartBlock));
     obj.push_back(Pair("start-time", gameStartTime));
     obj.push_back(Pair("total-bets", totalFoundCGBets));
+    obj.push_back(Pair("network", Params().NetworkID()));
 
     return obj;
 }
