@@ -1567,7 +1567,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
                             }
                         }
 
-                        // Only payout bets that are between 50 - 10000 WRG inclusive (MaxBetPayoutRange).
+                        // Only payout bets that are between 25 - 10000 WRG inclusive (MaxBetPayoutRange).
                         if (eventFound && betAmount >= (Params().MinBetPayoutRange() * COIN) && betAmount <= (Params().MaxBetPayoutRange() * COIN)) {
 
                             // Bet OP RETURN transaction.

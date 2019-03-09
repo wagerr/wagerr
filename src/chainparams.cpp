@@ -172,8 +172,8 @@ public:
         nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
         nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        nMinBetPayoutRange = 50;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 50 - 10000 WRG inclusive).
-        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 50 - 10000 WRG inclusive).
+        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
 
         /**
@@ -314,8 +314,8 @@ public:
         nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
         nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        nMinBetPayoutRange = 50;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 50 - 10000 WRG inclusive).
-        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 50 - 10000 WRG inclusive).
+        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
