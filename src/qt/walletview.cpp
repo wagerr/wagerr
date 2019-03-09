@@ -303,7 +303,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
     // go thru blockchain and get data
 
     // Set the Oracle wallet address. 
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
+    std::vector<string> oracleAddrs = Params().OracleWalletAddrs();
 
     // Set event name
     std::string evtDes;
@@ -387,7 +387,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                 if(ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
 
                     BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
-                        if (CBitcoinAddress(prevAddr).ToString() == OracleWalletAddr) {
+                        if (std::find(oracleAddrs.begin(), oracleAddrs.end(), CBitcoinAddress(prevAddr).ToString()) != oracleAddrs.end()) {
                             validEventTx = true;
                         }
                     }

@@ -32,6 +32,7 @@
 bool IsValidOracleTx(const CTxIn &txin)
 {
     COutPoint prevout = txin.prevout;
+    std::vector<string> oracleAddrs = Params().OracleWalletAddrs();
 
     uint256 hashBlock;
     CTransaction txPrev;
@@ -46,7 +47,7 @@ bool IsValidOracleTx(const CTxIn &txin)
 
         if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
             BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
-                if (CBitcoinAddress(prevAddr).ToString() == Params().OracleWalletAddr()) {
+                if (std::find(oracleAddrs.begin(), oracleAddrs.end(), CBitcoinAddress(prevAddr).ToString()) != oracleAddrs.end()) {
                     return true;
                 }
             }
@@ -1346,8 +1347,6 @@ bool CEventDB::Read(eventIndex_t& eventIndex, uint256& lastBlockHash)
  */
 std::vector<CPeerlessResult> getEventResults( int height )
 {
-    // Set the Oracle wallet address.
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
     std::vector<CPeerlessResult> results;
 
     // Get the current block so we can look for any results in it.
@@ -1405,9 +1404,6 @@ std::vector<CTxOut> GetBetPayouts(int height)
     std::vector<CPeerlessResult> results = getEventResults(height);
     LogPrintf("Results found: %li \n", results.size());
 
-    // Set the Oracle wallet address.
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
-
     // Traverse the blockchain for an event to match a result and all the bets on a result.
     for (const auto& result : results) {
         // Look back the chain 14 days for any events and bets.
@@ -1427,7 +1423,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
         time_t latestEventStartTime = 0;
         bool eventFound = false;
 
-        /** TODO - Code below needs to be refactored and added to a function or something **/
+        /** TODO - Code below needs to be refactored! **/
         // Find peerless outcome (result).
         if (result.nMoneyLineResult == homeWin) {
             nMoneylineResult = moneyLineWin;
@@ -1654,8 +1650,6 @@ std::vector<CTxOut> GetBetPayouts(int height)
  */
 std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEventResults(int height)
 {
-    // Set the Oracle wallet address.
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
     std::vector<CChainGamesResult> chainGameResults;
     std::vector<std::string> blockTotalValues;
     CAmount totalBlockValue = 0;
@@ -1671,7 +1665,6 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
     BOOST_FOREACH(CTransaction& tx, block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet by looking at the TX vins.
         const CTxIn &txin = tx.vin[0];
-
         uint256 hashBlock;
         CTransaction txPrev;
 
@@ -1728,9 +1721,6 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
     std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> resultArray = getCGLottoEventResults(height);
     std::vector<CChainGamesResult> allChainGames = resultArray.first;
     std::vector<std::string> blockSizeArray = resultArray.second;
-
-    // Set the Oracle wallet address.
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
 
     // Find payout for each CGLotto game
     for (unsigned int currResult = 0; currResult < resultArray.second.size(); currResult++) {
