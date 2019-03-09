@@ -163,7 +163,7 @@ public:
 
         /** Bet related parameters **/
         nBetStartHeight = 298386;                                       // The block that betting protocols become active.
-        strOracleWalletAddr = "WTogNAzaHf9oEbBoAv9RA49FdxyWaGLmdZ";     // Oracle Masternode Event & Result Posting Wallet Address.
+        vOracleWalletAddrs = {"WTogNAzaHf9oEbBoAv9RA49FdxyWaGLmdZ"};    // Oracle Masternode Event & Result Posting Wallet Addresses.
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
         strDevPayoutAddr = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";        // Development fund payout address.
         strOMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";       // OMNO fund payout address.
@@ -172,8 +172,8 @@ public:
         nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
         nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        nMinBetPayoutRange = 50;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 50 - 10000 WRG inclusive).
-        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 50 - 10000 WRG inclusive).
+        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
 
         /**
@@ -305,7 +305,8 @@ public:
 
         /** Bet related parameters **/
         nBetStartHeight = 20600;                                        // The block that betting protocols become active (Testnet).
-        strOracleWalletAddr = "TJtBqooSnYGhatyefH1Th9MyMXowi1xfKf";     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
+        vOracleWalletAddrs = {"TJtBqooSnYGhatyefH1Th9MyMXowi1xfKf",     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
+                              "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc"};
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
         strDevPayoutAddr = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";        // Development fund payout address (Testnet).
         strOMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";       // OMNO fund payout address (Testnet).
@@ -314,8 +315,8 @@ public:
         nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
         nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
-        nMinBetPayoutRange = 50;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 50 - 10000 WRG inclusive).
-        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 50 - 10000 WRG inclusive).
+        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
