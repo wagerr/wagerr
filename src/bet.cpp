@@ -1857,9 +1857,8 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
             CAmount winnerPayout = totalPot / 10 * 8;
             CAmount fee = totalPot / 50;
 
-            LogPrintf("CG Lotto Payput: id -> %i, entrants -> $i, fee -> $i \n", allChainGames[currResult].nEventId, noOfBets, entranceFee );
-            LogPrintf("Winning lotto details: address -> %u, index -> %i, total pot -> payout -> $i \n", winnerAddress, winnerIndex, totalPot, winnerPayout );
-            LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout);
+            LogPrintf("CG Lotto Payput: id -> %i, entrants -> $i, entryfee -> $i \n", allChainGames[currResult].nEventId, noOfBets, entranceFee );
+            LogPrintf("Winning lotto details: address -> %u, index -> %i, total pot -> %i, payout -> $i, fee -> %i \n", winnerAddress, winnerIndex, totalPot, winnerPayout, fee );
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
