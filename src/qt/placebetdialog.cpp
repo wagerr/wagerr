@@ -228,13 +228,13 @@ void PlaceBetDialog::on_placeBetButton_clicked()
     if (!ui->payAmount->validate() || ui->payAmount->value(0) < (Params().MinBetPayoutRange() * COIN) || ui->payAmount->value(0) > ( Params().MaxBetPayoutRange() * COIN ) ){
         ui->payAmount->setValid(false);
 
-        QString questionString = tr("Bet amount must be between 50 - 10,000 WGR inclusive!");
+        QString questionString = tr("Bet amount must be between 25 - 10,000 WGR inclusive!");
 
         QPair<QString, CClientUIInterface::MessageBoxFlags> msgParams;
         // Default to a warning message, override if error message is needed
         msgParams.second = CClientUIInterface::MSG_WARNING;
 
-        msgParams.first = tr("Bet amount must be between 50 - 10,000 WGR inclusive!");
+        msgParams.first = tr("Bet amount must be between 25 - 10,000 WGR inclusive!");
         emit message(tr("Invalid Bet Amount!"), msgParams.first, msgParams.second);
         return;
     }
