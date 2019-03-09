@@ -2635,7 +2635,7 @@ bool RecalculateWGRSupply(int nHeightStart)
                     continue;
 
                 if (tx.vout[i].scriptPubKey.IsUnspendable())
-                    continue
+                    continue;
 
                 nValueOut += tx.vout[i].nValue;
             }
