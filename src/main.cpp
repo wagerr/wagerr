@@ -2634,6 +2634,9 @@ bool RecalculateWGRSupply(int nHeightStart)
                 if (i == 0 && tx.IsCoinStake())
                     continue;
 
+                if (tx.vout[i].scriptPubKey.IsUnspendable())
+                    continue
+
                 nValueOut += tx.vout[i].nValue;
             }
         }
@@ -2984,7 +2987,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // track money supply and mint amount info
     CAmount nMoneySupplyPrev = pindex->pprev ? pindex->pprev->nMoneySupply : 0;
-    pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn;
+    pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn - nValueBurned;
     pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
 
 //    LogPrintf("XX69----------> ConnectBlock(): nValueOut: %s, nValueIn: %s, nFees: %s, nMint: %s zWgrSpent: %s\n",
