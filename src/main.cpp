@@ -2989,17 +2989,13 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // track money supply and mint amount info
     CAmount nMoneySupplyPrev = pindex->pprev ? pindex->pprev->nMoneySupply : 0;
-
-    // TODO temp fix to test the money supply accumulating bet burn transactions.
+    pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn;
+    pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
+    
+    // adjust MoneySupply to account for WGR bet/burned, after first calculating actual Mint (pindex->nMint above)
     if (pindex->nHeight >= Params().BetStartHeight() ) {
         pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn - nValueBurned;
     }
-    else{
-        pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn;
-    }
-
-    pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
-
 //    LogPrintf("XX69----------> ConnectBlock(): nValueOut: %s, nValueIn: %s, nFees: %s, nMint: %s zWgrSpent: %s\n",
 //              FormatMoney(nValueOut), FormatMoney(nValueIn),
 //              FormatMoney(nFees), FormatMoney(pindex->nMint), FormatMoney(nAmountZerocoinSpent));
