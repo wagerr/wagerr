@@ -4147,6 +4147,7 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "[                   (array of json object)\n"
             "  {\n"
+            "    \"id\": \"serial hash\",  (string) the mint's zWGR serial hash \n"
             "    \"d\": n,         (numeric) the mint's zerocoin denomination \n"
             "    \"p\": \"pubcoin\", (string) The public coin\n"
             "    \"s\": \"serial\",  (string) The secret serial number\n"
@@ -4187,6 +4188,7 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
             continue;
 
         UniValue objMint(UniValue::VOBJ);
+        objMint.push_back(Pair("id", meta.hashSerial.GetHex()));
         objMint.push_back(Pair("d", mint.GetDenomination()));
         objMint.push_back(Pair("p", mint.GetValue().GetHex()));
         objMint.push_back(Pair("s", mint.GetSerialNumber().GetHex()));
