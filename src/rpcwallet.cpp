@@ -4585,7 +4585,7 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
             "\nArguments:\n"
             "1. \"serialHex\"        (string, required) A zerocoin serial number (hex)\n"
             "2. \"randomnessHex\"    (string, required) A zerocoin randomness value (hex)\n"
-            "3. denom                (numberic, required) A zerocoin denomination (decimal)\n"
+            "3. denom                (numeric, required) A zerocoin denomination (decimal)\n"
             "4. \"priv key\"         (string, required) The private key associated with this coin (hex)\n"
             "5. \"address\"          (string, optional) WAGERR address to spend to. If not specified, spend to change add.\n"
 
@@ -4593,25 +4593,19 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
                 "\"txid\"             (string) The transaction txid in hex\n"
 
             "\nExamples\n" +
-            HelpExampleCli("spendrawzerocoin", "f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2 a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600") +
-            HelpExampleRpc("createrawtransaction", "f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2, a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600"));
+            HelpExampleCli("spendrawzerocoin", "\"f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2\" \"a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600\" 100 \"xxx\"") +
+            HelpExampleRpc("spendrawzerocoin", "\"f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2\", \"a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600\", 100, \"xxx\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     if (GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
             throw JSONRPCError(RPC_WALLET_ERROR, "zWGR is currently disabled due to maintenance.");
 
-    std::string serial_str = params[0].get_str();
-    if (!IsHex(serial_str))
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected hex serial");
     CBigNum serial;
-    serial.SetHex(serial_str);
+    serial.SetHex(params[0].get_str());
 
-    std::string randomness_str = params[1].get_str();
-    if (!IsHex(randomness_str))
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected hex randomness");
     CBigNum randomness;
-    randomness.SetHex(randomness_str);
+    randomness.SetHex(params[1].get_str());
 
     const int denom_int = params[2].get_int();
     libzerocoin::CoinDenomination denom = libzerocoin::IntToZerocoinDenomination(denom_int);
