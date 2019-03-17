@@ -15,7 +15,7 @@ class Test_03(WAGERR_FakeStakeTest):
         self.init_test()
 
         FORK_DEPTH = 20  # Depth at which we are creating a fork. We are mining
-        INITAL_MINED_BLOCKS = 301
+        INITAL_MINED_BLOCKS = 321
         self.NUM_BLOCKS = 15
 
         # 1) Starting mining blocks
@@ -25,12 +25,12 @@ class Test_03(WAGERR_FakeStakeTest):
 
         # 2) Collect the possible prevouts and mint zerocoins with those
         self.log.info("Collecting all unspent coins which we generated from mining...")
-        balance = self.node.getbalance()
+        balance = self.node.getbalance("*", 100)
         self.log.info("Minting zerocoins...")
         initial_mints = 0
-        while balance > 1000:
+        while balance > 5000:
             try:
-                self.node.mintzerocoin(1000)
+                self.node.mintzerocoin(5000)
             except JSONRPCException:
                 break
             time.sleep(1)
@@ -45,6 +45,19 @@ class Test_03(WAGERR_FakeStakeTest):
         self.log.info("Mining 200 blocks ... and getting spendable zerocoins")
         self.node.generate(200)
         mints_list = [x["serial hash"] for x in self.node.listmintedzerocoins(True, True)]
+
+        balance = self.node.getbalance("*", 100)
+        while balance > 5000:
+            try:
+                self.node.mintzerocoin(5000)
+            except JSONRPCException:
+                break
+            time.sleep(1)
+            initial_mints += 1
+            self.node.generate(1)
+            time.sleep(1)
+            balance = self.node.getbalance("*", 100)
+
         # This mints are not ready spendable, only few of them.
         self.log.info("Got %d spendable (confirmed & mature) mints" % len(mints_list))
 
