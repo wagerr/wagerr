@@ -401,13 +401,14 @@ public:
         genesis.nBits = 0x207fffff;
         genesis.nNonce = 574752;                // hex 57 47 52 in text = WGR
 
-        nLastPOWBlock = 200000;
+        nLastPOWBlock = 250;
         nMaturity = 100;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 43199500 * COIN;
-        nZerocoinStartHeight = 100000;
+        nZerocoinStartHeight = 300;
         nZerocoinStartTime = 1518696283;
+        nBlockZerocoinV2 = 300;
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 999999999; //Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 999999999; //First block that bad serials emerged
