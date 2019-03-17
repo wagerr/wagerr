@@ -392,12 +392,13 @@ public:
 
         //! Modify the regtest genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696183;             // GMT: Thursday, 15. February 2018 12:03:03
+        genesis.nBits = 0x207fffff;
         genesis.nNonce = 574752;                // hex 57 47 52 in text = WG
 
         nLastPOWBlock = 250;
         nMaturity = 100;
         nMasternodeCountDrift = 4;
-        nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMT
+        nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMTy
         nMaxMoneyOut = 398360470 * COIN;
         nZerocoinStartHeight = 300;
         nZerocoinStartTime = 1518696283;
