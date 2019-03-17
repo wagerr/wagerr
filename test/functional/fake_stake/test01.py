@@ -16,7 +16,7 @@ class Test_01(WAGERR_FakeStakeTest):
 
         FORK_DEPTH = 10  # Depth at which we are creating a fork. We are mining
         INITAL_MINED_BLOCKS = 150
-        self.NUM_BLOCKS = 7
+        self.NUM_BLOCKS = 3
 
         # 1) Starting mining blocks
         self.log.info("Mining %d blocks.." % INITAL_MINED_BLOCKS)
@@ -47,5 +47,5 @@ class Test_01(WAGERR_FakeStakeTest):
         sleep(2)
 
         # 6) Create "Fake Stake" blocks and send them
-        self.log.info("-- Main chain blocks first")
+        self.log.info("Creating Fake stake blocks")
         self.test_spam("Main", stakingPrevOuts)

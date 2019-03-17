@@ -20,7 +20,7 @@ class Test_02(WAGERR_FakeStakeTest):
         INITAL_MINED_BLOCKS = 200
         FORK_DEPTH = 50
         MORE_MINED_BLOCKS = 10
-        self.NUM_BLOCKS = 7
+        self.NUM_BLOCKS = 3
 
         # 1) Starting mining blocks
         self.log.info("Mining %d blocks.." % INITAL_MINED_BLOCKS)
