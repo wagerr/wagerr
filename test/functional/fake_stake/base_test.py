@@ -3,12 +3,13 @@
 
 from io import BytesIO
 from struct import pack
+from random import randint
 import time
 
 from test_framework.authproxy import JSONRPCException
 from test_framework.blocktools import create_coinbase, create_block
 from test_framework.key import CECKey
-from test_framework.messages import CTransaction, CTxOut, CTxIn, COIN
+from test_framework.messages import CTransaction, CTxOut, CTxIn, COIN, msg_block
 from test_framework.mininode import network_thread_start
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.script import CScript, OP_CHECKSIG
@@ -252,3 +253,69 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
     def log_data_dir_size(self):
         init_size = dir_size(self.node.datadir + "/regtest/blocks")
         self.log.info("Size of data dir: %s kilobytes" % str(init_size))
+
+
+
+    def test_spam(self, name, stakingPrevOuts,
+                  fRandomHeight=False, randomRange=0, randomRange2=0,
+                  fDoubleSpend=False, fMustPass=False):
+        ''' creates and sends spam blocks
+        :param      name:            (string) chain branch (usually either "Main" or "Forked")
+                    stakingPrevOuts: ({COutPoint --> (int, int)} dictionary) utxos to use
+                    fRandomHeight:   (bool) send blocks at random height
+                    randomRange:     (int) if fRandomHeight=True, height is >= current-randomRange
+                    randomRange2:    (int) if fRandomHeight=True, height is < current-randomRange2
+                    fDoubleSpend:    (bool) if true, stake input is double spent in block.vtx
+                    fMustPass:       (bool) if true, the blocks must be stored on disk
+        :return:
+        '''
+        self.log_data_dir_size()
+        block_count = self.node.getblockcount()
+        pastBlockHash = self.node.getblockhash(block_count)
+        randomCount = block_count
+        self.log.info("Current height: %d" % block_count)
+        for i in range(0, self.NUM_BLOCKS):
+            if i !=0:
+                self.log.info("Sent %s blocks out of %s" % (str(i), str(self.NUM_BLOCKS)))
+
+            if fRandomHeight:
+                randomCount = randint(block_count - randomRange, block_count - randomRange2)
+                pastBlockHash = self.node.getblockhash(randomCount)
+
+            block = self.create_spam_block(pastBlockHash, stakingPrevOuts, randomCount + 1, fDoubleSpend)
+            block_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(block.nTime))
+            block_size = len(block.serialize())/1000
+            self.log.info("Sending block %d [%s...] - nTime: %s - Size (kb): %.2f",
+                          randomCount + 1, block.hash[:7], block_time, block_size)
+
+            var = self.node.submitblock(bytes_to_hex_str(block.serialize()))
+            if (not fMustPass and var is not None) or (fMustPass and var != "inconclusive"):
+                raise AssertionError("Error, submitblock [fMustPass=%s] result: %s" % (str(fMustPass), str(var)))
+
+            msg = msg_block(block)
+            self.test_nodes[0].send_message(msg)
+
+            try:
+                block_ret = self.node.getblock(block.hash)
+                if not fMustPass and block_ret is not None:
+                    raise AssertionError("Error, block stored in %s chain" % name)
+                if fMustPass:
+                    if block_ret is None:
+                        raise AssertionError("Error, block NOT stored in %s chain" % name)
+                    else:
+                        self.log.info("Good. Block IS stored on disk.")
+
+            except JSONRPCException as e:
+                err_msg = str(e)
+                if err_msg == "Can't read block from disk (-32603)":
+                    if fMustPass:
+                        self.log.warning("Bad! Block was NOT stored to disk.")
+                    else:
+                        self.log.info("Good. Block was not stored on disk.")
+
+            # remove a random prevout from the list
+            # (to randomize block creation if the same height is picked two times)
+            stakingPrevOuts.popitem()
+
+        self.log.info("Sent all %s blocks." % str(self.NUM_BLOCKS))
+        self.log_data_dir_size()
