@@ -31,6 +31,7 @@ class Test_05(WAGERR_FakeStakeTest):
         stakingPrevOuts = self.get_prevouts(utxo_list)
 
         # 3) Spam Blocks on the main chain
+        self.log.info("-- Main chain blocks first")
         self.log_data_dir_size()
         for i in range(0, self.NUM_BLOCKS):
             if i != 0:
@@ -60,6 +61,7 @@ class Test_05(WAGERR_FakeStakeTest):
         time.sleep(3)
 
         # 4) Spam Blocks on a forked chain
+        self.log.info("-- Forked chain blocks now")
         # regenerate prevouts
         self.log.info("Mining %d more blocks as buffer..." % 31)
         self.node.generate(31)
@@ -73,7 +75,8 @@ class Test_05(WAGERR_FakeStakeTest):
             block = self.create_spam_block(pastBlockHash, stakingPrevOuts, randomCount + 1, True)
             self.log.info("Sending block %d [%s...]", randomCount + 1, block.hash[:7])
             var = self.node.submitblock(bytes_to_hex_str(block.serialize()))
-            assert_equal(var, None)
+            if var is not "duplicate" or not None:
+                raise AssertionError("Error, submitted forked block stored on disk")
 
             try:
                 block_ret = self.node.getblock(block.hash)
