@@ -8,7 +8,6 @@
 /// \copyright  Copyright 2013 Ian Miers, Christina Garman and Matthew Green
 /// \license    This project is released under the MIT license.
 // Copyright (c) 2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 
 #ifndef PARAMGENERATION_H_
 #define PARAMGENERATION_H_
@@ -50,7 +49,6 @@ CBigNum              calculateGroupGenerator(uint256 seed, uint256 pSeed, uint25
 CBigNum              generateRandomPrime(uint32_t primeBitLen, uint256 in_seed, uint256 *out_seed,
                                         uint32_t *prime_gen_counter);
 CBigNum              generateIntegerFromSeed(uint32_t numBits, uint256 seed, uint32_t *numIterations);
-bool                primalityTestByTrialDivision(uint32_t candidate);
 
 }/* namespace libzerocoin */
 
