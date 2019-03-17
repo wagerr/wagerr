@@ -10,11 +10,12 @@
  * @license    This project is released under the MIT license.
  **/
 // Copyright (c) 2017-2018 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 
 #ifndef COINSPEND_H_
 #define COINSPEND_H_
 
+#include <streams.h>
+#include <utilstrencodings.h>
 #include "Accumulator.h"
 #include "AccumulatorProofOfKnowledge.h"
 #include "Coin.h"
@@ -116,6 +117,9 @@ public:
     SpendType getSpendType() const { return spendType; }
     std::vector<unsigned char> getSignature() const { return vchSig; }
 
+    static std::vector<unsigned char> ParseSerial(CDataStream& s);
+
+    const uint256 signatureHash() const;
     bool Verify(const Accumulator& a) const;
     bool HasValidSerial(ZerocoinParams* params) const;
     bool HasValidSignature() const;
@@ -147,7 +151,6 @@ public:
     }
 
 private:
-    const uint256 signatureHash() const;
     CoinDenomination denomination;
     uint32_t accChecksum;
     uint256 ptxHash;

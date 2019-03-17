@@ -1341,10 +1341,10 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
         AddOneShot(strDest);
 
 #if ENABLE_ZMQ
-    pzmqNotificationInterface = CZMQNotificationInterface::CreateWithArguments(mapArgs);
-
     if (pzmqNotificationInterface) {
-        RegisterValidationInterface(pzmqNotificationInterface);
+        UnregisterValidationInterface(pzmqNotificationInterface);
+        delete pzmqNotificationInterface;
+        pzmqNotificationInterface = NULL;
     }
 #endif
 
