@@ -642,7 +642,6 @@ bool GenerateAccumulatorWitness(
         int nSecurityLevel,
         int& nMintsAdded,
         string& strError,
-        bool isV1Coin,
         CBlockIndex* pindexCheckpoint)
 {
     try {
