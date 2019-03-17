@@ -380,6 +380,7 @@ public:
         pchMessageStart[1] = 0x76;
         pchMessageStart[2] = 0xa1;
         pchMessageStart[3] = 0xfa;
+        nDefaultPort = 55006;
         nSubsidyHalvingInterval = 150;
         nEnforceBlockUpgradeMajority = 750;
         nRejectBlockOutdatedMajority = 950;
@@ -388,15 +389,16 @@ public:
         nTargetTimespan = 24 * 60 * 60; // WAGERR: 1 day
         nTargetSpacing = 1 * 60;        // WAGERR: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
+
+        //! Modify the regtest genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696183;             // GMT: Thursday, 15. February 2018 12:03:03
-        genesis.nBits = 0x207fffff;
-        genesis.nNonce = 574752;                // hex 57 47 52 in text = WGR
+        genesis.nNonce = 574752;                // hex 57 47 52 in text = WG
 
         nLastPOWBlock = 250;
         nMaturity = 100;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMT
-        nMaxMoneyOut = 43199500 * COIN;
+        nMaxMoneyOut = 398360470 * COIN;
         nZerocoinStartHeight = 300;
         nZerocoinStartTime = 1518696283;
         nBlockZerocoinV2 = 300;
@@ -406,7 +408,6 @@ public:
         nBlockLastGoodCheckpoint = 999999999; //Last valid accumulator checkpoint
 
         hashGenesisBlock = genesis.GetHash();
-        nDefaultPort = 55006;
         assert(hashGenesisBlock == uint256("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec"));
 
         vFixedSeeds.clear(); //! Testnet mode doesn't have any fixed seeds.
