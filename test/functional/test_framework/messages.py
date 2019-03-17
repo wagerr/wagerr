@@ -457,12 +457,17 @@ class CBlockHeader():
         target = uint256_from_compact(self.nBits)
         loop = True
         while loop:
+
             for prevout in prevouts:
                 nvalue, txBlockTime = prevouts[prevout]
                 data = b""
                 data += ser_uint256(stakeModifier)
                 data += struct.pack("<I", txBlockTime)
-                data += prevout.serialize()
+                # prevout for zPoS is serial hashes hex strings
+                if isinstance(prevout, str):
+                    data += ser_uint256(uint256_from_str(bytes.fromhex(prevout)))
+                else:
+                    data += prevout.serialize()
                 data += struct.pack("<I", self.nTime)
                 posHash = uint256_from_str(hash256(data))
                 if posHash <= target:

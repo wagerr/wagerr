@@ -5,6 +5,7 @@ Covers the scenario of a zPoS block where the coinstake input is a zerocoin spen
 of an already spent coin.
 '''
 
+from random import choice
 from time import sleep
 
 from test_framework.authproxy import JSONRPCException
@@ -18,9 +19,10 @@ class Test_03(WAGERR_FakeStakeTest):
         self.description = "Covers the scenario of a zPoS block where the coinstake input is a zerocoin spend of an already spent coin."
         self.init_test()
 
-        DENOM_TO_USE = 1000 # zc denomination
+        DENOM_TO_USE = 5000 # zc denomination
         INITAL_MINED_BLOCKS = 321
-        self.NUM_BLOCKS = 10
+        MORE_MINED_BLOCKS = 301
+        self.NUM_BLOCKS = 2
 
         # 1) Starting mining blocks
         self.log.info("Mining %d blocks to get to zPOS activation...." % INITAL_MINED_BLOCKS)
@@ -41,21 +43,22 @@ class Test_03(WAGERR_FakeStakeTest):
             initial_mints += 1
             self.node.generate(1)
             sleep(1)
+
             if initial_mints % 5 == 0:
-                self.log.info("Minted %d coins..." % initial_mints)
+                self.log.info("Minted %d coins" % initial_mints)
             if initial_mints > 70:
                 break
             balance = self.node.getbalance("*", 100)
-        self.log.info("Minted %d coins in the %d-denom, remaining balance %d...", initial_mints, DENOM_TO_USE, balance)
+        self.log.info("Minted %d coins in the %d-denom, remaining balance %d", initial_mints, DENOM_TO_USE, balance)
         sleep(2)
 
-        # 3) mine 101 blocks
-        self.log.info("Mining 101 more blocks ... and getting spendable zerocoins")
-        self.node.generate(101)
+        # 3) mine more blocks
+        self.log.info("Mining %d more blocks ... and getting spendable zerocoins" % MORE_MINED_BLOCKS)
+        self.node.generate(MORE_MINED_BLOCKS)
         sleep(2)
         mints = self.node.listmintedzerocoins(True, True)
         sleep(1)
-        stakingPrevouts = mints_to_stakingPrevOuts(mints)
+        stakingPrevOuts = mints_to_stakingPrevOuts(mints)
         mints_hashes = [x["serial hash"] for x in mints]
 
         # This mints are not ready spendable, only few of them.
@@ -92,5 +95,5 @@ class Test_03(WAGERR_FakeStakeTest):
         sleep(1)
 
         # 7) Create "Fake Stake" blocks and send them
-        self.log.info("Creating Fake stake zPoS blocks")
-        self.test_spam("Main", stakingPrevouts, spendingPrevOuts=spendingPrevOuts, fZPoS=True)
+        self.log.info("Creating Fake stake zPoS blocks...")
+        self.test_spam("Main", stakingPrevOuts, spendingPrevOuts=spendingPrevOuts, fZPoS=True)
