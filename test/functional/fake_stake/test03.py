@@ -7,7 +7,7 @@ from test_framework.messages import msg_block
 from test_framework.authproxy import JSONRPCException
 
 from base_test import WAGERR_FakeStakeTest
-from util import utxos_to_stakingPrevOuts, dir_size
+from util import dir_size
 
 class Test_03(WAGERR_FakeStakeTest):
 
@@ -15,7 +15,7 @@ class Test_03(WAGERR_FakeStakeTest):
         self.init_test()
 
         FORK_DEPTH = 20  # Depth at which we are creating a fork. We are mining
-        INITAL_MINED_BLOCKS = 1101
+        INITAL_MINED_BLOCKS = 301
         self.NUM_BLOCKS = 15
 
         # 1) Starting mining blocks
@@ -28,28 +28,30 @@ class Test_03(WAGERR_FakeStakeTest):
         balance = self.node.getbalance()
         self.log.info("Minting zerocoins...")
         initial_mints = 0
-        while balance > 5000:
+        while balance > 1000:
             try:
-                self.node.mintzerocoin(5000)
+                self.node.mintzerocoin(1000)
             except JSONRPCException:
                 break
             time.sleep(1)
             initial_mints += 1
             self.node.generate(1)
             time.sleep(1)
-            balance = self.node.getbalance()
-        self.log.info("Minted %d coins in the 5000-denom..." % initial_mints)
+            balance = self.node.getbalance("*", 100)
+        self.log.info("Minted %d coins in the 1000-denom, remaining balance %d...", initial_mints, balance)
         time.sleep(2)
 
-        # 3) mine 10 blocks
-        self.log.info("Mining 10 blocks ... and getting spendable zerocoins")
-        self.node.generate(10)
+        # 3) mine 200 blocks
+        self.log.info("Mining 200 blocks ... and getting spendable zerocoins")
+        self.node.generate(200)
         mints_list = [x["serial hash"] for x in self.node.listmintedzerocoins(True, True)]
+        # This mints are not ready spendable, only few of them.
         self.log.info("Got %d spendable (confirmed & mature) mints" % len(mints_list))
 
         # 4) spend mints
         self.log.info("Spending mints...")
         spends = 0
+        spent_mints = []
         for mint in mints_list:
             mint_arg = []
             mint_arg.append(mint)
@@ -57,6 +59,7 @@ class Test_03(WAGERR_FakeStakeTest):
                 self.node.spendzerocoinmints(mint_arg)
                 time.sleep(1)
                 spends += 1
+                spent_mints.append(mint)
             except JSONRPCException as e:
                 self.log.warning(str(e))
                 continue
@@ -69,10 +72,11 @@ class Test_03(WAGERR_FakeStakeTest):
         self.log.info("Sleeping 2 sec. Now mining PoS blocks based on already spent transactions...")
         time.sleep(2)
 
-        '''
-        # 4) Create "Fake Stake" blocks and send them
+        # 6) Create "Fake Stake" blocks and send them
         init_size = dir_size(self.node.datadir + "/regtest/blocks")
         self.log.info("Initial size of data dir: %s kilobytes" % str(init_size))
+
+        '''
 
         for i in range(0, self.NUM_BLOCKS):
             if i != 0 and i % 5 == 0:
