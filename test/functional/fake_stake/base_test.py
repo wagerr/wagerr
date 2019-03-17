@@ -78,15 +78,21 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         return
 
 
-    def create_spam_block(self, hashPrevBlock, stakingPrevOuts, height, fStakeDoubleSpent=False):
+
+    def create_spam_block(self, hashPrevBlock, stakingPrevOuts, height, fStakeDoubleSpent=False, fZPoS=False, spendingPrevOuts=[]):
         ''' creates a spam block filled with num_of_txes transactions
         :param   hashPrevBlock:      (hex string) hash of previous block
                  stakingPrevOuts:    ({COutPoint --> (int, int)} dictionary)
                          map outpoints to (be used as staking inputs) to amount, block_time
-                 num_of_txes:        (int) number of transactions to include in the block
+                 height:             (int) block height
                  fStakeDoubleSpent:  (bool) spend the coinstake input inside the block
-        :return  block:            (CBlock) generated block
+                 fZPoS:              (bool) stake the block with zerocoin
+                 spendingPrevOuts:    ({COutPoint --> (int, int)} dictionary)
+                         map outpoints to (be used as tx inputs) to amount, block_time
+        :return  block:              (CBlock) generated block
         '''
+        if spendingPrevOuts == []:
+            spendingPrevOuts = stakingPrevOuts
         current_time = int(time.time())
         nTime = current_time & 0xfffffff0
 
@@ -108,12 +114,12 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         block.vtx.append(signed_stake_tx)
 
         # remove coinstake input prevout
-        if not fStakeDoubleSpent:
-            del stakingPrevOuts[block.prevoutStake]
+        if not fZPoS and not fStakeDoubleSpent:
+            del spendingPrevOuts[block.prevoutStake]
 
         # create spam for the block. random transactions
-        for outPoint in stakingPrevOuts:
-            value_out = int(stakingPrevOuts[outPoint][0] - self.DEFAULT_FEE * COIN)
+        for outPoint in spendingPrevOuts:
+            value_out = int(spendingPrevOuts[outPoint][0] - self.DEFAULT_FEE * COIN)
             tx = create_transaction(outPoint, b"", value_out, nTime, scriptPubKey=CScript([self.block_sig_key.get_pubkey(), OP_CHECKSIG]))
             # sign txes
             signed_tx_hex = self.node.signrawtransaction(bytes_to_hex_str(tx.serialize()))['hex']
@@ -214,24 +220,30 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
 
 
 
-    def sign_stake_tx(self, block, stake_in_value):
+    def sign_stake_tx(self, block, stake_in_value, fZPoS=False):
         ''' signs a coinstake transaction (non zPOS)
-        :param      block:  (CBlock) block with stake to sign
-        :return:            (CTransaction) signed tx
+        :param      block:          (CBlock) block with stake to sign
+                    stake_in_value: (int) staked amount
+                    fZPoS:          (bool) zerocoin stake
+        :return:                    (CTransaction) signed tx
         '''
-        self.block_sig_key = CECKey()
-        self.block_sig_key.set_secretbytes(hash256(pack('<I', 0xffff)))
-        pubkey = self.block_sig_key.get_pubkey()
-        scriptPubKey = CScript([pubkey, OP_CHECKSIG])
-        outNValue = int(stake_in_value + 2*COIN)
+        if fZPoS:
+            stake_tx_signed_raw_hex = self.node.createrawzerocoinstake(block.prevoutStake)
+        else:
+            self.block_sig_key = CECKey()
+            self.block_sig_key.set_secretbytes(hash256(pack('<I', 0xffff)))
+            pubkey = self.block_sig_key.get_pubkey()
+            scriptPubKey = CScript([pubkey, OP_CHECKSIG])
+            outNValue = int(stake_in_value + 2*COIN)
 
-        stake_tx_unsigned = CTransaction()
-        stake_tx_unsigned.nTime = block.nTime
-        stake_tx_unsigned.vin.append(CTxIn(block.prevoutStake))
-        stake_tx_unsigned.vin[0].nSequence = 0xffffffff
-        stake_tx_unsigned.vout.append(CTxOut())
-        stake_tx_unsigned.vout.append(CTxOut(outNValue, scriptPubKey))
-        stake_tx_signed_raw_hex = self.node.signrawtransaction(bytes_to_hex_str(stake_tx_unsigned.serialize()))['hex']
+            stake_tx_unsigned = CTransaction()
+            stake_tx_unsigned.nTime = block.nTime
+            stake_tx_unsigned.vin.append(CTxIn(block.prevoutStake))
+            stake_tx_unsigned.vin[0].nSequence = 0xffffffff
+            stake_tx_unsigned.vout.append(CTxOut())
+            stake_tx_unsigned.vout.append(CTxOut(outNValue, scriptPubKey))
+            stake_tx_signed_raw_hex = self.node.signrawtransaction(bytes_to_hex_str(stake_tx_unsigned.serialize()))['hex']
+
         stake_tx_signed = CTransaction()
         stake_tx_signed.deserialize(BytesIO(hex_str_to_bytes(stake_tx_signed_raw_hex)))
         return stake_tx_signed
@@ -258,15 +270,18 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
 
     def test_spam(self, name, stakingPrevOuts,
                   fRandomHeight=False, randomRange=0, randomRange2=0,
-                  fDoubleSpend=False, fMustPass=False):
+                  fDoubleSpend=False, fMustPass=False, fZPoS=False,
+                  spendingPrevOuts=[]):
         ''' creates and sends spam blocks
         :param      name:            (string) chain branch (usually either "Main" or "Forked")
-                    stakingPrevOuts: ({COutPoint --> (int, int)} dictionary) utxos to use
+                    stakingPrevOuts: ({COutPoint --> (int, int)} dictionary) utxos to use for staking
                     fRandomHeight:   (bool) send blocks at random height
                     randomRange:     (int) if fRandomHeight=True, height is >= current-randomRange
                     randomRange2:    (int) if fRandomHeight=True, height is < current-randomRange2
                     fDoubleSpend:    (bool) if true, stake input is double spent in block.vtx
                     fMustPass:       (bool) if true, the blocks must be stored on disk
+                    fZPoS:           (bool) stake the block with zerocoin
+                    spendingPrevOuts:({COutPoint --> (int, int)} dictionary) utxos to use for spending
         :return:
         '''
         self.log_data_dir_size()
@@ -276,13 +291,14 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         self.log.info("Current height: %d" % block_count)
         for i in range(0, self.NUM_BLOCKS):
             if i !=0:
-                self.log.info("Sent %s blocks out of %s" % (str(i), str(self.NUM_BLOCKS)))
+                self.log.info("Sent %d blocks out of %d" % (i, self.NUM_BLOCKS))
 
             if fRandomHeight:
                 randomCount = randint(block_count - randomRange, block_count - randomRange2)
                 pastBlockHash = self.node.getblockhash(randomCount)
 
-            block = self.create_spam_block(pastBlockHash, stakingPrevOuts, randomCount + 1, fDoubleSpend)
+            block = self.create_spam_block(pastBlockHash, stakingPrevOuts, randomCount + 1,
+                                           fStakeDoubleSpent=fDoubleSpend, fZPoS=fZPoS, spendingPrevOuts=spendingPrevOuts)
             block_time = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(block.nTime))
             block_size = len(block.serialize())/1000
             self.log.info("Sending block %d [%s...] - nTime: %s - Size (kb): %.2f",
@@ -312,6 +328,8 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
                         self.log.warning("Bad! Block was NOT stored to disk.")
                     else:
                         self.log.info("Good. Block was not stored on disk.")
+                else:
+                    self.log.warning(err_msg)
 
             # remove a random prevout from the list
             # (to randomize block creation if the same height is picked two times)

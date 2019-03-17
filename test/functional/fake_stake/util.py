@@ -2,6 +2,7 @@
 # -*- coding: utf-8 -*-
 
 import subprocess
+import time
 
 from test_framework.messages import CTransaction, CTxIn, CTxOut, COutPoint, COIN
 from test_framework.messages import msg_getheaders, msg_headers, CBlockHeader
@@ -128,3 +129,20 @@ def utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime):
         stakingPrevOuts[outPoint] = (int(utxo['amount'])*COIN, txBlocktime)
 
     return
+
+
+def mints_to_stakingPrevOuts(mints):
+    '''
+    Creates a map of unspent zerocoins to (amount, blocktime) to be used as stake inputs
+    :param   mints:             (JSON list) verbose mint list returned from listmintedzerocoins
+    :return  stakingPrevOuts:   ({string --> (int, int)} dictionary) maps zerocoin serial hashes
+    '''
+    COINBASE_MATURITY = 200
+    stakingPrevOuts = {}
+    txBlocktime = int(time.time())
+    for mint in mints:
+        if mint["confirmations"] > COINBASE_MATURITY:
+            outPoint = mint["serial hash"]
+            stakingPrevOuts[outPoint] = (int(mint["denomination"])*COIN, txBlocktime)
+
+    return stakingPrevOuts
