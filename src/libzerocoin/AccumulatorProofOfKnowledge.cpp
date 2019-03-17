@@ -10,7 +10,6 @@
  * @license    This project is released under the MIT license.
  **/
 // Copyright (c) 2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 
 #include "AccumulatorProofOfKnowledge.h"
 #include "hash.h"
@@ -20,8 +19,7 @@ namespace libzerocoin {
 AccumulatorProofOfKnowledge::AccumulatorProofOfKnowledge(const AccumulatorAndProofParams* p): params(p) {}
 
 AccumulatorProofOfKnowledge::AccumulatorProofOfKnowledge(const AccumulatorAndProofParams* p,
-        const Commitment& commitmentToCoin, const AccumulatorWitness& witness,
-        Accumulator& a): params(p) {
+        const Commitment& commitmentToCoin, const AccumulatorWitness& witness): params(p) {
 
 	CBigNum sg = params->accumulatorPoKCommitmentGroup.g;
 	CBigNum sh = params->accumulatorPoKCommitmentGroup.h;
@@ -33,16 +31,18 @@ AccumulatorProofOfKnowledge::AccumulatorProofOfKnowledge(const AccumulatorAndPro
 	CBigNum r = commitmentToCoin.getRandomness();
 
 	CBigNum aM_4 = params->accumulatorModulus/CBigNum((long)4);
-	
-	CBigNum r_1 = CBigNum::randBignum(params->accumulatorModulus/4);
-	CBigNum r_2 = CBigNum::randBignum(params->accumulatorModulus/4);
-	CBigNum r_3 = CBigNum::randBignum(params->accumulatorModulus/4);
+    CBigNum aR = CBigNum(2).pow(params->k_prime + params->k_dprime);
+    CBigNum aR_t_aM_4 = aM_4 * aR;
+
+    CBigNum r_1 = CBigNum::randBignum(aM_4);
+    CBigNum r_2 = CBigNum::randBignum(aM_4);
+    CBigNum r_3 = CBigNum::randBignum(aM_4);
 
 	this->C_e = g_n.pow_mod(e, params->accumulatorModulus) * h_n.pow_mod(r_1, params->accumulatorModulus);
 	this->C_u = witness.getValue() * h_n.pow_mod(r_2, params->accumulatorModulus);
 	this->C_r = g_n.pow_mod(r_2, params->accumulatorModulus) * h_n.pow_mod(r_3, params->accumulatorModulus);
 
-	CBigNum r_alpha = CBigNum::randBignum(params->maxCoinValue * CBigNum(2).pow(params->k_prime + params->k_dprime));
+    CBigNum r_alpha = CBigNum::randBignum(params->maxCoinValue * aR);
 	if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
 		r_alpha = 0-r_alpha;
 	}
@@ -53,24 +53,24 @@ AccumulatorProofOfKnowledge::AccumulatorProofOfKnowledge(const AccumulatorAndPro
 	CBigNum r_sigma = CBigNum::randBignum(params->accumulatorPoKCommitmentGroup.modulus);
 	CBigNum r_xi = CBigNum::randBignum(params->accumulatorPoKCommitmentGroup.modulus);
 
-	CBigNum r_epsilon =  CBigNum::randBignum((params->accumulatorModulus/4) * CBigNum(2).pow(params->k_prime + params->k_dprime));
+    CBigNum r_epsilon =  CBigNum::randBignum(aR_t_aM_4);
 	if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
 		r_epsilon = 0-r_epsilon;
 	}
-	CBigNum r_eta = CBigNum::randBignum((params->accumulatorModulus/4) * CBigNum(2).pow(params->k_prime + params->k_dprime));
+    CBigNum r_eta = CBigNum::randBignum(aR_t_aM_4);
 	if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
 		r_eta = 0-r_eta;
 	}
-	CBigNum r_zeta = CBigNum::randBignum((params->accumulatorModulus/4) * CBigNum(2).pow(params->k_prime + params->k_dprime));
+    CBigNum r_zeta = CBigNum::randBignum(aR_t_aM_4);
 	if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
 		r_zeta = 0-r_zeta;
 	}
 
-	CBigNum r_beta = CBigNum::randBignum((params->accumulatorModulus/4) * params->accumulatorPoKCommitmentGroup.modulus * CBigNum(2).pow(params->k_prime + params->k_dprime));
+    CBigNum r_beta = CBigNum::randBignum(aR_t_aM_4 * params->accumulatorPoKCommitmentGroup.modulus);
 	if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
 		r_beta = 0-r_beta;
 	}
-	CBigNum r_delta = CBigNum::randBignum((params->accumulatorModulus/4) * params->accumulatorPoKCommitmentGroup.modulus * CBigNum(2).pow(params->k_prime + params->k_dprime));
+    CBigNum r_delta = CBigNum::randBignum(aR_t_aM_4 * params->accumulatorPoKCommitmentGroup.modulus);
 	if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
 		r_delta = 0-r_delta;
 	}
@@ -127,8 +127,6 @@ bool AccumulatorProofOfKnowledge:: Verify(const Accumulator& a, const CBigNum& v
 	CBigNum t_3_prime = ((a.getValue()).pow_mod(c, params->accumulatorModulus) * C_u.pow_mod(s_alpha, params->accumulatorModulus) * ((h_n.inverse(params->accumulatorModulus)).pow_mod(s_beta, params->accumulatorModulus))) % params->accumulatorModulus;
 	CBigNum t_4_prime = (C_r.pow_mod(s_alpha, params->accumulatorModulus) * ((h_n.inverse(params->accumulatorModulus)).pow_mod(s_delta, params->accumulatorModulus)) * ((g_n.inverse(params->accumulatorModulus)).pow_mod(s_beta, params->accumulatorModulus))) % params->accumulatorModulus;
 
-	bool result = false;
-
 	bool result_st1 = (st_1 == st_1_prime);
 	bool result_st2 = (st_2 == st_2_prime);
 	bool result_st3 = (st_3 == st_3_prime);
@@ -140,9 +138,7 @@ bool AccumulatorProofOfKnowledge:: Verify(const Accumulator& a, const CBigNum& v
 
 	bool result_range = ((s_alpha >= -(params->maxCoinValue * CBigNum(2).pow(params->k_prime + params->k_dprime + 1))) && (s_alpha <= (params->maxCoinValue * CBigNum(2).pow(params->k_prime + params->k_dprime + 1))));
 
-	result = result_st1 && result_st2 && result_st3 && result_t1 && result_t2 && result_t3 && result_t4 && result_range;
-
-	return result;
+    return result_st1 && result_st2 && result_st3 && result_t1 && result_t2 && result_t3 && result_t4 && result_range;
 }
 
 } /* namespace libzerocoin */

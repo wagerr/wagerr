@@ -10,7 +10,6 @@
  * @license    This project is released under the MIT license.
  **/
 // Copyright (c) 2017 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 
 #ifndef ACCUMULATEPROOF_H_
 #define ACCUMULATEPROOF_H_
@@ -33,7 +32,7 @@ public:
 	 * @param witness The witness to the accumulation of the coin
 	 * @param a
 	 */
-	AccumulatorProofOfKnowledge(const AccumulatorAndProofParams* p, const Commitment& commitmentToCoin, const AccumulatorWitness& witness, Accumulator& a);
+    AccumulatorProofOfKnowledge(const AccumulatorAndProofParams* p, const Commitment& commitmentToCoin, const AccumulatorWitness& witness);
 	/** Verifies that  a commitment c is accumulated in accumulated a
 	 */
 	bool Verify(const Accumulator& a,const CBigNum& valueOfCommitmentToCoin) const;
