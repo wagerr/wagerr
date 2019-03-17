@@ -8,6 +8,7 @@ sys.path.append(os.path.abspath(".."))
 from test01 import Test_01
 from test02 import Test_02
 from test03 import Test_03
+from test04 import Test_04
 from test05 import Test_05
 
 
@@ -15,6 +16,7 @@ switcher = {
     1: Test_01(),
     2: Test_02(),
     3: Test_03(),
+    4: Test_04(),
     5: Test_05()
 }
 
