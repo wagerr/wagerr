@@ -120,6 +120,7 @@ CAmount AmountFromValue(const UniValue& value)
     CAmount nAmount = roundint64(dAmount * COIN);
     if (!MoneyRange(nAmount))
         throw JSONRPCError(RPC_TYPE_ERROR, "Invalid amount");
+
     return nAmount;
 }
 
@@ -391,6 +392,13 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "spork", &spork, true, true, false},
         {"wagerr", "getpoolinfo", &getpoolinfo, true, true, false},
         {"wagerr", "listevents", &listevents, false, false, false},
+        {"wagerr", "listchaingamesevents", &listchaingamesevents, false, false, false},
+        {"wagerr", "listchaingamesbets", &listchaingamesbets, false, false, false},
+        {"wagerr", "getchaingamesinfo", &getchaingamesinfo, false, false, false},
+        {"wagerr", "placechaingamesbet", &placechaingamesbet, false, false, true},
+        {"wagerr", "getmappingid", &getmappingid, false, false, true},
+        {"wagerr", "getmappingname", &getmappingname, false, false, true},
+
 
 #ifdef ENABLE_WALLET
         /* Wallet */
@@ -428,6 +436,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "listreceivedbyaddress", &listreceivedbyaddress, false, false, true},
         {"wallet", "listsinceblock", &listsinceblock, false, false, true},
         {"wallet", "listtransactions", &listtransactions, false, false, true},
+        {"wallet", "listtransactionrecords", &listtransactionrecords, false, false, true},
         {"wallet", "listunspent", &listunspent, false, false, true},
         {"wallet", "lockunspent", &lockunspent, true, false, true},
         {"wallet", "move", &movecmd, false, false, true},

@@ -233,20 +233,23 @@ static bool InitHTTPAllowList()
 static std::string RequestMethodString(HTTPRequest::RequestMethod m)
 {
     switch (m) {
-    case HTTPRequest::GET:
-        return "GET";
-        break;
-    case HTTPRequest::POST:
-        return "POST";
-        break;
-    case HTTPRequest::HEAD:
-        return "HEAD";
-        break;
-    case HTTPRequest::PUT:
-        return "PUT";
-        break;
-    default:
-        return "unknown";
+        case HTTPRequest::GET:
+            return "GET";
+            break;
+        case HTTPRequest::POST:
+            return "POST";
+            break;
+        case HTTPRequest::HEAD:
+            return "HEAD";
+            break;
+        case HTTPRequest::PUT:
+            return "PUT";
+            break;
+        case HTTPRequest::OPTIONS:
+            return "OPTIONS";
+            break;
+        default:
+            return "unknown";
     }
 }
 
@@ -265,7 +268,14 @@ static void http_request_cb(struct evhttp_request* req, void* arg)
     }
 
     // Early reject unknown HTTP methods
-    if (hreq->GetRequestMethod() == HTTPRequest::UNKNOWN) {
+    HTTPRequest::RequestMethod method = hreq->GetRequestMethod();
+    if (method == HTTPRequest::OPTIONS) {
+        hreq->WriteHeader("Access-Control-Allow-Headers", "Authorization, Content-Type");
+        hreq->WriteHeader("Allow", "OPTIONS, GET, POST, HEAD, PUT");
+        hreq->WriteReply(HTTP_OK);
+        return;
+    } else if (method == HTTPRequest::UNKNOWN) {
+        // Early reject unknown HTTP methods
         hreq->WriteReply(HTTP_BADMETHOD);
         return;
     }
@@ -421,6 +431,8 @@ bool InitHTTPServer()
     }
 
     evhttp_set_timeout(http, GetArg("-rpcservertimeout", DEFAULT_HTTP_SERVER_TIMEOUT));
+    evhttp_set_allowed_methods(http, EVHTTP_REQ_GET | EVHTTP_REQ_POST |
+                                     EVHTTP_REQ_HEAD | EVHTTP_REQ_PUT | EVHTTP_REQ_OPTIONS);
     evhttp_set_max_headers_size(http, MAX_HEADERS_SIZE);
     evhttp_set_max_body_size(http, MAX_SIZE);
     evhttp_set_gencb(http, http_request_cb, NULL);
@@ -594,16 +606,22 @@ void HTTPRequest::WriteHeader(const std::string& hdr, const std::string& value)
  * a HTTP request.
  * Replies must be sent in the main loop in the main http thread,
  * this cannot be done from worker threads.
+ *
  */
 void HTTPRequest::WriteReply(int nStatus, const std::string& strReply)
 {
+
+    // TODO We use `*` for development, but this should be replaced with a proper access control scheme to
+    // prevent XSS. This value will likely be `http://127.0.0.1:xxxx`, where `xxxx` is the port that
+    // the web app will be served from on wagerrd.
+    WriteHeader("Access-Control-Allow-Origin", "*");
     assert(!replySent && req);
     // Send event to main http thread to send reply message
     struct evbuffer* evb = evhttp_request_get_output_buffer(req);
     assert(evb);
     evbuffer_add(evb, strReply.data(), strReply.size());
     HTTPEvent* ev = new HTTPEvent(eventBase, true,
-        boost::bind(evhttp_send_reply, req, nStatus, (const char*)NULL, (struct evbuffer *)NULL));
+                                  boost::bind(evhttp_send_reply, req, nStatus, (const char*)NULL, (struct evbuffer *)NULL));
     ev->trigger(0);
     replySent = true;
     req = 0; // transferred back to main thread
@@ -631,21 +649,24 @@ std::string HTTPRequest::GetURI()
 HTTPRequest::RequestMethod HTTPRequest::GetRequestMethod()
 {
     switch (evhttp_request_get_command(req)) {
-    case EVHTTP_REQ_GET:
-        return GET;
-        break;
-    case EVHTTP_REQ_POST:
-        return POST;
-        break;
-    case EVHTTP_REQ_HEAD:
-        return HEAD;
-        break;
-    case EVHTTP_REQ_PUT:
-        return PUT;
-        break;
-    default:
-        return UNKNOWN;
-        break;
+        case EVHTTP_REQ_GET:
+            return GET;
+            break;
+        case EVHTTP_REQ_POST:
+            return POST;
+            break;
+        case EVHTTP_REQ_HEAD:
+            return HEAD;
+            break;
+        case EVHTTP_REQ_PUT:
+            return PUT;
+            break;
+        case EVHTTP_REQ_OPTIONS:
+            return OPTIONS;
+            break;
+        default:
+            return UNKNOWN;
+            break;
     }
 }
 

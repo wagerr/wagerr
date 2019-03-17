@@ -12,6 +12,7 @@
 #include "accumulatormap.h"
 #include "addrman.h"
 #include "alert.h"
+#include "bet.h"
 #include "blocksignature.h"
 #include "chainparams.h"
 #include "checkpoints.h"
@@ -1963,53 +1964,6 @@ int64_t GetBlockValue(int nHeight)
     return nSubsidy;
 }
 
-int64_t GetBlockPayouts( std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetReward){
-    CAmount profitAcc = 0; 
-    CAmount nPayout   = 0;
-    CAmount totalAmountBet = 0;
-
-    // Set the OMNO and Dev reward addresses
-    std::string devPayoutAddr  = Params().DevPayoutAddr();
-    std::string OMNOPayoutAddr = Params().OMNOPayoutAddr();
-
-     for(unsigned i = 0; i < vexpectedPayouts.size(); i++){
-        CAmount betValue = vexpectedPayouts[i].nBetValue;
-        CAmount payValue = vexpectedPayouts[i].nValue;
-    
-        //printf( "Bet Amount: %li     Pay Amount %li: ", betValue, payValue );
-
-        totalAmountBet += betValue;
-        profitAcc += payValue - betValue;
-        nPayout += payValue;
-    }
- 
-    if(vexpectedPayouts.size() > 0){
-        // Calculate the OMNO reward and the Dev reward.
-        CAmount nOMNOReward = (CAmount)((profitAcc / (1000.0 - Params().BetXPermille()) * Params().OMNORewardPermille()));
-        CAmount nDevReward  = (CAmount)((profitAcc / (1000.0 - Params().BetXPermille()) * Params().DevRewardPermille()));
-
-// Kokary: Putting odds in variables can cause significant rounding errors to occur.
-// to see an illustration of floating point rounding errors, resync with the following code. 
-/*  
-        if (nOMNOReward != profitAcc / 94 * 100 * 0.024){
-            LogPrintf("Floating point rounding error");
-        } 
-        if (nDevReward != profitAcc / 94 * 100 * 0.006){
-            LogPrintf("Floating point rounding error");
-        }
-*/
-
-        // Add both reward payouts to the payout vector.
-        vexpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress( devPayoutAddr ).Get()));
-        vexpectedPayouts.emplace_back(nOMNOReward, GetScriptForDestination(CBitcoinAddress( OMNOPayoutAddr ).Get()));
-
-        ///nMNBetReward = totalAmountBet * 0.024;
-        nPayout += nDevReward + nOMNOReward;
-    }
- 
-     return  nPayout;
-}
-
 CAmount GetSeeSaw(const CAmount& blockValue, int nMasternodeCount, int nHeight)
 {
     //if a mn count is inserted into the function we are looking for a specific result for a masternode count
@@ -2076,6 +2030,11 @@ bool IsInitialBlockDownload()
         return false;
     bool state = (chainActive.Height() < pindexBestHeader->nHeight - 24 * 6 ||
                   pindexBestHeader->GetBlockTime() < GetTime() - 6 * 60 * 60); // ~144 blocks behind -> 2 x fork detection time
+
+    if (GetBoolArg("-testnet", false) && GetBoolArg("-devnet", false)) {
+        state = true;
+    }
+
     if (!state)
         lockIBDState = true;
     return state;
@@ -2833,9 +2792,6 @@ static int64_t nTimeTotal = 0;
 
 bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool fJustCheck, bool fAlreadyChecked)
 {
-
-    //std::vector<CTxOut> GetBetPayouts();
-
     AssertLockHeld(cs_main);
     // Check it again in case a previous version let a bad block in
     if (!fAlreadyChecked && !CheckBlock(block, state, !fJustCheck, !fJustCheck))
@@ -3055,9 +3011,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         nExpectedMint += nFees;
 
     // Calculate the expected bet payouts.
-    std::vector<CTxOut> vExpectedPayouts;
-    if( pindex->nHeight > Params().BetStartHeight()) {
+    std::vector<CTxOut> vExpectedAllPayouts;
+    std::vector<CTxOut> vExpectedPLPayouts;
+    std::vector<CTxOut> vExpectedCGLottoPayouts;
 
+    if( pindex->nHeight > Params().BetStartHeight()) {
         std::string strBetNetBlockTxt;
         std::ostringstream BetNetBlockTxt;
         std::ostringstream BetNetExpectedTxt;
@@ -3080,17 +3038,15 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 	    //const char * BetNetBlockTxtConst = strBetNetBlockTmp.c_str();
         //const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
 
-        //printf(BetNetBlockTxtConst, (pindex->nHeight));
+        vExpectedPLPayouts = GetBetPayouts(pindex->nHeight - 1);
+        vExpectedCGLottoPayouts = GetCGLottoBetPayouts(pindex->nHeight - 1);
 
-        vExpectedPayouts = GetBetPayouts(pindex->nHeight - 1);
-        nExpectedMint += GetBlockPayouts(vExpectedPayouts, nMNBetReward);
+        // Merge vectors into single payout vector.
+        vExpectedAllPayouts = vExpectedPLPayouts;
+        vExpectedAllPayouts.insert(vExpectedAllPayouts.end(), vExpectedCGLottoPayouts.begin(), vExpectedCGLottoPayouts.end());
+
+        nExpectedMint += GetBlockPayouts(vExpectedAllPayouts, nMNBetReward);
         nExpectedMint += nMNBetReward;
-
-        /*
-        for (unsigned int l = 0; l < vExpectedPayouts.size(); l++) {
-            printf(BetNetExpectedTxtConst, vExpectedPayouts[l].ToString().c_str());
-        }
-        */
     }
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
@@ -3105,16 +3061,19 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
      *         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
      * Though if we keep this check for minimum mint, it should be moved to IsBlockValueValid().
      */
-    if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= 15195 || pindex->nHeight <= 15220)) {
+    if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= 15195 && pindex->nHeight <= 15220)) {
         LogPrintf("Skipping validation of mint size on testnet subset");
     } else if (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint)) {
         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
     }
 
-    if (!IsBlockPayoutsValid(vExpectedPayouts, block))
+    if (!IsBlockPayoutsValid(vExpectedAllPayouts, block))
         return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
 
-    vExpectedPayouts.clear();
+    // Clear all the payout vectors.
+    vExpectedAllPayouts.clear();
+    vExpectedPLPayouts.clear();
+    vExpectedCGLottoPayouts.clear();
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().Zerocoin_Block_V2_Start()));
@@ -3214,101 +3173,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         if (it != mapZerocoinspends.end())
             mapZerocoinspends.erase(it);
     }
-
-    return true;
-}
-
-/**
- * Validates the payout block to ensure all bet payout amounts and payout addresses match their expected values.
- *
- * @param vExpectedPayouts -  The bet payout vector.
- * @param nHeight - The current chain height.
- * @return
- */
-bool IsBlockPayoutsValid( std::vector<CTxOut> vExpectedPayouts, CBlock block ) {
-
-    unsigned long size = vExpectedPayouts.size();
-
-    // If we have payouts to validate.
-    if (size > 0) {
-
-        CTransaction &tx = block.vtx[1];
-
-        // Get the vin staking value so we can use it to find out how many staking TX in the vouts.
-        const CTxIn &txin         = tx.vin[0];
-        COutPoint prevout         = txin.prevout;
-        unsigned int numStakingTx = 0;
-        CAmount stakeAmount       = 0;
-
-        uint256 hashBlock;
-        CTransaction txPrev;
-
-        if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
-            const CTxOut &prevTxOut = txPrev.vout[prevout.n];
-            stakeAmount = prevTxOut.nValue;
-        }
-
-        // Count the coinbase and staking vouts in the current block TX.
-        CAmount totalStakeAcc = 0;
-        for (unsigned int i = 0; i < tx.vout.size(); i++) {
-            const CTxOut &txout = tx.vout[i];
-            CAmount voutValue   = txout.nValue;
-
-            if (totalStakeAcc < stakeAmount) {
-                numStakingTx++;
-            }
-            else {
-                break;
-            }
-
-            totalStakeAcc += voutValue;
-        }
-
-        // Validate the payout block against the expected payouts vector. If all payout amounts and payout addresses match then we have a valid payout block.
-        for (unsigned int i = numStakingTx; i < tx.vout.size() - 1; i++) {
-            const CTxOut &txout = tx.vout[i];
-            CAmount voutValue   = txout.nValue;
-            CAmount vExpected   = vExpectedPayouts[i - numStakingTx].nValue;
-
-            LogPrintf("Bet Amount %li  - Expected Bet Amount: %li \n", voutValue, vExpected );
-
-            // Get the bet payout address.
-            CTxDestination betAddr;
-            ExtractDestination( tx.vout[i].scriptPubKey, betAddr );
-            std::string betAddrS = CBitcoinAddress(betAddr).ToString();
-
-            // Get the expected payout address.
-            CTxDestination expectedAddr;
-            ExtractDestination( vExpectedPayouts[i - numStakingTx].scriptPubKey, expectedAddr );
-            std::string expectedAddrS = CBitcoinAddress(expectedAddr).ToString();
-
-            LogPrintf("Bet Address %s  - Expected Bet Address: %s \n", betAddrS.c_str(), expectedAddrS.c_str() );
-
-            // Check vExpected matches the tx value.
-
-            /* **TODO**
-             * WagerrTor
-             *  Not passing block 29798
-             *      Validation failed!
-             *      ERROR: ConnectBlock() : Bet payout TX's don't match up with block payout TX's 29798
-             * InvalidChainFound: invalid block=3aa6be4b2e58a793380d575bf663a0a0c7c674a52196e767410bb988b4068d46  height=29798  log2_work=65.005159  date=2018-08-01 16:06:17
-             */
-            /* ORIGINAL 
-            if (vExpected != voutValue || betAddrS != expectedAddrS) {
-                LogPrintf("Validation failed! \n");
-                return false;
-            }
-            */
-            /* WORKAROUND - REVERT BACK TO && UNTIL RESOLVED */
-            if (vExpected != voutValue && betAddrS != expectedAddrS) {
-                LogPrintf("Validation failed! \n");
-                return false;
-            }
-        }
-    }
-
-
-    //LogPrintf( "Payout Block is valid! \n" );
 
     return true;
 }
@@ -4763,6 +4627,108 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
             return error("AcceptBlock() : ReceivedBlockTransactions failed");
     } catch (std::runtime_error& e) {
         return state.Abort(std::string("System error: ") + e.what());
+    }
+
+    bool eiUpdated = false;
+    // Look through the block for any events, results or mapping TX.
+    BOOST_FOREACH (CTransaction& tx, block.vtx) {
+
+        // Ensure the event TX has come from Oracle wallet.
+        const CTxIn &txin = tx.vin[0];
+        bool validOracleTx = IsValidOracleTx(txin);
+
+        // If a valid OMNO transaction.
+        if (validOracleTx) {
+
+            for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                const CTxOut& txout = tx.vout[i];
+                std::string s = txout.scriptPubKey.ToString();
+
+                if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+                    vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
+                    std::string opCode(v.begin(), v.end());
+
+                    // TODO - Optimise the OP code validation, we don't need to compare current OP code against all TX types.
+                    // if it matches any TX type the rest should be skipped.
+
+                    // If events found in block add them to the events index.
+                    CPeerlessEvent plEvent;
+                    if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
+                        CEventDB::AddEvent(plEvent);
+                        eiUpdated = true;
+                    }
+
+                    // If results found in block remove event from event index.
+                    CPeerlessResult plResult;
+                    if (CPeerlessResult::FromOpCode(opCode, plResult)) {
+                        CEventDB::RemoveEvent(plEvent);
+                        eiUpdated = true;
+                    }
+
+                    // If update money line odds TX found in block, update the event index.
+                    CPeerlessUpdateOdds puo;
+                    if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
+                        SetEventMLOdds(puo);
+                        eiUpdated = true;
+                    }
+
+                    // If spread odds TX found then update the spread odds for that event object.
+                    CPeerlessSpreadsEvent spreadEvent;
+                    if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
+                        SetEventSpreadOdds(spreadEvent);
+                        eiUpdated = true;
+                    }
+
+                    // If total odds TX found then update the total odds for that event object.
+                    CPeerlessTotalsEvent totalsEvent;
+                    if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
+                        SetEventTotalOdds(totalsEvent);
+                        eiUpdated = true;
+                    }
+
+                    // If mapping found then add it to the relating map index and write the map index to disk.
+                    CMapping cMapping;
+                    if (CMapping::FromOpCode(opCode, cMapping)) {
+                        if (cMapping.nMType == sportMapping) {
+                            CMappingDB::AddSport(cMapping);
+
+                            mappingIndex_t sportsIndex;
+                            CMappingDB mdb("sports.dat");
+                            mdb.Write(sportsIndex, block.GetHash());
+                        }
+                        else if (cMapping.nMType == roundMapping) {
+                            CMappingDB::AddRound(cMapping);
+
+                            mappingIndex_t roundsIndex;
+                            CMappingDB mdb("rounds.dat");
+                            mdb.Write(roundsIndex, block.GetHash());
+                        }
+                        else if (cMapping.nMType == teamMapping) {
+                            CMappingDB::AddTeam(cMapping);
+
+                            mappingIndex_t teamsIndex;
+                            CMappingDB mdb("teams.dat");
+                            mdb.Write(teamsIndex, block.GetHash());
+                        }
+                        else if (cMapping.nMType == tournamentMapping) {
+                            CMappingDB::AddTournament(cMapping);
+
+                            mappingIndex_t tournamentsIndex;
+                            CMappingDB mdb("tournaments.dat");
+                            mdb.Write(tournamentsIndex, block.GetHash());
+                        }
+                    }
+                }
+            }
+
+            // Write event index to events.dat file only if it has been updated.
+            if (eiUpdated) {
+                CEventDB edb;
+                eventIndex_t eventIndex;
+                edb.GetEvents(eventIndex);
+                edb.Write(eventIndex, block.GetHash());
+            }
+        }
     }
 
     return true;

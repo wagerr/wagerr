@@ -2,7 +2,7 @@
 name: "wagerr-osx-2.0"
 enable_cache: true
 suites:
-- "trusty"
+- "bionic"
 architectures:
 - "amd64"
 packages:

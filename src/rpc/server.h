@@ -230,6 +230,7 @@ extern UniValue addmultisigaddress(const UniValue& params, bool fHelp);
 extern UniValue listreceivedbyaddress(const UniValue& params, bool fHelp);
 extern UniValue listreceivedbyaccount(const UniValue& params, bool fHelp);
 extern UniValue listtransactions(const UniValue& params, bool fHelp);
+extern UniValue listtransactionrecords(const UniValue& params, bool fHelp);
 extern UniValue listaddressgroupings(const UniValue& params, bool fHelp);
 extern UniValue listaccounts(const UniValue& params, bool fHelp);
 extern UniValue listsinceblock(const UniValue& params, bool fHelp);
@@ -268,9 +269,16 @@ extern UniValue generatemintlist(const UniValue& params, bool fHelp);
 extern UniValue searchdzwgr(const UniValue& params, bool fHelp);
 extern UniValue dzwgrstate(const UniValue& params, bool fHelp);
 
+/** Betting related RPC methods **/
 extern UniValue listevents(const UniValue& params, bool fHelp);
+extern UniValue listchaingamesevents(const UniValue& params, bool fHelp);
+extern UniValue listchaingamesbets(const UniValue& params, bool fHelp);
+extern UniValue getchaingamesinfo(const UniValue& params, bool fHelp);
+extern UniValue placechaingamesbet(const UniValue& params, bool fHelp);
 extern UniValue placebet(const UniValue& params, bool fHelp);
 extern UniValue listbets(const UniValue& params, bool fHelp);
+extern UniValue getmappingid(const UniValue& params, bool fHelp);
+extern UniValue getmappingname(const UniValue& params, bool fHelp);
 
 extern UniValue getrawtransaction(const UniValue& params, bool fHelp); // in rpc/rawtransaction.cpp
 extern UniValue listunspent(const UniValue& params, bool fHelp);

@@ -86,6 +86,7 @@ BITCOIN_CORE_H = \
   allocators.h \
   amount.h \
   base58.h \
+  bet.h \
   bip38.h \
   bloom.h \
   blocksignature.h \
@@ -167,6 +168,7 @@ BITCOIN_CORE_H = \
   timedata.h \
   tinyformat.h \
   torcontrol.h \
+  transactionrecord.h \
   txdb.h \
   txmempool.h \
   ui_interface.h \
@@ -184,7 +186,6 @@ BITCOIN_CORE_H = \
   zwgrchain.h \
   zwgrtracker.h \
   zwgrwallet.h \
-  concurrentqueue.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h \
   zmq/zmqnotificationinterface.h \
@@ -202,6 +203,7 @@ libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
   addrman.cpp \
   alert.cpp \
+  bet.cpp \
   bloom.cpp \
   blocksignature.cpp \
   chain.cpp \
@@ -224,6 +226,7 @@ libbitcoin_server_a_SOURCES = \
   rpc/misc.cpp \
   rpc/net.cpp \
   rpc/rawtransaction.cpp \
+  rpc/bet.cpp \
   rpc/server.cpp \
   script/sigcache.cpp \
   sporkdb.cpp \
@@ -269,6 +272,7 @@ libbitcoin_wallet_a_SOURCES = \
   primitives/zerocoin.cpp \
   rpcwallet.cpp \
   kernel.cpp \
+  transactionrecord.cpp \
   wallet.cpp \
   wallet_ismine.cpp \
   walletdb.cpp \
