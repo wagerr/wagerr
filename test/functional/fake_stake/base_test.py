@@ -47,7 +47,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         :param:
         :return:
         '''
-        self.log.info("\n***Starting %s test ***", self.__class__.__name__)
+        self.log.info("\n\n*** Starting %s ***\n------------------------\n%s\n", self.__class__.__name__, self.description)
         # Global Test parameters (override in run_test)
         self.DEFAULT_FEE = 0.1
         # Spam blocks to send in current test
@@ -72,6 +72,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         :param:
         :return:
         '''
+        self.description = ""
         self.init_test()
         return
 

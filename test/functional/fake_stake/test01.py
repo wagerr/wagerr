@@ -1,5 +1,8 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+'''
+Covers the scenario of a PoS block where the coinstake input prevout is already spent.
+'''
 from random import randint
 import time
 
@@ -11,6 +14,7 @@ from util import dir_size
 class Test_01(WAGERR_FakeStakeTest):
 
     def run_test(self):
+        self.description = "Covers the scenario of a PoS block where the coinstake input prevout is already spent."
         self.init_test()
 
         FORK_DEPTH = 20  # Depth at which we are creating a fork. We are mining

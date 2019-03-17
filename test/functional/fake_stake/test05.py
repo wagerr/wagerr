@@ -1,5 +1,10 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+'''
+Covers the scenario of a valid PoS block with a valid coinstake transaction where the
+coinstake input prevout is double spent in one of the other transactions in the same block.
+'''
+
 from random import randint
 import time
 
@@ -9,14 +14,10 @@ from test_framework.util import bytes_to_hex_str, assert_equal
 from base_test import WAGERR_FakeStakeTest
 
 
-'''
-Covers the scenario of a valid PoS block with a valid coinstake transaction where the 
-coinstake input prevout is double spent in one of the other transactions in the same block.
-'''
-
 class Test_05(WAGERR_FakeStakeTest):
 
     def run_test(self):
+        self.description = "Covers the scenario of a zPoS block where the coinstake input is a zerocoin spend of an already spent coin."
         self.init_test()
         INITAL_MINED_BLOCKS = 300
         self.NUM_BLOCKS = 3

@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-from random import randint
+'''
+Covers the scenario of a zPoS block where the coinstake input is a zerocoin spend
+of an already spent coin.
+'''
 import time
 
 from test_framework.messages import msg_block
@@ -12,6 +15,7 @@ from util import dir_size
 class Test_03(WAGERR_FakeStakeTest):
 
     def run_test(self):
+        self.description = "Covers the scenario of a zPoS block where the coinstake input is a zerocoin spend of an already spent coin."
         self.init_test()
 
         FORK_DEPTH = 20  # Depth at which we are creating a fork. We are mining
