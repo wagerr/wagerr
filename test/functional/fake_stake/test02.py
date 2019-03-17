@@ -18,10 +18,9 @@ class Test_02(WAGERR_FakeStakeTest):
         self.description = "Covers the scenario of a valid PoS block where the coinstake input prevout is spent on main chain, but not on the fork branch. These blocks must be accepted."
         self.init_test()
         INITAL_MINED_BLOCKS = 200
-        MORE_MINED_BLOCKS = 50
-        self.NUM_BLOCKS = 10
-
-#        self.log.info("Furszy: " + str(self.furszy_node.getblockcount()))
+        FORK_DEPTH = 50
+        MORE_MINED_BLOCKS = 10
+        self.NUM_BLOCKS = 7
 
         # 1) Starting mining blocks
         self.log.info("Mining %d blocks.." % INITAL_MINED_BLOCKS)
@@ -33,8 +32,8 @@ class Test_02(WAGERR_FakeStakeTest):
         time.sleep(2)
 
         # 3) Mine more blocks
-        self.log.info("Mining %d more blocks.." % MORE_MINED_BLOCKS)
-        self.node.generate(MORE_MINED_BLOCKS)
+        self.log.info("Mining %d more blocks.." % (FORK_DEPTH+1))
+        self.node.generate(FORK_DEPTH+1)
         time.sleep(2)
 
         # 4) Spend the coins collected in 2 (mined in the first 100 blocks)
@@ -45,38 +44,10 @@ class Test_02(WAGERR_FakeStakeTest):
         time.sleep(2)
 
         # 5) Mine 10 more blocks
-        self.log.info("Mining 10 more blocks to include the TXs in chain...")
-        self.node.generate(10)
+        self.log.info("Mining %d more blocks to include the TXs in chain..." % MORE_MINED_BLOCKS)
+        self.node.generate(MORE_MINED_BLOCKS)
         time.sleep(2)
 
         # 6) Create PoS blocks and send them
-        init_size = dir_size(self.node.datadir + "/regtest/blocks")
-        self.log.info("Initial size of data dir: %s kilobytes" % str(init_size))
-
-        for i in range(0, self.NUM_BLOCKS):
-            if i != 0 and i % 5 == 0:
-                self.log.info("Sent %s blocks out of %s" % (str(i), str(self.NUM_BLOCKS)))
-
-            # Create the spam block
-            block_count = self.node.getblockcount()
-            randomCount = randint(block_count-MORE_MINED_BLOCKS-1, block_count-12)
-            pastBlockHash = self.node.getblockhash(randomCount)
-            block = self.create_spam_block(pastBlockHash, stakingPrevOuts, randomCount+1)
-            timeStamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(block.nTime))
-            self.log.info("Created PoS block [%d] with nTime %s: %s", randomCount+1, timeStamp, block.hash)
-            self.log.info("Sending block (size: %.2f Kbytes)...", len(block.serialize())/1000)
-            blockHex = bytes_to_hex_str(block.serialize())
-            var = self.node.submitblock(blockHex)
-            self.log.info("block status: " + var)
-            # Answer needs to be "inconclusive" because this is a forked block.
-            assert_equal(var, "inconclusive")
-
-
-        self.log.info("Sent all %s blocks." % str(self.NUM_BLOCKS))
-        self.stop_node(0)
-        time.sleep(5)
-
-        final_size = dir_size(self.node.datadir + "/regtest/blocks")
-        self.log.info("Final size of data dir: %s kilobytes" % str(final_size))
-        self.log.info("Total size increase: %s kilobytes" % str(final_size-init_size))
+        self.test_spam("Fork", stakingPrevOuts, fRandomHeight=True, randomRange=FORK_DEPTH, randomRange2=MORE_MINED_BLOCKS-2, fMustPass=True)
 

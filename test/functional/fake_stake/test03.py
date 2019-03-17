@@ -6,8 +6,8 @@ of an already spent coin.
 '''
 import time
 
-from test_framework.messages import msg_block
 from test_framework.authproxy import JSONRPCException
+from test_framework.messages import msg_block
 
 from base_test import WAGERR_FakeStakeTest
 from util import dir_size
@@ -18,9 +18,9 @@ class Test_03(WAGERR_FakeStakeTest):
         self.description = "Covers the scenario of a zPoS block where the coinstake input is a zerocoin spend of an already spent coin."
         self.init_test()
 
-        FORK_DEPTH = 20  # Depth at which we are creating a fork. We are mining
+        DENOM_TO_USE = 5000 # zc denomination
         INITAL_MINED_BLOCKS = 321
-        self.NUM_BLOCKS = 15
+        self.NUM_BLOCKS = 10
 
         # 1) Starting mining blocks
         self.log.info("Mining %d blocks to get to zPOS activation...." % INITAL_MINED_BLOCKS)
@@ -32,9 +32,9 @@ class Test_03(WAGERR_FakeStakeTest):
         balance = self.node.getbalance("*", 100)
         self.log.info("Minting zerocoins...")
         initial_mints = 0
-        while balance > 5000:
+        while balance > DENOM_TO_USE:
             try:
-                self.node.mintzerocoin(5000)
+                self.node.mintzerocoin(DENOM_TO_USE)
             except JSONRPCException:
                 break
             time.sleep(1)
@@ -42,28 +42,17 @@ class Test_03(WAGERR_FakeStakeTest):
             self.node.generate(1)
             time.sleep(1)
             balance = self.node.getbalance("*", 100)
-        self.log.info("Minted %d coins in the 1000-denom, remaining balance %d...", initial_mints, balance)
+        self.log.info("Minted %d coins in the %d-denom, remaining balance %d...", initial_mints, DENOM_TO_USE, balance)
         time.sleep(2)
 
-        # 3) mine 200 blocks
-        self.log.info("Mining 200 blocks ... and getting spendable zerocoins")
-        self.node.generate(200)
+        # 3) mine 101 blocks
+        self.log.info("Mining 101 more blocks ... and getting spendable zerocoins")
+        self.node.generate(101)
+        time.sleep(2)
         mints_list = [x["serial hash"] for x in self.node.listmintedzerocoins(True, True)]
 
-        balance = self.node.getbalance("*", 100)
-        while balance > 5000:
-            try:
-                self.node.mintzerocoin(5000)
-            except JSONRPCException:
-                break
-            time.sleep(1)
-            initial_mints += 1
-            self.node.generate(1)
-            time.sleep(1)
-            balance = self.node.getbalance("*", 100)
-
         # This mints are not ready spendable, only few of them.
-        self.log.info("Got %d spendable (confirmed & mature) mints" % len(mints_list))
+        self.log.info("Got %d confirmed mints" % len(mints_list))
 
         # 4) spend mints
         self.log.info("Spending mints...")
@@ -83,16 +72,22 @@ class Test_03(WAGERR_FakeStakeTest):
         time.sleep(1)
         self.log.info("Successfully spent %d mints" % spends)
 
-        # 5) Start mining again so that spends get confirmted in a block.
+        # 5) Start mining again so that spends get confirmed in a block.
         self.log.info("Mining 5 more blocks...")
         self.node.generate(5)
-        self.log.info("Sleeping 2 sec. Now mining PoS blocks based on already spent transactions...")
         time.sleep(2)
 
-        # 6) Create "Fake Stake" blocks and send them
+        # 6) Collect some prevouts for random txes
+        utxo_list = self.node.listunspent()
+        self.log.info("Collecting inputs...")
+        stakingPrevOuts = self.get_prevouts(utxo_list)
+        time.sleep(1)
+
+        # 7) Create "Fake Stake" blocks and send them
         init_size = dir_size(self.node.datadir + "/regtest/blocks")
         self.log.info("Initial size of data dir: %s kilobytes" % str(init_size))
-
+        block_count = self.node.getblockcount()
+        pastBlockHash = self.node.getblockhash(block_count)
         '''
 
         for i in range(0, self.NUM_BLOCKS):
@@ -100,12 +95,7 @@ class Test_03(WAGERR_FakeStakeTest):
                 self.log.info("Sent %s blocks out of %s" % (str(i), str(self.NUM_BLOCKS)))
 
             # Create the spam block
-            block_count = self.node.getblockcount()
-            randomCount = randint(block_count-FORK_DEPTH-1, block_count)
-            pastBlockHash = self.node.getblockhash(randomCount)
-            block = self.create_spam_block(pastBlockHash, stakingPrevOuts, randomCount+1)
-            timeStamp = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime(block.nTime))
-            self.log.info("Created PoS block with nTime %s: %s", timeStamp, block.hash)
+            block = self.create_spam_zblock(pastBlockHash, mints_list, stakingPrevOuts, block_count+1)
             msg = msg_block(block)
             self.log.info("Sending block (size: %.2f Kbytes)...", len(block.serialize())/1000)
             self.test_nodes[0].send_message(msg)
