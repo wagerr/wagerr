@@ -10,7 +10,9 @@ from test02 import Test_02
 from test03 import Test_03
 from test05 import Test_05
 
+
 total_num_of_tests = 5
+
 
 def syntax_error(err_msg=None):
     if err_msg is not None:
@@ -37,12 +39,14 @@ def get_test():
 
     return choice
 
+
 switcher = {
     1: Test_01(),
     2: Test_02(),
     3: Test_03(),
     5: Test_05()
 }
+
 
 def run_test(choice):
     # clear arguments for test_fw parser
@@ -56,7 +60,7 @@ def run_test(choice):
 
 if __name__ == '__main__':
     # select test number
-    choice = get_test()
+    test_n = get_test()
     # run corresponding test
-    run_test(choice)
+    run_test(test_n)
 

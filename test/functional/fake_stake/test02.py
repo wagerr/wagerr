@@ -1,5 +1,9 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
+'''
+Covers the scenario of a valid PoS block where the coinstake input prevout is spent on main chain,
+but not on the fork branch. These blocks must be accepted.
+'''
 from random import randint
 import time
 
@@ -11,6 +15,7 @@ from util import dir_size
 class Test_02(WAGERR_FakeStakeTest):
 
     def run_test(self):
+        self.description = "Covers the scenario of a valid PoS block where the coinstake input prevout is spent on main chain, but not on the fork branch. These blocks must be accepted."
         self.init_test()
         INITAL_MINED_BLOCKS = 200
         MORE_MINED_BLOCKS = 50
