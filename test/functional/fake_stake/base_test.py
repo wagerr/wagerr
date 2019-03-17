@@ -3,7 +3,7 @@
 
 from io import BytesIO
 from struct import pack
-from random import randint
+from random import randint, choice
 import time
 
 from test_framework.authproxy import JSONRPCException
@@ -91,6 +91,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
                          map outpoints to (be used as tx inputs) to amount, block_time
         :return  block:              (CBlock) generated block
         '''
+        self.log.info("Creating Spam Block")
         if spendingPrevOuts == []:
             spendingPrevOuts = stakingPrevOuts
         current_time = int(time.time())
@@ -110,7 +111,8 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         if not block.solve_stake(parent_block_stake_modifier, stakingPrevOuts):
             raise Exception("Not able to solve for any prev_outpoint")
 
-        signed_stake_tx = self.sign_stake_tx(block, stakingPrevOuts[block.prevoutStake][0])
+        self.log.info("Stake found. Signing block...")
+        signed_stake_tx = self.sign_stake_tx(block, stakingPrevOuts[block.prevoutStake][0], fZPoS)
         block.vtx.append(signed_stake_tx)
 
         # remove coinstake input prevout
@@ -118,6 +120,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
             del spendingPrevOuts[block.prevoutStake]
 
         # create spam for the block. random transactions
+        self.log.info("Creating spam TXes...")
         for outPoint in spendingPrevOuts:
             value_out = int(spendingPrevOuts[outPoint][0] - self.DEFAULT_FEE * COIN)
             tx = create_transaction(outPoint, b"", value_out, nTime, scriptPubKey=CScript([self.block_sig_key.get_pubkey(), OP_CHECKSIG]))
@@ -227,10 +230,17 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
                     fZPoS:          (bool) zerocoin stake
         :return:                    (CTransaction) signed tx
         '''
+        self.block_sig_key = CECKey()
+
         if fZPoS:
-            stake_tx_signed_raw_hex = self.node.createrawzerocoinstake(block.prevoutStake)
+            self.log.info("Signing zPoS stake...")
+            raw_stake = self.node.createrawzerocoinstake(block.prevoutStake)
+            stake_tx_signed_raw_hex = raw_stake["hex"]
+            stake_pkey = raw_stake["private-key"]
+            self.block_sig_key.set_compressed(True)
+            self.block_sig_key.set_secretbytes(bytes.fromhex(stake_pkey))
+
         else:
-            self.block_sig_key = CECKey()
             self.block_sig_key.set_secretbytes(hash256(pack('<I', 0xffff)))
             pubkey = self.block_sig_key.get_pubkey()
             scriptPubKey = CScript([pubkey, OP_CHECKSIG])
@@ -305,7 +315,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
                           randomCount + 1, block.hash[:7], block_time, block_size)
 
             var = self.node.submitblock(bytes_to_hex_str(block.serialize()))
-            if (not fMustPass and var is not None) or (fMustPass and var != "inconclusive"):
+            if (not fMustPass and var not in [None, "bad-txns-invalid-zwgr"]) or (fMustPass and var != "inconclusive"):
                 raise AssertionError("Error, submitblock [fMustPass=%s] result: %s" % (str(fMustPass), str(var)))
 
             msg = msg_block(block)
@@ -314,7 +324,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
             try:
                 block_ret = self.node.getblock(block.hash)
                 if not fMustPass and block_ret is not None:
-                    raise AssertionError("Error, block stored in %s chain" % name)
+                    raise AssertionError("Error, block stored in %s chain: %s" % (name, str(block_ret)))
                 if fMustPass:
                     if block_ret is None:
                         raise AssertionError("Error, block NOT stored in %s chain" % name)
@@ -333,7 +343,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
 
             # remove a random prevout from the list
             # (to randomize block creation if the same height is picked two times)
-            stakingPrevOuts.popitem()
+            del stakingPrevOuts[choice(list(stakingPrevOuts))]
 
         self.log.info("Sent all %s blocks." % str(self.NUM_BLOCKS))
         self.log_data_dir_size()
