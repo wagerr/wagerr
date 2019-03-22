@@ -1,7 +1,7 @@
 # Copyright (c) 2018-2019 The Ion developers
 # Copyright (c) 2018-2019 The Wagerr developers
 name: wagerr
-version: master
+version: 3.0.99
 summary:   peer-to-peer network based digital currency
 description: |
   Wagerr is a free open source peer-to-peer electronic cash system that
@@ -56,7 +56,7 @@ parts:
   wagerr:
     source: https://github.com/wagerr/wagerr
     source-type: git
-    source-tag: master
+    source-tag: 2019_regtest-mode-and-fake-test-suite
     plugin: nil
     override-build: |
       # Patch - Default home folder
