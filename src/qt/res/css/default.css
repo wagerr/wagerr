@@ -1702,3 +1702,32 @@ WalletFrame {
     QCalendarWidget QAbstractItemView:disabled { /* Calendar widget days not in month */
     color:#818181;
     }
+
+QWidget#GovernancePage .QFrame#frame_Content {
+    background-color:#ffffff;
+}
+
+QWidget#GovernancePage .QFrame#proposalFrame {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #9179c7, stop: 1 #b396f6);
+    border:1px solid #b396f6;
+    border-radius:5px;
+    margin:2px;
+    max-height:250px;
+}
+
+QWidget#GovernancePage .QFrame#proposalFrame > QLabel#strProposalName, QLabel#strMonthlyPayout {
+    font-size:18pt;
+}
+
+QWidget#GovernancePage .QFrame#proposalFrame > QLabel#strProposalURL {
+    font-size:14pt;
+}
+
+QWidget#GovernancePage .QScrollArea, .QWidget#scrollAreaWidgetContents {
+    background-color:#fff;
+}
+
+QWidget#GovernancePage .QGridLayout#proposalGrid {
+    margin-right:35px!important;
+    padding-right:35px!important;
+}
