@@ -127,7 +127,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     governancePage = new GovernancePage();
     receiveCoinsPage = new ReceiveCoinsDialog();
     sendCoinsPage = new SendCoinsDialog();
-    placeBetPage = new PlaceBetDialog();
+    //placeBetPage = new PlaceBetDialog();
 
     addWidget(overviewPage);
     addWidget(transactionsPage);
@@ -135,7 +135,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     addWidget(privacyPage);
     addWidget(receiveCoinsPage);
     addWidget(sendCoinsPage);
-    addWidget(placeBetPage);
+    //addWidget(placeBetPage);
     addWidget(explorerWindow);
 
     QSettings settings;
@@ -160,7 +160,7 @@ WalletView::WalletView(QWidget* parent) : QStackedWidget(parent),
     connect(sendCoinsPage, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
 
     // Pass through messages from sendCoinsPage
-    connect(placeBetPage, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
+    //connect(placeBetPage, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
 
     // Pass through messages from transactionView
     connect(transactionView, SIGNAL(message(QString, QString, unsigned int)), this, SIGNAL(message(QString, QString, unsigned int)));
@@ -215,7 +215,7 @@ void WalletView::setWalletModel(WalletModel* walletModel)
     receiveCoinsPage->setModel(walletModel);
     sendCoinsPage->setModel(walletModel);
     governancePage->setWalletModel(walletModel);
-    placeBetPage->setModel(walletModel);
+    //placeBetPage->setModel(walletModel);
 
     if (walletModel) {
         // Receive and pass through messages from wallet model
@@ -312,7 +312,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
     // go thru blockchain and get data
 
     // Set the Oracle wallet address. 
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
+    std::vector<string> oracleAddrs = Params().OracleWalletAddrs();
 
     // Set event name
     std::string evtDes;
@@ -396,7 +396,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                 if(ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
 
                     BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
-                        if (CBitcoinAddress(prevAddr).ToString() == OracleWalletAddr) {
+                        if (std::find(oracleAddrs.begin(), oracleAddrs.end(), CBitcoinAddress(prevAddr).ToString()) != oracleAddrs.end()) {
                             validEventTx = true;
                         }
                     }

@@ -84,7 +84,7 @@ BitcoinGUI::BitcoinGUI(const NetworkStyle* networkStyle, QWidget* parent) : QMai
                                                                             masternodeAction(0),
                                                                             quitAction(0),
                                                                             sendCoinsAction(0),
-                                                                            placeBetAction(0),
+                                                                            //placeBetAction(0),
                                                                             usedSendingAddressesAction(0),
                                                                             usedReceivingAddressesAction(0),
                                                                             signMessageAction(0),
@@ -332,16 +332,16 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
 #endif
     tabGroup->addAction(sendCoinsAction);
 
-    placeBetAction = new QAction(QIcon(":/icons/betting"), tr("&Bet"), this);
-    placeBetAction->setStatusTip(tr("Place a bet on an event"));
-    placeBetAction->setToolTip(placeBetAction->statusTip());
-    placeBetAction->setCheckable(true);
+//    placeBetAction = new QAction(QIcon(":/icons/betting"), tr("&Bet"), this);
+//    placeBetAction->setStatusTip(tr("Place a bet on an event"));
+//    placeBetAction->setToolTip(placeBetAction->statusTip());
+//    placeBetAction->setCheckable(true);
 #ifdef Q_OS_MAC
-    placeBetAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
+//    placeBetAction->setShortcut(QKeySequence(Qt::CTRL + Qt::Key_3));
 #else
-    placeBetAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_3));
+//    placeBetAction->setShortcut(QKeySequence(Qt::ALT + Qt::Key_3));
 #endif
-    tabGroup->addAction(placeBetAction);
+    //tabGroup->addAction(placeBetAction);
 
     receiveCoinsAction = new QAction(QIcon(":/icons/receiving_addresses"), tr("&Receive"), this);
     receiveCoinsAction->setStatusTip(tr("Request payments (generates QR codes and wagerr: URIs)"));
@@ -411,8 +411,8 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
-    connect(placeBetAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    connect(placeBetAction, SIGNAL(triggered()), this, SLOT(gotoPlaceBetPage()));
+    //connect(placeBetAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
+    //connect(placeBetAction, SIGNAL(triggered()), this, SLOT(gotoPlaceBetPage()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
     connect(privacyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -601,7 +601,7 @@ void BitcoinGUI::createToolBars()
 
         toolbar->addAction(overviewAction);
         toolbar->addAction(sendCoinsAction);
-        toolbar->addAction(placeBetAction);
+        //toolbar->addAction(placeBetAction);
         toolbar->addAction(receiveCoinsAction);
         toolbar->addAction(privacyAction);
         toolbar->addAction(historyAction);
@@ -708,7 +708,7 @@ void BitcoinGUI::setWalletActionsEnabled(bool enabled)
 {
     overviewAction->setEnabled(enabled);
     sendCoinsAction->setEnabled(enabled);
-    placeBetAction->setEnabled(enabled);
+    //placeBetAction->setEnabled(enabled);
     receiveCoinsAction->setEnabled(enabled);
     privacyAction->setEnabled(enabled);
     historyAction->setEnabled(enabled);
@@ -766,7 +766,7 @@ void BitcoinGUI::createTrayIconMenu()
     trayIconMenu->addAction(toggleHideAction);
     trayIconMenu->addSeparator();
     trayIconMenu->addAction(sendCoinsAction);
-    trayIconMenu->addAction(placeBetAction);
+    //trayIconMenu->addAction(placeBetAction);
     trayIconMenu->addAction(receiveCoinsAction);
     trayIconMenu->addAction(privacyAction);
     trayIconMenu->addSeparator();
@@ -884,8 +884,8 @@ void BitcoinGUI::gotoSendCoinsPage(QString addr)
 
 void BitcoinGUI::gotoPlaceBetPage(QString addr)
 {
-    placeBetAction->setChecked(true);
-    if (walletFrame) walletFrame->gotoPlaceBetPage(addr);
+//    placeBetAction->setChecked(true);
+//    if (walletFrame) walletFrame->gotoPlaceBetPage(addr);
 }
 
 void BitcoinGUI::gotoSignMessageTab(QString addr)

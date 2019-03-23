@@ -32,6 +32,7 @@
 bool IsValidOracleTx(const CTxIn &txin)
 {
     COutPoint prevout = txin.prevout;
+    std::vector<string> oracleAddrs = Params().OracleWalletAddrs();
 
     uint256 hashBlock;
     CTransaction txPrev;
@@ -46,7 +47,7 @@ bool IsValidOracleTx(const CTxIn &txin)
 
         if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
             BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
-                if (CBitcoinAddress(prevAddr).ToString() == Params().OracleWalletAddr()) {
+                if (std::find(oracleAddrs.begin(), oracleAddrs.end(), CBitcoinAddress(prevAddr).ToString()) != oracleAddrs.end()) {
                     return true;
                 }
             }
@@ -1346,8 +1347,6 @@ bool CEventDB::Read(eventIndex_t& eventIndex, uint256& lastBlockHash)
  */
 std::vector<CPeerlessResult> getEventResults( int height )
 {
-    // Set the Oracle wallet address.
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
     std::vector<CPeerlessResult> results;
 
     // Get the current block so we can look for any results in it.
@@ -1381,6 +1380,8 @@ std::vector<CPeerlessResult> getEventResults( int height )
                         continue;
                     }
 
+                    LogPrintf("Results found...\n");
+
                     // Store the result if its a valid result OP CODE.
                     results.push_back(plResult);
                 }
@@ -1403,10 +1404,6 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
     // Get all the results posted in the latest block.
     std::vector<CPeerlessResult> results = getEventResults(height);
-    LogPrintf("Results found: %li \n", results.size());
-
-    // Set the Oracle wallet address.
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
 
     // Traverse the blockchain for an event to match a result and all the bets on a result.
     for (const auto& result : results) {
@@ -1427,7 +1424,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
         time_t latestEventStartTime = 0;
         bool eventFound = false;
 
-        /** TODO - Code below needs to be refactored and added to a function or something **/
+        /** TODO - Code below needs to be refactored! **/
         // Find peerless outcome (result).
         if (result.nMoneyLineResult == homeWin) {
             nMoneylineResult = moneyLineWin;
@@ -1567,7 +1564,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
                             }
                         }
 
-                        // Only payout bets that are between 50 - 10000 WRG inclusive (MaxBetPayoutRange).
+                        // Only payout bets that are between 25 - 10000 WRG inclusive (MaxBetPayoutRange).
                         if (eventFound && betAmount >= (Params().MinBetPayoutRange() * COIN) && betAmount <= (Params().MaxBetPayoutRange() * COIN)) {
 
                             // Bet OP RETURN transaction.
@@ -1654,8 +1651,6 @@ std::vector<CTxOut> GetBetPayouts(int height)
  */
 std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEventResults(int height)
 {
-    // Set the Oracle wallet address.
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
     std::vector<CChainGamesResult> chainGameResults;
     std::vector<std::string> blockTotalValues;
     CAmount totalBlockValue = 0;
@@ -1671,7 +1666,6 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
     BOOST_FOREACH(CTransaction& tx, block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet by looking at the TX vins.
         const CTxIn &txin = tx.vin[0];
-
         uint256 hashBlock;
         CTransaction txPrev;
 
@@ -1728,9 +1722,6 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
     std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> resultArray = getCGLottoEventResults(height);
     std::vector<CChainGamesResult> allChainGames = resultArray.first;
     std::vector<std::string> blockSizeArray = resultArray.second;
-
-    // Set the Oracle wallet address.
-    std::string OracleWalletAddr = Params().OracleWalletAddr();
 
     // Find payout for each CGLotto game
     for (unsigned int currResult = 0; currResult < resultArray.second.size(); currResult++) {
@@ -1835,39 +1826,52 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
             BlocksIndex = chainActive.Next(BlocksIndex);
         }
 
-        // Choose winner from candidates, pay out
-        if (candidates.size() >= 1) {
+        // Choose winner from candidates who entered the lotto and payout their winnings.
+        if (candidates.size() == 1) {
+             // Refund the single entrant.
+             CAmount noOfBets = candidates.size();
+             std::string winnerAddress = candidates[0];
+             CAmount entranceFee = eventFee;
+             CAmount winnerPayout = eventFee;
 
-            // Use random number to choose winner from array
-            CAmount noOfBets = candidates.size();
-            CAmount winnerIndex = totalValueOfBlock % noOfBets;
+ 	         LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
+           LogPrintf("Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+           LogPrintf("Winner Address: %u \n", winnerAddress);
+           LogPrintf(" This Lotto was refunded as only one person bought a ticket.\n" );
 
-            if (winnerIndex > noOfBets) {
-                winnerIndex = noOfBets;
-            }
+             // Only add valid payouts to the vector.
+             if (winnerPayout > 0) {
+                 vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee);
+             }
+         }
+         else if (candidates.size() >= 2) {
+             // Use random number to choose winner.
+             CAmount noOfBets    = candidates.size();
+             CAmount winnerIndex = totalValueOfBlock % noOfBets;
 
-            // Split the pot and calulate winnings
-            std::string winnerAddress = candidates[winnerIndex];
-            CAmount entranceFee = eventFee;
-            CAmount totalPot = (noOfBets*entranceFee);
-            CAmount winnerPayout = totalPot / 10 * 8;
-            CAmount fee = totalPot / 50;
+             if (winnerIndex > noOfBets) {
+                 winnerIndex = noOfBets;
+             }
 
-            LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
-            LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-            LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerIndex);
-            LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
-            LogPrintf("Entrance fee: %u \n", entranceFee);
-            LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
+             // Split the pot and calculate winnings.
+             std::string winnerAddress = candidates[winnerIndex];
+             CAmount entranceFee = eventFee;
+             CAmount totalPot = (noOfBets*entranceFee);
+             CAmount winnerPayout = totalPot / 10 * 8;
+             CAmount fee = totalPot / 50;
 
-            // Only add valid payouts to the vector.
-            if (winnerPayout > 0) {
-                vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee);
-            }
+   	         LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
+             LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+             LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerIndex);
+             LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
+             LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
+
+             // Only add valid payouts to the vector.
+             if (winnerPayout > 0) {
+                 vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee);
+             }
         }
     }
 
     return vexpectedCGLottoBetPayouts;
 }
-
-

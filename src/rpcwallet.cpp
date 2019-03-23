@@ -205,7 +205,9 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
 
     //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     CBlockIndex *BlocksIndex = NULL;
-    BlocksIndex = chainActive[chainActive.Height() - 14400];
+
+    int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
+    BlocksIndex = chainActive[height];
 
     while (BlocksIndex) {
         CBlock block;
@@ -824,14 +826,14 @@ UniValue placebet(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
             "\nExamples:\n" +
-            HelpExampleCli("placebet", "\"000\" \"1\" 50\"donation\" \"seans outpost\"") +
-            HelpExampleRpc("placebet", "\"000\", \"1\", 50, \"donation\", \"seans outpost\""));
+            HelpExampleCli("placebet", "\"000\" \"1\" 25\"donation\" \"seans outpost\"") +
+            HelpExampleRpc("placebet", "\"000\", \"1\", 25, \"donation\", \"seans outpost\""));
 
     CAmount nAmount = AmountFromValue(params[2]);
 
-    // Validate bet amount so its between 1 - 10000 WGR inclusive.
+    // Validate bet amount so its between 25 - 10000 WGR inclusive.
     if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 50 - 10000 WGR inclusive.");
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.");
     }
 
     // Wallet comments
@@ -901,9 +903,9 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
 
     CAmount nAmount = AmountFromValue(params[1]);
 
-    // Validate bet amount so its between 1 - 10000 WGR inclusive.
-    if (nAmount < (50 * COIN ) || nAmount > (10000 * COIN)) {
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 1 - 10000 WGR inclusive.");
+    // Validate bet amount so its between 25 - 10000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 25 - 10000 WGR inclusive.");
     }
 
     // TODO Allow comments for chain games bet
@@ -953,7 +955,8 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
 
     //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     CBlockIndex *BlocksIndex = NULL;
-    BlocksIndex = chainActive[chainActive.Height() - 14400];
+    int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
+    BlocksIndex = chainActive[height];
 
     while (BlocksIndex) {
         CBlock block;
@@ -1008,6 +1011,7 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("start-block", gameStartBlock));
     obj.push_back(Pair("start-time", gameStartTime));
     obj.push_back(Pair("total-bets", totalFoundCGBets));
+    obj.push_back(Pair("network", Params().NetworkID()));
 
     return obj;
 }
