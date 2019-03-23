@@ -1346,7 +1346,7 @@ WalletFrame {
     padding:2px;
     }
     
-    /* QDialog#SendCoinsDialog .QFrame#frameCoinControl .QCheckBox#checkBoxCoinControlChange { /* Custom Change Label */ 
+    /* QDialog#SendCoinsDialog .QFrame#frameCoinControl .QCheckBox#checkBoxCoinControlChange { /* Custom Change Label */
     /* QDialog#SendCoinsDialog .QFrame#frameCoinControl .QValidatedLineEdit#lineEditCoinControlChange { /* Custom Change Address */
     /* QDialog#SendCoinsDialog .QFrame#frameCoinControl .QValidatedLineEdit#lineEditCoinControlChange:!focus { /* Custom Change Address */
     /* QDialog#SendCoinsDialog .QFrame#frameCoinControl .QLineEdit#splitBlockLineEdit { */
@@ -1636,7 +1636,7 @@ WalletFrame {
     color:#333333;
     font-weight:bold;
     }
-     
+    
     QLabel#transactionSum { /* Example of setObjectName for widgets without name */
     color:#333333;
     }
