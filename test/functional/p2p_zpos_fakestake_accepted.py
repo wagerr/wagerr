@@ -1,16 +1,17 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# Copyright (c) 2019 The WAGERR Core developers
+# Distributed under the MIT software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 '''
 Performs the same check as in Test_02 verifying that zPoS forked blocks that stake a zerocoin which is spent on mainchain on an higher block are still accepted.
 '''
-from random import randint
-import time
-from test_framework.authproxy import JSONRPCException
-from base_test import WAGERR_FakeStakeTest
-from time import sleep
-from util import mints_to_stakingPrevOuts
 
-class Test_04(WAGERR_FakeStakeTest):
+from test_framework.authproxy import JSONRPCException
+from fake_stake.base_test import WAGERR_FakeStakeTest
+from time import sleep
+
+class zPoSFakeStakeAccepted(WAGERR_FakeStakeTest):
 
 
     def set_test_params(self):
@@ -66,7 +67,6 @@ class Test_04(WAGERR_FakeStakeTest):
         sleep(2)
         mints = self.node.listmintedzerocoins(True, True)
         sleep(1)
-        stakingPrevOuts = mints_to_stakingPrevOuts(mints)
         mints_hashes = [x["serial hash"] for x in mints]
 
         # This mints are not ready spendable, only few of them.
@@ -80,7 +80,6 @@ class Test_04(WAGERR_FakeStakeTest):
         # 5) spend mints
         self.log.info("Spending mints in block %d..." % self.node.getblockcount())
         spends = 0
-        spent_mints = []
         for mint in mints_hashes:
             # create a single element list to pass to RPC spendzerocoinmints
             mint_arg = []
@@ -89,7 +88,6 @@ class Test_04(WAGERR_FakeStakeTest):
                 self.node.spendzerocoinmints(mint_arg)
                 sleep(1)
                 spends += 1
-                spent_mints.append(mint)
             except JSONRPCException as e:
                 self.log.warning(str(e))
                 continue
@@ -103,9 +101,17 @@ class Test_04(WAGERR_FakeStakeTest):
         # 6) Collect some prevouts for random txes
         self.log.info("Collecting inputs for txes...")
         utxo_list = self.node.listunspent()
-        spendingPrevOuts = self.get_prevouts(utxo_list)
         sleep(1)
 
         # 7) Create valid forked zPoS blocks and send them
         self.log.info("Creating stake zPoS blocks...")
-        self.test_spam("Fork", stakingPrevOuts, spendingPrevOuts=spendingPrevOuts, fZPoS=True, fRandomHeight=True, randomRange=FORK_DEPTH, randomRange2=50, fMustPass=True)
+        err_msgs = self.test_spam("Fork", mints, spending_utxo_list=utxo_list, fZPoS=True, fRandomHeight=True, randomRange=FORK_DEPTH, randomRange2=50, fMustPass=True)
+
+        if not len(err_msgs) == 0:
+            self.log.error("result: " + " | ".join(err_msgs))
+            raise AssertionError("TEST FAILED")
+
+        self.log.info("%s PASSED" % self.__class__.__name__)
+
+if __name__ == '__main__':
+    zPoSFakeStakeAccepted().main()

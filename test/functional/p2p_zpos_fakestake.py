@@ -1,28 +1,29 @@
 #!/usr/bin/env python3
-# -*- coding: utf-8 -*-
+# Copyright (c) 2019 The WAGERR Core developers
+# Distributed under the MIT software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+
 '''
 Covers the scenario of a zPoS block where the coinstake input is a zerocoin spend
 of an already spent coin.
 '''
 
-from random import choice
 from time import sleep
 
 from test_framework.authproxy import JSONRPCException
 
-from base_test import WAGERR_FakeStakeTest
-from util import mints_to_stakingPrevOuts
+from fake_stake.base_test import WAGERR_FakeStakeTest
 
-class Test_03(WAGERR_FakeStakeTest):
+class zPoSFakeStake(WAGERR_FakeStakeTest):
 
     def run_test(self):
         self.description = "Covers the scenario of a zPoS block where the coinstake input is a zerocoin spend of an already spent coin."
         self.init_test()
 
-        DENOM_TO_USE = 5000 # zc denomination
-        INITAL_MINED_BLOCKS = 321
-        MORE_MINED_BLOCKS = 301
-        self.NUM_BLOCKS = 2
+        DENOM_TO_USE = 5000         # zc denomination
+        INITAL_MINED_BLOCKS = 321   # First mined blocks (rewards collected to mint)
+        MORE_MINED_BLOCKS = 301     # More blocks mined before spending zerocoins
+        self.NUM_BLOCKS = 2         # Number of spammed blocks
 
         # 1) Starting mining blocks
         self.log.info("Mining %d blocks to get to zPOS activation...." % INITAL_MINED_BLOCKS)
@@ -57,8 +58,6 @@ class Test_03(WAGERR_FakeStakeTest):
         self.node.generate(MORE_MINED_BLOCKS)
         sleep(2)
         mints = self.node.listmintedzerocoins(True, True)
-        sleep(1)
-        stakingPrevOuts = mints_to_stakingPrevOuts(mints)
         mints_hashes = [x["serial hash"] for x in mints]
 
         # This mints are not ready spendable, only few of them.
@@ -90,10 +89,18 @@ class Test_03(WAGERR_FakeStakeTest):
 
         # 6) Collect some prevouts for random txes
         self.log.info("Collecting inputs for txes...")
-        utxo_list = self.node.listunspent()
-        spendingPrevOuts = self.get_prevouts(utxo_list)
+        spending_utxo_list = self.node.listunspent()
         sleep(1)
 
         # 7) Create "Fake Stake" blocks and send them
         self.log.info("Creating Fake stake zPoS blocks...")
-        self.test_spam("Main", stakingPrevOuts, spendingPrevOuts=spendingPrevOuts, fZPoS=True)
+        err_msgs = self.test_spam("Main", mints, spending_utxo_list=spending_utxo_list, fZPoS=True)
+
+        if not len(err_msgs) == 0:
+            self.log.error("result: " + " | ".join(err_msgs))
+            raise AssertionError("TEST FAILED")
+
+        self.log.info("%s PASSED" % self.__class__.__name__)
+
+if __name__ == '__main__':
+    zPoSFakeStake().main()
