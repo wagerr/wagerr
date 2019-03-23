@@ -114,11 +114,12 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     CBlock* pblock = &pblocktemplate->block; // pointer for convenience
 
     // Tip
-    CBlockIndex* pindexPrev;
+    CBlockIndex* pindexPrev = nullptr;
     {   // Don't keep cs_main locked
         LOCK(cs_main);
         pindexPrev = chainActive.Tip();
     }
+
     const int nHeight = pindexPrev->nHeight + 1;
 
     // Make sure to create the correct block version after zerocoin is enabled
@@ -206,6 +207,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     {
         LOCK2(cs_main, mempool.cs);
 
+        CBlockIndex* pindexPrev = chainActive.Tip();
+        const int nHeight = pindexPrev->nHeight + 1;
         CCoinsViewCache view(pcoinsTip);
 
         // Priority order to process transactions
