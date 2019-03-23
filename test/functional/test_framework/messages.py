@@ -473,16 +473,16 @@ class CBlockHeader():
         loop = True
         while loop:
             for prevout in prevouts:
-                nvalue, txBlockTime, stakeModifier = prevouts[prevout]
+                nvalue, txBlockTime, stakeModifier, hashStake = prevouts[prevout]
                 target = int(target0 * nvalue / 100) % 2**256
                 data = b""
                 data += ser_uint64(stakeModifier)
                 data += struct.pack("<I", txBlockTime)
                 # prevout for zPoS is serial hashes hex strings
-                if isinstance(prevout, str):
-                    data += ser_uint256(uint256_from_str(bytes.fromhex(prevout)))
-                else:
+                if isinstance(prevout, COutPoint):
                     data += self.get_uniqueness(prevout)
+                else:
+                    data += ser_uint256(uint256_from_str(bytes.fromhex(hashStake)[::-1]))
                 data += struct.pack("<I", self.nTime)
                 posHash = uint256_from_str(hash256(data))
                 if posHash <= target:

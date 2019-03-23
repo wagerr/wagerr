@@ -56,10 +56,16 @@ BASE_SCRIPTS= [
     # Scripts that are run by the travis build process.
     # Longest test should go first, to favor running tests in parallel
     'wallet_backup.py',
+    'p2p_pos_fakestake.py',
+    'p2p_pos_fakestake_accepted.py',
+    'p2p_zpos_fakestake.py',
+    'p2p_zpos_fakestake_accepted.py',
+    'zerocoin_wrapped_serials.py',
     # vv Tests less than 5m vv
     'feature_block.py',
     'rpc_fundrawtransaction.py',
     # vv Tests less than 2m vv
+    'p2p_pos_doublespend.py',
     'wallet_basic.py',
     'wallet_accounts.py',
     'wallet_dump.py',
