@@ -186,6 +186,9 @@ BITCOIN_CORE_H = \
   zwgrchain.h \
   zwgrtracker.h \
   zwgrwallet.h \
+  genwit.h \
+  concurrentqueue.h \
+  lightzwgrthread.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h \
   zmq/zmqnotificationinterface.h \
