@@ -177,6 +177,7 @@ extern std::string HelpExampleCli(std::string methodname, std::string args);
 extern std::string HelpExampleRpc(std::string methodname, std::string args);
 
 extern void EnsureWalletIsUnlocked(bool fAllowAnonOnly = false);
+extern UniValue DoZwgrSpend(const CAmount nAmount, bool fMintChange, bool fMinimizeChange, const int nSecurityLevel, vector<CZerocoinMint>& vMintsSelected, std::string address_str);
 
 extern UniValue getconnectioncount(const UniValue& params, bool fHelp); // in rpc/net.cpp
 extern UniValue getpeerinfo(const UniValue& params, bool fHelp);
@@ -256,6 +257,7 @@ extern UniValue listzerocoinamounts(const UniValue& params, bool fHelp);
 extern UniValue mintzerocoin(const UniValue& params, bool fHelp);
 extern UniValue spendzerocoin(const UniValue& params, bool fHelp);
 extern UniValue spendrawzerocoin(const UniValue& params, bool fHelp);
+extern UniValue spendzerocoinmints(const UniValue& params, bool fHelp);
 extern UniValue spendzerocoinfrom(const UniValue& params, bool fHelp);
 extern UniValue resetmintzerocoin(const UniValue& params, bool fHelp);
 extern UniValue resetspentzerocoin(const UniValue& params, bool fHelp);
