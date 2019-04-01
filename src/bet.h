@@ -22,14 +22,6 @@ typedef enum OutcomeType {
     totalUnder    = 0x07
 } OutcomeType;
 
-// The supported result types.
-typedef enum ResultType {
-    homeWin = 0x01,
-    awayWin = 0x02,
-    draw    = 0x03,
-    refund  = 0x04
-} ResultType;
-
 // The supported betting TX types.
 typedef enum BetTxTypes{
     mappingTxType        = 0x01,  // Mapping transaction type identifier.
@@ -180,20 +172,19 @@ class CPeerlessResult
 {
 public:
     uint32_t nEventId;
-    ResultType nMoneyLineResult;
-    ResultType nSpreadResult;
-    ResultType nTotalResult;
+    uint32_t nHomeScore;
+    uint32_t nAwayScore;
+
 
     // Default Constructor.
     CPeerlessResult() {}
 
     // Parametrized Constructor.
-    CPeerlessResult(int eventId, ResultType mlResult, ResultType sResult, ResultType tResult)
+    CPeerlessResult(int eventId, int pHomeScore, int pAwayScore)
     {
-        nEventId         = eventId;
-        nMoneyLineResult = mlResult;
-        nSpreadResult    = sResult;
-        nTotalResult     = tResult;
+        nEventId        = eventId;
+        nHomeScore      = pHomeScore;
+        nAwayScore      = pAwayScore;
     }
 
     static bool ToOpCode(CPeerlessResult pr, std::string &opCode);
