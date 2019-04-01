@@ -3047,15 +3047,19 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 	    //const char * BetNetBlockTxtConst = strBetNetBlockTmp.c_str();
         //const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
 
+        // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
         vExpectedPLPayouts = GetBetPayouts(pindex->nHeight - 1);
         vExpectedCGLottoPayouts = GetCGLottoBetPayouts(pindex->nHeight - 1);
+
+        // Get the total amount of WGR that needs to be minted to payout all winning bets.
+        nExpectedMint += GetBlockPayouts(vExpectedPLPayouts, nMNBetReward);
+        nExpectedMint += GetCGBlockPayouts(vExpectedCGLottoPayouts, nMNBetReward);
+
+        nExpectedMint += nMNBetReward;
 
         // Merge vectors into single payout vector.
         vExpectedAllPayouts = vExpectedPLPayouts;
         vExpectedAllPayouts.insert(vExpectedAllPayouts.end(), vExpectedCGLottoPayouts.begin(), vExpectedCGLottoPayouts.end());
-
-        nExpectedMint += GetBlockPayouts(vExpectedAllPayouts, nMNBetReward);
-        nExpectedMint += nMNBetReward;
     }
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.

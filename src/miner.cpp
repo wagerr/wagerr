@@ -469,15 +469,17 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             CAmount nMNBetReward = 0;
 
             if( nHeight > Params().BetStartHeight()) {
+                // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
                 vPLPayouts = GetBetPayouts(nHeight - 1);
                 vCGLottoPayouts = GetCGLottoBetPayouts(nHeight - 1);
+
+                // Get the total amount of WGR that needs to be minted to payout all winning bets.
+                GetBlockPayouts(vPLPayouts, nMNBetReward);
+                GetCGBlockPayouts(vCGLottoPayouts, nMNBetReward);
 
                 // Merge vectors into single payout vector.
                 vAllPayouts = vPLPayouts;
                 vAllPayouts.insert(vAllPayouts.end(), vCGLottoPayouts.begin(), vCGLottoPayouts.end());
-
-                // Get the total amount of WGR that needs to be minted to payout all bets.
-                GetBlockPayouts(vAllPayouts, nMNBetReward);
             }
 
             // Fill coin stake transaction.

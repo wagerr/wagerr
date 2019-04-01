@@ -58,6 +58,9 @@ bool IsValidOracleTx(const CTxIn &txin);
 /** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
 int64_t GetBlockPayouts(std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetReward);
 
+/** Aggregates the amount of WGR to be minted to pay out all CG Lotto winners as well as OMNO rewards. **/
+int64_t GetCGBlockPayouts(std::vector<CTxOut>& vexpectedCGPayouts, CAmount& nMNBetReward);
+
 /** Validating the payout block using the payout vector. **/
 bool IsBlockPayoutsValid(std::vector<CTxOut> vExpectedPayouts, CBlock block);
 

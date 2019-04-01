@@ -101,6 +101,25 @@ int64_t GetBlockPayouts(std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetRe
 }
 
 /**
+ * Takes a payout vector and aggregates the total WGR that is required to pay out all CGLotto bets.
+ *
+ * @param vexpectedCGPayouts  A vector containing all the winning bets that need to be paid out.
+ * @param nMNBetReward  The Oracle masternode reward.
+ * @return
+ */
+int64_t GetCGBlockPayouts(std::vector<CTxOut>& vexpectedCGPayouts, CAmount& nMNBetReward)
+{
+    CAmount nPayout = 0;
+
+    for (unsigned i = 0; i < vexpectedCGPayouts.size(); i++) {
+        CAmount payValue = vexpectedCGPayouts[i].nValue;
+        nPayout += payValue;
+    }
+
+    return  nPayout;
+}
+
+/**
  * Validates the payout block to ensure all bet payout amounts and payout addresses match their expected values.
  *
  * @param vExpectedPayouts -  The bet payout vector.
@@ -1835,41 +1854,42 @@ std::vector<CTxOut> GetCGLottoBetPayouts (int height)
              CAmount winnerPayout = eventFee;
 
  	         LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
-           LogPrintf("Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-           LogPrintf("Winner Address: %u \n", winnerAddress);
-           LogPrintf(" This Lotto was refunded as only one person bought a ticket.\n" );
+ 	         LogPrintf("Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+ 	         LogPrintf("Winner Address: %u \n", winnerAddress);
+ 	         LogPrintf(" This Lotto was refunded as only one person bought a ticket.\n" );
 
              // Only add valid payouts to the vector.
              if (winnerPayout > 0) {
                  vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee);
              }
-         }
-         else if (candidates.size() >= 2) {
-             // Use random number to choose winner.
-             CAmount noOfBets    = candidates.size();
-             CAmount winnerIndex = totalValueOfBlock % noOfBets;
+        }
+        else if (candidates.size() >= 2) {
+            // Use random number to choose winner.
+            CAmount noOfBets    = candidates.size();
+            CAmount winnerIndex = totalValueOfBlock % noOfBets;
 
-             if (winnerIndex > noOfBets) {
-                 winnerIndex = noOfBets;
-             }
+            if (winnerIndex > noOfBets) {
+                winnerIndex = noOfBets;
+            }
 
-             // Split the pot and calculate winnings.
-             std::string winnerAddress = candidates[winnerIndex];
-             CAmount entranceFee = eventFee;
-             CAmount totalPot = (noOfBets*entranceFee);
-             CAmount winnerPayout = totalPot / 10 * 8;
-             CAmount fee = totalPot / 50;
+            // Split the pot and calculate winnings.
+            std::string winnerAddress = candidates[winnerIndex];
+            CAmount entranceFee = eventFee;
+            CAmount totalPot = (noOfBets*entranceFee);
+            CAmount winnerPayout = totalPot / 10 * 8;
+            CAmount fee = totalPot / 50;
 
-   	         LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
-             LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-             LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerIndex);
-             LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
-             LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
+            LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
+            LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+            LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerIndex);
+            LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
+            LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
 
-             // Only add valid payouts to the vector.
-             if (winnerPayout > 0) {
-                 vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee);
-             }
+            // Only add valid payouts to the vector.
+            if (winnerPayout > 0) {
+                vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee);
+                vexpectedCGLottoBetPayouts.emplace_back(fee, GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get()), entranceFee);
+            }
         }
     }
 
