@@ -2284,9 +2284,9 @@ void ListTransactionRecords(const CWalletTx& wtx, const string& strAccount, int 
         entry.push_back(Pair("transactionid", vRec.getTxID()));
         entry.push_back(Pair("outputindex", vRec.getOutputIndex()));
         entry.push_back(Pair("time", vRec.time));
-        entry.push_back(Pair("debit", vRec.debit));
-        entry.push_back(Pair("credit", vRec.credit));
-        entry.push_back(Pair("involvesWatchAddress", vRec.involvesWatchAddress));
+        entry.push_back(Pair("debit", ValueFromAmount(vRec.debit)));
+        entry.push_back(Pair("credit", ValueFromAmount(vRec.credit)));
+        entry.push_back(Pair("involvesWatchonly", vRec.involvesWatchAddress));
 
         if (fLong) {
             if (vRec.statusUpdateNeeded()) vRec.updateStatus(wtx);
@@ -2320,36 +2320,22 @@ UniValue listtransactionrecords(const UniValue& params, bool fHelp)
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
-                "    \"account\":\"accountname\",       (string) The account name associated with the transaction. \n"
-                "                                                It will be \"\" for the default account.\n"
-                "    \"address\":\"ionaddress\",    (string) The ion address of the transaction. Not present for \n"
-                "                                                move transactions (category = move).\n"
-                "    \"category\":\"send|receive|move\", (string) The transaction category. 'move' is a local (off blockchain)\n"
-                "                                                transaction between accounts, and not associated with an address,\n"
-                "                                                transaction id or block. 'send' and 'receive' transactions are \n"
-                "                                                associated with an address, transaction id and block details\n"
-                "    \"amount\": x.xxx,          (numeric) The amount in ION. This is negative for the 'send' category, and for the\n"
-                "                                         'move' category for moves outbound. It is positive for the 'receive' category,\n"
-                "                                         and for the 'move' category for inbound funds.\n"
-                "    \"vout\" : n,               (numeric) the vout value\n"
-                "    \"fee\": x.xxx,             (numeric) The amount of the fee in ION. This is negative and only available for the \n"
-                "                                         'send' category of transactions.\n"
-                "    \"confirmations\": n,       (numeric) The number of confirmations for the transaction. Available for 'send' and \n"
-                "                                         'receive' category of transactions.\n"
-                "    \"bcconfirmations\": n,     (numeric) The number of blockchain confirmations for the transaction. Available for 'send'\n"
-                "                                          and 'receive' category of transactions.\n"
-                "    \"blockhash\": \"hashvalue\", (string) The block hash containing the transaction. Available for 'send' and 'receive'\n"
-                "                                          category of transactions.\n"
-                "    \"blockindex\": n,          (numeric) The block index containing the transaction. Available for 'send' and 'receive'\n"
-                "                                          category of transactions.\n"
-                "    \"txid\": \"transactionid\", (string) The transaction id. Available for 'send' and 'receive' category of transactions.\n"
-                "    \"time\": xxx,              (numeric) The transaction time in seconds since epoch (midnight Jan 1 1970 GMT).\n"
-                "    \"timereceived\": xxx,      (numeric) The time received in seconds since epoch (midnight Jan 1 1970 GMT). Available \n"
-                "                                          for 'send' and 'receive' category of transactions.\n"
-                "    \"comment\": \"...\",       (string) If a comment is associated with the transaction.\n"
-                "    \"otheraccount\": \"accountname\",  (string) For the 'move' category of transactions, the account the funds came \n"
-                "                                          from (for receiving funds, positive amounts), or went to (for sending funds,\n"
-                "                                          negative amounts).\n"
+                "    \"type\" : \"type\",                         (string) The output type.\n"
+                "    \"transactionid\" : \"hash\",                (string) The transaction hash in hex.\n"
+                "    \"outputindex\" : n,                       (numeric) The transaction output index.\n"
+                "    \"time\" : ttt,                            (numeric) The transaction time in seconds since epoch (Jan 1 1970 GMT).\n"
+                "    \"debit\" : x.xxx,                         (numeric) The transaction debit amount. This is negative and only available \n"
+                "                                                 for the 'send' category of transactions.\n"
+                "    \"credit\" : x.xxx,                        (numeric) The transaction debit amount. Available for the 'receive' category \n"
+                "                                                 of transactions.\n"
+                "    \"involvesWatchonly\" : true|false,        (boolean) Only returned if imported addresses were involved in transaction.\n"
+                "    \"depth\" : n,                             (numeric) The depth of the transaction in the blockchain.\n"
+                "    \"status\" : \"status\",                     (string) The transaction status.\n"
+                "    \"countsForBalance\" : true|false,         (boolean) Does the transaction count towards the available balance.\n"
+                "    \"matures_in\" : n,                        (numeric) The number of blocks until the transaction is mature.\n"
+                "    \"open_for\" : n,                          (numeric) The number of blocks that need to be mined before finalization.\n"
+                "    \"cur_num_blocks\" : n,                    (numeric) The current number of blocks.\n"
+                "    \"cur_num_ix_locks\" : n,                  (numeric) When to update transaction for ix locks.\n"
                 "  }\n"
                 "]\n"
 
