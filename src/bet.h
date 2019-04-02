@@ -22,6 +22,12 @@ typedef enum OutcomeType {
     totalUnder    = 0x07
 } OutcomeType;
 
+typedef enum ResultType {
+    push    = 0x01,
+    awayWin = 0x02,
+    homeWin = 0x03,
+} ResultType;
+
 // The supported betting TX types.
 typedef enum BetTxTypes{
     mappingTxType        = 0x01,  // Mapping transaction type identifier.
