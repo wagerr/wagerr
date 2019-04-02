@@ -894,6 +894,97 @@ void SetEventTotalOdds (CPeerlessTotalsEvent totalsEvent) {
     }
 }
 
+
+/**
+ * Updates a peerless event object with total bet accumulators.
+ */
+void SetEventAccummulators (CPeerlessBet plBet, CAmount betAmount) {
+
+    CEventDB edb;
+    eventIndex_t eventsIndex;
+    edb.GetEvents(eventsIndex);
+
+    unsigned int oddsDivisor  = Params().OddsDivisor();
+    unsigned int betXPermille = Params().BetXPermille();
+
+    // Check the events index actually has events
+    if (eventsIndex.size() > 0) {
+
+        CPeerlessEvent pe = eventsIndex.find(plBet.nEventId)->second;
+        CAmount payout = 0 * COIN;
+        CAmount burn = 0;
+        CAmount winnings = 0;
+
+        // Check which outcome the bet was placed on and add to accumulators
+        if (plBet.nOutcome == moneyLineWin){
+            winnings = betAmount * pe.nHomeOdds;
+            burn = (winnings - betAmount * oddsDivisor) * betXPermille / 2000;
+            payout = winnings - burn;
+            pe.nMoneyLineHomePotentialLiability += payout / COIN ;
+            pe.nMoneyLineHomeBets += 1;
+
+        }else if (plBet.nOutcome == moneyLineLose){
+            winnings = betAmount * pe.nAwayOdds;
+            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            payout = winnings - burn;
+            pe.nMoneyLineAwayPotentialLiability += payout / COIN ;
+            pe.nMoneyLineAwayBets += 1;
+
+        }else if (plBet.nOutcome == moneyLineDraw){
+            winnings = betAmount * pe.nDrawOdds;
+            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            payout = winnings - burn;
+            pe.nMoneyLineDrawPotentialLiability += payout / COIN ;
+            pe.nMoneyLineDrawBets += 1;
+
+        }else if (plBet.nOutcome == spreadHome){
+            winnings = betAmount * pe.nSpreadHomeOdds;
+            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            payout = winnings - burn;
+
+            pe.nSpreadHomePotentialLiability += payout / COIN ;
+            pe.nSpreadPushPotentialLiability += betAmount / COIN;
+            pe.nSpreadHomeBets += 1;
+            pe.nSpreadPushBets += 1;
+
+        }else if (plBet.nOutcome == spreadAway){
+            winnings = betAmount * pe.nSpreadAwayOdds;
+            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            payout = winnings - burn;
+
+            pe.nSpreadAwayPotentialLiability += payout / COIN ;
+            pe.nSpreadPushPotentialLiability += betAmount / COIN;
+            pe.nSpreadAwayBets += 1;
+            pe.nSpreadPushBets += 1;
+
+        }else if (plBet.nOutcome == totalOver){
+            winnings = betAmount * pe.nTotalOverOdds;
+            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            payout = winnings - burn;
+
+            pe.nTotalOverPotentialLiability += payout / COIN ;
+            pe.nTotalPushPotentialLiability += betAmount / COIN;
+            pe.nTotalOverBets += 1;
+            pe.nTotalPushBets += 1;
+
+        }else if (plBet.nOutcome == totalUnder){
+            winnings = betAmount * pe.nTotalUnderOdds;
+            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            payout = winnings - burn;
+
+            pe.nTotalUnderPotentialLiability += payout / COIN;
+            pe.nTotalPushPotentialLiability += betAmount / COIN;
+            pe.nTotalUnderBets += 1;
+            pe.nTotalPushBets += 1;
+
+        }
+
+        eventsIndex[plBet.nEventId] = pe;
+        CEventDB::SetEvents(eventsIndex);
+    }
+
+}
+
 /**
  * Split a CMapping OpCode string into byte components and store in CMapping object.
  *

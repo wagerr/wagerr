@@ -4652,6 +4652,24 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
         const CTxIn &txin = tx.vin[0];
         bool validOracleTx = IsValidOracleTx(txin);
 
+        // Search for any new bets
+        for (unsigned int i = 0; i < tx.vout.size(); i++) {
+            const CTxOut& txout = tx.vout[i];
+            std::string s = txout.scriptPubKey.ToString();
+
+            if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+                vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
+                 std::string opCode(v.begin(), v.end());
+
+                CPeerlessBet plBet;
+                if (CPeerlessBet::FromOpCode(opCode, plBet)) {
+                    CAmount betAmount = txout.nValue;
+                    SetEventAccummulators(plBet, betAmount);
+                    eiUpdated = true;
+                }
+            }
+        }
+
         // If a valid OMNO transaction.
         if (validOracleTx) {
 

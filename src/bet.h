@@ -85,6 +85,24 @@ public:
     uint32_t nTotalPoints;
     uint32_t nTotalOverOdds;
     uint32_t nTotalUnderOdds;
+    uint32_t nMoneyLineHomePotentialLiability;
+    uint32_t nMoneyLineAwayPotentialLiability;
+    uint32_t nMoneyLineDrawPotentialLiability;
+    uint32_t nSpreadHomePotentialLiability;
+    uint32_t nSpreadAwayPotentialLiability;
+    uint32_t nSpreadPushPotentialLiability;
+    uint32_t nTotalOverPotentialLiability;
+    uint32_t nTotalUnderPotentialLiability;
+    uint32_t nTotalPushPotentialLiability;
+    uint32_t nMoneyLineHomeBets;
+    uint32_t nMoneyLineAwayBets;
+    uint32_t nMoneyLineDrawBets;
+    uint32_t nSpreadHomeBets;
+    uint32_t nSpreadAwayBets;
+    uint32_t nSpreadPushBets;
+    uint32_t nTotalOverBets;
+    uint32_t nTotalUnderBets;
+    uint32_t nTotalPushBets;
 
     // Default Constructor.
     CPeerlessEvent() {}
@@ -114,6 +132,24 @@ public:
         READWRITE(nTotalPoints);
         READWRITE(nTotalOverOdds);
         READWRITE(nTotalUnderOdds);
+        READWRITE(nMoneyLineHomePotentialLiability);
+        READWRITE(nMoneyLineAwayPotentialLiability);
+        READWRITE(nMoneyLineDrawPotentialLiability);
+        READWRITE(nSpreadHomePotentialLiability);
+        READWRITE(nSpreadAwayPotentialLiability);
+        READWRITE(nSpreadPushPotentialLiability);
+        READWRITE(nTotalOverPotentialLiability);
+        READWRITE(nTotalUnderPotentialLiability);
+        READWRITE(nTotalPushPotentialLiability);
+        READWRITE(nMoneyLineHomeBets);
+        READWRITE(nMoneyLineAwayBets);
+        READWRITE(nMoneyLineDrawBets);     
+        READWRITE(nSpreadHomeBets);
+        READWRITE(nSpreadAwayBets);
+        READWRITE(nSpreadPushBets);
+        READWRITE(nTotalOverBets);
+        READWRITE(nTotalUnderBets); 
+        READWRITE(nTotalPushBets);
     }
 };
 
@@ -370,5 +406,8 @@ void SetEventTotalOdds(CPeerlessTotalsEvent tEventOdds);
 
 /** Set a peerless event money line odds **/
 void SetEventMLOdds(CPeerlessUpdateOdds mEventOdds);
+
+/** Set a peerless event accumulators **/
+void SetEventAccummulators (CPeerlessBet plBet, CAmount betAmount);
 
 #endif // WAGERR_BET_H

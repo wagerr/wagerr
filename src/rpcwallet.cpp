@@ -1016,6 +1016,126 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     return obj;
 }
 
+/**
+ * Get total liability for each event that is currently active.
+ *
+ * @param params The RPC params consisting of the event id.
+ * @param fHelp  Help text
+ * @return
+ */
+UniValue geteventsliability(const UniValue& params, bool fHelp)
+{
+  if (fHelp || (params.size() <= 1))
+        throw runtime_error(
+            "geteventsliability\n"
+            "Return the payout of each event.\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"name\": \"xxx\",         (string) The event ID\n"
+            "    \"event-id\": \"xxx\",       (string) The name of the event\n"
+            "    \"moneyline-home-payout\": \"xxx\",\n"
+            "    \"moneyline-away-payout\": n,\n"
+            "    \"moneyline-draw-payout\": n,\n"
+            "    \"spread-over-payout\": n,\n"
+            "    \"spread-under-payout\": n,\n"
+            "    \"spread-push-payout\": n,\n"
+            "    \"totals-over-payout\": n,\n"
+            "    \"totals-under-payout\": n,\n"
+            "    \"totals-push-payout\": n,\n"
+            "    ]\n"
+            "  }\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("geteventtotals", "") + HelpExampleRpc("geteventtotals", ""));
+
+    CEventDB edb;
+    eventIndex_t eventsIndex;
+    edb.GetEvents(eventsIndex);
+
+    // Check the events index actually has events,
+    if (eventsIndex.size() < 1) {
+        throw runtime_error("Currently no events to list.");
+    } 
+
+    int payoutThreshold = params[0].get_int();
+    int betThreshold = params[1].get_int();
+
+    UniValue ret(UniValue::VARR);
+
+    map<uint32_t, CPeerlessEvent>::iterator it;
+    for (it = eventsIndex.begin(); it != eventsIndex.end(); it++) {
+
+        CPeerlessEvent plEvent = it->second;
+
+        UniValue event(UniValue::VOBJ);
+        event.push_back(Pair("event-id", (int) plEvent.nEventId));
+
+        // Return potential moneyline payouts if each outcome is still open for betting
+        if (plEvent.nHomeOdds != 0 && (int) plEvent.nMoneyLineHomePotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("moneyline-home-liability", (int) plEvent.nMoneyLineHomePotentialLiability ));
+        }
+
+        if (plEvent.nAwayOdds != 0 && (int) plEvent.nMoneyLineAwayPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("moneyline-away-liability", (int) plEvent.nMoneyLineAwayPotentialLiability));
+        }
+
+        if (plEvent.nDrawOdds != 0 && (int) plEvent.nMoneyLineDrawPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("moneyline-draw-liability", (int) plEvent.nMoneyLineDrawPotentialLiability));
+        }
+
+        // Return potential spread payouts if each outcome is still open for betting
+        if (plEvent.nSpreadHomeOdds != 0 && (int) plEvent.nSpreadHomePotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("spreads-home-liability", (int) plEvent.nSpreadHomePotentialLiability));
+        }
+
+        if (plEvent.nSpreadAwayOdds != 0 && (int) plEvent.nSpreadAwayPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("spreads-away-liability", (int) plEvent.nSpreadAwayPotentialLiability));
+        }
+
+        if ( (int) plEvent.nSpreadPushPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("spreads-push-liability", (int) plEvent.nSpreadPushPotentialLiability));
+        }
+
+        // Return potential totals payouts if each outcome is still open for betting
+        if (plEvent.nTotalOverOdds != 0 && (int) plEvent.nTotalOverPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("total-over-liability", (int) plEvent.nTotalOverPotentialLiability));
+        }
+
+        if (plEvent.nTotalUnderOdds != 0 && (int) plEvent.nTotalUnderPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("total-under-liability", (int) plEvent.nTotalUnderPotentialLiability));
+        }
+
+        if ( (int) plEvent.nTotalPushPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("total-push-liability", (int) plEvent.nTotalPushPotentialLiability));
+        }
+
+        // Find the moneyline event with the most amount of bets and add it to total push bets to find total number potential bets to be payed out
+        int moneylineTotalBets[] = {(int) plEvent.nMoneyLineHomeBets , (int) plEvent.nMoneyLineAwayBets, (int) plEvent.nMoneyLineDrawBets};
+        int highestMoneyLine = 0;
+
+        for (int n=0; n<3; n++ )
+        {
+            if (moneylineTotalBets[n] > highestMoneyLine){
+                highestMoneyLine = moneylineTotalBets[n];
+            }
+        }
+
+        int betCount = highestMoneyLine + (int) plEvent.nSpreadPushBets + (int) plEvent.nTotalPushBets;
+
+        event.push_back(Pair("event-bet-count", betCount));
+
+        if (event.size() > 2 || betCount >= betThreshold) {
+            ret.push_back(event);
+        } 
+
+    }
+
+    return ret;
+}
+
 UniValue sendtoaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
