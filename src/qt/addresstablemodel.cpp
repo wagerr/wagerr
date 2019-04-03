@@ -219,6 +219,10 @@ int AddressTableModel::columnCount(const QModelIndex& parent) const
     return columns.length();
 }
 
+int AddressTableModel::size() const{
+    return priv->size();
+}
+
 QVariant AddressTableModel::data(const QModelIndex& index, int role) const
 {
     if (!index.isValid())
