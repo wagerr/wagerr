@@ -172,6 +172,15 @@ public:
 
     SendCoinsReturn placeBet(WalletModelTransaction& transaction, CAmount amount, const std::string& eventId, const std::string& teamToWin);
 
+    bool convertBackZwgr(
+            CAmount value,
+            vector<CZerocoinMint> &vMintsSelected,
+            bool fMintChange,
+            bool fMinimizeChange,
+            CZerocoinSpendReceipt &receipt,
+            CBitcoinAddress addressTo
+    );
+
     // Wallet encryption
     bool setWalletEncrypted(bool encrypted, const SecureString& passphrase);
     // Passphrase only needed when unlocking
