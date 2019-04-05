@@ -487,6 +487,34 @@ WalletModel::SendCoinsReturn WalletModel::placeBet(WalletModelTransaction& trans
     return SendCoinsReturn(OK);
 }
 
+bool WalletModel::convertBackZwgr(
+        CAmount value,
+        vector<CZerocoinMint> &vMintsSelected,
+        bool fMintChange,
+        bool fMinimizeChange,
+        CZerocoinSpendReceipt &receipt,
+        CBitcoinAddress addressTo
+){
+
+    // address to must be from us.
+    if(!isMine(addressTo)){
+        receipt.SetStatus(_("To convert zWGR back to WGR the return address must be from your wallet"), ZWGR_SPEND_ERROR);
+        return false;
+    }
+
+    CWalletTx wtxNew;
+    return wallet->SpendZerocoin(
+            value,
+            100,
+            wtxNew,
+            receipt,
+            vMintsSelected,
+            fMintChange,
+            fMinimizeChange,
+            &addressTo
+    );
+}
+
 OptionsModel* WalletModel::getOptionsModel()
 {
     return optionsModel;
