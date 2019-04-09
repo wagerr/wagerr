@@ -246,6 +246,14 @@ void PrepareShutdown()
     if (!mtodb.Write(tournamentsIndex, lastBlockHash))
         LogPrintf("Failed to write to the tournaments.dat\n");
 
+    // Write the results index to results.dat.
+    CResultDB rdb;
+    resultsIndex_t resultsIndex;
+    rdb.GetResults(resultsIndex);
+
+    if (!rdb.Write(resultsIndex, lastBlockHash))
+        LogPrintf("Failed to write to the results.dat\n");
+
     /// Note: Shutdown() must be able to handle cases in which AppInit2() failed part of the way,
     /// for example if the data directory was found to be locked.
     /// Be sure that anything that writes files or flushes caches only does this if the respective
@@ -1213,6 +1221,7 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
             filesystem::path roundsDat = GetDataDir() / "rounds.dat";
             filesystem::path teamsDat = GetDataDir() / "teams.dat";
             filesystem::path tournamentsDat = GetDataDir() / "tournaments.dat";
+            filesystem::path resultsDat = GetDataDir() / "results.dat";
 
             LogPrintf("Deleting blockchain folders blocks, chainstate, sporks and zerocoin\n");
             // We delete in 4 individual steps in case one of the folder is missing already
@@ -1261,6 +1270,11 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                 if (filesystem::exists(tournamentsDat)) {
                     boost::filesystem::remove(tournamentsDat);
                     LogPrintf("-resync: file deleted: %s\n", tournamentsDat.string().c_str());
+                }
+
+                if (filesystem::exists(resultsDat)) {
+                    boost::filesystem::remove(resultsDat);
+                    LogPrintf("-resync: file deleted: %s\n", resultsDat.string().c_str());
                 }
 
             } catch (boost::filesystem::filesystem_error& error) {
@@ -1559,6 +1573,15 @@ bool AppInit2(boost::thread_group& threadGroup, CScheduler& scheduler)
                     LogPrintf("Invalid or missing tournaments.dat; recreating\n");
 
                 cmTournamentsDb.SetTournaments(tournamentsIndex);
+
+                // Load up the results from the results.dat.
+                CResultDB rdb;
+                resultsIndex_t resultsIndex;
+                uint256 resultsLastBlockHash;
+                if (!rdb.Read(resultsIndex, resultsLastBlockHash))
+                    LogPrintf("Invalid or missing results.dat; recreating\n");
+
+                rdb.SetResults(resultsIndex);
 
                 if (fReindex)
                     pblocktree->WriteReindexing(true);

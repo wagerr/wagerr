@@ -22,6 +22,7 @@ typedef enum OutcomeType {
     totalUnder    = 0x07
 } OutcomeType;
 
+// The supported result types
 typedef enum ResultType {
     push    = 0x01,
     awayWin = 0x02,
@@ -151,9 +152,6 @@ public:
     }
 };
 
-// Define new map type to store Wagerr events.
-typedef std::map<uint32_t, CPeerlessEvent> eventIndex_t;
-
 class CPeerlessBet
 {
 public:
@@ -177,6 +175,8 @@ public:
 class CPeerlessResult
 {
 public:
+    int nVersion;
+
     uint32_t nEventId;
     uint32_t nHomeScore;
     uint32_t nAwayScore;
@@ -188,13 +188,24 @@ public:
     // Parametrized Constructor.
     CPeerlessResult(int eventId, int pHomeScore, int pAwayScore)
     {
-        nEventId        = eventId;
-        nHomeScore      = pHomeScore;
-        nAwayScore      = pAwayScore;
+        nEventId   = eventId;
+        nHomeScore = pHomeScore;
+        nAwayScore = pAwayScore;
     }
 
     static bool ToOpCode(CPeerlessResult pr, std::string &opCode);
     static bool FromOpCode(std::string opCode, CPeerlessResult &pr);
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(this->nVersion);
+        nVersion = this->nVersion;
+        READWRITE(nEventId);
+        READWRITE(nHomeScore);
+        READWRITE(nAwayScore);
+    }
 };
 
 class CPeerlessUpdateOdds
@@ -359,6 +370,9 @@ public:
     static void AddTournament(CMapping ts);
 };
 
+// Define new map type to store Wagerr events.
+typedef std::map<uint32_t, CPeerlessEvent> eventIndex_t;
+
 class CEventDB
 {
 protected:
@@ -380,7 +394,34 @@ public:
     static void SetEvents(const eventIndex_t &eventIndex);
 
     static void AddEvent(CPeerlessEvent pe);
-    static void RemoveEvent(CPeerlessEvent pe);
+    static void RemoveEvent(CPeerlessResult pr);
+};
+
+// Define new map type to store Wagerr results.
+typedef std::map<uint32_t, CPeerlessResult> resultsIndex_t;
+
+class CResultDB
+{
+protected:
+    // Global variable that stores the Wagerr results.
+    static resultsIndex_t resultsIndex;
+    static CCriticalSection cs_setResults;
+
+private:
+    boost::filesystem::path pathResults;
+
+public:
+    // Default constructor.
+    CResultDB();
+
+    bool Write(const resultsIndex_t& resultsIndex,  uint256 latestProcessedBlock);
+    bool Read(resultsIndex_t& resultsIndex, uint256& lastBlockHash);
+
+    static void GetResults(resultsIndex_t &resultsIndex);
+    static void SetResults(const resultsIndex_t &resultsIndex);
+
+    static void AddResult(CPeerlessResult pe);
+    static void RemoveResult(CPeerlessResult pe);
 };
 
 /** Find peerless events. **/

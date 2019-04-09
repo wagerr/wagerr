@@ -4691,10 +4691,11 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                         eiUpdated = true;
                     }
 
-                    // If results found in block remove event from event index.
+                    // If results found in block remove event from event index and add result to result index.
                     CPeerlessResult plResult;
                     if (CPeerlessResult::FromOpCode(opCode, plResult)) {
-                        CEventDB::RemoveEvent(plEvent);
+                        CEventDB::RemoveEvent(plResult);
+                        CResultDB::AddResult(plResult);
                         eiUpdated = true;
                     }
 
@@ -4754,12 +4755,19 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                 }
             }
 
-            // Write event index to events.dat file only if it has been updated.
+            // Write event and result indexes to events.dat and results.dat respectively.
             if (eiUpdated) {
+                // Update the global event index.
                 CEventDB edb;
                 eventIndex_t eventIndex;
                 edb.GetEvents(eventIndex);
                 edb.Write(eventIndex, block.GetHash());
+
+                // Update the global results index.
+                CResultDB rdb;
+                resultsIndex_t resultsIndex;
+                rdb.GetResults(resultsIndex);
+                rdb.Write(resultsIndex, block.GetHash());
             }
         }
     }

@@ -125,10 +125,10 @@ UniValue listevents(const UniValue& params, bool fHelp)
                 continue;
             }
 
-            //std::string round      = roundsIndex.find(plEvent.nStage)->second.sName;
+            //std::string round    = roundsIndex.find(plEvent.nStage)->second.sName;
             std::string tournament = tournamentsIndex.find(plEvent.nTournament)->second.sName;
-            std::string homeTeam = teamsIndex.find(plEvent.nHomeTeam)->second.sName;
-            std::string awayTeam = teamsIndex.find(plEvent.nAwayTeam)->second.sName;
+            std::string homeTeam   = teamsIndex.find(plEvent.nHomeTeam)->second.sName;
+            std::string awayTeam   = teamsIndex.find(plEvent.nAwayTeam)->second.sName;
 
             UniValue evt(UniValue::VOBJ);
 
@@ -328,10 +328,58 @@ UniValue listbets(const UniValue& params, bool fHelp)
                         entry.push_back(Pair("event-id", (uint64_t) plBet.nEventId));
                         entry.push_back(Pair("team-to-win", (uint64_t) plBet.nOutcome));
                         entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+
+                        // Check if the users bet has a result posted, if so check to see it its a winning or losing bet.
+                        CResultDB rdb;
+                        resultsIndex_t resultsIndex;
+                        rdb.GetResults(resultsIndex);
+
+                        if (resultsIndex.size() > 0) {
+                            std:string betResult = "pending";
+
+                            if (resultsIndex.count(plBet.nEventId)) {
+                                CPeerlessResult plResult = resultsIndex.find(plBet.nEventId)->second;
+
+                                switch (plBet.nOutcome) {
+                                    case OutcomeType::moneyLineWin:
+                                        betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
+
+                                        break;
+                                    case OutcomeType::moneyLineLose:
+                                        betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
+
+                                        break;
+                                    case OutcomeType::moneyLineDraw :
+                                        betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
+
+                                        break;
+                                    case OutcomeType::spreadHome:
+                                        betResult = "Check block explorer for result.";
+
+                                        break;
+                                    case OutcomeType::spreadAway:
+                                        betResult = "Check block explorer for result.";
+
+                                        break;
+                                    case OutcomeType::totalOver:
+                                        betResult = "Check block explorer for result.";
+
+                                        break;
+                                    case OutcomeType::totalUnder:
+                                        betResult = "Check block explorer for result.";
+
+                                        break;
+                                    default :
+                                        LogPrintf("Invalid bet outcome");
+                                }
+                            }
+
+                            entry.push_back(Pair("result", betResult));
+                        }
+
                         ret.push_back(entry);
                     }
                 }
-
             }
         }
 

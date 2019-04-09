@@ -1363,10 +1363,13 @@ void CEventDB::AddEvent(CPeerlessEvent pe)
  *
  * @param pe
  */
-void CEventDB::RemoveEvent(CPeerlessEvent pe)
+void CEventDB::RemoveEvent(CPeerlessResult pr)
 {
     LOCK(cs_setEvents);
-    eventsIndex.erase(pe.nEventId);
+
+    if (eventsIndex.count(pr.nEventId)) {
+        eventsIndex.erase(pr.nEventId);
+    }
 }
 
 /**
@@ -1466,6 +1469,176 @@ bool CEventDB::Read(eventIndex_t& eventIndex, uint256& lastBlockHash)
     try {
         ssEvents >> lastBlockHash;
         ssEvents >> eventIndex;
+    }
+    catch (std::exception& e) {
+        return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+    }
+
+    return true;
+}
+
+
+/**
+ * Constructor for the results database object.
+ */
+CResultDB::CResultDB()
+{
+    pathResults = GetDataDir() / "results.dat";
+}
+
+/** The global results index. **/
+resultsIndex_t CResultDB::resultsIndex;
+CCriticalSection CResultDB::cs_setResults;
+
+/**
+ * Returns the current results.
+ *
+ * @param resultsIndex
+ */
+void CResultDB::GetResults(resultsIndex_t &resultIndex)
+{
+    LOCK(cs_setResults);
+    resultIndex = resultsIndex;
+}
+
+/**
+ * Set the results list.
+ *
+ * @param resultsIndex
+ */
+void CResultDB::SetResults(const resultsIndex_t &resultIndex)
+{
+    LOCK(cs_setResults);
+    resultsIndex = resultIndex;
+}
+
+/**
+ * Add a new result to the result index.
+ *
+ * @param pr CPeerlessResult object.
+ */
+void CResultDB::AddResult(CPeerlessResult pr)
+{
+    // If result already exists then update it
+    if (resultsIndex.count(pr.nEventId) > 0) {
+        resultsIndex[pr.nEventId] = pr;
+        CResultDB::SetResults(resultsIndex);
+    }
+    // Else save the new result.
+    else {
+        LOCK(cs_setResults);
+        resultsIndex.insert(make_pair(pr.nEventId, pr));
+    }
+}
+
+/**
+ * Remove and event from the event index.
+ *
+ * @param pe
+ */
+void CResultDB::RemoveResult(CPeerlessResult pr)
+{
+    LOCK(cs_setResults);
+    resultsIndex.erase(pr.nEventId);
+}
+
+/**
+ * Serialises the event index map into binary format and writes to the events.dat file.
+ *
+ * @param eventIndex       The events index map which contains the current live events.
+ * @param latestBlockHash  The latest block hash which we can use a reference as to when data was last saved to the file.
+ * @return                 Bool
+ */
+bool CResultDB::Write(const resultsIndex_t& resultsIndex, uint256 latestBlockHash)
+{
+    // Generate random temporary filename.
+    unsigned short randv = 0;
+    GetRandBytes((unsigned char*)&randv, sizeof(randv));
+    std::string tmpfn = strprintf("results.dat.%04x", randv);
+
+    // Serialize event index object and latest block hash as a reference.
+    CDataStream ssResults(SER_DISK, CLIENT_VERSION);
+    ssResults << latestBlockHash;
+    ssResults << resultsIndex;
+
+    // Checksum added for verification purposes.
+    uint256 hash = Hash(ssResults.begin(), ssResults.end());
+    ssResults << hash;
+
+    // Open output file, and associate with CAutoFile.
+    boost::filesystem::path pathTemp = GetDataDir() / tmpfn;
+    FILE* file = fopen(pathTemp.string().c_str(), "wb");
+    CAutoFile fileout(file, SER_DISK, CLIENT_VERSION);
+
+    if (fileout.IsNull())
+        return error("%s : Failed to open file %s", __func__, pathTemp.string());
+
+    // Write and commit data.
+    try {
+        fileout << ssResults;
+    }
+    catch (std::exception& e) {
+        return error("%s : Serialize or I/O error - %s", __func__, e.what());
+    }
+
+    FileCommit(fileout.Get());
+    fileout.fclose();
+
+    // Replace existing events.dat, if any, with new events.dat.XXXX
+    if (!RenameOver(pathTemp, pathResults))
+        return error("%s: Rename-into-place failed", __func__);
+
+    return true;
+}
+
+/**
+ * Reads the events.dat file and deserializes the data to recreate event index map object as well as the last
+ * block hash before file was written to.
+ *
+ * @param eventIndex The event index map which will be populated with data from the file.
+ * @return           Bool
+ */
+bool CResultDB::Read(resultsIndex_t& resultsIndex, uint256& lastBlockHash)
+{
+    // Open input file, and associate with CAutoFile.
+    FILE* file = fopen(pathResults.string().c_str(), "rb");
+    CAutoFile filein(file, SER_DISK, CLIENT_VERSION);
+
+    if (filein.IsNull())
+        return error("%s : Failed to open file %s", __func__, pathResults.string());
+
+    // Use file size to size memory buffer.
+    uint64_t fileSize = boost::filesystem::file_size(pathResults);
+    uint64_t dataSize = fileSize - sizeof(uint256);
+
+    // Don't try to resize to a negative number if file is small.
+    if (fileSize >= sizeof(uint256))
+        dataSize = fileSize - sizeof(uint256);
+
+    vector<unsigned char> vchData;
+    vchData.resize(dataSize);
+    uint256 hashIn;
+
+    // Read data and checksum from file.
+    try {
+        filein.read((char*)&vchData[0], dataSize);
+        filein >> hashIn;
+    }
+    catch (std::exception& e) {
+        return error("%s : Deserialize or I/O error - %s", __func__, e.what());
+    }
+
+    filein.fclose();
+    CDataStream ssResults(vchData, SER_DISK, CLIENT_VERSION);
+
+    // Verify stored checksum matches input data.
+    uint256 hashTmp = Hash(ssResults.begin(), ssResults.end());
+    if (hashIn != hashTmp)
+        return error("%s : Checksum mismatch, data corrupted", __func__);
+
+    try {
+        ssResults >> lastBlockHash;
+        ssResults >> resultsIndex;
     }
     catch (std::exception& e) {
         return error("%s : Deserialize or I/O error - %s", __func__, e.what());
