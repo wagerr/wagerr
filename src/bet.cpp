@@ -15,7 +15,7 @@
 // String lengths for all currently supported op codes.
 #define PE_OP_STRLEN  74
 #define PB_OP_STRLEN  16
-#define PR_OP_STRLEN  22
+#define PR_OP_STRLEN  24
 #define PUO_OP_STRLEN 38
 #define CGE_OP_STRLEN 14
 #define CGB_OP_STRLEN 10
@@ -23,8 +23,6 @@
 #define PSE_OP_STRLEN 34
 #define PTE_OP_STRLEN 34
 
-#define REFUND_HOME_SCORE 0
-#define REFUND_AWAY_SCORE 43931
 
 /**
  * Validate the transaction to ensure it has been posted by an oracle node.
@@ -257,6 +255,19 @@ uint32_t FromChars(unsigned char a, unsigned char b)
 }
 
 /**
+ * Convert the hex chars for 1 byte of opCode into uint32_t integer value.
+ *
+ * @param a First hex char
+ * @return  32 bit unsigned integer
+ */
+uint32_t FromChars(unsigned char a)
+{
+    uint32_t n = a;
+
+    return n;
+}
+
+/**
  * Convert a unsigned 32 bit integer into its hex equivalent with the
  * amount of zero padding given as argument length.
  *
@@ -463,8 +474,9 @@ bool CPeerlessResult::FromOpCode(std::string opCode, CPeerlessResult &pr)
     }
 
     pr.nEventId         = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
-    pr.nHomeScore       = FromChars (opCode[7], opCode[8]);
-    pr.nAwayScore       = FromChars (opCode[9], opCode[10]);
+    pr.nResultType      = FromChars (opCode[7]);
+    pr.nHomeScore       = FromChars (opCode[8], opCode[9]);
+    pr.nAwayScore       = FromChars (opCode[10], opCode[11]);
 
     return true;
 }
@@ -1854,35 +1866,35 @@ std::vector<CTxOut> GetBetPayouts(int height)
                             UpdateSpreads = true;
 
                             if (pse.nPoints == nSpreadsDifference ) {
-                                nSpreadsWinner = ResultType::push;
+                                nSpreadsWinner = WinnerType::push;
                             }
                             else if (HomeFavorite){
                                 if (pse.nPoints > nSpreadsDifference) {
-                                    nSpreadsWinner = ResultType::awayWin;
+                                    nSpreadsWinner = WinnerType::awayWin;
                                 }
                                 else{
-                                    nSpreadsWinner = ResultType::homeWin;
+                                    nSpreadsWinner = WinnerType::homeWin;
                                 }
                             }
                             else {
                                 if (pse.nPoints < nSpreadsDifference) {
-                                    nSpreadsWinner = ResultType::awayWin;
+                                    nSpreadsWinner = WinnerType::awayWin;
                                 }
                                 else {
-                                    nSpreadsWinner = ResultType::homeWin;
+                                    nSpreadsWinner = WinnerType::homeWin;
                                 }
                             }
 
                             // If current event ID matches result ID set the temp odds.
-                            if (result.nEventId == pse.nEventId && nSpreadsWinner == ResultType::push) {
+                            if (result.nEventId == pse.nEventId && nSpreadsWinner == WinnerType::push) {
                                 nTempSpreadsOdds = Params().OddsDivisor();
                             }
 
-                            else if (result.nEventId == pse.nEventId && nSpreadsWinner == ResultType::awayWin) {
+                            else if (result.nEventId == pse.nEventId && nSpreadsWinner == WinnerType::awayWin) {
                                 nTempSpreadsOdds = pse.nAwayOdds;
                             }
 
-                            else if (result.nEventId == pse.nEventId && nSpreadsWinner == ResultType::homeWin) {
+                            else if (result.nEventId == pse.nEventId && nSpreadsWinner == WinnerType::homeWin) {
                                 nTempSpreadsOdds = pse.nHomeOdds;
                             }
                         }
@@ -1896,23 +1908,23 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
                             // Find totals outcome (result).
                             if (pte.nPoints == nTotalsPoints) {
-                                nTotalsWinner = ResultType::push;
+                                nTotalsWinner = WinnerType::push;
                             }
                             else if (pte.nPoints > nTotalsPoints) {
-                                nTotalsWinner = ResultType::awayWin;
+                                nTotalsWinner = WinnerType::awayWin;
                             }
                             else {
-                                nTotalsWinner = ResultType::homeWin;
+                                nTotalsWinner = WinnerType::homeWin;
                             }
 
                             // If current event ID matches result ID set the temp odds.
-                            if (result.nEventId == pte.nEventId && nTotalsWinner == ResultType::push) {
+                            if (result.nEventId == pte.nEventId && nTotalsWinner == WinnerType::push) {
                                 nTempTotalsOdds = Params().OddsDivisor();
                             }
-                            else if (result.nEventId == pte.nEventId && nTotalsWinner == ResultType::awayWin) {
+                            else if (result.nEventId == pte.nEventId && nTotalsWinner == WinnerType::awayWin) {
                                 nTempTotalsOdds = pte.nUnderOdds;
                             }
-                            else if (result.nEventId == pte.nEventId && nTotalsWinner == ResultType::homeWin) {
+                            else if (result.nEventId == pte.nEventId && nTotalsWinner == WinnerType::homeWin) {
                                 nTempTotalsOdds = pte.nOverOdds;
                             }
                         }
@@ -1936,7 +1948,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
                                     CAmount winnings = 0;
 
                                     // If bet payout result.
-                                    if (result.nHomeScore != REFUND_HOME_SCORE && result.nAwayScore != REFUND_AWAY_SCORE ) {
+                                    if (result.nResultType ==  ResultType::standardResult) {
 
                                         // Calculate winnings.
                                         if (pb.nOutcome == nMoneylineResult) {
@@ -1958,7 +1970,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
                                         }
                                     }
                                     // Bet refund result.
-                                    else{
+                                    else if (result.nResultType ==  ResultType::eventRefund){
                                         payout = betAmount;
                                     }
 
@@ -2005,19 +2017,19 @@ std::vector<CTxOut> GetBetPayouts(int height)
                 vSpreadsResult.clear();
 
                 //Depending on the calculations above we populate the winner vector (push/away/home)
-                if (nSpreadsWinner == 1 ) {
+                if (nSpreadsWinner == WinnerType::homeWin) {
                     vSpreadsResult.emplace_back(spreadHome);
+                    vSpreadsResult.emplace_back(spreadHome);
+                }
+
+                else if (nSpreadsWinner == WinnerType::awayWin) {
+                    vSpreadsResult.emplace_back(spreadAway);
                     vSpreadsResult.emplace_back(spreadAway);
                 }
 
-                else if (nSpreadsWinner == 2) {
-                    vSpreadsResult.emplace_back(spreadAway);
-                    vSpreadsResult.emplace_back(spreadAway);
-                }
-
-                else if (nSpreadsWinner == 3) {
+                else if (nSpreadsWinner == WinnerType::push) {
                     vSpreadsResult.emplace_back(spreadHome);
-                    vSpreadsResult.emplace_back(spreadHome);
+                    vSpreadsResult.emplace_back(spreadAway);
                 }
 
                 nSpreadsWinner = 0;
@@ -2029,17 +2041,19 @@ std::vector<CTxOut> GetBetPayouts(int height)
                 nTotalsOdds = nTempTotalsOdds;
                 vTotalsResult.clear();
 
-                if (nTotalsWinner == 1) {
+                if (nTotalsWinner == WinnerType::homeWin) {
                     vTotalsResult.emplace_back(totalOver);
+                    vTotalsResult.emplace_back(totalOver);
+                }
+
+                else if (nTotalsWinner == WinnerType::awayWin) {
+                    vTotalsResult.emplace_back(totalUnder);
                     vTotalsResult.emplace_back(totalUnder);
                 }
-                else if (nTotalsWinner == 2) {
-                    vTotalsResult.emplace_back(totalUnder);
-                    vTotalsResult.emplace_back(totalUnder);
-                }
-                else if (nTotalsWinner == 3) {
+
+                else if (nTotalsWinner == WinnerType::push) {
                     vTotalsResult.emplace_back(totalOver);
-                    vTotalsResult.emplace_back(totalOver);
+                    vTotalsResult.emplace_back(totalUnder);
                 }
                 nTotalsWinner = 0;
             }

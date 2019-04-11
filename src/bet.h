@@ -24,10 +24,19 @@ typedef enum OutcomeType {
 
 // The supported result types
 typedef enum ResultType {
-    push    = 0x01,
-    awayWin = 0x02,
-    homeWin = 0x03,
+    standardResult = 0x01,
+    eventRefund    = 0x02,
+    mlRefund       = 0x03,
+    spreadsRefund  = 0x04,
+    totalsRefund   = 0x05,
 } ResultType;
+
+// The supported result types
+typedef enum WinnerType {
+    homeWin = 0x01,
+    awayWin = 0x02,
+    push    = 0x03,
+} WinnerType;
 
 // The supported betting TX types.
 typedef enum BetTxTypes{
@@ -178,6 +187,7 @@ public:
     int nVersion;
 
     uint32_t nEventId;
+    uint32_t nResultType;
     uint32_t nHomeScore;
     uint32_t nAwayScore;
 
@@ -186,11 +196,12 @@ public:
     CPeerlessResult() {}
 
     // Parametrized Constructor.
-    CPeerlessResult(int eventId, int pHomeScore, int pAwayScore)
+    CPeerlessResult(int eventId, int pResultType, int pHomeScore, int pAwayScore)
     {
-        nEventId   = eventId;
-        nHomeScore = pHomeScore;
-        nAwayScore = pAwayScore;
+        nEventId    = eventId;
+        nResultType = pResultType;
+        nHomeScore  = pHomeScore;
+        nAwayScore  = pAwayScore;
     }
 
     static bool ToOpCode(CPeerlessResult pr, std::string &opCode);
@@ -203,6 +214,7 @@ public:
         READWRITE(this->nVersion);
         nVersion = this->nVersion;
         READWRITE(nEventId);
+        READWRITE(nResultType);
         READWRITE(nHomeScore);
         READWRITE(nAwayScore);
     }
