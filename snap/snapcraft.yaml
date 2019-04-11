@@ -1,44 +1,89 @@
 # Copyright (c) 2018-2019 The Ion developers
 # Copyright (c) 2018-2019 The Wagerr developers
+# Copyright (c) 2019 The OBSR developers
 name: wagerr
-version: master
-summary:   peer-to-peer network based digital currency
+base: core18
+version: 2.0.99
+summary:   wagerr, digital currency for decentralized betting
 description: |
-  Wagerr is a free open source peer-to-peer electronic cash system that
-  is completely decentralized, without the need for a central server or
-  trusted parties.  Users hold the crypto keys to their own money and
-  transact directly with each other, with the help of a P2P network to
-  check for double-spending.
-
+  Wagerr is a decentralized sportsbook that changes the way the world
+  bets on sports.
+  
+  - built for everyone.
+    Wagerr uses distributed
+    blockchain technology to execute betting contracts. It escrows
+    stakes, verifies results, and pays out winners. By eliminating
+    centralauthorities, Wagerr solves the most pernicious problems in
+    the industry. Reducing corruption and risk results in predictable
+    operation. You can bet on Wagerr.
+    - Free of All regulatory bodies
+    - Unrestricted global Access
+    - Support for all major sport leagues
+    - Truly Deflationary Chain
+  - Value Coupling
+    Nearly half of all fees are systematically destroyed — and
+    destroying fees diminishes coin supply. It’s a simple matter of
+  - supply and demand
+    Given steady demand, free markets tend to respond to a dwindling
+    supply with rising asset price. Holders of the asset will only
+    sell it for the highest price the market will bear. Watch the
+    video and check out the “economics” tab for more details on how
+    the Wagerr economy works.
+  
+  Homepage: https://wagerr.com/
+  Blockexplorer (main): https://explorer.wagerr.com/
+  Blockexplorer (testnet): https://explorer2.wagerr.com/
+  Github: https://github.com/wagerr/wagerr/
+  Wiki: https://github.com/wagerr/wagerr/wiki
+  
+  Coinmarketcap: https://coinmarketcap.com/currencies/wagerr/
+  
+  Chat with us:
+  - Discord (https://discord.gg/vvvvDbv)
+  
+  Social networks/forums:
+  - Telegram (https://t.me/wagerrcoin)
+  - twitter (https://twitter.com/wagerrx)
+  - reddit (https://www.reddit.com/r/Wagerr/)
+  - bitcointalk (https://bitcointalk.org/index.php?topic=1911583.0)
+  - facebook (https://www.facebook.com/wagerr/)
 grade: devel
 confinement: strict
 icon: share/pixmaps/wagerr256.png
 apps:
   daemon:
     command: wagerrd
-    plugs: [network, network-bind, home, removable-media]
+    plugs: [network, network-bind, network-status, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-testnet:
     command: wagerrd --testnet
-    plugs: [network, network-bind, home, removable-media]
+    plugs: [network, network-bind, network-status, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-regtest:
     command: wagerrd --regtest
-    plugs: [network, network-bind, home, removable-media]
+    plugs: [network, network-bind, network-status, home, removable-media]
+    environment:
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt:
-    command: desktop-launch wagerr-qt
-    plugs: [network, network-bind, unity7, unity8-calendar, unity8-contacts, desktop, desktop-legacy, wayland, x11, mir, opengl, home, removable-media]
+    command: wagerr-qt
+    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
     desktop: qt.desktop
+    environment:
+      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
   qt-testnet:
-    command: desktop-launch wagerr-qt --testnet
-    plugs: [network, network-bind, unity7, unity8-calendar, unity8-contacts, desktop, desktop-legacy, wayland, x11, mir, opengl, home, removable-media]
+    command: wagerr-qt --testnet
+    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
     desktop: qt-testnet.desktop
+    environment:
+      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
   qt-regtest:
-    command: desktop-launch wagerr-qt --regtest
-    plugs: [network, network-bind, unity7, unity8-calendar, unity8-contacts, desktop, desktop-legacy, wayland, x11, mir, opengl, home, removable-media]
+    command: wagerr-qt --regtest
+    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
     desktop: qt-regtest.desktop
+    environment:
+      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
   cli:
     command: wagerr-cli
     plugs: [network, network-bind, home]
@@ -59,47 +104,54 @@ parts:
     source-tag: master
     plugin: nil
     override-build: |
-      # Patch - Default home folder
-      ## We don't want to copy the full blockchain every time that the snap is   
-      ## updated, but there's no way to define a default data dir in wagerr-qt.
-      ## Additionaly we fix funcs.mk
-      git apply $SNAPCRAFT_STAGE/default_data_dir.patch
-      git apply $SNAPCRAFT_STAGE/fix-bdb-tmp-folder.patch
-      ## Patch - Fix Bug extracting sources without ownership
-      sed -i 's/tar --strip-components/tar --no-same-owner --strip-components/' $SNAPCRAFT_PART_BUILD/depends/funcs.mk
-      # Build Dependencies
-      echo "START BUILDING FOR $SNAPCRAFT_ARCH_TRIPLET architecture"
-      cd $SNAPCRAFT_PART_BUILD/depends
-      # Fix building ARM and AARCh64, as on some point they fail with, predownload all packages
-      #   curl: (22) The requested URL returned error: 407
+      SHORTNAME="wagerr"
+      if [ $SNAPCRAFT_ARCH_TRIPLET = "i386-linux-gnu" ]; then
+        HOST="i686-linux-gnu"
+      else
+        HOST="${SNAPCRAFT_ARCH_TRIPLET}"
+      fi
+      # APPLY PATCHES
+      echo "apply patches:"
+      git apply ${SNAPCRAFT_STAGE}/default_data_dir.patch
+      git apply ${SNAPCRAFT_STAGE}/fix-bdb-tmp-folder.patch
+      git apply ${SNAPCRAFT_STAGE}/fix-use-snap-instead-of-dirty.patch
+      sed -i 's/tar --strip-components/tar --no-same-owner --strip-components/' ${SNAPCRAFT_PART_BUILD}/depends/funcs.mk
+      # BUILD DEPENDENCIES
+      echo "START BUILDING ${SHORTNAME} FOR ${SNAPCRAFT_ARCH_TRIPLET} architecture"
+      cd ${SNAPCRAFT_PART_BUILD}/depends
       make download-linux
-      if [ $SNAPCRAFT_ARCH_TRIPLET = "i386-linux-gnu" ]
-      then
-        make HOST=i686-linux-gnu
-      else
-        make HOST=$SNAPCRAFT_ARCH_TRIPLET
-      fi
-      # Configure Wagerr Core
-      cd $SNAPCRAFT_PART_BUILD
+      make -j4 HOST=${HOST}
+      # CONFIGURE
+      echo "Configure ${SHORTNAME}"
+      cd ${SNAPCRAFT_PART_BUILD}
+      echo "Configure and build ${SHORTNAME}"
       ./autogen.sh
-      if [ $SNAPCRAFT_ARCH_TRIPLET = "i386-linux-gnu" ]
-      then
-        ./configure --prefix=`pwd`/depends/i686-linux-gnu
-      else
-        ./configure --prefix=`pwd`/depends/$SNAPCRAFT_ARCH_TRIPLET
+      ./configure --prefix=`pwd`/depends/${HOST}
+      # COMPILE
+      echo "Compile ${SHORTNAME}"
+      make -j4
+      # INSTALL
+      echo "Install ${SHORTNAME}"
+      make install prefix=${SNAPCRAFT_PART_INSTALL}
+      # POST INSTALL
+      if [ $SNAPCRAFT_ARCH_TRIPLET = "powerpc64le-linux-gnu" ]; then
+        if [ -e $SNAPCRAFT_PART_BUILD/src/qt/${SHORTNAME}-qt ]; then
+          echo "PPC64EL fix - ${SHORTNAME}-qt exists, fix unrequired"
+        else
+          echo "echo ${SHORTNAME}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/${SHORTNAME}-qt
+          chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/${SHORTNAME}-qt
+          echo "PPC64EL fix - ${SHORTNAME}-qt exists, fix required, dummy as ${SHORTNAME}-qt"
+        fi
       fi
-      # Compile Wagerr Core
-      make
-      # Install Wagerr Core
-      make install prefix=$SNAPCRAFT_PART_INSTALL
-      # print in log which files are installed
       echo "Installed files:"
-      find $SNAPCRAFT_PART_INSTALL -type f
+      find ${SNAPCRAFT_PART_INSTALL} -type f
     build-packages:
       - curl
       - wget
-      - g++
       - gcc
+      - gcc-8
+      - g++
+      - g++-8
       - make
       - autoconf
       - automake
@@ -109,11 +161,6 @@ parts:
       - bsdmainutils
       - binutils
       - python3
-    stage-packages: [ca-certificates]
-    after:
-      - desktop-qt5
-      - patches
-  desktop-qt5:
     stage-packages:
       - libxkbcommon0
       - ttf-ubuntu-font-family
@@ -125,6 +172,9 @@ parts:
       - libqt5svg5 # for loading icon themes which are svg
       - locales-all
       - qtwayland5
+      - ca-certificates
+    after:
+      - patches
   patches:
     source: snap/patches
     plugin: dump
