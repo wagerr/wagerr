@@ -179,7 +179,7 @@ public:
             bool fMinimizeChange,
             CZerocoinSpendReceipt &receipt,
             std::list<std::pair<CBitcoinAddress*, CAmount>> outputs,
-            std::string changeAddress
+            std::string changeAddress = ""
     );
 
     bool sendZwgr(
