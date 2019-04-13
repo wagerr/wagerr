@@ -172,6 +172,15 @@ public:
 
     SendCoinsReturn placeBet(WalletModelTransaction& transaction, CAmount amount, const std::string& eventId, const std::string& teamToWin);
 
+    bool sendZwgr(
+            vector<CZerocoinMint> &vMintsSelected,
+            bool fMintChange,
+            bool fMinimizeChange,
+            CZerocoinSpendReceipt &receipt,
+            std::list<std::pair<CBitcoinAddress*, CAmount>> outputs,
+            std::string changeAddress = ""
+    );
+
     bool convertBackZwgr(
             CAmount value,
             vector<CZerocoinMint> &vMintsSelected,
