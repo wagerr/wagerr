@@ -41,6 +41,7 @@
 #include <boost/algorithm/hex.hpp>
 
 #include <univalue.h>
+#include <iostream>
 
 
 // TODO The Wagerr functions in this file are being placed here for speed of
@@ -5150,13 +5151,15 @@ extern UniValue DoZwgrSpend(const CAmount nAmount, bool fMintChange, bool fMinim
     CZerocoinSpendReceipt receipt;
     bool fSuccess;
 
+    std::list<std::pair<CBitcoinAddress*, CAmount>> outputs;
     if(address_str != "") { // Spend to supplied destination address
         address = CBitcoinAddress(address_str);
         if(!address.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address, ispublicspend);
+        outputs.push_back(std::pair<CBitcoinAddress*, CAmount>(&address, nAmount));
+        fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, outputs);
     } else                   // Spend to newly generated local address
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, nullptr, ispublicspend);
+        fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, outputs);
 
     if (!fSuccess)
         throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
