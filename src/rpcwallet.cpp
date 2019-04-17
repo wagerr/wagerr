@@ -335,7 +335,7 @@ UniValue listbets(const UniValue& params, bool fHelp)
                         rdb.GetResults(resultsIndex);
 
                         if (resultsIndex.size() > 0) {
-                            std:string betResult = "pending";
+                            std::string betResult = "pending";
 
                             if (resultsIndex.count(plBet.nEventId)) {
                                 CPeerlessResult plResult = resultsIndex.find(plBet.nEventId)->second;
