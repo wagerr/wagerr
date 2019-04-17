@@ -52,27 +52,29 @@ QString BitcoinUnits::id(int unit)
     }
 }
 
-QString BitcoinUnits::name(int unit)
+QString BitcoinUnits::name(int unit, bool isZwgr)
 {
+    QString z = "";
+    if(isZwgr) z = "z";
     if (Params().NetworkID() == CBaseChainParams::MAIN) {
         switch (unit) {
         case WGR:
-            return QString("WGR");
+            return z + QString("WGR");
         case mWGR:
-            return QString("mWGR");
+            return z + QString("mWGR");
         case uWGR:
-            return QString::fromUtf8("μWGR");
+            return z + QString::fromUtf8("μWGR");
         default:
             return QString("???");
         }
     } else {
         switch (unit) {
         case WGR:
-            return QString("tWGR");
+            return z + QString("tWGR");
         case mWGR:
-            return QString("mtWGR");
+            return z + QString("mtWGR");
         case uWGR:
-            return QString::fromUtf8("μtWGR");
+            return z + QString::fromUtf8("μtWGR");
         default:
             return QString("???");
         }
