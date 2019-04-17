@@ -424,6 +424,10 @@ WalletModel::SendCoinsReturn WalletModel::sendCoins(WalletModelTransaction& tran
     return SendCoinsReturn(OK);
 }
 
+const CWalletTx* WalletModel::getTx(uint256 id){
+    return wallet->GetWalletTx(id);
+}
+
 WalletModel::SendCoinsReturn WalletModel::prepareBetTransaction(WalletModelTransaction& transaction, CAmount amount, const std::string& eventId, const std::string& teamToWin)
 {
     if (isAnonymizeOnlyUnlocked()) {
