@@ -1011,3 +1011,11 @@ bool WalletModel::isMine(CBitcoinAddress address)
 {
     return IsMine(*wallet, address.Get());
 }
+
+std::string WalletModel::resetMintZerocoin(){
+    return wallet->ResetMintZerocoin();
+}
+
+std::string WalletModel::resetSpentZerocoin(){
+    return wallet->ResetSpentZerocoin();
+}
