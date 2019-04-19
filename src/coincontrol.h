@@ -15,7 +15,7 @@
 class CCoinControl
 {
 public:
-    CTxDestination destChange;
+    CTxDestination destChange = CNoDestination();
     bool useObfuScation;
     bool useSwiftTX;
     bool fSplitBlock;
