@@ -387,8 +387,8 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
         return tr("Chain Game Entry");
     case TransactionRecord::BetWin:
         return tr("Bet Payout");
-
     default:
+        std::cout << "Type: " << wtx->type << std::endl;
         return QString();
     }
 }
