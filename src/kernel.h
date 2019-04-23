@@ -44,4 +44,6 @@ bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierCheck
 // Get time weight using supplied timestamps
 int64_t GetWeight(int64_t nIntervalBeginning, int64_t nIntervalEnd);
 
+bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake);
+
 #endif // BITCOIN_KERNEL_H
