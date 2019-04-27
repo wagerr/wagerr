@@ -143,13 +143,13 @@ public:
     int BetStartHeight() const { return nBetStartHeight; }
     std::string DevPayoutAddr() const { return strDevPayoutAddr; }
     std::string OMNOPayoutAddr() const { return strOMNOPayoutAddr; }
-    int OMNORewardPermille() const { return nOMNORewardPermille; }
-    int DevRewardPermille() const { return nDevRewardPermille; }
-    int OddsDivisor() const { return nOddsDivisor; }
-    int BetXPermille() const { return nBetXPermille; }
-    int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; }
-    int MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
-    int MinBetPayoutRange() const { return nMinBetPayoutRange; }
+    uint64_t OMNORewardPermille() const { return nOMNORewardPermille; }
+    uint64_t DevRewardPermille() const { return nDevRewardPermille; }
+    uint64_t OddsDivisor() const { return nOddsDivisor; }
+    uint64_t BetXPermille() const { return nBetXPermille; }
+    int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; } // Currently not used
+    int64_t MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
+    int64_t MinBetPayoutRange() const { return nMinBetPayoutRange; }
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
 protected:
     CChainParams() {}
@@ -227,13 +227,13 @@ protected:
     int nBetStartHeight;
     std::string strDevPayoutAddr;
     std::string strOMNOPayoutAddr;
-    int nOMNORewardPermille;
-    int nDevRewardPermille;
-    int nOddsDivisor;
-    int nBetXPermille;
-    int nBetBlockPayoutAmount;
-    int nMinBetPayoutRange;
-    int nMaxBetPayoutRange;
+    uint64_t nOMNORewardPermille;
+    uint64_t nDevRewardPermille;
+    uint64_t nOddsDivisor;
+    uint64_t nBetXPermille;
+    uint64_t nBetBlockPayoutAmount;
+    int64_t nMinBetPayoutRange;
+    int64_t nMaxBetPayoutRange;
     int nBetPlaceTimeoutBlocks;
 };
 

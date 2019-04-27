@@ -88,8 +88,8 @@ int64_t GetBlockPayouts(std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetRe
 
     if (vexpectedPayouts.size() > 0) {
         // Calculate the OMNO reward and the Dev reward.
-        CAmount nOMNOReward = (CAmount)((profitAcc / (1000.0 - Params().BetXPermille()) * Params().OMNORewardPermille()));
-        CAmount nDevReward  = (CAmount)((profitAcc / (1000.0 - Params().BetXPermille()) * Params().DevRewardPermille()));
+        CAmount nOMNOReward = (CAmount)(profitAcc * Params().OMNORewardPermille() / (1000.0 - Params().BetXPermille()));
+        CAmount nDevReward  = (CAmount)(profitAcc * Params().DevRewardPermille() / (1000.0 - Params().BetXPermille()));
 
         // Add both reward payouts to the payout vector.
         vexpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress(devPayoutAddr).Get()));
@@ -940,8 +940,8 @@ void SetEventAccummulators (CPeerlessBet plBet, CAmount betAmount) {
     eventIndex_t eventsIndex;
     edb.GetEvents(eventsIndex);
 
-    unsigned int oddsDivisor  = Params().OddsDivisor();
-    unsigned int betXPermille = Params().BetXPermille();
+    uint64_t oddsDivisor  = Params().OddsDivisor();
+    uint64_t betXPermille = Params().BetXPermille();
 
     // Check the events index actually has events
     if (eventsIndex.size() > 0) {
@@ -954,28 +954,31 @@ void SetEventAccummulators (CPeerlessBet plBet, CAmount betAmount) {
         // Check which outcome the bet was placed on and add to accumulators
         if (plBet.nOutcome == moneyLineWin){
             winnings = betAmount * pe.nHomeOdds;
-            burn = (winnings - betAmount * oddsDivisor) * betXPermille / 2000;
+            // To avoid internal overflow issues, first divide and then multiply.
+            // This will not cause inaccuracy, because the Odds (and thus the winnings) are scaled by a
+            // factor 10000 (the oddsDivisor)
+            burn = (winnings - betAmount * oddsDivisor) / 2000 * betXPermille;
             payout = winnings - burn;
             pe.nMoneyLineHomePotentialLiability += payout / COIN ;
             pe.nMoneyLineHomeBets += 1;
 
         }else if (plBet.nOutcome == moneyLineLose){
             winnings = betAmount * pe.nAwayOdds;
-            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
             payout = winnings - burn;
             pe.nMoneyLineAwayPotentialLiability += payout / COIN ;
             pe.nMoneyLineAwayBets += 1;
 
         }else if (plBet.nOutcome == moneyLineDraw){
             winnings = betAmount * pe.nDrawOdds;
-            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
             payout = winnings - burn;
             pe.nMoneyLineDrawPotentialLiability += payout / COIN ;
             pe.nMoneyLineDrawBets += 1;
 
         }else if (plBet.nOutcome == spreadHome){
             winnings = betAmount * pe.nSpreadHomeOdds;
-            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
             payout = winnings - burn;
 
             pe.nSpreadHomePotentialLiability += payout / COIN ;
@@ -985,7 +988,7 @@ void SetEventAccummulators (CPeerlessBet plBet, CAmount betAmount) {
 
         }else if (plBet.nOutcome == spreadAway){
             winnings = betAmount * pe.nSpreadAwayOdds;
-            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
             payout = winnings - burn;
 
             pe.nSpreadAwayPotentialLiability += payout / COIN ;
@@ -995,7 +998,7 @@ void SetEventAccummulators (CPeerlessBet plBet, CAmount betAmount) {
 
         }else if (plBet.nOutcome == totalOver){
             winnings = betAmount * pe.nTotalOverOdds;
-            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
             payout = winnings - burn;
 
             pe.nTotalOverPotentialLiability += payout / COIN ;
@@ -1005,7 +1008,7 @@ void SetEventAccummulators (CPeerlessBet plBet, CAmount betAmount) {
 
         }else if (plBet.nOutcome == totalUnder){
             winnings = betAmount * pe.nTotalUnderOdds;
-            burn = (winnings - betAmount*oddsDivisor) * betXPermille / 2000;
+            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
             payout = winnings - burn;
 
             pe.nTotalUnderPotentialLiability += payout / COIN;
@@ -1741,31 +1744,31 @@ std::vector<CTxOut> GetBetPayouts(int height)
         CBlockIndex *BlocksIndex = NULL;
         BlocksIndex = chainActive[nCurrentHeight - Params().BetBlocksIndexTimespan()];
 
-        unsigned int oddsDivisor  = Params().OddsDivisor();
-        unsigned int betXPermille = Params().BetXPermille();
+        uint64_t oddsDivisor  = Params().OddsDivisor();
+        uint64_t betXPermille = Params().BetXPermille();
 
         OutcomeType nMoneylineResult = (OutcomeType) 0;
         std::vector<OutcomeType> vSpreadsResult;
         std::vector<OutcomeType> vTotalsResult;
 
-        unsigned int nMoneylineOdds     = 0;
-        unsigned int nSpreadsOdds       = 0;
-        unsigned int nTotalsOdds        = 0;
-        unsigned int nTotalsPoints      = result.nHomeScore + result.nAwayScore;
-        unsigned int nSpreadsDifference = 0;
+        uint64_t nMoneylineOdds     = 0;
+        uint64_t nSpreadsOdds       = 0;
+        uint64_t nTotalsOdds        = 0;
+        uint64_t nTotalsPoints      = result.nHomeScore + result.nAwayScore;
+        uint64_t nSpreadsDifference = 0;
         bool HomeFavorite               = false;
 
         // We keep temp values as we can't be sure of the order of the TX's being stored in a block.
         // This can lead to a case were some bets don't
-        unsigned int nTempMoneylineOdds = 0;
-        unsigned int nTempSpreadsOdds   = 0;
-        unsigned int nTempTotalsOdds    = 0;
+        uint64_t nTempMoneylineOdds = 0;
+        uint64_t nTempSpreadsOdds   = 0;
+        uint64_t nTempTotalsOdds    = 0;
 
         bool UpdateMoneyLine = false;
         bool UpdateSpreads   = false;
         bool UpdateTotals    = false;
-        unsigned int nSpreadsWinner = 0;
-        unsigned int nTotalsWinner  = 0;
+        uint64_t nSpreadsWinner = 0;
+        uint64_t nTotalsWinner  = 0;
 
         time_t tempEventStartTime   = 0;
         time_t latestEventStartTime = 0;
@@ -2004,7 +2007,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
                                         // Calculate the bet winnings for the current bet.
                                         if (winnings > 0) {
-                                            payout = (winnings - ((winnings - betAmount*oddsDivisor) * betXPermille / 1000)) / oddsDivisor;
+                                            payout = (winnings - ((winnings - betAmount*oddsDivisor) / 1000 * betXPermille)) / oddsDivisor;
                                         }
                                         else {
                                             payout = 0;
