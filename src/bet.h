@@ -60,17 +60,48 @@ typedef enum MappingTypes {
     tournamentMapping = 0x04
 } MappingTypes;
 
+// Class derived from CTxOut
+// nBetValue is NOT serialized, nor is it included in the hash.
+class CBetOut : public CTxOut {
+    public:
+
+    CAmount nBetValue;
+
+    CBetOut() : CTxOut() {
+        SetNull();
+    }
+
+    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn) : CTxOut(nValueIn, scriptPubKeyIn), nBetValue(0) {};
+
+    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn) :
+            CTxOut(nValueIn, scriptPubKeyIn), nBetValue(nBetValueIn) {};
+
+    void SetNull() {
+        CTxOut::SetNull();
+        nBetValue = -1;
+    }
+
+    void SetEmpty() {
+        CTxOut::SetEmpty();
+        nBetValue = 0;
+    }
+
+    bool IsEmpty() const {
+        return CTxOut::IsEmpty() && nBetValue == 0;
+    }
+};
+
 /** Ensures a TX has come from an OMNO wallet. **/
 bool IsValidOracleTx(const CTxIn &txin);
 
 /** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
-int64_t GetBlockPayouts(std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetReward);
+int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward);
 
 /** Aggregates the amount of WGR to be minted to pay out all CG Lotto winners as well as OMNO rewards. **/
-int64_t GetCGBlockPayouts(std::vector<CTxOut>& vexpectedCGPayouts, CAmount& nMNBetReward);
+int64_t GetCGBlockPayouts(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& nMNBetReward);
 
 /** Validating the payout block using the payout vector. **/
-bool IsBlockPayoutsValid(std::vector<CTxOut> vExpectedPayouts, CBlock block);
+bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block);
 
 class CPeerlessEvent
 {
@@ -443,10 +474,10 @@ std::vector<CPeerlessResult> getEventResults(int height);
 std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEventResults(int height);
 
 /** Get the peerless winning bets from the block chain and return the payout vector. **/
-std::vector<CTxOut> GetBetPayouts(int height);
+std::vector<CBetOut> GetBetPayouts(int height);
 
 /** Get the chain games winner and return the payout vector. **/
-std::vector<CTxOut> GetCGLottoBetPayouts(int height);
+std::vector<CBetOut> GetCGLottoBetPayouts(int height);
 
 /** Set a peerless event spread odds **/
 void SetEventSpreadOdds(CPeerlessSpreadsEvent sEventOdds);

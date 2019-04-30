@@ -3121,9 +3121,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         nExpectedMint += nFees;
 
     // Calculate the expected bet payouts.
-    std::vector<CTxOut> vExpectedAllPayouts;
-    std::vector<CTxOut> vExpectedPLPayouts;
-    std::vector<CTxOut> vExpectedCGLottoPayouts;
+    std::vector<CBetOut> vExpectedAllPayouts;
+    std::vector<CBetOut> vExpectedPLPayouts;
+    std::vector<CBetOut> vExpectedCGLottoPayouts;
 
     if( pindex->nHeight > Params().BetStartHeight()) {
         std::string strBetNetBlockTxt;

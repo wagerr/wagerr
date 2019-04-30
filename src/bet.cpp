@@ -62,11 +62,11 @@ bool IsValidOracleTx(const CTxIn &txin)
  * Takes a payout vector and aggregates the total WGR that is required to pay out all bets.
  * We also calculate and add the OMNO and dev fund rewards.
  *
- * @param vexpectedPayouts  A vector containing all the winning bets that need to be paid out.
+ * @param vExpectedPayouts  A vector containing all the winning bets that need to be paid out.
  * @param nMNBetReward  The Oracle masternode reward.
  * @return
  */
-int64_t GetBlockPayouts(std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetReward)
+int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward)
 {
     CAmount profitAcc = 0;
     CAmount nPayout = 0;
@@ -77,23 +77,23 @@ int64_t GetBlockPayouts(std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetRe
     std::string OMNOPayoutAddr = Params().OMNOPayoutAddr();
 
     // Loop over the payout vector and aggregate values.
-    for (unsigned i = 0; i < vexpectedPayouts.size(); i++) {
-        CAmount betValue = vexpectedPayouts[i].nBetValue;
-        CAmount payValue = vexpectedPayouts[i].nValue;
+    for (unsigned i = 0; i < vExpectedPayouts.size(); i++) {
+        CAmount betValue = vExpectedPayouts[i].nBetValue;
+        CAmount payValue = vExpectedPayouts[i].nValue;
 
         totalAmountBet += betValue;
         profitAcc += payValue - betValue;
         nPayout += payValue;
     }
 
-    if (vexpectedPayouts.size() > 0) {
+    if (vExpectedPayouts.size() > 0) {
         // Calculate the OMNO reward and the Dev reward.
         CAmount nOMNOReward = (CAmount)(profitAcc * Params().OMNORewardPermille() / (1000.0 - Params().BetXPermille()));
         CAmount nDevReward  = (CAmount)(profitAcc * Params().DevRewardPermille() / (1000.0 - Params().BetXPermille()));
 
         // Add both reward payouts to the payout vector.
-        vexpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress(devPayoutAddr).Get()));
-        vexpectedPayouts.emplace_back(nOMNOReward, GetScriptForDestination(CBitcoinAddress(OMNOPayoutAddr).Get()));
+        vExpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress(devPayoutAddr).Get()));
+        vExpectedPayouts.emplace_back(nOMNOReward, GetScriptForDestination(CBitcoinAddress(OMNOPayoutAddr).Get()));
 
         nPayout += nDevReward + nOMNOReward;
     }
@@ -108,7 +108,7 @@ int64_t GetBlockPayouts(std::vector<CTxOut>& vexpectedPayouts, CAmount& nMNBetRe
  * @param nMNBetReward  The Oracle masternode reward.
  * @return
  */
-int64_t GetCGBlockPayouts(std::vector<CTxOut>& vexpectedCGPayouts, CAmount& nMNBetReward)
+int64_t GetCGBlockPayouts(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& nMNBetReward)
 {
     CAmount nPayout = 0;
 
@@ -127,7 +127,7 @@ int64_t GetCGBlockPayouts(std::vector<CTxOut>& vexpectedCGPayouts, CAmount& nMNB
  * @param nHeight - The current chain height.
  * @return
  */
-bool IsBlockPayoutsValid(std::vector<CTxOut> vExpectedPayouts, CBlock block)
+bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block)
 {
     unsigned long size = vExpectedPayouts.size();
 
@@ -1730,9 +1730,9 @@ std::vector<CPeerlessResult> getEventResults( int height )
  *
  * @return payout vector.
  */
-std::vector<CTxOut> GetBetPayouts(int height)
+std::vector<CBetOut> GetBetPayouts(int height)
 {
-    std::vector<CTxOut> vexpectedPayouts;
+    std::vector<CBetOut> vExpectedPayouts;
     int nCurrentHeight = chainActive.Height();
 
     // Get all the results posted in the latest block.
@@ -1970,7 +1970,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
 
                             LogPrintf("Result found ending search \n");
 
-                            return vexpectedPayouts;
+                            return vExpectedPayouts;
                         }
 
                         // Only payout bets that are between 25 - 10000 WRG inclusive (MaxBetPayoutRange).
@@ -2036,7 +2036,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
                                     // Only add valid payouts to the vector.
                                     if (payout > 0) {
                                         // Add winning bet payout to the bet vector.
-                                        vexpectedPayouts.emplace_back(payout, GetScriptForDestination(CBitcoinAddress(payoutAddress).Get()), betAmount);
+                                        vExpectedPayouts.emplace_back(payout, GetScriptForDestination(CBitcoinAddress(payoutAddress).Get()), betAmount);
                                     }
                                 }
                             }
@@ -2103,7 +2103,7 @@ std::vector<CTxOut> GetBetPayouts(int height)
         }
     }
 
-    return vexpectedPayouts;
+    return vExpectedPayouts;
 }
 
 /**
@@ -2176,9 +2176,9 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
  *
  * @return payout vector.
  */
-std::vector<CTxOut> GetCGLottoBetPayouts (int height)
+std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 {
-    std::vector<CTxOut> vexpectedCGLottoBetPayouts;
+    std::vector<CBetOut> vexpectedCGLottoBetPayouts;
     int nCurrentHeight = chainActive.Height();
     long long totalValueOfBlock = 0;
 

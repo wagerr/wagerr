@@ -459,9 +459,9 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         }
         else {
             // Calculate the bet payouts.
-            std::vector<CTxOut> vAllPayouts;
-            std::vector<CTxOut> vPLPayouts;
-            std::vector<CTxOut> vCGLottoPayouts;
+            std::vector<CTxOut> vAllBetTxOuts;
+            std::vector<CBetOut> vPLPayouts;
+            std::vector<CBetOut> vCGLottoPayouts;
             CAmount nMNBetReward = 0;
 
             if( nHeight > Params().BetStartHeight()) {
@@ -474,13 +474,16 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 GetCGBlockPayouts(vCGLottoPayouts, nMNBetReward);
 
                 // Merge vectors into single payout vector.
-                vAllPayouts = vPLPayouts;
-                vAllPayouts.insert(vAllPayouts.end(), vCGLottoPayouts.begin(), vCGLottoPayouts.end());
+                for (auto vPLPayout : vPLPayouts) {
+                    vAllBetTxOuts.emplace_back(vPLPayout.nValue, vPLPayout.scriptPubKey);
+                }
+                for (auto vCGLottoPayout : vCGLottoPayouts) {
+                    vAllBetTxOuts.emplace_back(vCGLottoPayout.nValue, vCGLottoPayout.scriptPubKey);
+                }
             }
 
             // Fill coin stake transaction.
-            // pwallet->FillCoinStake(txCoinStake, nMNBetReward, voutPayouts); // Kokary: add betting fee
-            if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, vAllPayouts, stakeInput)) {
+            if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, vAllBetTxOuts, stakeInput)) {
                 LogPrintf("%s: filled coin stake tx [%s]\n", __func__, txCoinStake.ToString());
             }
             else {
@@ -492,7 +495,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             // pwallet->SignCoinStake(txCoinStake, vwtxPrev);
 
             // Clear all vectors after a payout.
-            vAllPayouts.clear();
+            vAllBetTxOuts.clear();
             vPLPayouts.clear();
             vCGLottoPayouts.clear();
         }
