@@ -304,6 +304,8 @@ public:
     // Default Constructor.
     CChainGamesResult() {}
 
+    bool FromScript(CScript script);
+
     static bool ToOpCode(CChainGamesResult cgr, std::string &opCode);
     static bool FromOpCode(std::string opCode, CChainGamesResult &cgr);
 };

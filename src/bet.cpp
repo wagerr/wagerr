@@ -2121,6 +2121,16 @@ std::vector<CBetOut> GetBetPayouts(int height)
     return vExpectedPayouts;
 }
 
+bool CChainGamesResult::FromScript(CScript script) {
+    if (script.size() < 5) return false;
+    if (script[0] != OP_RETURN) return false;
+    if (script[1] != BTX_FORMAT_VERSION) return false;
+    if (script[2] != cgResultTxType) return false;
+
+    nEventId = script[3] << 8 | script[4];
+
+    return true;
+}
 /**
  * Checks a given block for any Chain Games results.
  *
@@ -2152,21 +2162,11 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
         if (validResultTx) {
             // Look for result OP RETURN code in the tx vouts.
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
-                const CTxOut &txout = tx.vout[i];
-                std::string scriptPubKey = txout.scriptPubKey.ToString();
-                totalBlockValue = txout.nValue + totalBlockValue;
+                CScript script = tx.vout[i].scriptPubKey;
 
-                if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
-                    // Get OP CODE from transactions.
-                    vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
-                    std::string opCode(vOpCode.begin(), vOpCode.end());
-
-                    CChainGamesResult plResult;
-                    if (!CChainGamesResult::FromOpCode(opCode, plResult)) {
-                        continue;
-                    }
-
-                    chainGameResults.push_back(plResult);
+                CChainGamesResult cgResult;
+                if (cgResult.FromScript(script)) {
+                    chainGameResults.push_back(cgResult);
                 }
             }
         }
