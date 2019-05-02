@@ -2032,6 +2032,33 @@ std::vector<CBetOut> GetBetPayouts(int height)
                                     // Bet refund result.
                                     else if (result.nResultType ==  ResultType::eventRefund){
                                         payout = betAmount;
+                                    } else if (result.nResultType == ResultType::mlRefund){
+                                        // Calculate winnings.
+                                        if (pb.nOutcome == nMoneylineResult) {
+                                            payout = betAmount;
+                                        }
+                                        else if (spreadsFound && (pb.nOutcome == vSpreadsResult.at(0) || pb.nOutcome == vSpreadsResult.at(1))) {
+                                            winnings = betAmount * nSpreadsOdds;
+
+                                            // Calculate the bet winnings for the current bet.
+                                            if (winnings > 0) {
+                                                payout = (winnings - ((winnings - betAmount*oddsDivisor) / 1000 * betXPermille)) / oddsDivisor;
+                                            }
+                                            else {
+                                                payout = 0;
+                                            }
+                                        }
+                                        else if (totalsFound && (pb.nOutcome == vTotalsResult.at(0) || pb.nOutcome == vTotalsResult.at(1))) {
+                                           winnings = betAmount * nTotalsOdds;
+
+                                            // Calculate the bet winnings for the current bet.
+                                            if (winnings > 0) {
+                                                payout = (winnings - ((winnings - betAmount*oddsDivisor) / 1000 * betXPermille)) / oddsDivisor;
+                                            }
+                                            else {
+                                                payout = 0;
+                                            }
+                                        }
                                     }
 
                                     // Get the users payout address from the vin of the bet TX they used to place the bet.
