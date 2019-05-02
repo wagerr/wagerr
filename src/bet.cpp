@@ -506,11 +506,12 @@ bool CPeerlessResult::FromOpCode(std::string opCode, CPeerlessResult &pr)
 bool CPeerlessResult::ToOpCode(CPeerlessResult pr, std::string &opCode)
 {
     std::string sEventId        = ToHex(pr.nEventId, 8);
+    std::string sResultType     = ToHex(pr.nResultType, 2);
     std::string sHomeScore      = ToHex(pr.nHomeScore, 4);
     std::string sAwayScore      = ToHex(pr.nAwayScore, 4);
 
 
-    opCode = BTX_HEX_PREFIX "0104" + sEventId + sHomeScore + sAwayScore;
+    opCode = BTX_HEX_PREFIX "0104" + sEventId + sResultType + sHomeScore + sAwayScore;
 
     // Ensure peerless result OpCode string is the correct length.
     if (opCode.length() != PR_OP_STRLEN) {
