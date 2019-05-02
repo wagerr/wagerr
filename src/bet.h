@@ -299,10 +299,20 @@ public:
 class CChainGamesResult
 {
 public:
-    uint32_t nEventId;
+    uint16_t nEventId;
 
     // Default Constructor.
     CChainGamesResult() {}
+
+    CChainGamesResult(uint16_t nEventId) : nEventId(nEventId) {};
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
+    {
+        READWRITE(nEventId);
+    }
 
     bool FromScript(CScript script);
 
