@@ -5,9 +5,7 @@
 #include "bet.h"
 #include <boost/filesystem.hpp>
 
-#ifdef ENABLE_WALLET
 #include "wallet/wallet.h"
-#endif
 
 #define BTX_FORMAT_VERSION 0x01
 #define BTX_HEX_PREFIX "42"
@@ -227,13 +225,13 @@ int ReadBTXFormatVersion(std::string opCode)
  */
 uint32_t FromChars(unsigned char a, unsigned char b, unsigned char c, unsigned char d)
 {
-    uint32_t n = a;
-    n <<= 8;
-    n += b;
+    uint32_t n = d;
     n <<= 8;
     n += c;
     n <<= 8;
-    n += d;
+    n += b;
+    n <<= 8;
+    n += a;
 
     return n;
 }
@@ -247,9 +245,9 @@ uint32_t FromChars(unsigned char a, unsigned char b, unsigned char c, unsigned c
  */
 uint32_t FromChars(unsigned char a, unsigned char b)
 {
-    uint32_t n = a;
+    uint32_t n = b;
     n <<= 8;
-    n += b;
+    n += a;
 
     return n;
 }
@@ -267,19 +265,36 @@ uint32_t FromChars(unsigned char a)
     return n;
 }
 
+inline uint16_t swap_endianness_16(uint16_t x)
+{
+    return (x >> 8) | (x << 8);
+}
+inline uint32_t swap_endianness_32(uint32_t x)
+{
+    return (((x & 0xff000000U) >> 24) | ((x & 0x00ff0000U) >>  8) |
+            ((x & 0x0000ff00U) <<  8) | ((x & 0x000000ffU) << 24));
+}
 /**
  * Convert a unsigned 32 bit integer into its hex equivalent with the
  * amount of zero padding given as argument length.
  *
  * @param value  The integer value
- * @param length The size in bits
+ * @param length The size in nr of hex characters
  * @return       Hex string
  */
 std::string ToHex(uint32_t value, int length)
 {
     std::stringstream strBuffer;
-    strBuffer << std::hex << std::setw(length) << std::setfill('0') << value;
-
+    if (length == 2){
+        strBuffer << std::hex << std::setw(length) << std::setfill('0') << value;
+    } else if (length == 4){
+        uint16_t be_value = (uint16_t)value;
+        uint16_t le_value = swap_endianness_16(be_value);
+        strBuffer << std::hex << std::setw(length) << std::setfill('0') << le_value;
+    } else if (length == 8){
+        uint32_t le_value = swap_endianness_32(value);
+        strBuffer << std::hex << std::setw(length) << std::setfill('0') << le_value;
+    }
     return strBuffer.str();
 }
 
