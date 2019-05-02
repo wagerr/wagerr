@@ -2353,14 +2353,22 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
         else if (candidates.size() >= 2) {
             // Use random number to choose winner.
             CAmount noOfBets    = candidates.size();
-            CAmount winnerIndex = totalValueOfBlock % noOfBets;
 
-            if (winnerIndex > noOfBets) {
-                winnerIndex = noOfBets;
+            uint256 hashProofOfStake = 0;
+            unique_ptr<CStakeInput> stake;
+
+            CBlockIndex *winBlockIndex = chainActive[height];
+            CBlock winBlock;
+            ReadBlockFromDisk(winBlock, winBlockIndex);
+
+            if (!CheckProofOfStake(winBlock, hashProofOfStake, stake)) {
+                hashProofOfStake = 0;
+                return vexpectedCGLottoBetPayouts;
             }
+            uint64_t winnerNr = hashProofOfStake.Get64() % noOfBets;
 
             // Split the pot and calculate winnings.
-            std::string winnerAddress = candidates[winnerIndex];
+            std::string winnerAddress = candidates[winnerNr];
             CAmount entranceFee = eventFee;
             CAmount totalPot = (noOfBets*entranceFee);
             CAmount winnerPayout = totalPot / 10 * 8;
@@ -2368,7 +2376,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 
             LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
             LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-            LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerIndex);
+            LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerNr);
             LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
             LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
 
