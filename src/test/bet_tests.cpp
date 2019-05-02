@@ -33,6 +33,7 @@ typedef struct _peerless_bet_test {
 typedef struct _peerless_result_test {
     std::string opCode;
     uint32_t nEventId;
+    uint8_t nResultType;
     uint32_t homeScore;
     uint32_t awayScore;
 } peerless_result_test;
@@ -90,15 +91,15 @@ const peerless_event_test pe_tests[] = {
                   "01"           // BTX protocol version
                   "02"           // BTX transaction type
                   "80808080"     // Event ID
-                  "5BE554F3"     // Event timestamp
-                  "55FA"         // Sport
-                  "66FA"         // Tournament
-                  "FFAA"         // Stage
-                  "00000001"     // Home team
-                  "00000002"     // Away team
-                  "000055F0"     // Home odds
-                  "000080E8"     // Away odds
-                  "0000D8CC",    // Draw odds
+                  "F354E55B"     // Event timestamp
+                  "FA55"         // Sport
+                  "FA66"         // Tournament
+                  "AAFF"         // Stage
+                  "01000000"     // Home team
+                  "02000000"     // Away team
+                  "F0550000"     // Home odds
+                  "E8800000"     // Away odds
+                  "CCD80000",    // Draw odds
         .nEventId    = 2155905152,
         .nStartTime  = 1541756147,
         .nSport      = 22010,
@@ -114,16 +115,16 @@ const peerless_event_test pe_tests[] = {
         .opCode = "42"
                   "01"
                   "02"
-                  "00000101"
-                  "5BE2EB8B"
-                  "0001"
-                  "0006"
-                  "0007"
-                  "00000008"
-                  "00000002"
-                  "00001F1F"
-                  "00008080"
-                  "00001010",
+                  "01010000"
+                  "8BEBE25B"
+                  "0100"
+                  "0600"
+                  "0700"
+                  "08000000"
+                  "02000000"
+                  "1F1F0000"
+                  "80800000"
+                  "10100000",
         .nEventId    = 257,
         .nStartTime  = 1541598091,
         .nSport      = 1,
@@ -140,7 +141,7 @@ const peerless_event_test pe_tests[] = {
                   "01"
                   "02"
                   "FFFFFFFF"
-                  "5BE55CA0"
+                  "A05CE55B"
                   "FFFF"
                   "FFFF"
                   "FFFF"
@@ -167,7 +168,7 @@ const peerless_bet_test pb_tests[] = {
          .opCode = "42"        // BTX format
                    "01"        // BTX version number
                    "03"        // TX type
-                   "019A861A"  // Event ID
+                   "1A869A01"  // Event ID
                    "02",       // Bet Outcome Type
          .nEventId = 26904090,
          .nOutcome = moneyLineLose,
@@ -176,7 +177,7 @@ const peerless_bet_test pb_tests[] = {
          .opCode = "42"
                    "01"
                    "03"
-                   "000FDB6D"
+                   "6DDB0F00"
                    "01",
          .nEventId = 1039213,
          .nOutcome = moneyLineWin,
@@ -197,12 +198,14 @@ const peerless_result_test pr_tests[] = {
          .opCode = "42"         // BTX format
                    "01"         // BTX version number
                    "04"         // TX type
-                   "00000009"   // Event ID
-                   "0001"       // Home team score
-                   "0002",      // Away team score
-         .nEventId  = 9,
-         .homeScore = 1,
-         .awayScore = 2,
+                   "09000000"   // Event ID
+                   "01"         // Result Type
+                   "0100"       // Home team score
+                   "0200",      // Away team score
+         .nEventId    = 9,
+         .nResultType = 1,
+         .homeScore   = 1,
+         .awayScore   = 2,
     },
 //    {
 //         .opCode = "42"
@@ -237,10 +240,10 @@ const peerless_update_odds_test puo_tests[] = {
          .opCode = "42"         // BTX format
                    "01"         // BTX version number
                    "05"         // TX type
-                   "01FC97A7"   // Event ID
-                   "0000581B"   // Home Odds
-                   "0000D903"   // Away Odds
-                   "000055F0",  // Draw Odds
+                   "A797FC01"   // Event ID
+                   "1B580000"   // Home Odds
+                   "03D90000"   // Away Odds
+                   "F0550000",  // Draw Odds
          .nEventId  = 33331111,
          .nHomeOdds = 22555,
          .nAwayOdds = 55555,
@@ -250,10 +253,10 @@ const peerless_update_odds_test puo_tests[] = {
          .opCode = "42"
                    "01"
                    "05"
-                   "00000040"
-                   "000055F0"
-                   "0000AD9C"
-                   "0001046A",
+                   "40000000"
+                   "F0550000"
+                   "9CAD0000"
+                   "6A040100",
          .nEventId  = 64,
          .nHomeOdds = 22000,
          .nAwayOdds = 44444,
@@ -263,10 +266,10 @@ const peerless_update_odds_test puo_tests[] = {
          .opCode = "42"
                    "01"
                    "05"
-                   "020ECD6C"
-                   "00012FD1"
-                   "00003FE4"
-                   "0001689A",
+                   "6CCD0E02"
+                   "D12F0100"
+                   "E43F0000"
+                   "9A680100",
          .nEventId  = 34524524,
          .nHomeOdds = 77777,
          .nAwayOdds = 16356,
@@ -292,10 +295,10 @@ const peerless_spreads_event_test pse_tests[] = {
          .opCode = "42"         // BTX format
                    "01"         // BTX version number
                    "09"         // TX type
-                   "01FC97A7"   // Event ID
+                   "A797FC01"   // Event ID
                    "581B"       // Spread Points
-                   "0000D903"   // Over Odds
-                   "000055F0",  // Under Odds
+                   "03D90000"   // Over Odds
+                   "F0550000",  // Under Odds
          .nEventId  = 33331111,
          .nPoints = 22555,
          .nOverOdds = 55555,
@@ -305,10 +308,10 @@ const peerless_spreads_event_test pse_tests[] = {
          .opCode = "42"
                    "01"
                    "09"
-                   "00000040"
-                   "55F0"
-                   "0000AD9C"
-                   "0001046A",
+                   "40000000"
+                   "F055"
+                   "9CAD0000"
+                   "6A040100",
          .nEventId  = 64,
          .nPoints = 22000,
          .nOverOdds = 44444,
@@ -318,10 +321,10 @@ const peerless_spreads_event_test pse_tests[] = {
          .opCode = "42"
                    "01"
                    "09"
-                   "020ECD6C"
-                   "2FD1"
-                   "00003FE4"
-                   "0001689A",
+                   "6CCD0E02"
+                   "D12F"
+                   "E43F0000"
+                   "9A680100",
          .nEventId  = 34524524,
          .nPoints = 12241,
          .nOverOdds = 16356,
@@ -347,10 +350,10 @@ const peerless_totals_event_test pte_tests[] = {
         .opCode = "42"         // BTX format
                   "01"         // BTX version number
                   "0a"         // TX type
-                  "01FC97A7"   // Event ID
-                  "581B"       // Totals Points
-                  "0000D903"   // Over Odds
-                  "000055F0",  // Under Odds
+                  "A797FC01"   // Event ID
+                  "1B58"       // Totals Points
+                  "03D90000"   // Over Odds
+                  "F0550000",  // Under Odds
         .nEventId  = 33331111,
         .nPoints = 22555,
         .nOverOdds = 55555,
@@ -360,10 +363,10 @@ const peerless_totals_event_test pte_tests[] = {
         .opCode = "42"
                   "01"
                   "0a"
-                  "00000040"
-                  "55F0"
-                  "0000AD9C"
-                  "0001046A",
+                  "40000000"
+                  "F055"
+                  "9CAD0000"
+                  "6A040100",
         .nEventId  = 64,
         .nPoints = 22000,
         .nOverOdds = 44444,
@@ -373,10 +376,10 @@ const peerless_totals_event_test pte_tests[] = {
         .opCode = "42"
                   "01"
                   "0a"
-                  "020ECD6C"
-                  "2FD1"
-                  "00003FE4"
-                  "0001689A",
+                  "6CCD0E02"
+                  "D12F"
+                  "E43F0000"
+                  "9A680100",
         .nEventId  = 34524524,
         .nPoints = 12241,
         .nOverOdds = 16356,
@@ -402,8 +405,8 @@ const chain_games_event_test cge_tests[] = {
         .opCode = "42"      // BTX format
                   "01"         // BTX version number
                   "06"         // TX type
-                  "0009"       // Event ID
-                  "0064",      // Entry Price
+                  "0900"       // Event ID
+                  "6400",      // Entry Price
         .nEventId  = 9,
         .nEntryFee = 100,
     },
@@ -411,8 +414,8 @@ const chain_games_event_test cge_tests[] = {
         .opCode = "42"
                   "01"
                   "06"
-                  "07D0"
-                  "00C8",
+                  "D007"
+                  "C800",
         .nEventId  = 2000,
         .nEntryFee = 200,
     },
@@ -449,7 +452,7 @@ const chain_games_result_test cgr_tests[] = {
          .opCode = "42"         // BTX format
                    "01"         // BTX version number
                    "08"         // TX type
-                   "689A",      // Event ID
+                   "9A68",      // Event ID
          .nEventId = 26778,
     },
     {
@@ -467,7 +470,7 @@ const mapping_test cm_tests[] = {
                    "01"            // BTX version number
                    "01"            // TX type
                    "01"            // Mapping type
-                   "D4B3"          // Mapping ID
+                   "B3D4"          // Mapping ID
                    "536f63636572", // Hex encoded string
          .nMType = 1,
          .nId    = 54451,
@@ -478,7 +481,7 @@ const mapping_test cm_tests[] = {
                    "01"
                    "01"
                    "02"
-                   "7FFE"
+                   "FE7F"
                    "526f756e642031",
          .nMType = 2,
          .nId    = 32766,
@@ -489,7 +492,7 @@ const mapping_test cm_tests[] = {
                    "01"
                    "01"
                    "03"
-                   "02A65A08"
+                   "085AA602"
                    "4c69766572706f6f6c",
          .nMType = 3,
          .nId    = 44456456,
@@ -592,6 +595,7 @@ BOOST_AUTO_TEST_CASE(basics) // constructors, equality, inequality
         // From OpCode
         BOOST_CHECK(CPeerlessResult::FromOpCode(OpCode, pr));
         BOOST_CHECK_EQUAL(pr.nEventId, t.nEventId);
+        BOOST_CHECK_EQUAL(pr.nResultType, t.nResultType);
         BOOST_CHECK_EQUAL(pr.nHomeScore, t.homeScore);
         BOOST_CHECK_EQUAL(pr.nAwayScore, t.awayScore);
 
