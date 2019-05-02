@@ -3,6 +3,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "bet.h"
+#include "clientversion.h"
+#include "streams.h"
 #include "utilstrencodings.h"
 #include <boost/test/unit_test.hpp>
 
@@ -681,6 +683,28 @@ BOOST_AUTO_TEST_CASE(basics) // constructors, equality, inequality
         std::string opCode;
         BOOST_CHECK(CChainGamesResult::ToOpCode(cgr, opCode));
     }
+    CScript cgrScript;
+    cgr = CChainGamesResult(3102);
+
+    CDataStream ssObj1(SER_DISK, CLIENT_VERSION);
+    ssObj1 << cgr;
+
+    std::vector<unsigned char> dataIn = {30, 12};
+    cgrScript << OP_RETURN << dataIn;
+    CScript::const_iterator pc = cgrScript.begin();
+    std::vector<unsigned char> data;
+    opcodetype opcode;
+
+    BOOST_CHECK(cgrScript.GetOp(pc, opcode, data));
+    BOOST_CHECK(opcode == OP_RETURN);
+
+    BOOST_CHECK(cgrScript.GetOp(pc, opcode, data));
+    BOOST_CHECK(data.size() == 2);
+    uint16_t nEventId = 3102;
+
+    CDataStream ssObj(data, SER_DISK, CLIENT_VERSION);
+    ssObj >> cgr;
+    BOOST_CHECK(cgr.nEventId == nEventId);
 }
 
 BOOST_AUTO_TEST_CASE(serialisation) // Test the event index map serialisation / deserialization methods.
