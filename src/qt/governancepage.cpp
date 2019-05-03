@@ -1,4 +1,4 @@
-// Copyright (c) 2018 The WAGERR developers
+// Copyright (c) 2018 The PIVX developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -6,6 +6,7 @@
 #include "ui_governancepage.h"
 
 #include "activemasternode.h"
+#include "chainparams.h"
 #include "clientmodel.h"
 #include "masternode-budget.h"
 #include "masternode-sync.h"
@@ -114,7 +115,7 @@ void GovernancePage::updateProposalList()
         nLeft = 0;
     }
     else {
-        nNext = pindexPrev->nHeight - pindexPrev->nHeight % GetBudgetPaymentCycleBlocks() + GetBudgetPaymentCycleBlocks();
+        nNext = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
         nLeft = nNext - pindexPrev->nHeight;
     }
 

@@ -102,6 +102,12 @@ void TransactionFilterProxy::setShowInactive(bool showInactive)
     invalidateFilter();
 }
 
+void TransactionFilterProxy::setHideOrphans(bool fHide)
+{
+    this->fHideOrphans = fHide;
+    invalidateFilter();
+}
+
 int TransactionFilterProxy::rowCount(const QModelIndex& parent) const
 {
     if (limitRows != -1) {

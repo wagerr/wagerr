@@ -108,6 +108,7 @@ static const unsigned int DATABASE_WRITE_INTERVAL = 3600;
 static const unsigned int MAX_REJECT_MESSAGE_LENGTH = 111;
 
 /** Enable bloom filter */
+static const bool DEFAULT_PEERBLOOMFILTERS = true;
 static const bool DEFAULT_PEERBLOOMFILTERS_ZC = false;
 
 

@@ -29,31 +29,32 @@ public:
     explicit OptionsModel(QObject* parent = 0);
 
     enum OptionID {
-        StartAtStartup,      // bool
-        MinimizeToTray,      // bool
-        MapPortUPnP,         // bool
-        MinimizeOnClose,     // bool
-        ProxyUse,            // bool
-        ProxyIP,             // QString
-        ProxyPort,           // int
-        DisplayUnit,         // BitcoinUnits::Unit
-        ThirdPartyTxUrls,    // QString
-        Digits,              // QString
-        Theme,               // QString
-        Language,            // QString
-        CoinControlFeatures, // bool
-        ThreadsScriptVerif,  // int
-        DatabaseCache,       // int
-        SpendZeroConfChange, // bool
-        ZeromintEnable,      // bool
-        ZeromintAddresses,   // bool
-        ZeromintPercentage,  // int
-        ZeromintPrefDenom,   // int
-        HideZeroBalances,    // bool
-        AnonymizeWagerrAmount, //int
-        ShowMasternodesTab,  // bool
-        Listen,              // bool
-        StakeSplitThreshold, // int
+        StartAtStartup,         // bool
+        MinimizeToTray,         // bool
+        MapPortUPnP,            // bool
+        MinimizeOnClose,        // bool
+        ProxyUse,               // bool
+        ProxyIP,                // QString
+        ProxyPort,              // int
+        DisplayUnit,            // BitcoinUnits::Unit
+        ThirdPartyTxUrls,       // QString
+        Digits,                 // QString
+        Theme,                  // QString
+        Language,               // QString
+        CoinControlFeatures,    // bool
+        ThreadsScriptVerif,     // int
+        DatabaseCache,          // int
+        SpendZeroConfChange,    // bool
+        ZeromintEnable,         // bool
+        ZeromintAddresses,      // bool
+        ZeromintPercentage,     // int
+        ZeromintPrefDenom,      // int
+        HideZeroBalances,       // bool
+        HideOrphans,            // bool
+        AnonymizeWagerrAmount,  //int
+        ShowMasternodesTab,     // bool
+        Listen,                 // bool
+        StakeSplitThreshold,    // int
         OptionIDRowCount,
     };
 
@@ -106,6 +107,7 @@ signals:
     void anonymizeWagerrAmountChanged(int);
     void coinControlFeaturesChanged(bool);
     void hideZeroBalancesChanged(bool);
+    void hideOrphansChanged(bool);
 };
 
 #endif // BITCOIN_QT_OPTIONSMODEL_H

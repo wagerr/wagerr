@@ -206,7 +206,7 @@ HEADERS += src/activemasternode.h \
            src/qt/transactiondesc.h \
            src/qt/transactiondescdialog.h \
            src/qt/transactionfilterproxy.h \
-           src/transactionrecord.h \
+           src/qt(transactionrecord.h \
            src/qt/transactiontablemodel.h \
            src/qt/transactionview.h \
            src/qt/utilitydialog.h \

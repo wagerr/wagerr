@@ -161,7 +161,6 @@ BITCOIN_CORE_H = \
   timedata.h \
   tinyformat.h \
   torcontrol.h \
-  transactionrecord.h \
   txdb.h \
   txmempool.h \
   ui_interface.h \

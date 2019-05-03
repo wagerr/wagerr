@@ -6,7 +6,7 @@
 #include <boost/filesystem.hpp>
 
 #ifdef ENABLE_WALLET
-#include "wallet.h"
+#include "wallet/wallet.h"
 #endif
 
 #define BTX_FORMAT_VERSION 0x01

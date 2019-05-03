@@ -1,27 +1,26 @@
 // Copyright (c) 2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
-// Copyright (c) 2015-2018 The PIVX developers
+// Copyright (c) 2015-2018 The WAGERR developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "amount.h"
 #include "base58.h"
-#include "bet.h"
 #include "core_io.h"
 #include "init.h"
 #include "net.h"
 #include "netbase.h"
 #include "rpc/server.h"
 #include "timedata.h"
-#include "transactionrecord.h"
 #include "util.h"
 #include "utilmoneystr.h"
 #include "wallet.h"
 #include "walletdb.h"
 #include "zwgrchain.h"
 
+#include "bet.h"
 #include <cstdlib>
 #include <stdint.h>
 
@@ -31,7 +30,6 @@
 #include "zwgr/deterministicmint.h"
 #include <boost/assign/list_of.hpp>
 #include <boost/thread/thread.hpp>
-#include <boost/algorithm/hex.hpp>
 
 #include <univalue.h>
 
@@ -581,7 +579,7 @@ UniValue getnewaddress(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getnewaddress ( \"account\" )\n"
-            "\nReturns a new Wagerr address for receiving payments.\n"
+            "\nReturns a new WAGERR address for receiving payments.\n"
             "If 'account' is specified (recommended), it is added to the address book \n"
             "so payments received with the address will be credited to 'account'.\n"
 
@@ -656,7 +654,7 @@ UniValue getaccountaddress(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw runtime_error(
             "getaccountaddress \"account\"\n"
-            "\nReturns the current Wagerr address for receiving payments to this account.\n"
+            "\nReturns the current WAGERR address for receiving payments to this account.\n"
 
             "\nArguments:\n"
             "1. \"account\"       (string, required) The account name for the address. It can also be set to the empty string \"\" to represent the default account. The account does not need to exist, it will be created and a new address created  if there is no account by the given name.\n"
@@ -685,7 +683,7 @@ UniValue getrawchangeaddress(const UniValue& params, bool fHelp)
     if (fHelp || params.size() > 1)
         throw runtime_error(
             "getrawchangeaddress\n"
-            "\nReturns a new Wagerr address, for receiving change.\n"
+            "\nReturns a new WAGERR address, for receiving change.\n"
             "This is for use with raw transactions, NOT normal use.\n"
 
             "\nResult:\n"
@@ -711,6 +709,7 @@ UniValue getrawchangeaddress(const UniValue& params, bool fHelp)
     return CBitcoinAddress(keyID).ToString();
 }
 
+
 UniValue setaccount(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
@@ -723,13 +722,13 @@ UniValue setaccount(const UniValue& params, bool fHelp)
             "2. \"account\"         (string, required) The account to assign the address to.\n"
 
             "\nExamples:\n" +
-            HelpExampleCli("setaccount", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" \"tabby\"") + HelpExampleRpc("setaccount", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\", \"tabby\""));
+            HelpExampleCli("setaccount", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" \"tabby\"") + HelpExampleRpc("setaccount", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", \"tabby\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
 
 
     string strAccount;
@@ -766,13 +765,13 @@ UniValue getaccount(const UniValue& params, bool fHelp)
             "\"accountname\"        (string) the account address\n"
 
             "\nExamples:\n" +
-            HelpExampleCli("getaccount", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\"") + HelpExampleRpc("getaccount", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\""));
+            HelpExampleCli("getaccount", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\"") + HelpExampleRpc("getaccount", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
 
     string strAccount;
     map<CTxDestination, CAddressBookData>::iterator mi = pwalletMain->mapAddressBook.find(address.Get());
@@ -816,10 +815,7 @@ UniValue getaddressesbyaccount(const UniValue& params, bool fHelp)
     return ret;
 }
 
-// TODO `opReturn` was added as an optional parameter for speed of
-// implementation. This approach should be validated and corrected when time
-// allows.
-void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false, const std::string& opReturn = "")
+void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false)
 {
     // Check amount
     if (nValue <= 0)
@@ -835,13 +831,13 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
     }
 
-    // Parse Wagerr address
+    // Parse WAGERR address
     CScript scriptPubKey = GetScriptForDestination(address);
 
     // Create and send the transaction
     CReserveKey reservekey(pwalletMain);
     CAmount nFeeRequired;
-    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, NULL, ALL_COINS, fUseIX, (CAmount)0, opReturn)) {
+    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, NULL, ALL_COINS, fUseIX, (CAmount)0)) {
         if (nValue + nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         LogPrintf("SendMoney() : %s\n", strError);
@@ -849,339 +845,6 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     }
     if (!pwalletMain->CommitTransaction(wtxNew, reservekey, (!fUseIX ? "tx" : "ix")))
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
-}
-
-UniValue placebet(const UniValue& params, bool fHelp)
-{
-    if (fHelp || params.size() < 3 || params.size() > 5)
-        throw runtime_error(
-            "placebet \"event-id\" outcome amount ( \"comment\" \"comment-to\" )\n"
-            "\nWARNING - Betting closes 20 minutes before event start time.\n"
-            "Any bets placed after this time will be invalid and will not be paid out! \n"
-            "\nPlace an amount as a bet on an event. The amount is rounded to the nearest 0.00000001\n" +
-            HelpRequiringPassphrase() +
-            "\nArguments:\n"
-            "1. \"event-id\"    (numeric, required) The event to bet on.\n"
-            "2. outcome         (numeric, required) 1 means home team win,\n"
-            "                                       2 means away team win,\n"
-            "                                       3 means a draw."
-            "3. amount          (numeric, required) The amount in wgr to send. eg 10\n"
-            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
-            "                             This is not part of the transaction, just kept in your wallet.\n"
-            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
-            "                             to which you're sending the transaction. This is not part of the \n"
-            "                             transaction, just kept in your wallet.\n"
-            "\nResult:\n"
-            "\"transactionid\"  (string) The transaction id.\n"
-            "\nExamples:\n" +
-            HelpExampleCli("placebet", "\"000\" \"1\" 25\"donation\" \"seans outpost\"") +
-            HelpExampleRpc("placebet", "\"000\", \"1\", 25, \"donation\", \"seans outpost\""));
-
-    CAmount nAmount = AmountFromValue(params[2]);
-
-    // Validate bet amount so its between 25 - 10000 WGR inclusive.
-    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.");
-    }
-
-    // Wallet comments
-    CWalletTx wtx;
-    if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
-        wtx.mapValue["comment"] = params[3].get_str();
-    if (params.size() > 4 && !params[4].isNull() && !params[4].get_str().empty())
-        wtx.mapValue["to"] = params[4].get_str();
-
-    EnsureWalletIsUnlocked();
-    EnsureEnoughWagerr(nAmount);
-
-    CBitcoinAddress address("");
-    int eventId = params[0].get_int();
-    int outcome = params[1].get_int();
-    CPeerlessBet plBet(eventId, (OutcomeType) outcome);
-
-    // TODO Retrieve the `CPeerlessEvent` currently associated with `eventId`
-    // and confirm that the submitted `team` is available; `throw` an
-    // `RPC_BET_DETAILS_ERROR` in the case of a mismatch.
-
-    // TODO `address` isn't used when adding the following transaction to the
-    // blockchain, so ideally it would not need to be supplied to `SendMoney`.
-    // Ideally an alternative function, such as `BurnMoney`, would be developed
-    // and used, which would take the `OP_RETURN` value in place of the address
-    // value.
-    // Note that, during testing, the `opReturn` value is added to the
-    // blockchain incorrectly if its length is less than 5. This behaviour would
-    // ideally be investigated and corrected/justified when time allows.
-    std::string opCode;
-    CPeerlessBet::ToOpCode(plBet, opCode);
-
-    // Unhex the validated bet opcode
-    vector<unsigned char> vectorValue;
-    string stringValue(opCode);
-    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
-    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
-
-    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
-
-    return wtx.GetHash().GetHex();
-}
-
-UniValue placechaingamesbet(const UniValue& params, bool fHelp)
-{
-    if (fHelp || params.size() < 1 || params.size() > 5) {
-        throw runtime_error(
-            "placechaingamesbet \"event-id\" amount ( \"comment\" \"comment-to\" )\n"
-            "\n WARNING!!! - Betting closes 20 minutes before event start time. Any bets placed after this time will be \n"
-            "invalid and will not be paid out! \n"
-            "\nPlace an amount as a bet on a chain games event. The amount is rounded to the nearest 0.00000001\n" +
-            HelpRequiringPassphrase() +
-            "\nArguments:\n"
-            "1. event-id        (numeric, required) The event to bet on.\n"
-            "2. amount          (numeric, required) The amount in wgr to send. eg 0.1\n"
-            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
-            "                             This is not part of the transaction, just kept in your wallet.\n"
-            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
-            "                             to which you're sending the transaction. This is not part of the \n"
-            "                             transaction, just kept in your wallet.\n"
-            "\nResult:\n"
-            "\"transactionid\"  (string) The transaction id.\n"
-            "\nExamples:\n" +
-            HelpExampleCli("placechaingamesbet", "\"#000\" 0.1 \"donation\" \"seans outpost\"") +
-            HelpExampleRpc("placechaingamesbet", "\"#000\", 0.1, \"donation\", \"seans outpost\""));
-    }
-
-    CAmount nAmount = AmountFromValue(params[1]);
-
-    // Validate bet amount so its between 25 - 10000 WGR inclusive.
-    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 25 - 10000 WGR inclusive.");
-    }
-
-    // TODO Allow comments for chain games bet
-    CWalletTx wtx;
-
-    // Validate amount
-    EnsureWalletIsUnlocked();
-    EnsureEnoughWagerr(nAmount);
-
-    //TODO Respond if amount not correct
-    CBitcoinAddress address("");
-    int eventId = params[0].get_int();
-    CChainGamesBet cgBet(eventId);
-
-    std::string opCode;
-    CChainGamesBet::ToOpCode(cgBet, opCode);
-
-    // Unhex the validated bet opcode
-    vector<unsigned char> vectorValue;
-    boost::algorithm::unhex(opCode, back_inserter(vectorValue));
-    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
-
-    // Process transaction
-    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
-
-    return wtx.GetHash().GetHex();
-}
-
-/**
- * Looks up a chain game info for a given ID.
- *
- * @param params The RPC params consisting of the event id.
- * @param fHelp  Help text
- * @return
- */
-UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
-{
-    UniValue ret(UniValue::VARR);
-    UniValue obj(UniValue::VOBJ);
-
-    // Set default return values
-    unsigned int eventID = params[0].get_int();
-    int entryFee = 0;
-    int totalFoundCGBets = 0;
-    int gameStartTime = 0;
-    int gameStartBlock = 0;
-
-    //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
-    CBlockIndex *BlocksIndex = NULL;
-    int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
-    BlocksIndex = chainActive[height];
-
-    while (BlocksIndex) {
-        CBlock block;
-        ReadBlockFromDisk(block, BlocksIndex);
-
-        BOOST_FOREACH (CTransaction& tx, block.vtx) {
-
-            const CTxIn &txin = tx.vin[0];
-            bool validTx = IsValidOracleTx(txin);
-
-            // Check each TX out for values
-            for (unsigned int i = 0; i < tx.vout.size(); i++) {
-                const CTxOut &txout = tx.vout[i];
-                std::string scriptPubKey = txout.scriptPubKey.ToString();
-
-                // Find OP_RETURN transactions
-                if(scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
-
-                    std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
-                    std::string OpCode(vOpCode.begin(), vOpCode.end());
-
-                    // Find any CChainGameEvents matching the specified id
-                    CChainGamesEvent cgEvent;
-                    if (validTx && CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
-                        if (((unsigned int)cgEvent.nEventId) == eventID){
-                            entryFee = cgEvent.nEntryFee;
-                            gameStartTime = block.GetBlockTime();
-                            gameStartBlock = BlocksIndex -> nHeight;
-                        }
-                    }
-
-                    CChainGamesBet cgBet;
-                    if (!CChainGamesBet::FromOpCode(OpCode, cgBet)) {
-                        continue;
-                    }
-
-                    if (((unsigned int)cgBet.nEventId) == eventID){
-                        totalFoundCGBets = totalFoundCGBets + 1;
-                    }
-
-                }
-            }
-        }
-
-        BlocksIndex = chainActive.Next(BlocksIndex);
-    }
-
-    int potSize = totalFoundCGBets*entryFee;
-
-    obj.push_back(Pair("pot-size", potSize));
-    obj.push_back(Pair("entry-fee", entryFee));
-    obj.push_back(Pair("start-block", gameStartBlock));
-    obj.push_back(Pair("start-time", gameStartTime));
-    obj.push_back(Pair("total-bets", totalFoundCGBets));
-    obj.push_back(Pair("network", Params().NetworkID()));
-
-    return obj;
-}
-
-/**
- * Get total liability for each event that is currently active.
- *
- * @param params The RPC params consisting of the event id.
- * @param fHelp  Help text
- * @return
- */
-UniValue geteventsliability(const UniValue& params, bool fHelp)
-{
-  if (fHelp || (params.size() <= 1))
-        throw runtime_error(
-            "geteventsliability\n"
-            "Return the payout of each event.\n"
-
-            "\nResult:\n"
-            "[\n"
-            "  {\n"
-            "    \"name\": \"xxx\",         (string) The event ID\n"
-            "    \"event-id\": \"xxx\",       (string) The name of the event\n"
-            "    \"moneyline-home-payout\": \"xxx\",\n"
-            "    \"moneyline-away-payout\": n,\n"
-            "    \"moneyline-draw-payout\": n,\n"
-            "    \"spread-over-payout\": n,\n"
-            "    \"spread-under-payout\": n,\n"
-            "    \"spread-push-payout\": n,\n"
-            "    \"totals-over-payout\": n,\n"
-            "    \"totals-under-payout\": n,\n"
-            "    \"totals-push-payout\": n,\n"
-            "    ]\n"
-            "  }\n"
-            "]\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("geteventtotals", "") + HelpExampleRpc("geteventtotals", ""));
-
-    CEventDB edb;
-    eventIndex_t eventsIndex;
-    edb.GetEvents(eventsIndex);
-
-    // Check the events index actually has events,
-    if (eventsIndex.size() < 1) {
-        throw runtime_error("Currently no events to list.");
-    } 
-
-    int payoutThreshold = params[0].get_int();
-    int betThreshold = params[1].get_int();
-
-    UniValue ret(UniValue::VARR);
-
-    map<uint32_t, CPeerlessEvent>::iterator it;
-    for (it = eventsIndex.begin(); it != eventsIndex.end(); it++) {
-
-        CPeerlessEvent plEvent = it->second;
-
-        UniValue event(UniValue::VOBJ);
-        event.push_back(Pair("event-id", (int) plEvent.nEventId));
-
-        // Return potential moneyline payouts if each outcome is still open for betting
-        if (plEvent.nHomeOdds != 0 && (int) plEvent.nMoneyLineHomePotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("moneyline-home-liability", (int) plEvent.nMoneyLineHomePotentialLiability ));
-        }
-
-        if (plEvent.nAwayOdds != 0 && (int) plEvent.nMoneyLineAwayPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("moneyline-away-liability", (int) plEvent.nMoneyLineAwayPotentialLiability));
-        }
-
-        if (plEvent.nDrawOdds != 0 && (int) plEvent.nMoneyLineDrawPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("moneyline-draw-liability", (int) plEvent.nMoneyLineDrawPotentialLiability));
-        }
-
-        // Return potential spread payouts if each outcome is still open for betting
-        if (plEvent.nSpreadHomeOdds != 0 && (int) plEvent.nSpreadHomePotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("spreads-home-liability", (int) plEvent.nSpreadHomePotentialLiability));
-        }
-
-        if (plEvent.nSpreadAwayOdds != 0 && (int) plEvent.nSpreadAwayPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("spreads-away-liability", (int) plEvent.nSpreadAwayPotentialLiability));
-        }
-
-        if ( (int) plEvent.nSpreadPushPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("spreads-push-liability", (int) plEvent.nSpreadPushPotentialLiability));
-        }
-
-        // Return potential totals payouts if each outcome is still open for betting
-        if (plEvent.nTotalOverOdds != 0 && (int) plEvent.nTotalOverPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("total-over-liability", (int) plEvent.nTotalOverPotentialLiability));
-        }
-
-        if (plEvent.nTotalUnderOdds != 0 && (int) plEvent.nTotalUnderPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("total-under-liability", (int) plEvent.nTotalUnderPotentialLiability));
-        }
-
-        if ( (int) plEvent.nTotalPushPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("total-push-liability", (int) plEvent.nTotalPushPotentialLiability));
-        }
-
-        // Find the moneyline event with the most amount of bets and add it to total push bets to find total number potential bets to be payed out
-        int moneylineTotalBets[] = {(int) plEvent.nMoneyLineHomeBets , (int) plEvent.nMoneyLineAwayBets, (int) plEvent.nMoneyLineDrawBets};
-        int highestMoneyLine = 0;
-
-        for (int n=0; n<3; n++ )
-        {
-            if (moneylineTotalBets[n] > highestMoneyLine){
-                highestMoneyLine = moneylineTotalBets[n];
-            }
-        }
-
-        int betCount = highestMoneyLine + (int) plEvent.nSpreadPushBets + (int) plEvent.nTotalPushBets;
-
-        event.push_back(Pair("event-bet-count", betCount));
-
-        if (event.size() > 2 || betCount >= betThreshold) {
-            ret.push_back(event);
-        } 
-
-    }
-
-    return ret;
 }
 
 UniValue sendtoaddress(const UniValue& params, bool fHelp)
@@ -1205,15 +868,15 @@ UniValue sendtoaddress(const UniValue& params, bool fHelp)
             "\"transactionid\"  (string) The transaction id.\n"
 
             "\nExamples:\n" +
-            HelpExampleCli("sendtoaddress", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" 0.1") +
-            HelpExampleCli("sendtoaddress", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" 0.1 \"donation\" \"seans outpost\"") +
-            HelpExampleRpc("sendtoaddress", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\", 0.1, \"donation\", \"seans outpost\""));
+            HelpExampleCli("sendtoaddress", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.1") +
+            HelpExampleCli("sendtoaddress", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.1 \"donation\" \"seans outpost\"") +
+            HelpExampleRpc("sendtoaddress", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", 0.1, \"donation\", \"seans outpost\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
 
     // Amount
     CAmount nAmount = AmountFromValue(params[1]);
@@ -1253,15 +916,15 @@ UniValue sendtoaddressix(const UniValue& params, bool fHelp)
             "\"transactionid\"  (string) The transaction id.\n"
 
             "\nExamples:\n" +
-            HelpExampleCli("sendtoaddressix", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" 0.1") +
-            HelpExampleCli("sendtoaddressix", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" 0.1 \"donation\" \"seans outpost\"") +
-            HelpExampleRpc("sendtoaddressix", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\", 0.1, \"donation\", \"seans outpost\""));
+            HelpExampleCli("sendtoaddressix", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.1") +
+            HelpExampleCli("sendtoaddressix", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.1 \"donation\" \"seans outpost\"") +
+            HelpExampleRpc("sendtoaddressix", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", 0.1, \"donation\", \"seans outpost\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     CBitcoinAddress address(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
 
     // Amount
     CAmount nAmount = AmountFromValue(params[1]);
@@ -1345,11 +1008,11 @@ UniValue signmessage(const UniValue& params, bool fHelp)
             "\nUnlock the wallet for 30 seconds\n" +
             HelpExampleCli("walletpassphrase", "\"mypassphrase\" 30") +
             "\nCreate the signature\n" +
-            HelpExampleCli("signmessage", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" \"my message\"") +
+            HelpExampleCli("signmessage", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" \"my message\"") +
             "\nVerify the signature\n" +
-            HelpExampleCli("verifymessage", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" \"signature\" \"my message\"") +
+            HelpExampleCli("verifymessage", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" \"signature\" \"my message\"") +
             "\nAs json rpc\n" +
-            HelpExampleRpc("signmessage", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\", \"my message\""));
+            HelpExampleRpc("signmessage", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", \"my message\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -1384,7 +1047,7 @@ UniValue signmessage(const UniValue& params, bool fHelp)
 UniValue getreceivedbyaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        throw runtime_error(
+        throw std::runtime_error(
             "getreceivedbyaddress \"wagerraddress\" ( minconf )\n"
             "\nReturns the total amount received by the given wagerraddress in transactions with at least minconf confirmations.\n"
 
@@ -1397,23 +1060,23 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp)
 
             "\nExamples:\n"
             "\nThe amount from transactions with at least 1 confirmation\n" +
-            HelpExampleCli("getreceivedbyaddress", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\"") +
+            HelpExampleCli("getreceivedbyaddress", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\"") +
             "\nThe amount including unconfirmed transactions, zero confirmations\n" +
-            HelpExampleCli("getreceivedbyaddress", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" 0") +
+            HelpExampleCli("getreceivedbyaddress", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0") +
             "\nThe amount with at least 6 confirmation, very safe\n" +
-            HelpExampleCli("getreceivedbyaddress", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" 6") +
+            HelpExampleCli("getreceivedbyaddress", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 6") +
             "\nAs a json rpc call\n" +
-            HelpExampleRpc("getreceivedbyaddress", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\", 6"));
+            HelpExampleRpc("getreceivedbyaddress", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", 6"));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     // wagerr address
     CBitcoinAddress address = CBitcoinAddress(params[0].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
     CScript scriptPubKey = GetScriptForDestination(address.Get());
     if (!IsMine(*pwalletMain, scriptPubKey))
-        return (double)0.0;
+        throw JSONRPCError(RPC_WALLET_ERROR, "Address not found in wallet");
 
     // Minimum confirmations
     int nMinDepth = 1;
@@ -1422,7 +1085,7 @@ UniValue getreceivedbyaddress(const UniValue& params, bool fHelp)
 
     // Tally
     CAmount nAmount = 0;
-    for (map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
+    for (std::map<uint256, CWalletTx>::iterator it = pwalletMain->mapWallet.begin(); it != pwalletMain->mapWallet.end(); ++it) {
         const CWalletTx& wtx = (*it).second;
         if (wtx.IsCoinBase() || !IsFinalTx(wtx))
             continue;
@@ -1598,54 +1261,6 @@ UniValue getbalance(const UniValue& params, bool fHelp)
     return ValueFromAmount(nBalance);
 }
 
-UniValue getextendedbalance(const UniValue& params, bool fHelp)
-{
-    if (fHelp || (params.size() > 0))
-        throw runtime_error(
-            "getextendedbalance\n"
-            "\nGet extended balance information.\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"blocks\": \"xxx\", (string) The current block height\n"
-            "  \"balance\": \"xxx\", (string) The total WGR balance\n"
-            "  \"balance_locked\": \"xxx\", (string) The locked WGR balance\n"
-            "  \"balance_unlocked\": \"xxx\", (string) The unlocked WGR balance\n"
-            "  \"balance_unconfirmed\": \"xxx\", (string) The unconfirmed WGR balance\n"
-            "  \"balance_immature\": \"xxx\", (string) The immature WGR balance\n"
-            "  \"zerocoin_balance\": \"xxx\", (string) The total zWGR balance\n"
-            "  \"zerocoin_balance_mature\": \"xxx\", (string) The mature zWGR balance\n"
-            "  \"zerocoin_balance_immature\": \"xxx\", (string) The immature zWGR balance\n"
-            "  \"watchonly_balance\": \"xxx\", (string) The total watch-only WGR balance\n"
-            "  \"watchonly_balance_unconfirmed\": \"xxx\", (string) The unconfirmed watch-only WGR balance\n"
-            "  \"watchonly_balance_immature\": \"xxx\", (string) The immature watch-only WGR balance\n"
-            "  \"watchonly_balance_locked\": \"xxx\", (string) The locked watch-only WGR balance\n"
-            "}\n"
-
-            "\nExamples:\n" +
-            HelpExampleCli("getextendedbalance", "") + HelpExampleRpc("getextendedbalance", ""));
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-
-    UniValue obj(UniValue::VOBJ);
-
-    obj.push_back(Pair("blocks", (int)chainActive.Height()));
-    obj.push_back(Pair("balance", ValueFromAmount(pwalletMain->GetBalance())));
-    obj.push_back(Pair("balance_locked", ValueFromAmount(pwalletMain->GetLockedCoins())));
-    obj.push_back(Pair("balance_unlocked", ValueFromAmount(pwalletMain->GetUnlockedCoins())));
-    obj.push_back(Pair("balance_unconfirmed", ValueFromAmount(pwalletMain->GetUnconfirmedBalance())));
-    obj.push_back(Pair("balance_immature", ValueFromAmount(pwalletMain->GetImmatureBalance())));
-    obj.push_back(Pair("zerocoin_balance", ValueFromAmount(pwalletMain->GetZerocoinBalance(false))));
-    obj.push_back(Pair("zerocoin_balance_mature", ValueFromAmount(pwalletMain->GetZerocoinBalance(true))));
-    obj.push_back(Pair("zerocoin_balance_immature", ValueFromAmount(pwalletMain->GetImmatureZerocoinBalance())));
-    obj.push_back(Pair("watchonly_balance", ValueFromAmount(pwalletMain->GetWatchOnlyBalance())));
-    obj.push_back(Pair("watchonly_balance_unconfirmed", ValueFromAmount(pwalletMain->GetUnconfirmedWatchOnlyBalance())));
-    obj.push_back(Pair("watchonly_balance_immature", ValueFromAmount(pwalletMain->GetImmatureWatchOnlyBalance())));
-    obj.push_back(Pair("watchonly_balance_locked", ValueFromAmount(pwalletMain->GetLockedWatchOnlyBalance())));
-
-    return obj;
-}
-
 UniValue getunconfirmedbalance(const UniValue &params, bool fHelp)
 {
     if (fHelp || params.size() > 0)
@@ -1662,36 +1277,37 @@ UniValue getunconfirmedbalance(const UniValue &params, bool fHelp)
 UniValue movecmd(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 3 || params.size() > 5)
-        throw runtime_error(
+        throw std::runtime_error(
             "move \"fromaccount\" \"toaccount\" amount ( minconf \"comment\" )\n"
             "\nMove a specified amount from one account in your wallet to another.\n"
 
             "\nArguments:\n"
             "1. \"fromaccount\"   (string, required) The name of the account to move funds from. May be the default account using \"\".\n"
             "2. \"toaccount\"     (string, required) The name of the account to move funds to. May be the default account using \"\".\n"
-            "3. minconf           (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
-            "4. \"comment\"       (string, optional) An optional comment, stored in the wallet only.\n"
+            "3. amount            (numeric, required) Quantity of WGR to move between accounts.\n"
+            "4. minconf           (numeric, optional, default=1) Only use funds with at least this many confirmations.\n"
+            "5. \"comment\"       (string, optional) An optional comment, stored in the wallet only.\n"
 
             "\nResult:\n"
-            "true|false           (boolean) true if successfull.\n"
+            "true|false           (boolean) true if successful.\n"
 
             "\nExamples:\n"
             "\nMove 0.01 WGR from the default account to the account named tabby\n" +
             HelpExampleCli("move", "\"\" \"tabby\" 0.01") +
-            "\nMove 0.01 WGR from timotei to akiko with a comment and funds have 6 confirmations\n" +
-            HelpExampleCli("move", "\"timotei\" \"akiko\" 0.01 6 \"happy birthday!\"") +
+            "\nMove 0.01 WGR from timotei to akiko with a comment\n" +
+            HelpExampleCli("move", "\"timotei\" \"akiko\" 0.01 1 \"happy birthday!\"") +
             "\nAs a json rpc call\n" +
-            HelpExampleRpc("move", "\"timotei\", \"akiko\", 0.01, 6, \"happy birthday!\""));
+            HelpExampleRpc("move", "\"timotei\", \"akiko\", 0.01, 1, \"happy birthday!\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    string strFrom = AccountFromValue(params[0]);
-    string strTo = AccountFromValue(params[1]);
+    std::string strFrom = AccountFromValue(params[0]);
+    std::string strTo = AccountFromValue(params[1]);
     CAmount nAmount = AmountFromValue(params[2]);
     if (params.size() > 3)
         // unused parameter, used to be nMinDepth, keep type-checking it though
         (void)params[3].get_int();
-    string strComment;
+    std::string strComment;
     if (params.size() > 4)
         strComment = params[4].get_str();
 
@@ -1753,18 +1369,18 @@ UniValue sendfrom(const UniValue& params, bool fHelp)
 
             "\nExamples:\n"
             "\nSend 0.01 WGR from the default account to the address, must have at least 1 confirmation\n" +
-            HelpExampleCli("sendfrom", "\"\" \"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" 0.01") +
+            HelpExampleCli("sendfrom", "\"\" \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.01") +
             "\nSend 0.01 from the tabby account to the given address, funds must have at least 6 confirmations\n" +
-            HelpExampleCli("sendfrom", "\"tabby\" \"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" 0.01 6 \"donation\" \"seans outpost\"") +
+            HelpExampleCli("sendfrom", "\"tabby\" \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 0.01 6 \"donation\" \"seans outpost\"") +
             "\nAs a json rpc call\n" +
-            HelpExampleRpc("sendfrom", "\"tabby\", \"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\", 0.01, 6, \"donation\", \"seans outpost\""));
+            HelpExampleRpc("sendfrom", "\"tabby\", \"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\", 0.01, 6, \"donation\", \"seans outpost\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
     string strAccount = AccountFromValue(params[0]);
     CBitcoinAddress address(params[1].get_str());
     if (!address.IsValid())
-        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
     CAmount nAmount = AmountFromValue(params[2]);
     int nMinDepth = 1;
     if (params.size() > 3)
@@ -1814,11 +1430,11 @@ UniValue sendmany(const UniValue& params, bool fHelp)
 
             "\nExamples:\n"
             "\nSend two amounts to two different addresses:\n" +
-            HelpExampleCli("sendmany", "\"tabby\" \"{\\\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\\\":0.01,\\\"WXUdjGuXGJEWb7YXkBn73Xkdzd6vkwazeo\\\":0.02}\"") +
+            HelpExampleCli("sendmany", "\"tabby\" \"{\\\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\\\":0.01,\\\"DAD3Y6ivr8nPQLT1NEPX84DxGCw9jz9Jvg\\\":0.02}\"") +
             "\nSend two amounts to two different addresses setting the confirmation and comment:\n" +
-            HelpExampleCli("sendmany", "\"tabby\" \"{\\\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\\\":0.01,\\\"WXUdjGuXGJEWb7YXkBn73Xkdzd6vkwazeo\\\":0.02}\" 6 \"testing\"") +
+            HelpExampleCli("sendmany", "\"tabby\" \"{\\\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\\\":0.01,\\\"DAD3Y6ivr8nPQLT1NEPX84DxGCw9jz9Jvg\\\":0.02}\" 6 \"testing\"") +
             "\nAs a json rpc call\n" +
-            HelpExampleRpc("sendmany", "\"tabby\", \"{\\\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\\\":0.01,\\\"WXUdjGuXGJEWb7YXkBn73Xkdzd6vkwazeo\\\":0.02}\", 6, \"testing\""));
+            HelpExampleRpc("sendmany", "\"tabby\", \"{\\\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\\\":0.01,\\\"DAD3Y6ivr8nPQLT1NEPX84DxGCw9jz9Jvg\\\":0.02}\", 6, \"testing\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -1841,7 +1457,7 @@ UniValue sendmany(const UniValue& params, bool fHelp)
     BOOST_FOREACH(const string& name_, keys) {
         CBitcoinAddress address(name_);
         if (!address.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid Wagerr address: ")+name_);
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, string("Invalid WAGERR address: ")+name_);
 
         if (setAddress.count(address))
             throw JSONRPCError(RPC_INVALID_PARAMETER, string("Invalid parameter, duplicated address: ")+name_);
@@ -1883,7 +1499,7 @@ UniValue addmultisigaddress(const UniValue& params, bool fHelp)
         throw runtime_error(
             "addmultisigaddress nrequired [\"key\",...] ( \"account\" )\n"
             "\nAdd a nrequired-to-sign multisignature address to the wallet.\n"
-            "Each key is a Wagerr address or hex-encoded public key.\n"
+            "Each key is a WAGERR address or hex-encoded public key.\n"
             "If 'account' is specified, assign address to that account.\n"
 
             "\nArguments:\n"
@@ -1900,9 +1516,9 @@ UniValue addmultisigaddress(const UniValue& params, bool fHelp)
 
             "\nExamples:\n"
             "\nAdd a multisig address from 2 addresses\n" +
-            HelpExampleCli("addmultisigaddress", "2 \"[\\\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\\\",\\\"WXUdjGuXGJEWb7YXkBn73Xkdzd6vkwazeo\\\"]\"") +
+            HelpExampleCli("addmultisigaddress", "2 \"[\\\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\\\",\\\"DAD3Y6ivr8nPQLT1NEPX84DxGCw9jz9Jvg\\\"]\"") +
             "\nAs json rpc call\n" +
-            HelpExampleRpc("addmultisigaddress", "2, \"[\\\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\\\",\\\"WXUdjGuXGJEWb7YXkBn73Xkdzd6vkwazeo\\\"]\""));
+            HelpExampleRpc("addmultisigaddress", "2, \"[\\\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\\\",\\\"DAD3Y6ivr8nPQLT1NEPX84DxGCw9jz9Jvg\\\"]\""));
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -2323,142 +1939,6 @@ UniValue listtransactions(const UniValue& params, bool fHelp)
     return ret;
 }
 
-void ListTransactionRecords(const CWalletTx& wtx, const string& strAccount, int nMinDepth, bool fLong, UniValue& ret, const isminefilter& filter)
-{
-    std::vector<TransactionRecord> vRecs = TransactionRecord::decomposeTransaction(pwalletMain, wtx);
-    for(auto&& vRec: vRecs) {
-        UniValue entry(UniValue::VOBJ);
-        entry.push_back(Pair("type", vRec.GetTransactionRecordType()));
-        entry.push_back(Pair("transactionid", vRec.getTxID()));
-        entry.push_back(Pair("outputindex", vRec.getOutputIndex()));
-        entry.push_back(Pair("time", vRec.time));
-        entry.push_back(Pair("debit", ValueFromAmount(vRec.debit)));
-        entry.push_back(Pair("credit", ValueFromAmount(vRec.credit)));
-        entry.push_back(Pair("involvesWatchonly", vRec.involvesWatchAddress));
-
-        if (fLong) {
-            if (vRec.statusUpdateNeeded()) vRec.updateStatus(wtx);
-
-            entry.push_back(Pair("depth", vRec.status.depth));
-            entry.push_back(Pair("status", vRec.GetTransactionStatus()));
-            entry.push_back(Pair("countsForBalance", vRec.status.countsForBalance));
-            entry.push_back(Pair("matures_in", vRec.status.matures_in));
-            entry.push_back(Pair("open_for", vRec.status.open_for));
-            entry.push_back(Pair("cur_num_blocks", vRec.status.cur_num_blocks));
-            entry.push_back(Pair("cur_num_ix_locks", vRec.status.cur_num_ix_locks));
-        }
-        ret.push_back(entry);
-    }
-}
-
-UniValue listtransactionrecords(const UniValue& params, bool fHelp)
-{
-    if (fHelp || params.size() > 4)
-        throw runtime_error(
-                "listtransactionrecords ( \"account\" count from includeWatchonly)\n"
-                "\nReturns up to 'count' most recent transactions skipping the first 'from' transactions for account 'account'.\n"
-
-                "\nArguments:\n"
-                "1. \"account\"    (string, optional) The account name. If not included, it will list all transactions for all accounts.\n"
-                "                                     If \"\" is set, it will list transactions for the default account.\n"
-                "2. count          (numeric, optional, default=10) The number of transactions to return\n"
-                "3. from           (numeric, optional, default=0) The number of transactions to skip\n"
-                "4. includeWatchonly (bool, optional, default=false) Include transactions to watchonly addresses (see 'importaddress')\n"
-
-                "\nResult:\n"
-                "[\n"
-                "  {\n"
-                "    \"type\" : \"type\",                         (string) The output type.\n"
-                "    \"transactionid\" : \"hash\",                (string) The transaction hash in hex.\n"
-                "    \"outputindex\" : n,                       (numeric) The transaction output index.\n"
-                "    \"time\" : ttt,                            (numeric) The transaction time in seconds since epoch (Jan 1 1970 GMT).\n"
-                "    \"debit\" : x.xxx,                         (numeric) The transaction debit amount. This is negative and only available \n"
-                "                                                 for the 'send' category of transactions.\n"
-                "    \"credit\" : x.xxx,                        (numeric) The transaction debit amount. Available for the 'receive' category \n"
-                "                                                 of transactions.\n"
-                "    \"involvesWatchonly\" : true|false,        (boolean) Only returned if imported addresses were involved in transaction.\n"
-                "    \"depth\" : n,                             (numeric) The depth of the transaction in the blockchain.\n"
-                "    \"status\" : \"status\",                     (string) The transaction status.\n"
-                "    \"countsForBalance\" : true|false,         (boolean) Does the transaction count towards the available balance.\n"
-                "    \"matures_in\" : n,                        (numeric) The number of blocks until the transaction is mature.\n"
-                "    \"open_for\" : n,                          (numeric) The number of blocks that need to be mined before finalization.\n"
-                "    \"cur_num_blocks\" : n,                    (numeric) The current number of blocks.\n"
-                "    \"cur_num_ix_locks\" : n,                  (numeric) When to update transaction for ix locks.\n"
-                "  }\n"
-                "]\n"
-
-                "\nExamples:\n"
-                "\nList the most recent 10 transactions in the systems\n" +
-                HelpExampleCli("listtransactionrecords", "") +
-                "\nList the most recent 10 transactions for the tabby account\n" +
-                HelpExampleCli("listtransactionrecords", "\"tabby\"") +
-                "\nList transactions 100 to 120 from the tabby account\n" +
-                HelpExampleCli("listtransactionrecords", "\"tabby\" 20 100") +
-                "\nAs a json rpc call\n" +
-                HelpExampleRpc("listtransactionrecords", "\"tabby\", 20, 100"));
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-
-    string strAccount = "*";
-    if (params.size() > 0)
-        strAccount = params[0].get_str();
-    int nCount = 10;
-    if (params.size() > 1)
-        nCount = params[1].get_int();
-    int nFrom = 0;
-    if (params.size() > 2)
-        nFrom = params[2].get_int();
-    isminefilter filter = ISMINE_SPENDABLE;
-    if (params.size() > 3)
-        if (params[3].get_bool())
-            filter = filter | ISMINE_WATCH_ONLY;
-
-    if (nCount < 0)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative count");
-    if (nFrom < 0)
-        throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative from");
-
-    UniValue ret(UniValue::VARR);
-
-    const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
-
-    // iterate backwards until we have nCount items to return:
-    for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
-        CWalletTx* const pwtx = (*it).second.first;
-        if (pwtx != 0){}
-            ListTransactionRecords(*pwtx, strAccount, 0, true, ret, filter);
-        CAccountingEntry* const pacentry = (*it).second.second;
-        if (pacentry != 0)
-            AcentryToJSON(*pacentry, strAccount, ret);
-
-        if ((int)ret.size() >= (nCount + nFrom)) break;
-    }
-    // ret is newest to oldest
-
-    if (nFrom > (int)ret.size())
-        nFrom = ret.size();
-    if ((nFrom + nCount) > (int)ret.size())
-        nCount = ret.size() - nFrom;
-
-    vector<UniValue> arrTmp = ret.getValues();
-
-    vector<UniValue>::iterator first = arrTmp.begin();
-    std::advance(first, nFrom);
-    vector<UniValue>::iterator last = arrTmp.begin();
-    std::advance(last, nFrom+nCount);
-
-    if (last != arrTmp.end()) arrTmp.erase(last, arrTmp.end());
-    if (first != arrTmp.begin()) arrTmp.erase(arrTmp.begin(), first);
-
-    std::reverse(arrTmp.begin(), arrTmp.end()); // Return oldest to newest
-
-    ret.clear();
-    ret.setArray();
-    ret.push_backV(arrTmp);
-
-    return ret;
-}
-
 UniValue listaccounts(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() > 2)
@@ -2776,7 +2256,7 @@ UniValue walletpassphrase(const UniValue& params, bool fHelp)
             "\nArguments:\n"
             "1. \"passphrase\"     (string, required) The wallet passphrase\n"
             "2. timeout            (numeric, required) The time to keep the decryption key in seconds.\n"
-            "3. anonymizeonly      (boolean, optional, default=flase) If is true sending functions are disabled."
+            "3. anonymizeonly      (boolean, optional, default=false) If is true sending functions are disabled."
 
             "\nNote:\n"
             "Issuing the walletpassphrase command while the wallet is already unlocked will set a new unlock\n"
@@ -2813,14 +2293,22 @@ UniValue walletpassphrase(const UniValue& params, bool fHelp)
     if (!pwalletMain->IsLocked() && pwalletMain->fWalletUnlockAnonymizeOnly && anonymizeOnly)
         throw JSONRPCError(RPC_WALLET_ALREADY_UNLOCKED, "Error: Wallet is already unlocked.");
 
+    // Get the timeout
+    int64_t nSleepTime = params[1].get_int64();
+    // Timeout cannot be negative, otherwise it will relock immediately
+    if (nSleepTime < 0) {
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Timeout cannot be negative.");
+    }
+    // Clamp timeout
+    constexpr int64_t MAX_SLEEP_TIME = 100000000; // larger values trigger a macos/libevent bug?
+    if (nSleepTime > MAX_SLEEP_TIME) {
+        nSleepTime = MAX_SLEEP_TIME;
+    }
+
     if (!pwalletMain->Unlock(strWalletPass, anonymizeOnly))
         throw JSONRPCError(RPC_WALLET_PASSPHRASE_INCORRECT, "Error: The wallet passphrase entered was incorrect.");
 
     pwalletMain->TopUpKeyPool();
-
-    int64_t nSleepTime = params[1].get_int64();
-    LOCK(cs_nWalletUnlockTime);
-    nWalletUnlockTime = GetTime() + nSleepTime;
 
     if (nSleepTime > 0) {
         nWalletUnlockTime = GetTime () + nSleepTime;
@@ -2887,7 +2375,7 @@ UniValue walletlock(const UniValue& params, bool fHelp)
             "\nSet the passphrase for 2 minutes to perform a transaction\n" +
             HelpExampleCli("walletpassphrase", "\"my pass phrase\" 120") +
             "\nPerform a send (requires passphrase set)\n" +
-            HelpExampleCli("sendtoaddress", "\"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\" 1.0") +
+            HelpExampleCli("sendtoaddress", "\"DMJRSsuU9zfyrvxVaAEFQqK4MxZg6vgeS6\" 1.0") +
             "\nClear the passphrase since we are done before 2 minutes is up\n" +
             HelpExampleCli("walletlock", "") +
             "\nAs json rpc call\n" +
@@ -3136,6 +2624,7 @@ UniValue getwalletinfo(const UniValue& params, bool fHelp)
             "  \"keypoololdest\": xxxxxx,    (numeric) the timestamp (seconds since GMT epoch) of the oldest pre-generated key in the key pool\n"
             "  \"keypoolsize\": xxxx,        (numeric) how many new keys are pre-generated\n"
             "  \"unlocked_until\": ttt,      (numeric) the timestamp in seconds since epoch (midnight Jan 1 1970 GMT) that the wallet is unlocked for transfers, or 0 if the wallet is locked\n"
+            "  \"paytxfee\": x.xxxx,         (numeric) the transaction fee configuration, set in WGR/kB\n"
             "  \"automintaddresses\": status (boolean) the status of automint addresses (true if enabled, false if disabled)\n"
             "}\n"
 
@@ -3276,7 +2765,7 @@ UniValue autocombinerewards(const UniValue& params, bool fHelp)
     if (fHelp || params.size() < 1 || (fEnable && params.size() != 2) || params.size() > 2)
         throw runtime_error(
             "autocombinerewards enable ( threshold )\n"
-            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same Wagerr address\n"
+            "\nWallet will automatically monitor for any coins with value below the threshold amount, and combine them if they reside with the same WAGERR address\n"
             "When autocombinerewards runs it will create a transaction, and therefore will be subject to transaction fees.\n"
 
             "\nArguments:\n"
@@ -3321,7 +2810,7 @@ UniValue printMultiSend()
 
     UniValue vMS(UniValue::VOBJ);
     for (unsigned int i = 0; i < pwalletMain->vMultiSend.size(); i++) {
-        vMS.push_back(Pair("Address " + boost::lexical_cast<std::string>(i), pwalletMain->vMultiSend[i].first));
+        vMS.push_back(Pair("Address " + std::to_string(i), pwalletMain->vMultiSend[i].first));
         vMS.push_back(Pair("Percent", pwalletMain->vMultiSend[i].second));
     }
 
@@ -3449,7 +2938,7 @@ UniValue multisend(const UniValue& params, bool fHelp)
         }
     }
     if (params.size() == 2 && params[0].get_str() == "delete") {
-        int del = boost::lexical_cast<int>(params[1].get_str());
+        int del = std::stoi(params[1].get_str().c_str());
         if (!walletdb.EraseMultiSend(pwalletMain->vMultiSend))
             throw JSONRPCError(RPC_DATABASE_ERROR, "failed to delete old MultiSend vector from database");
 
@@ -3505,11 +2994,11 @@ UniValue multisend(const UniValue& params, bool fHelp)
     CBitcoinAddress address(strAddress);
     if (!address.IsValid())
         throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WGR address");
-    if (boost::lexical_cast<int>(params[1].get_str()) < 0)
+    if (std::stoi(params[1].get_str().c_str()) < 0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid parameter, expected valid percentage");
     if (pwalletMain->IsLocked())
         throw JSONRPCError(RPC_WALLET_UNLOCK_NEEDED, "Error: Please enter the wallet passphrase with walletpassphrase first.");
-    unsigned int nPercent = boost::lexical_cast<unsigned int>(params[1].get_str());
+    unsigned int nPercent = (unsigned int) std::stoul(params[1].get_str().c_str());
 
     LOCK(pwalletMain->cs_wallet);
     {
@@ -3903,148 +3392,6 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
     return DoZwgrSpend(nAmount, fMintChange, fMinimizeChange, vMintsSelected, address_str);
 }
 
-UniValue spendzerocoinfrom(const UniValue& params, bool fHelp)
-{
-    if (fHelp || params.size() > 6 || params.size() < 5)
-        throw runtime_error(
-            "spendzerocoinfrom amount mintchange minimizechange securitylevel selectedmints ( \"address\" )\n"
-            "\nSpend zWGR to a WGR address.\n" +
-            HelpRequiringPassphrase() + "\n"
-
-            "\nArguments:\n"
-            "1. amount          (numeric, required) Amount to spend.\n"
-            "2. mintchange      (boolean, required) Re-mint any leftover change.\n"
-            "3. minimizechange  (boolean, required) Try to minimize the returning change  [false]\n"
-            "4. securitylevel   (numeric, required) Amount of checkpoints to add to the accumulator.\n"
-            "                       A checkpoint contains 10 blocks worth of zerocoinmints.\n"
-            "                       The more checkpoints that are added, the more untraceable the transaction.\n"
-            "                       Use [100] to add the maximum amount of checkpoints available.\n"
-            "                       Adding more checkpoints makes the minting process take longer\n"
-            "5. selectedmints   (string, optional) A json array of strings.\n"
-            "                       Each string cointains the pubcoin hash of a zerocoin mint\n"
-            "6. \"address\"     (string, optional, default=change) Send to specified address or to a new change address.\n"
-            "                       If there is change then an address is required\n"
-
-            "\nResult:\n"
-            "{\n"
-            "  \"txid\": \"xxx\",             (string) Transaction hash.\n"
-            "  \"bytes\": nnn,              (numeric) Transaction size.\n"
-            "  \"fee\": amount,             (numeric) Transaction fee (if any).\n"
-            "  \"spends\": [                (array) JSON array of input objects.\n"
-            "    {\n"
-            "      \"denomination\": nnn,   (numeric) Denomination value.\n"
-            "      \"pubcoin\": \"xxx\",      (string) Pubcoin in hex format.\n"
-            "      \"serial\": \"xxx\",       (string) Serial number in hex format.\n"
-            "      \"acc_checksum\": \"xxx\", (string) Accumulator checksum in hex format.\n"
-            "    }\n"
-            "    ,...\n"
-            "  ],\n"
-            "  \"outputs\": [                 (array) JSON array of output objects.\n"
-            "    {\n"
-            "      \"value\": amount,         (numeric) Value in WGR.\n"
-            "      \"address\": \"xxx\"         (string) WGR address or \"zerocoinmint\" for reminted change.\n"
-            "    }\n"
-            "    ,...\n"
-            "  ]\n"
-            "}\n"
-
-            "\nExamples\n" +
-            HelpExampleCli("spendzerocoinfrom", "5000 false true 100 \"[\\\"4945d2549abc3b893810bb6499eb890c98a0dbe3ab945ed0baefa938409ca039\\\"]\" \"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\"") +
-            HelpExampleRpc("spendzerocoinfrom", "5000 false true 100 \"[\\\"4945d2549abc3b893810bb6499eb890c98a0dbe3ab945ed0baefa938409ca039\\\"]\" \"Wf1QqABAiQ17aorbB2WTcWAr6HF6zQRLmV\""));
-
-    LOCK2(cs_main, pwalletMain->cs_wallet);
-
-    if(GetAdjustedTime() > GetSporkValue(SPORK_16_ZEROCOIN_MAINTENANCE_MODE))
-        throw JSONRPCError(RPC_WALLET_ERROR, "zWGR is currently disabled due to maintenance.");
-
-    EnsureWalletIsUnlocked();
-
-    int64_t nTimeStart = GetTimeMillis();
-    CAmount nAmount = AmountFromValue(params[0]);   // Spending amount
-    bool fMintChange = params[1].get_bool();        // Mint change to zWGR
-    bool fMinimizeChange = params[2].get_bool();    // Minimize change
-    int nSecurityLevel = params[3].get_int();       // Security level
-
-    CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
-    if (params.size() == 6) {
-        // Destination address was supplied as params[4]. Optional parameters MUST be at the end
-        // to avoid type confusion from the JSON interpreter
-        address = CBitcoinAddress(params[5].get_str());
-        if(!address.IsValid())
-            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid Wagerr address");
-    }
-
-    CWalletTx wtx;
-    vector<CZerocoinMint> vMintsSelected;
-    CZerocoinSpendReceipt receipt;
-    bool fSuccess;
-
-    UniValue inputsPubcoinHashes = params[4].get_array();
-    for (unsigned int inx = 0; inx < inputsPubcoinHashes.size(); inx++){
-        const UniValue& inputPubcoinHash = inputsPubcoinHashes[inx];
-        const uint256 pubcoinHash = uint256(inputPubcoinHash.get_str());
-        CMintMeta mintMeta = pwalletMain->zwgrTracker->GetMetaFromPubcoin(pubcoinHash);
-
-        if (mintMeta.nVersion < libzerocoin::PrivateCoin::PUBKEY_VERSION) {
-            //version 1 coins have to use full security level to successfully spend.
-            if (nSecurityLevel < 100)
-                throw JSONRPCError(RPC_WALLET_ERROR, "Version 1 zWGR require a security level of 100 to successfully spend.");
-        }
-        CZerocoinMint mint;
-        if (!pwalletMain->GetMint(mintMeta.hashSerial, mint))
-            throw JSONRPCError(RPC_WALLET_ERROR, "Failed to fetch mint associated with serial hash");
-        vMintsSelected.emplace_back(mint);
-    }
-
-
-    if(params.size() == 6) // Spend to supplied destination address
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
-    else                   // Spend to newly generated local address
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange);
-
-    if (!fSuccess)
-        throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
-
-    CAmount nValueIn = 0;
-    UniValue arrSpends(UniValue::VARR);
-    for (CZerocoinSpend spend : receipt.GetSpends()) {
-        UniValue obj(UniValue::VOBJ);
-        obj.push_back(Pair("denomination", spend.GetDenomination()));
-        obj.push_back(Pair("pubcoin", spend.GetPubCoin().GetHex()));
-        obj.push_back(Pair("serial", spend.GetSerial().GetHex()));
-        uint32_t nChecksum = spend.GetAccumulatorChecksum();
-        obj.push_back(Pair("acc_checksum", HexStr(BEGIN(nChecksum), END(nChecksum))));
-        arrSpends.push_back(obj);
-        nValueIn += libzerocoin::ZerocoinDenominationToAmount(spend.GetDenomination());
-    }
-
-    CAmount nValueOut = 0;
-    UniValue vout(UniValue::VARR);
-    for (unsigned int i = 0; i < wtx.vout.size(); i++) {
-        const CTxOut& txout = wtx.vout[i];
-        UniValue out(UniValue::VOBJ);
-        out.push_back(Pair("value", ValueFromAmount(txout.nValue)));
-        nValueOut += txout.nValue;
-
-        CTxDestination dest;
-        if(txout.scriptPubKey.IsZerocoinMint())
-            out.push_back(Pair("address", "zerocoinmint"));
-        else if(ExtractDestination(txout.scriptPubKey, dest))
-            out.push_back(Pair("address", CBitcoinAddress(dest).ToString()));
-        vout.push_back(out);
-    }
-
-    //construct JSON to return
-    UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("txid", wtx.GetHash().ToString()));
-    ret.push_back(Pair("bytes", (int64_t)wtx.GetSerializeSize(SER_NETWORK, CTransaction::CURRENT_VERSION)));
-    ret.push_back(Pair("fee", ValueFromAmount(nValueIn - nValueOut)));
-    ret.push_back(Pair("duration_millis", (GetTimeMillis() - nTimeStart)));
-    ret.push_back(Pair("spends", arrSpends));
-    ret.push_back(Pair("outputs", vout));
-
-    return ret;
-}
 
 UniValue spendzerocoinmints(const UniValue& params, bool fHelp)
 {
@@ -4127,10 +3474,19 @@ UniValue spendzerocoinmints(const UniValue& params, bool fHelp)
         nAmount += mint.GetDenominationAsAmount();
     }
 
-    return DoZwgrSpend(nAmount, false, true, 100, vMintsSelected, address_str);
+    CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
+    if (params.size() == 4) {
+        // Destination address was supplied as params[4]. Optional parameters MUST be at the end
+        // to avoid type confusion from the JSON interpreter
+        address = CBitcoinAddress(params[3].get_str());
+        if(!address.IsValid())
+            throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
+    }
+
+    return DoZwgrSpend(nAmount, false, true, vMintsSelected, address_str);
 }
 
-extern UniValue DoZwgrSpend(const CAmount nAmount, bool fMintChange, bool fMinimizeChange, const int nSecurityLevel, vector<CZerocoinMint>& vMintsSelected, std::string address_str)
+extern UniValue DoZwgrSpend(const CAmount nAmount, bool fMintChange, bool fMinimizeChange, vector<CZerocoinMint>& vMintsSelected, std::string address_str)
 {
     int64_t nTimeStart = GetTimeMillis();
     CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
@@ -4142,9 +3498,9 @@ extern UniValue DoZwgrSpend(const CAmount nAmount, bool fMintChange, bool fMinim
         address = CBitcoinAddress(address_str);
         if(!address.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
+        fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, &address);
     } else                   // Spend to newly generated local address
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, nSecurityLevel, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange);
+        fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange);
 
     if (!fSuccess)
         throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
@@ -4345,7 +3701,7 @@ UniValue getarchivedzerocoin(const UniValue& params, bool fHelp)
     list<CDeterministicMint> listDMints = walletdb.ListArchivedDeterministicMints();
 
     UniValue arrRet(UniValue::VARR);
-    for (const CZerocoinMint mint : listMints) {
+    for (const CZerocoinMint& mint : listMints) {
         UniValue objMint(UniValue::VOBJ);
         objMint.push_back(Pair("txid", mint.GetTxHash().GetHex()));
         objMint.push_back(Pair("denomination", ValueFromAmount(mint.GetDenominationAsAmount())));
@@ -4355,7 +3711,7 @@ UniValue getarchivedzerocoin(const UniValue& params, bool fHelp)
         arrRet.push_back(objMint);
     }
 
-    for (const CDeterministicMint dMint : listDMints) {
+    for (const CDeterministicMint& dMint : listDMints) {
         UniValue objDMint(UniValue::VOBJ);
         objDMint.push_back(Pair("txid", dMint.GetTxHash().GetHex()));
         objDMint.push_back(Pair("denomination", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination()))));
@@ -4435,7 +3791,11 @@ UniValue exportzerocoins(const UniValue& params, bool fHelp)
         objMint.push_back(Pair("u", mint.IsUsed()));
         objMint.push_back(Pair("v", mint.GetVersion()));
         if (mint.GetVersion() >= 2) {
-            objMint.push_back(Pair("k", HexStr(mint.GetPrivKey())));
+            CKey key;
+            key.SetPrivKey(mint.GetPrivKey(), true);
+            CBitcoinSecret cBitcoinSecret;
+            cBitcoinSecret.SetKey(key);
+            objMint.push_back(Pair("k", cBitcoinSecret.ToString()));
         }
         jsonList.push_back(objMint);
     }
@@ -4513,10 +3873,10 @@ UniValue importzerocoins(const UniValue& params, bool fHelp)
         CPrivKey privkey;
         if (nVersion >= libzerocoin::PrivateCoin::PUBKEY_VERSION) {
             std::string strPrivkey = find_value(o, "k").get_str();
-            CKey key;
-            uint256 nPrivKey(strPrivkey);
-            key.Set(nPrivKey.begin(), nPrivKey.end(), true);
-            if (!key.IsValid())
+            CBitcoinSecret vchSecret;
+            bool fGood = vchSecret.SetString(strPrivkey);
+            CKey key = vchSecret.GetKey();
+            if (!key.IsValid() && fGood)
                 return JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "privkey is not valid");
             privkey = key.GetPrivKey();
         }
@@ -4566,7 +3926,7 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
     pwalletMain->ReconsiderZerocoins(listMints, listDMints);
 
     UniValue arrRet(UniValue::VARR);
-    for (const CZerocoinMint mint : listMints) {
+    for (const CZerocoinMint& mint : listMints) {
         UniValue objMint(UniValue::VOBJ);
         objMint.push_back(Pair("txid", mint.GetTxHash().GetHex()));
         objMint.push_back(Pair("denomination", ValueFromAmount(mint.GetDenominationAsAmount())));
@@ -4574,7 +3934,7 @@ UniValue reconsiderzerocoins(const UniValue& params, bool fHelp)
         objMint.push_back(Pair("height", mint.GetHeight()));
         arrRet.push_back(objMint);
     }
-    for (const CDeterministicMint dMint : listDMints) {
+    for (const CDeterministicMint& dMint : listDMints) {
         UniValue objMint(UniValue::VOBJ);
         objMint.push_back(Pair("txid", dMint.GetTxHash().GetHex()));
         objMint.push_back(Pair("denomination", FormatMoney(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination()))));
@@ -4795,21 +4155,41 @@ UniValue searchdzwgr(const UniValue& params, bool fHelp)
     return "done";
 }
 
+UniValue enableautomintaddress(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() != 1)
+        throw std::runtime_error(
+                "enableautomintaddress enable\n"
+                "\nEnables or disables automint address functionality\n"
+
+                "\nArguments\n"
+                "1. enable     (boolean, required) Enable or disable automint address functionality\n"
+
+                "\nExamples\n" +
+                HelpExampleCli("enableautomintaddress", "true") + HelpExampleRpc("enableautomintaddress", "false"));
+
+    fEnableAutoConvert = params[0].get_bool();
+
+    return NullUniValue;
+}
+
 UniValue createautomintaddress(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() != 0)
-        throw runtime_error(
+        throw std::runtime_error(
                 "createautomintaddress\n"
-                        "Overview: generates new auto mint address\n"
-                        "\nResult\n"
-                        "\"address\"             160hash of public key\n" +
+                "\nGenerates new auto mint address\n" +
+                HelpRequiringPassphrase() + "\n"
+
+                "\nResult\n"
+                "\"address\"     (string) WAGERR address for auto minting\n" +
                 HelpExampleCli("createautomintaddress", "") +
                 HelpExampleRpc("createautomintaddress", ""));
+
+    EnsureWalletIsUnlocked();
     LOCK(pwalletMain->cs_wallet);
     CBitcoinAddress address = pwalletMain->GenerateNewAutoMintKey();
-    UniValue ret(UniValue::VOBJ);
-    ret.push_back(Pair("address", address.ToString()));
-    return ret;
+    return address.ToString();
 }
 
 UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
@@ -4870,5 +4250,41 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
     vector<CZerocoinMint> vMintsSelected = {mint};
     CAmount nAmount = mint.GetDenominationAsAmount();
 
-    return DoZwgrSpend(nAmount, false, true, 42, vMintsSelected, address_str);
+    return DoZwgrSpend(nAmount, false, true, vMintsSelected, address_str);
+}
+
+UniValue clearspendcache(const UniValue& params, bool fHelp)
+{
+    if(fHelp || params.size() != 0)
+        throw runtime_error(
+            "clearspendcache\n"
+            "\nClear the pre-computed zWGR spend cache, and database.\n" +
+            HelpRequiringPassphrase() + "\n"
+
+            "\nExamples\n" +
+            HelpExampleCli("clearspendcache", "") + HelpExampleRpc("clearspendcache", ""));
+
+    EnsureWalletIsUnlocked();
+
+    CzWGRTracker* zwgrTracker = pwalletMain->zwgrTracker.get();
+
+    {
+        int nTries = 0;
+        while (nTries < 100) {
+            TRY_LOCK(zwgrTracker->cs_spendcache, fLocked);
+            if (fLocked) {
+                if (zwgrTracker->ClearSpendCache()) {
+                    fClearSpendCache = true;
+                    CWalletDB walletdb("precomputes.dat", "cr+");
+                    walletdb.EraseAllPrecomputes();
+                    return "Successfully Cleared the Precompute Spend Cache and Database";
+                }
+            } else {
+                fGlobalUnlockSpendCache = true;
+                nTries++;
+                MilliSleep(100);
+            }
+        }
+    }
+    throw JSONRPCError(RPC_WALLET_ERROR, "Error: Spend cache not cleared!");
 }
