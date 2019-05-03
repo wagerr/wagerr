@@ -300,14 +300,14 @@ public:
         nBlockLastGoodCheckpoint = 350; //Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
         nBlockEnforceInvalidUTXO = 350; //Start enforcing the invalid UTXO's
         nInvalidAmountFiltered = 0; //Amount of invalid coins filtered through exchanges, that should be considered valid
-        nBlockZerocoinV2 = 26150; //The block that zerocoin v2 becomes active
+        nBlockZerocoinV2 = 26050; //The block that zerocoin v2 becomes active
         nEnforceNewSporkKey = 1536019200; //!> Sporks signed after Tuesday September 4, 2018 12:00:00 AM GMT must use the new spork key
         nRejectOldSporkKey = 1538611200; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
 
         nZerocoinStartHeight = 50;            // Start accumulation coins here - first zerocoin mint occurs at block 87
 
         /** Bet related parameters **/
-        nBetStartHeight = 23000;                                        // The block that betting protocols become active (Testnet).
+        nBetStartHeight = 26080;                                        // The block that betting protocols become active (Testnet).
         vOracleWalletAddrs = {"TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2",     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
                               "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc" };
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
