@@ -1,1 +1,2 @@
 contrib/wagerrd.bash-completion	wagerrd
+contrib/wagerr-cli.bash-completion wagerr-cli

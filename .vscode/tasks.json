@@ -1,0 +1,78 @@
+{
+    // See https://go.microsoft.com/fwlink/?LinkId=733558
+    // for the documentation about the tasks.json format
+    "version": "2.0.0",
+    "tasks": [
+        {
+            "label": "build with depends (default build, x86_64)",
+            "type": "shell",
+            "command": "make clean;make dist clean;rm -fR ./autom4te.cache;rm ./configure ./*.m4 ./config.log ./config.status ./libtool ./Makefile .Makefile.in;cd depends;make -j4;cd ..;./autogen.sh;./configure --prefix=`pwd`/depends/x86_64-pc-linux-gnu;make -j4",
+            "group": {
+                "kind": "build",
+                "isDefault": true
+            }
+        },
+        {
+            "label": "build with depends and run make check at the end (x86_64)",
+            "type": "shell",
+            "command": "make clean;make dist clean;rm -fR ./autom4te.cache;rm ./configure ./*.m4 ./config.log ./config.status ./libtool ./Makefile .Makefile.in;cd depends;make -j4;cd ..;./autogen.sh;./configure --prefix=`pwd`/depends/x86_64-pc-linux-gnu;make -j4;make check",
+        },
+        {
+            "label": "build with depends and launch QT-Wallet with datadir in: ../datadir (x86_64)",
+            "type": "shell",
+            "command": "make clean;make dist clean;rm -fR ./autom4te.cache;rm ./configure ./*.m4 ./config.log ./config.status ./libtool ./Makefile .Makefile.in;cd depends;make -j4;cd ..;./autogen.sh;./configure --prefix=`pwd`/depends/x86_64-pc-linux-gnu;make -j4;mkdir -p ../datadir;src/qt/wagerr-qt --datadir=../datadir;",
+        },
+        {
+            "label": "build with shared libraries",
+            "type": "shell",
+            "command": "make clean;make dist clean;rm -fR ./autom4te.cache;rm ./configure ./*.m4 ./config.log ./config.status ./libtool ./Makefile .Makefile.in;./autogen.sh;./configure;make -j4",        },
+        {
+            "label": "build with shared libraries and run make check at the end",
+            "type": "shell",
+            "command": "make clean;make dist clean;rm -fR ./autom4te.cache;rm ./configure ./*.m4 ./config.log ./config.status ./libtool ./Makefile .Makefile.in;./autogen.sh;;./configure;make -j4;make check",        },
+        {
+            "label": "build with shared libraries and launch QT-Wallet with datadir in: ../datadir",
+            "type": "shell",
+            "command": "make clean;make dist clean;rm -fR ./autom4te.cache;rm ./configure ./*.m4 ./config.log ./config.status ./libtool ./Makefile .Makefile.in;./autogen.sh;./configure;make -j4;mkdir -p ../datadir;src/qt/wagerr-qt --datadir=../datadir;",
+        },
+        {
+            "label": "Run tests",
+            "type": "shell",
+            "command": "./src/test/test_ion;./src/qt/test/test_wagerr-qt;./test/util/bitcoin-util-test.py;./test/util/rpcauth-test.py;./test/functional/test_runner.py --extended",
+            "windows": {
+                "command": ".\\src\\test\\test_wagerr.exe;.\\src\\qt\\test\\test_wagerr-qt.exe;.\\test\\util\\bitcoin-util-test.py;.\\test\\util\\rpcauth-test.py;.\\test\\functional\\test_runner.py --extended"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Run Travis tests (packer-1515445631-7dfb2e1)",
+            "type": "shell",
+            "command": "INSTANCE='travisci/ci-garnet:ppacker-1515445631-7dfb2e1';docker run --name $BUILDID -dit $INSTANCE /sbin/init;docker exec -it $BUILDID bash -l; su - travis",
+            "windows": {
+                "command": ".\\src\\test\\test_wagerr.exe;.\\src\\qt\\test\\test_wagerr-qt.exe;.\\test\\util\\bitcoin-util-test.py;.\\test\\util\\rpcauth-test.py;.\\test\\functional\\test_runner.py --extended"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Optimize PNGS",
+            "type": "shell",
+            "command": "./contrib/devtools/optimize-pngs.py",
+            "windows": {
+                "command": ".\\contrib\\devtools\\optimize-pngs.py"
+            },
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+    ]
+}

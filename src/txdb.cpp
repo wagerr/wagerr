@@ -10,7 +10,7 @@
 #include "main.h"
 #include "pow.h"
 #include "uint256.h"
-#include "accumulators.h"
+#include "zwgr/accumulators.h"
 
 #include <stdint.h>
 

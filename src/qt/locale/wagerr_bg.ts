@@ -608,10 +608,6 @@
         <source>&amp;Command-line options</source>
         <translation>Опции за &amp;Командното-поле</translation>
     </message>
-    <message numerus="yes">
-        <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>Обработени %n блока от преводната история.</numerusform><numerusform>Обработени %n блока от преводна история.</numerusform></translation>
-    </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
         <translation>Синхронизиране на допълнитенни данни: %p%</translation>
@@ -736,10 +732,6 @@
         <source>Wagerr Core client</source>
         <translation>Клиент Wagerr Ядро</translation>
     </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform> %n активни свръзки към Wagerr мрежата </numerusform><numerusform>%n активни свръзка(и) към Wagerr мрежата </numerusform></translation>
-    </message>
     <message>
         <source>Synchronizing with network...</source>
         <translation>Синхронизиране с мрежата...</translation>
@@ -760,21 +752,9 @@
         <source>Up to date</source>
         <translation>Актуален</translation>
     </message>
-    <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation><numerusform>%n часа</numerusform><numerusform>%n часа</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation><numerusform>%n седмици</numerusform><numerusform>%n седмици</numerusform></translation>
-    </message>
     <message>
         <source>%1 and %2</source>
         <translation>%1 и %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation><numerusform>%n години</numerusform><numerusform>%n години</numerusform></translation>
     </message>
     <message>
         <source>Catching up...</source>
@@ -846,7 +826,7 @@ Address: %4
     </message>
     <message>
         <source>AutoMint is currently enabled and set to </source>
-        <translation>АвтоЕмитирането е включено в момента и настроено на </translation>
+        <translation>АвтоЕмисията е включена и настроена на</translation>
     </message>
     <message>
         <source>AutoMint is disabled</source>

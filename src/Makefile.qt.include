@@ -8,37 +8,38 @@ EXTRA_LIBRARIES += qt/libbitcoinqt.a
 # wagerr qt core #
 QT_TS = \
   qt/locale/wagerr_bg.ts \
-  qt/locale/wagerr_ca.ts \
-  qt/locale/wagerr_cs.ts \
-  qt/locale/wagerr_da.ts \
-  qt/locale/wagerr_de.ts \
-  qt/locale/wagerr_en.ts \
-  qt/locale/wagerr_en_US.ts \
-  qt/locale/wagerr_eo.ts \
-  qt/locale/wagerr_es.ts \
-  qt/locale/wagerr_es_ES.ts \
-  qt/locale/wagerr_fi.ts \
-  qt/locale/wagerr_fr_FR.ts \
-  qt/locale/wagerr_hi_IN.ts \
-  qt/locale/wagerr_hr.ts \
-  qt/locale/wagerr_hr_HR.ts \
-  qt/locale/wagerr_it.ts \
-  qt/locale/wagerr_ja.ts \
-  qt/locale/wagerr_ko_KR.ts \
-  qt/locale/wagerr_lt_LT.ts \
-  qt/locale/wagerr_nl.ts \
-  qt/locale/wagerr_pl.ts \
-  qt/locale/wagerr_pt.ts \
-  qt/locale/wagerr_pt_BR.ts \
-  qt/locale/wagerr_ro_RO.ts \
-  qt/locale/wagerr_ru.ts \
-  qt/locale/wagerr_sk.ts \
-  qt/locale/wagerr_sv.ts \
-  qt/locale/wagerr_tr.ts \
-  qt/locale/wagerr_uk.ts \
-  qt/locale/wagerr_vi.ts \
-  qt/locale/wagerr_zh_CN.ts \
-  qt/locale/wagerr_zh_TW.ts
+   qt/locale/wagerr_ca.ts \
+   qt/locale/wagerr_cs.ts \
+   qt/locale/wagerr_da.ts \
+   qt/locale/wagerr_de.ts \
+   qt/locale/wagerr_en.ts \
+   qt/locale/wagerr_en_GB.ts \
+   qt/locale/wagerr_en_US.ts \
+   qt/locale/wagerr_eo.ts \
+   qt/locale/wagerr_es.ts \
+   qt/locale/wagerr_es_ES.ts \
+   qt/locale/wagerr_fi.ts \
+   qt/locale/wagerr_fr_FR.ts \
+   qt/locale/wagerr_hi_IN.ts \
+   qt/locale/wagerr_hr.ts \
+   qt/locale/wagerr_hr_HR.ts \
+   qt/locale/wagerr_it.ts \
+   qt/locale/wagerr_ja.ts \
+   qt/locale/wagerr_ko_KR.ts \
+   qt/locale/wagerr_lt_LT.ts \
+   qt/locale/wagerr_nl.ts \
+   qt/locale/wagerr_pl.ts \
+   qt/locale/wagerr_pt.ts \
+   qt/locale/wagerr_pt_BR.ts \
+   qt/locale/wagerr_ro_RO.ts \
+   qt/locale/wagerr_ru.ts \
+   qt/locale/wagerr_sk.ts \
+   qt/locale/wagerr_sv.ts \
+   qt/locale/wagerr_tr.ts \
+   qt/locale/wagerr_uk.ts \
+   qt/locale/wagerr_vi.ts \
+   qt/locale/wagerr_zh_CN.ts \
+   qt/locale/wagerr_zh_TW.ts
 
 QT_FORMS_UI = \
   qt/forms/addressbookpage.ui \
@@ -369,10 +370,7 @@ RES_IMAGES = \
   qt/res/images/upArrow_small.png \
   qt/res/images/leftArrow_small_dark.png \
   qt/res/images/rightArrow_small_dark.png \
-  qt/res/images/qtreeview_selected.png \
-  qt/res/images/walletFrame.png \
-  qt/res/images/walletFrame_bg.png \
-  qt/res/images/walletFrame_bg.png
+  qt/res/images/qtreeview_selected.png
 
 RES_CSS = \
   qt/res/css/default.css

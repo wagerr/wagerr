@@ -18,8 +18,8 @@
 #include "timedata.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
-#include "wallet.h"
-#include "walletdb.h"
+#include "wallet/wallet.h"
+#include "wallet/walletdb.h"
 #endif
 
 #include <stdint.h>
@@ -96,12 +96,34 @@ UniValue getinfo(const UniValue& params, bool fHelp)
     LOCK(cs_main);
 #endif
 
+    std::string services;
+    for (int i = 0; i < 8; i++) {
+        uint64_t check = 1 << i;
+        if (nLocalServices & check) {
+            switch (check) {
+                case NODE_NETWORK:
+                    services+= "NETWORK/";
+                    break;
+                case NODE_BLOOM:
+                    services+= "BLOOM/";
+                    break;
+                case NODE_BLOOM_WITHOUT_MN:
+                case NODE_BLOOM_LIGHT_ZC:
+                    services+= "BLOOM_ZC/";
+                    break;
+                default:
+                    services+= "UNKNOWN/";
+            }
+        }
+    }
+
     proxyType proxy;
     GetProxy(NET_IPV4, proxy);
 
     UniValue obj(UniValue::VOBJ);
     obj.push_back(Pair("version", CLIENT_VERSION));
     obj.push_back(Pair("protocolversion", PROTOCOL_VERSION));
+    obj.push_back(Pair("services", services));
 #ifdef ENABLE_WALLET
     if (pwalletMain) {
         obj.push_back(Pair("walletversion", pwalletMain->GetVersion()));

@@ -8,15 +8,15 @@
 #include "chainparams.h"
 #include "main.h"
 #include "txdb.h"
-#include "primitives/deterministicmint.h"
+#include "zwgr/deterministicmint.h"
 #include "key.h"
-#include "accumulatorcheckpoints.h"
+#include "zwgr/accumulatorcheckpoints.h"
 #include "libzerocoin/bignum.h"
 #include <boost/test/unit_test.hpp>
 #include <iostream>
-#include <accumulators.h>
-#include "wallet.h"
-#include "zwgrwallet.h"
+#include <zwgr/accumulators.h>
+#include "wallet/wallet.h"
+#include "zwgr/zwgrwallet.h"
 #include "zwgrchain.h"
 
 using namespace libzerocoin;

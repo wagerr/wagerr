@@ -29,6 +29,7 @@ BITCOIN_TESTS =\
   test/zerocoin_implementation_tests.cpp\
   test/zerocoin_denomination_tests.cpp\
   test/zerocoin_transactions_tests.cpp \
+  test/zerocoin_coinspend_tests.cpp \
   test/benchmark_zerocoin.cpp \
   test/tutorial_zerocoin.cpp \
   test/libzerocoin_tests.cpp \
@@ -74,7 +75,7 @@ BITCOIN_TESTS =\
 if ENABLE_WALLET
 BITCOIN_TESTS += \
   test/accounting_tests.cpp \
-  test/wallet_tests.cpp \
+  wallet/test/wallet_tests.cpp \
   test/rpc_wallet_tests.cpp
 endif
 

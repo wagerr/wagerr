@@ -14,7 +14,7 @@ To install:
 	sudo update-desktop-database
 
 If you build yourself, you will either need to modify the paths in
-the .desktop file or copy or symlink your wagerrqt binary to `/usr/bin`
+the .desktop file or copy or symlink your wagerr-qt binary to `/usr/bin`
 and the `../../share/pixmaps/wagerr128.png` to `/usr/share/pixmaps`
 
 wagerr-qt.protocol (KDE)

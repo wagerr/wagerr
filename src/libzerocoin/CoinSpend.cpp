@@ -9,7 +9,7 @@
  * @copyright  Copyright 2013 Ian Miers, Christina Garman and Matthew Green
  * @license    This project is released under the MIT license.
  **/
-// Copyright (c) 2017-2018 The PIVX developers
+// Copyright (c) 2017-2018 The WAGERR developers
 
 #include "CoinSpend.h"
 #include <iostream>
@@ -72,7 +72,7 @@ namespace libzerocoin
     }
 }
 
-bool CoinSpend::Verify(const Accumulator& a) const
+bool CoinSpend::Verify(const Accumulator& a, bool verifyParams) const
 {
     // Double check that the version is the same as marked in the serial
     if (ExtractVersionFromSerial(coinSerialNumber) != version) {
@@ -96,7 +96,7 @@ bool CoinSpend::Verify(const Accumulator& a) const
         return false;
     }
 
-    if (!serialNumberSoK.Verify(coinSerialNumber, serialCommitmentToCoinValue, signatureHash())) {
+    if (!serialNumberSoK.Verify(coinSerialNumber, serialCommitmentToCoinValue, signatureHash(), verifyParams)) {
         //std::cout << "CoinsSpend::Verify: serialNumberSoK failed. sighash:" << signatureHash().GetHex() << "\n";
         return false;
     }
@@ -135,11 +135,16 @@ bool CoinSpend::HasValidSignature() const
     if (version < PrivateCoin::PUBKEY_VERSION)
         return true;
 
-    //V2 serial requires that the signature hash be signed by the public key associated with the serial
-    uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end()) >> PrivateCoin::V2_BITSHIFT;
-    if (hashedPubkey != GetAdjustedSerial(coinSerialNumber).getuint256()) {
-        //cout << "CoinSpend::HasValidSignature() hashedpubkey is not equal to the serial!\n";
-        return false;
+    try {
+        //V2 serial requires that the signature hash be signed by the public key associated with the serial
+        uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end()) >> PrivateCoin::V2_BITSHIFT;
+        if (hashedPubkey != GetAdjustedSerial(coinSerialNumber).getuint256()) {
+            //cout << "CoinSpend::HasValidSignature() hashedpubkey is not equal to the serial!\n";
+            return false;
+        }
+    } catch(std::range_error &e) {
+        //std::cout << "HasValidSignature() error: " << e.what() << std::endl;
+        throw InvalidSerialException("Serial longer than 256 bits");
     }
 
     return pubkey.Verify(signatureHash(), vchSig);

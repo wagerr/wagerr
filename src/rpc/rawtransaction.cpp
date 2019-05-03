@@ -13,7 +13,7 @@
 #include "main.h"
 #include "net.h"
 #include "primitives/transaction.h"
-#include "primitives/deterministicmint.h"
+#include "zwgr/deterministicmint.h"
 #include "rpc/server.h"
 #include "script/script.h"
 #include "script/script_error.h"
@@ -24,7 +24,7 @@
 #include "utilmoneystr.h"
 #include "zwgrchain.h"
 #ifdef ENABLE_WALLET
-#include "wallet.h"
+#include "wallet/wallet.h"
 #endif
 
 #include <stdint.h>

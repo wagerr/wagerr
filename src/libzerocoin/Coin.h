@@ -9,8 +9,7 @@
  * @copyright  Copyright 2013 Ian Miers, Christina Garman and Matthew Green
  * @license    This project is released under the MIT license.
  **/
-// Copyright (c) 2017-2018 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
+// Copyright (c) 2017-2018 The WAGERR developers
 
 #ifndef COIN_H_
 #define COIN_H_
@@ -23,8 +22,16 @@
 
 namespace libzerocoin
 {
+
+    class InvalidSerialException : public std::exception {
+    public:
+        std::string message;
+        InvalidSerialException(const string &message) : message(message) {}
+    };
+
     int ExtractVersionFromSerial(const CBigNum& bnSerial);
     bool IsValidSerial(const ZerocoinParams* params, const CBigNum& bnSerial);
+    bool IsValidCommitmentToCoinRange(const ZerocoinParams* params, const CBigNum& bnCommitment);
     CBigNum GetAdjustedSerial(const CBigNum& bnSerial);
     bool GenerateKeyPair(const CBigNum& bnGroupOrder, const uint256& nPrivkey, CKey& key, CBigNum& bnSerial);
 
@@ -112,8 +119,8 @@ public:
     const uint8_t& getVersion() const { return this->version; }
 
     void setPublicCoin(PublicCoin p) { publicCoin = p; }
-    void setRandomness(Bignum n) { randomness = n; }
-    void setSerialNumber(Bignum n) { serialNumber = n; }
+    void setRandomness(CBigNum n) { randomness = n; }
+    void setSerialNumber(CBigNum n) { serialNumber = n; }
     void setVersion(uint8_t nVersion) { this->version = nVersion; }
     void setPrivKey(const CPrivKey& privkey) { this->privkey = privkey; }
     bool sign(const uint256& hash, std::vector<unsigned char>& vchSig) const;

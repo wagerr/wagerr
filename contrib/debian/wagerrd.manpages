@@ -1,2 +1,2 @@
-debian/manpages/wagerrd.1
-debian/manpages/wagerr.conf.5
+doc/man/wagerrd.1
+doc/man/wagerr-cli.1

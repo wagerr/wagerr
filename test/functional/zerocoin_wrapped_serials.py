@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-# Copyright (c) 2019 The PIVX Core developers
+# Copyright (c) 2019 The WAGERR Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -91,7 +91,7 @@ class zWGRwrappedSerialsTest(WAGERR_FakeStakeTest):
                 tx = self.node.spendrawzerocoin(serial, randomness, DENOM_TO_USE, privkey)
             except JSONRPCException as e:
                 exc_msg = str(e)
-                if exc_msg == "The new spend coin transaction did not verify (-4)":
+                if exc_msg == "CoinSpend: failed check (-4)":
                     self.log.info("GOOD: Transaction did not verify")
                 else:
                     raise e

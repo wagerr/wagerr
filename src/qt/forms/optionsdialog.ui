@@ -131,17 +131,34 @@
         </spacer>
        </item>
        <item>
-        <widget class="QCheckBox" name="checkBoxZeromintEnable">
-         <property name="toolTip">
-          <string>Enable automatic minting of WGR units to zWGR</string>
-         </property>
-         <property name="layoutDirection">
-          <enum>Qt::LeftToRight</enum>
-         </property>
-         <property name="text">
-          <string>Enable zWGR Automint</string>
-         </property>
-        </widget>
+        <layout class="QHBoxLayout" name="horiz-autominting-layout">
+         <item>
+          <widget class="QCheckBox" name="checkBoxZeromintEnable">
+           <property name="toolTip">
+            <string>Enable automatic minting of WGR units to zWGR</string>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Enable zWGR Automint</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QCheckBox" name="checkBoxZeromintAddresses">
+           <property name="toolTip">
+            <string>Enable automatic zWGR minting from specific addresses</string>
+           </property>
+           <property name="layoutDirection">
+            <enum>Qt::LeftToRight</enum>
+           </property>
+           <property name="text">
+            <string>Enable Automint Addresses</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
        </item>
        <item>
         <layout class="QHBoxLayout" name="horizontalLayout_3">

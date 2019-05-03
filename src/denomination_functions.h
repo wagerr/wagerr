@@ -6,7 +6,7 @@
 #include "reverse_iterate.h"
 #include "util.h"
 #include "libzerocoin/Denominations.h"
-#include "primitives/zerocoin.h"
+#include "zwgr/zerocoin.h"
 #include <list>
 #include <map>
 std::vector<CMintMeta> SelectMintsFromList(const CAmount nValueTarget, CAmount& nSelectedValue,

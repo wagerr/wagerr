@@ -23,7 +23,7 @@
 /****************************************************************************************/
 
 WalletFrame {
-    border-image: url(':/images/walletFrame_bg') 0 0 0 0 stretch stretch;
+    background-color:#ffffff;
     border-top:0px solid #000;
     margin:0;
     padding:0;
@@ -224,7 +224,7 @@ WalletFrame {
     /***************************** Global Qt Objects ***********************************************************/
     
     QPushButton { /* Global Button Style */
-    background-color: #b70000; 
+    background-color: #b70000;
     border-width: 1px;
     border-style: outset;
     border-color: #454545;

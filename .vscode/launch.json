@@ -1,0 +1,2596 @@
+{
+    // Copyright (c) 2018-2019 The Ion developers
+        "version": "0.2.0",
+        "configurations": [
+            {
+                "name": "bitcoin-util test (verbos) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/util/bitcoin-util-test.py",
+                "args": ["-v"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "Wagerr tests",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/test/test_ion",
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr QT tests",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/test/test_wagerr-qt",
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (normal)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (normal)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (normal)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (normal)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug addrman)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=addrman"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug alert)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=alert"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug bench)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=bench"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug coindb)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=coindb"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug db)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=db"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug lock)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=lock"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug rand)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=rand"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug rpc)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=rpc"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug rpc)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=rpc"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug tor)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=tor"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug mempool)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=mempool"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug net)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=net"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug proxy)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=proxy"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug http)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=http"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug libevent)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=libevent"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug ion)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=ion"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug obfuscation)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=obfuscation"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug swiftx)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=swiftx"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug masternode)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=masternode"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug mnpayments)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=mnpayments"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug mnbudget)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=mnbudget"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon main net (debug zero)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=zero"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug addrman)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=addrman"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug alert)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=alert"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug bench)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=bench"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug coindb)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=coindb"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug db)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=db"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug lock)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=lock"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug rand)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=rand"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug rpc)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=rpc"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug rpc)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=rpc"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug tor)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=tor"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug mempool)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=mempool"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug net)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=net"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug proxy)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=proxy"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug http)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=http"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug libevent)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=libevent"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug ion)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=ion"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug obfuscation)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=obfuscation"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug swiftx)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=swiftx"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug masternode)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=masternode"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug mnpayments)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=mnpayments"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug mnbudget)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=mnbudget"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT main net (debug zero)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--debug=zero"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug addrman)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=addrman"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug alert)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=alert"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug bench)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=bench"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug coindb)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=coindb"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug db)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=db"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug lock)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=lock"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug rand)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=rand"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug rpc)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=rpc"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug rpc)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=rpc"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug tor)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=tor"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug mempool)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=mempool"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug net)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=net"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug proxy)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=proxy"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug http)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=http"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug libevent)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=libevent"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug ion)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=ion"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug obfuscation)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=obfuscation"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug swiftx)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=swiftx"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug masternode)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=masternode"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug mnpayments)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=mnpayments"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug mnbudget)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=mnbudget"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr daemon testnet (debug zero)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=zero"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug addrman)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=addrman"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug alert)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=alert"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug bench)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=bench"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug coindb)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=coindb"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug db)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=db"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug lock)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=lock"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug rand)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=rand"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug rpc)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=rpc"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug rpc)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=rpc"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug tor)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=tor"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug mempool)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=mempool"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug net)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=net"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug proxy)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=proxy"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug http)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=http"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug libevent)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=libevent"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug ion)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=ion"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug obfuscation)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=obfuscation"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug swiftx)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=swiftx"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug masternode)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=masternode"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug mnpayments)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=mnpayments"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug mnbudget)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=mnbudget"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr-QT testnet (debug zero)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/qt/wagerr-qt",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet", "--debug=zero"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "selectcoins",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for selectcoins",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr CLI main net (normal)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerr-cli",
+                "args": ["--datadir=${workspaceFolder}/../datadir"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "Wagerr CLI testnet (normal)",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerr-cli",
+                "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            // FULL SUITE ALL TESTS
+            {
+                "name": "test suite (extended) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--extended", "--jobs=4"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "test suite (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            // NORMAL SINGLE TESTS
+            {
+                "name": "example_test.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "example_test.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_block.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_block.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_reindex.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_reindex.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_proxy.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_proxy.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_cltv.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_cltv.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_minchainwork.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_minchainwork.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_uacomment.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_uacomment.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_config_args.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_config_args.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_help.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_help.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_fee_estimation.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_fee_estimation.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "feature_notifications.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "feature_notifications.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "interface_bitcoin_cli.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "interface_bitcoin_cli.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "interface_rest.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "interface_rest.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "interface_http.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "interface_http.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "interface_zmq.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "interface_zmq.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "mempool_spend_coinbase.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "mempool_spend_coinbase.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "mempool_reorg.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "mempool_reorg.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "mempool_persist.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "mempool_persist.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "mempool_resurrect.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "mempool_resurrect.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "mempool_limit.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "mempool_limit.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "mining_basic.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "mining_basic.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "mining_prioritisetransaction.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "mining_prioritisetransaction.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_mempool.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_mempool.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_pos_fakestake.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_pos_fakestake.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_pos_fakestake_accepted.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_pos_fakestake_accepted.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_zpos_fakestake.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_zpos_fakestake.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_zpos_fakestake_accepted.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_zpos_fakestake_accepted.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_pos_doublespend.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_pos_doublespend.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_disconnect_ban.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_disconnect_ban.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_invalid_block.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_invalid_block.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_invalid_tx.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_invalid_tx.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_leak.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_leak.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_fingerprint.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_fingerprint.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_unrequested_blocks.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_unrequested_blocks.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_timeouts.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_timeouts.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "p2p_feefilter.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "p2p_feefilter.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_fundrawtransaction.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_fundrawtransaction.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_listtransactions.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_listtransactions.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_rawtransaction.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_rawtransaction.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_bip38.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_bip38.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_getchaintips.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_getchaintips.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_users.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_users.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_signrawtransaction.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_signrawtransaction.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_decodescript.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_decodescript.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_blockchain.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_blockchain.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_deprecated.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_deprecated.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_net.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_net.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_signmessage.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_signmessage.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_bind.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_bind.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_invalidateblock.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_invalidateblock.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_basic.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_basic.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_accounts.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_accounts.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_dump.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_dump.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_zapwallettxes.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_zapwallettxes.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_importmulti.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_importmulti.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_backup.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_backup.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_listreceivedby.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_listreceivedby.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_abandonconflict.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_abandonconflict.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_keypool_topup.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_keypool_topup.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_txn_doublespend.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_txn_doublespend.py", "--mineblock"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_txn_clone.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_txn_clone.py","--mineblock"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_disable.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_disable.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_keypool.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_keypool.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_import_rescan.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_import_rescan.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_bumpfee.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_bumpfee.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_listsinceblock.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_listsinceblock.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_encryption.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_encryption.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "wallet_resendwallettransactions.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "wallet_resendwallettransactions.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "zerocoin_wrapped_serials.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "zerocoin_wrapped_serials.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            // NON_SCRIPTS
+            {
+                "name": "combine_logs.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "combine_logs.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "create_cache.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "create_cache.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "test suite (extended) (external terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--extended", "--jobs=4"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "console": "externalTerminal"
+            },
+            {
+                "name": "test suite (normal) (external terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4"],
+    
+                "cwd": "${workspaceFolder}",
+    
+                "console": "externalTerminal"
+            }
+        ]
+    }
+    
