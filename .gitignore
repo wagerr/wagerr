@@ -113,6 +113,8 @@ coverage_percent.txt
 linux-coverage-build
 linux-build
 win32-build
+test/config.ini
+test/cache/*
 qa/pull-tester/run-bitcoind-for-test.sh
 qa/pull-tester/tests-config.sh
 qa/pull-tester/cache/*
@@ -125,7 +127,7 @@ cache/*
 .project
 /doc/doxygen/
 /nbproject/
-
+libbitcoinconsensus.pc
 .idea
 CMakeLists.txt
 cmake-build-debug
@@ -137,3 +139,22 @@ cmake-build-debug
 # keys
 share/keys/
 
+# exclude 5.hfs file created by the script
+*.hfs
+*.dmg
+MacOSX10.11.sdk/
+
+#Vscode
+.vscode/
+.vscode/settings.json
+
+#SNAP
+parts/
+prime/
+snap/.snapcraft/
+stage/
+*.snap
+
+# datadir
+datadir/
+datadir*/
