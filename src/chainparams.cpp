@@ -431,7 +431,7 @@ public:
         nBlockLastGoodCheckpoint = 999999999; //Last valid accumulator checkpoint
 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x59db40eac6838e95d74905314b219f2338c89d020e962356fdd7e8083eccf3bb"));
+        assert(hashGenesisBlock == uint256("0x00000607d5df6a6501a2c97f33a56fe652fc9472492871afafdf88e9ba1180d3"));
 
         vFixedSeeds.clear(); //! Testnet mode doesn't have any fixed seeds.
         vSeeds.clear();      //! Testnet mode doesn't have any DNS seeds.

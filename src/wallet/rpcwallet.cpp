@@ -20,7 +20,9 @@
 #include "walletdb.h"
 #include "zwgrchain.h"
 
+//#include "qt/transactionrecord.h"
 #include "bet.h"
+
 #include <cstdlib>
 #include <stdint.h>
 
@@ -30,6 +32,7 @@
 #include "zwgr/deterministicmint.h"
 #include <boost/assign/list_of.hpp>
 #include <boost/thread/thread.hpp>
+#include <boost/algorithm/hex.hpp>
 
 #include <univalue.h>
 
@@ -815,7 +818,7 @@ UniValue getaddressesbyaccount(const UniValue& params, bool fHelp)
     return ret;
 }
 
-void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false)
+void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew, bool fUseIX = false, const std::string& opReturn = "")
 {
     // Check amount
     if (nValue <= 0)
@@ -837,7 +840,7 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     // Create and send the transaction
     CReserveKey reservekey(pwalletMain);
     CAmount nFeeRequired;
-    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, NULL, ALL_COINS, fUseIX, (CAmount)0)) {
+    if (!pwalletMain->CreateTransaction(scriptPubKey, nValue, wtxNew, reservekey, nFeeRequired, strError, NULL, ALL_COINS, fUseIX, (CAmount)0, opReturn)) {
         if (nValue + nFeeRequired > pwalletMain->GetBalance())
             strError = strprintf("Error: This transaction requires a transaction fee of at least %s because of its amount, complexity, or use of recently received funds!", FormatMoney(nFeeRequired));
         LogPrintf("SendMoney() : %s\n", strError);
@@ -845,6 +848,339 @@ void SendMoney(const CTxDestination& address, CAmount nValue, CWalletTx& wtxNew,
     }
     if (!pwalletMain->CommitTransaction(wtxNew, reservekey, (!fUseIX ? "tx" : "ix")))
         throw JSONRPCError(RPC_WALLET_ERROR, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.");
+}
+
+UniValue placebet(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 3 || params.size() > 5)
+        throw runtime_error(
+            "placebet \"event-id\" outcome amount ( \"comment\" \"comment-to\" )\n"
+            "\nWARNING - Betting closes 20 minutes before event start time.\n"
+            "Any bets placed after this time will be invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on an event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. \"event-id\"    (numeric, required) The event to bet on.\n"
+            "2. outcome         (numeric, required) 1 means home team win,\n"
+            "                                       2 means away team win,\n"
+            "                                       3 means a draw."
+            "3. amount          (numeric, required) The amount in wgr to send. eg 10\n"
+            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
+            "                             to which you're sending the transaction. This is not part of the \n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placebet", "\"000\" \"1\" 25\"donation\" \"seans outpost\"") +
+            HelpExampleRpc("placebet", "\"000\", \"1\", 25, \"donation\", \"seans outpost\""));
+
+    CAmount nAmount = AmountFromValue(params[2]);
+
+    // Validate bet amount so its between 25 - 10000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.");
+    }
+
+    // Wallet comments
+    CWalletTx wtx;
+    if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
+        wtx.mapValue["comment"] = params[3].get_str();
+    if (params.size() > 4 && !params[4].isNull() && !params[4].get_str().empty())
+        wtx.mapValue["to"] = params[4].get_str();
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    CBitcoinAddress address("");
+    int eventId = params[0].get_int();
+    int outcome = params[1].get_int();
+    CPeerlessBet plBet(eventId, (OutcomeType) outcome);
+
+    // TODO Retrieve the `CPeerlessEvent` currently associated with `eventId`
+    // and confirm that the submitted `team` is available; `throw` an
+    // `RPC_BET_DETAILS_ERROR` in the case of a mismatch.
+
+    // TODO `address` isn't used when adding the following transaction to the
+    // blockchain, so ideally it would not need to be supplied to `SendMoney`.
+    // Ideally an alternative function, such as `BurnMoney`, would be developed
+    // and used, which would take the `OP_RETURN` value in place of the address
+    // value.
+    // Note that, during testing, the `opReturn` value is added to the
+    // blockchain incorrectly if its length is less than 5. This behaviour would
+    // ideally be investigated and corrected/justified when time allows.
+    std::string opCode;
+    CPeerlessBet::ToOpCode(plBet, opCode);
+
+    // Unhex the validated bet opcode
+    vector<unsigned char> vectorValue;
+    string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
+UniValue placechaingamesbet(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 5) {
+        throw runtime_error(
+            "placechaingamesbet \"event-id\" amount ( \"comment\" \"comment-to\" )\n"
+            "\n WARNING!!! - Betting closes 20 minutes before event start time. Any bets placed after this time will be \n"
+            "invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on a chain games event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. event-id        (numeric, required) The event to bet on.\n"
+            "2. amount          (numeric, required) The amount in wgr to send. eg 0.1\n"
+            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
+            "                             to which you're sending the transaction. This is not part of the \n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placechaingamesbet", "\"#000\" 0.1 \"donation\" \"seans outpost\"") +
+            HelpExampleRpc("placechaingamesbet", "\"#000\", 0.1, \"donation\", \"seans outpost\""));
+    }
+
+    CAmount nAmount = AmountFromValue(params[1]);
+
+    // Validate bet amount so its between 25 - 10000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is beteen 25 - 10000 WGR inclusive.");
+    }
+
+    // TODO Allow comments for chain games bet
+    CWalletTx wtx;
+
+    // Validate amount
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    //TODO Respond if amount not correct
+    CBitcoinAddress address("");
+    int eventId = params[0].get_int();
+    CChainGamesBet cgBet(eventId);
+
+    std::string opCode;
+    CChainGamesBet::ToOpCode(cgBet, opCode);
+
+    // Unhex the validated bet opcode
+    vector<unsigned char> vectorValue;
+    boost::algorithm::unhex(opCode, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    // Process transaction
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
+/**
+ * Looks up a chain game info for a given ID.
+ *
+ * @param params The RPC params consisting of the event id.
+ * @param fHelp  Help text
+ * @return
+ */
+UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
+{
+    UniValue ret(UniValue::VARR);
+    UniValue obj(UniValue::VOBJ);
+
+    // Set default return values
+    unsigned int eventID = params[0].get_int();
+    int entryFee = 0;
+    int totalFoundCGBets = 0;
+    int gameStartTime = 0;
+    int gameStartBlock = 0;
+
+    //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
+    CBlockIndex *BlocksIndex = NULL;
+    int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
+    BlocksIndex = chainActive[height];
+
+    while (BlocksIndex) {
+        CBlock block;
+        ReadBlockFromDisk(block, BlocksIndex);
+
+        BOOST_FOREACH (CTransaction& tx, block.vtx) {
+
+            const CTxIn &txin = tx.vin[0];
+            bool validTx = IsValidOracleTx(txin);
+
+            // Check each TX out for values
+            for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                const CTxOut &txout = tx.vout[i];
+                std::string scriptPubKey = txout.scriptPubKey.ToString();
+
+                // Find OP_RETURN transactions
+                if(scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+
+                    std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
+                    std::string OpCode(vOpCode.begin(), vOpCode.end());
+
+                    // Find any CChainGameEvents matching the specified id
+                    CChainGamesEvent cgEvent;
+                    if (validTx && CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
+                        if (((unsigned int)cgEvent.nEventId) == eventID){
+                            entryFee = cgEvent.nEntryFee;
+                            gameStartTime = block.GetBlockTime();
+                            gameStartBlock = BlocksIndex -> nHeight;
+                        }
+                    }
+
+                    CChainGamesBet cgBet;
+                    if (!CChainGamesBet::FromOpCode(OpCode, cgBet)) {
+                        continue;
+                    }
+
+                    if (((unsigned int)cgBet.nEventId) == eventID){
+                        totalFoundCGBets = totalFoundCGBets + 1;
+                    }
+
+                }
+            }
+        }
+
+        BlocksIndex = chainActive.Next(BlocksIndex);
+    }
+
+    int potSize = totalFoundCGBets*entryFee;
+
+    obj.push_back(Pair("pot-size", potSize));
+    obj.push_back(Pair("entry-fee", entryFee));
+    obj.push_back(Pair("start-block", gameStartBlock));
+    obj.push_back(Pair("start-time", gameStartTime));
+    obj.push_back(Pair("total-bets", totalFoundCGBets));
+    obj.push_back(Pair("network", Params().NetworkID()));
+
+    return obj;
+}
+
+/**
+ * Get total liability for each event that is currently active.
+ *
+ * @param params The RPC params consisting of the event id.
+ * @param fHelp  Help text
+ * @return
+ */
+UniValue geteventsliability(const UniValue& params, bool fHelp)
+{
+  if (fHelp || (params.size() <= 1))
+        throw runtime_error(
+            "geteventsliability\n"
+            "Return the payout of each event.\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"name\": \"xxx\",         (string) The event ID\n"
+            "    \"event-id\": \"xxx\",       (string) The name of the event\n"
+            "    \"moneyline-home-payout\": \"xxx\",\n"
+            "    \"moneyline-away-payout\": n,\n"
+            "    \"moneyline-draw-payout\": n,\n"
+            "    \"spread-over-payout\": n,\n"
+            "    \"spread-under-payout\": n,\n"
+            "    \"spread-push-payout\": n,\n"
+            "    \"totals-over-payout\": n,\n"
+            "    \"totals-under-payout\": n,\n"
+            "    \"totals-push-payout\": n,\n"
+            "    ]\n"
+            "  }\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("geteventtotals", "") + HelpExampleRpc("geteventtotals", ""));
+
+    CEventDB edb;
+    eventIndex_t eventsIndex;
+    edb.GetEvents(eventsIndex);
+
+    // Check the events index actually has events,
+    if (eventsIndex.size() < 1) {
+        throw runtime_error("Currently no events to list.");
+    } 
+
+    int payoutThreshold = params[0].get_int();
+    int betThreshold = params[1].get_int();
+
+    UniValue ret(UniValue::VARR);
+
+    map<uint32_t, CPeerlessEvent>::iterator it;
+    for (it = eventsIndex.begin(); it != eventsIndex.end(); it++) {
+
+        CPeerlessEvent plEvent = it->second;
+
+        UniValue event(UniValue::VOBJ);
+        event.push_back(Pair("event-id", (int) plEvent.nEventId));
+
+        // Return potential moneyline payouts if each outcome is still open for betting
+        if (plEvent.nHomeOdds != 0 && (int) plEvent.nMoneyLineHomePotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("moneyline-home-liability", (int) plEvent.nMoneyLineHomePotentialLiability ));
+        }
+
+        if (plEvent.nAwayOdds != 0 && (int) plEvent.nMoneyLineAwayPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("moneyline-away-liability", (int) plEvent.nMoneyLineAwayPotentialLiability));
+        }
+
+        if (plEvent.nDrawOdds != 0 && (int) plEvent.nMoneyLineDrawPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("moneyline-draw-liability", (int) plEvent.nMoneyLineDrawPotentialLiability));
+        }
+
+        // Return potential spread payouts if each outcome is still open for betting
+        if (plEvent.nSpreadHomeOdds != 0 && (int) plEvent.nSpreadHomePotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("spreads-home-liability", (int) plEvent.nSpreadHomePotentialLiability));
+        }
+
+        if (plEvent.nSpreadAwayOdds != 0 && (int) plEvent.nSpreadAwayPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("spreads-away-liability", (int) plEvent.nSpreadAwayPotentialLiability));
+        }
+
+        if ( (int) plEvent.nSpreadPushPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("spreads-push-liability", (int) plEvent.nSpreadPushPotentialLiability));
+        }
+
+        // Return potential totals payouts if each outcome is still open for betting
+        if (plEvent.nTotalOverOdds != 0 && (int) plEvent.nTotalOverPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("total-over-liability", (int) plEvent.nTotalOverPotentialLiability));
+        }
+
+        if (plEvent.nTotalUnderOdds != 0 && (int) plEvent.nTotalUnderPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("total-under-liability", (int) plEvent.nTotalUnderPotentialLiability));
+        }
+
+        if ( (int) plEvent.nTotalPushPotentialLiability >= payoutThreshold ){
+            event.push_back(Pair("total-push-liability", (int) plEvent.nTotalPushPotentialLiability));
+        }
+
+        // Find the moneyline event with the most amount of bets and add it to total push bets to find total number potential bets to be payed out
+        int moneylineTotalBets[] = {(int) plEvent.nMoneyLineHomeBets , (int) plEvent.nMoneyLineAwayBets, (int) plEvent.nMoneyLineDrawBets};
+        int highestMoneyLine = 0;
+
+        for (int n=0; n<3; n++ )
+        {
+            if (moneylineTotalBets[n] > highestMoneyLine){
+                highestMoneyLine = moneylineTotalBets[n];
+            }
+        }
+
+        int betCount = highestMoneyLine + (int) plEvent.nSpreadPushBets + (int) plEvent.nTotalPushBets;
+
+        event.push_back(Pair("event-bet-count", betCount));
+
+        if (event.size() > 2 || betCount >= betThreshold) {
+            ret.push_back(event);
+        } 
+
+    }
+
+    return ret;
 }
 
 UniValue sendtoaddress(const UniValue& params, bool fHelp)
@@ -1259,6 +1595,54 @@ UniValue getbalance(const UniValue& params, bool fHelp)
     CAmount nBalance = GetAccountBalance(strAccount, nMinDepth, filter);
 
     return ValueFromAmount(nBalance);
+}
+
+UniValue getextendedbalance(const UniValue& params, bool fHelp)
+{
+    if (fHelp || (params.size() > 0))
+        throw runtime_error(
+            "getextendedbalance\n"
+            "\nGet extended balance information.\n"
+
+            "\nResult:\n"
+            "{\n"
+            "  \"blocks\": \"xxx\", (string) The current block height\n"
+            "  \"balance\": \"xxx\", (string) The total WGR balance\n"
+            "  \"balance_locked\": \"xxx\", (string) The locked WGR balance\n"
+            "  \"balance_unlocked\": \"xxx\", (string) The unlocked WGR balance\n"
+            "  \"balance_unconfirmed\": \"xxx\", (string) The unconfirmed WGR balance\n"
+            "  \"balance_immature\": \"xxx\", (string) The immature WGR balance\n"
+            "  \"zerocoin_balance\": \"xxx\", (string) The total zWGR balance\n"
+            "  \"zerocoin_balance_mature\": \"xxx\", (string) The mature zWGR balance\n"
+            "  \"zerocoin_balance_immature\": \"xxx\", (string) The immature zWGR balance\n"
+            "  \"watchonly_balance\": \"xxx\", (string) The total watch-only WGR balance\n"
+            "  \"watchonly_balance_unconfirmed\": \"xxx\", (string) The unconfirmed watch-only WGR balance\n"
+            "  \"watchonly_balance_immature\": \"xxx\", (string) The immature watch-only WGR balance\n"
+            "  \"watchonly_balance_locked\": \"xxx\", (string) The locked watch-only WGR balance\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getextendedbalance", "") + HelpExampleRpc("getextendedbalance", ""));
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    UniValue obj(UniValue::VOBJ);
+
+    obj.push_back(Pair("blocks", (int)chainActive.Height()));
+    obj.push_back(Pair("balance", ValueFromAmount(pwalletMain->GetBalance())));
+    obj.push_back(Pair("balance_locked", ValueFromAmount(pwalletMain->GetLockedCoins())));
+    obj.push_back(Pair("balance_unlocked", ValueFromAmount(pwalletMain->GetUnlockedCoins())));
+    obj.push_back(Pair("balance_unconfirmed", ValueFromAmount(pwalletMain->GetUnconfirmedBalance())));
+    obj.push_back(Pair("balance_immature", ValueFromAmount(pwalletMain->GetImmatureBalance())));
+    obj.push_back(Pair("zerocoin_balance", ValueFromAmount(pwalletMain->GetZerocoinBalance(false))));
+    obj.push_back(Pair("zerocoin_balance_mature", ValueFromAmount(pwalletMain->GetZerocoinBalance(true))));
+    obj.push_back(Pair("zerocoin_balance_immature", ValueFromAmount(pwalletMain->GetImmatureZerocoinBalance())));
+    obj.push_back(Pair("watchonly_balance", ValueFromAmount(pwalletMain->GetWatchOnlyBalance())));
+    obj.push_back(Pair("watchonly_balance_unconfirmed", ValueFromAmount(pwalletMain->GetUnconfirmedWatchOnlyBalance())));
+    obj.push_back(Pair("watchonly_balance_immature", ValueFromAmount(pwalletMain->GetImmatureWatchOnlyBalance())));
+    obj.push_back(Pair("watchonly_balance_locked", ValueFromAmount(pwalletMain->GetLockedWatchOnlyBalance())));
+
+    return obj;
 }
 
 UniValue getunconfirmedbalance(const UniValue &params, bool fHelp)
@@ -3391,7 +3775,6 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
 
     return DoZwgrSpend(nAmount, fMintChange, fMinimizeChange, vMintsSelected, address_str);
 }
-
 
 UniValue spendzerocoinmints(const UniValue& params, bool fHelp)
 {

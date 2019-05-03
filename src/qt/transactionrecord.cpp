@@ -1,7 +1,6 @@
 // Copyright (c) 2011-2014 The Bitcoin developers
 // Copyright (c) 2014-2015 The Dash developers
 // Copyright (c) 2015-2018 The PIVX developers
-// Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -13,14 +12,8 @@
 #include "timedata.h"
 #include "wallet/wallet.h"
 #include "zwgrchain.h"
-#include "bet.h"
 
 #include <stdint.h>
-#include <boost/thread.hpp>
-#include <boost/tuple/tuple.hpp>
-#include <boost/algorithm/string.hpp>
-#include <boost/assign/list_of.hpp>
-#include <boost/algorithm/hex.hpp>
 
 /* Return positive answer if transaction should be shown in list.
  */
@@ -38,9 +31,9 @@ bool TransactionRecord::showTransaction(const CWalletTx& wtx)
 /*
  * Decompose CWallet transaction to model transaction records.
  */
-std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* wallet, const CWalletTx& wtx)
+QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* wallet, const CWalletTx& wtx)
 {
-    std::vector<TransactionRecord> parts;
+    QList<TransactionRecord> parts;
     int64_t nTime = wtx.GetComputedTxTime();
     CAmount nCredit = wtx.GetCredit(ISMINE_ALL);
     CAmount nDebit = wtx.GetDebit(ISMINE_ALL);
@@ -79,7 +72,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
             sub.address = CBitcoinAddress(address).ToString();
             sub.credit = nNet;
         } else {
-            // Masternode reward
+            //Masternode reward
             CTxDestination destMN;
             int nIndexMN = wtx.vout.size() - 1;
             if (ExtractDestination(wtx.vout[nIndexMN].scriptPubKey, destMN) && IsMine(*wallet, destMN)) {
@@ -89,29 +82,13 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 sub.address = CBitcoinAddress(destMN).ToString();
                 sub.credit = wtx.vout[nIndexMN].nValue;
             }
-            // Bet Winning payout.
-            else{
-                CTxDestination destBetWin;
-
-                for( unsigned int i = 0; i < wtx.vout.size(); i++  ){
-
-                    if (ExtractDestination(wtx.vout[i].scriptPubKey, destBetWin) && IsMine(*wallet, destBetWin)) {
-                        isminetype mine = wallet->IsMine(wtx.vout[i]);
-                        sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
-                        sub.type = TransactionRecord::BetWin;
-                        sub.address = CBitcoinAddress(destBetWin).ToString();
-                        sub.credit = wtx.vout[i].nValue;
-                    }
-
-                }
-            }
         }
 
-        parts.push_back(sub);
+        parts.append(sub);
     } else if (wtx.IsZerocoinSpend()) {
         //zerocoin spend outputs
         bool fFeeAssigned = false;
-        for (const CTxOut txout : wtx.vout) {
+        for (const CTxOut& txout : wtx.vout) {
             // change that was reminted as zerocoins
             if (txout.IsZerocoinMint()) {
                 // do not display record if this isn't from our wallet
@@ -128,7 +105,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     fFeeAssigned = true;
                 }
                 sub.idx = parts.size();
-                parts.push_back(sub);
+                parts.append(sub);
                 continue;
             }
 
@@ -152,7 +129,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 if (strAddress != "")
                     sub.address = strAddress;
                 sub.idx = parts.size();
-                parts.push_back(sub);
+                parts.append(sub);
                 continue;
             }
 
@@ -169,7 +146,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
             if (strAddress != "")
                 sub.address = strAddress;
             sub.idx = parts.size();
-            parts.push_back(sub);
+            parts.append(sub);
         }
     } else if (nNet > 0 || wtx.IsCoinBase()) {
         //
@@ -184,7 +161,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 sub.credit = txout.nValue;
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address)) {
-                    // Received by Wagerr Address
+                    // Received by WAGERR Address
                     sub.type = TransactionRecord::RecvWithAddress;
                     sub.address = CBitcoinAddress(address).ToString();
                 } else {
@@ -197,7 +174,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     sub.type = TransactionRecord::Generated;
                 }
 
-                parts.push_back(sub);
+                parts.append(sub);
             }
         }
     } else {
@@ -228,9 +205,9 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
             if (fAllToMe > mine) fAllToMe = mine;
         }
 
-        if (fAllFromMeDenom && fAllToMeDenom && nFromMe && nToMe) {
-            parts.push_back(TransactionRecord(hash, nTime, TransactionRecord::ObfuscationDenominate, "", -nDebit, nCredit));
-            parts.back().involvesWatchAddress = false; // maybe pass to TransactionRecord as constructor argument
+        if (fAllFromMeDenom && fAllToMeDenom && nFromMe * nToMe) {
+            parts.append(TransactionRecord(hash, nTime, TransactionRecord::ObfuscationDenominate, "", -nDebit, nCredit));
+            parts.last().involvesWatchAddress = false; // maybe pass to TransactionRecord as constructor argument
         } else if (fAllFromMe && fAllToMe) {
             // Payment to self
             // TODO: this section still not accurate but covers most cases,
@@ -245,7 +222,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 sub.type = TransactionRecord::Obfuscated;
                 CTxDestination address;
                 if (ExtractDestination(wtx.vout[0].scriptPubKey, address)) {
-                    // Sent to Wagerr Address
+                    // Sent to WAGERR Address
                     sub.address = CBitcoinAddress(address).ToString();
                 } else {
                     // Sent to IP, or other non-address transaction like OP_EVAL
@@ -266,9 +243,9 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
 
             sub.debit = -(nDebit - nChange);
             sub.credit = nCredit - nChange;
-            parts.push_back(sub);
-            parts.back().involvesWatchAddress = involvesWatchAddress; // maybe pass to TransactionRecord as constructor argument
-        } else if (fAllFromMe) {
+            parts.append(sub);
+            parts.last().involvesWatchAddress = involvesWatchAddress; // maybe pass to TransactionRecord as constructor argument
+        } else if (fAllFromMe || wtx.IsZerocoinMint()) {
             //
             // Debit
             //
@@ -292,7 +269,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     //private keys that the change was sent to. Do not display a "sent to" here.
                     if (wtx.IsZerocoinMint())
                         continue;
-                    // Sent to Wagerr Address
+                    // Sent to WAGERR Address
                     sub.type = TransactionRecord::SendToAddress;
                     sub.address = CBitcoinAddress(address).ToString();
                 } else if (txout.IsZerocoinMint()){
@@ -301,24 +278,8 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     sub.credit += txout.nValue;
                 } else {
                     // Sent to IP, or other non-address transaction like OP_EVAL
-                    bool isBet = false;
-                    if (txout.scriptPubKey.IsUnspendable()) {
-                        vector<unsigned char> vOpCode = ParseHex(txout.scriptPubKey.ToString().substr(9, string::npos));
-                        std::string opCode(vOpCode.begin(), vOpCode.end());
-
-                        CPeerlessBet plBet;
-                        if (CPeerlessBet::FromOpCode(opCode, plBet)) {
-                            isBet = true;
-                        }
-                    }
-                    if (isBet) {
-                        sub.type = TransactionRecord::BetPlaced;
-                        sub.address = mapValue["to"];
-                    } else {
-                        // Sent to IP, or other non-address transaction like OP_EVAL
-                        sub.type = TransactionRecord::SendToOther;
-                        sub.address = mapValue["to"];
-                    }
+                    sub.type = TransactionRecord::SendToOther;
+                    sub.address = mapValue["to"];
                 }
 
                 if (mapValue["DS"] == "1") {
@@ -333,14 +294,14 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 }
                 sub.debit = -nValue;
 
-                parts.push_back(sub);
+                parts.append(sub);
             }
         } else {
             //
             // Mixed debit transaction, can't break down payees
             //
-            parts.push_back(TransactionRecord(hash, nTime, TransactionRecord::Other, "", nNet, 0));
-            parts.back().involvesWatchAddress = involvesWatchAddress;
+            parts.append(TransactionRecord(hash, nTime, TransactionRecord::Other, "", nNet, 0));
+            parts.last().involvesWatchAddress = involvesWatchAddress;
         }
     }
 
@@ -436,73 +397,12 @@ bool TransactionRecord::statusUpdateNeeded()
     return status.cur_num_blocks != chainActive.Height() || status.cur_num_ix_locks != nCompleteTXLocks;
 }
 
-std::string TransactionRecord::getTxID() const
+QString TransactionRecord::getTxID() const
 {
-    return hash.ToString();
+    return QString::fromStdString(hash.ToString());
 }
 
 int TransactionRecord::getOutputIndex() const
 {
     return idx;
 }
-
-std::string TransactionRecord::GetTransactionRecordType() const
-{
-    return GetTransactionRecordType(type);
-}
-std::string TransactionRecord::GetTransactionRecordType(Type type) const
-{
-    switch (type)
-    {
-        case Other: return "Other";
-        case BetWin: return "BetWinnings";
-        case BetPlaced: return "Bet";
-        case Generated: return "Generated";
-        case StakeMint: return "StakeMint";
-        case StakeZWGR: return "StakeZWGR";
-        case SendToAddress: return "SendToAddress";
-        case SendToOther: return "SendToOther";
-        case RecvWithAddress: return "RecvWithAddress";
-        case MNReward: return "MNReward";
-        case RecvFromOther: return "RecvFromOther";
-        case SendToSelf: return "SendToSelf";
-        case ZerocoinMint: return "ZerocoinMint";
-        case ZerocoinSpend: return "ZerocoinSpend";
-        case RecvFromZerocoinSpend: return "RecvFromZerocoinSpend";
-        case ZerocoinSpend_Change_zWgr: return "ZerocoinSpend_Change_zWgr";
-        case ZerocoinSpend_FromMe: return "ZerocoinSpend_FromMe";
-        case RecvWithObfuscation: return "RecvWithObfuscation";
-        case ObfuscationDenominate: return "ObfuscationDenominate";
-        case ObfuscationCollateralPayment: return "ObfuscationCollateralPayment";
-        case ObfuscationMakeCollaterals: return "ObfuscationMakeCollaterals";
-        case ObfuscationCreateDenominations: return "ObfuscationCreateDenominations";
-        case Obfuscated: return "Obfuscated";
-    }
-    return NULL;
-}
-
-std::string TransactionRecord::GetTransactionStatus() const
-{
-    return GetTransactionStatus(status.status);
-}
-std::string TransactionRecord::GetTransactionStatus(TransactionStatus::Status status) const
-{
-    switch (status)
-    {
-        case TransactionStatus::Confirmed: return "Confirmed";           /**< Have 6 or more confirmations (normal tx) or fully mature (mined tx) **/
-            /// Normal (sent/received) transactions
-        case TransactionStatus::OpenUntilDate: return "OpenUntilDate";   /**< Transaction not yet final, waiting for date */
-        case TransactionStatus::OpenUntilBlock: return "OpenUntilBlock"; /**< Transaction not yet final, waiting for block */
-        case TransactionStatus::Offline: return "Offline";               /**< Not sent to any other nodes **/
-        case TransactionStatus::Unconfirmed: return "Unconfirmed";       /**< Not yet mined into a block **/
-        case TransactionStatus::Confirming: return "Confirmed";          /**< Confirmed, but waiting for the recommended number of confirmations **/
-        case TransactionStatus::Conflicted: return "Conflicted";         /**< Conflicts with other transaction or mempool **/
-            /// Generated (mined) transactions
-        case TransactionStatus::Immature: return "Immature";             /**< Mined but waiting for maturity */
-        case TransactionStatus::MaturesWarning: return "MaturesWarning"; /**< Transaction will likely not mature because no nodes have confirmed */
-        case TransactionStatus::NotAccepted: return "NotAccepted";       /**< Mined but not accepted */
-    }
-    return NULL;
-}
-
-
