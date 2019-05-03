@@ -29,7 +29,7 @@
 #include "spork.h"
 #include "invalid.h"
 #include "zwgrchain.h"
-#include "bet.h"
+#include "betting/bet.h"
 
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>

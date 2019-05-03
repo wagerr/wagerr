@@ -21,7 +21,7 @@
 #include "zwgrchain.h"
 
 //#include "qt/transactionrecord.h"
-#include "bet.h"
+#include "betting/bet.h"
 
 #include <cstdlib>
 #include <stdint.h>

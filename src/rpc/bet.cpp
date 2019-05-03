@@ -7,7 +7,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "net.h"
-#include "bet.h"
+#include "betting/bet.h"
 #include "rpc/server.h"
 
 #include <univalue.h>

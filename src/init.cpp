@@ -23,7 +23,7 @@
 #include "invalid.h"
 #include "key.h"
 #include "main.h"
-#include "bet.h"
+#include "betting/bet.h"
 #include "masternode-budget.h"
 #include "masternode-payments.h"
 #include "masternodeconfig.h"

@@ -2,7 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "bet.h"
+#include "betting/bet.h"
 #include "clientversion.h"
 #include "streams.h"
 #include "utilstrencodings.h"

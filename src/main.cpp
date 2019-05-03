@@ -12,7 +12,7 @@
 #include "zwgr/accumulatormap.h"
 #include "addrman.h"
 #include "alert.h"
-#include "bet.h"
+#include "betting/bet.h"
 #include "blocksignature.h"
 #include "chainparams.h"
 #include "checkpoints.h"

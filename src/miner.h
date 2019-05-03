@@ -10,7 +10,7 @@
 
 #include <stdint.h>
 #include "primitives/transaction.h"
-#include "bet.h"
+#include "betting/bet.h"
 #include <vector>
 
 class CBlock;
