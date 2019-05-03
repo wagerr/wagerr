@@ -303,7 +303,6 @@ static const CRPCCommand vRPCCommands[] =
         /* Block chain and UTXO */
         {"blockchain", "findserial", &findserial, true, false, false},
         {"blockchain", "getaccumulatorvalues", &getaccumulatorvalues, true, false, false},
-        {"blockchain", "calculateaccumulatorvalues", &calculateaccumulatorvalues, true, false, false},
         {"blockchain", "getaccumulatorwitness", &getaccumulatorwitness, true, false, false},
         {"blockchain", "getmintsinblocks", &getmintsinblocks, true, false, false},
         {"blockchain", "getserials", &getserials, true, false, false},
@@ -398,7 +397,6 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "listevents", &listevents, false, false, false},
         {"wagerr", "listchaingamesevents", &listchaingamesevents, false, false, false},
         {"wagerr", "listchaingamesbets", &listchaingamesbets, false, false, false},
-        {"wagerr", "getchaingamesinfo", &getchaingamesinfo, false, false, false},
         {"wagerr", "placechaingamesbet", &placechaingamesbet, false, false, true},
         {"wagerr", "geteventsliability", &geteventsliability, false, false, true},
         {"wagerr", "getmappingid", &getmappingid, false, false, true},
