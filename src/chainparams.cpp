@@ -76,21 +76,18 @@ static const Checkpoints::CCheckpointData data = {
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
     boost::assign::map_list_of
-    (       1, uint256("0x00000385558ec1b9af7f939e1626a3116b9fb988c86c2f915e6451e8efcd0521"))        // First PoW block
-    (   20040, uint256("0x03a92984c2deba55ac8f9e8194b1bc745fbad9f7a0f3ed94ebb8c372935bed9c"));        // tx=40878 timestamp=1535653584 Fork September 2018 - after restarted testnet
-    //(   25490, uint256("0xa87c169c9317a8474c44846a9409e775313b769bfa290298b0054abbfd570733"));     // tx=52013 timestamp=1535967610 Fork September 2018 - after enabling zerocoin maintenence mode.
-    // Commented out so testnet blockchain could be forked back below the 25940 block without stalling the chain.
+    (       0, uint256("0x001"));
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1535967610,
-    40878,
-    3000};
+    1556815048,
+    0,
+    2000};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
-    boost::assign::map_list_of(0, uint256("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec"));
+    boost::assign::map_list_of(0, uint256("0x001"));
 static const Checkpoints::CCheckpointData dataRegtest = {
     &mapCheckpointsRegtest,
-    1518696183,
+    1556815048,
     0,
     100};
 
@@ -296,7 +293,7 @@ public:
         nMaxMoneyOut = 398360470 * COIN;
         nZerocoinStartHeight = 350;
         nZerocoinAccumulationStartHeight = 350;
-        nZerocoinStartTime = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
+        nZerocoinStartTime = 1556815049; // GMT: Thursday, 2. May 2019 16:37:29
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 1400; //Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 21012; //First block that bad serials emerged (currently we do not have any) *** TODO ***
@@ -330,11 +327,11 @@ public:
         nSupplyBeforeFakeSerial = 0;
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
-        genesis.nTime = 1518696182;
-        genesis.nNonce = 75183976;
+        genesis.nTime = 1556815048; // GMT: Thursday, 2. May 2019 16:37:28
+        genesis.nNonce = 75944121;
 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x00000fdc268f54ff1368703792dc046b1356e60914c2b5b6348032144bcb2de5"));
+        assert(hashGenesisBlock == uint256("0x00000607d5df6a6501a2c97f33a56fe652fc9472492871afafdf88e9ba1180d3"));
 
         vFixedSeeds.clear();
         vSeeds.clear();
@@ -418,8 +415,7 @@ public:
         nFakeSerialBlockheightEnd = -1;
 
         //! Modify the regtest genesis block so the timestamp is valid for a later start.
-        genesis.nTime = 1518696183;             // GMT: Thursday, 15. February 2018 12:03:03
-        genesis.nNonce = 574752;                // hex 57 47 52 in text = WG
+        genesis.nTime = 1556815048; // GMT: Thursday, 2. May 2019 16:37:29
 
         nLastPOWBlock = 250;
         nMaturity = 100;
@@ -427,7 +423,7 @@ public:
         nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMTy
         nMaxMoneyOut = 398360470 * COIN;
         nZerocoinStartHeight = 300;
-        nZerocoinStartTime = 1518696283;
+        nZerocoinStartTime = 1556815049;
         nBlockZerocoinV2 = 300;
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
         nBlockRecalculateAccumulators = 999999999; //Trigger a recalculation of accumulators
@@ -435,7 +431,7 @@ public:
         nBlockLastGoodCheckpoint = 999999999; //Last valid accumulator checkpoint
 
         hashGenesisBlock = genesis.GetHash();
-        assert(hashGenesisBlock == uint256("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec"));
+        assert(hashGenesisBlock == uint256("0x59db40eac6838e95d74905314b219f2338c89d020e962356fdd7e8083eccf3bb"));
 
         vFixedSeeds.clear(); //! Testnet mode doesn't have any fixed seeds.
         vSeeds.clear();      //! Testnet mode doesn't have any DNS seeds.
