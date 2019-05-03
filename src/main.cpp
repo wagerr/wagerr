@@ -4770,33 +4770,14 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
 
     bool eiUpdated = false;
     // Look through the block for any events, results or mapping TX.
-    BOOST_FOREACH (CTransaction& tx, block.vtx) {
+    if (pindex->nHeight > Params().BetStartHeight()) {
+        BOOST_FOREACH (CTransaction& tx, block.vtx) {
 
-        // Ensure the event TX has come from Oracle wallet.
-        const CTxIn &txin = tx.vin[0];
-        bool validOracleTx = IsValidOracleTx(txin);
+            // Ensure the event TX has come from Oracle wallet.
+            const CTxIn &txin = tx.vin[0];
+            bool validOracleTx = IsValidOracleTx(txin);
 
-        // Search for any new bets
-        for (unsigned int i = 0; i < tx.vout.size(); i++) {
-            const CTxOut& txout = tx.vout[i];
-            std::string s = txout.scriptPubKey.ToString();
-
-            if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
-                vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
-                 std::string opCode(v.begin(), v.end());
-
-                CPeerlessBet plBet;
-                if (CPeerlessBet::FromOpCode(opCode, plBet)) {
-                    CAmount betAmount = txout.nValue;
-                    SetEventAccummulators(plBet, betAmount);
-                    eiUpdated = true;
-                }
-            }
-        }
-
-        // If a valid OMNO transaction.
-        if (validOracleTx) {
-
+            // Search for any new bets
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
                 const CTxOut& txout = tx.vout[i];
                 std::string s = txout.scriptPubKey.ToString();
@@ -4805,93 +4786,114 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                     vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
                     std::string opCode(v.begin(), v.end());
 
-                    // TODO - Optimise the OP code validation, we don't need to compare current OP code against all TX types.
-                    // if it matches any TX type the rest should be skipped.
-
-                    // If events found in block add them to the events index.
-                    CPeerlessEvent plEvent;
-                    if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
-                        CEventDB::AddEvent(plEvent);
+                    CPeerlessBet plBet;
+                    if (CPeerlessBet::FromOpCode(opCode, plBet)) {
+                        CAmount betAmount = txout.nValue;
+                        SetEventAccummulators(plBet, betAmount);
                         eiUpdated = true;
-                    }
-
-                    // If results found in block remove event from event index and add result to result index.
-                    CPeerlessResult plResult;
-                    if (CPeerlessResult::FromOpCode(opCode, plResult)) {
-                        CEventDB::RemoveEvent(plResult);
-                        CResultDB::AddResult(plResult);
-                        eiUpdated = true;
-                    }
-
-                    // If update money line odds TX found in block, update the event index.
-                    CPeerlessUpdateOdds puo;
-                    if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
-                        SetEventMLOdds(puo);
-                        eiUpdated = true;
-                    }
-
-                    // If spread odds TX found then update the spread odds for that event object.
-                    CPeerlessSpreadsEvent spreadEvent;
-                    if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
-                        SetEventSpreadOdds(spreadEvent);
-                        eiUpdated = true;
-                    }
-
-                    // If total odds TX found then update the total odds for that event object.
-                    CPeerlessTotalsEvent totalsEvent;
-                    if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
-                        SetEventTotalOdds(totalsEvent);
-                        eiUpdated = true;
-                    }
-
-                    // If mapping found then add it to the relating map index and write the map index to disk.
-                    CMapping cMapping;
-                    if (CMapping::FromOpCode(opCode, cMapping)) {
-                        if (cMapping.nMType == sportMapping) {
-                            CMappingDB::AddSport(cMapping);
-
-                            mappingIndex_t sportsIndex;
-                            CMappingDB mdb("sports.dat");
-                            mdb.Write(sportsIndex, block.GetHash());
-                        }
-                        else if (cMapping.nMType == roundMapping) {
-                            CMappingDB::AddRound(cMapping);
-
-                            mappingIndex_t roundsIndex;
-                            CMappingDB mdb("rounds.dat");
-                            mdb.Write(roundsIndex, block.GetHash());
-                        }
-                        else if (cMapping.nMType == teamMapping) {
-                            CMappingDB::AddTeam(cMapping);
-
-                            mappingIndex_t teamsIndex;
-                            CMappingDB mdb("teams.dat");
-                            mdb.Write(teamsIndex, block.GetHash());
-                        }
-                        else if (cMapping.nMType == tournamentMapping) {
-                            CMappingDB::AddTournament(cMapping);
-
-                            mappingIndex_t tournamentsIndex;
-                            CMappingDB mdb("tournaments.dat");
-                            mdb.Write(tournamentsIndex, block.GetHash());
-                        }
                     }
                 }
             }
 
-            // Write event and result indexes to events.dat and results.dat respectively.
-            if (eiUpdated) {
-                // Update the global event index.
-                CEventDB edb;
-                eventIndex_t eventIndex;
-                edb.GetEvents(eventIndex);
-                edb.Write(eventIndex, block.GetHash());
+            // If a valid OMNO transaction.
+            if (validOracleTx) {
 
-                // Update the global results index.
-                CResultDB rdb;
-                resultsIndex_t resultsIndex;
-                rdb.GetResults(resultsIndex);
-                rdb.Write(resultsIndex, block.GetHash());
+                for (unsigned int i = 0; i < tx.vout.size(); i++) {
+                    const CTxOut& txout = tx.vout[i];
+                    std::string s = txout.scriptPubKey.ToString();
+
+                    if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+                        vector<unsigned char> v = ParseHex(s.substr(9, string::npos));
+                        std::string opCode(v.begin(), v.end());
+
+                        // TODO - Optimise the OP code validation, we don't need to compare current OP code against all TX types.
+                        // if it matches any TX type the rest should be skipped.
+
+                        // If events found in block add them to the events index.
+                        CPeerlessEvent plEvent;
+                        if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
+                            CEventDB::AddEvent(plEvent);
+                            eiUpdated = true;
+                        }
+
+                        // If results found in block remove event from event index and add result to result index.
+                        CPeerlessResult plResult;
+                        if (CPeerlessResult::FromOpCode(opCode, plResult)) {
+                            CEventDB::RemoveEvent(plResult);
+                            CResultDB::AddResult(plResult);
+                            eiUpdated = true;
+                        }
+
+                        // If update money line odds TX found in block, update the event index.
+                        CPeerlessUpdateOdds puo;
+                        if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
+                            SetEventMLOdds(puo);
+                            eiUpdated = true;
+                        }
+
+                        // If spread odds TX found then update the spread odds for that event object.
+                        CPeerlessSpreadsEvent spreadEvent;
+                        if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
+                            SetEventSpreadOdds(spreadEvent);
+                            eiUpdated = true;
+                        }
+
+                        // If total odds TX found then update the total odds for that event object.
+                        CPeerlessTotalsEvent totalsEvent;
+                        if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
+                            SetEventTotalOdds(totalsEvent);
+                            eiUpdated = true;
+                        }
+
+                        // If mapping found then add it to the relating map index and write the map index to disk.
+                        CMapping cMapping;
+                        if (CMapping::FromOpCode(opCode, cMapping)) {
+                            if (cMapping.nMType == sportMapping) {
+                                CMappingDB::AddSport(cMapping);
+
+                                mappingIndex_t sportsIndex;
+                                CMappingDB mdb("sports.dat");
+                                mdb.Write(sportsIndex, block.GetHash());
+                            }
+                            else if (cMapping.nMType == roundMapping) {
+                                CMappingDB::AddRound(cMapping);
+
+                                mappingIndex_t roundsIndex;
+                                CMappingDB mdb("rounds.dat");
+                                mdb.Write(roundsIndex, block.GetHash());
+                            }
+                            else if (cMapping.nMType == teamMapping) {
+                                CMappingDB::AddTeam(cMapping);
+
+                                mappingIndex_t teamsIndex;
+                                CMappingDB mdb("teams.dat");
+                                mdb.Write(teamsIndex, block.GetHash());
+                            }
+                            else if (cMapping.nMType == tournamentMapping) {
+                                CMappingDB::AddTournament(cMapping);
+
+                                mappingIndex_t tournamentsIndex;
+                                CMappingDB mdb("tournaments.dat");
+                                mdb.Write(tournamentsIndex, block.GetHash());
+                            }
+                        }
+                    }
+                }
+
+                // Write event and result indexes to events.dat and results.dat respectively.
+                if (eiUpdated) {
+                    // Update the global event index.
+                    CEventDB edb;
+                    eventIndex_t eventIndex;
+                    edb.GetEvents(eventIndex);
+                    edb.Write(eventIndex, block.GetHash());
+
+                    // Update the global results index.
+                    CResultDB rdb;
+                    resultsIndex_t resultsIndex;
+                    rdb.GetResults(resultsIndex);
+                    rdb.Write(resultsIndex, block.GetHash());
+                }
             }
         }
     }
