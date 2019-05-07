@@ -136,6 +136,9 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
 
     result.push_back(Pair("modifier", strprintf("%016x", blockindex->nStakeModifier)));
 
+    if (blockindex->hashProofOfStake != 0)
+        result.push_back(Pair("stake_hash", blockindex->hashProofOfStake.GetHex()));
+
     result.push_back(Pair("moneysupply",ValueFromAmount(blockindex->nMoneySupply)));
 
     UniValue zwgrObj(UniValue::VOBJ);
