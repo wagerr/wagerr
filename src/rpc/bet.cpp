@@ -76,25 +76,36 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
     }
 
     // Check the map for the string name.
+    unsigned int nFirstIndexFree = 0;
+    bool FirstIndexFreeFound = false;
     map<uint32_t, CMapping>::iterator it;
     for (it = mappingIndex.begin(); it != mappingIndex.end(); it++) {
-        if (it->second.sName == name) {
-            mapping.push_back(Pair("mapping-id", (uint64_t) it->second.nId));
-            mapping.push_back(Pair("exists", true));
-            mapping.push_back(Pair("mapping-index", mIndex));
-            mappingFound = true;
-            break;
+        LogPrintf("%s - mapping - it=[%d] nId=[%d] nMType=[%d] nVersion=[%d] [%s]\n", __func__, it->first, it->second.nId, it->second.nMType, it->second.nVersion, it->second.sName);
+        if (!mappingFound) {
+            if (it->second.sName == name) {
+                mapping.push_back(Pair("mapping-id", (uint64_t) it->second.nId));
+                mapping.push_back(Pair("exists", true));
+                mapping.push_back(Pair("mapping-index", mIndex));
+                mappingFound = true;
+            }
+        }
+        // Find the first available free key in the sorted map
+        if (!FirstIndexFreeFound){
+            if (it->first != nFirstIndexFree) {
+                FirstIndexFreeFound = true;
+            } else {
+                nFirstIndexFree++;
+            }
         }
     }
 
     // If no mapping found then create a new one and add to the given map index.
     if (!mappingFound) {
-        unsigned int newId = mappingIndex.size();
-
         CMapping cm;
         cm.nMType = type;
-        cm.nId = newId;
+        cm.nId = nFirstIndexFree;
         cm.sName = name;
+        cm.nVersion = 1;
 
         CMappingDB cmdb;
 
@@ -111,7 +122,7 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
             cmdb.AddTournament(cm);
         }
 
-        mapping.push_back(Pair("mapping-id",  (uint64_t) newId));
+        mapping.push_back(Pair("mapping-id",  (uint64_t) nFirstIndexFree));
         mapping.push_back(Pair("exists", false));
         mapping.push_back(Pair("mapping-index", mIndex));
     }
