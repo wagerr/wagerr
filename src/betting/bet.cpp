@@ -2352,25 +2352,20 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
         }
         else if (candidates.size() >= 2) {
             // Use random number to choose winner.
-            CAmount noOfBets    = candidates.size();
-
-            uint256 hashProofOfStake = 0;
-            unique_ptr<CStakeInput> stake;
+            uint64_t noOfBets    = candidates.size();
 
             CBlockIndex *winBlockIndex = chainActive[height];
-            CBlock winBlock;
-            ReadBlockFromDisk(winBlock, winBlockIndex);
-
-            if (!CheckProofOfStake(winBlock, hashProofOfStake, stake)) {
-                hashProofOfStake = 0;
-                return vexpectedCGLottoBetPayouts;
-            }
-            uint64_t winnerNr = hashProofOfStake.Get64() % noOfBets;
+            uint256 hashProofOfStake = winBlockIndex->hashProofOfStake;
+            if (hashProofOfStake == 0) hashProofOfStake = winBlockIndex->GetBlockHash();
+            uint256 tempVal = hashProofOfStake / noOfBets;
+            tempVal = tempVal * noOfBets;
+            tempVal = hashProofOfStake - tempVal;
+            uint64_t winnerNr = hashProofOfStake.Get64();
 
             // Split the pot and calculate winnings.
             std::string winnerAddress = candidates[winnerNr];
             CAmount entranceFee = eventFee;
-            CAmount totalPot = (noOfBets*entranceFee);
+            CAmount totalPot = hashProofOfStake == 0 ? 0 : (noOfBets*entranceFee);
             CAmount winnerPayout = totalPot / 10 * 8;
             CAmount fee = totalPot / 50;
 
