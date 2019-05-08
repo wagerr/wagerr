@@ -2150,12 +2150,25 @@ std::vector<CBetOut> GetBetPayouts(int height)
 }
 
 bool CChainGamesResult::FromScript(CScript script) {
-    if (script.size() < 5) return false;
-    if (script[0] != OP_RETURN) return false;
-    if (script[1] != BTX_FORMAT_VERSION) return false;
-    if (script[2] != cgResultTxType) return false;
+    LogPrintf("%s - %s\n", __func__, script.ToString());
 
-    nEventId = script[3] << 8 | script[4];
+    CScript::const_iterator pc = script.begin();
+    std::vector<unsigned char> data;
+    opcodetype opcode;
+
+    // Check that we are parsing an OP_RETURN script
+    if (!script.GetOp(pc, opcode, data)) return false;
+    if (opcode != OP_RETURN) return false;
+
+    // Get data block
+    if (!script.GetOp(pc, opcode, data)) return false;
+
+    if (data.size() < 5) return false;
+    if (data[0] != 'B') return false;
+    if (data[1] != BTX_FORMAT_VERSION) return false;
+    if (data[2] != cgResultTxType) return false;
+
+    nEventId = *((uint16_t*)&data[3]);
 
     return true;
 }
