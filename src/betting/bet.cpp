@@ -163,9 +163,15 @@ bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block)
 
             totalStakeAcc += voutValue;
         }
+        if (vExpectedPayouts.size() + numStakingTx > tx.vout.size() - 1) {
+            LogPrintf("%s - Incorrect number of transactions in block %s\n", __func__, block.GetHash().ToString());
+            return false;
+        }
 
         // Validate the payout block against the expected payouts vector. If all payout amounts and payout addresses match then we have a valid payout block.
-        for (unsigned int i = numStakingTx; i < tx.vout.size() - 1; i++) {
+        for (unsigned int j = 0; j < vExpectedPayouts.size(); j++) {
+            unsigned int i = numStakingTx + j;
+
             const CTxOut &txout = tx.vout[i];
             CAmount voutValue   = txout.nValue;
             CAmount vExpected   = vExpectedPayouts[i - numStakingTx].nValue;
