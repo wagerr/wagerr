@@ -2034,7 +2034,9 @@ std::vector<CBetOut> GetBetPayouts(int height)
                                         payout = betAmount;
                                     } else if (result.nResultType == ResultType::mlRefund){
                                         // Calculate winnings.
-                                        if (pb.nOutcome == nMoneylineResult) {
+                                        if (pb.nOutcome == OutcomeType::moneyLineDraw ||
+                                                pb.nOutcome == OutcomeType::moneyLineLose ||
+                                                pb.nOutcome == OutcomeType::moneyLineWin) {
                                             payout = betAmount;
                                         }
                                         else if (spreadsFound && (pb.nOutcome == vSpreadsResult.at(0) || pb.nOutcome == vSpreadsResult.at(1))) {
@@ -2072,7 +2074,7 @@ std::vector<CBetOut> GetBetPayouts(int height)
                                         ExtractDestination( txPrev.vout[prevout.n].scriptPubKey, payoutAddress );
                                     }
 
-                                    LogPrintf("WINNING PAYOUT :)\n");
+                                    LogPrintf("MoneyLine Refund - PAYOUT\n");
                                     LogPrintf("AMOUNT: %li \n", payout);
                                     LogPrintf("ADDRESS: %s \n", CBitcoinAddress( payoutAddress ).ToString().c_str());
 
