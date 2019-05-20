@@ -2367,15 +2367,15 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
         }
         else if (candidates.size() >= 2) {
             // Use random number to choose winner.
-            uint64_t noOfBets    = candidates.size();
+            auto noOfBets    = candidates.size();
 
             CBlockIndex *winBlockIndex = chainActive[height];
             uint256 hashProofOfStake = winBlockIndex->hashProofOfStake;
             if (hashProofOfStake == 0) hashProofOfStake = winBlockIndex->GetBlockHash();
-            uint256 tempVal = hashProofOfStake / noOfBets;
+            uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
             tempVal = tempVal * noOfBets;
-            tempVal = hashProofOfStake - tempVal;
-            uint64_t winnerNr = hashProofOfStake.Get64();
+            tempVal = hashProofOfStake - tempVal;           // remainder
+            uint64_t winnerNr = tempVal.Get64();
 
             // Split the pot and calculate winnings.
             std::string winnerAddress = candidates[winnerNr];
