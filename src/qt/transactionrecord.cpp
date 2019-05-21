@@ -28,6 +28,129 @@ bool TransactionRecord::showTransaction(const CWalletTx& wtx)
     return true;
 }
 
+bool DecomposeBettingCoinstake(const CWallet* wallet, const CWalletTx& wtx, const CTxDestination address, bool fMyZMint, std::vector<TransactionRecord> &coinStakeRecords) {
+    std::map<uint64_t, CTxOut> stakeRewards;
+    std::map<uint64_t, CTxOut> betRewards;
+    std::map<uint64_t, CTxOut> MNRewards;
+
+    // No betting outputs, so the default decompose function suffices
+    if (wtx.vout.size() < 3) return false;
+
+    const CBlockIndex* pindexWtx;
+    const int nStakeDepth = wtx.GetDepthInMainChain(pindexWtx, false);
+
+    // When no coinstake value can be determined, the default decompose function suffices
+    if (nStakeDepth <= 0) return false;
+
+    const int nStakeHeight = pindexWtx->nHeight;
+    const CAmount nStakeValue = GetBlockValue(nStakeHeight - 1);
+    const CAmount nMNExpectedRewardValue = GetMasternodePayment(nStakeHeight, nStakeValue, 1, wtx.IsZerocoinSpend());
+
+    int nMNIndex = -1;
+    CAmount nActualMNValue = 0;
+
+    COutPoint prevout = wtx.vin[0].prevout;
+
+    // When no coinstake value can be determined, the default decompose function suffices
+    uint256 hashBlock;
+    CTransaction txIn;
+    if (!GetTransaction(prevout.hash, txIn, hashBlock, true)) return false;
+    if (txIn.vout.size() < prevout.n + 1) return false;
+    CAmount nStakeInValue = txIn.vout[prevout.n].nValue;
+
+    if (wtx.vout.size() > 2) {
+        CAmount nPotentialMNValue = wtx.vout[wtx.vout.size() - 1].nValue;
+        if (nPotentialMNValue == nMNExpectedRewardValue) {
+            nMNIndex = wtx.vout.size() - 1;
+            nActualMNValue = nPotentialMNValue;
+            MNRewards.insert(std::make_pair(nMNIndex, wtx.vout[nMNIndex]));
+        }
+    }
+
+    bool allStakesFound = false;
+    CAmount nStakeValueFound = 0;
+    for (int i = 1; i < (int)wtx.vout.size(); i++) {
+        if (i == nMNIndex) continue;
+
+        CTxOut curOut = wtx.vout[i];
+        if (!allStakesFound) {
+            if (nStakeValueFound + nActualMNValue + curOut.nValue <= nStakeInValue + nStakeValue) {
+                nStakeValueFound += curOut.nValue;
+                stakeRewards.insert(std::make_pair(i, curOut));
+            } else {
+                allStakesFound = true;
+            }
+        } else {
+            betRewards.insert(std::make_pair(i, curOut));
+        }
+    }
+
+    int64_t nTime = wtx.GetComputedTxTime();
+    const uint256 hash = wtx.GetHash();
+    std::map<std::string, std::string> mapValue = wtx.mapValue;
+
+    TransactionRecord stakeRecord(hash, nTime);
+    if (stakeRewards.size() > 0) {
+         if (fMyZMint) {
+            //zWGR stake reward
+            stakeRecord.involvesWatchAddress = false;
+            stakeRecord.type = TransactionRecord::StakeZWGR;
+            stakeRecord.address = mapValue["zerocoinmint"];
+            stakeRecord.credit = 0;
+            for (auto stakeReward : stakeRewards) {
+                if (stakeReward.second.IsZerocoinMint()){
+                    stakeRecord.credit += stakeReward.second.nValue;
+                }
+            }
+            stakeRecord.debit -= wtx.vin[0].nSequence * COIN;
+            coinStakeRecords.push_back(stakeRecord);
+        } else if (isminetype mine = wallet->IsMine(wtx.vout[1])){
+            //WGR stake reward
+            stakeRecord.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+            stakeRecord.type = TransactionRecord::StakeMint;
+            stakeRecord.address = CBitcoinAddress(address).ToString();
+            for (auto stakeReward : stakeRewards) {
+                stakeRecord.credit += wallet->GetCredit(stakeReward.second, ISMINE_ALL);
+            }
+            stakeRecord.debit = wtx.GetDebit(ISMINE_ALL);
+            coinStakeRecords.push_back(stakeRecord);
+        }
+    }
+
+    std::vector<TransactionRecord> betRecords;
+    if (betRewards.size() > 0) {
+        for (auto betReward : betRewards) {
+            CTxDestination destBetWin;
+            if (ExtractDestination(betReward.second.scriptPubKey, destBetWin) && IsMine(*wallet, destBetWin)) {
+                TransactionRecord betRecord(hash, nTime);
+                isminetype mine = wallet->IsMine(betReward.second);
+                betRecord.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+                betRecord.type = TransactionRecord::BetWin;
+                betRecord.address = CBitcoinAddress(destBetWin).ToString();
+                betRecord.credit = betReward.second.nValue;
+                coinStakeRecords.push_back(betRecord);
+            }
+        }
+    }
+
+    TransactionRecord MNRecord(hash, nTime);
+    if (MNRewards.size() > 0) {
+        auto MNReward = MNRewards.begin();
+        // Masternode reward
+        CTxDestination destMN;
+        if (ExtractDestination(MNReward->second.scriptPubKey, destMN) && IsMine(*wallet, destMN)) {
+            isminetype mine = wallet->IsMine(MNReward->second);
+            MNRecord.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+            MNRecord.type = TransactionRecord::MNReward;
+            MNRecord.address = CBitcoinAddress(destMN).ToString();
+            MNRecord.credit = MNReward->second.nValue;
+            coinStakeRecords.push_back(MNRecord);
+        }
+    }
+
+    return true;
+}
+
 /*
  * Decompose CWallet transaction to model transaction records.
  */
@@ -53,6 +176,10 @@ QList<TransactionRecord> TransactionRecord::decomposeTransaction(const CWallet* 
         CTxDestination address;
         if (!wtx.IsZerocoinSpend() && !ExtractDestination(wtx.vout[1].scriptPubKey, address))
             return parts;
+
+        if (DecomposeBettingCoinstake(wallet, wtx, address, fZSpendFromMe || wallet->zwgrTracker->HasMintTx(hash), parts)) {
+            return parts;
+        }
 
         if (wtx.IsZerocoinSpend() && (fZSpendFromMe || wallet->zwgrTracker->HasMintTx(hash))) {
             //zWGR stake reward
