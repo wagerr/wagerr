@@ -306,6 +306,18 @@ UniValue listbets(const UniValue& params, bool fHelp)
 
     const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
 
+    CEventDB edb;
+    eventIndex_t eventIndex;
+    edb.GetEvents(eventIndex);
+
+    mappingIndex_t teamsIndex;
+    CMappingDB mtdb("teams.dat");
+    mtdb.GetTeams(teamsIndex);
+
+    mappingIndex_t tournamentsIndex;
+    CMappingDB mtodb("tournaments.dat");
+    mtodb.GetTournaments(tournamentsIndex);
+
     // iterate backwards until we have nCount items to return:
     for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
         CWalletTx* const pwtx = (*it).second.first;
@@ -327,6 +339,23 @@ UniValue listbets(const UniValue& params, bool fHelp)
                         UniValue entry(UniValue::VOBJ);
                         entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
                         entry.push_back(Pair("event-id", (uint64_t) plBet.nEventId));
+
+                        // Retrieve the event details
+                        if (eventIndex.count(plBet.nEventId)){
+                            CPeerlessEvent plEvent = eventIndex.find(plBet.nEventId)->second;
+
+                            entry.push_back(Pair("starting", plEvent.nStartTime));
+                            if (teamsIndex.count(plEvent.nHomeTeam)) {
+                                entry.push_back(Pair("home", teamsIndex.find(plEvent.nHomeTeam)->second.sName));
+                            }
+                            if (teamsIndex.count(plEvent.nAwayTeam)) {
+                                entry.push_back(Pair("away", teamsIndex.find(plEvent.nAwayTeam)->second.sName));
+                            }
+                            if (tournamentsIndex.count(plEvent.nTournament)) {
+                                entry.push_back(Pair("tournament", tournamentsIndex.find(plEvent.nTournament)->second.sName));
+                            }
+                        }
+
                         entry.push_back(Pair("team-to-win", (uint64_t) plBet.nOutcome));
                         entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
 
