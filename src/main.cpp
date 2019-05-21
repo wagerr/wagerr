@@ -4826,7 +4826,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
                         // If results found in block remove event from event index and add result to result index.
                         CPeerlessResult plResult;
                         if (CPeerlessResult::FromOpCode(opCode, plResult)) {
-                            CEventDB::RemoveEvent(plResult);
+//                            CEventDB::RemoveEvent(plResult);
                             CResultDB::AddResult(plResult);
                             eiUpdated = true;
                         }
