@@ -112,7 +112,7 @@ bool DecomposeBettingCoinstake(const CWallet* wallet, const CWalletTx& wtx, cons
             for (auto stakeReward : stakeRewards) {
                 stakeRecord.credit += wallet->GetCredit(stakeReward.second, ISMINE_ALL);
             }
-            stakeRecord.debit = wtx.GetDebit(ISMINE_ALL);
+            stakeRecord.credit -= wtx.GetDebit(ISMINE_ALL);
             coinStakeRecords.push_back(stakeRecord);
         }
     }
