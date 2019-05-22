@@ -2254,7 +2254,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
     for (unsigned int currResult = 0; currResult < resultArray.second.size(); currResult++) {
 
         CChainGamesResult currentChainGame = allChainGames[currResult];
-        int currentEventID = currentChainGame.nEventId;
+        uint32_t currentEventID = currentChainGame.nEventId;
         CAmount eventFee = 0;
 
         totalValueOfBlock = stoll(blockSizeArray[0]);
@@ -2269,6 +2269,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 
         time_t eventStart = 0;
         bool eventStartedFlag = false;
+        bool currentEventFound = false;
 
         while (BlocksIndex) {
 
@@ -2307,15 +2308,18 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 
                         // Find most recent CGLotto event
                         CChainGamesEvent chainGameEvt;
-                        if (validTX && CChainGamesEvent::FromOpCode(opCode, chainGameEvt)) {
-                            eventFee = chainGameEvt.nEntryFee * COIN;
+                        if (validTX && CChainGamesEvent::FromOpCode(opCode, chainGameEvt)){
+                            if (chainGameEvt.nEventId == currentEventID) {
+                                eventFee = chainGameEvt.nEntryFee * COIN;
+                                currentEventFound = true;
+                            }
                         }
 
                         // Find most recent CGLotto bet once the event has been found
                         CChainGamesBet chainGamesBet;
-                        if (CChainGamesBet::FromOpCode(opCode, chainGamesBet)) {
+                        if (currentEventFound && CChainGamesBet::FromOpCode(opCode, chainGamesBet)) {
 
-                            int eventId = chainGamesBet.nEventId;
+                            uint32_t eventId = chainGamesBet.nEventId;
 
                             // If current event ID matches result ID add bettor to candidate array
                             if (eventId == currentEventID) {
