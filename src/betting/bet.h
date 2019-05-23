@@ -66,28 +66,34 @@ class CBetOut : public CTxOut {
     public:
 
     CAmount nBetValue;
+    uint32_t nEventId;
 
     CBetOut() : CTxOut() {
         SetNull();
     }
 
-    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn) : CTxOut(nValueIn, scriptPubKeyIn), nBetValue(0) {};
+    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn) : CTxOut(nValueIn, scriptPubKeyIn), nBetValue(0), nEventId(0) {};
 
     CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn) :
-            CTxOut(nValueIn, scriptPubKeyIn), nBetValue(nBetValueIn) {};
+            CTxOut(nValueIn, scriptPubKeyIn), nBetValue(nBetValueIn), nEventId(0) {};
+
+    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn, uint32_t nEventIdIn) :
+            CTxOut(nValueIn, scriptPubKeyIn), nBetValue(nBetValueIn), nEventId(nEventIdIn) {};
 
     void SetNull() {
         CTxOut::SetNull();
         nBetValue = -1;
+        nEventId = -1;
     }
 
     void SetEmpty() {
         CTxOut::SetEmpty();
         nBetValue = 0;
+        nEventId = 0;
     }
 
     bool IsEmpty() const {
-        return CTxOut::IsEmpty() && nBetValue == 0;
+        return CTxOut::IsEmpty() && nBetValue == 0 && nEventId == 0;
     }
 };
 

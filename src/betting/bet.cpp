@@ -2372,7 +2372,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 
              // Only add valid payouts to the vector.
              if (winnerPayout > 0) {
-                 vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee);
+                 vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
              }
         }
         else if (candidates.size() >= 2) {
@@ -2402,7 +2402,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
-                vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee);
+                vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
                 vexpectedCGLottoBetPayouts.emplace_back(fee, GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get()), entranceFee);
             }
         }

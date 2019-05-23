@@ -1025,10 +1025,13 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     int totalFoundCGBets = 0;
     int gameStartTime = 0;
     int gameStartBlock = 0;
+    int resultHeight = -1;
+    CBetOut winningBetOut;
+    bool winningBetFound = false;
 
     //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     CBlockIndex *BlocksIndex = NULL;
-    int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
+    int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 14400;
     BlocksIndex = chainActive[height];
 
     while (BlocksIndex) {
@@ -1060,21 +1063,34 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
                             gameStartBlock = BlocksIndex -> nHeight;
                         }
                     }
-
+                    // Find a matching result transaction
+                    CChainGamesResult cgResult;
+                    if (validTx && resultHeight == -1 && cgResult.FromScript(txout.scriptPubKey)) {
+                        if (cgResult.nEventId == (uint16_t)eventID) {
+                            resultHeight = BlocksIndex->nHeight;
+                        }
+                    }
                     CChainGamesBet cgBet;
-                    if (!CChainGamesBet::FromOpCode(OpCode, cgBet)) {
-                        continue;
+                    if (CChainGamesBet::FromOpCode(OpCode, cgBet)) {
+                        if (((unsigned int)cgBet.nEventId) == eventID){
+                            totalFoundCGBets = totalFoundCGBets + 1;
+                        }
                     }
-
-                    if (((unsigned int)cgBet.nEventId) == eventID){
-                        totalFoundCGBets = totalFoundCGBets + 1;
-                    }
-
                 }
             }
         }
 
         BlocksIndex = chainActive.Next(BlocksIndex);
+    }
+
+    if (resultHeight > Params().BetStartHeight()) {
+        std::vector<CBetOut> betOuts = GetCGLottoBetPayouts(resultHeight);
+        for (auto betOut : betOuts) {
+            if (!winningBetFound && betOut.nEventId == eventID) {
+                winningBetOut = betOut;
+                winningBetFound = true;
+            }
+        }
     }
 
     int potSize = totalFoundCGBets*entryFee;
@@ -1084,6 +1100,15 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("start-block", gameStartBlock));
     obj.push_back(Pair("start-time", gameStartTime));
     obj.push_back(Pair("total-bets", totalFoundCGBets));
+    obj.push_back(Pair("result-trigger-block", resultHeight));
+    if (winningBetFound) {
+        CTxDestination address;
+        if (ExtractDestination(winningBetOut.scriptPubKey, address)) {
+            obj.push_back(Pair("winner", CBitcoinAddress(address).ToString()));
+            obj.push_back(Pair("winnings", ValueFromAmount(winningBetOut.nValue)));
+        }
+
+    }
     obj.push_back(Pair("network", Params().NetworkID()));
 
     return obj;
