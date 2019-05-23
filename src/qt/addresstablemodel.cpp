@@ -129,6 +129,11 @@ public:
             parent->beginInsertRows(QModelIndex(), lowerIndex, lowerIndex);
             cachedAddressTable.insert(lowerIndex, AddressTableEntry(newEntryType, label, address));
             parent->endInsertRows();
+            if(purpose == "receive"){
+                recvNum++;
+            }else if(purpose == "send"){
+                sendNum++;
+            }
             break;
         case CT_UPDATED:
             if (!inModel) {
@@ -147,6 +152,11 @@ public:
             parent->beginRemoveRows(QModelIndex(), lowerIndex, upperIndex - 1);
             cachedAddressTable.erase(lower, upper);
             parent->endRemoveRows();
+            if(purpose == "receive"){
+                recvNum--;
+            }else if(purpose == "send"){
+                sendNum--;
+            }
             break;
         }
     }
