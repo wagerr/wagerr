@@ -140,6 +140,7 @@ def bctest(testDir, testObj, buildenv):
                                                           outs[0].splitlines(True),
                                                           fromfile=outputFn,
                                                           tofile="returned"))
+            logging.error('Outs0 %s outputData %s' % (outs[0], outputData))
             logging.error(error_message)
             formatting_mismatch = True
 
