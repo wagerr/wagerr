@@ -1109,7 +1109,7 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
         }
 
     }
-    obj.push_back(Pair("network", Params().NetworkID()));
+    obj.push_back(Pair("network", Params().NetworkIDString()));
 
     return obj;
 }
