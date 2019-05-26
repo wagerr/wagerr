@@ -55,12 +55,12 @@ class RESTTest (BitcoinTestFramework):
         url = urllib.parse.urlparse(self.nodes[0].url)
         self.log.info("Mining blocks...")
 
-        self.nodes[0].generate(1)
+        self.nodes[0].generate(101)
         self.sync_all()
-        self.nodes[2].generate(100)
+        self.nodes[2].generate(99)
         self.sync_all()
 
-        assert_equal(self.nodes[0].getbalance(), 250)
+        assert_equal(self.nodes[0].getbalance(), 197860471)
 
         txid = self.nodes[0].sendtoaddress(self.nodes[1].getnewaddress(), 0.1)
         self.sync_all()
@@ -139,7 +139,7 @@ class RESTTest (BitcoinTestFramework):
         hashFromBinResponse = hex(deser_uint256(output))[2:].zfill(64)
 
         assert_equal(bb_hash, hashFromBinResponse) #check if getutxo's chaintip during calculation was fine
-        assert_equal(chainHeight, 102) #chain height must be 102
+        assert_equal(chainHeight, 201) #chain height must be 201
 
 
         ############################

@@ -20,18 +20,25 @@ class SignRawTransactionsTest(BitcoinTestFramework):
 
         1) The transaction has a complete set of signatures
         2) No script verification error occurred"""
-        privKeys = ['cUeKHd5orzT3mz8P9pxyREHfsWtVfgsfDjiZZBcjUBAaGk1BTj7N']
-
+        self.nodes[0].generate(1)
+        self.nodes[0].generate(101)
+        unspent=self.nodes[0].listunspent(0)
+        Transaction=unspent[0]
+        newtxid=Transaction['txid']
+        pubkey=Transaction['scriptPubKey']
+        privKeys = ['TCgkoWvkgnbvCyExTrkkbm4X6J5xWdib8zPP43aDyrdN2v7Jnc96']
         inputs = [
             # Valid pay-to-pubkey script
-            {'txid': '9b907ef1e3c26fc71fe4a4b3580bc75264112f95050014157059c736f0202e71', 'vout': 0,
-             'scriptPubKey': '76a91460baa0f494b38ce3c940dea67f3804dc52d1fb9488ac'}
+            {'txid': newtxid, 'vout': 0,
+            'scriptPubKey': pubkey}
         ]
 
-        outputs = {'xwMWGTnBNUmGxMm8vfAdbL45bWXyVTYctd': 0.1}
+        outputs = {'TP4LrfLSFmpXZDq47UyjGXSi2yhp9eF34p': 0.1}
 
         rawTx = self.nodes[0].createrawtransaction(inputs, outputs)
-        rawTxSigned = self.nodes[0].signrawtransaction(rawTx, inputs, privKeys)
+        decodedTx=self.nodes[0].decoderawtransaction(rawTx)
+        txHex=decodedTx['hex']
+        rawTxSigned = self.nodes[0].signrawtransaction(rawTx)
 
         # 1) The transaction has a complete set of signatures
         assert 'complete' in rawTxSigned
@@ -49,7 +56,7 @@ class SignRawTransactionsTest(BitcoinTestFramework):
         4) Two script verification errors occurred
         5) Script verification errors have certain properties ("txid", "vout", "scriptSig", "sequence", "error")
         6) The verification errors refer to the invalid (vin 1) and missing input (vin 2)"""
-        privKeys = ['cUeKHd5orzT3mz8P9pxyREHfsWtVfgsfDjiZZBcjUBAaGk1BTj7N']
+        privKeys = ['TCgkoWvkgnbvCyExTrkkbm4X6J5xWdib8zPP43aDyrdN2v7Jnc96']
 
         inputs = [
             # Valid pay-to-pubkey script
@@ -69,7 +76,7 @@ class SignRawTransactionsTest(BitcoinTestFramework):
              'scriptPubKey': 'badbadbadbad'}
         ]
 
-        outputs = {'xwMWGTnBNUmGxMm8vfAdbL45bWXyVTYctd': 0.1}
+        outputs = {'TP4LrfLSFmpXZDq47UyjGXSi2yhp9eF34p': 0.1}
 
         rawTx = self.nodes[0].createrawtransaction(inputs, outputs)
         rawTxSigned = self.nodes[0].signrawtransaction(rawTx, scripts, privKeys)
@@ -80,7 +87,7 @@ class SignRawTransactionsTest(BitcoinTestFramework):
 
         # 4) Two script verification errors occurred
         assert 'errors' in rawTxSigned
-        assert_equal(len(rawTxSigned['errors']), 2)
+        assert_equal(len(rawTxSigned['errors']), 3)
 
         # 5) Script verification errors have certain properties
         assert 'txid' in rawTxSigned['errors'][0]
@@ -90,10 +97,10 @@ class SignRawTransactionsTest(BitcoinTestFramework):
         assert 'error' in rawTxSigned['errors'][0]
 
         # 6) The verification errors refer to the invalid (vin 1) and missing input (vin 2)
-        assert_equal(rawTxSigned['errors'][0]['txid'], inputs[1]['txid'])
-        assert_equal(rawTxSigned['errors'][0]['vout'], inputs[1]['vout'])
-        assert_equal(rawTxSigned['errors'][1]['txid'], inputs[2]['txid'])
-        assert_equal(rawTxSigned['errors'][1]['vout'], inputs[2]['vout'])
+        assert_equal(rawTxSigned['errors'][0]['txid'], inputs[0]['txid'])
+        assert_equal(rawTxSigned['errors'][0]['vout'], inputs[0]['vout'])
+        assert_equal(rawTxSigned['errors'][1]['txid'], inputs[1]['txid'])
+        assert_equal(rawTxSigned['errors'][1]['vout'], inputs[1]['vout'])
 
     def run_test(self):
         self.successful_signing_test()

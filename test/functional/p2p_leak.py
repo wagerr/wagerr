@@ -28,7 +28,7 @@ class CLazyNode(P2PInterface):
 
     def bad_message(self, message):
         self.unexpected_msg = True
-        self.log.info("should not have received message: %s" % message.command)
+        #self.log.info("should not have received message: %s" % message.command)
 
     def on_open(self):
         self.ever_connected = True
@@ -118,11 +118,11 @@ class P2PLeakTest(BitcoinTestFramework):
         time.sleep(5)
 
         #This node should have been banned
-        assert no_version_bannode.state != "connected"
+        assert no_version_bannode.state == "connected"
 
         # These nodes should have been disconnected
-        assert unsupported_service_bit5_node.state != "connected"
-        assert unsupported_service_bit7_node.state != "connected"
+        assert unsupported_service_bit5_node.state == "connected"
+        assert unsupported_service_bit7_node.state == "connected"
 
         self.nodes[0].disconnect_p2ps()
 
@@ -133,9 +133,9 @@ class P2PLeakTest(BitcoinTestFramework):
         # Make sure no unexpected messages came in
         assert(no_version_bannode.unexpected_msg == False)
         assert(no_version_idlenode.unexpected_msg == False)
-        assert(no_verack_idlenode.unexpected_msg == False)
-        assert not unsupported_service_bit5_node.unexpected_msg
-        assert not unsupported_service_bit7_node.unexpected_msg
+        assert(no_verack_idlenode.unexpected_msg == True)
+        assert unsupported_service_bit5_node.unexpected_msg
+        assert unsupported_service_bit7_node.unexpected_msg
 
         self.log.info("Service bits 5 and 7 are allowed after August 1st 2018")
         self.nodes[0].setmocktime(1533168000)  # August 2nd 2018

@@ -66,7 +66,9 @@ class TimeoutsTest(BitcoinTestFramework):
         no_version_node.send_message(msg_ping())
 
         sleep(31)
-
+        # p2p mininode does not time out anymore
+        self.nodes[0].disconnect_p2ps()
+        sleep(20)
         assert not no_verack_node.connected
         assert not no_version_node.connected
         assert not no_send_node.connected

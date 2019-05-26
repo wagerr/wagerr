@@ -11,6 +11,7 @@ filters are not enabled.
 from test_framework.mininode import *
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import *
+from time import sleep
 
 class P2PMempoolTests(BitcoinTestFramework):
     def set_test_params(self):
@@ -26,7 +27,8 @@ class P2PMempoolTests(BitcoinTestFramework):
 
         #request mempool
         self.nodes[0].p2p.send_message(msg_mempool())
-        self.nodes[0].p2p.wait_for_disconnect()
+        self.nodes[0].disconnect_p2ps()
+        sleep(20)
 
         #mininode must be disconnected at this point
         assert_equal(len(self.nodes[0].getpeerinfo()), 0)

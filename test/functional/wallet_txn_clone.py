@@ -23,10 +23,13 @@ class TxnMallTest(BitcoinTestFramework):
 
     def run_test(self):
         # All nodes should start with 1,250 BTC:
-        starting_balance = 6250
-        for i in range(4):
+        starting_balance = 179110471
+        self.nodes[0].getnewaddress("")
+        for i in range(1, 4):
+            starting_balance = 6250000
             assert_equal(self.nodes[i].getbalance(), starting_balance)
             self.nodes[i].getnewaddress("")  # bug workaround, coins generated assigned to first getnewaddress!
+        starting_balance = 179110471
 
         # Assign coins to foo and bar accounts:
         self.nodes[0].settxfee(.001)
@@ -132,9 +135,9 @@ class TxnMallTest(BitcoinTestFramework):
 
         # Check node0's total balance; should be same as before the clone, + 100 BTC for 2 matured,
         # less possible orphaned matured subsidy
-        expected += 500
+        expected += 500000
         if (self.options.mine_block):
-            expected -= 250
+            expected -= 250000
         assert_equal(self.nodes[0].getbalance(), expected)
         assert_equal(self.nodes[0].getbalance("*", 0), expected)
 
@@ -149,7 +152,7 @@ class TxnMallTest(BitcoinTestFramework):
                                                                 + fund_foo_tx["fee"]
                                                                 -   (29 * 5)
                                                                 + fund_bar_tx["fee"]
-                                                                +  500)
+                                                                +  500000)
 
         # Node1's "from0" account balance
         assert_equal(self.nodes[1].getbalance("from0", 0), -(tx1["amount"] + tx2["amount"]))

@@ -31,7 +31,7 @@ class WalletAccountsTest(BitcoinTestFramework):
         # the same address, so we call twice to get two addresses w/50 each
         node.generate(1)
         node.generate(101)
-        assert_equal(node.getbalance(), 500)
+        assert_equal(node.getbalance(), 173360471)
 
         # there should be 2 address groups
         # each with 1 address with a balance of 50 Bitcoins
@@ -50,7 +50,7 @@ class WalletAccountsTest(BitcoinTestFramework):
         # There's some fee that will come back to us when the miner reward
         # matures.
         node.settxfee(0)
-        common_address = "y9B3dwrBGGs3yVkyEHm68Yn36Wp2Rt7Vtd"
+        common_address = "TKADt1cGWJ3RQFs3ADwXEwSu8EWYZ5XzGv"
         txid = node.sendmany("", {common_address: 100}, 1)
         tx_details = node.gettransaction(txid)
         fee = -tx_details['details'][0]['fee']
