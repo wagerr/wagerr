@@ -25,7 +25,6 @@
 # [1] https://docs.travis-ci.com/user/caching/#build-phases
 # [2] https://docs.travis-ci.com/user/customizing-the-build#build-timeouts
 
-sudo: required
 dist: trusty
 os: linux
 language: minimal
@@ -76,7 +75,6 @@ jobs:
 # lint stage
     - stage: lint
       env:
-      sudo: false
       cache: false
       language: python
       python: '3.6'
