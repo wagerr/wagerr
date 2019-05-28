@@ -252,14 +252,11 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
 }
 
 
-// TODO There is a lot of code shared between `bets` and `listtransactions`.
+// TODO: There is a lot of code shared between `bets` and `listtransactions`.
 // This would ideally be abstracted when time allows.
+// TODO: The first parameter for account isn't used.
 UniValue listbets(const UniValue& params, bool fHelp)
 {
-    // TODO The command-line parameters for this command aren't handled as
-    // described, either the documentation or the behaviour of this command
-    // should be corrected when time allows.
-
     if (fHelp || params.size() > 4)
         throw runtime_error(
             "listbets ( \"account\" count from includeWatchonly)\n"
@@ -1134,7 +1131,7 @@ UniValue geteventsliability(const UniValue& params, bool fHelp)
     // Check the events index actually has events,
     if (eventsIndex.size() < 1) {
         throw runtime_error("Currently no events to list.");
-    } 
+    }
 
     int payoutThreshold = params[0].get_int();
     int betThreshold = params[1].get_int();
@@ -1205,7 +1202,7 @@ UniValue geteventsliability(const UniValue& params, bool fHelp)
 
         if (event.size() > 2 || betCount >= betThreshold) {
             ret.push_back(event);
-        } 
+        }
 
     }
 
