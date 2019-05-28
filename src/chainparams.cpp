@@ -335,10 +335,8 @@ public:
 
         vFixedSeeds.clear();
         vSeeds.clear();
-        vSeeds.push_back(CDNSSeedData("1", "test.testseederv1.wgr.host")); // Wagerr's official testseed 1
-        vSeeds.push_back(CDNSSeedData("2", "test.testseederv2.wgr.host")); // Wagerr's official testseed 2
-        vSeeds.push_back(CDNSSeedData("3", "test.devseeder1.wgr.host"));   // Wagerr's dev1 testseed
-        vSeeds.push_back(CDNSSeedData("4", "test.devseeder2.wgr.host"));   // Wagerr's dev2 testseed
+        vSeeds.push_back(CDNSSeedData("testnet-seeder-01.wgr.host", "testnet.testnet-seeder-01.wgr.host"));
+        vSeeds.push_back(CDNSSeedData("testnet-seeder-02.wgr.host", "testnet.testnet-seeder-02.wgr.host"));
 
         base58Prefixes[PUBKEY_ADDRESS] = std::vector<unsigned char>(1, 65);   // Testnet wagerr addresses start with 'y'
         base58Prefixes[SCRIPT_ADDRESS] = std::vector<unsigned char>(1, 125);  // Testnet wagerr script addresses start with '8' or '9'
