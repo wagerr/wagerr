@@ -1,5 +1,5 @@
 ---
-name: "wagerr-linux-3.2"
+name: "wagerr-linux-4.0"
 enable_cache: true
 suites:
 - "bionic"

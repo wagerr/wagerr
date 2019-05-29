@@ -1,5 +1,5 @@
 ---
-name: "wagerr-osx-3.2"
+name: "wagerr-osx-4.0"
 enable_cache: true
 suites:
 - "bionic"
