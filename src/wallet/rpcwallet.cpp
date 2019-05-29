@@ -3076,6 +3076,15 @@ UniValue getwalletinfo(const UniValue& params, bool fHelp)
     obj.push_back(Pair("txcount", (int)pwalletMain->mapWallet.size()));
     obj.push_back(Pair("keypoololdest", pwalletMain->GetOldestKeyPoolTime()));
     obj.push_back(Pair("keypoolsize", (int)pwalletMain->GetKeyPoolSize()));
+    if (!pwalletMain->IsCrypted()) {
+        obj.push_back(Pair("encryption_status", "unencrypted"));
+    } else if (pwalletMain->fWalletUnlockAnonymizeOnly) {
+        obj.push_back(Pair("encryption_status", "unlocked_for_anonimization_only"));
+    } else if (pwalletMain->IsLocked()) {
+        obj.push_back(Pair("encryption_status", "locked"));
+    } else {
+        obj.push_back(Pair("encryption_status", "unlocked"));
+    }
     if (pwalletMain->IsCrypted())
         obj.push_back(Pair("unlocked_until", nWalletUnlockTime));
     obj.push_back(Pair("paytxfee",      ValueFromAmount(payTxFee.GetFeePerK())));
