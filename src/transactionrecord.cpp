@@ -28,7 +28,7 @@ bool TransactionRecord::showTransaction(const CWalletTx& wtx)
     return true;
 }
 
-bool DecomposeBettingCoinstake(const CWallet* wallet, const CWalletTx& wtx, const CTxDestination address, bool fMyZMint, QList<TransactionRecord> &coinStakeRecords) {
+bool DecomposeBettingCoinstake(const CWallet* wallet, const CWalletTx& wtx, const CTxDestination address, bool fMyZMint, std::vector<TransactionRecord> &coinStakeRecords) {
     std::map<uint64_t, CTxOut> stakeRewards;
     std::map<uint64_t, CTxOut> betRewards;
     std::map<uint64_t, CTxOut> MNRewards;
