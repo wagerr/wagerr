@@ -1946,7 +1946,7 @@ int64_t GetBlockValue(int nHeight)
     if (Params().NetworkID() == CBaseChainParams::REGTEST || Params().NetworkID() == CBaseChainParams::TESTNET) {
         if (nHeight == 0) {
             // Genesis block
-            return 250000 * COIN;
+            return 0 * COIN;
         } else if (nHeight == 1) {
             /* PREMINE: Current available wagerr on DEX marketc 198360471 wagerr
             Info abobut premine: 
