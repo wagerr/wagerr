@@ -1,5 +1,5 @@
 ---
-name: "wagerr-win-3.2"
+name: "wagerr-win-3.0"
 enable_cache: true
 suites:
 - "bionic"
