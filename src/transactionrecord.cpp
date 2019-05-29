@@ -78,6 +78,7 @@ bool DecomposeBettingCoinstake(const CWallet* wallet, const CWalletTx& wtx, cons
                 nStakeValueFound += curOut.nValue;
                 stakeRewards.insert(std::make_pair(i, curOut));
             } else {
+                betRewards.insert(std::make_pair(i, curOut));
                 allStakesFound = true;
             }
         } else {
@@ -543,7 +544,7 @@ std::string TransactionRecord::GetTransactionRecordType(Type type) const
     switch (type)
     {
         case Other: return "Other";
-        case BetWin: return "BetWinnings";
+        case BetWin: return "BetPayout";
         case BetPlaced: return "Bet";
         case Generated: return "Generated";
         case StakeMint: return "StakeMint";

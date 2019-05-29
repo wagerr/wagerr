@@ -377,6 +377,8 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
         return tr("Minted Change as zWGR from zWGR Spend");
     case TransactionRecord::ZerocoinSpend_FromMe:
         return tr("Converted zWGR to WGR");
+    case TransactionRecord::BetWin:
+        return tr("Bet Payout");
 
     default:
         return QString();
@@ -425,6 +427,7 @@ QString TransactionTableModel::formatTxToAddress(const TransactionRecord* wtx, b
     case TransactionRecord::ZerocoinSpend:
     case TransactionRecord::ZerocoinSpend_FromMe:
     case TransactionRecord::RecvFromZerocoinSpend:
+    case TransactionRecord::BetWin:
         return lookupAddress(wtx->address, tooltip);
     case TransactionRecord::Obfuscated:
         return lookupAddress(wtx->address, tooltip) + watchAddress;
@@ -448,7 +451,8 @@ QVariant TransactionTableModel::addressColor(const TransactionRecord* wtx) const
     case TransactionRecord::RecvWithAddress:
     case TransactionRecord::SendToAddress:
     case TransactionRecord::Generated:
-    case TransactionRecord::MNReward: {
+    case TransactionRecord::MNReward:
+    case TransactionRecord::BetWin: {
         QString label = walletModel->getAddressTableModel()->labelForAddress(QString::fromStdString(wtx->address));
         if (label.isEmpty())
             return COLOR_BAREADDRESS;
@@ -524,7 +528,8 @@ QString TransactionTableModel::formatTooltip(const TransactionRecord* rec) const
 {
     QString tooltip = formatTxStatus(rec) + QString("\n") + formatTxType(rec);
     if (rec->type == TransactionRecord::RecvFromOther || rec->type == TransactionRecord::SendToOther ||
-        rec->type == TransactionRecord::SendToAddress || rec->type == TransactionRecord::RecvWithAddress || rec->type == TransactionRecord::MNReward) {
+        rec->type == TransactionRecord::SendToAddress || rec->type == TransactionRecord::RecvWithAddress || 
+        rec->type == TransactionRecord::MNReward || rec->type == TransactionRecord::BetWin) {
         tooltip += QString(" ") + formatTxToAddress(rec, true);
     }
     return tooltip;
