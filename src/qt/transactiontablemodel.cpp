@@ -377,6 +377,8 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
         return tr("Minted Change as zWGR from zWGR Spend");
     case TransactionRecord::ZerocoinSpend_FromMe:
         return tr("Converted zWGR to WGR");
+    case TransactionRecord::BetPlaced:
+        return tr("Bet Placed");
     case TransactionRecord::BetWin:
         return tr("Bet Payout");
 
@@ -528,7 +530,7 @@ QString TransactionTableModel::formatTooltip(const TransactionRecord* rec) const
 {
     QString tooltip = formatTxStatus(rec) + QString("\n") + formatTxType(rec);
     if (rec->type == TransactionRecord::RecvFromOther || rec->type == TransactionRecord::SendToOther ||
-        rec->type == TransactionRecord::SendToAddress || rec->type == TransactionRecord::RecvWithAddress || 
+        rec->type == TransactionRecord::SendToAddress || rec->type == TransactionRecord::RecvWithAddress ||
         rec->type == TransactionRecord::MNReward || rec->type == TransactionRecord::BetWin) {
         tooltip += QString(" ") + formatTxToAddress(rec, true);
     }
