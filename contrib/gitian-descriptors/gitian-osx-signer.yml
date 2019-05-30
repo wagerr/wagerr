@@ -7,7 +7,7 @@ architectures:
 packages:
 - "faketime"
 remotes:
-- "url": "https://github.com/wagerr-project/wagerr-detached-sigs.git"
+- "url": "https://github.com/wagerr/wagerr-detached-sigs.git"
   "dir": "signature"
 files:
 - "wagerr-osx-unsigned.tar.gz"
