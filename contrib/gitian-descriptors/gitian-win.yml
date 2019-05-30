@@ -23,7 +23,7 @@ packages:
 - "python"
 - "rename"
 remotes:
-- "url": "https://github.com/wagerr-project/wagerr.git"
+- "url": "https://github.com/wagerr/wagerr.git"
   "dir": "wagerr"
 files: []
 script: |
