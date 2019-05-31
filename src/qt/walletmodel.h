@@ -99,7 +99,7 @@ public:
     }
 };
 
-/** Interface to Bitcoin wallet from Qt view code. */
+/** Interface to Wagerr wallet from Qt view code. */
 class WalletModel : public QObject
 {
     Q_OBJECT
