@@ -537,7 +537,7 @@ bool WalletModel::createZwgrSpend(
             receipt,
             vMintsSelected,
             vNewMints,
-            fMintChange,
+            false, // No more mints
             fMinimizeChange,
             outputs,
             changeAdd
@@ -571,7 +571,7 @@ bool WalletModel::sendZwgr(
             wtxNew,
             receipt,
             vMintsSelected,
-            fMintChange,
+            false, // No more mints
             fMinimizeChange,
             outputs,
             changeAdd
@@ -600,7 +600,7 @@ bool WalletModel::convertBackZwgr(
             wtxNew,
             receipt,
             vMintsSelected,
-            fMintChange,
+            false, // No more mints
             fMinimizeChange,
             std::list<std::pair<CBitcoinAddress*, CAmount>>(),
             &addressTo
