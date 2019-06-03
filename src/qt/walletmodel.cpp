@@ -433,6 +433,13 @@ const CWalletTx* WalletModel::getTx(uint256 id){
     return wallet->GetWalletTx(id);
 }
 
+bool WalletModel::isCoinStake(QString id){
+    uint256 hashTx;
+    hashTx.SetHex(id.toStdString());
+    const CWalletTx* tx = getTx(hashTx);
+    return tx->IsCoinStake();
+}
+
 WalletModel::SendCoinsReturn WalletModel::prepareBetTransaction(WalletModelTransaction& transaction, CAmount amount, const std::string& eventId, const std::string& teamToWin)
 {
     if (isAnonymizeOnlyUnlocked()) {
