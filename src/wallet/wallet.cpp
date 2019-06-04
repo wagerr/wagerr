@@ -2971,12 +2971,13 @@ bool CWallet::CreateTransaction(CScript scriptPubKey, const CAmount& nValue, CWa
 }
 
 // ppcoin: create coin stake transaction
-bool CWallet::CreateCoinStake(
+bool CWallet::FindCoinStake(
         const CKeyStore& keystore,
         unsigned int nBits,
         int64_t nSearchInterval,
         CMutableTransaction& txNew,
-        unsigned int& nTxNewTime
+        unsigned int& nTxNewTime,
+        std::unique_ptr<CStakeInput>& newStakeInput
         )
 {
     // The following split & combine thresholds are important to security
@@ -3079,33 +3080,9 @@ bool CWallet::CreateCoinStake(
             // Limit size
             unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
             if (nBytes >= DEFAULT_BLOCK_MAX_SIZE / 5)
-                return error("CreateCoinStake : exceeded coinstake size limit");
+                return error("FindCoinStake : exceeded coinstake size limit");
 
-            //Masternode payment
-            FillBlockPayee(txNew, nMinFee, true, stakeInput->IsZWGR());
-
-            {
-                TRY_LOCK(zwgrTracker->cs_spendcache, fLocked);
-                if (!fLocked)
-                    continue;
-
-                uint256 hashTxOut = txNew.GetHash();
-                CTxIn in;
-                if (!stakeInput->CreateTxIn(this, in, hashTxOut)) {
-                    LogPrintf("%s : failed to create TxIn\n", __func__);
-                    txNew.vin.clear();
-                    txNew.vout.clear();
-                    continue;
-                }
-                txNew.vin.emplace_back(in);
-            }
-
-            //Mark mints as spent
-            if (stakeInput->IsZWGR()) {
-                CZWgrStake* z = (CZWgrStake*)stakeInput.get();
-                if (!z->MarkSpent(this, txNew.GetHash()))
-                    return error("%s: failed to mark mint as used\n", __func__);
-            }
+            newStakeInput = std::move(stakeInput);
 
             fKernelFound = true;
             break;
@@ -5742,7 +5719,7 @@ bool CWallet::FillCoinStake(const CKeyStore& keystore, CMutableTransaction& txNe
 {
 
     {
-        LOCK(cs_main);
+        LOCK2(cs_main, zwgrTracker->cs_spendcache);
 
         BOOST_FOREACH (const CTxOut& out, voutPayouts)
             txNew.vout.push_back(out);
