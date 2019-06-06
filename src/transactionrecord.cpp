@@ -12,6 +12,7 @@
 #include "timedata.h"
 #include "wallet/wallet.h"
 #include "zwgrchain.h"
+#include "betting/bet.h"
 
 #include <stdint.h>
 
@@ -200,7 +201,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
             sub.address = CBitcoinAddress(address).ToString();
             sub.credit = nNet;
         } else {
-            //Masternode reward
+            // Masternode reward
             CTxDestination destMN;
             int nIndexMN = wtx.vout.size() - 1;
             if (ExtractDestination(wtx.vout[nIndexMN].scriptPubKey, destMN) && IsMine(*wallet, destMN)) {
@@ -209,6 +210,18 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 sub.type = TransactionRecord::MNReward;
                 sub.address = CBitcoinAddress(destMN).ToString();
                 sub.credit = wtx.vout[nIndexMN].nValue;
+            } else {
+                // Bet winning payout
+                CTxDestination destBetWin;
+                for( unsigned int i = 0; i < wtx.vout.size(); i++  ){
+                    if (ExtractDestination(wtx.vout[i].scriptPubKey, destBetWin) && IsMine(*wallet, destBetWin)) {
+                        isminetype mine = wallet->IsMine(wtx.vout[i]);
+                        sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
+                        sub.type = TransactionRecord::BetWin;
+                        sub.address = CBitcoinAddress(destBetWin).ToString();
+                        sub.credit = wtx.vout[i].nValue;
+                    }
+                }
             }
         }
 
@@ -289,7 +302,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 sub.credit = txout.nValue;
                 sub.involvesWatchAddress = mine & ISMINE_WATCH_ONLY;
                 if (ExtractDestination(txout.scriptPubKey, address) && IsMine(*wallet, address)) {
-                    // Received by WAGERR Address
+                    // Received by Wagerr Address
                     sub.type = TransactionRecord::RecvWithAddress;
                     sub.address = CBitcoinAddress(address).ToString();
                 } else {
@@ -350,7 +363,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 sub.type = TransactionRecord::Obfuscated;
                 CTxDestination address;
                 if (ExtractDestination(wtx.vout[0].scriptPubKey, address)) {
-                    // Sent to WAGERR Address
+                    // Sent to Wagerr Address
                     sub.address = CBitcoinAddress(address).ToString();
                 } else {
                     // Sent to IP, or other non-address transaction like OP_EVAL
@@ -397,7 +410,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     //private keys that the change was sent to. Do not display a "sent to" here.
                     if (wtx.IsZerocoinMint())
                         continue;
-                    // Sent to WAGERR Address
+                    // Sent to Wagerr Address
                     sub.type = TransactionRecord::SendToAddress;
                     sub.address = CBitcoinAddress(address).ToString();
                 } else if (txout.IsZerocoinMint()){
@@ -405,9 +418,26 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     sub.address = mapValue["zerocoinmint"];
                     sub.credit += txout.nValue;
                 } else {
-                    // Sent to IP, or other non-address transaction like OP_EVAL
-                    sub.type = TransactionRecord::SendToOther;
-                    sub.address = mapValue["to"];
+                    bool isBet = false;
+                    if (txout.scriptPubKey.IsUnspendable()) {
+                        vector<unsigned char> vOpCode = ParseHex(txout.scriptPubKey.ToString().substr(9, string::npos));
+                        std::string opCode(vOpCode.begin(), vOpCode.end());
+
+                        CPeerlessBet plBet;
+                        CChainGamesBet cgBet;
+                        if (CPeerlessBet::FromOpCode(opCode, plBet) || CChainGamesBet::FromOpCode(opCode, cgBet)) {
+                            isBet = true;
+                        }
+                    }
+                    if (isBet) {
+                        // Placed a bet
+                        sub.type = TransactionRecord::BetPlaced;
+                        sub.address = mapValue["to"];
+                    } else {
+                        // Sent to IP, or other non-address transaction like OP_EVAL
+                        sub.type = TransactionRecord::SendToOther;
+                        sub.address = mapValue["to"];
+                    }
                 }
 
                 if (mapValue["DS"] == "1") {
@@ -545,7 +575,7 @@ std::string TransactionRecord::GetTransactionRecordType(Type type) const
     {
         case Other: return "Other";
         case BetWin: return "BetPayout";
-        case BetPlaced: return "Bet";
+        case BetPlaced: return "BetPlaced";
         case Generated: return "Generated";
         case StakeMint: return "StakeMint";
         case StakeZWGR: return "StakeZWGR";
