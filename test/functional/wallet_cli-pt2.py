@@ -1,0 +1,77 @@
+#!/usr/bin/env python3
+# Copyright (c) 2014-2017 The Bitcoin Core developers
+# Distributed under the MIT software license, see the accompanying
+# file COPYING or http://www.opensource.org/licenses/mit-license.php.
+"""Test the CLI command sendfrom.
+
+"""
+from test_framework.test_framework import BitcoinTestFramework
+
+from test_framework.util import (
+    assert_equal,
+    assert_raises_rpc_error,
+    wait_until,
+    assert_raises_rpc_error,
+    connect_nodes_bi,
+    disconnect_nodes,
+    p2p_port,
+)
+from time import sleep
+
+from decimal import Decimal
+
+import re
+import sys
+import os
+
+class SendFromTest (BitcoinTestFramework):
+    def set_test_params(self):
+        self.setup_clean_chain = True
+        self.num_nodes = 2
+        #self.extra_args = [["-debug"],["-debug"]]
+
+    def run_test(self):
+        connect_nodes_bi(self.nodes,0,1)
+        self.log.info("Mining Blocks...")
+        self.nodes[0].generate(2)
+        self.nodes[1].generate(102)
+        self.sync_all()
+        tmpdir=self.options.tmpdir
+        ###
+        # Send From
+        ###
+        sendfrom=self.nodes[0].getnewaddress('SendFrom')
+        self.log.info("Sending 500 wgr to %s" % sendfrom)
+        self.nodes[1].sendfrom('', sendfrom, 500)
+        self.nodes[1].generate(1)
+        self.sync_all()
+        self.log.info("Balance of address %s %s" % (sendfrom, self.nodes[0].getbalance('SendFrom')))
+        ###
+        # Send Many
+        ###
+        smaddr1=self.nodes[0].getnewaddress('SMaddr1')
+        smaddr2=self.nodes[0].getnewaddress('SMaddr2')
+        self.nodes[1].settxfee(0.0000123)
+        self.log.info("Sending 500 wgr to %s" % smaddr1)
+        self.log.info("Sending 500 wgr to %s" % smaddr2)
+        smtxid=self.nodes[1].sendmany('', {smaddr1: 500, smaddr2: 500})
+        self.log.info("SMtxid %s" % smtxid)
+        smtransaction=self.nodes[1].gettransaction(smtxid)
+        self.log.info("Send Many Transaction Fee %s" % smtransaction['fee'])
+        self.nodes[1].generate(1)
+        self.sync_all()
+        self.log.info("Balance of address %s %s" % (smaddr1, self.nodes[0].getbalance('SMaddr1')))
+        self.log.info("Balance of address %s %s" % (smaddr2, self.nodes[0].getbalance('SMaddr2'))) 
+        ###
+        # Send to Addressix
+        ###
+        addressix=self.nodes[0].getnewaddress()
+        self.nodes[0].setaccount(addressix, 'Addressix')
+        self.log.info("Sending 500 wgr to %s" % addressix)
+        self.nodes[1].sendtoaddressix(addressix,500)
+        self.nodes[1].generate(1)
+        self.sync_all()
+        self.log.info("Balance of address %s %s" % (addressix, self.nodes[0].getbalance('Addressix')))
+
+if __name__ == '__main__':
+    SendFromTest().main()
