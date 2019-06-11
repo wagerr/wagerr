@@ -1490,6 +1490,11 @@ UniValue getblockindexstats(const UniValue& params, bool fHelp) {
                 "        \"denom_5\": xxxx           (numeric) number of spends of denom_5 occurred over the block range\n"
                 "         ...                    ... number of spends of other denominations: ..., 10, 50, 100, 500, 1000, 5000\n"
                 "  }\n"
+                "  \"pubspendcount\": {             [if fFeeOnly=False]\n"
+                "        \"denom_1\": xxxx           (numeric) number of PUBLIC spends of denom_1 occurred over the block range\n"
+                "        \"denom_5\": xxxx           (numeric) number of PUBLIC spends of denom_5 occurred over the block range\n"
+                "         ...                    ... number of PUBLIC spends of other denominations: ..., 10, 50, 100, 500, 1000, 5000\n"
+                "  }\n"
                 "  \"txbytes\": xxxxx                (numeric) Sum of the size of all txes (zWGR excluded) over block range\n"
                 "  \"ttlfee\": xxxxx                 (numeric) Sum of the fee amount of all txes (zWGR mints excluded) over block range\n"
                 "  \"ttlfee_all\": xxxxx             (numeric) Sum of the fee amount of all txes (zWGR mints included) over block range\n"
@@ -1522,9 +1527,11 @@ UniValue getblockindexstats(const UniValue& params, bool fHelp) {
 
     std::map<libzerocoin::CoinDenomination, int64_t> mapMintCount;
     std::map<libzerocoin::CoinDenomination, int64_t> mapSpendCount;
+    std::map<libzerocoin::CoinDenomination, int64_t> mapPublicSpendCount;
     for (auto& denom : libzerocoin::zerocoinDenomList) {
         mapMintCount.insert(make_pair(denom, 0));
         mapSpendCount.insert(make_pair(denom, 0));
+        mapPublicSpendCount.insert(make_pair(denom, 0));
     }
 
     CBlockIndex* pindex = chainActive[heightStart];
@@ -1545,12 +1552,17 @@ UniValue getblockindexstats(const UniValue& params, bool fHelp) {
         for (const CTransaction& tx : block.vtx) {
             if (tx.IsCoinBase() || (tx.IsCoinStake() && !tx.HasZerocoinSpendInputs()))
                 continue;
-			
-			// fetch input value from prevouts and count spends
+
+            // fetch input value from prevouts and count spends
             for (unsigned int j = 0; j < tx.vin.size(); j++) {
-                if (tx.vin[j].IsZerocoinSpend() || tx.vin[j].IsZerocoinPublicSpend()) {
+                if (tx.vin[j].IsZerocoinSpend()) {
                     if (!fFeeOnly)
                         mapSpendCount[libzerocoin::IntToZerocoinDenomination(tx.vin[j].nSequence)]++;
+                    continue;
+                }
+                if (tx.vin[j].IsZerocoinPublicSpend()) {
+                    if (!fFeeOnly)
+                        mapPublicSpendCount[libzerocoin::IntToZerocoinDenomination(tx.vin[j].nSequence)]++;
                     continue;
                 }
 
@@ -1602,12 +1614,15 @@ UniValue getblockindexstats(const UniValue& params, bool fHelp) {
     if (!fFeeOnly) {
         UniValue mint_obj(UniValue::VOBJ);
         UniValue spend_obj(UniValue::VOBJ);
+        UniValue pubspend_obj(UniValue::VOBJ);
         for (auto& denom : libzerocoin::zerocoinDenomList) {
             mint_obj.push_back(Pair(strprintf("denom_%d", ZerocoinDenominationToInt(denom)), mapMintCount[denom]));
             spend_obj.push_back(Pair(strprintf("denom_%d", ZerocoinDenominationToInt(denom)), mapSpendCount[denom]));
+            pubspend_obj.push_back(Pair(strprintf("denom_%d", ZerocoinDenominationToInt(denom)), mapPublicSpendCount[denom]));
         }
         ret.push_back(Pair("mintcount", mint_obj));
         ret.push_back(Pair("spendcount", spend_obj));
+        ret.push_back(Pair("publicspendcount", pubspend_obj));
 
     }
     ret.push_back(Pair("txbytes", (int64_t)nBytes));
