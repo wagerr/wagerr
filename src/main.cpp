@@ -5249,7 +5249,7 @@ bool TestBlockValidity(CValidationState& state, const CBlock& block, CBlockIndex
     AssertLockHeld(cs_main);
     assert(pindexPrev);
     if (pindexPrev != chainActive.Tip()) {
-        LogPrintf("TestBlockValidity(): No longer working on chain tip\n");
+        LogPrintf("%s : No longer working on chain tip\n", __func__);
         return false;
     }
 
