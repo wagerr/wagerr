@@ -8,9 +8,9 @@
 #
 # All text after a single hash (#) is considered a comment and will be ignored.
 # The format is:
-#       TAG = value [value, ...]
+# TAG = value [value, ...]
 # For lists, items can also be appended using:
-#       TAG += value [value, ...]
+# TAG += value [value, ...]
 # Values that contain spaces should be placed between quotes (\" \").
 
 #---------------------------------------------------------------------------
@@ -103,7 +103,7 @@ BRIEF_MEMBER_DESC      = YES
 # If the REPEAT_BRIEF tag is set to YES, doxygen will prepend the brief
 # description of a member or function before the detailed description
 #
-# Note: if both HIDE_UNDOC_MEMBERS and BRIEF_MEMBER_DESC are set to NO, the
+# Note: If both HIDE_UNDOC_MEMBERS and BRIEF_MEMBER_DESC are set to NO, the
 # brief descriptions will be completely suppressed.
 # The default value is: YES.
 
@@ -128,10 +128,10 @@ ABBREVIATE_BRIEF       = "The $name class" \
                          represents \
                          a \
                          an \
-                         the 
+                         the
 
 # If the ALWAYS_DETAILED_SEC and REPEAT_BRIEF tags are both set to YES then
-# Doxygen will generate a detailed section even if there is only a brief
+# doxygen will generate a detailed section even if there is only a brief
 # description.
 # The default value is: NO.
 
@@ -488,7 +488,7 @@ EXTRACT_ANON_NSPACES   = NO
 
 HIDE_UNDOC_MEMBERS     = NO
 
-# If the HIDE_UNDOC_CLASSES tag is set to YES, Doxygen will hide all
+# If the HIDE_UNDOC_CLASSES tag is set to YES, doxygen will hide all
 # undocumented classes that are normally visible in the class hierarchy. If set
 # to NO, these classes will be included in the various overviews. This option
 # has no effect if EXTRACT_ALL is enabled.
@@ -503,7 +503,7 @@ HIDE_UNDOC_CLASSES     = NO
 
 HIDE_FRIEND_COMPOUNDS  = NO
 
-# If the HIDE_IN_BODY_DOCS tag is set to YES, Doxygen will hide any
+# If the HIDE_IN_BODY_DOCS tag is set to YES, doxygen will hide any
 # documentation blocks found inside the body of a function. If set to NO, these
 # blocks will be appended to the function's detailed documentation block.
 # The default value is: NO.
@@ -556,6 +556,7 @@ SHOW_GROUPED_MEMB_INC  = NO
 # If the FORCE_LOCAL_INCLUDES tag is set to YES then doxygen will list include
 # files with double quotes in the documentation rather than with sharp brackets.
 # The default value is: NO.
+
 FORCE_LOCAL_INCLUDES   = NO
 
 # If the INLINE_INFO tag is set to YES then a tag [inline] is inserted in the
@@ -941,7 +942,7 @@ IMAGE_PATH             =
 INPUT_FILTER           =
 
 # The FILTER_PATTERNS tag can be used to specify filters on a per file pattern
-# basis.  Doxygen will compare the file name with each pattern and apply the
+# basis. Doxygen will compare the file name with each pattern and apply the
 # filter if there is a match. The filters are a list of the form: pattern=filter
 # (like *.cpp=my_cpp_filter). See INPUT_FILTER for further information on how
 # filters are used. If the FILTER_PATTERNS tag is empty or if none of the
@@ -1062,7 +1063,7 @@ USE_HTAGS              = NO
 VERBATIM_HEADERS       = YES
 
 #---------------------------------------------------------------------------
-# configuration options related to the alphabetical class index
+# Configuration options related to the alphabetical class index
 #---------------------------------------------------------------------------
 
 # If the ALPHABETICAL_INDEX tag is set to YES, an alphabetical index of all
@@ -1416,7 +1417,7 @@ QHG_LOCATION           =
 
 GENERATE_ECLIPSEHELP   = NO
 
-# A unique identifier for the eclipse help plugin. When installing the plugin
+# A unique identifier for the Eclipse help plugin. When installing the plugin
 # the directory name containing the HTML and XML files should also have this
 # name. Each documentation set should have its own identifier.
 # The default value is: org.doxygen.Project.
@@ -2099,9 +2100,9 @@ SKIP_FUNCTION_MACROS   = YES
 # The TAGFILES tag can be used to specify one or more tag files. For each tag
 # file the location of the external documentation should be added. The format of
 # a tag file without this location is as follows:
-#   TAGFILES = file1 file2 ...
+# TAGFILES = file1 file2 ...
 # Adding location for the tag files is done as follows:
-#   TAGFILES = file1=loc1 "file2 = loc2" ...
+# TAGFILES = file1=loc1 "file2 = loc2" ...
 # where loc1 and loc2 can be relative or absolute paths or URLs. See the
 # section "Linking to external documentation" for more information about the use
 # of tag files.
@@ -2176,6 +2177,7 @@ DIA_PATH               =
 # If set to YES the inheritance and collaboration graphs will hide inheritance
 # and usage relations if the target is undocumented or is not a class.
 # The default value is: YES.
+
 HIDE_UNDOC_RELATIONS   = YES
 
 # If you set the HAVE_DOT tag to YES then doxygen will assume the dot tool is
