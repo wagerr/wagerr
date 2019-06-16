@@ -214,7 +214,7 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
         CBlock block;
         ReadBlockFromDisk(block, BlocksIndex);
 
-        BOOST_FOREACH (CTransaction& tx, block.vtx) {
+        for (CTransaction& tx : block.vtx) {
 
             uint256 txHash = tx.GetHash();
 
@@ -1038,7 +1038,7 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
         CBlock block;
         ReadBlockFromDisk(block, BlocksIndex);
 
-        BOOST_FOREACH (CTransaction& tx, block.vtx) {
+        for (CTransaction& tx : block.vtx) {
 
             const CTxIn &txin = tx.vin[0];
             bool validTx = IsValidOracleTx(txin);

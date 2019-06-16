@@ -4954,7 +4954,7 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
     bool eiUpdated = false;
     // Look through the block for any events, results or mapping TX.
     if (pindex->nHeight > Params().BetStartHeight()) {
-        BOOST_FOREACH (CTransaction& tx, block.vtx) {
+        for (CTransaction& tx : block.vtx) {
 
             // Ensure the event TX has come from Oracle wallet.
             const CTxIn &txin = tx.vin[0];

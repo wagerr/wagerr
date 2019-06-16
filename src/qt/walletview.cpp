@@ -376,7 +376,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
         CBlock block;
         ReadBlockFromDisk(block, pindex);
 
-        BOOST_FOREACH (CTransaction& tx, block.vtx) {
+        for (CTransaction& tx : block.vtx) {
 
             // Ensure event TX has been posted by Oracle wallet.
             bool validEventTx = false;
