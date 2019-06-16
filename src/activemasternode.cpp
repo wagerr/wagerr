@@ -455,12 +455,12 @@ vector<COutput> CActiveMasternode::SelectCoinsMasternode()
     if (!confLockedCoins.empty()) {
         LOCK(pwalletMain->cs_wallet);
 
-        BOOST_FOREACH (COutPoint outpoint, confLockedCoins)
+        for (COutPoint outpoint : confLockedCoins)
             pwalletMain->LockCoin(outpoint);
     }
 
     // Filter
-    BOOST_FOREACH (const COutput& out, vCoins) {
+    for (const COutput& out : vCoins) {
         if (out.tx->vout[out.i].nValue == 25000 * COIN) { //exactly
             filteredCoins.push_back(out);
         }

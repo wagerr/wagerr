@@ -363,8 +363,7 @@ static const CRPCCommand vRPCCommands[] =
         { "hidden",             "waitforblock",           &waitforblock,           true,  true,  false  },
         { "hidden",             "waitforblockheight",     &waitforblockheight,     true,  true,  false  },
 
-        /* Wagerr features */
-        {"wagerr", "masternode", &masternode, true, true, false},
+        /* WAGERR features */
         {"wagerr", "listmasternodes", &listmasternodes, true, true, false},
         {"wagerr", "getmasternodecount", &getmasternodecount, true, true, false},
         {"wagerr", "masternodeconnect", &masternodeconnect, true, true, false},

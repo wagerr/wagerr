@@ -3964,12 +3964,19 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
 
     CAmount nAmount = AmountFromValue(params[0]);   // Spending amount
     bool fMintChange = params[1].get_bool();        // Mint change to zWGR
+    if (fMintChange && Params().NetworkID() != CBaseChainParams::REGTEST)
+        throw JSONRPCError(RPC_WALLET_ERROR, "zWGR minting is DISABLED, cannot mint change");
     bool fMinimizeChange = params[2].get_bool();    // Minimize change
     std::string address_str = params.size() > 3 ? params[3].get_str() : "";
+    bool ispublicspend = params.size() > 4 ? params[3].get_bool() : true;
 
     vector<CZerocoinMint> vMintsSelected;
 
-    return DoZwgrSpend(nAmount, fMintChange, fMinimizeChange, vMintsSelected, address_str);
+    if (!ispublicspend && Params().NetworkID() != CBaseChainParams::REGTEST) {
+        throw JSONRPCError(RPC_WALLET_ERROR, "zWGR old spend only available in regtest for tests purposes");
+    }
+
+    return DoZwgrSpend(nAmount, fMintChange, fMinimizeChange, vMintsSelected, address_str, ispublicspend);
 }
 
 UniValue spendzerocoinmints(const UniValue& params, bool fHelp)
@@ -4065,8 +4072,12 @@ UniValue spendzerocoinmints(const UniValue& params, bool fHelp)
     return DoZwgrSpend(nAmount, false, true, vMintsSelected, address_str);
 }
 
-extern UniValue DoZwgrSpend(const CAmount nAmount, bool fMintChange, bool fMinimizeChange, vector<CZerocoinMint>& vMintsSelected, std::string address_str)
-{
+extern UniValue DoZwgrSpend(const CAmount nAmount, bool fMintChange, bool fMinimizeChange, vector<CZerocoinMint>& vMintsSelected, std::string address_str, bool ispublicspend)
+ {
+    // zerocoin MINT is disabled. fMintChange should be false here. Double check
+    if (fMintChange && Params().NetworkID() != CBaseChainParams::REGTEST)
+        throw JSONRPCError(RPC_WALLET_ERROR, "zWGR minting is DISABLED, cannot mint change");
+
     int64_t nTimeStart = GetTimeMillis();
     CBitcoinAddress address = CBitcoinAddress(); // Optional sending address. Dummy initialization here.
     CWalletTx wtx;

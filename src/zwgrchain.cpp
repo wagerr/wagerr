@@ -17,11 +17,11 @@
 bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, vector<CBigNum>& vValues)
 {
     for (const CTransaction tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if(!tx.HasZerocoinMintOutputs())
             continue;
 
         for (const CTxOut txOut : tx.vout) {
-            if(!txOut.scriptPubKey.IsZerocoinMint())
+            if(!txOut.IsZerocoinMint())
                 continue;
 
             CValidationState state;
@@ -42,7 +42,7 @@ bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomina
 bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>& listPubcoins, bool fFilterInvalid)
 {
     for (const CTransaction tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if(!tx.HasZerocoinMintOutputs())
             continue;
 
         // Filter out mints that have used invalid outpoints
@@ -373,14 +373,15 @@ std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock
 {
     std::list<libzerocoin::CoinDenomination> vSpends;
     for (const CTransaction tx : block.vtx) {
-        if (!tx.IsZerocoinSpend())
+        if (!tx.HasZerocoinSpendInputs())
             continue;
 
         for (const CTxIn txin : tx.vin) {
-            if (!txin.scriptSig.IsZerocoinSpend())
+            bool isPublicSpend = txin.IsZerocoinPublicSpend();
+            if (!txin.IsZerocoinSpend() && !isPublicSpend)
                 continue;
 
-            if (fFilterInvalid) {
+            if (fFilterInvalid && !isPublicSpend) {
                 libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txin);
                 if (invalid_out::ContainsSerial(spend.getCoinSerialNumber()))
                     continue;

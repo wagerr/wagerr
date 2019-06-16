@@ -9,7 +9,7 @@
  * @copyright  Copyright 2013 Ian Miers, Christina Garman and Matthew Green
  * @license    This project is released under the MIT license.
  **/
-// Copyright (c) 2017-2018 The PIVX developers
+// Copyright (c) 2017-2018 The WAGERR developers
 
 #include "CoinSpend.h"
 #include <iostream>
@@ -18,14 +18,15 @@
 namespace libzerocoin
 {
     CoinSpend::CoinSpend(const ZerocoinParams* paramsCoin, const ZerocoinParams* paramsAcc, const PrivateCoin& coin, Accumulator& a, const uint32_t& checksum,
-                     const AccumulatorWitness& witness, const uint256& ptxHash, const SpendType& spendType) : accChecksum(checksum),
-                                                                                  ptxHash(ptxHash),
+                     const AccumulatorWitness& witness, const uint256& ptxHash, const SpendType& spendType) :
                                                                                   coinSerialNumber((coin.getSerialNumber())),
+                                                                                  spendType(spendType),
+                                                                                  ptxHash(ptxHash),
+                                                                                  accChecksum(checksum),
                                                                                   accumulatorPoK(&paramsAcc->accumulatorParams),
                                                                                   serialNumberSoK(paramsCoin),
                                                                                   commitmentPoK(&paramsCoin->serialNumberSoKCommitmentGroup,
-                                                                                                &paramsAcc->accumulatorParams.accumulatorPoKCommitmentGroup),
-                                                                                  spendType(spendType)
+                                                                                                &paramsAcc->accumulatorParams.accumulatorPoKCommitmentGroup)
 {
     denomination = coin.getPublicCoin().getDenomination();
     version = coin.getVersion();

@@ -131,100 +131,109 @@
         </spacer>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horiz-autominting-layout">
-         <item>
-          <widget class="QCheckBox" name="checkBoxZeromintEnable">
-           <property name="toolTip">
-            <string>Enable automatic minting of PIV units to zPIV</string>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Enable zPIV Automint</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBoxZeromintAddresses">
-           <property name="toolTip">
-            <string>Enable automatic zPIV minting from specific addresses</string>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Enable Automint Addresses</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="percentage_label">
-           <property name="toolTip">
-            <string>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</string>
-           </property>
-           <property name="text">
-            <string>Percentage of autominted zPIV</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="zeromintPercentage">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetFixedSize</enum>
-         </property>
-         <item>
-          <widget class="QLabel" name="labelPreferredDenom">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</string>
-           </property>
-           <property name="text">
-            <string>Preferred Automint zPIV Denomination</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="preferredDenom">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>27</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</string>
-           </property>
-           <property name="maxVisibleItems">
-            <number>9</number>
-           </property>
-           <property name="maxCount">
-            <number>9</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QWidget" name="verticalZwgrOptionsWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalZwgrOptionsLayout">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalAutomintingLayout">
+            <item>
+             <widget class="QCheckBox" name="checkBoxZeromintEnable">
+              <property name="toolTip">
+               <string>Enable automatic minting of WGR units to zWGR</string>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Enable zWGR Automint</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxZeromintAddresses">
+              <property name="toolTip">
+               <string>Enable automatic zWGR minting from specific addresses</string>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Enable Automint Addresses</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalZmintPercentageLayout">
+            <item>
+             <widget class="QLabel" name="percentage_label">
+              <property name="toolTip">
+               <string>Percentage of incoming WGR which get automatically converted to zWGR via Zerocoin Protocol (min: 10%)</string>
+              </property>
+              <property name="text">
+               <string>Percentage of autominted zWGR</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="zeromintPercentage">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+            <item>
+             <widget class="QLabel" name="labelPreferredDenom">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Wait with automatic conversion to Zerocoin until enough WGR for this denomination is available</string>
+              </property>
+              <property name="text">
+               <string>Preferred Automint zWGR Denomination</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="preferredDenom">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Wait with automatic conversion to Zerocoin until enough WGR for this denomination is available</string>
+              </property>
+              <property name="maxVisibleItems">
+               <number>9</number>
+              </property>
+              <property name="maxCount">
+               <number>9</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>

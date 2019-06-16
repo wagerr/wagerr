@@ -9,7 +9,7 @@
 * @copyright  Copyright 2013 Ian Miers, Christina Garman and Matthew Green
 * @license    This project is released under the MIT license.
 **/
-// Copyright (c) 2017 The PIVX developers
+// Copyright (c) 2017 The WAGERR developers
 
 #ifndef SERIALNUMBERPROOF_H_
 #define SERIALNUMBERPROOF_H_
@@ -34,6 +34,7 @@ namespace libzerocoin {
  */
 class SerialNumberSignatureOfKnowledge {
 public:
+    SerialNumberSignatureOfKnowledge(){};
 	SerialNumberSignatureOfKnowledge(const ZerocoinParams* p);
 	/** Creates a Signature of knowledge object that a commitment to a coin contains a coin with serial number x
 	 *
