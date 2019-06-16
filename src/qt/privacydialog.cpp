@@ -567,6 +567,28 @@ void PrivacyDialog::coinControlUpdateLabels()
 }
 */
 
+void PrivacyDialog::on_pushButtonShowDenoms_clicked()
+{
+    minimizeDenomsSection(false);
+}
+
+void PrivacyDialog::on_pushButtonHideDenoms_clicked()
+{
+    minimizeDenomsSection(true);
+}
+
+void PrivacyDialog::minimizeDenomsSection(bool fMinimize)
+{
+    if (fMinimize) {
+        ui->balanceSupplyFrame->show();
+        ui->verticalFrameRight->hide();
+    } else {
+        ui->balanceSupplyFrame->hide();
+        ui->verticalFrameRight->show();
+    }
+    fDenomsMinimized = fMinimize;
+}
+
 bool PrivacyDialog::updateLabel(const QString& address)
 {
     if (!walletModel)
