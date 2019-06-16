@@ -283,7 +283,7 @@ bool CWallet::Unlock(const SecureString& strWalletPassphrase, bool anonymizeOnly
 
     {
         LOCK(cs_wallet);
-        BOOST_FOREACH (const MasterKeyMap::value_type& pMasterKey, mapMasterKeys) {
+        for (const MasterKeyMap::value_type& pMasterKey : mapMasterKeys) {
             if (!crypter.SetKeyFromPassphrase(strWalletPassphraseFinal, pMasterKey.second.vchSalt, pMasterKey.second.nDeriveIterations, pMasterKey.second.nDerivationMethod))
                 return false;
             if (!crypter.Decrypt(pMasterKey.second.vchCryptedKey, vMasterKey))
@@ -2407,9 +2407,9 @@ bool CWallet::SelectCoinsByDenominations(int nDenom, CAmount nValueMin, CAmount 
     if (!(nDenom & (1 << 5))) fFound1 = true;
     if (!(nDenom & (1 << 6))) fFoundDot1 = true;
 
-    BOOST_FOREACH (const COutput& out, vCoins) {
+    for (const COutput& out : vCoins) {
         // masternode-like input should not be selected by AvailableCoins now anyway
-        //if(out.tx->vout[out.i].nValue == 10000*COIN) continue;
+        //if(out.tx->vout[out.i].nValue == 25000*COIN) continue;
         if (nValueRet + out.tx->vout[out.i].nValue <= nValueMax) {
             bool fAccepted = false;
 
@@ -2770,7 +2770,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
 
                 // vouts to the payees
                 if (coinControl && !coinControl->fSplitBlock) {
-                    BOOST_FOREACH (const PAIRTYPE(CScript, CAmount) & s, vecSend) {
+                    for (const PAIRTYPE(CScript, CAmount) & s : vecSend) {
                         CScript outs = opReturn.size() > 0 ? pubSubScript : s.first;
                         CTxOut txout(s.second, outs);
                         if (txout.IsDust(::minRelayTxFee)) {
@@ -2788,7 +2788,7 @@ bool CWallet::CreateTransaction(const vector<pair<CScript, CAmount> >& vecSend,
                     else
                         nSplitBlock = 1;
 
-                    BOOST_FOREACH (const PAIRTYPE(CScript, CAmount) & s, vecSend) {
+                    for (const PAIRTYPE(CScript, CAmount) & s : vecSend) {
                         CScript outs = opReturn.size() > 0 ? pubSubScript : s.first;
                         for (int i = 0; i < nSplitBlock; i++) {
                             if (i == nSplitBlock - 1) {
@@ -3275,7 +3275,7 @@ string CWallet::PrepareObfuscationDenominate(int minRounds, int maxRounds)
     int nStep = 0;
     int nStepsMax = 6 + GetRandInt(6);
     while (nStep < nStepsMax) {
-        BOOST_FOREACH (CAmount v, obfuScationDenominations) {
+        for (CAmount v : obfuScationDenominations) {
             // only use the ones that are approved
             bool fAccepted = false;
             if ((obfuScationPool.sessionDenom & (1 << 0)) && v == ((25000 * COIN) + 10000000)) {
@@ -4675,14 +4675,28 @@ bool CWallet::CheckCoinSpend(libzerocoin::CoinSpend& spend, libzerocoin::Accumul
     return true;
 }
 
-bool CWallet::MintToTxIn(CZerocoinMint mint, const uint256& hashTxOut, CTxIn& newTxIn, CZerocoinSpendReceipt& receipt, libzerocoin::SpendType spendType, CBlockIndex* pindexCheckpoint)
+bool CWallet::MintToTxIn(
+        CZerocoinMint mint,
+        const uint256& hashTxOut,
+        CTxIn& newTxIn,
+        CZerocoinSpendReceipt& receipt,
+        libzerocoin::SpendType spendType,
+        CBlockIndex* pindexCheckpoint,
+        bool publicCoinSpend)
 {
     std::map<CBigNum, CZerocoinMint> mapMints;
     mapMints.insert(std::make_pair(mint.GetValue(), mint));
     std::vector<CTxIn> vin;
-    if (MintsToInputVector(mapMints, hashTxOut, vin, receipt, spendType, pindexCheckpoint)) {
-        newTxIn = vin[0];
-        return true;
+    if (publicCoinSpend) {
+        if (MintsToInputVectorPublicSpend(mapMints, hashTxOut, vin, receipt, spendType, pindexCheckpoint)) {
+            newTxIn = vin[0];
+            return true;
+        }
+    } else {
+        if (MintsToInputVector(mapMints, hashTxOut, vin, receipt, spendType, pindexCheckpoint)) {
+            newTxIn = vin[0];
+            return true;
+        }
     }
     return false;
 }
@@ -4793,7 +4807,93 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
      return true;
  }
 
-bool CWallet::CreateZerocoinSpendTransaction(CAmount nValue, CWalletTx& wtxNew, CReserveKey& reserveKey, CZerocoinSpendReceipt& receipt, vector<CZerocoinMint>& vSelectedMints, vector<CDeterministicMint>& vNewMints, bool fMintChange,  bool fMinimizeChange, CBitcoinAddress* address)
+bool CWallet::MintsToInputVectorPublicSpend(std::map<CBigNum, CZerocoinMint>& mapMintsSelected, const uint256& hashTxOut, std::vector<CTxIn>& vin,
+                                    CZerocoinSpendReceipt& receipt, libzerocoin::SpendType spendType, CBlockIndex* pindexCheckpoint)
+{
+    // Default error status if not changed below
+    receipt.SetStatus(_("Transaction Mint Started"), ZWGR_TXMINT_GENERAL);
+
+    int nLockAttempts = 0;
+    while (nLockAttempts < 100) {
+        TRY_LOCK(zwgrTracker->cs_spendcache, lockSpendcache);
+        if (!lockSpendcache) {
+            fGlobalUnlockSpendCache = true;
+            MilliSleep(100);
+            ++nLockAttempts;
+            continue;
+        }
+
+        for (auto &it : mapMintsSelected) {
+            CZerocoinMint mint = it.second;
+
+            // Create the simple input and the scriptSig -> Serial + Randomness + Private key signature of both.
+            // As the mint doesn't have the output index search it..
+            CTransaction txMint;
+            uint256 hashBlock;
+            if (!GetTransaction(mint.GetTxHash(), txMint, hashBlock)) {
+                receipt.SetStatus(strprintf(_("Unable to find transaction containing mint %s"), mint.GetTxHash().GetHex()), ZWGR_TXMINT_GENERAL);
+                return false;
+            } else if (mapBlockIndex.count(hashBlock) < 1) {
+                // check that this mint made it into the blockchain
+                receipt.SetStatus(_("Mint did not make it into blockchain"), ZWGR_TXMINT_GENERAL);
+                return false;
+            }
+
+            int outputIndex = -1;
+            for (unsigned long i = 0; i < txMint.vout.size(); ++i) {
+                CTxOut out = txMint.vout[i];
+                if (out.scriptPubKey.IsZerocoinMint()){
+                    libzerocoin::PublicCoin pubcoin(Params().Zerocoin_Params(false));
+                    CValidationState state;
+                    if (!TxOutToPublicCoin(out, pubcoin, state))
+                        return error("%s: extracting pubcoin from txout failed", __func__);
+
+                    if (pubcoin.getValue() == mint.GetValue()){
+                        outputIndex = i;
+                        break;
+                    }
+                }
+            }
+
+            if (outputIndex == -1) {
+                receipt.SetStatus(_("Pubcoin not found in mint tx"), ZWGR_TXMINT_GENERAL);
+                return false;
+            }
+
+            mint.SetOutputIndex(outputIndex);
+            CTxIn in;
+            if(!ZWGRModule::createInput(in, mint, hashTxOut)){
+                receipt.SetStatus(_("Cannot create public spend input"), ZWGR_TXMINT_GENERAL);
+                return false;
+            }
+            vin.emplace_back(in);
+            receipt.AddSpend(CZerocoinSpend(mint.GetSerialNumber(), 0, mint.GetValue(), mint.GetDenomination(), 0));
+        }
+        break;
+    }
+
+    if (nLockAttempts == 100) {
+        LogPrintf("%s : could not get lock on cs_spendcache\n", __func__);
+        receipt.SetStatus(_("could not get lock on cs_spendcache"), ZWGR_TXMINT_GENERAL);
+        return false;
+    }
+
+    receipt.SetStatus(_("Spend Valid"), ZWGR_SPEND_OKAY); // Everything okay
+
+    return true;
+}
+
+bool CWallet::CreateZerocoinSpendTransaction(
+        CAmount nValue,
+        CWalletTx& wtxNew,
+        CReserveKey& reserveKey,
+        CZerocoinSpendReceipt& receipt,
+        vector<CZerocoinMint>& vSelectedMints,
+        vector<CDeterministicMint>& vNewMints,
+        bool fMintChange,
+        bool fMinimizeChange,
+        CBitcoinAddress* address,
+        bool isPublicSpend)
 {
     // Check available funds
     int nStatus = ZWGR_TRX_FUNDS_PROBLEMS;

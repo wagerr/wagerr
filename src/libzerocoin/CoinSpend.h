@@ -9,7 +9,7 @@
  * @copyright  Copyright 2013 Ian Miers, Christina Garman and Matthew Green
  * @license    This project is released under the MIT license.
  **/
-// Copyright (c) 2017-2018 The PIVX developers
+// Copyright (c) 2017-2018 The WAGERR developers
 
 #ifndef COINSPEND_H_
 #define COINSPEND_H_
@@ -38,8 +38,10 @@ class CoinSpend
 {
 public:
 
+    CoinSpend(){};
+
     //! \param paramsV1 - if this is a V1 zerocoin, then use params that existed with initial modulus, ignored otherwise
-    //! \param paramsV2 - params that begin when V2 zerocoins begin on the PIVX network
+    //! \param paramsV2 - params that begin when V2 zerocoins begin on the WAGERR network
     //! \param strm - a serialized CoinSpend
     template <typename Stream>
     CoinSpend(const ZerocoinParams* paramsV1, const ZerocoinParams* paramsV2, Stream& strm) :
@@ -87,6 +89,9 @@ public:
     CoinSpend(const ZerocoinParams* paramsCoin, const ZerocoinParams* paramsAcc, const PrivateCoin& coin, Accumulator& a, const uint32_t& checksum,
               const AccumulatorWitness& witness, const uint256& ptxHash, const SpendType& spendType);
 
+
+    virtual ~CoinSpend(){};
+
     /** Returns the serial number of the coin spend by this proof.
 	 *
 	 * @return the coin's serial number
@@ -119,10 +124,13 @@ public:
 
     static std::vector<unsigned char> ParseSerial(CDataStream& s);
 
-    const uint256 signatureHash() const;
-    bool Verify(const Accumulator& a, bool verifyParams = true) const;
+    virtual const uint256 signatureHash() const;
+    virtual bool Verify(const Accumulator& a, bool verifyParams = true) const;
     bool HasValidSerial(ZerocoinParams* params) const;
     bool HasValidSignature() const;
+    void setTxOutHash(uint256 txOutHash) { this->ptxHash = txOutHash; };
+    void setDenom(libzerocoin::CoinDenomination denom) { this->denomination = denom; }
+
     CBigNum CalculateValidSerial(ZerocoinParams* params);
     std::string ToString() const;
 
@@ -150,22 +158,24 @@ public:
         }
     }
 
-private:
-    CoinDenomination denomination;
-    uint32_t accChecksum;
-    uint256 ptxHash;
-    CBigNum accCommitmentToCoinValue;
-    CBigNum serialCommitmentToCoinValue;
+protected:
+    CoinDenomination denomination = ZQ_ERROR;
     CBigNum coinSerialNumber;
-    AccumulatorProofOfKnowledge accumulatorPoK;
-    SerialNumberSignatureOfKnowledge serialNumberSoK;
-    CommitmentProofOfKnowledge commitmentPoK;
     uint8_t version;
-
     //As of version 2
     CPubKey pubkey;
     std::vector<unsigned char> vchSig;
     SpendType spendType;
+    uint256 ptxHash;
+
+private:
+    uint32_t accChecksum;
+    CBigNum accCommitmentToCoinValue;
+    CBigNum serialCommitmentToCoinValue;
+    AccumulatorProofOfKnowledge accumulatorPoK;
+    SerialNumberSignatureOfKnowledge serialNumberSoK;
+    CommitmentProofOfKnowledge commitmentPoK;
+
 };
 
 } /* namespace libzerocoin */

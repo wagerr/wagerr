@@ -220,14 +220,12 @@ CAmount CTransaction::GetValueBurned() const
 
 CAmount CTransaction::GetZerocoinMinted() const
 {
+    CAmount nValueOut = 0;
     for (const CTxOut txOut : vout) {
-        if(!txOut.scriptPubKey.IsZerocoinMint())
-            continue;
-
-        return txOut.nValue;
+        nValueOut += txOut.GetZerocoinMinted();
     }
 
-    return  CAmount(0);
+    return  nValueOut;
 }
 
 bool CTransaction::UsesUTXO(const COutPoint out)
@@ -251,12 +249,9 @@ std::list<COutPoint> CTransaction::GetOutPoints() const
 
 CAmount CTransaction::GetZerocoinSpent() const
 {
-    if(!IsZerocoinSpend())
-        return 0;
-
     CAmount nValueOut = 0;
     for (const CTxIn txin : vin) {
-        if(!txin.scriptSig.IsZerocoinSpend())
+        if(!txin.IsZerocoinSpend())
             continue;
 
         nValueOut += txin.nSequence * COIN;
@@ -269,7 +264,7 @@ int CTransaction::GetZerocoinMintCount() const
 {
     int nCount = 0;
     for (const CTxOut out : vout) {
-        if (out.scriptPubKey.IsZerocoinMint())
+        if (out.IsZerocoinMint())
             nCount++;
     }
     return nCount;

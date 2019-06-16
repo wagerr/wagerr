@@ -1213,17 +1213,33 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
                 return state.DoS(100, error("CheckTransaction() : invalid zerocoin mint"));
         }
         if (fZerocoinActive && txout.scriptPubKey.IsZerocoinSpend())
+    }
+
+    set<COutPoint> vInOutPoints;
+    set<CBigNum> vZerocoinSpendSerials;
+    int nZCSpendCount = 0;
+    for (const CTxIn& txin : tx.vin) {
+        // Check for duplicate inputs
+        if (vInOutPoints.count(txin.prevout))
+            return state.DoS(100, error("CheckTransaction() : duplicate inputs"),
+                REJECT_INVALID, "bad-txns-inputs-duplicate");
+
+        //duplicate zcspend serials are checked in CheckZerocoinSpend()
+        if (!txin.IsZerocoinSpend()) {
+            vInOutPoints.insert(txin.prevout);
+        } else if (!txin.IsZerocoinPublicSpend()) {
             nZCSpendCount++;
+        }
     }
 
     if (fZerocoinActive) {
         if (nZCSpendCount > Params().Zerocoin_MaxSpendsPerTransaction())
             return state.DoS(100, error("CheckTransaction() : there are more zerocoin spends than are allowed in one transaction"));
 
-        if (tx.IsZerocoinSpend()) {
-            //require that a zerocoinspend only has inputs that are zerocoins
+        //require that a zerocoinspend only has inputs that are zerocoins
+        if (tx.HasZerocoinSpendInputs()) {
             for (const CTxIn in : tx.vin) {
-                if (!in.scriptSig.IsZerocoinSpend())
+                if (!in.IsZerocoinSpend() && !in.IsZerocoinPublicSpend())
                     return state.DoS(100,
                                      error("CheckTransaction() : zerocoinspend contains inputs that are not zerocoins"));
             }
@@ -2240,19 +2256,33 @@ void AddInvalidSpendsToMap(const CBlock& block)
 
         //Check all zerocoinspends for bad serials
         for (const CTxIn in : tx.vin) {
-            if (in.scriptSig.IsZerocoinSpend()) {
-                CoinSpend spend = TxInToZerocoinSpend(in);
+            bool isPublicSpend = in.IsZerocoinPublicSpend();
+            if (in.IsZerocoinSpend() || isPublicSpend) {
+
+                CoinSpend* spend;
+                if (isPublicSpend) {
+                    libzerocoin::ZerocoinParams* params = Params().Zerocoin_Params(false);
+                    PublicCoinSpend publicSpend(params);
+                    CValidationState state;
+                    if (!ZWGRModule::ParseZerocoinPublicSpend(in, tx, state, publicSpend)){
+                        throw runtime_error("Failed to parse public spend");
+                    }
+                    spend = &publicSpend;
+                } else {
+                    CoinSpend spendObj = TxInToZerocoinSpend(in);
+                    spend = &spendObj;
+                }
 
                 //If serial is not valid, mark all outputs as bad
-                if (!spend.HasValidSerial(Params().Zerocoin_Params(false))) {
-                    mapInvalidSerials[spend.getCoinSerialNumber()] = spend.getDenomination() * COIN;
+                if (!spend->HasValidSerial(Params().Zerocoin_Params(false))) {
+                    mapInvalidSerials[spend->getCoinSerialNumber()] = spend->getDenomination() * COIN;
 
                     // Derive the actual valid serial from the invalid serial if possible
-                    CBigNum bnActualSerial = spend.CalculateValidSerial(Params().Zerocoin_Params(false));
+                    CBigNum bnActualSerial = spend->CalculateValidSerial(Params().Zerocoin_Params(false));
                     uint256 txHash;
 
                     if (zerocoinDB->ReadCoinSpend(bnActualSerial, txHash)) {
-                        mapInvalidSerials[bnActualSerial] = spend.getDenomination() * COIN;
+                        mapInvalidSerials[bnActualSerial] = spend->getDenomination() * COIN;
 
                         CTransaction txPrev;
                         uint256 hashBlock;
@@ -2430,18 +2460,32 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
          * addresses should still be handled by the typical bitcoin based undo code
          * */
         if (tx.ContainsZerocoins()) {
-            if (tx.IsZerocoinSpend()) {
+            if (tx.HasZerocoinSpendInputs()) {
                 //erase all zerocoinspends in this transaction
-                for (const CTxIn txin : tx.vin) {
-                    if (txin.scriptSig.IsZerocoinSpend()) {
-                        CoinSpend spend = TxInToZerocoinSpend(txin);
-                        if (!zerocoinDB->EraseCoinSpend(spend.getCoinSerialNumber()))
+                for (const CTxIn &txin : tx.vin) {
+                    bool isPublicSpend = txin.IsZerocoinPublicSpend();
+                    if (txin.scriptSig.IsZerocoinSpend() || isPublicSpend) {
+                        CBigNum serial;
+                        if (isPublicSpend) {
+                            libzerocoin::ZerocoinParams *params = Params().Zerocoin_Params(false);
+                            PublicCoinSpend publicSpend(params);
+                            CValidationState state;
+                            if (!ZWGRModule::ParseZerocoinPublicSpend(txin, tx, state, publicSpend)) {
+                                return error("Failed to parse public spend");
+                            }
+                            serial = publicSpend.getCoinSerialNumber();
+                        } else {
+                            CoinSpend spend = TxInToZerocoinSpend(txin);
+                            serial = spend.getCoinSerialNumber();
+                        }
+
+                        if (!zerocoinDB->EraseCoinSpend(serial))
                             return error("failed to erase spent zerocoin in block");
 
                         //if this was our spend, then mark it unspent now
                         if (pwalletMain) {
-                            if (pwalletMain->IsMyZerocoinSpend(spend.getCoinSerialNumber())) {
-                                if (!pwalletMain->SetMintUnspent(spend.getCoinSerialNumber()))
+                            if (pwalletMain->IsMyZerocoinSpend(serial)) {
+                                if (!pwalletMain->SetMintUnspent(serial))
                                     LogPrintf("%s: failed to automatically reset mint", __func__);
                             }
                         }
@@ -2450,17 +2494,17 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
                 }
             }
 
-            if (tx.IsZerocoinMint()) {
+            if (tx.HasZerocoinMintOutputs()) {
                 //erase all zerocoinmints in this transaction
-                for (const CTxOut txout : tx.vout) {
-                    if (txout.scriptPubKey.empty() || !txout.scriptPubKey.IsZerocoinMint())
+                for (const CTxOut &txout : tx.vout) {
+                    if (txout.scriptPubKey.empty() || !txout.IsZerocoinMint())
                         continue;
 
                     PublicCoin pubCoin(Params().Zerocoin_Params(false));
                     if (!TxOutToPublicCoin(txout, pubCoin, state))
                         return error("DisconnectBlock(): TxOutToPublicCoin() failed");
 
-                    if(!zerocoinDB->EraseCoinMint(pubCoin.getValue()))
+                    if (!zerocoinDB->EraseCoinMint(pubCoin.getValue()))
                         return error("DisconnectBlock(): Failed to erase coin mint");
                 }
             }
@@ -3528,11 +3572,11 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, CBlock* 
     UpdateTip(pindexNew);
     // Tell wallet about transactions that went from mempool
     // to conflicted:
-    BOOST_FOREACH (const CTransaction& tx, txConflicted) {
+    for (const CTransaction& tx : txConflicted) {
         SyncWithWallets(tx, NULL);
     }
     // ... and about transactions that got confirmed:
-    BOOST_FOREACH (const CTransaction& tx, pblock->vtx) {
+    for (const CTransaction& tx : pblock->vtx) {
         SyncWithWallets(tx, pblock);
     }
 
@@ -4256,10 +4300,21 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
             return error("CheckBlock() : CheckTransaction failed");
 
         // double check that there are no double spent zWGR spends in this block
-        if (tx.IsZerocoinSpend()) {
+        if (tx.HasZerocoinSpendInputs()) {
             for (const CTxIn txIn : tx.vin) {
-                if (txIn.scriptSig.IsZerocoinSpend()) {
-                    libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txIn);
+                bool isPublicSpend = txIn.IsZerocoinPublicSpend();
+                if (txIn.IsZerocoinSpend() || isPublicSpend) {
+                    libzerocoin::CoinSpend spend;
+                    if (isPublicSpend) {
+                        libzerocoin::ZerocoinParams* params = Params().Zerocoin_Params(false);
+                        PublicCoinSpend publicSpend(params);
+                        if (!ZWGRModule::ParseZerocoinPublicSpend(txIn, tx, state, publicSpend)){
+                            return false;
+                        }
+                        spend = publicSpend;
+                    } else {
+                        spend = TxInToZerocoinSpend(txIn);
+                    }
                     if (count(vBlockSerials.begin(), vBlockSerials.end(), spend.getCoinSerialNumber()))
                         return state.DoS(100, error("%s : Double spending of zWGR serial %s in block\n Block: %s",
                                                     __func__, spend.getCoinSerialNumber().GetHex(), block.ToString()));
@@ -6973,14 +7028,13 @@ bool static ProcessMessage(CNode* pfrom, string strCommand, CDataStream& vRecv, 
 //       it was the one which was commented out
 int ActiveProtocol()
 {
-    // SPORK_14 was used for 70910. Leave it 'ON' so they don't see > 70910 nodes. They won't react to SPORK_15
-    // messages because it's not in their code
-    if (IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT))
-            return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
-
-    // SPORK_15 was used for 70912 (v3.0.5+), commented out now.
+    // SPORK_14 was used for 70910, commented out now.
+    //if (IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT))
     //if (IsSporkActive(SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2))
     //        return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
+    // SPORK_15 is used for 70912 (v3.0.5+)
+    if (IsSporkActive(SPORK_15_NEW_PROTOCOL_ENFORCEMENT_2))
+            return MIN_PEER_PROTO_VERSION_AFTER_ENFORCEMENT;
 
     return MIN_PEER_PROTO_VERSION_BEFORE_ENFORCEMENT;
 }

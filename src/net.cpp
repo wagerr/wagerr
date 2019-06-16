@@ -19,7 +19,7 @@
 #include "obfuscation.h"
 #include "primitives/transaction.h"
 #include "scheduler.h"
-#include "ui_interface.h"
+#include "guiinterface.h"
 
 #ifdef ENABLE_WALLET
 #include "wallet/wallet.h"

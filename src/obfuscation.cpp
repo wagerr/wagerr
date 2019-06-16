@@ -11,11 +11,12 @@
 #include "masternodeman.h"
 #include "script/sign.h"
 #include "swifttx.h"
-#include "ui_interface.h"
+#include "guiinterface.h"
 #include "util.h"
 #include <boost/algorithm/string/replace.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/filesystem/fstream.hpp>
+#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
 #include <algorithm>
@@ -2114,7 +2115,7 @@ bool CObfuScationSigner::IsVinAssociatedWithPubkey(CTxIn& vin, CPubKey& pubkey)
     CTransaction txVin;
     uint256 hash;
     if (GetTransaction(vin.prevout.hash, txVin, hash, true)) {
-        BOOST_FOREACH (CTxOut out, txVin.vout) {
+        for (CTxOut out : txVin.vout) {
             if (out.nValue == 25000 * COIN) {
                 if (out.scriptPubKey == payee2) return true;
             }

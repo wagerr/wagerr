@@ -135,6 +135,8 @@ public:
     int Zerocoin_Block_Double_Accumulated() const { return nBlockDoubleAccumulated; }
     CAmount InvalidAmountFiltered() const { return nInvalidAmountFiltered; };
 
+    int Zerocoin_Block_Public_Spend_Enabled() const { return nPublicZCSpends; }
+
     int Zerocoin_AccumulationStartHeight() const { return nZerocoinAccumulationStartHeight; }
 
     /** Betting on blockchain **/

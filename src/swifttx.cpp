@@ -17,6 +17,7 @@
 #include "sync.h"
 #include "util.h"
 #include "validationinterface.h"
+#include <boost/foreach.hpp>
 
 #include <boost/lexical_cast.hpp>
 

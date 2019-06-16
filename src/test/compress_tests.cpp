@@ -21,7 +21,7 @@
 // amounts 50 .. 398360470
 #define NUM_MULTIPLES_50BTC 420000
 
-BOOST_AUTO_TEST_SUITE(compress_tests)
+BOOST_FIXTURE_TEST_SUITE(compress_tests, BasicTestingSetup)
 
 bool static TestEncode(uint64_t in) {
     return in == CTxOutCompressor::DecompressAmount(CTxOutCompressor::CompressAmount(in));

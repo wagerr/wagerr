@@ -36,11 +36,11 @@ PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystem
 
     // "Spending 999999 zWGR ought to be enough for anybody." - Bill Gates, 2017
     ui->zWGRpayAmount->setValidator( new QDoubleValidator(0.0, 398360470.0, 20, this) );
-    ui->labelMintAmountValue->setValidator( new QIntValidator(0, 999999, this) );
+    //ui->labelMintAmountValue->setValidator( new QIntValidator(0, 999999, this) );     // disable MINT
 
     // Default texts for (mini-) coincontrol
-    ui->labelCoinControlQuantity->setText (tr("Coins automatically selected"));
-    ui->labelCoinControlAmount->setText (tr("Coins automatically selected"));
+    //ui->labelCoinControlQuantity->setText (tr("Coins automatically selected"));       // disable MINT
+    //ui->labelCoinControlAmount->setText (tr("Coins automatically selected"));         // disable MINT
     ui->labelzWGRSyncStatus->setText("(" + tr("out of sync") + ")");
 
     // Sunken frame for minting messages
@@ -104,6 +104,13 @@ PrivacyDialog::PrivacyDialog(QWidget* parent) : QDialog(parent, Qt::WindowSystem
 
     // Set labels/buttons depending on SPORK_16 status
     updateSPORK16Status();
+
+    // init Denoms section
+    if(!settings.contains("fDenomsSectionMinimized"))
+        settings.setValue("fDenomsSectionMinimized", true);
+    minimizeDenomsSection(settings.value("fDenomsSectionMinimized").toBool());
+
+    ui->checkBoxMintChange->setVisible(false);
 }
 
 PrivacyDialog::~PrivacyDialog()
@@ -551,6 +558,7 @@ void PrivacyDialog::coinControlUpdateLabels()
         ui->labelCoinControlAmount->setText (tr("Coins automatically selected"));
     }
 }
+*/
 
 bool PrivacyDialog::updateLabel(const QString& address)
 {
@@ -673,7 +681,7 @@ void PrivacyDialog::setBalance(const CAmount& balance, const CAmount& unconfirme
 
     ui->labelzAvailableAmount->setText(QString::number(zerocoinBalance/COIN) + QString(" zWGR "));
     ui->labelzAvailableAmount_2->setText(QString::number(matureZerocoinBalance/COIN) + QString(" zWGR "));
-    ui->labelzWGRAmountValue->setText(BitcoinUnits::floorHtmlWithUnit(nDisplayUnit, balance - immatureBalance - nLockedBalance, false, BitcoinUnits::separatorAlways));
+    ui->labelzAvailableAmount_4->setText(QString::number(zerocoinBalance/COIN) + QString(" zWGR "));
 
     // Display AutoMint status
     updateAutomintStatus();

@@ -287,7 +287,7 @@ libbitcoin_wallet_a_SOURCES = \
   stakeinput.cpp \
   genwit.cpp \
   lightzwgrthread.cpp \
-   $(BITCOIN_CORE_H)
+  $(BITCOIN_CORE_H)
 
 # crypto primitives library
 crypto_libbitcoin_crypto_a_CPPFLAGS = $(AM_CPPFLAGS) $(PIC_FLAGS)

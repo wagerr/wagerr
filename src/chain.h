@@ -17,7 +17,6 @@
 
 #include <vector>
 
-#include <boost/foreach.hpp>
 #include <boost/lexical_cast.hpp>
 
 struct CDiskBlockPos {
