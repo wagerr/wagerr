@@ -1260,7 +1260,6 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
             if(!CheckZerocoinMint(tx.GetHash(), txout, state, true))
                 return state.DoS(100, error("CheckTransaction() : invalid zerocoin mint"));
         }
-        if (fZerocoinActive && txout.scriptPubKey.IsZerocoinSpend())
     }
 
     set<COutPoint> vInOutPoints;
