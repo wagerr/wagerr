@@ -102,6 +102,7 @@ private slots:
     void on_pushButtonSpendzWGR_clicked();
     void on_pushButtonZWgrControl_clicked();
     void on_pasteButton_clicked();
+    void minimizeDenomsSection(bool fMinimize);
     void updateDisplayUnit();
     void updateAutomintStatus();
     void updateSPORK16Status();
