@@ -395,7 +395,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                 int nRequired;
                 if(ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
 
-                    BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
+                    for (const CTxDestination &prevAddr : prevAddrs) {
                         if (std::find(oracleAddrs.begin(), oracleAddrs.end(), CBitcoinAddress(prevAddr).ToString()) != oracleAddrs.end()) {
                             validEventTx = true;
                         }
