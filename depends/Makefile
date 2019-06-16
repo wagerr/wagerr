@@ -8,7 +8,6 @@ NO_QT ?=
 NO_WALLET ?=
 NO_UPNP ?=
 FALLBACK_DOWNLOAD_PATH ?= https://bitcoincore.org/depends-sources
-FALLBACK_DOWNLOAD_PATH_ION ?= https://github.com/ioncoincore/ion-depends/releases/download/latest
 
 BUILD = $(shell ./config.guess)
 HOST ?= $(BUILD)
@@ -168,7 +167,7 @@ $(host_prefix)/share/config.site: check-packages
 check-packages: check-sources
 
 clean-all: clean
-	@rm -rf $(SOURCES_PATH) x86_64* i686* mips* arm* aarch64* riscv32* riscv64* s390x* ppc64el* ppc64le* powerpc64le* i386* sparc* m68k* alpha* sh4* hppa*
+	@rm -rf $(SOURCES_PATH) x86_64* i686* mips* arm* aarch64* riscv32* riscv64*
 
 clean:
 	@rm -rf $(WORK_PATH) $(BASE_CACHE) $(BUILD)
