@@ -1280,9 +1280,15 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
     }
 
     if (fZerocoinActive) {
-        if (nZCSpendCount > Params().Zerocoin_MaxSpendsPerTransaction())
-            return state.DoS(100, error("CheckTransaction() : there are more zerocoin spends than are allowed in one transaction"));
-
+        /* WAGERRTOR - workaround - disable this check - ** TODO **
+         * temp fix to pass block 8075, 10022, ... which fails due to spend having more than allowed txin's
+         */
+        if (chainActive.Height() > Params().ZerocoinCheckTX()) {
+            if (chainActive.Height() > Params().Zerocoin_Block_V2_Start()) {
+                if (nZCSpendCount > Params().Zerocoin_MaxSpendsPerTransaction())
+                    return state.DoS(100, error("CheckTransaction() : there are more zerocoin spends than are allowed in one transaction"));
+            }
+        }
         //require that a zerocoinspend only has inputs that are zerocoins
         if (tx.HasZerocoinSpendInputs()) {
             for (const CTxIn in : tx.vin) {
@@ -1305,14 +1311,19 @@ bool CheckTransaction(const CTransaction& tx, bool fZerocoinActive, bool fReject
     } else if (fZerocoinActive && tx.HasZerocoinSpendInputs()) {
         if (tx.vin.size() < 1)
             return state.DoS(10, error("CheckTransaction() : Zerocoin Spend has less than allowed txin's"), REJECT_INVALID, "bad-zerocoinspend");
-        if (tx.HasZerocoinPublicSpendInputs()) {
-            // tx has public zerocoin spend inputs
-            if(static_cast<int>(tx.vin.size()) > Params().Zerocoin_MaxPublicSpendsPerTransaction())
-                return state.DoS(10, error("CheckTransaction() : Zerocoin Spend has more than allowed txin's"), REJECT_INVALID, "bad-zerocoinspend");
-        } else {
-            // tx has regular zerocoin spend inputs
-            if(static_cast<int>(tx.vin.size()) > Params().Zerocoin_MaxSpendsPerTransaction())
-                return state.DoS(10, error("CheckTransaction() : Zerocoin Spend has more than allowed txin's"), REJECT_INVALID, "bad-zerocoinspend");
+        /* WAGERRTOR - workaround - disable this check - ** TODO **
+         * temp fix to pass block 8075, 10022, ... which fails due to spend having more than allowed txin's
+         */
+        if (chainActive.Height() > Params().ZerocoinCheckTX()) {
+            if (tx.HasZerocoinPublicSpendInputs()) {
+                // tx has public zerocoin spend inputs
+                if(static_cast<int>(tx.vin.size()) > Params().Zerocoin_MaxPublicSpendsPerTransaction())
+                    return state.DoS(10, error("CheckTransaction() : Zerocoin Spend has more than allowed txin's"), REJECT_INVALID, "bad-zerocoinspend");
+            } else {
+                // tx has regular zerocoin spend inputs
+                if(static_cast<int>(tx.vin.size()) > Params().Zerocoin_MaxSpendsPerTransaction())
+                    return state.DoS(10, error("CheckTransaction() : Zerocoin Spend has more than allowed txin's"), REJECT_INVALID, "bad-zerocoinspend");
+            }
         }
 
     } else {
@@ -3307,27 +3318,37 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
-    /* **TODO**
-     * 
-     * Kokary: there are some oddities with fee calculation:
-     * - Coinstake transactions do have fees, resulting in rougly 4400 satoshi less mints
-     * - When there are no masternodes to pay, those MN rewards are not paid, resulting in 1*COIN less than expected mints
-     * - Testnet is polluted with test coinstake payouts between block 15195 and 15220
-     * A 'safe' check that also checks for underminting coins would be something like this:
-     *     if ((pindex->nHeight < 15195 || pindex->nHeight > 15220) && (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint )) )
-     *         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
-     * Though if we keep this check for minimum mint, it should be moved to IsBlockValueValid().
+    /*  **TODO**
+        * 
+        * Kokary: there are some oddities with fee calculation:
+        * - Coinstake transactions do have fees, resulting in rougly 4400 satoshi less mints
+        * - When there are no masternodes to pay, those MN rewards are not paid, resulting in 1*COIN less than expected mints
+        * - Testnet is polluted with test coinstake payouts between block 15195 and 15220
+        * A 'safe' check that also checks for underminting coins would be something like this:
+        *     if ((pindex->nHeight < 15195 || pindex->nHeight > 15220) && (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint )) )
+        *         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
+        * Though if we keep this check for minimum mint, it should be moved to IsBlockValueValid().
      */
+    /*  WAGERRTOR - workaround - disable this check - ** TODO **
+        * temp fix to pass block 8075, 10022, ... which fails due to spend having more than allowed txin's
+        * Example: 2019-06-16 21:09:27 UpdateTip: new best=f6566de88449c72d36ed651a2fcea801c88b1a28b6d571e0426b5a1fa0fb4c61  height=301364 version=4  log2_work=70.163181  tx=628550  date=2018-09-16 00:35:51 progress=0.087420  cache=81116
+        *   2019-06-16 21:09:27 ProcessNewBlock : ACCEPTED Block 301364 in 7 milliseconds with size=864
+        *   2019-06-16 21:09:27 ERROR: ConnectBlock() : reward pays wrong amount (actual=125456.669 vs limit=3.80)
+    */
     if (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint)) {
-        if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= 15195 && pindex->nHeight <= 50228)) {
-            LogPrintf("ConnectBlock() - Skipping validation of mint size on testnet subset : reward pays wrong amount at block %i (actual=%s vs limit=%s)\n", pindex->nHeight, FormatMoney(pindex->nMint), FormatMoney(nExpectedMint));
+        if (Params().NetworkID() == CBaseChainParams::MAIN) {
+            if (chainActive.Height() > Params().ZerocoinCheckTX())
+                return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
+        } else if (Params().NetworkID() == CBaseChainParams::TESTNET) {
+            if (pindex->nHeight >= 15195 && pindex->nHeight <= Params().ZerocoinCheckTX())
+                LogPrintf("ConnectBlock() - Skipping validation of mint size on testnet subset : reward pays wrong amount at block %i (actual=%s vs limit=%s)\n", pindex->nHeight, FormatMoney(pindex->nMint), FormatMoney(nExpectedMint));
         } else  {
             return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
         }
     }
 
     if (!IsBlockPayoutsValid(vExpectedAllPayouts, block)) {
-        if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= 15195 && pindex->nHeight <= 50228)) {
+        if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= 15195 && pindex->nHeight <= Params().ZerocoinCheckTX())) {
             LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : Bet payout TX's don't match up with block payout TX's at block %i\n", pindex->nHeight);
         } else  {
             return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");

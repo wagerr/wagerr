@@ -182,6 +182,9 @@ public:
         nFakeSerialBlockheightEnd = 1686229;
         nSupplyBeforeFakeSerial = 4131563 * COIN;   // zerocoin supply at block nFakeSerialBlockheightEnd
 
+        // workarond fixes
+        nZerocoinCheckTX = 691823;
+
         /**
          * Build the genesis block. Note that the output of the genesis coinbase cannot
          * be spent as it did not originally exist in the database.
@@ -333,6 +336,9 @@ public:
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;
         nSupplyBeforeFakeSerial = 0;
+
+        // workarond fixes
+        nZerocoinCheckTX = 50228;
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696182;

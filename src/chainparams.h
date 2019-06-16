@@ -155,6 +155,9 @@ public:
     int64_t MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
     int64_t MinBetPayoutRange() const { return nMinBetPayoutRange; }
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
+
+    /** temp worarounds **/
+    int ZerocoinCheckTX() const { return nZerocoinCheckTX; }
 protected:
     CChainParams() {}
 
@@ -242,6 +245,9 @@ protected:
     int64_t nMinBetPayoutRange;
     int64_t nMaxBetPayoutRange;
     int nBetPlaceTimeoutBlocks;
+
+    // workarounds
+    int nZerocoinCheckTX;
 };
 
 /**
