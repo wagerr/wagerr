@@ -215,6 +215,132 @@
                        </widget>
                       </item>
                       <item>
+                       <widget class="QFrame" name="balanceSupplyFrame">
+                        <layout class="QHBoxLayout" name="horizontalLayout_2" stretch="0,0,0,1,0">
+                         <property name="rightMargin">
+                          <number>0</number>
+                         </property>
+                         <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_34">
+                           <item>
+                            <widget class="QLabel" name="labelzAvailableText_3">
+                             <property name="font">
+                              <font>
+                               <weight>75</weight>
+                               <bold>true</bold>
+                              </font>
+                             </property>
+                             <property name="toolTip">
+                              <string>Total Balance including unconfirmed and immature zWGR</string>
+                             </property>
+                             <property name="text">
+                              <string>Total Zerocoin  Balance:</string>
+                             </property>
+                             <property name="alignment">
+                              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QLabel" name="labelzAvailableAmount_4">
+                             <property name="minimumSize">
+                              <size>
+                               <width>40</width>
+                               <height>0</height>
+                              </size>
+                             </property>
+                             <property name="font">
+                              <font>
+                               <weight>75</weight>
+                               <bold>true</bold>
+                              </font>
+                             </property>
+                             <property name="toolTip">
+                              <string>Total Balance including unconfirmed and immature zWGR</string>
+                             </property>
+                             <property name="text">
+                              <string>0 zWGR</string>
+                             </property>
+                             <property name="alignment">
+                              <set>Qt::AlignLeading|Qt::AlignLeft|Qt::AlignVCenter</set>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </item>
+                         <item>
+                          <spacer name="horizontalSpacer_32">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                         <item>
+                          <layout class="QHBoxLayout" name="horizontalLayout_35">
+                           <item>
+                            <widget class="QLabel" name="labelZsupplyText_2">
+                             <property name="font">
+                              <font>
+                               <weight>75</weight>
+                               <bold>true</bold>
+                              </font>
+                             </property>
+                             <property name="text">
+                              <string>Global Supply:</string>
+                             </property>
+                             <property name="alignment">
+                              <set>Qt::AlignRight|Qt::AlignTrailing|Qt::AlignVCenter</set>
+                             </property>
+                            </widget>
+                           </item>
+                           <item>
+                            <widget class="QLabel" name="labelZsupplyAmount_2">
+                             <property name="font">
+                              <font>
+                               <weight>75</weight>
+                               <bold>true</bold>
+                              </font>
+                             </property>
+                             <property name="text">
+                              <string>0 zWGR</string>
+                             </property>
+                            </widget>
+                           </item>
+                          </layout>
+                         </item>
+                         <item>
+                          <spacer name="horizontalSpacer_31">
+                           <property name="orientation">
+                            <enum>Qt::Horizontal</enum>
+                           </property>
+                           <property name="sizeHint" stdset="0">
+                            <size>
+                             <width>40</width>
+                             <height>20</height>
+                            </size>
+                           </property>
+                          </spacer>
+                         </item>
+                         <item>
+                          <widget class="QPushButton" name="pushButtonShowDenoms">
+                           <property name="toolTip">
+                            <string>Show zWGR denominations list</string>
+                           </property>
+                           <property name="text">
+                            <string>Show Denominations</string>
+                           </property>
+                          </widget>
+                         </item>
+                        </layout>
+                       </widget>
+                      </item>
+                      <item>
                        <layout class="QHBoxLayout" name="horizontalLayout_4">
                         <item>
                          <spacer name="horizontalSpacer_2">
