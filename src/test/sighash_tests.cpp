@@ -12,6 +12,7 @@
 #include "script/interpreter.h"
 #include "util.h"
 #include "version.h"
+#include "test_wagerr.h"
 
 #include <iostream>
 
@@ -114,7 +115,7 @@ void static RandomTransaction(CMutableTransaction &tx, bool fSingle) {
     }
 }
 
-BOOST_AUTO_TEST_SUITE(sighash_tests)
+BOOST_FIXTURE_TEST_SUITE(sighash_tests, BasicTestingSetup)
 
 BOOST_AUTO_TEST_CASE(sighash_test)
 {

@@ -23,6 +23,7 @@ RAW_TEST_FILES = test/data/alertTests.raw
 GENERATED_TEST_FILES = $(JSON_TEST_FILES:.json=.json.h) $(RAW_TEST_FILES:.raw=.raw.h)
 
 BITCOIN_TEST_SUITE = \
+  test/test_wagerr.h \
   test/test_wagerr.cpp
 # test_wagerr binary #
 BITCOIN_TESTS =\
@@ -30,9 +31,11 @@ BITCOIN_TESTS =\
   test/zerocoin_denomination_tests.cpp\
   test/zerocoin_transactions_tests.cpp \
   test/zerocoin_coinspend_tests.cpp \
+  test/zerocoin_bignum_tests.cpp \
   test/benchmark_zerocoin.cpp \
   test/tutorial_zerocoin.cpp \
   test/libzerocoin_tests.cpp \
+  test/addrman_tests.cpp \
   test/allocator_tests.cpp \
   test/base32_tests.cpp \
   test/base58_tests.cpp \

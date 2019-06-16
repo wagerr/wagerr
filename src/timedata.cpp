@@ -8,11 +8,10 @@
 
 #include "netbase.h"
 #include "sync.h"
-#include "ui_interface.h"
+#include "guiinterface.h"
 #include "util.h"
 #include "utilstrencodings.h"
 
-#include <boost/foreach.hpp>
 
 using namespace std;
 
@@ -85,7 +84,7 @@ void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
             if (!fDone) {
                 // If nobody has a time different than ours but within 5 minutes of ours, give a warning
                 bool fMatch = false;
-                BOOST_FOREACH (int64_t nOffset, vSorted)
+                for (int64_t nOffset : vSorted)
                     if (nOffset != 0 && abs64(nOffset) < 5 * 60)
                         fMatch = true;
 
@@ -99,7 +98,7 @@ void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
             }
         }
         if (fDebug) {
-            BOOST_FOREACH (int64_t n, vSorted)
+            for (int64_t n : vSorted)
                 LogPrintf("%+d  ", n);
             LogPrintf("|  ");
         }

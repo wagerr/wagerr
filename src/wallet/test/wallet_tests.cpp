@@ -9,8 +9,8 @@
 #include <utility>
 #include <vector>
 
-#include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
+#include "test_wagerr.h"
 
 // how many times to run all the tests to have a chance to catch errors that only show up with particular random shuffles
 #define RUN_TESTS 100
@@ -23,7 +23,7 @@ using namespace std;
 
 typedef set<pair<const CWalletTx*,unsigned int> > CoinSet;
 
-BOOST_AUTO_TEST_SUITE(wallet_tests)
+BOOST_FIXTURE_TEST_SUITE(wallet_tests, TestingSetup)
 
 static CWallet wallet;
 static vector<COutput> vCoins;
@@ -52,7 +52,7 @@ static void add_coin(const CAmount& nValue, int nAge = 6*24, bool fIsFromMe = fa
 
 static void empty_wallet(void)
 {
-    BOOST_FOREACH(COutput output, vCoins)
+    for (COutput output : vCoins)
         delete output.tx;
     vCoins.clear();
 }

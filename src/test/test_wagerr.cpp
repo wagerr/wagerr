@@ -6,19 +6,19 @@
 
 #define BOOST_TEST_MODULE Wagerr Test Suite
 
+#include "test_wagerr.h"
+
 #include "main.h"
 #include "random.h"
 #include "txdb.h"
-#include "ui_interface.h"
+#include "guiinterface.h"
 #include "util.h"
 #ifdef ENABLE_WALLET
 #include "wallet/db.h"
 #include "wallet/wallet.h"
 #endif
 
-#include <boost/filesystem.hpp>
 #include <boost/test/unit_test.hpp>
-#include <boost/thread.hpp>
 
 CClientUIInterface uiInterface;
 CWallet* pwalletMain;
@@ -26,22 +26,25 @@ CWallet* pwalletMain;
 extern bool fPrintToConsole;
 extern void noui_connect();
 
-struct TestingSetup {
-    CCoinsViewDB *pcoinsdbview;
-    boost::filesystem::path pathTemp;
-    boost::thread_group threadGroup;
-    ECCVerifyHandle globalVerifyHandle;
-
-    TestingSetup() {
+BasicTestingSetup::BasicTestingSetup()
+{
         ECC_Start();
         SetupEnvironment();
         fPrintToDebugLog = false; // don't want to write to debug.log file
         fCheckBlockIndex = true;
         SelectParams(CBaseChainParams::UNITTEST);
-        noui_connect();
+}
+BasicTestingSetup::~BasicTestingSetup()
+{
+        ECC_Stop();
+}
+
+TestingSetup::TestingSetup()
+{
 #ifdef ENABLE_WALLET
         bitdb.MakeMock();
 #endif
+        ClearDatadirCache();
         pathTemp = GetTempPath() / strprintf("test_wagerr_%lu_%i", (unsigned long)GetTime(), (int)(GetRand(100000)));
         boost::filesystem::create_directories(pathTemp);
         mapArgs["-datadir"] = pathTemp.string();
@@ -59,28 +62,28 @@ struct TestingSetup {
         for (int i=0; i < nScriptCheckThreads-1; i++)
             threadGroup.create_thread(&ThreadScriptCheck);
         RegisterNodeSignals(GetNodeSignals());
-    }
-    ~TestingSetup()
-    {
+}
+
+TestingSetup::~TestingSetup()
+{
+        UnregisterNodeSignals(GetNodeSignals());
         threadGroup.interrupt_all();
         threadGroup.join_all();
-        UnregisterNodeSignals(GetNodeSignals());
 #ifdef ENABLE_WALLET
+        UnregisterValidationInterface(pwalletMain);
         delete pwalletMain;
         pwalletMain = NULL;
 #endif
+        UnloadBlockIndex();
         delete pcoinsTip;
         delete pcoinsdbview;
         delete pblocktree;
 #ifdef ENABLE_WALLET
         bitdb.Flush(true);
+        bitdb.Reset();
 #endif
         boost::filesystem::remove_all(pathTemp);
-        ECC_Stop();
-    }
-};
-
-BOOST_GLOBAL_FIXTURE(TestingSetup);
+}
 
 void Shutdown(void* parg)
 {

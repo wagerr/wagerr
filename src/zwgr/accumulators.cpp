@@ -147,7 +147,7 @@ bool LoadAccumulatorValuesFromDB(const uint256 nCheckpoint)
         if (!zerocoinDB->ReadAccumulatorValue(nChecksum, bnValue)) {
             if (!count(listAccCheckpointsNoDB.begin(), listAccCheckpointsNoDB.end(), nCheckpoint))
                 listAccCheckpointsNoDB.push_back(nCheckpoint);
-            LogPrint("zero", "%s : Missing databased value for checksum %d", __func__, nChecksum);
+            LogPrint("zero", "%s : Missing databased value for checksum %d\n", __func__, nChecksum);
             return false;
         }
         mapAccumulatorValues.insert(make_pair(nChecksum, bnValue));
