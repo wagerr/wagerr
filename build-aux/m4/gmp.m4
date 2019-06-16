@@ -8,7 +8,7 @@ if test x"$has_gmp" != x"yes"; then
   AC_CHECK_HEADER(gmp.h,[
     AC_CHECK_LIB(gmp, __gmpz_init,[
       has_gmp=yes;
-      GMP_LIBS="$GMP_LIBS -lgmp";
+      LIBS="$LIBS -lgmp";
       AC_DEFINE(HAVE_LIBGMP, 1, [Define this symbol if libgmp is installed])
     ])
   ])
