@@ -18,12 +18,13 @@
 #include "wallet/wallet.h"
 #include "zwgr/zwgrwallet.h"
 #include "zwgrchain.h"
+#include "test_wagerr.h"
 
 using namespace libzerocoin;
 
 extern bool DecodeHexTx(CTransaction& tx, const std::string& strHexTx);
 
-BOOST_AUTO_TEST_SUITE(zerocoin_implementation_tests)
+BOOST_FIXTURE_TEST_SUITE(zerocoin_implementation_tests, TestingSetup)
 
 BOOST_AUTO_TEST_CASE(zcparams_test)
 {
@@ -97,7 +98,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinmint_test)
     CValidationState state;
     bool fFoundMint = false;
     for(unsigned int i = 0; i < tx.vout.size(); i++){
-        if(!tx.vout[i].scriptPubKey.empty() && tx.vout[i].scriptPubKey.IsZerocoinMint()) {
+        if(tx.vout[i].IsZerocoinMint()) {
             BOOST_CHECK(CheckZerocoinMint(tx.GetHash(), tx.vout[i], state, true));
             fFoundMint = true;
         }
@@ -134,10 +135,10 @@ bool CheckZerocoinSpendNoDB(const CTransaction tx, string& strError)
     set<CBigNum> serials;
     list<CoinSpend> vSpends;
     CAmount nTotalRedeemed = 0;
-    BOOST_FOREACH(const CTxIn& txin, tx.vin) {
+    for (const CTxIn& txin : tx.vin) {
 
         //only check txin that is a zcspend
-        if (!txin.scriptSig.IsZerocoinSpend())
+        if (!txin.IsZerocoinSpend())
             continue;
 
         // extract the CoinSpend from the txin
@@ -356,7 +357,7 @@ BOOST_AUTO_TEST_CASE(checkzerocoinspend_test)
     //Get the checksum of the accumulator we use for the spend and also add it to our checksum map
     uint32_t nChecksum_v2 = GetChecksum(accumulator_v2.getValue());
     //AddAccumulatorChecksum(nChecksum_v2, accumulator_v2.getValue(), true);
-    uint256 ptxHash = CBigNum::RandKBitBigum(256).getuint256();
+    uint256 ptxHash = CBigNum::randKBitBignum(256).getuint256();
     CoinSpend coinSpend_v2(Params().Zerocoin_Params(false), Params().Zerocoin_Params(false), privateCoin_v2, accumulator_v2, nChecksum_v2, witness_v2, ptxHash, SpendType::SPEND);
 
     BOOST_CHECK_MESSAGE(coinSpend_v2.HasValidSerial(Params().Zerocoin_Params(false)), "coinspend_v2 does not have a valid serial");

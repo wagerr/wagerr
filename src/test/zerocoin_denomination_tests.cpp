@@ -11,13 +11,13 @@
 #include "txdb.h"
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
+#include "test/test_wagerr.h"
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 
 using namespace libzerocoin;
 
-BOOST_AUTO_TEST_SUITE(zerocoin_denom_tests)
-
+BOOST_FIXTURE_TEST_SUITE(zerocoin_denom_tests, BasicTestingSetup)
 
 //translation from wagerr quantity to zerocoin denomination
 BOOST_AUTO_TEST_CASE(amount_to_denomination_test)
@@ -92,7 +92,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test241)
             nTotalAmount += currentAmount;
             CBigNum value;
             CBigNum rand;
-            CBigNum serial = CBigNum::RandKBitBigum(256);
+            CBigNum serial = CBigNum::randKBitBignum(256);
             bool isUsed = false;
             CMintMeta meta;
             meta.denom = denom;
@@ -176,7 +176,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test115)
             nTotalAmount += currentAmount;
             CBigNum value;
             CBigNum rand;
-            CBigNum serial = CBigNum::RandKBitBigum(256);
+            CBigNum serial = CBigNum::randKBitBignum(256);
             bool isUsed = false;
             CMintMeta meta;
             meta.denom = denom;
@@ -260,7 +260,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test_from_245)
             nTotalAmount += currentAmount;
             CBigNum value;
             CBigNum rand;
-            CBigNum serial = CBigNum::RandKBitBigum(256);
+            CBigNum serial = CBigNum::randKBitBignum(256);
             bool isUsed = false;
             CMintMeta meta;
             meta.denom = denom;
@@ -362,7 +362,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test_from_145)
             nTotalAmount += currentAmount;
             CBigNum value;
             CBigNum rand;
-            CBigNum serial = CBigNum::RandKBitBigum(256);
+            CBigNum serial = CBigNum::randKBitBignum(256);
             bool isUsed = false;
             CMintMeta meta;
             meta.denom = denom;
@@ -468,7 +468,7 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test99)
             nTotalAmount += currentAmount;
             CBigNum value;
             CBigNum rand;
-            CBigNum serial = CBigNum::RandKBitBigum(256);
+            CBigNum serial = CBigNum::randKBitBignum(256);
             bool isUsed = false;
             CMintMeta meta;
             meta.denom = denom;

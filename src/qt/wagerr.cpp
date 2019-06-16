@@ -31,7 +31,7 @@
 #include "init.h"
 #include "main.h"
 #include "rpc/server.h"
-#include "ui_interface.h"
+#include "guiinterface.h"
 #include "util.h"
 
 #ifdef ENABLE_WALLET

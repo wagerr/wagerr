@@ -494,14 +494,8 @@ public:
 
     bool IsValid(std::string& strError, bool fCheckCollateral = true);
 
-    bool IsEstablished()
-    {
-        // Proposals must be at least a day old to make it into a budget
-        if (Params().NetworkID() == CBaseChainParams::MAIN) return (nTime < GetTime() - (60 * 60 * 24));
-
-        // For testing purposes - 5 minutes
-        return (nTime < GetTime() - (60 * 5));
-    }
+    bool IsEstablished();
+    bool IsPassing(const CBlockIndex* pindexPrev, int nBlockStartBudget, int nBlockEndBudget, int mnCount);
 
     std::string GetName() { return strProposalName; }
     std::string GetURL() { return strURL; }

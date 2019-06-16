@@ -12,7 +12,7 @@
 #include "masternodeconfig.h"
 #include "noui.h"
 #include "rpc/server.h"
-#include "ui_interface.h"
+#include "guiinterface.h"
 #include "util.h"
 #include "httpserver.h"
 #include "httprpc.h"

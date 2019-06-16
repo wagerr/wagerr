@@ -16,6 +16,7 @@
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h"
 #include "txdb.h"
+#include "test/test_wagerr.h"
 #include <boost/test/unit_test.hpp>
 #include <iostream>
 
@@ -23,7 +24,7 @@ using namespace libzerocoin;
 
 class CDeterministicMint;
 
-BOOST_AUTO_TEST_SUITE(zerocoin_coinspend_tests)
+BOOST_FIXTURE_TEST_SUITE(zerocoin_coinspend_tests, TestingSetup)
 
 /**
  * Check that wrapped serials pass and not pass using the new validation.
