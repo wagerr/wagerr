@@ -3318,15 +3318,13 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         *         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
         * Though if we keep this check for minimum mint, it should be moved to IsBlockValueValid().
      */
-    if (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint)) {
-        if (Params().NetworkID() == CBaseChainParams::TESTNET) {
-            if (pindex->nHeight >= Params().ZerocoinCheckTXexclude() && pindex->nHeight <= Params().ZerocoinCheckTX())
-                LogPrintf("ConnectBlock() - Skipping validation of mint size on testnet subset : reward pays wrong amount at block %i (actual=%s vs limit=%s)\n", pindex->nHeight, FormatMoney(pindex->nMint), FormatMoney(nExpectedMint));
-        } else  {
-            return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
-        }
+    /*
+    if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().ZerocoinCheckTXexclude() || pindex->nHeight <= Params().ZerocoinCheckTX())) {
+        LogPrintf("Skipping validation of mint size on testnet subset");
+    } else if (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint)) {
+        return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
     }
-
+    */
     if (!IsBlockPayoutsValid(vExpectedAllPayouts, block)) {
         if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().ZerocoinCheckTXexclude() && pindex->nHeight <= Params().ZerocoinCheckTX())) {
             LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : Bet payout TX's don't match up with block payout TX's at block %i\n", pindex->nHeight);

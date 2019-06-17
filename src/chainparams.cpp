@@ -297,7 +297,7 @@ public:
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
-        nZerocoinStartHeight = 350;
+        nZerocoinStartHeight = 50;            // Start accumulation coins here - first zerocoin mint occurs at block 87
         nZerocoinAccumulationStartHeight = 350;
         nZerocoinStartTime = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
@@ -312,8 +312,6 @@ public:
 
         // Public coin spend enforcement
         nPublicZCSpends = 1000000;
-
-        nZerocoinStartHeight = 50;            // Start accumulation coins here - first zerocoin mint occurs at block 87
 
         /** Bet related parameters **/
         nBetStartHeight = 26080;                                        // The block that betting protocols become active (Testnet).
