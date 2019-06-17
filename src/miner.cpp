@@ -476,7 +476,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 txNew.vout[0].nValue = blockValue;
                 txNew.vin[0].scriptSig = CScript() << nHeight << OP_0;
             }
-        } 
+        }
 
         if (fProofOfStake) {
             // Calculate the bet payouts.

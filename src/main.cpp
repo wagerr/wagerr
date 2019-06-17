@@ -3308,7 +3308,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
     /*  **TODO**
-        * 
+        *
         * Kokary: there are some oddities with fee calculation:
         * - Coinstake transactions do have fees, resulting in rougly 4400 satoshi less mints
         * - When there are no masternodes to pay, those MN rewards are not paid, resulting in 1*COIN less than expected mints
