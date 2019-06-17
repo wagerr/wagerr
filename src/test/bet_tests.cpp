@@ -6,9 +6,16 @@
 #include "clientversion.h"
 #include "streams.h"
 #include "utilstrencodings.h"
+
+#include "test/test_wagerr.h"
+
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(bet_tests)
+using namespace std;
+
+BOOST_FIXTURE_TEST_SUITE(bet_tests, TestingSetup)
+
+//BOOST_AUTO_TEST_SUITE(bet_tests)
 
 typedef struct _peerless_event_test {
     std::string opCode;
