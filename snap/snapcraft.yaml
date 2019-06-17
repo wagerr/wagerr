@@ -3,7 +3,7 @@
 # Copyright (c) 2019 The OBSR developers
 name: wagerr
 base: core18
-version: 2.0.99
+version: 3.0.99
 summary:   wagerr, digital currency for decentralized betting
 description: |
   Wagerr is a decentralized sportsbook that changes the way the world
@@ -49,54 +49,70 @@ description: |
   - facebook (https://www.facebook.com/wagerr/)
 grade: devel
 confinement: strict
-icon: share/pixmaps/wagerr256.png
 apps:
   daemon:
     command: wagerrd
-    plugs: [network, network-bind, network-status, home, removable-media]
+    plugs: [network, network-bind, home, removable-media]
+    #desktop: wagerrd.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-testnet:
     command: wagerrd --testnet
-    plugs: [network, network-bind, network-status, home, removable-media]
+    plugs: [network, network-bind, home, removable-media]
+    #desktop: wagerrd_testnet.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-regtest:
     command: wagerrd --regtest
-    plugs: [network, network-bind, network-status, home, removable-media]
+    plugs: [network, network-bind, home, removable-media]
+    #desktop: wagerrd_regtest.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt:
     command: wagerr-qt
     plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
-    desktop: qt.desktop
+    desktop: wagerr-qt.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt-testnet:
     command: wagerr-qt --testnet
     plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
-    desktop: qt-testnet.desktop
+    desktop: wagerr-qt_testnet.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt-regtest:
     command: wagerr-qt --regtest
     plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
-    desktop: qt-regtest.desktop
+    desktop: wagerr-qt_regtest.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli:
     command: wagerr-cli
-    plugs: [network, network-bind, home]
+    plugs: [network, network-bind, home, removable-media]
+    environment:
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli-testnet:
     command: wagerr-cli --testnet
-    plugs: [network, network-bind, home]
+    plugs: [network, network-bind, home, removable-media]
+    environment:
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli-regtest:
     command: wagerr-cli --regtest
-    plugs: [network, network-bind, home]
+    plugs: [network, network-bind, home, removable-media]
+    environment:
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   tx:
     command: wagerr-tx
     plugs: [home]
-
+  test:
+    command: test_wagerr
+    plugs: [home]
+  testqt:
+    command: test_wagerr-qt
+    plugs: [home]
 parts:
   wagerr:
     source: https://github.com/wagerr/wagerr
@@ -104,47 +120,178 @@ parts:
     source-tag: master
     plugin: nil
     override-build: |
-      SHORTNAME="wagerr"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "CUSTOM SETTINGS"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      #    use override prefix if binaries differ from project name, for ion it does,
+      #    project is called ioncore because ion exists already as package. For anybody
+      #    offering non official release and using own SNAP, this variable should be used
+      #    default value is "false", to enable it, use your projects binary prefix
+      OVERRIDEBINPREFIX="false"
+      OVERRIDEDATADIR="false"
+      OVERRIDECONF="${OVERRIDEDATADIR}"
+      COPYCONF=0    # copy example config into users data folder, 1 = enabled
+      JOBS=4        # 0 means off and make will run without -j
+      PATCH=1       # 1 = enabled
+      SPLASHPNGS=0  # patch pngs to differ visaully from those installed from self compilation or other source like deb
+      FIXPPCBUILD=1 # if ppc builds fail due to failed qt, apps part will return error and build will fail, 1 = enabled
+      EXTRALOG=1    # prints env and all installed files at the end of current script
+      RUNTESTS=1    # run make check after post install part
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "SET OVERRIDE VARIABLES IF SET" # checks OVERRIDEBINPREFIX, OVERRIDEDATADIR and OVERRIDECONF
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      if [ $OVERRIDEBINPREFIX = "false" ]; then
+        BINPREF="${SNAPCRAFT_PROJECT_NAME}"
+      else
+        BINPREF="${OVERRIDEBINPREFIX}"
+      fi
+      if [ $OVERRIDEDATADIR = "false" ]; then
+        DATADIR="${SNAPCRAFT_PROJECT_NAME}"
+      else
+        DATADIR="${OVERRIDEDATADIR}"
+      fi
+      if [ $OVERRIDECONF = "false" ]; then
+        CONF="${SNAPCRAFT_PROJECT_NAME}"
+      else
+        CONF="${OVERRIDECONF}"
+      fi
+      echo "BINPREF VARIABLE - ${BINPREF}"
+      echo "DATADIR VARIABLE - ${DATADIR}"
+      echo "CONF VARIABLE - ${CONF}"
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "OVERRIDE ARCHITECTURE" # applies currently only on i386,  for i386 architecture, we will use i686-linux-gnu to compile dependencies
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       if [ $SNAPCRAFT_ARCH_TRIPLET = "i386-linux-gnu" ]; then
         HOST="i686-linux-gnu"
       else
         HOST="${SNAPCRAFT_ARCH_TRIPLET}"
       fi
-      # APPLY PATCHES
-      echo "apply patches:"
-      git apply ${SNAPCRAFT_STAGE}/default_data_dir.patch
-      git apply ${SNAPCRAFT_STAGE}/fix-bdb-tmp-folder.patch
-      git apply ${SNAPCRAFT_STAGE}/fix-use-snap-instead-of-dirty.patch
-      sed -i 's/tar --strip-components/tar --no-same-owner --strip-components/' ${SNAPCRAFT_PART_BUILD}/depends/funcs.mk
-      # BUILD DEPENDENCIES
-      echo "START BUILDING ${SHORTNAME} FOR ${SNAPCRAFT_ARCH_TRIPLET} architecture"
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "APPLY PATCHES ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # patches which have to be applied for compilation, replace splash screen
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      cd ${SNAPCRAFT_PART_BUILD}
+      if [ $PATCH = 1 ]; then
+        echo "apply patches:"
+        git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X001-default_data_dir.patch
+        git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X002-fix-bdb-tmp-folder.patch
+        git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X003-fix-use-snap-instead-of-dirty.patch
+        sed -i 's/tar --strip-components/tar --no-same-owner --strip-components/' ${SNAPCRAFT_PART_BUILD}/depends/funcs.mk
+      else
+        echo "APPLY .patch files during compilation is disabled, skipping"
+      fi
+      if [ $SPLASHPNGS = 1 ]; then
+        echo "replace splash screen with snapcrafts"
+        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/images/splash.png $SNAPCRAFT_PART_BUILD/src/qt/res/images/splash.png
+        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/images/splash_regtest.png $SNAPCRAFT_PART_BUILD/src/qt/res/images/splash_regtest.png
+        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/images/splash_testnet.png $SNAPCRAFT_PART_BUILD/src/qt/res/images/splash_testnet.png
+        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/icons/favicon.ico $SNAPCRAFT_PART_BUILD/share/pixmaps/favicon.ico
+        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/icons/favicon_testnet.ico $SNAPCRAFT_PART_BUILD/share/pixmaps/favicon_testnet.ico
+        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/icons/favicon_regtest.ico $SNAPCRAFT_PART_BUILD/share/pixmaps/favicon_regtest.ico
+        mv -f $SNAPCRAFT_PART_BUILD/snap/local/desktop/${BINPREF}.png $SNAPCRAFT_PART_BUILD/src/qt/res/icons/${BINPREF}.png
+        mv -f $SNAPCRAFT_PART_BUILD/snap/local/desktop/${BINPREF}_testnet.png $SNAPCRAFT_PART_BUILD/src/qt/res/icons/${BINPREF}_testnet.png
+        mv -f $SNAPCRAFT_PART_BUILD/snap/local/desktop/${BINPREF}_regtest.png $SNAPCRAFT_PART_BUILD/src/qt/res/icons/${BINPREF}_regtest.png
+      else
+        echo "patch icons and images is disabled, skipping"
+      fi
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "BUILD DEPENDENCIES"
+      echo "PRECOMPILE ${SNAPCRAFT_ARCH_TRIPLET} DEPENDENCIES FOR ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # cd to depends folder, download and precompile
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       cd ${SNAPCRAFT_PART_BUILD}/depends
       make download-linux
-      make -j4 HOST=${HOST}
-      # CONFIGURE
-      echo "Configure ${SHORTNAME}"
+      if [ $JOBS = 0 ]; then
+        make
+      else
+        make -j${JOBS} HOST=${HOST}
+      fi
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "CONFIGURATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # run configure with prefix to include depends
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       cd ${SNAPCRAFT_PART_BUILD}
-      echo "Configure and build ${SHORTNAME}"
+      echo "Configure and build ${BINPREF}"
       ./autogen.sh
       ./configure --prefix=`pwd`/depends/${HOST}
-      # COMPILE
-      echo "Compile ${SHORTNAME}"
-      make -j4
-      # INSTALL
-      echo "Install ${SHORTNAME}"
-      make install prefix=${SNAPCRAFT_PART_INSTALL}
-      # POST INSTALL
-      if [ $SNAPCRAFT_ARCH_TRIPLET = "powerpc64le-linux-gnu" ]; then
-        if [ -e $SNAPCRAFT_PART_BUILD/src/qt/${SHORTNAME}-qt ]; then
-          echo "PPC64EL fix - ${SHORTNAME}-qt exists, fix unrequired"
-        else
-          echo "echo ${SHORTNAME}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/${SHORTNAME}-qt
-          chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/${SHORTNAME}-qt
-          echo "PPC64EL fix - ${SHORTNAME}-qt exists, fix required, dummy as ${SHORTNAME}-qt"
-        fi
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "COMPILATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # run make to compile using -j
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      if [ $JOBS = 0 ]; then
+        make
+      else
+        make -j${JOBS} HOST=${HOST}
       fi
-      echo "Installed files:"
-      find ${SNAPCRAFT_PART_INSTALL} -type f
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "INSTALLATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # run make install with a prefix where to install
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      make install prefix=${SNAPCRAFT_PART_INSTALL}
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "POST INSTALL SCRIPTS OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # run make install with a prefix where to install
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      if [ $FIXPPCBUILD = 1 ]; then
+        if [ $SNAPCRAFT_ARCH_TRIPLET = "powerpc64le-linux-gnu" ]; then
+          if [ -e $SNAPCRAFT_PART_BUILD/src/qt/${BINPREF}-qt ]; then
+            echo "PPC64EL fix - ${BINPREF}-qt exists, fix unrequired"
+          else
+            echo "echo ${BINPREF}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/${BINPREF}-qt
+            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/${BINPREF}-qt
+            echo "PPC64EL fix - ${BINPREF}-qt does not exist, fix required, dummy as ${BINPREF}-qt"
+          fi
+          if [ -e $SNAPCRAFT_PART_BUILD/src/qt/test/test_${BINPREF}-qt ]; then
+            echo "PPC64EL fix - test_${BINPREF}-qt exists, fix unrequired"
+          else
+            echo "echo test_${BINPREF}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}-qt
+            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}-qt
+            echo "PPC64EL fix - test_${BINPREF}-qt does not exist, fix required, dummy as test_${BINPREF}-qt"
+          fi
+          if [ -e $SNAPCRAFT_PART_BUILD/src/test/test_${BINPREF} ]; then
+            echo "PPC64EL fix - test_${BINPREF} exists, fix unrequired"
+          else
+            echo "echo test_${BINPREF} is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}
+            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}
+            echo "PPC64EL fix - test_${BINPREF} does not exist, fix required, dummy as test_${BINPREF}"
+          fi
+        fi
+        else
+          echo "PPC64EL fix disabled, skipping"
+      fi
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "CONFIG FILE" # create .wagerr folder and copy example config - !!!warning!!!: do not copy as wagerr.conf
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      mkdir -p ${SNAP_USER_COMMON}/.${DATADIR}
+      if [ $COPYCONF = 1 ]; then
+        cp ${SNAPCRAFT_PART_BUILD}/contrib/debian/manpages/${CONF}.conf.5 ${SNAP_USER_COMMON}/.${DATADIR}/${CONF}-example.conf
+      else
+        echo "COPY CONFIG FILE disabled, skipping"
+      fi
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "RUN TESTS" # if tests fail to pass, build and release will fail
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      cd ${SNAPCRAFT_PART_BUILD}
+      if [ $RUNTESTS = 1 ]; then
+        make check
+      else
+        echo "RUN TESTS disabled, skipping"
+      fi
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "INSTALATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}-snap has finished" # List installed files and vars when installation is finished
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      if [ $EXTRALOG = 1 ]; then
+        find ${SNAPCRAFT_PART_INSTALL} -type f
+        env
+      else
+        echo "RUN TESTS disabled, skipping"
+      fi
+      echo "-----------------------------------------------+"
     build-packages:
       - curl
       - wget
@@ -161,6 +308,8 @@ parts:
       - bsdmainutils
       - binutils
       - python3
+      - help2man
+      - doxygen
     stage-packages:
       - libxkbcommon0
       - ttf-ubuntu-font-family
@@ -176,10 +325,10 @@ parts:
     after:
       - patches
   patches:
-    source: snap/patches
+    source: snap/local/patches
     plugin: dump
     prime:
       - -*
   desktop:
-    source: snap/usr/share/applications
+    source: snap/local/desktop
     plugin: dump
