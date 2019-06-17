@@ -2983,7 +2983,8 @@ bool CWallet::CreateCoinStake(
         unsigned int nBits,
         int64_t nSearchInterval,
         CMutableTransaction& txNew,
-        unsigned int& nTxNewTime
+        unsigned int& nTxNewTime,
+        std::unique_ptr<CStakeInput>& newStakeInput
         )
 {
     // The following split & combine thresholds are important to security
@@ -3062,7 +3063,7 @@ bool CWallet::CreateCoinStake(
 
             // Calculate reward
             CAmount nReward;
-            nReward = GetBlockValue(chainActive.Height());
+            nReward = GetBlockValue(chainActive.Height() + 1);
             nCredit += nReward;
 
             // Create the output transaction(s)
@@ -3085,9 +3086,12 @@ bool CWallet::CreateCoinStake(
 
             // Limit size
             unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
-            if (nBytes >= DEFAULT_BLOCK_MAX_SIZE / 5)
+            if (nBytes >= DEFAULT_BLOCK_MAX_SIZE * 0.85)
                 return error("CreateCoinStake : exceeded coinstake size limit");
 
+            newStakeInput = std::move(stakeInput);
+
+            /*
             //Masternode payment
             FillBlockPayee(txNew, nMinFee, true, stakeInput->IsZWGR());
 
@@ -3113,7 +3117,7 @@ bool CWallet::CreateCoinStake(
                 if (!z->MarkSpent(this, txNew.GetHash()))
                     return error("%s: failed to mark mint as used\n", __func__);
             }
-
+            */
             fKernelFound = true;
             break;
         }
