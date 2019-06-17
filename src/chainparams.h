@@ -158,6 +158,8 @@ public:
 
     /** temp worarounds **/
     int ZerocoinCheckTX() const { return nZerocoinCheckTX; }
+    int ZerocoinCheckTXexclude() const { return nZerocoinCheckTXexclude; }
+
 protected:
     CChainParams() {}
 
@@ -248,6 +250,7 @@ protected:
 
     // workarounds
     int nZerocoinCheckTX;
+    int nZerocoinCheckTXexclude;
 };
 
 /**
