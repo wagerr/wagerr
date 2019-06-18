@@ -402,7 +402,11 @@ bool OptionsModel::setData(const QModelIndex& index, const QVariant& value, int 
             settings.setValue("fHideZeroBalances", fHideZeroBalances);
             emit hideZeroBalancesChanged(fHideZeroBalances);
             break;
-
+        case HideOrphans:
+            fHideOrphans = value.toBool();
+            settings.setValue("fHideOrphans", fHideOrphans);
+            emit hideOrphansChanged(fHideOrphans);
+            break;
         case AnonymizeWagerrAmount:
             nAnonymizeWagerrAmount = value.toInt();
             settings.setValue("nAnonymizeWagerrAmount", nAnonymizeWagerrAmount);
