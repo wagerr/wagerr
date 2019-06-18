@@ -24,18 +24,18 @@ URL:		https://wagerr.org/
 Source0:	https://wagerr.org/bin/wagerr-core-%{version}/wagerr-%{version}.tar.gz
 Source1:	http://download.oracle.com/berkeley-db/db-%{bdbv}.NC.tar.gz
 
-Source10:	https://raw.githubusercontent.com/wagerr-project/wagerr/v%{version}/contrib/debian/examples/wagerr.conf
+Source10:	https://raw.githubusercontent.com/wagerr/wagerr/v%{version}/contrib/debian/examples/wagerr.conf
 
 #man pages
-Source20:	https://raw.githubusercontent.com/wagerr-project/wagerr/v%{version}/doc/man/wagerrd.1
-Source21:	https://raw.githubusercontent.com/wagerr-project/wagerr/v%{version}/doc/man/wagerr-cli.1
-Source22:	https://raw.githubusercontent.com/wagerr-project/wagerr/v%{version}/doc/man/wagerr-qt.1
+Source20:	https://raw.githubusercontent.com/wagerr/wagerr/v%{version}/doc/man/wagerrd.1
+Source21:	https://raw.githubusercontent.com/wagerr/wagerr/v%{version}/doc/man/wagerr-cli.1
+Source22:	https://raw.githubusercontent.com/wagerr/wagerr/v%{version}/doc/man/wagerr-qt.1
 
 #selinux
-Source30:	https://raw.githubusercontent.com/wagerr-project/wagerr/v%{version}/contrib/rpm/wagerr.te
+Source30:	https://raw.githubusercontent.com/wagerr/wagerr/v%{version}/contrib/rpm/wagerr.te
 # Source31 - what about wagerr-tx and bench_wagerr ???
-Source31:	https://raw.githubusercontent.com/wagerr-project/wagerr/v%{version}/contrib/rpm/wagerr.fc
-Source32:	https://raw.githubusercontent.com/wagerr-project/wagerr/v%{version}/contrib/rpm/wagerr.if
+Source31:	https://raw.githubusercontent.com/wagerr/wagerr/v%{version}/contrib/rpm/wagerr.fc
+Source32:	https://raw.githubusercontent.com/wagerr/wagerr/v%{version}/contrib/rpm/wagerr.if
 
 Source100:	https://upload.wikimedia.org/wikipedia/commons/4/46/Bitcoin.svg
 
