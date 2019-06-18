@@ -17,7 +17,7 @@ class PoSFakeStake(WAGERR_FakeStakeTest):
         self.description = "Covers the scenario of a PoS block where the coinstake input prevout is already spent."
         self.init_test()
 
-        INITAL_MINED_BLOCKS = 150   # First mined blocks (rewards collected to spend)
+        INITAL_MINED_BLOCKS = 350   # First mined blocks (rewards collected to spend)
         MORE_MINED_BLOCKS = 100     # Blocks mined after spending
         STAKE_AMPL_ROUNDS = 2       # Rounds of stake amplification
         self.NUM_BLOCKS = 3         # Number of spammed blocks

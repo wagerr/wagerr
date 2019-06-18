@@ -85,7 +85,7 @@ BASE_SCRIPTS= [
     'interface_bitcoin_cli.py',
     #'mempool_resurrect.py', # Not Working -- TODO Fix it
     'wallet_txn_doublespend.py',
-    'wallet_txn_clone.py',
+    'wallet_txn_clone.py', # Not Working -- TODO Fix it (seemed to work before)
     #'rpc_getchaintips.py', # Not Working -- TODO Fix it
     'interface_rest.py',
     #'mempool_spend_coinbase.py', # Not Working -- TODO Fix it
@@ -131,6 +131,8 @@ EXTENDED_SCRIPTS = [
     # vv Tests less than 20m vv
     #'feature_fee_estimation.py', # Not Working -- TODO Fix it
     # vv Tests less than 5m vv
+    'wallet_cli-pt1.py',
+    'wallet_multisend.py',
     # vv Tests less than 2m vv
     'p2p_timeouts.py', # p2p peer does not timeout
     # vv Tests less than 60s vv
@@ -138,11 +140,8 @@ EXTENDED_SCRIPTS = [
     'rpc_bind.py',
     # vv Tests less than 30s vv
     # 'example_test.py',
-    #'feature_notifications.py', # Not Working -- TODO Fix it
-    'rpc_invalidateblock.py',
-    # EXTRA TESTS FOR EXTENDED SCRIPTS
-    'wallet_cli-pt1.py',
-    'multisend_test.py'
+    'feature_notifications.py', # Not Working -- TODO Fix it
+    'rpc_invalidateblock.py'
 ]
 
 # Place EXTENDED_SCRIPTS first since it has the 3 longest running tests
