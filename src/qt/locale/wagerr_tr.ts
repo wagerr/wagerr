@@ -62,12 +62,12 @@
         <translation>Alıcı Adres</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Bunlar ödemeleri göndermek için olan Wagerr adreslerinizdir.Coinleri göndermeden önce her zaman gönderilen miktarı ve adresi kontrol edin</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Bunlar ödemeleri göndermek için olan WAGERR adreslerinizdir.Coinleri göndermeden önce her zaman gönderilen miktarı ve adresi kontrol edin</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Bunlar ödemeleri almak için olan Wagerr adreslerinizdirHer işlem için yeni bir adres kullanmanız önerilir.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Bunlar ödemeleri almak için olan WAGERR adreslerinizdirHer işlem için yeni bir adres kullanmanız önerilir.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -254,12 +254,12 @@
         <translation>adres</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>BIP 38 ile şifrelemek isteğiniz Wagerr Adresini giriniz. Ortadaki kutucuğa bir parola giriniz. Şifrelenmiş özel anahtarı hesaplamak için şifrele tuşuna basınız. </translation>
+        <source>Enter a WAGERR Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <translation>BIP 38 ile şifrelemek isteğiniz WAGERR Adresini giriniz. Ortadaki kutucuğa bir parola giriniz. Şifrelenmiş özel anahtarı hesaplamak için şifrele tuşuna basınız. </translation>
     </message>
     <message>
-        <source>The Wagerr address to encrypt</source>
-        <translation>Şifrelenecek Wagerr adresi</translation>
+        <source>The WAGERR address to encrypt</source>
+        <translation>Şifrelenecek WAGERR adresi</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -290,8 +290,8 @@
         <translation>Geçerli imzayı sistem panosuna kopyala</translation>
     </message>
     <message>
-        <source>Encrypt the private key for this Wagerr address</source>
-        <translation>Bu Wagerr adresinin özel anahtarını şifreleyin</translation>
+        <source>Encrypt the private key for this WAGERR address</source>
+        <translation>Bu WAGERR adresinin özel anahtarını şifreleyin</translation>
     </message>
     <message>
         <source>Reset all fields</source>
@@ -617,6 +617,14 @@
         <translation>%1 geride. blok tarıyor %2</translation>
     </message>
     <message>
+        <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonymization and staking only</source>
+        <translation>Cüzdan şifrelenmiştirve şu anda sadece anonimleştirme ve staking yapılabilmesi amacıyla kilitsiz&lt;/b&gt; hale getirilmiştir.</translation>
+    </message>
+    <message>
+        <source>Tor is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Tor &lt;b&gt;etkin&lt;/b&gt; hale getirilmiştir: %1</translation>
+    </message>
+    <message>
         <source>&amp;File</source>
         <translation>&amp;Dosya</translation>
     </message>
@@ -637,12 +645,12 @@
         <translation>Sekme tablosu</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR CORE</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Koinleri Wagerr adresine gönder</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Koinleri WAGERR adresine gönder</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -661,11 +669,11 @@
         <translation>Masternodları ara</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
+        <source>&amp;About WAGERR Core</source>
         <translation>Pıvx core Hakkında</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
+        <source>Show information about WAGERR Core</source>
         <translation>Pıvx Core hakkında bilgi göster</translation>
     </message>
     <message>
@@ -673,12 +681,12 @@
         <translation>WAGERR için yapılandırma seçeneklerini değiştirin</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Sahip olduğunuzu kanıtlamak için mesajlarınızı Wagerr adresleriyle imzalayın</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Sahip olduğunuzu kanıtlamak için mesajlarınızı WAGERR adresleriyle imzalayın</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Belirtilen Wagerr adresleriyle imzalanmış olduklarından emin olmak için iletileri doğrulayın</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Belirtilen WAGERR adresleriyle imzalanmış olduklarından emin olmak için iletileri doğrulayın</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -721,12 +729,12 @@
         <translation>Kaşif penceresini engelle</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Olası Wagerr komut satırı seçeneklerine sahip bir liste almak için Wagerr Core yardım mesajını gösterin</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Olası WAGERR komut satırı seçeneklerine sahip bir liste almak için WAGERR Core yardım mesajını gösterin</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Wagerr Core istemci</translation>
+        <source>WAGERR Core client</source>
+        <translation>WAGERR Core istemci</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -786,7 +794,7 @@
     </message>
     <message>
         <source>Sent MultiSend transaction</source>
-        <translation>MultiSend işlemi gönderildi</translation>
+        <translation>ÇokluGönderi işlemi gönderildi</translation>
     </message>
     <message>
         <source>Date: %1
@@ -804,7 +812,7 @@ Adres: %4
         <source>Staking is active
  MultiSend: %1</source>
         <translation>Staking aktif
- Multisend: %1</translation>
+ ÇokluGönderi: %1</translation>
     </message>
     <message>
         <source>Active</source>
@@ -817,8 +825,8 @@ Adres: %4
     <message>
         <source>Staking is not active
  MultiSend: %1</source>
-        <translation>staking inaktif
- Multisend: %1</translation>
+        <translation>Staking etkin değildir
+ÇokluGönderi: %1</translation>
     </message>
     <message>
         <source>AutoMint is currently enabled and set to </source>
@@ -836,7 +844,7 @@ Adres: %4
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Cüzdan&lt;b&gt;şifreli&lt;/b&gt;ve şu anda&lt;b&gt;kilitli&lt;/b&gt;</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>BlockExplorer</name>
     <message>
@@ -1154,8 +1162,8 @@ Adres: %4
         <translation>Gönderen adresini düzenle</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>Girilen "%1" adresi geçerli bir Wagerr adresi değil.</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>Girilen "%1" adresi geçerli bir WAGERR adresi değil.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1194,22 +1202,33 @@ Adres: %4
     </message>
 </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>Form</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
         <translation>versiyon</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR CORE</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>hakkında Wagerr Core</translation>
+        <source>About WAGERR Core</source>
+        <translation>hakkında WAGERR Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1255,16 +1274,16 @@ Adres: %4
         <translation>Hoşgeldiniz</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Wagerr Core'a hoşgeldiniz.</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>WAGERR Core'a hoşgeldiniz.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>Program ilk başlatıldığında Wagerr Core'un verilerini nerede saklayacağını seçebilirsiniz.</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>Program ilk başlatıldığında WAGERR Core'un verilerini nerede saklayacağını seçebilirsiniz.</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Wagerr Core, Wagerr blok zincirinin bir kopyasını indirecek ve depolayacaktır. Bu dizinde en az %1GB veri saklanacak ve zamanla büyüyecek. Cüzdan ayrıca bu dizinde saklanır.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR Core, WAGERR blok zincirinin bir kopyasını indirecek ve depolayacaktır. Bu dizinde en az %1GB veri saklanacak ve zamanla büyüyecek. Cüzdan ayrıca bu dizinde saklanır.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1275,8 +1294,8 @@ Adres: %4
         <translation>Özel bir veri dizini kullanın:</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR CORE</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1402,7 +1421,7 @@ Adres: %4
     <name>MultiSendDialog</name>
     <message>
         <source>MultiSend</source>
-        <translation>MultiSend</translation>
+        <translation>ÇokluGönderi</translation>
     </message>
     <message>
         <source>Enter whole numbers 1 - 100</source>
@@ -1417,18 +1436,18 @@ Adres: %4
         <translation>Gönderim adresi girin</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Wagerr addresses after it matures.
-To Add: enter percentage to give and Wagerr address to add to the MultiSend vector.
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other WAGERR addresses after it matures.
+To Add: enter percentage to give and WAGERR address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>MultiSend, olgunlaştıktan sonra diğer Wagerr adreslerinin bir listesine otomatik olarak kazancınızın 100% 'ünü veya grup yazınızı ödüllendirmenize olanak tanır.
-Eklemek için: Verilecek yüzdeyi ve MultiSend vektörüne eklemek için Wagerr adresi girin.
+        <translation>ÇokluGönderi, olgunlaştıktan sonra diğer WAGERR adreslerinin bir listesine staking ya da masternode ödülünüzün 100% 'ünü otomatik olarak göndermenize olanak tanır.
+Eklemek için: Verilecek yüzdeyi ve ÇokluGönderi vektörüne eklemek için WAGERR adresi girin.
 Silme: Silinecek adresi girin ve silmek için basın.
-MultiSend, Etkinleştir'i tıklamadığınız sürece etkinleştirilmeyecektir</translation>
+ÇokluGönderi, Etkinleştir'i tıklamadığınız sürece etkinleştirilmeyecektir</translation>
     </message>
     <message>
         <source>Add to MultiSend Vector</source>
-        <translation>Ekle MultiSend Vector</translation>
+        <translation>ÇokluGönderi Vektörüne Ekle</translation>
     </message>
     <message>
         <source>Add</source>
@@ -1436,7 +1455,7 @@ MultiSend, Etkinleştir'i tıklamadığınız sürece etkinleştirilmeyecektir</
     </message>
     <message>
         <source>Deactivate MultiSend</source>
-        <translation>Deaktif et MultiSend</translation>
+        <translation>ÇokluGönderi'yi Etkisiz hale getir</translation>
     </message>
     <message>
         <source>Deactivate</source>
@@ -1476,7 +1495,7 @@ MultiSend, Etkinleştir'i tıklamadığınız sürece etkinleştirilmeyecektir</
     </message>
     <message>
         <source>Delete Address From MultiSend Vector</source>
-        <translation>MultiSend Vector den adresi sil</translation>
+        <translation>ÇokluGönderi Vektöründen Adresi Sil</translation>
     </message>
     <message>
         <source>Delete</source>
@@ -1484,7 +1503,7 @@ MultiSend, Etkinleştir'i tıklamadığınız sürece etkinleştirilmeyecektir</
     </message>
     <message>
         <source>Activate MultiSend</source>
-        <translation>aktifle MultiSend</translation>
+        <translation>ÇokluGönderi'yi Etkinleştir</translation>
     </message>
     <message>
         <source>Activate</source>
@@ -1492,11 +1511,11 @@ MultiSend, Etkinleştir'i tıklamadığınız sürece etkinleştirilmeyecektir</
     </message>
     <message>
         <source>View MultiSend Vector</source>
-        <translation>GösterMultiSend Vector</translation>
+        <translation>ÇokluGönderi Vektörünü Görüntüle</translation>
     </message>
     <message>
         <source>View MultiSend</source>
-        <translation>Göster multisend</translation>
+        <translation>ÇokluGönderi'yi Görüntüle</translation>
     </message>
     <message>
         <source>Send For Stakes</source>
@@ -1511,42 +1530,42 @@ MultiSend, Etkinleştir'i tıklamadığınız sürece etkinleştirilmeyecektir</
         <translation>(etiket yok)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>Girilen adres:
-</translation>
+        <source>MultiSend Active for Stakes and Masternode Rewards</source>
+        <translation>Masternode Ödülleri için ÇokluGönderi Etkinleştirilmiştir</translation>
     </message>
     <message>
-        <source> is invalid.
+        <source>MultiSend Active for Masternode Rewards</source>
+        <translation>Masternode Ödülleri için ÇokluGönderi Etkinleştirilmiştir</translation>
+    </message>
+    <message>
+        <source>MultiSend Not Active</source>
+        <translation>ÇokluGönderi Etkin değildir</translation>
+    </message>
+    <message>
+        <source>The entered address: %1 is invalid.
 Please check the address and try again.</source>
-        <translation>geçersiz.
-Lütfen adresi kontrol edin ve tekrar deneyin.</translation>
+        <translation>Girili adres: %1 geçersiz.
+Lütfen adresi kontrol ediniz ve tekrar deneyiniz.</translation>
     </message>
     <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation> MultiSend vectorünüzün toplam miktarı stake ödülünün  100% ünden fazla 
-</translation>
+        <source>Removed %1</source>
+        <translation>Kaldırıldı %1</translation>
+    </message>
+    <message>
+        <source>Could not locate address</source>
+        <translation>Adres bulunamadı.</translation>
+    </message>
+    <message>
+        <source>MultiSend activated</source>
+        <translation>ÇokluGönderi geçerli hale getirildi</translation>
+    </message>
+    <message>
+        <source>First Address Not Valid</source>
+        <translation>İlk Adres Geçersiz</translation>
     </message>
     <message>
         <source>Please Enter 1 - 100 for percent.</source>
         <translation>Lütfen 1 - 100 arası yüzdelik miktarı girin</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>MultiSend Vector
-</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>Silindi</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>Adres bulunamıyor
-</translation>
     </message>
 </context>
 <context>
@@ -1721,73 +1740,6 @@ Unutmayın, cüzdan, yeni adresi içeren işlemleri bulmak için blok zinciri ye
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Şaşırtmayı Yapılandır</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Temel Gizlilik</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>Yüksek Gizlilik</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Maksimum Gizlilik</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Lütfen bir gizlilik düzeyi seçin.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>25000 WGR'e kadar fonları karıştırmak için 2 ayrı matternod kullanın</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>25000 WGR'ye kadar olan fonları karıştırmak için 8 ayrı matternod kullanın</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>16 ayrı matternod kullan</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>Bu seçenek en hızlıdır ve 25000 WGR'yi anonimleştirmek için ~ 0.025 WGR'lik bir maliyeti olacaktır</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>Bu seçenek orta derecede hızlıdır ve 25000 WGR'yi anonimleştirmek için yaklaşık 0.05 WGR'e mal olur</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>Bu en yavaş ve en güvenli seçenektir. Maksimum anonimlik kullanmak maliyete gelecek</translation>
-    </message>
-    <message>
-        <source>0.1 WGR per 25000 WGR you anonymize.</source>
-        <translation>0.1 WGR her 25000 WGR anonimleştirmeye.</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Şaşırtma ayarlama</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Şaşırtma başarıyla temele ayarlandı. (%1 ve  2 turlar) Bunu istediğiniz zaman değiştirmek için Wagerr in ayarlar ekranını açmanız yeterli</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Şaşırtma başarıyla Yüksek e ayarlandı. (%1 ve 8 turlar) Bunu istediğiniz zaman değiştirmek için Wagerr in ayarlar ekranını açmanız yeterli</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Şaşırtma başarıyla maksimuma ayarlandı. (%1 ve 16 turlar) Bunu istediğiniz zaman değiştirmek için Wagerr in ayarlar ekranını açmanız yeterli</translation>
-    </message>
-</context>
-<context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
@@ -1845,8 +1797,8 @@ Unutmayın, cüzdan, yeni adresi içeren işlemleri bulmak için blok zinciri ye
         <translation>Doğrulanmamış değişikliğin harcamasını devre dışı bırakırsanız, bir işlemdeki değişiklik&lt;br/&gt;Bu işlem en az bir onay alıncaya kadar kullanılamaz.&lt;br/&gt;Bu aynı zamanda bakiyenizin nasıl hesaplandığını etkiler.</translation>
     </message>
     <message>
-        <source>Automatically open the Wagerr client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Yönelticideki Wagerr istemci bağlantı noktasını otomatik olarak açın. Bu, yalnızca yönlendiriciniz UPnP'yi destekliyorsa ve etkinleştirilmişse çalışır.</translation>
+        <source>Automatically open the WAGERR client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Yönelticideki WAGERR istemci bağlantı noktasını otomatik olarak açın. Bu, yalnızca yönlendiriciniz UPnP'yi destekliyorsa ve etkinleştirilmişse çalışır.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1865,11 +1817,11 @@ Unutmayın, cüzdan, yeni adresi içeren işlemleri bulmak için blok zinciri ye
         <translation>Uzman</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
+        <source>Automatically start WAGERR after logging in to the system.</source>
         <translation>Sisteme giriş yaptıktan sonra otomatik olarak WAGERR'i başlatın.</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
+        <source>&amp;Start WAGERR on system login</source>
         <translation>&amp; Sistem oturum açma işleminde WAGERR'i başlat</translation>
     </message>
     <message>
@@ -1898,17 +1850,21 @@ Unutmayın, cüzdan, yeni adresi içeren işlemleri bulmak için blok zinciri ye
     </message>
     <message>
         <source>The user interface language can be set here. This setting will take effect after restarting WAGERR.</source>
-        <translation>Kullanıcı arabirimi dili burada ayarlanabilir. Bu ayar, Wagerr yeniden başlatıldıktan sonra geçerli olur.</translation>
+        <translation>Kullanıcı arabirimi dili burada ayarlanabilir. Bu ayar, WAGERR yeniden başlatıldıktan sonra geçerli olur.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr/wagerr</source>
         <translation>Dil eksik veya çeviri tamamlanmamış mı? Katkıda bulunan çevirilere yardımcı olun:
-https://www.transifex.com/wagerr/wagerr-translations</translation>
+https://www.transifex.com/wagerr/wagerr</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
         <translation>Map port using &amp;UPnP</translation>
+    </message>
+    <message>
+        <source>Enable automatic minting of WGR units to zWGR</source>
+        <translation>WGR birimlerinin zWGR'e otomatik basımını ektinleştir</translation>
     </message>
     <message>
         <source>Enable zWGR Automint</source>
@@ -1931,8 +1887,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Tercih edilen Automint zWGR Nominal değeri</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Bir SOCKS5 proxy vasıtasıyla Wagerr ağına bağlanın.</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Bir SOCKS5 proxy vasıtasıyla WAGERR ağına bağlanın.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -1981,10 +1937,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>User Interface Theme:</source>
         <translation>Kullanıcı Arabirimi Teması:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>&amp; Birim tutarları göstermek için:</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
@@ -2058,7 +2010,15 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <source>The supplied proxy address is invalid.</source>
         <translation>Verilen proxy adresi geçersiz.</translation>
     </message>
-    </context>
+    <message>
+        <source>The supplied proxy port is invalid.</source>
+        <translation>Verilen proxy port adresi geçersiz.</translation>
+    </message>
+    <message>
+        <source>The supplied proxy settings are invalid.</source>
+        <translation>Verilen proxy seçenekleri geçersiz.</translation>
+    </message>
+</context>
 <context>
     <name>OverviewPage</name>
     <message>
@@ -2098,16 +2058,32 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Staklanmış veya masternod ödülleri henüz olgunlaşmamış</translation>
     </message>
     <message>
-        <source>Your current Wagerr balance, unconfirmed and immature transactions included</source>
-        <translation>Güncel Wagerr bakiyeniz, onaylanmamış ve olgunlaşmamış işlemler dahil</translation>
+        <source>Current locked balance in watch-only addresses</source>
+        <translation>Mevcut kilitli bakiye sadece görüntülenebilir adreslerde.</translation>
+    </message>
+    <message>
+        <source>Your current WAGERR balance, unconfirmed and immature transactions included</source>
+        <translation>Güncel WAGERR bakiyeniz, onaylanmamış ve olgunlaşmamış işlemler dahil</translation>
     </message>
     <message>
         <source>zWGR Balance</source>
         <translation>zWGR Bakiyesi</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Görüntülenen bilgiler güncelliğini yitirmiş olabilir. Bir bağlantı kurulduktan sonra M-cüzdanınız otomatik olarak Wagerr şebekesiyle senkronize edilir, ancak bu işlem henüz tamamlanmadı.</translation>
+        <source>Mature: more than 20 confirmation and more than 1 mint of the same denomination after it was minted.
+These zWGR are spendable.</source>
+        <translation>Olgun: basılmış olduktan sonra 20'den fazla onay alınmış ve aynı ölçü biriminden 1 kereden fazla basılmış.
+Bu zWGR ler harcanabilir.</translation>
+    </message>
+    <message>
+        <source>Unconfirmed: less than 20 confirmations
+Immature: confirmed, but less than 1 mint of the same denomination after it was minted</source>
+        <translation>Doğrulanmamış: 20'den az doğrulama
+Olgunlaşmamış: onaylandı, ancak basıldıktan sonra aynı ölçü biriminden 1 taneden daha az basım bulunmakta.</translation>
+    </message>
+    <message>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Görüntülenen bilgiler güncelliğini yitirmiş olabilir. Bir bağlantı kurulduktan sonra M-cüzdanınız otomatik olarak WAGERR şebekesiyle senkronize edilir, ancak bu işlem henüz tamamlanmadı.</translation>
     </message>
     <message>
         <source>OVERVIEW</source>
@@ -2223,8 +2199,8 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>Wagerr başlatılamıyor: tıkla ve ödeme işleyicisi</translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid Wagerr address or malformed URI parameters.</source>
-        <translation>URI ayrıştırılamaz! Bunun nedeni, geçersiz bir Wagerr adresi veya hatalı biçimlendirilmiş URI parametrelerinden kaynaklanabilir.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid WAGERR address or malformed URI parameters.</source>
+        <translation>URI ayrıştırılamaz! Bunun nedeni, geçersiz bir WAGERR adresi veya hatalı biçimlendirilmiş URI parametrelerinden kaynaklanabilir.</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
@@ -2309,8 +2285,8 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>Zerocoin Actions:</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Görüntülenen bilgiler güncelliğini yitirmiş olabilir. Bir bağlantı kurulduktan sonra M-cüzdanınız otomatik olarak Wagerr şebekesiyle senkronize edilir, ancak bu işlem henüz tamamlanmadı.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Görüntülenen bilgiler güncelliğini yitirmiş olabilir. Bir bağlantı kurulduktan sonra M-cüzdanınız otomatik olarak WAGERR şebekesiyle senkronize edilir, ancak bu işlem henüz tamamlanmadı.</translation>
     </message>
     <message>
         <source>Mint Zerocoin</source>
@@ -2325,36 +2301,12 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</source>
-        <translation>Minting için teyit edilmiş ve kilitli olmayan paralar veya Masternode teminatları mevcuttur.</translation>
-    </message>
-    <message>
-        <source>Available for Minting:</source>
-        <translation>Mintinge hazır</translation>
-    </message>
-    <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</source>
         <translation>Zerocoin Cüzdan DB'yi sıfırlayın. Blok zincirine sokmayan işlemleri siler.</translation>
     </message>
     <message>
         <source>Reset</source>
         <translation>Sıfırla</translation>
-    </message>
-    <message>
-        <source>Coin Control...</source>
-        <translation>Coin kontrol...</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Miktar</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Tutar:</translation>
     </message>
     <message>
         <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data.</source>
@@ -2371,6 +2323,14 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
     <message>
         <source>PRIVACY</source>
         <translation>GİZLİLİK</translation>
+    </message>
+    <message>
+        <source>zWGR Control</source>
+        <translation>zWGR Kontrolü</translation>
+    </message>
+    <message>
+        <source>zWGR Selected:</source>
+        <translation>zWgr Seçildi:</translation>
     </message>
     <message>
         <source>Quantity Selected:</source>
@@ -2405,24 +2365,12 @@ zWGR, 20'den fazla teyit bulunduğunda olgunlaşır ve bundan sonra aynı mezhep
         <translation>0 zWGR</translation>
     </message>
     <message>
-        <source>Security Level for Zerocoin Transactions. More is better, but needs more time and resources.</source>
-        <translation>Zerocoin İşlemleri için Güvenlik Seviyesi. Daha fazlası iyidir, ancak daha fazla zaman ve kaynak gerekmektedir.</translation>
-    </message>
-    <message>
-        <source>Security Level:</source>
-        <translation>Güvenlik seviyesi:</translation>
-    </message>
-    <message>
-        <source>Security Level 1 - 100 (default: 42)</source>
-        <translation>Güvenlik seviyesi 1 - 100 (varsayılan: 42)</translation>
-    </message>
-    <message>
         <source>Pay &amp;To:</source>
         <translation>şuna öde:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to. Creates local payment to yourself when empty.</source>
-        <translation>Ödemeyi göndermek için Wagerr adresi. Boş olduğunda kendinize yerel ödeme oluşturur.</translation>
+        <source>The WAGERR address to send the payment to. Creates local payment to yourself when empty.</source>
+        <translation>Ödemeyi göndermek için WAGERR adresi. Boş olduğunda kendinize yerel ödeme oluşturur.</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2487,6 +2435,12 @@ zWGR, 20'den fazla teyit bulunduğunda olgunlaşır ve bundan sonra aynı mezhep
     <message>
         <source>Denom. with value 1:</source>
         <translation>Denom. değer 1 ile:</translation>
+    </message>
+    <message>
+        <source>Unconfirmed: less than 20 confirmations
+Immature: confirmed, but less than 1 mint of the same denomination after it was minted</source>
+        <translation>Doğrulanmamış: 20'den az doğrulama
+Olgunlaşmamış: onaylandı, ancak basıldıktan sonra aynı ölçü biriminden 1 taneden daha az basım bulunmakta.</translation>
     </message>
     <message>
         <source>AutoMint Status</source>
@@ -2621,32 +2575,10 @@ zWGR, 20'den fazla teyit bulunduğunda olgunlaşır ve bundan sonra aynı mezhep
         <translation>Mint Durumu: Tamam</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>Miktarı kopyala</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Miktarı kopyala</translation>
-    </message>
-    <message>
         <source>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware.
 Please be patient...</source>
         <translation>ResetMintZerocoin: tam blok zinciri yeniden tarama, bu donanımınıza bağlı olarak 30 dakika kadar sürmelidir.
 Lütfen sabırlı olun...</translation>
-    </message>
-    <message>
-        <source>Spending Zerocoin.
-Computationally expensive, might need several minutes depending on the selected Security Level and your hardware.
-Please be patient...</source>
-        <translation>Harcanıyor Zerocoin.
-Hesaplaması pahalı, biraz fazla  hardware. ve seçili güvenlik seviyesine bağlı olarak.
-Lütfen sabırlı olun...</translation>
-    </message>
-    <message>
-        <source>) needed.
-Maximum allowed: </source>
-        <translation>) gerekli.
-Maksimum bırakılan: </translation>
     </message>
     <message>
         <source>zWGR is currently disabled due to maintenance.</source>
@@ -2659,32 +2591,6 @@ Maksimum bırakılan: </translation>
     <message>
         <source>AutoMint Status:</source>
         <translation>Otomatik Basım Durumu:</translation>
-    </message>
-    <message>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Hata: Cüzdan kilitlendi. Lütfen önce cüzdan parolasını girin.</translation>
-    </message>
-    <message>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation>Mesaj: Değer girin  &gt; 0.</translation>
-    </message>
-    <message>
-        <source>Minting </source>
-        <translation>Minting </translation>
-    </message>
-    <message>
-        <source>Successfully minted </source>
-        <translation>Başarılı şekilde mint edildi</translation>
-    </message>
-    <message>
-        <source> zWGR in </source>
-        <translation> zWGR in </translation>
-    </message>
-    <message>
-        <source> sec. Used denominations:
-</source>
-        <translation> sec. Used denominations:
-</translation>
     </message>
     <message>
         <source>Duration: </source>
@@ -2729,22 +2635,8 @@ Maksimum bırakılan: </translation>
         <translation>yeni üretilen (kullanılmayan ve bu nedenle isimsiz) yerel adrese &lt;br /&gt;</translation>
     </message>
     <message>
-        <source>with Security Level </source>
-        <translation>Güvenlik seviyesi ile</translation>
-    </message>
-    <message>
         <source>Confirm send coins</source>
         <translation>Coin gönderimini onayla</translation>
-    </message>
-    <message>
-        <source>Too much inputs (</source>
-        <translation>Çok fazla girdi (</translation>
-    </message>
-    <message>
-        <source>
-Either mint higher denominations (so fewer inputs are needed) or reduce the amount to spend.</source>
-        <translation>
-Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama miktarını azaltın.</translation>
     </message>
     <message>
         <source>Spend Zerocoin failed with status = </source>
@@ -2784,14 +2676,17 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
     </message>
 </context>
 <context>
+    <name>ProposalFrame</name>
+    </context>
+<context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
         <translation>Miktar</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Gir bir Wagerr addres (e.g. %1)</translation>
+        <source>Enter a WAGERR address (e.g. %1)</source>
+        <translation>Gir bir WAGERR addres (e.g. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2833,7 +2728,11 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
-</context>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR CORE</translation>
+    </message>
+    </context>
 <context>
     <name>QRImageWidget</name>
     <message>
@@ -2928,8 +2827,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Block chain</translation>
     </message>
     <message>
-        <source>Open the Wagerr debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Geçerli veri dizininden Wagerr hata ayıklama günlük dosyasını açın. Bu, büyük günlük dosyaları için birkaç saniye sürebilir.</translation>
+        <source>Open the WAGERR debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Geçerli veri dizininden WAGERR hata ayıklama günlük dosyasını açın. Bu, büyük günlük dosyaları için birkaç saniye sürebilir.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -3112,7 +3011,7 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Dışa:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
+        <source>Welcome to the WAGERR RPC console.</source>
         <translation>WAGERR RPC konsola hoşgeldiniz</translation>
     </message>
     <message>
@@ -3134,10 +3033,6 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
     <message>
         <source>Confirm resync Blockchain</source>
         <translation>Blockchaini resenkronize etmeyi onaylayın</translation>
-    </message>
-    <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Geçmişi görmek için ukarı ve aşağı okları kullanın, ve &lt;b&gt;Ctrl-L&lt;/b&gt; ekranı silmek için.</translation>
     </message>
     <message>
         <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
@@ -3199,12 +3094,16 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Yeni alma adresi ile ilişkilendirilebilecek isteğe bağlı bir etiket.</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Talep açıldığında görüntülenecek ödeme isteğine eklemek için isteğe bağlı bir mesaj. Not: Mesaj, ödemenin Wagerr şebekesi üzerinden gönderilmeyecektir.</translation>
+        <source>A&amp;mount:</source>
+        <translation>Miktar:</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Talep açıldığında görüntülenecek, ödeme isteğine eklemek için isteğe bağlı bir mesaj.&lt;br&gt;Not: Mesaj, ödemenin Wagerr şebekesi üzerinden gönderilmeyecektir.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Talep açıldığında görüntülenecek ödeme isteğine eklemek için isteğe bağlı bir mesaj. Not: Mesaj, ödemenin WAGERR şebekesi üzerinden gönderilmeyecektir.</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Talep açıldığında görüntülenecek, ödeme isteğine eklemek için isteğe bağlı bir mesaj.&lt;br&gt;Not: Mesaj, ödemenin WAGERR şebekesi üzerinden gönderilmeyecektir.</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
@@ -3217,10 +3116,6 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
     <message>
         <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
         <translation>İsteğe bağlı olarak isteğe bağlı bir miktar. Belirli bir miktar talep etmemek için bu boş bırakın veya sıfırlayın.</translation>
-    </message>
-    <message>
-        <source>&amp;Amount:</source>
-        <translation>miktar:</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
@@ -3265,6 +3160,10 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
     <message>
         <source>Copy amount</source>
         <translation>Miktarı kopyala</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Adresi Kopyala</translation>
     </message>
 </context>
 <context>
@@ -3335,6 +3234,10 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
     <message>
         <source>Message</source>
         <translation>Mesaj</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>adres</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -3492,8 +3395,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Özel ücret 1000 uWGR olarak ayarlanırsa ve işlem sadece 250 bayt ise, "kilobayt başına" ücret karşılığında yalnızca 250 uWGR ücreti verilir,&lt;br /&gt;"toplam en az" ise 1000 uWGR ödüyor. Bir kilobayttan daha büyük işlemler için kilobayt ödersiniz.</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for Wagerr transactions than the network can process.</source>
-        <translation>Yalnızca minimum ücreti ödemek, işlem hacmi bloklardaki alana göre daha az olduğu sürece iyidir.&lt;br /&gt;Ancak, bunun, Wagerr işlemleri için ağın işleyebileceğinden daha fazla talep olması durumunda, onaylama işleminde asla sonuçlanamayacağına dikkat edin.</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for WAGERR transactions than the network can process.</source>
+        <translation>Yalnızca minimum ücreti ödemek, işlem hacmi bloklardaki alana göre daha az olduğu sürece iyidir.&lt;br /&gt;Ancak, bunun, WAGERR işlemleri için ağın işleyebileceğinden daha fazla talep olması durumunda, onaylama işleminde asla sonuçlanamayacağına dikkat edin.</translation>
     </message>
     <message>
         <source>normal</source>
@@ -3588,8 +3491,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Bloğu böl aygıtı multipl adresle çalışmaz Tekrar deneyin</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
-        <translation>Uyarı: Geçersiz Wagerr adresi</translation>
+        <source>Warning: Invalid WAGERR address</source>
+        <translation>Uyarı: Geçersiz WAGERR adresi</translation>
     </message>
     <message>
         <source>%1 to %2</source>
@@ -3683,8 +3586,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>şuna öde:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
-        <translation>Ödemeyi göndermek için Wagerr adresi</translation>
+        <source>The WAGERR address to send the payment to</source>
+        <translation>Ödemeyi göndermek için WAGERR adresi</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -3723,8 +3626,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Mesaj:</translation>
     </message>
     <message>
-        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Wagerr network.</source>
-        <translation>WAGERR e eklenmiş olan bir mesaj: İşleminizle beraber saklanacak olan URI hatırlamanız için. Not: Bu mesaj Wagerr ağında yayınlanmayacak.</translation>
+        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the WAGERR network.</source>
+        <translation>WAGERR e eklenmiş olan bir mesaj: İşleminizle beraber saklanacak olan URI hatırlamanız için. Not: Bu mesaj WAGERR ağında yayınlanmayacak.</translation>
     </message>
     <message>
         <source>This is an unverified payment request.</source>
@@ -3750,8 +3653,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
-        <translation>Wagerr Core kapanıyor ...</translation>
+        <source>WAGERR Core is shutting down...</source>
+        <translation>WAGERR Core kapanıyor ...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -3773,8 +3676,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Sahip olduğunuzu kanıtlamak için adreslerinizle mesaj imzalayabilirsiniz. Kimlik avı saldırıları sizi kimliğini onlara yazmaya kandırmaya çalışabilir, çünkü belirsiz bir şey imzalamamaya dikkat edin. Kabul ettiğiniz tamamen ayrıntılı ifadeleri yalnızca imzalayın.</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Ile mesaj imzalamak için Wagerr adresi</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Ile mesaj imzalamak için WAGERR adresi</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -3805,16 +3708,16 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Geçerli imzayı sistem panosuna kopyala</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Bu Wagerr adresinin sahibi olduğunuzu kanıtlamak için mesajı imzala</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Bu WAGERR adresinin sahibi olduğunuzu kanıtlamak için mesajı imzala</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>Mesajın imzalandığı Wagerr adresi</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>Mesajın imzalandığı WAGERR adresi</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Belirtilen Wagerr adresi ile imzalanmış olduğundan emin olmak için iletiyi doğrulayın</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Belirtilen WAGERR adresi ile imzalanmış olduğundan emin olmak için iletiyi doğrulayın</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -3900,8 +3803,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR CORE</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -3916,8 +3819,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>The Dash Core developers</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
-        <translation>The Wagerr Core developers</translation>
+        <source>The WAGERR Core developers</source>
+        <translation>The WAGERR Core developers</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -4464,7 +4367,7 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
     </message>
 </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>Quantity</source>
         <translation>Adet</translation>
@@ -4481,11 +4384,7 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <source>Select/Deselect All</source>
         <translation>Seç/Çıkar Hepsini</translation>
     </message>
-    <message>
-        <source>Is Spendable</source>
-        <translation>Harcanabilir</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>wagerr-core</name>
     <message>
@@ -4513,8 +4412,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Hesaplanan akümülatör kontrol noktası, blok indeksiyle kaydedilen kontrol noktası değildir.</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Wagerr Core is probably already running.</source>
-        <translation>Veri dizini %s üzerinde bir kilit elde edemiyor. Wagerr Core muhtemelen zaten çalışıyor.</translation>
+        <source>Cannot obtain a lock on data directory %s. WAGERR Core is probably already running.</source>
+        <translation>Veri dizini %s üzerinde bir kilit elde edemiyor. WAGERR Core muhtemelen zaten çalışıyor.</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
@@ -4577,10 +4476,6 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Bellek havuzundan disk günlüğüne her veritabanı aktivitesini temizle&lt;n&gt; megabytes (default: %u)</translation>
     </message>
     <message>
-        <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
-        <translation>Teyit edilmemiş isimler buldular, devam ettiklerini onaylayana kadar bekleyecekler.</translation>
-    </message>
-    <message>
         <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
         <translation>Paytxfee belirlenmemişse, işlemlerin ortalama n blokta onaylanmaya başlaması için yeterli ücret ekleyin (varsayılan: %u)</translation>
     </message>
@@ -4615,14 +4510,6 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
     <message>
         <source>Done loading</source>
         <translation>Yükleme tamamlandı</translation>
-    </message>
-    <message>
-        <source>Entries are full.</source>
-        <translation>Girişler full</translation>
-    </message>
-    <message>
-        <source>Error connecting to Masternode.</source>
-        <translation>Masternod'a bağlanırken hata oluştu.</translation>
     </message>
     <message>
         <source>Error initializing block database</source>
@@ -4699,10 +4586,6 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Masternode seçenekleri:</translation>
     </message>
     <message>
-        <source>Masternode:</source>
-        <translation>Masternode:</translation>
-    </message>
-    <message>
         <source>Rescanning...</source>
         <translation>Yeniden taranıyor...</translation>
     </message>
@@ -4719,16 +4602,8 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
         <translation>Bu yardım mesajı</translation>
     </message>
     <message>
-        <source>This is not a Masternode.</source>
-        <translation>Bu masternod değil</translation>
-    </message>
-    <message>
         <source>Transaction amount too small</source>
         <translation>İşlem miktarı çok düşük</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>İşlem geçersiz</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
@@ -4737,10 +4612,6 @@ Ya daha yüksek mezhepleri daraltın (daha az girdi gereklidir) veya harcama mik
     <message>
         <source>Verifying wallet...</source>
         <translation>Cüzdan doğrulanıyor..</translation>
-    </message>
-    <message>
-        <source>Wallet is locked.</source>
-        <translation>Cüzdan kilitli.</translation>
     </message>
     <message>
         <source>Wallet options:</source>

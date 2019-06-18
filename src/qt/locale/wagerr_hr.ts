@@ -62,12 +62,12 @@
         <translation>Adrese za primanje</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>To su vaše Wagerr adrese za slanje plaćanja. Uvijek provjerite iznos i adresu primatelja prije slanja novca.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>To su vaše WAGERR adrese za slanje plaćanja. Uvijek provjerite iznos i adresu primatelja prije slanja novca.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>To su vaše Wagerr adrese za primanje uplata. Preporuča se upotreba nove adrese primanja za svaku transakciju.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>To su vaše WAGERR adrese za primanje uplata. Preporuča se upotreba nove adrese primanja za svaku transakciju.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -268,6 +268,18 @@
     <message>
         <source>Copy the current signature to the system clipboard</source>
         <translation>Kopirajte trenutačni potpis u međuspremnik sustava</translation>
+    </message>
+    <message>
+        <source>Reset all fields</source>
+        <translation>Resetiraj sva polja</translation>
+    </message>
+    <message>
+        <source>The encrypted private key</source>
+        <translation>Šifrirani privatni ključ</translation>
+    </message>
+    <message>
+        <source>Decrypt the entered key using the passphrase</source>
+        <translation>Dešifriraj uneseni ključ pomoću zaporke</translation>
     </message>
     <message>
         <source>Encrypt &amp;Key</source>
@@ -581,6 +593,10 @@
         <translation>%1 iza. Skeniranje blokiranjem %2</translation>
     </message>
     <message>
+        <source>Tor is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Tor je &lt;b&gt; omogućen &lt;b&gt;: %1</translation>
+    </message>
+    <message>
         <source>&amp;File</source>
         <translation>&amp;Datoteka</translation>
     </message>
@@ -601,12 +617,12 @@
         <translation>Alatna traka kartica</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Pošaljite kovanice na Wagerr adresu</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Pošaljite kovanice na WAGERR adresu</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -625,24 +641,24 @@
         <translation>Pregledajte masternode</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp; O Wagerr Coreu</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp; O WAGERR Coreu</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Prikaz informacija o Wagerr Coreu</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Prikaz informacija o WAGERR Coreu</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
         <translation>Izmijenite opcije konfiguracije za WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Potpišite poruke s vašim Wagerr adresama kako biste dokazali da ih posjedujete</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Potpišite poruke s vašim WAGERR adresama kako biste dokazali da ih posjedujete</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Potvrdite poruke kako biste bili sigurni da su potpisani s određenim Wagerr adresama</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Potvrdite poruke kako biste bili sigurni da su potpisani s određenim WAGERR adresama</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -653,8 +669,32 @@
         <translation>Šifriranje i dešifriranje privatnih ključeva pomoću zaporke</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Wagerr Core klijent</translation>
+        <source>&amp;MultiSend</source>
+        <translation>&amp;MultiSend</translation>
+    </message>
+    <message>
+        <source>MultiSend Settings</source>
+        <translation>MultiSend postavke</translation>
+    </message>
+    <message>
+        <source>Open Wallet &amp;Configuration File</source>
+        <translation>Otvori novčanik i konfiguracijsku datoteku</translation>
+    </message>
+    <message>
+        <source>Open Masternode configuration file</source>
+        <translation>Otvori konfiguracijsku datoteku za Masternode</translation>
+    </message>
+    <message>
+        <source>WAGERR Core client</source>
+        <translation>WAGERR Core klijent</translation>
+    </message>
+    <message>
+        <source>Importing blocks from disk...</source>
+        <translation>Unos blokova s diska</translation>
+    </message>
+    <message>
+        <source>Up to date</source>
+        <translation>Ažurirano</translation>
     </message>
     <message>
         <source>Error</source>
@@ -668,12 +708,40 @@
         <source>Information</source>
         <translation>Informacija</translation>
     </message>
+    <message>
+        <source>Sent transaction</source>
+        <translation>Poslana transakcija</translation>
+    </message>
+    <message>
+        <source>Incoming transaction</source>
+        <translation>Nadolazeća tranksakcija</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation>Aktivan</translation>
+    </message>
+    <message>
+        <source>Not Active</source>
+        <translation>Neaktivan</translation>
+    </message>
     </context>
 <context>
     <name>BlockExplorer</name>
     <message>
+        <source>Back</source>
+        <translation>Povratak</translation>
+    </message>
+    <message>
+        <source>Forward</source>
+        <translation>Naprijed</translation>
+    </message>
+    <message>
         <source>Address / Block / Transaction</source>
         <translation>Adresa / Blok / Transakcija</translation>
+    </message>
+    <message>
+        <source>Search</source>
+        <translation>Traži</translation>
     </message>
     </context>
 <context>
@@ -694,8 +762,40 @@
         <translation>Prioritet:</translation>
     </message>
     <message>
+        <source>Fee:</source>
+        <translation>Naknada:</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Nakon naknade:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Ostatak:</translation>
+    </message>
+    <message>
+        <source>(un)select all</source>
+        <translation>(od)znači sve</translation>
+    </message>
+    <message>
+        <source>Tree mode</source>
+        <translation>Stablo prikaz</translation>
+    </message>
+    <message>
+        <source>List mode</source>
+        <translation>Popis prikaz</translation>
+    </message>
+    <message>
+        <source>(1 locked)</source>
+        <translation>(1 zaključan)</translation>
+    </message>
+    <message>
         <source>Amount</source>
         <translation>Iznos</translation>
+    </message>
+    <message>
+        <source>Received with address</source>
+        <translation>Primljeno s adresom</translation>
     </message>
     <message>
         <source>Type</source>
@@ -714,6 +814,10 @@
         <translation>Potvrđeno</translation>
     </message>
     <message>
+        <source>Priority</source>
+        <translation>Prioritet</translation>
+    </message>
+    <message>
         <source>Copy address</source>
         <translation>Kopiraj adrese</translation>
     </message>
@@ -726,8 +830,64 @@
         <translation>Kopiraj iznos</translation>
     </message>
     <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopiraj ID transakcije</translation>
+    </message>
+    <message>
+        <source>Lock unspent</source>
+        <translation>Zaključaj neiskorišteno</translation>
+    </message>
+    <message>
+        <source>Unlock unspent</source>
+        <translation>Otključaj neiskorišteno</translation>
+    </message>
+    <message>
         <source>Copy quantity</source>
         <translation>Kopiraj količinu</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopiraj naknadu</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Kopiraj nakon naknade</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopiraj naknadu</translation>
+    </message>
+    <message>
+        <source>highest</source>
+        <translation>Najviši</translation>
+    </message>
+    <message>
+        <source>higher</source>
+        <translation>viši</translation>
+    </message>
+    <message>
+        <source>high</source>
+        <translation>visok</translation>
+    </message>
+    <message>
+        <source>medium-high</source>
+        <translation>srednje-visoki</translation>
+    </message>
+    <message>
+        <source>medium</source>
+        <translation>Srednji</translation>
+    </message>
+    <message>
+        <source>low</source>
+        <translation>nizak</translation>
+    </message>
+    <message>
+        <source>lower</source>
+        <translation>niži</translation>
+    </message>
+    <message>
+        <source>lowest</source>
+        <translation>najniži</translation>
     </message>
     <message>
         <source>yes</source>
@@ -741,7 +901,11 @@
         <source>(no label)</source>
         <translation>(nema oznake)</translation>
     </message>
-    </context>
+    <message>
+        <source>(change)</source>
+        <translation>(ostatak)</translation>
+    </message>
+</context>
 <context>
     <name>EditAddressDialog</name>
     </context>
@@ -749,17 +913,24 @@
     <name>FreespaceChecker</name>
     </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
     <name>Intro</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error</source>
@@ -775,6 +946,10 @@
     <message>
         <source>Status</source>
         <translation>Status</translation>
+    </message>
+    <message>
+        <source>Active</source>
+        <translation>Aktivan</translation>
     </message>
     <message>
         <source>0</source>
@@ -808,9 +983,6 @@
     </message>
     </context>
 <context>
-    <name>ObfuscationConfig</name>
-    </context>
-<context>
     <name>OpenURIDialog</name>
     </context>
 <context>
@@ -830,14 +1002,6 @@
     <message>
         <source>0</source>
         <translation>0</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Količina:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Iznos:</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -860,17 +1024,24 @@
         <translation>Prioritet:</translation>
     </message>
     <message>
+        <source>Fee:</source>
+        <translation>Naknada:</translation>
+    </message>
+    <message>
         <source>no</source>
         <translation>ne</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>Kopiraj količinu</translation>
+        <source>medium</source>
+        <translation>Srednji</translation>
     </message>
     <message>
-        <source>Copy amount</source>
-        <translation>Kopiraj iznos</translation>
+        <source>Change:</source>
+        <translation>Ostatak:</translation>
     </message>
+    </context>
+<context>
+    <name>ProposalFrame</name>
     </context>
 <context>
     <name>QObject</name>
@@ -885,6 +1056,10 @@
     <message>
         <source>N/A</source>
         <translation>N/A</translation>
+    </message>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
@@ -963,6 +1138,10 @@
         <source>Copy amount</source>
         <translation>Kopiraj iznos</translation>
     </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopiraj adrese</translation>
+    </message>
 </context>
 <context>
     <name>ReceiveRequestDialog</name>
@@ -1014,6 +1193,10 @@
         <translation>Poruka</translation>
     </message>
     <message>
+        <source>Address</source>
+        <translation>Adresa</translation>
+    </message>
+    <message>
         <source>Amount</source>
         <translation>Iznos</translation>
     </message>
@@ -1041,8 +1224,24 @@
         <translation>Prioritet:</translation>
     </message>
     <message>
+        <source>medium</source>
+        <translation>Srednji</translation>
+    </message>
+    <message>
+        <source>Fee:</source>
+        <translation>Naknada:</translation>
+    </message>
+    <message>
         <source>no</source>
         <translation>ne</translation>
+    </message>
+    <message>
+        <source>After Fee:</source>
+        <translation>Nakon naknade:</translation>
+    </message>
+    <message>
+        <source>Change:</source>
+        <translation>Ostatak:</translation>
     </message>
     <message>
         <source>0 WGR</source>
@@ -1067,6 +1266,18 @@
     <message>
         <source>Copy amount</source>
         <translation>Kopiraj iznos</translation>
+    </message>
+    <message>
+        <source>Copy fee</source>
+        <translation>Kopiraj naknadu</translation>
+    </message>
+    <message>
+        <source>Copy after fee</source>
+        <translation>Kopiraj nakon naknade</translation>
+    </message>
+    <message>
+        <source>Copy change</source>
+        <translation>Kopiraj naknadu</translation>
     </message>
     <message>
         <source>%1 to %2</source>
@@ -1111,14 +1322,14 @@
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
-        <translation>Wagerr Core se gasi...</translation>
+        <source>WAGERR Core is shutting down...</source>
+        <translation>WAGERR Core se gasi...</translation>
     </message>
     </context>
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
-        <source>The Wagerr address to sign the message with</source>
+        <source>The WAGERR address to sign the message with</source>
         <translation>WAGERR adresa za potpisivanje poruke s</translation>
     </message>
     <message>
@@ -1142,16 +1353,16 @@
         <translation>Kopirajte trenutačni potpis u međuspremnik sustava</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Potpišite poruku da biste dokazali da ste vlasnik ove Wagerr adrese</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Potpišite poruku da biste dokazali da ste vlasnik ove WAGERR adrese</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
+        <source>The WAGERR address the message was signed with</source>
         <translation>WAGERR adresa s kojom je potpisana poruka</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Potvrdite poruku kako biste bili sigurni da je potpisan s navedenom Wagerr adresom</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Potvrdite poruku kako biste bili sigurni da je potpisan s navedenom WAGERR adresom</translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
@@ -1197,8 +1408,8 @@
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -1292,6 +1503,10 @@
         <translation>Kopiraj iznos</translation>
     </message>
     <message>
+        <source>Copy transaction ID</source>
+        <translation>Kopiraj ID transakcije</translation>
+    </message>
+    <message>
         <source>Comma separated file (*.csv)</source>
         <translation>Comma separated file (*.csv)</translation>
     </message>
@@ -1345,7 +1560,7 @@
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>0</source>
         <translation>0</translation>
@@ -1362,12 +1577,64 @@
         <translation>Informacija</translation>
     </message>
     <message>
+        <source>Options:</source>
+        <translation>Mogućnosti:</translation>
+    </message>
+    <message>
+        <source>Synchronization failed</source>
+        <translation>Sinkronizacija neuspjela</translation>
+    </message>
+    <message>
+        <source>Synchronization finished</source>
+        <translation>Usklađivanje završeno</translation>
+    </message>
+    <message>
+        <source>Synchronization pending...</source>
+        <translation>Sinkronizacija je na čekanju...</translation>
+    </message>
+    <message>
+        <source>Synchronizing budgets...</source>
+        <translation>Usklađivanje proračuna...</translation>
+    </message>
+    <message>
+        <source>This is experimental software.</source>
+        <translation>Ovo je eksperimentalan softver.</translation>
+    </message>
+    <message>
+        <source>Transaction Created</source>
+        <translation>Transakcija stvorena</translation>
+    </message>
+    <message>
+        <source>Transaction too large for fee policy</source>
+        <translation>Transakcija je prevelika za trenutnu naknadu</translation>
+    </message>
+    <message>
+        <source>Transaction too large</source>
+        <translation>Transakcija je prevelika</translation>
+    </message>
+    <message>
         <source>Use the test network</source>
         <translation>Koristi testnu mrežu</translation>
     </message>
     <message>
+        <source>Verifying blocks...</source>
+        <translation>Provjera blokova...</translation>
+    </message>
+    <message>
+        <source>Verifying wallet...</source>
+        <translation>Provjera novčanika...</translation>
+    </message>
+    <message>
+        <source>Wallet options:</source>
+        <translation>Opcije novčanika:</translation>
+    </message>
+    <message>
         <source>Warning</source>
         <translation>Upozorenje</translation>
+    </message>
+    <message>
+        <source>Zerocoin options:</source>
+        <translation>Zerocoin opcije:</translation>
     </message>
     </context>
 </TS>

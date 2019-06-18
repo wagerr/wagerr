@@ -62,12 +62,12 @@
         <translation>Endereços de recebimento</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Esses são seus endereços Wagerr para envio de pagamentos. Sempre verifique a quantia e os endereços de recebimento antes de enviar moedas.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Esses são seus endereços WAGERR para envio de pagamentos. Sempre verifique a quantia e os endereços de recebimento antes de enviar moedas.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Esses são seus endereços Wagerr para recebimento de pagamentos. É recomendado usar um novo endereço para cada transação.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Esses são seus endereços WAGERR para recebimento de pagamentos. É recomendado usar um novo endereço para cada transação.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -254,7 +254,7 @@
         <translation>Endereço:</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <source>Enter a WAGERR Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
         <translation>Insira um endereço que você deseja criptografar usando a BIP 38. Insira a palavra-chave na caixa do meio. Pressione criptografar para computar a chave privada criptografada.</translation>
     </message>
     <message>
@@ -613,11 +613,11 @@
         <translation>Ferramentas de abas</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
+        <source>Send coins to a WAGERR address</source>
         <translation>Enviar moedas para um endereço WAGERR</translation>
     </message>
     <message>
@@ -637,24 +637,24 @@
         <translation>Procurar masternodes</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;Sobre o Wagerr Core</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;Sobre o WAGERR Core</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Mostra informação sobre o Wagerr Core</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Mostra informação sobre o WAGERR Core</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
         <translation>Modificar opções de configuração para WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Assine mensagens com seus endereços Wagerr para provar que você os detém</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Assine mensagens com seus endereços WAGERR para provar que você os detém</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Verifique as mensagens para ter certeza que estão assinadas com os endereços Wagerr especificados</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Verifique as mensagens para ter certeza que estão assinadas com os endereços WAGERR especificados</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -697,11 +697,11 @@
         <translation>Janela de exploração de blocos</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Mostra a ajuda da Wagerr Core para receber uma lista com possíveis opções de linha de comando WAGERR</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Mostra a ajuda da WAGERR Core para receber uma lista com possíveis opções de linha de comando WAGERR</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
+        <source>WAGERR Core client</source>
         <translation>Cliente Core WAGERR</translation>
     </message>
     <message>
@@ -809,7 +809,7 @@ MultiSend: %1</translation>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>A carteira está &lt;b&gt;criptografada&lt;/b&gt; e atualmente &lt;b&gt;travada&lt;/b&gt;</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>BlockExplorer</name>
     <message>
@@ -1118,7 +1118,7 @@ MultiSend: %1</translation>
         <translation>Editar endereço remetente</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
         <translation>O endereço que você selecionou, "%1" , não é um endereço válido de WAGERR</translation>
     </message>
     <message>
@@ -1158,22 +1158,33 @@ MultiSend: %1</translation>
     </message>
 </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>Formulário</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
         <translation>versão</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>Sobre o Wagerr Core</translation>
+        <source>About WAGERR Core</source>
+        <translation>Sobre o WAGERR Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1215,16 +1226,16 @@ MultiSend: %1</translation>
         <translation>Bem-vindo</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Bem-vindo ao Wagerr Core.</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Bem-vindo ao WAGERR Core.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>Como essa é a primeira vez que o programa é utilizado, você pode escolher onde Wagerr Core vai armazenar os seus dados.</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>Como essa é a primeira vez que o programa é utilizado, você pode escolher onde WAGERR Core vai armazenar os seus dados.</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Wagerr Core vai baixar e armazenar uma cópia da blockchain WAGERR. Pelo menos %1GB de informação será armazenado neste diretório e irá aumentar com o tempo. A carteira também será armazenada neste diretório.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR Core vai baixar e armazenar uma cópia da blockchain WAGERR. Pelo menos %1GB de informação será armazenado neste diretório e irá aumentar com o tempo. A carteira também será armazenada neste diretório.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1235,8 +1246,8 @@ MultiSend: %1</translation>
         <translation>Usar um diretório personalizado de dados:</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1437,43 +1448,8 @@ MultiSend: %1</translation>
         <translation>(sem rótulo)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>O endereço informado:
-</translation>
-    </message>
-    <message>
-        <source> is invalid.
-Please check the address and try again.</source>
-        <translation>é inválido.
-
-Favor verificar o endereço e tente novamente.</translation>
-    </message>
-    <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation>A quantia total de seu vetor MultiSend é superior a 100% da recompensa de seu stake
-</translation>
-    </message>
-    <message>
         <source>Please Enter 1 - 100 for percent.</source>
         <translation>Favor inserir 1 - 100 para porcentagem.</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>Vetor MultiSend
-</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>Removido</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>Não foi possível localizar o endereço
-</translation>
     </message>
 </context>
 <context>
@@ -1552,73 +1528,6 @@ Favor verificar o endereço e tente novamente.</translation>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Configurar Ofuscação</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Privacidade Básica</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>Alta Privacidade</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Privacidade Máxima</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Favor selecionar o nível de privacidade.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Use 2 masternodes separados para embaralhar fundos até 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Use 8 masternodes separados para embaralhar fundos até 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>Use 16 masternodes separados</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>Está opção é a mais rápida e vai custar em torno de ~0.025 WGR para anonimizar 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>Está opção moderamente rápida e vai custar em torno de ~0.05 WGR para anonimizar 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>Esta é a opção mais lenta e mais segura. Usando a anonimização máxima vai custar</translation>
-    </message>
-    <message>
-        <source>0.1 WGR per 25000 WGR you anonymize.</source>
-        <translation>0.1 WGR por 25000 WGR que deixar anônima.</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Configuração de ofuscação</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Ofuscação foi definida com sucesso para o básico (%1 e 2 rodadas) Você pode mudar isto a qualquer tempo ao abrir a configuração de tela WAGERR's.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Ofuscação foi definida com sucesso para alto (%1 e 8 rodadas). Você pode mudar isto a qualquer tempo ao abrir a configuração de tela WAGERR's.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Ofuscação foi definida com sucesso para máxima (%1 e 16 rodadas). Você pode mudar isto a qualquer tempo ao abrir a configuração de tela WAGERR's.</translation>
-    </message>
-</context>
-<context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
@@ -1668,8 +1577,8 @@ Favor verificar o endereço e tente novamente.</translation>
         <translation>C&amp;arteira</translation>
     </message>
     <message>
-        <source>Automatically open the Wagerr client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Abrir automaticamente a porta do cliente Wagerr no roteador. Isto somente funciona quando seu roteador suporta UPnP e este esteja habilitado.</translation>
+        <source>Automatically open the WAGERR client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Abrir automaticamente a porta do cliente WAGERR no roteador. Isto somente funciona quando seu roteador suporta UPnP e este esteja habilitado.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1688,12 +1597,12 @@ Favor verificar o endereço e tente novamente.</translation>
         <translation>Expert</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
-        <translation>Iniciar automaticamente Wagerr depois de logar no sistema.</translation>
+        <source>Automatically start WAGERR after logging in to the system.</source>
+        <translation>Iniciar automaticamente WAGERR depois de logar no sistema.</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;Iniciar Wagerr ao logar no sistema</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;Iniciar WAGERR ao logar no sistema</translation>
     </message>
     <message>
         <source>Enable coin &amp;control features</source>
@@ -1713,13 +1622,13 @@ Favor verificar o endereço e tente novamente.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr/wagerr</source>
         <translation>Linguagem não encontrada ou tradução incompleta? Ajude contribuido com traduções aqui:
-https://www.transifex.com/wagerr/wagerr-translations</translation>
+https://www.transifex.com/wagerr/wagerr</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Conectar à rede Wagerr através de um proxy SOCKS5</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Conectar à rede WAGERR através de um proxy SOCKS5</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -1764,10 +1673,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>User Interface Theme:</source>
         <translation>Usar tema de inferface:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>&amp;Unidades para mostrar as quantias:</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
@@ -1853,8 +1758,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Imaturo:</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>A informação mostrada pode estar desatualizada. A sua carteira se sincroniza automaticamente com a rede Wagerr após estabelecer uma conexão, mas esse processo ainda não foi concluído.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>A informação mostrada pode estar desatualizada. A sua carteira se sincroniza automaticamente com a rede WAGERR após estabelecer uma conexão, mas esse processo ainda não foi concluído.</translation>
     </message>
     <message>
         <source>Unconfirmed transactions to watch-only addresses</source>
@@ -1950,8 +1855,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Ações Zerocoin:</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>A informação mostrada pode estar desatualizada. A sua carteira se sincroniza automaticamente com a rede Wagerr após estabelecer uma conexão, mas esse processo ainda não foi concluído.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>A informação mostrada pode estar desatualizada. A sua carteira se sincroniza automaticamente com a rede WAGERR após estabelecer uma conexão, mas esse processo ainda não foi concluído.</translation>
     </message>
     <message>
         <source>0</source>
@@ -1962,20 +1867,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset</source>
         <translation>Reinicia</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Quantidade:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Quantia:</translation>
     </message>
     <message>
         <source>Quantity Selected:</source>
@@ -1986,20 +1879,12 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Saldo disponível:</translation>
     </message>
     <message>
-        <source>Security Level:</source>
-        <translation>Nível de Segurança:</translation>
-    </message>
-    <message>
-        <source>Security Level 1 - 100 (default: 42)</source>
-        <translation>Nível de segurança 1 - 100 (padrão: 42)</translation>
-    </message>
-    <message>
         <source>Pay &amp;To:</source>
         <translation>Pagar &amp;Para:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to. Creates local payment to yourself when empty.</source>
-        <translation>O endereço Wagerr para enviar o pagamento. Cria um pagamento local para si mesmo quando vazio.</translation>
+        <source>The WAGERR address to send the payment to. Creates local payment to yourself when empty.</source>
+        <translation>O endereço WAGERR para enviar o pagamento. Cria um pagamento local para si mesmo quando vazio.</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2118,22 +2003,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>fora de sincronia</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>Copiar quantidade</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Copiar quantia</translation>
-    </message>
-    <message>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Erro: Sua carteira está travada. Favor inserir a palavra-chave da carteira primeiro.</translation>
-    </message>
-    <message>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation>Mensagem: Insira uma quantia &gt; 0.</translation>
-    </message>
-    <message>
         <source>Confirm additional Fees</source>
         <translation>Confirmar Taxas adicionais</translation>
     </message>
@@ -2167,14 +2036,17 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     </message>
 </context>
 <context>
+    <name>ProposalFrame</name>
+    </context>
+<context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
         <translation>Quantidade</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Insira um endereço Wagerr (e.g. %1)</translation>
+        <source>Enter a WAGERR address (e.g. %1)</source>
+        <translation>Insira um endereço WAGERR (e.g. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2212,7 +2084,11 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
-</context>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
+    </message>
+    </context>
 <context>
     <name>QRImageWidget</name>
     <message>
@@ -2431,16 +2307,12 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>saída:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
-        <translation>Bem-vindo ao console da Wagerr RPC</translation>
+        <source>Welcome to the WAGERR RPC console.</source>
+        <translation>Bem-vindo ao console da WAGERR RPC</translation>
     </message>
     <message>
         <source>Do you want to continue?.&lt;br /&gt;</source>
         <translation>Você deseja continuar?.&lt;br /&gt;</translation>
-    </message>
-    <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Utilize as teclas para cima ou baixo para navegar no histórico e &lt;b&gt;Ctrl-L&lt;/b&gt; para limpar a tela.</translation>
     </message>
     <message>
         <source>%1 B</source>
@@ -2486,12 +2358,12 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Um rótulo opcional para associar a novos endereços de recebimento.</translation>
     </message>
     <message>
-        <source>&amp;Label:</source>
-        <translation>&amp;Rótulo:</translation>
+        <source>A&amp;mount:</source>
+        <translation>Quantia:</translation>
     </message>
     <message>
-        <source>&amp;Amount:</source>
-        <translation>&amp;Quantidade:</translation>
+        <source>&amp;Label:</source>
+        <translation>&amp;Rótulo:</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
@@ -2536,6 +2408,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Copy amount</source>
         <translation>Copiar quantia</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Copiar endereço</translation>
     </message>
 </context>
 <context>
@@ -2606,6 +2482,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Message</source>
         <translation>Mensagem</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Endereço</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -2735,8 +2615,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Se a taxa padrão estiver definida para 1000 uWGRs e a transação for somente de 250 bytes, então "por kilobyte" pagará somente 250 uWGRs em taxa,&lt;br /&gt; pagará pelo menos 1000 uWGRs. Para transações maiores que um kilobyte ambas pagam por kilobyte.</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for Wagerr transactions than the network can process.</source>
-        <translation>Pagar a taxa mínima é aceitável desde que existe menos volume de transações que espaço nos blocos. &lt;br/&gt; Mas fique atento que isso pode acabar em uma transação que nunca será confirmada caso haja mais demanda por transações de Wagerr do que a rede pode processar.</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for WAGERR transactions than the network can process.</source>
+        <translation>Pagar a taxa mínima é aceitável desde que existe menos volume de transações que espaço nos blocos. &lt;br/&gt; Mas fique atento que isso pode acabar em uma transação que nunca será confirmada caso haja mais demanda por transações de WAGERR do que a rede pode processar.</translation>
     </message>
     <message>
         <source>normal</source>
@@ -2819,8 +2699,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Copiar troco</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
-        <translation>Aviso: endereço Wagerr inválido</translation>
+        <source>Warning: Invalid WAGERR address</source>
+        <translation>Aviso: endereço WAGERR inválido</translation>
     </message>
     <message>
         <source>%1 to %2</source>
@@ -2906,8 +2786,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Pagar &amp;Para:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
-        <translation>O endereço Wagerr para enviar o pagamento</translation>
+        <source>The WAGERR address to send the payment to</source>
+        <translation>O endereço WAGERR para enviar o pagamento</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2969,8 +2849,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
-        <translation>Wagerr Core está desligando...</translation>
+        <source>WAGERR Core is shutting down...</source>
+        <translation>WAGERR Core está desligando...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -2988,8 +2868,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>&amp;Assinar mensagem</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>O endereço Wagerr para assinar a mensagem</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>O endereço WAGERR para assinar a mensagem</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -3020,16 +2900,16 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Copia a assinatura atual do sistema de transferência</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
+        <source>Sign the message to prove you own this WAGERR address</source>
         <translation>Assine a mensagem para provar que você possui este endereço WAGERR</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>O endereço Wagerr que assinou a mensagem</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>O endereço WAGERR que assinou a mensagem</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Verifique a mensagem para ter certeza que foi assinada com o endereço Wagerr especificado.</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Verifique a mensagem para ter certeza que foi assinada com o endereço WAGERR especificado.</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -3111,8 +2991,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -3127,8 +3007,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Os desenvolvedores do Dash Core</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
-        <translation>Os desenvolvedores do Wagerr Core</translation>
+        <source>The WAGERR Core developers</source>
+        <translation>Os desenvolvedores do WAGERR Core</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -3635,7 +3515,7 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     </message>
 </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>Quantity</source>
         <translation>Quantia</translation>
@@ -3696,8 +3576,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Define o tamanho máximo de transações de alta prioridade/taxa baixa em bytes (padrão: %d)</translation>
     </message>
     <message>
-        <source>Unable to locate enough funds for this transaction that are not equal 25000 WGR.</source>
-        <translation>Incapaz de localizar fundos para esta transação que não são iguais a 25000 WGR.</translation>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 WGR.</source>
+        <translation>Incapaz de localizar fundos para esta transação que não são iguais a 10000 WGR.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -3712,8 +3592,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Aviso: -paytxfee está definido como muito alto! Está e a taxa de transação que você irá pagar se enviar uma transação.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.</source>
-        <translation>Aviso: Favor verificar se o horário e data de seu computador estão corretos! Se o seu relógio estiver errado o Core Wagerr não vai funcionar corretamente.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong WAGERR Core will not work properly.</source>
+        <translation>Aviso: Favor verificar se o horário e data de seu computador estão corretos! Se o seu relógio estiver errado o Core WAGERR não vai funcionar corretamente.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -3752,20 +3632,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Adicionar um nó para conectar e tentar manter uma conexão aberta</translation>
     </message>
     <message>
-        <source>Already have that input.</source>
-        <translation>Já possui este input.</translation>
-    </message>
-    <message>
         <source>Block creation options:</source>
         <translation>Opções de criação de bloco:</translation>
-    </message>
-    <message>
-        <source>Can't find random Masternode.</source>
-        <translation>Não conseguiu encontrar um Masternode aleatório.</translation>
-    </message>
-    <message>
-        <source>Can't mix while sync in progress.</source>
-        <translation>Não é possível embaralhar enquanto a sincronia estiver em progresso.</translation>
     </message>
     <message>
         <source>Connect only to the specified node(s)</source>
@@ -3796,8 +3664,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Todos os direitos reservados (C) 2015-%i aos Desenvolvedores do PIVX Core</translation>
     </message>
     <message>
-        <source>Copyright (C) %i The Wagerr Core Developers</source>
-        <translation>Todos os direitos reservados (C) %i aos Desenvolvedores do Wagerr Core</translation>
+        <source>Copyright (C) 2018-%i The WAGERR Core Developers</source>
+        <translation>Todos os direitos reservados (C) 2018-%i aos Desenvolvedores do WAGERR Core</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -3828,14 +3696,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Permite ao cliente atuar como um masternode (0-1, padrão: %u)</translation>
     </message>
     <message>
-        <source>Entries are full.</source>
-        <translation>As entradas estão cheias.</translation>
-    </message>
-    <message>
-        <source>Error connecting to Masternode.</source>
-        <translation>Erro ao conectar ao Masternode.</translation>
-    </message>
-    <message>
         <source>Error initializing block database</source>
         <translation>Erro ao inicializar a base de dados de blocos</translation>
     </message>
@@ -3856,8 +3716,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Erro no carregamento da wallet.dat: Carteira corrompida</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Wagerr Core</source>
-        <translation>Erro ao carregar wallet.dat: A Carteira requer uma nova versão da Wagerr Core</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of WAGERR Core</source>
+        <translation>Erro ao carregar wallet.dat: A Carteira requer uma nova versão da WAGERR Core</translation>
     </message>
     <message>
         <source>Error opening block database</source>
@@ -3888,10 +3748,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>erro: Carteira travada, não foi possível criar a transação!</translation>
     </message>
     <message>
-        <source>Error: You already have pending entries in the Obfuscation pool</source>
-        <translation>Erro: Você já possui entradas pendentes na pool de Ofuscação</translation>
-    </message>
-    <message>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Falhou em escutar qualquer porta. Use -listen=0 se você quiser isso.</translation>
     </message>
@@ -3904,20 +3760,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Taxa (em WGR/kB) a adicionar em transações que você enviar (padrão: %s)</translation>
     </message>
     <message>
-        <source>Finalizing transaction.</source>
-        <translation>Encerrando a transação.</translation>
-    </message>
-    <message>
         <source>Force safe mode (default: %u)</source>
         <translation>Forçar modo seguro (padrão: %u)</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ( waiting %s )</source>
-        <translation>Encontrou usuários suficientes, autenticando (aguardando %s)</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ...</source>
-        <translation>Encontrou usuários suficientes, autenticando...</translation>
     </message>
     <message>
         <source>Generate coins (default: %u)</source>
@@ -3932,24 +3776,12 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Importando...</translation>
     </message>
     <message>
-        <source>Incompatible mode.</source>
-        <translation>Modo incompatível.</translation>
-    </message>
-    <message>
-        <source>Incompatible version.</source>
-        <translation>Versão incompatível.</translation>
-    </message>
-    <message>
         <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
         <translation>Incorreto ou bloco gênesis não encontrado. O datadir de rede estaria errado?</translation>
     </message>
     <message>
         <source>Information</source>
         <translation>Informação</translation>
-    </message>
-    <message>
-        <source>Input is not valid.</source>
-        <translation>O input não é válido.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -4004,10 +3836,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Chave privada inválida.</translation>
     </message>
     <message>
-        <source>Invalid script detected.</source>
-        <translation>Script inválido detectado.</translation>
-    </message>
-    <message>
         <source>SwiftX options:</source>
         <translation>opções SwiftX:</translation>
     </message>
@@ -4020,14 +3848,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>&lt;category&gt; can be:</source>
         <translation>&lt;category&gt; pode ser:</translation>
-    </message>
-    <message>
-        <source>Last Obfuscation was too recent.</source>
-        <translation>Última ofuscação foi muito recente.</translation>
-    </message>
-    <message>
-        <source>Last successful Obfuscation action was too recent.</source>
-        <translation>Última ação de ofuscação com sucesso foi muito recente.</translation>
     </message>
     <message>
         <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
@@ -4062,10 +3882,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Carregando carteira...</translation>
     </message>
     <message>
-        <source>Lock is already in place.</source>
-        <translation>Trava já está no lugar.</translation>
-    </message>
-    <message>
         <source>Maintain at most &lt;n&gt; connections to peers (default: %u)</source>
         <translation>Manter pelo menos &lt;n&gt; conexões aos pares (padrão: %u)</translation>
     </message>
@@ -4074,60 +3890,16 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Opções de Masternode:</translation>
     </message>
     <message>
-        <source>Masternode queue is full.</source>
-        <translation>A fila do Masternode está cheia.</translation>
-    </message>
-    <message>
-        <source>Masternode:</source>
-        <translation>Masternode:</translation>
-    </message>
-    <message>
-        <source>Mixing in progress...</source>
-        <translation>Embaralhamento em progresso.</translation>
-    </message>
-    <message>
         <source>Need to specify a port with -whitebind: '%s'</source>
         <translation>Necessário especificar uma porta com -whitebind: '%s'</translation>
-    </message>
-    <message>
-        <source>No Masternodes detected.</source>
-        <translation>Nenhum Masternode detectado.</translation>
-    </message>
-    <message>
-        <source>No compatible Masternode found.</source>
-        <translation>Nenhum Masternode compatível encontrado.</translation>
     </message>
     <message>
         <source>Node relay options:</source>
         <translation>Opções de propagação do Nó:</translation>
     </message>
     <message>
-        <source>Non-standard public key detected.</source>
-        <translation>Chave pública não-padronizada detectada.</translation>
-    </message>
-    <message>
-        <source>Not compatible with existing transactions.</source>
-        <translation>Não é compatível com as transações existentes.</translation>
-    </message>
-    <message>
-        <source>Not in the Masternode list.</source>
-        <translation>Não está na lista de Masternodes.</translation>
-    </message>
-    <message>
         <source>Number of automatic wallet backups (default: 10)</source>
         <translation>Número de backups automáticos da carteira (padrão: 10)</translation>
-    </message>
-    <message>
-        <source>Obfuscation is idle.</source>
-        <translation>Ofuscação está ociosa.</translation>
-    </message>
-    <message>
-        <source>Obfuscation request complete:</source>
-        <translation>Requisição de ofuscação completa:</translation>
-    </message>
-    <message>
-        <source>Obfuscation request incomplete:</source>
-        <translation>Requisição de ofuscação incompleta:</translation>
     </message>
     <message>
         <source>Only connect to nodes in network &lt;net&gt; (ipv4, ipv6 or onion)</source>
@@ -4160,10 +3932,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Send transactions as zero-fee transactions if possible (default: %u)</source>
         <translation>Enviar transações com taxa zero se possível (padrão: %u)</translation>
-    </message>
-    <message>
-        <source>Session not complete!</source>
-        <translation>Sessão não está completa!</translation>
     </message>
     <message>
         <source>Session timed out.</source>
@@ -4238,18 +4006,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Parar de rodar depois de importar blocos do disco (padrão: %u)</translation>
     </message>
     <message>
-        <source>Submitted following entries to masternode: %u / %d</source>
-        <translation>Enviadas as seguintes entradas ao masternode: %u / %d</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation>Enviado ao masternode, aguardando por mais entradas ( %u / %d) %s</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>Enviado ao masternode, aguardando na fila %s</translation>
-    </message>
-    <message>
         <source>Synchronization failed</source>
         <translation>Sincronização falhou</translation>
     </message>
@@ -4274,28 +4030,12 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Este software é experimental.</translation>
     </message>
     <message>
-        <source>This is not a Masternode.</source>
-        <translation>Isto não é um Masternode.</translation>
-    </message>
-    <message>
         <source>Transaction amount too small</source>
         <translation>Quantia de transação muito pequena</translation>
     </message>
     <message>
         <source>Transaction amounts must be positive</source>
         <translation>Quantias de transação devem ser positivas</translation>
-    </message>
-    <message>
-        <source>Transaction created successfully.</source>
-        <translation>Transação criada com sucesso.</translation>
-    </message>
-    <message>
-        <source>Transaction fees are too high.</source>
-        <translation>Taxa de transação muito elevada.</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>Transação não é válida.</translation>
     </message>
     <message>
         <source>Transaction too large for fee policy</source>
@@ -4306,16 +4046,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Transação muito grande</translation>
     </message>
     <message>
-        <source>Transmitting final transaction.</source>
-        <translation>Transmitindo transação final.</translation>
-    </message>
-    <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
         <translation>Rede desconhecida especificada em -onlynet: '%s'</translation>
-    </message>
-    <message>
-        <source>Unknown state: id = %u</source>
-        <translation>Estado desconhecido: id = %u</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
@@ -4330,10 +4062,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Nome de usuário para conexões JSON-RPC</translation>
     </message>
     <message>
-        <source>Value more than Obfuscation pool maximum allows.</source>
-        <translation>Valor maior que o máximo permitido pela pool de Ofuscação </translation>
-    </message>
-    <message>
         <source>Verifying blocks...</source>
         <translation>Verificando blocos...</translation>
     </message>
@@ -4342,12 +4070,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Verificando carteira...</translation>
     </message>
     <message>
-        <source>Wallet is locked.</source>
-        <translation>Carteira está travada.</translation>
-    </message>
-    <message>
-        <source>Wallet needed to be rewritten: restart Wagerr Core to complete</source>
-        <translation>A carteira precisa ser reescrita: reinicia o Wagerr Core para completar</translation>
+        <source>Wallet needed to be rewritten: restart WAGERR Core to complete</source>
+        <translation>A carteira precisa ser reescrita: reinicia o WAGERR Core para completar</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -4374,20 +4098,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Aviso: Argumento não suportado -debugnet ignorado, use -debug=net.</translation>
     </message>
     <message>
-        <source>Will retry...</source>
-        <translation>Tentando novamente...</translation>
-    </message>
-    <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation>Você precisa refazer a base de dados usando -reindex para mudar -txindex</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>Suas entradas foram adicionadas com sucesso.</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation>Sua transação foi aceita na pool!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>

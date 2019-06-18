@@ -62,11 +62,11 @@
         <translation>Ricevanta adresojn</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Ĉi tiuj estas viaj Wagerr adreso por sendi pagojn. Ĉiam kontroku la kvanto kaj la ricevanta antaŭ ol sendi monerojn.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Ĉi tiuj estas viaj WAGERR adreso por sendi pagojn. Ĉiam kontroku la kvanto kaj la ricevanta antaŭ ol sendi monerojn.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
         <translation>Ĉi tiuj estas vian adreson por ricevi pagojn. Ĝi rekomendas uzi novajn ricenvantan adreson por ĉiu nova transakcio.</translation>
     </message>
     <message>
@@ -254,11 +254,11 @@
         <translation>Adreso:</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Eniri unu Wagerr adreso ke vi volus ĉifri per BIP 38. Eniri unu pasfrazon meze skatolo. Klaku ĉifri por komputi la ĉifrita privata ŝlosilo.</translation>
+        <source>Enter a WAGERR Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <translation>Eniri unu WAGERR adreso ke vi volus ĉifri per BIP 38. Eniri unu pasfrazon meze skatolo. Klaku ĉifri por komputi la ĉifrita privata ŝlosilo.</translation>
     </message>
     <message>
-        <source>The Wagerr address to encrypt</source>
+        <source>The WAGERR address to encrypt</source>
         <translation>Adreson por ĉifri</translation>
     </message>
     <message>
@@ -290,8 +290,8 @@
         <translation>Kopiu la aktualan subskribo al la sistemo-poŝo</translation>
     </message>
     <message>
-        <source>Encrypt the private key for this Wagerr address</source>
-        <translation>Ĉifri la privata ŝlosilo por ĉi tiu Wagerr adreso</translation>
+        <source>Encrypt the private key for this WAGERR address</source>
+        <translation>Ĉifri la privata ŝlosilo por ĉi tiu WAGERR adreso</translation>
     </message>
     <message>
         <source>Reset all fields</source>
@@ -608,10 +608,6 @@
         <source>&amp;Command-line options</source>
         <translation>&amp;Komando-linio opcioj</translation>
     </message>
-    <message numerus="yes">
-        <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>%n bloko de tansakcio historo procesita</numerusform><numerusform>%n blokoj de tansakcio historo procesita</numerusform></translation>
-    </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
         <translation>Ĝisdatiĝante pliaj datumo: %p%</translation>
@@ -645,12 +641,12 @@
         <translation>Iloj langeto</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR kerno</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Sendu mono al Wagerr addreso</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Sendu mono al WAGERR addreso</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -669,24 +665,24 @@
         <translation>Foliumi mastro-nodo</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;Pri Wagerr Kerno</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;Pri WAGERR Kerno</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Montri informon pri Wagerr Kerno</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Montri informon pri WAGERR Kerno</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
         <translation>Modifi agordajn opciojn por WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Subskribu mesaĝo per via Wagerr adreso por pruvi vi posedas ĝin</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Subskribu mesaĝo per via WAGERR adreso por pruvi vi posedas ĝin</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Kontrolu mesaĝojn por certigi ke ili estas subskribita kun specifita Wagerr adreso</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Kontrolu mesaĝojn por certigi ke ili estas subskribita kun specifita WAGERR adreso</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -729,16 +725,12 @@
         <translation>Bloko esplorilo fenestro</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Montri la Wagerr Kore help-mesaĝo por havi liston de havebla Wagerr komandlinion opciojn</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Montri la WAGERR Kore help-mesaĝo por havi liston de havebla WAGERR komandlinion opciojn</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
+        <source>WAGERR Core client</source>
         <translation>WAGERR Kerno kliento</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform>%n aktiva ligo(j) al la Wagerr reto</numerusform><numerusform>%n aktiva ligo(j) al la Wagerr reto</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -760,25 +752,9 @@
         <source>Up to date</source>
         <translation>Ĝisdata</translation>
     </message>
-    <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation><numerusform>%n horo</numerusform><numerusform>%n horoj</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s)</source>
-        <translation><numerusform>%n tago</numerusform><numerusform>%n tagoj</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation><numerusform>%n semajno</numerusform><numerusform>%n semajnoj</numerusform></translation>
-    </message>
     <message>
         <source>%1 and %2</source>
         <translation>%1 kaj %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation><numerusform>%n jaro</numerusform><numerusform>%n jaroj</numerusform></translation>
     </message>
     <message>
         <source>Catching up...</source>
@@ -864,7 +840,7 @@ Muktisendi: %1</translation>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Monujo estas &lt;b&gt;ĉifrita&lt;/b&gt; kaj nuntempe &lt;b&gt;ŝlosita&lt;/b&gt;</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>BlockExplorer</name>
     <message>
@@ -1177,8 +1153,8 @@ Muktisendi: %1</translation>
         <translation>Redaktu sendantan adreson</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>La enirita "%1" adreso ne estas validan Wagerr adreson.</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>La enirita "%1" adreso ne estas validan WAGERR adreson.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1217,13 +1193,24 @@ Muktisendi: %1</translation>
     </message>
 </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>Formo</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
         <translation>versio</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR kerno</translation>
     </message>
     <message>
@@ -1231,8 +1218,8 @@ Muktisendi: %1</translation>
         <translation>(%1-bajto)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>Pri Wagerr Kerno</translation>
+        <source>About WAGERR Core</source>
+        <translation>Pri WAGERR Kerno</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1274,16 +1261,16 @@ Muktisendi: %1</translation>
         <translation>Bonvenon</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Bonvenon al la Wagerr Kerno.</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Bonvenon al la WAGERR Kerno.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>Ĉar estas la unuan fojon ke la programo estas lanĉita, vi povas elekti kie Wagerr kernk storigis sian datumojn. </translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>Ĉar estas la unuan fojon ke la programo estas lanĉita, vi povas elekti kie WAGERR kernk storigis sian datumojn. </translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>WAGERR kerno elŝutos kaj konservi kopion de la Wagerr blokĉeno. Almenaŭ %1GB datumoj stokitos en ĉi tiun dosierujo, kaj ĝi kresko kun la tempo. Monujo stokitos en ĉi tiun dosierujo.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR kerno elŝutos kaj konservi kopion de la WAGERR blokĉeno. Almenaŭ %1GB datumoj stokitos en ĉi tiun dosierujo, kaj ĝi kresko kun la tempo. Monujo stokitos en ĉi tiun dosierujo.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1294,7 +1281,7 @@ Muktisendi: %1</translation>
         <translation>Uzi kutimon datumojn dosierujo:</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR kerno</translation>
     </message>
     <message>
@@ -1460,42 +1447,8 @@ Muktisendi: %1</translation>
         <translation>(neniu etikedo)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>La enirita adreson:
-</translation>
-    </message>
-    <message>
-        <source> is invalid.
-Please check the address and try again.</source>
-        <translation>estas nevalida
-Bonvolu kontroku la adreson kaj riprovu</translation>
-    </message>
-    <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation>Totala sumo de via multisendo vektoro estas super 100% de via stako rekompenco
-</translation>
-    </message>
-    <message>
         <source>Please Enter 1 - 100 for percent.</source>
         <translation>Bonvolu eniru 1 - 100 por porcento.</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>Multisendo vektoro
-</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>Forigita</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>Ne eblis loki adreson
-</translation>
     </message>
 </context>
 <context>
@@ -1550,7 +1503,7 @@ Bonvolu kontroku la adreson kaj riprovu</translation>
     </message>
     <message>
         <source>Amount:</source>
-        <translation>Kvanto</translation>
+        <translation>Kvanto:</translation>
     </message>
     <message>
         <source>Add an input to fund the outputs</source>
@@ -1610,37 +1563,6 @@ Bonvolu kontroku la adreson kaj riprovu</translation>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Baza privateco</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>Alta privateco</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Maximuma privateco</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Bonvolu elekti privata nivelo.</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>Tion opcion estas la plej rapida kaji kostos ~0.025 WGR por anonimigi 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>Tion opcion estas moderebla rapide kaj kostos ĉirkaŭ 0.05 WGR por anonimigi 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>Ĉi tio estas plej malrapida kaj plej sekura opcio. Uzante maximuma anonimeco kostos</translation>
-    </message>
-    </context>
-<context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
@@ -1682,8 +1604,8 @@ Bonvolu kontroku la adreson kaj riprovu</translation>
         <translation>&amp;Monujo</translation>
     </message>
     <message>
-        <source>Automatically open the Wagerr client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Aŭtomate malfermi Wagerr klienton havenon en la enkursigilo. Tio nur laboras kiam via enkursigilo subtenas UPnP kaj estas ebligita.</translation>
+        <source>Automatically open the WAGERR client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Aŭtomate malfermi WAGERR klienton havenon en la enkursigilo. Tio nur laboras kiam via enkursigilo subtenas UPnP kaj estas ebligita.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1694,8 +1616,8 @@ Bonvolu kontroku la adreson kaj riprovu</translation>
         <translation>Sperta</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;Komencu Wagerr en sistem-ensaluto</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;Komencu WAGERR en sistem-ensaluto</translation>
     </message>
     <message>
         <source>&amp;Spend unconfirmed change</source>
@@ -1711,13 +1633,13 @@ Bonvolu kontroku la adreson kaj riprovu</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr/wagerr</source>
         <translation>Ĉu mankas lingvon aŭ nekompleta tradukado? Helpu la  tradukcio ĉi tie:
-https://www.transifex.com/wagerr/wagerr-translations</translation>
+https://www.transifex.com/wagerr/wagerr</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Konekti al la Wagerr reto per SOCKS5 prokurilo.</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Konekti al la WAGERR reto per SOCKS5 prokurilo.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -1738,10 +1660,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>User Interface Theme:</source>
         <translation>Usanto interfaco temo:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>&amp;Uneco per montri kvantojn:</translation>
     </message>
     <message>
         <source>Hide empty balances</source>
@@ -1795,8 +1713,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Nematura:</translation>
     </message>
     <message>
-        <source>Your current Wagerr balance, unconfirmed and immature transactions included</source>
-        <translation>Via aktuala Wagerr totalo, nekonformita kaj nematurita transakcioj inkluzivita</translation>
+        <source>Your current WAGERR balance, unconfirmed and immature transactions included</source>
+        <translation>Via aktuala WAGERR totalo, nekonformita kaj nematurita transakcioj inkluzivita</translation>
     </message>
     <message>
         <source>zWGR Balance</source>
@@ -1809,8 +1727,8 @@ Immature: confirmed, but less than 1 mint of the same denomination after it was 
 Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mintita</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Montrata informon povas esti malmoderna. Via monujo automate sinkronigis kun la Wagerr reto post konekcio establas, sed ĉi tio procezo ankoraŭ ne kompletigis.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Montrata informon povas esti malmoderna. Via monujo automate sinkronigis kun la WAGERR reto post konekcio establas, sed ĉi tio procezo ankoraŭ ne kompletigis.</translation>
     </message>
     <message>
         <source>OVERVIEW</source>
@@ -1862,8 +1780,8 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
 <context>
     <name>PrivacyDialog</name>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Montrata informon povas esti malmoderna. Via monujo automate sinkronigis kun la Wagerr reto post konekcio establas, sed ĉi tio procezo ankoraŭ ne kompletigis.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Montrata informon povas esti malmoderna. Via monujo automate sinkronigis kun la WAGERR reto post konekcio establas, sed ĉi tio procezo ankoraŭ ne kompletigis.</translation>
     </message>
     <message>
         <source>0</source>
@@ -1874,20 +1792,8 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset</source>
         <translation>Restarigi</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Kvanto</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Kvanto</translation>
     </message>
     <message>
         <source>zWGR Control</source>
@@ -1918,12 +1824,12 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>Pagu &amp;Al:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to. Creates local payment to yourself when empty.</source>
+        <source>The WAGERR address to send the payment to. Creates local payment to yourself when empty.</source>
         <translation>WAGERR adreso por alsendi la pago. Kreas lokala pago al vi mem kiam malplenija.</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>Elektu antaŭan uzatan adreson</translation>
+        <translation>Elektu antaŭe uzatan adreson</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -1949,7 +1855,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     </message>
     <message>
         <source>Priority:</source>
-        <translation>Prioritato</translation>
+        <translation>Prioritato:</translation>
     </message>
     <message>
         <source>TextLabel</source>
@@ -1961,7 +1867,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     </message>
     <message>
         <source>no</source>
-        <translation>no</translation>
+        <translation>ne</translation>
     </message>
     <message>
         <source>Bytes:</source>
@@ -1977,15 +1883,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     </message>
     <message>
         <source>Change:</source>
-        <translation>Ŝanĝo:</translation>
-    </message>
-    <message>
-        <source>Copy quantity</source>
-        <translation>Kopi kvanto</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Kopii kvanto</translation>
+        <translation>Ŝanĝu:</translation>
     </message>
     <message>
         <source> &lt;b&gt;enabled&lt;/b&gt;.</source>
@@ -1996,14 +1894,6 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>&lt;b&gt;malebligita&lt;/b&gt;.</translation>
     </message>
     <message>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Eraro: vian monujo estas fermita. Bonvolu eniri monujon pasfrazon unue.</translation>
-    </message>
-    <message>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation>Mesaĝo: eniri kvanto &gt; 0.</translation>
-    </message>
-    <message>
         <source>Invalid Wagerr Address</source>
         <translation>Nevalida Wagerr adreso</translation>
     </message>
@@ -2012,13 +1902,12 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>Konfirmu sendi monojn</translation>
     </message>
     <message>
-        <source>Too much inputs (</source>
-        <translation>Tro eniroj (</translation>
-    </message>
-    <message>
         <source>address: </source>
         <translation>adreso:</translation>
     </message>
+    </context>
+<context>
+    <name>ProposalFrame</name>
     </context>
 <context>
     <name>QObject</name>
@@ -2037,6 +1926,10 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     <message>
         <source>UNKNOWN</source>
         <translation>NEKONATA</translation>
+    </message>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR kerno</translation>
     </message>
     </context>
 <context>
@@ -2101,8 +1994,8 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>Rekonstrui indekson</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
-        <translation>Bonvenon al la Wagerr RPC konzolo.</translation>
+        <source>Welcome to the WAGERR RPC console.</source>
+        <translation>Bonvenon al la WAGERR RPC konzolo.</translation>
     </message>
     <message>
         <source>1 &amp;hour</source>
@@ -2115,10 +2008,6 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     <message>
         <source>1 &amp;week</source>
         <translation>1&amp;semajno</translation>
-    </message>
-    <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Uzi la sagojn supran kaj malsupran por esplori la historion, kaj &lt;b&gt;Ctr-L&lt;/b&gt; por malplenigi la ekraron.</translation>
     </message>
     <message>
         <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
@@ -2183,6 +2072,10 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <source>Copy amount</source>
         <translation>Kopii kvanto</translation>
     </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopi adreson</translation>
+    </message>
 </context>
 <context>
     <name>ReceiveRequestDialog</name>
@@ -2234,6 +2127,10 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>Mesaĝo</translation>
     </message>
     <message>
+        <source>Address</source>
+        <translation>Adreso</translation>
+    </message>
+    <message>
         <source>Amount</source>
         <translation>Sumo:</translation>
     </message>
@@ -2266,11 +2163,11 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     </message>
     <message>
         <source>Amount:</source>
-        <translation>Kvanto</translation>
+        <translation>Kvanto:</translation>
     </message>
     <message>
         <source>Priority:</source>
-        <translation>Prioritato</translation>
+        <translation>Prioritato:</translation>
     </message>
     <message>
         <source>medium</source>
@@ -2282,7 +2179,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     </message>
     <message>
         <source>no</source>
-        <translation>no</translation>
+        <translation>ne</translation>
     </message>
     <message>
         <source>After Fee:</source>
@@ -2290,7 +2187,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     </message>
     <message>
         <source>Change:</source>
-        <translation>Ŝanĝo:</translation>
+        <translation>Ŝanĝu:</translation>
     </message>
     <message>
         <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
@@ -2345,8 +2242,8 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>Kopi ŝanĝo</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
-        <translation>Averto: nevalida Wagerr adreson</translation>
+        <source>Warning: Invalid WAGERR address</source>
+        <translation>Averto: nevalida WAGERR adreson</translation>
     </message>
     <message>
         <source>Are you sure you want to send?</source>
@@ -2354,7 +2251,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     </message>
     <message>
         <source>Confirm send coins</source>
-        <translation>Konfirmu sendi monon</translation>
+        <translation>Konfirmu sendi monojn</translation>
     </message>
     <message>
         <source>(no label)</source>
@@ -2372,12 +2269,12 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>Pagu &amp;Al:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
+        <source>The WAGERR address to send the payment to</source>
         <translation>WGRC adreso por sendi la pago al</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
-        <translation>Elektu antaŭan uzatan adreson</translation>
+        <translation>Elektu antaŭe uzatan adreson</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -2407,7 +2304,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
+        <source>WAGERR Core is shutting down...</source>
         <translation>WAGERR kerno fermanta...</translation>
     </message>
     </context>
@@ -2415,7 +2312,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     <name>SignVerifyMessageDialog</name>
     <message>
         <source>Choose previously used address</source>
-        <translation>Elektu antaŭan uzatan adreson</translation>
+        <translation>Elektu antaŭe uzatan adreson</translation>
     </message>
     <message>
         <source>Alt+A</source>
@@ -2447,7 +2344,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     </message>
     <message>
         <source>The entered address does not refer to a key.</source>
-        <translation>La enirita adreso ne rilatas al ŝlosilo</translation>
+        <translation>La enirita adreso ne rilatas al ŝlosilo.</translation>
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
@@ -2461,7 +2358,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR kerno</translation>
     </message>
     <message>
@@ -2473,8 +2370,8 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>La Dash kerno programistoj</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
-        <translation>La Wagerr kerno programistoj</translation>
+        <source>The WAGERR Core developers</source>
+        <translation>La WAGERR kerno programistoj</translation>
     </message>
     </context>
 <context>
@@ -2649,7 +2546,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>0</source>
         <translation>0</translation>
@@ -2658,11 +2555,7 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <source>zWGR</source>
         <translation>zWGR</translation>
     </message>
-    <message>
-        <source>Is Spendable</source>
-        <translation>Estas elspezebla</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>wagerr-core</name>
     <message>
@@ -2698,24 +2591,8 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>Ĉi tio estas eksperimenta programaro.</translation>
     </message>
     <message>
-        <source>Transaction created successfully.</source>
-        <translation>Transakcio verkita sukcese.</translation>
-    </message>
-    <message>
-        <source>Transaction fees are too high.</source>
-        <translation>Transakcio krompago estas tro alta.</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>Transakcio nevalida.</translation>
-    </message>
-    <message>
         <source>Transaction too large</source>
         <translation>Tro longa transakcio</translation>
-    </message>
-    <message>
-        <source>Wallet is locked.</source>
-        <translation>Monujo estas ŝlosita.</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -2726,16 +2603,8 @@ Nematura: konfirmita, sed malpli ol 1 minto el la samo nomado post ĝin estis mi
         <translation>Averto</translation>
     </message>
     <message>
-        <source>Will retry...</source>
-        <translation>Reprovos</translation>
-    </message>
-    <message>
         <source>You don't have enough Zerocoins in your wallet</source>
         <translation>Vi ne havas sufiĉan Zeromonojn en vian monujon</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>Vian enirojn aldonis sukcese.</translation>
     </message>
     <message>
         <source>Zerocoin options:</source>

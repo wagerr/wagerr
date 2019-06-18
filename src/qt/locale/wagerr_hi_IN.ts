@@ -13,6 +13,10 @@
         <source>Choose the address to receive coins with</source>
         <translation>सिक्कों को प्राप्त करने के लिए पता चुनें</translation>
     </message>
+    <message>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>पहले इस्तेमाल किए गए पते को चुनें</translation>
+    </message>
     </context>
 <context>
     <name>AddressTableModel</name>
@@ -93,6 +97,9 @@
     <name>FreespaceChecker</name>
     </context>
 <context>
+    <name>GovernancePage</name>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     </context>
 <context>
@@ -116,9 +123,6 @@
     </message>
     </context>
 <context>
-    <name>ObfuscationConfig</name>
-    </context>
-<context>
     <name>OpenURIDialog</name>
     </context>
 <context>
@@ -136,14 +140,6 @@
 <context>
     <name>PrivacyDialog</name>
     <message>
-        <source>Quantity:</source>
-        <translation>मात्रा:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>राशि:</translation>
-    </message>
-    <message>
         <source>Fee:</source>
         <translation>फ़ीस:</translation>
     </message>
@@ -155,6 +151,9 @@
         <source>medium</source>
         <translation>मध्यम</translation>
     </message>
+    </context>
+<context>
+    <name>ProposalFrame</name>
     </context>
 <context>
     <name>QObject</name>
@@ -208,6 +207,10 @@
     <message>
         <source>Message</source>
         <translation>संदेश</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>पता</translation>
     </message>
     </context>
 <context>
@@ -321,7 +324,7 @@
     <name>WalletView</name>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     </context>
 <context>
     <name>wagerr-core</name>
