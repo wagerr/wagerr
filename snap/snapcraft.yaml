@@ -304,17 +304,8 @@ parts:
       fi
       echo "-----------------------------------------------"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "INSTALATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}-snap has finished" # List installed files and vars when installation is finished
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      if [ $EXTRALOG = 1 ]; then
-        find ${SNAPCRAFT_PART_INSTALL} -type f
-        env
-      else
-        echo "RUN TESTS disabled, skipping"
-      fi
-      echo "------------------------------------------------"
       echo "WAGERR SPECIFIC"
-      echo "------------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       if [ $HOST = "i686-linux-gnu" ]; then
         echo "get wagerr electron wallet"
         git clone https://github.com/wagerr/wagerr-electron-app.git
@@ -333,7 +324,16 @@ parts:
         chmod a+x wagerr-*.AppImage
         cp -f ./wagerr-*x86_64.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
       fi
-
+      echo "-----------------------------------------------"
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      echo "INSTALATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}-snap has finished" # List installed files and vars when installation is finished
+      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      if [ $EXTRALOG = 1 ]; then
+        find ${SNAPCRAFT_PART_INSTALL} -type f
+        env
+      else
+        echo "RUN TESTS disabled, skipping"
+      fi
     build-packages:
       - curl
       - wget
