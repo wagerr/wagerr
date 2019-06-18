@@ -196,6 +196,11 @@ std::string CBigNum::ToString(int nBase) const
 {
     char* c_str = mpz_get_str(NULL, nBase, bn);
     std::string str(c_str);
+    // Free c_str with the right free function:
+    void (*freefunc)(void *, size_t);
+    mp_get_memory_functions (NULL, NULL, &freefunc);
+    freefunc(c_str, strlen(c_str) + 1);
+
     return str;
 }
 

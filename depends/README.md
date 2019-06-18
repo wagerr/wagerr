@@ -34,7 +34,7 @@ No other options are needed, the paths are automatically configured.
 
 #### For macOS cross compilation
 
-    sudo apt-get install curl librsvg2-bin libtiff-tools bsdmainutils cmake imagemagick libcap-dev libz-dev libbz2-dev python-setuptools
+    sudo apt-get install curl librsvg2-bin libtiff-tools bsdmainutils cmake imagemagick libcap-dev libz-dev libbz2-dev python3-setuptools
 
 #### For Win32/Win64 cross compilation
 
@@ -44,7 +44,7 @@ No other options are needed, the paths are automatically configured.
 
 Common linux dependencies:
 
-    sudo apt-get install make automake cmake curl g++-multilib libtool binutils-gold bsdmainutils pkg-config python3
+    sudo apt-get install make automake cmake curl g++-multilib libtool binutils-gold bsdmainutils pkg-config python3 patch
 
 For linux ARM cross compilation:
 
@@ -69,6 +69,7 @@ The following can be set when running make: make FOO=bar
     SDK_PATH: Path where sdk's can be found (used by macOS)
     FALLBACK_DOWNLOAD_PATH: If a source file can't be fetched, try here before giving up
     NO_QT: Don't download/build/cache qt and its dependencies
+    NO_ZMQ: Don't download/build/cache packages needed for enabling zeromq
     NO_WALLET: Don't download/build/cache libs needed to enable the wallet
     NO_UPNP: Don't download/build/cache packages needed for enabling upnp
     DEBUG: disable some optimizations and enable more runtime checking
