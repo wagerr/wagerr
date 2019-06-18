@@ -291,7 +291,25 @@ parts:
       else
         echo "RUN TESTS disabled, skipping"
       fi
-      echo "-----------------------------------------------+"
+      echo "------------------------------------------------"
+      echo "WAGERR SPECIFIC"
+      echo "------------------------------------------------"
+      if [ $HOST = "i686-linux-gnu" ]; then
+        echo "get wagerr electron wallet"
+        git clone https://github.com/wagerr/wagerr-electron-app.git
+        cd wagerr-electron-app
+        npm install
+        npm run package
+      fi
+      if [ $HOST = "x86_64-linux-gnu" ]; then
+        echo "get wagerr electron wallet"
+        git clone https://github.com/wagerr/wagerr-electron-app.git
+        cd wagerr-electron-app
+        npm install
+        npm run package
+        chmod a+x release/wagerr-*.AppImage
+      fi
+
     build-packages:
       - curl
       - wget
@@ -310,6 +328,7 @@ parts:
       - python3
       - help2man
       - doxygen
+      - npm
     stage-packages:
       - libxkbcommon0
       - ttf-ubuntu-font-family
