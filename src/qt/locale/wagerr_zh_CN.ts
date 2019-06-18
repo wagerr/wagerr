@@ -62,11 +62,11 @@
         <translation>接收地址</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
         <translation>这是用于发送WAGERR的地址。在发送WAGERR之前，请认真核查发送金额和接收地址。</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
         <translation>这是用于接收WAGERR的钱包地址。建议每一笔交易都使用一个新的钱包地址。</translation>
     </message>
     <message>
@@ -569,11 +569,11 @@
         <translation>标签工具栏</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
+        <source>Send coins to a WAGERR address</source>
         <translation>发送数字货币到WAGERR地址</translation>
     </message>
     <message>
@@ -593,11 +593,11 @@
         <translation>浏览主节点</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;A关于Wagerr Core</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;A关于WAGERR Core</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
+        <source>Show information about WAGERR Core</source>
         <translation>显示WAGERR  Core的相关信息</translation>
     </message>
     <message>
@@ -605,11 +605,11 @@
         <translation>修改WAGERR的配置选项</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
         <translation>使用您的WAGERR地址验证消息，以证明您拥有他们</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
         <translation>验证消息确保它已使用指定的WAGERR地址进行签名</translation>
     </message>
     <message>
@@ -653,12 +653,12 @@
         <translation>区块浏览窗口</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>显示Wagerr Core帮助信息并获取WAGERR命令行选项列表</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>显示WAGERR Core帮助信息并获取WAGERR命令行选项列表</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Wagerr Core 客户端</translation>
+        <source>WAGERR Core client</source>
+        <translation>WAGERR Core 客户端</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -679,6 +679,10 @@
     <message>
         <source>Up to date</source>
         <translation>最新</translation>
+    </message>
+    <message>
+        <source>%1 and %2</source>
+        <translation>%1 和 %2</translation>
     </message>
     <message>
         <source>Catching up...</source>
@@ -801,33 +805,40 @@ Address: %4
     <name>FreespaceChecker</name>
     </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>来自</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>关于Wagerr Core</translation>
+        <source>About WAGERR Core</source>
+        <translation>关于WAGERR Core</translation>
     </message>
     </context>
 <context>
     <name>Intro</name>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>欢迎使用 Wagerr Core</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>欢迎使用 WAGERR Core</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>由于这是该程序第一次启动，您可以选择存储Wagerr Core 数据的位置。</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>由于这是该程序第一次启动，您可以选择存储WAGERR Core 数据的位置。</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Wagerr Core将下载并存储WAGERR区块链副本。 至少 %1 GB的数据将存储在此目录中，并且会随着时间的推移而增长。 钱包也将存储在此目录中。</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR Core将下载并存储WAGERR区块链副本。 至少 %1 GB的数据将存储在此目录中，并且会随着时间的推移而增长。 钱包也将存储在此目录中。</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error</source>
@@ -892,9 +903,6 @@ Address: %4
     <name>MultisigDialog</name>
     </context>
 <context>
-    <name>ObfuscationConfig</name>
-    </context>
-<context>
     <name>OpenURIDialog</name>
     </context>
 <context>
@@ -920,7 +928,7 @@ Address: %4
         <translation>如果您要禁用未经确认发送，在至少有一个确认之前&lt;br/&gt;不能更改。&lt;br/&gt;这也将影响您的余额计算。</translation>
     </message>
     <message>
-        <source>Automatically open the Wagerr client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <source>Automatically open the WAGERR client port on the router. This only works when your router supports UPnP and it is enabled.</source>
         <translation>自动打开路由器上的WAGERR钱包使用的端口。 这只有当您的路由器支持UPnP并且该享生效时才有用。</translation>
     </message>
     <message>
@@ -928,7 +936,7 @@ Address: %4
         <translation>&amp;使用SOCKS5代理（默认代理）</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
+        <source>&amp;Start WAGERR on system login</source>
         <translation>&amp;开机启动WAGERR</translation>
     </message>
     <message>
@@ -982,10 +990,6 @@ Address: %4
     <message>
         <source>User Interface Theme:</source>
         <translation>界面主题（语言包）:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>&amp;单位显示金额</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
@@ -1067,7 +1071,7 @@ Address: %4
         <translation>您目前的支出余额</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
         <translation>显示的信息可能已过期。建立连接后，您的钱包会自动与WAGERR网络同步，但此过程尚未完成。</translation>
     </message>
     <message>
@@ -1084,7 +1088,7 @@ Address: %4
 <context>
     <name>PrivacyDialog</name>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
         <translation>显示的信息可能已过期。建立连接后，您的钱包会自动与WAGERR网络同步，但此过程尚未完成。</translation>
     </message>
     <message>
@@ -1117,7 +1121,14 @@ Address: %4
     </message>
     </context>
 <context>
+    <name>ProposalFrame</name>
+    </context>
+<context>
     <name>QObject</name>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
+    </message>
     </context>
 <context>
     <name>QRImageWidget</name>
@@ -1172,20 +1183,20 @@ Address: %4
         <translation>&amp;消息：</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
+        <source>A&amp;mount:</source>
+        <translation>A&amp;总计</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the WAGERR network.</source>
         <translation>附加到付款请求的可选消息，将在请求打开时显示。 注意：消息不会在付款时通过WAGERR网络发送。</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the WAGERR network.</source>
         <translation>附加到付款请求的可选消息，将在请求打开时显示。&lt;br&gt; 注意：消息不会在付款时通过WAGERR网络发送。</translation>
     </message>
     <message>
         <source>&amp;Label:</source>
         <translation>&amp;标签</translation>
-    </message>
-    <message>
-        <source>&amp;Amount:</source>
-        <translation>&amp;总计</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
@@ -1195,7 +1206,11 @@ Address: %4
         <source>Copy message</source>
         <translation>复制消息</translation>
     </message>
-    </context>
+    <message>
+        <source>Copy address</source>
+        <translation>复制地址</translation>
+    </message>
+</context>
 <context>
     <name>ReceiveRequestDialog</name>
     <message>
@@ -1236,6 +1251,10 @@ Address: %4
     <message>
         <source>Message</source>
         <translation>消息 </translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>地址</translation>
     </message>
     <message>
         <source>(no label)</source>
@@ -1312,7 +1331,7 @@ Address: %4
         <translation>消息:</translation>
     </message>
     <message>
-        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Wagerr network.</source>
+        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the WAGERR network.</source>
         <translation>附加到WAGERR：URI的消息，该消息将与转账信息一起存储以供参考。 注意：此消息不会通过WAGERR网络发送。</translation>
     </message>
     <message>
@@ -1338,7 +1357,7 @@ Address: %4
         <translation>您可以使用地址签名消息，以证明您拥有他们。 小心不要签名任何您不了解的，因为网络钓鱼攻击可能会试图欺骗您，以让您签名。 只能签署您熟悉并且了解和同意的。</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
+        <source>The WAGERR address to sign the message with</source>
         <translation>该WAGERR地址签名的消息</translation>
     </message>
     <message>
@@ -1366,15 +1385,15 @@ Address: %4
         <translation>将当前签名复制到系统剪贴板</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
+        <source>Sign the message to prove you own this WAGERR address</source>
         <translation>签署消息以证明您拥有此WAGERR地址</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
+        <source>The WAGERR address the message was signed with</source>
         <translation>由WAGERR地址签名的消息</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
         <translation>验证消息确保它已使用指定的WAGERR地址进行签名</translation>
     </message>
     <message>
@@ -1453,8 +1472,8 @@ Address: %4
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
@@ -1533,7 +1552,7 @@ Address: %4
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     </context>
 <context>
     <name>wagerr-core</name>
@@ -1542,8 +1561,8 @@ Address: %4
         <translation>在收到相关警报时执行命令，或者看到一个很长的分叉（cmd中的%s被消息替换）</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.</source>
-        <translation>注意：请检查您的电脑的日期和时间是否正确！ 如果您的时间设置不正确，Wagerr Core将无法正常工作。</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong WAGERR Core will not work properly.</source>
+        <translation>注意：请检查您的电脑的日期和时间是否正确！ 如果您的时间设置不正确，WAGERR Core将无法正常工作。</translation>
     </message>
     <message>
         <source>Warning: wallet.dat corrupt, data salvaged! Original wallet.dat saved as wallet.{timestamp}.bak in %s; if your balance or transactions are incorrect you should restore from a backup.</source>
@@ -1568,14 +1587,6 @@ Address: %4
     <message>
         <source>Warning</source>
         <translation>注意</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>您的输入成功添加。</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation>您的交易被矿池接受！</translation>
     </message>
     </context>
 </TS>

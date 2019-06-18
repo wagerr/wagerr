@@ -62,12 +62,12 @@
         <translation>받을 주소</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>이 주소들은 송금할 Wagerr 주소입니다. 송금하기 전 항상 금액과 주소를 확인해주세요.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>이 주소들은 송금할 WAGERR 주소입니다. 송금하기 전 항상 금액과 주소를 확인해주세요.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>이 주소들은 입금 받을 Wagerr 주소입니다. 매 거래마다 새로운 입금 주소를 사용하는 것이 좋습니다.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>이 주소들은 입금 받을 WAGERR 주소입니다. 매 거래마다 새로운 입금 주소를 사용하는 것이 좋습니다.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -254,12 +254,12 @@
         <translation>주소:</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>BIP 38 알고리즘으로 암호화할 Wagerr 지갑 주소를 입력. 중간박스에 암호구절 입력. 암호화된 개인키를 계산하시려면 암호화 클릭</translation>
+        <source>Enter a WAGERR Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <translation>BIP 38 알고리즘으로 암호화할 WAGERR 지갑 주소를 입력. 중간박스에 암호구절 입력. 암호화된 개인키를 계산하시려면 암호화 클릭</translation>
     </message>
     <message>
-        <source>The Wagerr address to encrypt</source>
-        <translation>암호화할 Wagerr 주소</translation>
+        <source>The WAGERR address to encrypt</source>
+        <translation>암호화할 WAGERR 주소</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -290,8 +290,8 @@
         <translation>현재 서명을 시스템 클립 보드에 복사</translation>
     </message>
     <message>
-        <source>Encrypt the private key for this Wagerr address</source>
-        <translation>이 Wagerr 주소의 개인키 암호화</translation>
+        <source>Encrypt the private key for this WAGERR address</source>
+        <translation>이 WAGERR 주소의 개인키 암호화</translation>
     </message>
     <message>
         <source>Reset all fields</source>
@@ -608,10 +608,6 @@
         <source>&amp;Command-line options</source>
         <translation>&amp;명령행 옵션</translation>
     </message>
-    <message numerus="yes">
-        <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>%n 블록의 거래내역 확인됨</numerusform></translation>
-    </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
         <translation>추가 데이터 동기화: %p%</translation>
@@ -623,6 +619,10 @@
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonymization and staking only</source>
         <translation>현재 지갑은 &lt;b&gt;암호화&lt;/b&gt; 되어 &lt;b&gt;잠긴&lt;/b&gt; 상태로 스테이킹 전용모드로 안전하게 구동중입니다.</translation>
+    </message>
+    <message>
+        <source>Tor is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>토큰은 &lt;b&gt;입니다 .&lt;/b&gt; : %1</translation>
     </message>
     <message>
         <source>&amp;File</source>
@@ -645,11 +645,11 @@
         <translation>탭 도구 모음</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
+        <source>Send coins to a WAGERR address</source>
         <translation>WAGERR 주소로 입금하기</translation>
     </message>
     <message>
@@ -669,24 +669,24 @@
         <translation>마스터노드 검색</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>Wagerr Core &amp;정보</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>WAGERR Core &amp;정보</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Wagerr Core에 대한 정보 표시</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>WAGERR Core에 대한 정보 표시</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
         <translation>WAGERR에 대한 구성 옵션 수정</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
         <translation>WAGERR 주소로 메시지에 서명하여 소유하고 있음을 증명하십시오.</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>메시지가 지정된 Wagerr 주소로 서명되었는지 확인합니다.</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>메시지가 지정된 WAGERR 주소로 서명되었는지 확인합니다.</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -729,16 +729,12 @@
         <translation>블록 탐색 창</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Wagerr Core 도움말 메세지를 표시하여 사용 가능한 Wagerr 명령행 옵션 목록 표시</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>WAGERR Core 도움말 메세지를 표시하여 사용 가능한 WAGERR 명령행 옵션 목록 표시</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Wagerr Core 클라이언트</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform>%n 개의 Wagerr 네트웍에 연결됨</numerusform></translation>
+        <source>WAGERR Core client</source>
+        <translation>WAGERR Core 클라이언트</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -760,25 +756,9 @@
         <source>Up to date</source>
         <translation>최신</translation>
     </message>
-    <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation><numerusform>%n 시간</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s)</source>
-        <translation><numerusform>%n 일</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation><numerusform>%n 주</numerusform></translation>
-    </message>
     <message>
         <source>%1 and %2</source>
         <translation>%1 그리고 %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation><numerusform>%n 년</numerusform></translation>
     </message>
     <message>
         <source>Catching up...</source>
@@ -864,7 +844,7 @@ Address: %4
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>지갑은 &lt;b&gt;암호화&lt;/ b&gt;되어 있으며 현재 &lt;b&gt;잠겨 있습니다&lt;/ b&gt;.</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>BlockExplorer</name>
     <message>
@@ -1185,8 +1165,8 @@ Address: %4
         <translation>보내는 주소 수정</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>입력된 주소 "%1"는 올바른 Wagerr 주소가 아닙니다.</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>입력된 주소 "%1"는 올바른 WAGERR 주소가 아닙니다.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1225,22 +1205,33 @@ Address: %4
     </message>
 </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>Form</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
         <translation>버전</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>Wagerr Core 정보</translation>
+        <source>About WAGERR Core</source>
+        <translation>WAGERR Core 정보</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1286,16 +1277,16 @@ Address: %4
         <translation>환영합니다</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Wagerr Core에 오신 것을 환영합니다.</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>WAGERR Core에 오신 것을 환영합니다.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>이 프로그램이 처음 실행되었으므로 Wagerr Core가 데이터를 저장할 위치를 선택할 수 있습니다.</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>이 프로그램이 처음 실행되었으므로 WAGERR Core가 데이터를 저장할 위치를 선택할 수 있습니다.</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Wagerr Core는 Wagerr 블록체인을 다운로드하여 저장합니다. 최소 %1GB의 데이터가 디렉토리에 저장되며 시간이 지날수록 증가합니다. 또한 지갑도 해당 디렉토리에 저장됩니다.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR Core는 WAGERR 블록체인을 다운로드하여 저장합니다. 최소 %1GB의 데이터가 디렉토리에 저장되며 시간이 지날수록 증가합니다. 또한 지갑도 해당 디렉토리에 저장됩니다.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1306,8 +1297,8 @@ Address: %4
         <translation>사용자 지정 데이터 디렉토리 사용:</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1448,12 +1439,12 @@ Address: %4
         <translation>보낼 주소 입력</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Wagerr addresses after it matures.
-To Add: enter percentage to give and Wagerr address to add to the MultiSend vector.
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other WAGERR addresses after it matures.
+To Add: enter percentage to give and WAGERR address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>다중전송을 사용하면 성취 한 뒤 다른 Wagerr 주소 목록에 최대 100% 스테이크 또는 마스터노드 보상을 자동으로 보낼 수 있습니다.
-추가하려면 : 부여 할 백분율과 다중전송 벡터에 추가 할 Wagerr 주소를 입력하십시오.
+        <translation>다중전송을 사용하면 성취 한 뒤 다른 WAGERR 주소 목록에 최대 100% 스테이크 또는 마스터노드 보상을 자동으로 보낼 수 있습니다.
+추가하려면 : 부여 할 백분율과 다중전송 벡터에 추가 할 WAGERR 주소를 입력하십시오.
 삭제하려면 삭제할 주소를 입력하고 삭제를 누릅니다.
 활성화를 클릭하지 않으면 다중전송이 활성화되지 않습니다.</translation>
     </message>
@@ -1542,48 +1533,8 @@ MultiSend will not be activated unless you have clicked Activate</source>
         <translation>(라벨 없음)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>입력된 주소:
-</translation>
-    </message>
-    <message>
-        <source> is invalid.
-Please check the address and try again.</source>
-        <translation>올바르지 않습니다.
-주소를 확인하고 다시 시도해주세요.</translation>
-    </message>
-    <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation>다중전송 벡터의 총 금액이 스테이크 보상 금액의 100 % 이상입니다
-</translation>
-    </message>
-    <message>
         <source>Please Enter 1 - 100 for percent.</source>
         <translation>퍼센트로 1 - 100을 입력하십시오.</translation>
-    </message>
-    <message>
-        <source>Saved the MultiSend to memory, but failed saving properties to the database.
-</source>
-        <translation>MultiSend를 메모리에 저장했지만 데이터베이스에 대한 속성 저장에 실패했습니다.
-</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>다중전송 벡터
-</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>제거됨</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>주소를 찾을 수 없습니다
-</translation>
     </message>
 </context>
 <context>
@@ -1758,73 +1709,6 @@ Please be patient after clicking import.</source>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>난독화 구성</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>기본 익명화</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>높은 익명화</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>최대 익명화</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>익명화 레벨을 선택해주세요.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>2개의 개별 마스터노드를 이용하여 최대 25000 WGR 를 섞을 수 있습니다.</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>8개의 개별 마스터노드를 이용하여 최대 25000 WGR 를 섞을 수 있습니다.</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>16개의 개별 마스터노드를 사용</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>이 옵션은 가장 빠르게 전송되며 25000 WGR 익명화에 약 ~0.025 WGR의 비용이 들어갑니다.</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>이 옵션은 중간 정도의 속도로 전송되며 25000 WGR 익명화에 약 0.05 WGR의 비용이 들어갑니다.</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>이것은 가장 느리고 안전한 옵션입니다. 최고 익명성을 사용하면 비용이 발생합니다.</translation>
-    </message>
-    <message>
-        <source>0.1 WGR per 25000 WGR you anonymize.</source>
-        <translation>25000 WGR 익명화에 0.1 WGR 가 듭니다.</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>난독화 구성</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>난독화가 성공적으로 높게 설정되었습니다.(%1 및 2 rounds) WAGERR의 설정 화면을 열어 언제든지 다시 변경할 수 있습니다.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>난독화가 성공적으로 높게 설정되었습니다.(%1 및 8 rounds) WAGERR의 설정 화면을 열어 언제든지 다시 변경할 수 있습니다.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>난독화가 성공적으로 높게 설정되었습니다.(%1 및 16 rounds) WAGERR의 설정 화면을 열어 언제든지 다시 변경할 수 있습니다.</translation>
-    </message>
-</context>
-<context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
@@ -1882,8 +1766,8 @@ Please be patient after clicking import.</source>
         <translation>확인되지 않은 변경사항을 사용하지 않도록 설정하면 해당 트랜잭션에 하나 이상의 컨펌이 진행되야&lt;br/&gt;트랜잭션에 변경사항을 적용할 수 있습니다.&lt;br/&gt;또한 이것은 잔액 계산 방식에도 영향을 줍니다.</translation>
     </message>
     <message>
-        <source>Automatically open the Wagerr client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>라우터에서 Wagerr 클라이언트 포트를 자동으로 엽니다. 이 기능은 라우터가 UPnP를 지원하고 활성화 된 경우에만 사용할 수 있습니다.</translation>
+        <source>Automatically open the WAGERR client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>라우터에서 WAGERR 클라이언트 포트를 자동으로 엽니다. 이 기능은 라우터가 UPnP를 지원하고 활성화 된 경우에만 사용할 수 있습니다.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1902,12 +1786,12 @@ Please be patient after clicking import.</source>
         <translation>전문적</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
+        <source>Automatically start WAGERR after logging in to the system.</source>
         <translation>시스템 로그인 후 WAGERR을 자동으로 시작합니다.</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;시스템 로그인시 Wagerr 시작</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;시스템 로그인시 WAGERR 시작</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1939,9 +1823,9 @@ Please be patient after clicking import.</source>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr/wagerr</source>
         <translation>지원 언어가 없거나 번역이 불완전한가요? 번역을 도와주세요 :
-https://www.transifex.com/wagerr/wagerr-translations</translation>
+https://www.transifex.com/wagerr/wagerr</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1976,8 +1860,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Stake split threshold:</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>SOCKS5 프록시를 통해 Wagerr 네트워크에 연결해주세요.</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>SOCKS5 프록시를 통해 WAGERR 네트워크에 연결해주세요.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -2026,10 +1910,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>User Interface Theme:</source>
         <translation>사용자 인터페이스 테마:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>&amp;금액을 표시 할 단위:</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
@@ -2155,8 +2035,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>현재 보기전용 주소의 잠긴 잔액 </translation>
     </message>
     <message>
-        <source>Your current Wagerr balance, unconfirmed and immature transactions included</source>
-        <translation>현재 Wagerr 잔액, 미확정, 생성중인 코인 포함</translation>
+        <source>Your current WAGERR balance, unconfirmed and immature transactions included</source>
+        <translation>현재 WAGERR 잔액, 미확정, 생성중인 코인 포함</translation>
     </message>
     <message>
         <source>zWGR Balance</source>
@@ -2175,8 +2055,8 @@ Immature: confirmed, but less than 1 mint of the same denomination after it was 
 미성숙 : 확인되었지만 발행 된 후 같은 종파 1 개 미만</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>표시된 정보가 오래되었을 수 있습니다. 연결이 완료되면 지갑이 Wagerr 네트워크와 자동으로 동기화될 예정이지만, 아직 해당 프로세스가 완료되지 않았습니다.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>표시된 정보가 오래되었을 수 있습니다. 연결이 완료되면 지갑이 WAGERR 네트워크와 자동으로 동기화될 예정이지만, 아직 해당 프로세스가 완료되지 않았습니다.</translation>
     </message>
     <message>
         <source>OVERVIEW</source>
@@ -2291,8 +2171,8 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>WAGERR을 시작할 수 없습니다: 결제하기 위한 클릭 처리</translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid Wagerr address or malformed URI parameters.</source>
-        <translation>URI를 분석할 수 없습니다! 이는 잘못된 Wagerr 주소 또는 URI 매개변수 손상으로 인해 발생할 수 있습니다.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid WAGERR address or malformed URI parameters.</source>
+        <translation>URI를 분석할 수 없습니다! 이는 잘못된 WAGERR 주소 또는 URI 매개변수 손상으로 인해 발생할 수 있습니다.</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
@@ -2377,8 +2257,8 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>제로코인 관리:</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>표시된 정보가 오래되었을 수 있습니다. 연결이 완료되면 지갑이 Wagerr 네트워크와 자동으로 동기화될 예정이지만, 아직 해당 프로세스가 완료되지 않았습니다.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>표시된 정보가 오래되었을 수 있습니다. 연결이 완료되면 지갑이 WAGERR 네트워크와 자동으로 동기화될 예정이지만, 아직 해당 프로세스가 완료되지 않았습니다.</translation>
     </message>
     <message>
         <source>Mint Zerocoin</source>
@@ -2393,36 +2273,12 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</source>
-        <translation>주화 사용 가능 여부는 확정되고 잠기지 않은 주화 또는 주전원 collaterals입니다.</translation>
-    </message>
-    <message>
-        <source>Available for Minting:</source>
-        <translation>생성 가능한 수량:</translation>
-    </message>
-    <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</source>
         <translation>제로코인 지갑 DB 재설정. 블록 체인에 포함시키지 않은 트랜잭션을 삭제합니다.</translation>
     </message>
     <message>
         <source>Reset</source>
         <translation>초기화</translation>
-    </message>
-    <message>
-        <source>Coin Control...</source>
-        <translation>코인 컨트롤...</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>수량:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>금액:</translation>
     </message>
     <message>
         <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data.</source>
@@ -2439,10 +2295,6 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
     <message>
         <source>PRIVACY</source>
         <translation>프라이버시</translation>
-    </message>
-    <message>
-        <source>Enter an amount of Wgr to convert to zWGR</source>
-        <translation>zWGR로 변환할 WGR 수량을 입력하세요.</translation>
     </message>
     <message>
         <source>zWGR Control</source>
@@ -2485,24 +2337,12 @@ zWGR는 성명서가 20 개 이상 있고 명칭이 동일하지 않은 2 개 �
         <translation>0 zWGR</translation>
     </message>
     <message>
-        <source>Security Level for Zerocoin Transactions. More is better, but needs more time and resources.</source>
-        <translation>제로코인 전송 시큐리티 레벨.  높을수록 좋지만, 시간과 많은 자원이 필요합니다.</translation>
-    </message>
-    <message>
-        <source>Security Level:</source>
-        <translation>시큐리티 레벨:</translation>
-    </message>
-    <message>
-        <source>Security Level 1 - 100 (default: 42)</source>
-        <translation>시큐리티 레벨 1 - 100 (기본값: 42)</translation>
-    </message>
-    <message>
         <source>Pay &amp;To:</source>
         <translation>지불 &amp;대상:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to. Creates local payment to yourself when empty.</source>
-        <translation>WGR를 전송할 Wagerr 주소입니다. 비어있을 때 자신에게 지불할 주소를 생성합니다.</translation>
+        <source>The WAGERR address to send the payment to. Creates local payment to yourself when empty.</source>
+        <translation>WGR를 전송할 WAGERR 주소입니다. 비어있을 때 자신에게 지불할 주소를 생성합니다.</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2718,7 +2558,7 @@ To change the percentage (no restart required):
     </message>
     <message>
         <source>Bytes:</source>
-        <translation>Bytes:</translation>
+        <translation>바이트:</translation>
     </message>
     <message>
         <source>Insufficient funds!</source>
@@ -2726,11 +2566,11 @@ To change the percentage (no restart required):
     </message>
     <message>
         <source>Coins automatically selected</source>
-        <translation>코인 자동으로 선택됨</translation>
+        <translation>자동으로 선택됩니다.</translation>
     </message>
     <message>
         <source>medium</source>
-        <translation>중간</translation>
+        <translation>5 중간</translation>
     </message>
     <message>
         <source>Coin Control Features</source>
@@ -2761,32 +2601,10 @@ To change the percentage (no restart required):
         <translation>생성 상태 : Okay</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>수량 복사</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>금액 복사</translation>
-    </message>
-    <message>
         <source>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware.
 Please be patient...</source>
         <translation>제로코인 생성 초기화 진행중... : 전체 블록체인을 다시 검색합니다. 하드웨어에 따라 최대 30분이 걸릴수 있습니다.
 기다려주세요...</translation>
-    </message>
-    <message>
-        <source>Spending Zerocoin.
-Computationally expensive, might need several minutes depending on the selected Security Level and your hardware.
-Please be patient...</source>
-        <translation>제로코인 전송중입니다.
-시큐리티 레벨과 여러분의 하드웨어에 따라 수 분이 걸립니다.
-조금만 기다려주세요...</translation>
-    </message>
-    <message>
-        <source>) needed.
-Maximum allowed: </source>
-        <translation>) 가 필요함.
-가능한 최대값 :</translation>
     </message>
     <message>
         <source>zWGR Spend #: </source>
@@ -2885,32 +2703,6 @@ Maximum allowed: </source>
         <translation>Denom. &lt;b&gt;5000&lt;/b&gt;:</translation>
     </message>
     <message>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Error : 지갑이 잠겨있습니다. 먼저 지갑을 열어주세요.</translation>
-    </message>
-    <message>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation>Message: 0 이상의 수량을 입력하세요.</translation>
-    </message>
-    <message>
-        <source>Minting </source>
-        <translation>생성중입니다.</translation>
-    </message>
-    <message>
-        <source>Successfully minted </source>
-        <translation>성공적으로 발행됨</translation>
-    </message>
-    <message>
-        <source> zWGR in </source>
-        <translation> zWGR in </translation>
-    </message>
-    <message>
-        <source> sec. Used denominations:
-</source>
-        <translation> 초. 사용된 디노미네이션:
-</translation>
-    </message>
-    <message>
         <source>Duration: </source>
         <translation>경과시간:</translation>
     </message>
@@ -2930,7 +2722,7 @@ Maximum allowed: </source>
     </message>
     <message>
         <source>Invalid Wagerr Address</source>
-        <translation>잘못된 Wagerr 주소</translation>
+        <translation>잘못된 WAGERR 주소</translation>
     </message>
     <message>
         <source>Invalid Send Amount</source>
@@ -2953,42 +2745,16 @@ Maximum allowed: </source>
         <translation>새로 생성된 개인 지갑 주소(미사용된 익명의) &lt;br /&gt; 로</translation>
     </message>
     <message>
-        <source>with Security Level </source>
-        <translation>시큐리티 레벨</translation>
-    </message>
-    <message>
         <source>Confirm send coins</source>
         <translation>코인 전송 확인</translation>
-    </message>
-    <message>
-        <source>Version 1 zWGR require a security level of 100 to successfully spend.</source>
-        <translation>zWGR 버전 1은 성공적으로 보내기 위해서 100 시큐리티 레벨이 필요합니다.</translation>
-    </message>
-    <message>
-        <source>Failed to spend zWGR</source>
-        <translation>zWGR 전송 실패</translation>
     </message>
     <message>
         <source>Failed to fetch mint associated with serial hash</source>
         <translation>Failed to fetch mint associated with serial hash</translation>
     </message>
     <message>
-        <source>Too much inputs (</source>
-        <translation>너무 많은 입력 (</translation>
-    </message>
-    <message>
-        <source>
-Either mint higher denominations (so fewer inputs are needed) or reduce the amount to spend.</source>
-        <translation>높은 디노미네션 값으로 생성하거나, 보내실 금액을 줄여주세요.</translation>
-    </message>
-    <message>
         <source>Spend Zerocoin failed with status = </source>
         <translation>제로코인 송금 실패 상태 =</translation>
-    </message>
-    <message numerus="yes">
-        <source>PrivacyDialog</source>
-        <comment>Enter an amount of WGR to convert to zWGR</comment>
-        <translation><numerusform>PrivacyDialog</numerusform></translation>
     </message>
     <message>
         <source>denomination: </source>
@@ -3024,13 +2790,16 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
 </context>
 <context>
+    <name>ProposalFrame</name>
+    </context>
+<context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
         <translation>금액</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
+        <source>Enter a WAGERR address (e.g. %1)</source>
         <translation>WAGERR 주소를 입력하세요 (예 %1)</translation>
     </message>
     <message>
@@ -3073,7 +2842,11 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
-</context>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
+    </message>
+    </context>
 <context>
     <name>QRImageWidget</name>
     <message>
@@ -3168,8 +2941,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>블록체인</translation>
     </message>
     <message>
-        <source>Open the Wagerr debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>현재 데이터 디렉토리에서 Wagerr 디버그 로그 파일을 엽니다. 로그 파일이 클 경우, 약간의 시간이 걸릴 수 있습니다.</translation>
+        <source>Open the WAGERR debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>현재 데이터 디렉토리에서 WAGERR 디버그 로그 파일을 엽니다. 로그 파일이 클 경우, 약간의 시간이 걸릴 수 있습니다.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -3385,7 +3158,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>출력:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
+        <source>Welcome to the WAGERR RPC console.</source>
         <translation>WAGERR RPC 콘솔에 오신 것을 환영합니다.</translation>
     </message>
     <message>
@@ -3435,10 +3208,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Confirm resync Blockchain</source>
         <translation>블록체인 동기화를 다시 하시겠습니까?</translation>
-    </message>
-    <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>위 아래 화살표를 사용하여 기록을 탐색하고 &lt;b&gt;Ctrl-L&lt;/b&gt; 화면을 지웁니다.</translation>
     </message>
     <message>
         <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
@@ -3512,16 +3281,20 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>새로운 수신 주소와 연결할 선택적 라벨.</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>요청이 열릴 때 표시되는 결제 요청에 첨부할 선택적 메세지 입니다. 참고: Wagerr 네트워크를 통한 결제는 메세지가 전송되지 않습니다.</translation>
+        <source>A&amp;mount:</source>
+        <translation>금&amp;액:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>요청이 열릴 때 표시되는 결제 요청에 첨부할 선택적 메세지 입니다. 참고: WAGERR 네트워크를 통한 결제는 메세지가 전송되지 않습니다.</translation>
     </message>
     <message>
         <source>RECEIVE</source>
         <translation>받기</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>요청이 열릴 때 표시되는 결제 요청에 첨부할 선택적 메세지 입니다.&lt;br&gt;참고: Wagerr 네트워크를 통한 결제는 메세지가 전송되지 않습니다.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>요청이 열릴 때 표시되는 결제 요청에 첨부할 선택적 메세지 입니다.&lt;br&gt;참고: WAGERR 네트워크를 통한 결제는 메세지가 전송되지 않습니다.</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
@@ -3534,10 +3307,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
         <translation>요청할 선택적 금액. 이 금액을 비워두거나 특정 금액을 요청하지 않으려면 0으로 두세요.</translation>
-    </message>
-    <message>
-        <source>&amp;Amount:</source>
-        <translation>&amp;금액:</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
@@ -3583,6 +3352,10 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <source>Copy amount</source>
         <translation>금액 복사</translation>
     </message>
+    <message>
+        <source>Copy address</source>
+        <translation>주소 복사</translation>
+    </message>
 </context>
 <context>
     <name>ReceiveRequestDialog</name>
@@ -3616,7 +3389,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <source>Address</source>
-        <translation>마스터노드 주소</translation>
+        <translation>주소</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -3652,6 +3425,10 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Message</source>
         <translation>메세지</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>주소</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -3706,7 +3483,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <source>medium</source>
-        <translation>중간</translation>
+        <translation>5 중간</translation>
     </message>
     <message>
         <source>Fee:</source>
@@ -3813,8 +3590,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>트랜잭션이 250바이트 인 경우 사용자 지정 수수료가 1000 uWGRs로 설정되고,&lt;br /&gt;1000 uWGRs 안에는 전체에서 최소 "킬로바이트당" 250 uWGRs 만 지불합니다. 1 킬로바이트보다 큰 트랜잭션의 경우 모두 킬로바이트 단위로 지불합니다.</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for Wagerr transactions than the network can process.</source>
-        <translation>블록의 공간보다 트랜잭션량이 적으면 최소 수수료만 지불하면 됩니다.&lt;br /&gt;하지만 Wagerr 트랜잭션 수가 많으면 미확인된 트랜잭션로 네트워크가 처리할 수도 있습니다.</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for WAGERR transactions than the network can process.</source>
+        <translation>블록의 공간보다 트랜잭션량이 적으면 최소 수수료만 지불하면 됩니다.&lt;br /&gt;하지만 WAGERR 트랜잭션 수가 많으면 미확인된 트랜잭션로 네트워크가 처리할 수도 있습니다.</translation>
     </message>
     <message>
         <source>normal</source>
@@ -3909,8 +3686,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>분할 블록 도구는 여러 주소에서 작동하지 않습니다. 다시 시도하십시오.</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
-        <translation>경고: 잘못된 Wagerr 주소</translation>
+        <source>Warning: Invalid WAGERR address</source>
+        <translation>경고: 잘못된 WAGERR 주소</translation>
     </message>
     <message>
         <source>%1 to %2</source>
@@ -3935,10 +3712,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
         <translation>KB당 %1보다 %2배 많은 수수료는 너무 높은 수수료입니다.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Estimated to begin confirmation within %n block(s).</source>
-        <translation><numerusform>%n 개의 블록 내에서 컨펌이 시작할 것으로 추정됨.</numerusform></translation>
     </message>
     <message>
         <source>The recipient address is not valid, please recheck.</source>
@@ -4012,8 +3785,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>지불 &amp;대상:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
-        <translation>보낼 Wagerr 주소</translation>
+        <source>The WAGERR address to send the payment to</source>
+        <translation>보낼 WAGERR 주소</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -4052,8 +3825,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>메세지:</translation>
     </message>
     <message>
-        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Wagerr network.</source>
-        <translation>참조용으로 트랜잭션과 함께 기록되는 Wagerr : URI에 첨부된 메세지입니다. 참고: 이 메세지는 Wagerr 네트워크를 통해 전송되지 않습니다.</translation>
+        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the WAGERR network.</source>
+        <translation>참조용으로 트랜잭션과 함께 기록되는 WAGERR : URI에 첨부된 메세지입니다. 참고: 이 메세지는 WAGERR 네트워크를 통해 전송되지 않습니다.</translation>
     </message>
     <message>
         <source>This is an unverified payment request.</source>
@@ -4079,8 +3852,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
-        <translation>Wagerr Core가 종료됩니다...</translation>
+        <source>WAGERR Core is shutting down...</source>
+        <translation>WAGERR Core가 종료됩니다...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -4102,8 +3875,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>자신의 주소로 메세지에 서명할 수 있습니다. 피싱 공격으로 사용자를 속일 수 있으므로 서명에 주의해주세요. 동의하는 바에 한하여 서명하십시오.</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>메세지를 서명하기 위한 Wagerr 주소</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>메세지를 서명하기 위한 WAGERR 주소</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -4134,16 +3907,16 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>현재 서명을 시스템 클립 보드에 복사</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>이 Wagerr 주소를 소유하고 있다는 것을 증명하기 위해 메세지에 서명하십시오</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>이 WAGERR 주소를 소유하고 있다는 것을 증명하기 위해 메세지에 서명하십시오</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>메세지에 서명된 Wagerr 주소</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>메세지에 서명된 WAGERR 주소</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>메세지가 지정된 Wagerr 주소로 서명되었는지 확인해주세요</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>메세지가 지정된 WAGERR 주소로 서명되었는지 확인해주세요</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -4229,8 +4002,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -4245,8 +4018,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Dash Core 개발자</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
-        <translation>Wagerr Core 개발자</translation>
+        <source>The WAGERR Core developers</source>
+        <translation>WAGERR Core 개발자</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -4262,10 +4035,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 </context>
 <context>
     <name>TransactionDesc</name>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>%n 블럭 더 열기</numerusform></translation>
-    </message>
     <message>
         <source>Open until %1</source>
         <translation>%1까지 열기</translation>
@@ -4327,10 +4096,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <source>, has not been successfully broadcast yet</source>
         <translation>, 아직 성공적으로 브로드캐스트되지 않았습니다</translation>
     </message>
-    <message numerus="yes">
-        <source>, broadcast through %n node(s)</source>
-        <translation><numerusform>, %n 노드를 통한 브로드캐스트</numerusform></translation>
-    </message>
     <message>
         <source>Date</source>
         <translation>날짜</translation>
@@ -4370,10 +4135,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Credit</source>
         <translation>크레딧</translation>
-    </message>
-    <message numerus="yes">
-        <source>matures in %n more block(s)</source>
-        <translation><numerusform>%n 블록안에 생성됨</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
@@ -4472,10 +4233,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Address</source>
         <translation>주소</translation>
-    </message>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>%n 블럭 더 열기</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -4666,7 +4423,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <source>Received with</source>
-        <translation>수신 됨</translation>
+        <translation>수신됨</translation>
     </message>
     <message>
         <source>Sent to</source>
@@ -4746,7 +4503,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
     <message>
         <source>Confirmed</source>
-        <translation>확정</translation>
+        <translation>확정됨</translation>
     </message>
     <message>
         <source>Watch-only</source>
@@ -4858,7 +4615,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
 </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>Select zWGR to Spend</source>
         <translation>사용할 zWGR 선택</translation>
@@ -4879,11 +4636,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <source>Select/Deselect All</source>
         <translation>전체 선택 / 해제</translation>
     </message>
-    <message>
-        <source>Is Spendable</source>
-        <translation>전송가능한 코인수</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>wagerr-core</name>
     <message>
@@ -4911,8 +4664,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>계산된 누산기 체크포인트는 블록 인덱스에 의해 기록되는 것이 아닙니다.</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Wagerr Core is probably already running.</source>
-        <translation>        &lt;translation&gt;잠겨진 데이터 디렉토리 %s 를 가져올 수 없습니다. Wagerr Core는 이미 실행 중입니다.</translation>
+        <source>Cannot obtain a lock on data directory %s. WAGERR Core is probably already running.</source>
+        <translation>        &lt;translation&gt;잠겨진 데이터 디렉토리 %s 를 가져올 수 없습니다. WAGERR Core는 이미 실행 중입니다.</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
@@ -4993,10 +4746,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
         <translation>메모리 풀에서 디스크로 매 &lt;n&gt; 메가바이트만큼 데이터베이스 활동 플러쉬를 기록합니다 (기본값: %u)</translation>
-    </message>
-    <message>
-        <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
-        <translation>미확인 표시된 출력들을 찾고 계속하기 위한 확인을 받기 전까지 기다립니다.</translation>
     </message>
     <message>
         <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
@@ -5087,20 +4836,20 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>이 제품은 OpenSSL이 개발한 Open SSL 툴킷 &lt;https://www.openssl.org/&gt; 에서 사용하기 위한 프로젝트 소프트웨어, Eric Young이 개발한 암호화 소프트웨어, Thomas Bernard가 개발한 UPnP 소프트웨어가 포함되어 있습니다.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Wagerr Core is probably already running.</source>
-        <translation>이 컴퓨터를 %s 로 지정하는것은 불가능합니다. Wagerr Core는 이미 실행 중입니다.</translation>
+        <source>Unable to bind to %s on this computer. WAGERR Core is probably already running.</source>
+        <translation>이 컴퓨터를 %s 로 지정하는것은 불가능합니다. WAGERR Core는 이미 실행 중입니다.</translation>
     </message>
     <message>
         <source>Unable to locate enough Obfuscation denominated funds for this transaction.</source>
         <translation>이 트랜잭션를 위해 난독화 표기된 충분한 금액을 찾을 수 없습니다.</translation>
     </message>
     <message>
-        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 25000 WGR.</source>
-        <translation>이 트랜잭션를 위해 난독화 표기가 안된 충분한 금액을 찾을 수 없습니다. 25000 WGR과 일치하지 않음.</translation>
+        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 WGR.</source>
+        <translation>이 트랜잭션를 위해 난독화 표기가 안된 충분한 금액을 찾을 수 없습니다. 10000 WGR과 일치하지 않음.</translation>
     </message>
     <message>
-        <source>Unable to locate enough funds for this transaction that are not equal 25000 WGR.</source>
-        <translation>트랜잭션에 대한 충분한 금액을 찾을 수 없습니다. 25000 WGR와 같지 않음</translation>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 WGR.</source>
+        <translation>트랜잭션에 대한 충분한 금액을 찾을 수 없습니다. 10000 WGR와 같지 않음</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -5115,8 +4864,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>경고 : -paytxfee가 매우 높게 설정되었습니다! 이것은 전송할 경우 지불 할 트랜잭션 수수료입니다.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.</source>
-        <translation>경고: 컴퓨터의 날짜와 시간이 올바르게 설정되어 있는지 확인해 주세요! 만일 시계가 잘못되어 있다면 Wagerr 코어는 정상적으로 작동하지 않을 수 있습니다.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong WAGERR Core will not work properly.</source>
+        <translation>경고: 컴퓨터의 날짜와 시간이 올바르게 설정되어 있는지 확인해 주세요! 만일 시계가 잘못되어 있다면 WAGERR 코어는 정상적으로 작동하지 않을 수 있습니다.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5183,10 +4932,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>-addnode, -seednode, -connect을 위해 DNS 조회를 허용하십시오.</translation>
     </message>
     <message>
-        <source>Already have that input.</source>
-        <translation>이미 연결 중입니다.</translation>
-    </message>
-    <message>
         <source>Always query for peer addresses via DNS lookup (default: %u)</source>
         <translation>피어 주소에게 DNS 조회를 통한 지속적인 정보 수신 요청을 합니다 (기본값: %u)</translation>
     </message>
@@ -5207,18 +4952,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>누락된 누산기 계산중...</translation>
     </message>
     <message>
-        <source>Can't denominate: no compatible inputs left.</source>
-        <translation>표시할 수 없음: 남아있는 호환된 연결이 없습니다.</translation>
-    </message>
-    <message>
-        <source>Can't find random Masternode.</source>
-        <translation>임의의 마스터노드를 찾을 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Can't mix while sync in progress.</source>
-        <translation>동기화가 진행 중일 때에는 믹싱을 할 수 없습니다.</translation>
-    </message>
-    <message>
         <source>Cannot downgrade wallet</source>
         <translation>지갑을 다운그레이드 할 수 없습니다.</translation>
     </message>
@@ -5237,10 +4970,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Cannot write default address</source>
         <translation>기본 주소를 사용할 수 없습니다.</translation>
-    </message>
-    <message>
-        <source>Collateral not valid.</source>
-        <translation>Collateral이 유효하지 않습니다.</translation>
     </message>
     <message>
         <source>Connect only to the specified node(s)</source>
@@ -5271,8 +5000,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Copyright (C) 2015-%i The PIVX Core 개발자</translation>
     </message>
     <message>
-        <source>Copyright (C) %i The Wagerr Core Developers</source>
-        <translation>Copyright (C) %i The Wagerr Core 개발자</translation>
+        <source>Copyright (C) 2018-%i The WAGERR Core Developers</source>
+        <translation>Copyright (C) 2018-%i The WAGERR Core 개발자</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5331,14 +5060,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>클라이언트가 마스터노드로 작동하는 것을 활성화 (0-1, 기본값: %u)</translation>
     </message>
     <message>
-        <source>Entries are full.</source>
-        <translation>항목이 가득 찼습니다.</translation>
-    </message>
-    <message>
-        <source>Error connecting to Masternode.</source>
-        <translation>Masternode에 연결하는 중 오류가 발생했습니다.</translation>
-    </message>
-    <message>
         <source>Error initializing block database</source>
         <translation>블록 데이터베이스를 초기화하는 중 오류가 발생했습니다.</translation>
     </message>
@@ -5359,8 +5080,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>wallet.dat을 불러오는 중 오류가 발생했습니다: 지갑 손상됨</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Wagerr Core</source>
-        <translation>wallet.dat를 로드하는 중 오류가 발생했습니다. 지갑에 최신 버전의 Wagerr 코어가 필요합니다.</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of WAGERR Core</source>
+        <translation>wallet.dat를 로드하는 중 오류가 발생했습니다. 지갑에 최신 버전의 WAGERR 코어가 필요합니다.</translation>
     </message>
     <message>
         <source>Error opening block database</source>
@@ -5375,16 +5096,16 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>공개 키를 복구하는 중 오류가 발생했습니다.</translation>
     </message>
     <message>
+        <source>Error writing zerocoinDB to disk</source>
+        <translation>디스크에 zerocoinDB 쓰기 오류</translation>
+    </message>
+    <message>
         <source>Error</source>
         <translation>에러</translation>
     </message>
     <message>
         <source>Error: A fatal internal error occured, see debug.log for details</source>
         <translation>오류 : 내부에서 치명적인 오류가 발생했습니다. 자세한 내용은 debug.log를 참조하십시오</translation>
-    </message>
-    <message>
-        <source>Error: Can't select current denominated inputs</source>
-        <translation>오류 : 현재 표시된 입력을 선택할 수 없습니다</translation>
     </message>
     <message>
         <source>Error: Disk space is low!</source>
@@ -5399,16 +5120,16 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>오류 : 지갑이 잠겼습니다, 트랜잭션을 생성할 수 없습니다!</translation>
     </message>
     <message>
-        <source>Error: You already have pending entries in the Obfuscation pool</source>
-        <translation>오류 : 이미 난독화 그룹에 보류중인 항목들이 있습니다.</translation>
-    </message>
-    <message>
         <source>Failed to calculate accumulator checkpoint</source>
         <translation>축 압기 체크 포인트를 계산하지 못했습니다.</translation>
     </message>
     <message>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>어떠한 포트에서도 수신하는 것에 실패했습니다. 원하신다면 -listen=0 을 사용하십시오.</translation>
+    </message>
+    <message>
+        <source>Failed to parse host:port string</source>
+        <translation>호스트 : 포트 문자열을 구문 분석하지 못했습니다.</translation>
     </message>
     <message>
         <source>Failed to read block</source>
@@ -5419,20 +5140,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>당신이 보내는 트랜잭션에 추가 할 수수료 (WGR/kB) (기본값: %s)</translation>
     </message>
     <message>
-        <source>Finalizing transaction.</source>
-        <translation>트랜잭션 완료.</translation>
-    </message>
-    <message>
         <source>Force safe mode (default: %u)</source>
         <translation>강제 안전 모드 (기본값: %u)</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ( waiting %s )</source>
-        <translation>충분한 사용자를 찾았습니다, 서명 중 ( %s 기다리는 중 )</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ...</source>
-        <translation>충분한 사용자를 찾았습니다, 서명 중 ...</translation>
     </message>
     <message>
         <source>Generate coins (default: %u)</source>
@@ -5459,14 +5168,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>디버그 출력에 IP 주소를 포함합니다 (기본값: %u)</translation>
     </message>
     <message>
-        <source>Incompatible mode.</source>
-        <translation>호환되지 않는 모드.</translation>
-    </message>
-    <message>
-        <source>Incompatible version.</source>
-        <translation>호환되지 않는 버전.</translation>
-    </message>
-    <message>
         <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
         <translation>잘못되었거나 블록을 찾지 못하였습니다. 네트워크에 대한 잘못된 데이터 디렉토리 문제?</translation>
     </message>
@@ -5475,12 +5176,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>정보</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Wagerr Core is shutting down.</source>
-        <translation>초기화 정확성 검사에 실패 했습니다. Wagerr Core가 종료됩니다.</translation>
-    </message>
-    <message>
-        <source>Input is not valid.</source>
-        <translation>입력이 올바르지 않습니다.</translation>
+        <source>Initialization sanity check failed. WAGERR Core is shutting down.</source>
+        <translation>초기화 정확성 검사에 실패 했습니다. WAGERR Core가 종료됩니다.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -5539,10 +5236,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>유효하지 않은 개인 키입니다.</translation>
     </message>
     <message>
-        <source>Invalid script detected.</source>
-        <translation>유효하지 않은 스크립트가 발견되었습니다.</translation>
-    </message>
-    <message>
         <source>Percentage of automatically minted Zerocoin  (1-100, default: %u)</source>
         <translation>자동생성 zWGR 비율  (1-100, default: %u)</translation>
     </message>
@@ -5587,7 +5280,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 </translation>
     </message>
     <message>
-        <source>Disable all Wagerr specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
+        <source>Disable all WAGERR specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
         <translation>WAGERR의 모든 특정 기능들을 비활성화합니다(마스터노드, 난독화, SwiftTX, Budgeting) (0-1, 기본값: %u)</translation>
     </message>
     <message>
@@ -5687,10 +5380,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>생성 실패</translation>
     </message>
     <message>
-        <source>Failed to deserialize</source>
-        <translation>디시리얼 실패</translation>
-    </message>
-    <message>
         <source>Failed to find Zerocoins in wallet.dat</source>
         <translation>wallet.dat 에서 제로코인을 인식 실패</translation>
     </message>
@@ -5709,14 +5398,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</source>
         <translation>메모리에서 연결 불가능한 트랜잭션을 &lt;n&gt;개까지 유지하십시오. (기본값: %u)</translation>
-    </message>
-    <message>
-        <source>Last Obfuscation was too recent.</source>
-        <translation>최근에 마지막으로 난독화를 진행했습니다.</translation>
-    </message>
-    <message>
-        <source>Last successful Obfuscation action was too recent.</source>
-        <translation>최근에 마지막으로 성공한 난독화 작업이 있습니다.</translation>
     </message>
     <message>
         <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
@@ -5771,10 +5452,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>auth 쿠기 위치 (default: data dir)</translation>
     </message>
     <message>
-        <source>Lock is already in place.</source>
-        <translation>이미 올바르게 잠겨있습니다.</translation>
-    </message>
-    <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
         <translation>마스터노드 구성 파일에서 마스터노드를 잠급니다. (기본값: %u)</translation>
     </message>
@@ -5791,14 +5468,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>마스터노드 옵션:</translation>
     </message>
     <message>
-        <source>Masternode queue is full.</source>
-        <translation>마스터노드 대기열이 가득 찼습니다.</translation>
-    </message>
-    <message>
-        <source>Masternode:</source>
-        <translation>마스터노드:</translation>
-    </message>
-    <message>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: %u)</source>
         <translation>연결 당 최대 수신 버퍼, &lt;n&gt;*1000 바이트 (기본값: %u)</translation>
     </message>
@@ -5811,14 +5480,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>코인생성이 블록체인에 기록되지 않았습니다.</translation>
     </message>
     <message>
-        <source>Missing input transaction information.</source>
-        <translation>트랜잭션 정보 입력에 누락된 부분이 있습니다.</translation>
-    </message>
-    <message>
-        <source>Mixing in progress...</source>
-        <translation>믹싱이 진행 중입니다...</translation>
-    </message>
-    <message>
         <source>Need address because change is not exact</source>
         <translation>잔돈을 받을 주소가 필요합니다.</translation>
     </message>
@@ -5827,40 +5488,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>-whitebind: '%s' 의 포트를 지정해야 합니다</translation>
     </message>
     <message>
-        <source>No Masternodes detected.</source>
-        <translation>마스터노드가 발견되지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>No compatible Masternode found.</source>
-        <translation>호환되는 마스터노드가 발견되지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>No funds detected in need of denominating.</source>
-        <translation>분류가 필요한 자금이 발견되지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>No matching denominations found for mixing.</source>
-        <translation>믹싱에 대한 일치하는 표기를 찾을 수 없습니다.</translation>
-    </message>
-    <message>
         <source>Node relay options:</source>
         <translation>노드 중계 옵션:</translation>
     </message>
     <message>
-        <source>Non-standard public key detected.</source>
-        <translation>비 표준 공개 키가 감지되었습니다.</translation>
-    </message>
-    <message>
-        <source>Not compatible with existing transactions.</source>
-        <translation>기존 트랜잭션과 호환되지 않습니다.</translation>
-    </message>
-    <message>
         <source>Not enough file descriptors available.</source>
         <translation>사용 가능한 파일 디스크립터가 충분하지 않습니다.</translation>
-    </message>
-    <message>
-        <source>Not in the Masternode list.</source>
-        <translation>마스터노드 목록에 없습니다.</translation>
     </message>
     <message>
         <source>Number of automatic wallet backups (default: 10)</source>
@@ -5869,18 +5502,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Number of custom location backups to retain (default: %d)</source>
         <translation>Number of custom location backups to retain (default: %d)</translation>
-    </message>
-    <message>
-        <source>Obfuscation is idle.</source>
-        <translation>난독화는 유휴상태입니다.</translation>
-    </message>
-    <message>
-        <source>Obfuscation request complete:</source>
-        <translation>난독화 요청 완료:</translation>
-    </message>
-    <message>
-        <source>Obfuscation request incomplete:</source>
-        <translation>난독화 요청 미완료:</translation>
     </message>
     <message>
         <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
@@ -5973,10 +5594,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Send transactions as zero-fee transactions if possible (default: %u)</source>
         <translation>무료 수수료 트랜잭션이 가능할 경우 무료 수수료로 트랜잭션을 전송합니다 (기본값: %u)</translation>
-    </message>
-    <message>
-        <source>Session not complete!</source>
-        <translation>세션이 완료되지 않았습니다!</translation>
     </message>
     <message>
         <source>Session timed out.</source>
@@ -6083,18 +5700,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>디스크에서 블록을 가져오면 실행 중지 (기본값: %u)</translation>
     </message>
     <message>
-        <source>Submitted following entries to masternode: %u / %d</source>
-        <translation>마스터노드에 다음 항목들을 제출했습니다: %u / %d</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation>마스터노드에 제출했습니다, 남은 항목들 기다리는중 ( %u / %d ) %s</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>마스터노드에 제출했습니다, 대기열을 기다리는 중 %s</translation>
-    </message>
-    <message>
         <source>Synchronization failed</source>
         <translation>동기화 실패</translation>
     </message>
@@ -6131,14 +5736,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>전송이 이미 되었습니다.</translation>
     </message>
     <message>
-        <source>The new spend coin transaction did not verify</source>
-        <translation>신규로 전송된 거래가 확인되지 않았습니다.</translation>
-    </message>
-    <message>
-        <source>The selected mint coin is an invalid coin</source>
-        <translation>선택한 생성 코인은 유효하지 않은 동전입니다.</translation>
-    </message>
-    <message>
         <source>The transaction did not verify</source>
         <translation>거래가 확인되지 않았습니다.</translation>
     </message>
@@ -6153,10 +5750,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>This is intended for regression testing tools and app development.</source>
         <translation>이것은 리그레션 테스팅 및 앱 개발을 위해 만들어졌습니다.</translation>
-    </message>
-    <message>
-        <source>This is not a Masternode.</source>
-        <translation>마스터노드가 아닙니다.</translation>
     </message>
     <message>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
@@ -6191,18 +5784,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>트랜잭션 금액에 반드시 양수값이 들어가야 합니다</translation>
     </message>
     <message>
-        <source>Transaction created successfully.</source>
-        <translation>트랜잭션이 성공적으로 생성되었습니다.</translation>
-    </message>
-    <message>
-        <source>Transaction fees are too high.</source>
-        <translation>트랜잭션 수수료가 너무 높습니다.</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>올바르지 않은 트랜잭션입니다.</translation>
-    </message>
-    <message>
         <source>Transaction too large for fee policy</source>
         <translation>수수료 정책에 비해 트랜잭션이 너무 많습니다</translation>
     </message>
@@ -6211,24 +5792,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>트랜잭션이 너무 큽니다</translation>
     </message>
     <message>
-        <source>Transmitting final transaction.</source>
-        <translation>최종 트랜잭션를 전송 중입니다.</translation>
-    </message>
-    <message>
-        <source>Try to spend with a higher security level to include more coins</source>
-        <translation>높은 보안 수준으로 더 많은 코인을 전송해주세요.</translation>
-    </message>
-    <message>
         <source>Trying to spend an already spent serial #, try again.</source>
         <translation>이미 전송된 리얼 번호를 보내려고 했습니다. 다시 시도하십시오.</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
         <translation>이 컴퓨터에서 %s 로 바인드할 수 없습니다 (바인드 리턴 오류 %s)</translation>
-    </message>
-    <message>
-        <source>Unable to find transaction containing mint</source>
-        <translation>코인 생성이 포함된 거래를 찾을 수 없습니다.</translation>
     </message>
     <message>
         <source>Unable to sign spork message, wrong key?</source>
@@ -6241,10 +5810,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
         <translation>-onlynet: '%s' 에 알 수 없는 네트워크가 지정되었습니다</translation>
-    </message>
-    <message>
-        <source>Unknown state: id = %u</source>
-        <translation>알 수없는 상태: id = %u</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
@@ -6275,10 +5840,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Value is below the smallest available denomination (= 1) of zWGR</translation>
     </message>
     <message>
-        <source>Value more than Obfuscation pool maximum allows.</source>
-        <translation>난독화 풀의 최대 허용 값보다 높습니다.</translation>
-    </message>
-    <message>
         <source>Verifying blocks...</source>
         <translation>블록 인증 중...</translation>
     </message>
@@ -6287,20 +5848,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>지갑 인증 중...</translation>
     </message>
     <message>
-        <source>Version 1 zWGR require a security level of 100 to successfully spend.</source>
-        <translation>zWGR 버전 1은 성공적으로 보내기 위해서 100 시큐리티 레벨이 필요합니다.</translation>
-    </message>
-    <message>
         <source>Wallet %s resides outside data directory %s</source>
         <translation>지갑 %s 가 데이터 디렉토리 외부에 존재합니다 %s</translation>
     </message>
     <message>
-        <source>Wallet is locked.</source>
-        <translation>지갑이 잠겼습니다.</translation>
-    </message>
-    <message>
-        <source>Wallet needed to be rewritten: restart Wagerr Core to complete</source>
-        <translation>지갑을 다시 작성해야 합니다: 완료하려면 Wagerr 코어를 재시작해야 합니다</translation>
+        <source>Wallet needed to be rewritten: restart WAGERR Core to complete</source>
+        <translation>지갑을 다시 작성해야 합니다: 완료하려면 WAGERR 코어를 재시작해야 합니다</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -6327,24 +5880,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>경고 : 지원하지 않는 인수 -debugnet 무시됨 -debug=net를 사용하십시오.</translation>
     </message>
     <message>
-        <source>Will retry...</source>
-        <translation>다시 시도합니다...</translation>
-    </message>
-    <message>
         <source>You don't have enough Zerocoins in your wallet</source>
         <translation>지갑에 zWGR 가 부족합니다.</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation>-treindex를 변경하려면 -reindex를 사용하여 데이터베이스를 다시 빌드해야합니다.</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>항목이 성공적으로 추가되었습니다.</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation>트랜잭션이 풀로 접수되었습니다!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>

@@ -62,12 +62,12 @@
         <translation>Mottagar adresser</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Det här är dina Wagerr adresser för att skicka betalningar. Kontrollera alltid summan och mottagaradressen före du sänder mynt.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Det här är dina WAGERR adresser för att skicka betalningar. Kontrollera alltid summan och mottagaradressen före du sänder mynt.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Det här är dina Wagerr adresser för att ta emot betalningar. Det är rekomenderat att använda en ny mottagaradress för varje transaktion.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Det här är dina WAGERR adresser för att ta emot betalningar. Det är rekomenderat att använda en ny mottagaradress för varje transaktion.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -232,7 +232,7 @@
     <name>BanTableModel</name>
     <message>
         <source>IP/Netmask</source>
-        <translation>IP/Nätmask</translation>
+        <translation>IP/Netmask</translation>
     </message>
     <message>
         <source>Banned Until</source>
@@ -247,18 +247,18 @@
     </message>
     <message>
         <source>&amp;BIP 38 Encrypt</source>
-        <translation>BIP 38 Kryptering</translation>
+        <translation>&amp;BIP 38 Kryptering</translation>
     </message>
     <message>
         <source>Address:</source>
         <translation>Adress:</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Fyll i en Wagerr Adress som du skulle vilja cryptera med BIP 38. Skriv in en lösenfras i den mittersta lådan. Tryck kryptera för att beräkna fram den krypterade privata nyckeln.</translation>
+        <source>Enter a WAGERR Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <translation>Fyll i en WAGERR Adress som du skulle vilja kryptera med BIP 38. Skriv in en lösenfras i den mittersta raden. Tryck kryptera för att beräkna fram den krypterade privata nyckeln.</translation>
     </message>
     <message>
-        <source>The Wagerr address to encrypt</source>
+        <source>The WAGERR address to encrypt</source>
         <translation>WAGERR adressen som ska krypteras</translation>
     </message>
     <message>
@@ -271,7 +271,7 @@
     </message>
     <message>
         <source>Paste address from clipboard</source>
-        <translation>Limma in adress från urklipp</translation>
+        <translation>Infoga adress från urklipp</translation>
     </message>
     <message>
         <source>Alt+P</source>
@@ -290,8 +290,8 @@
         <translation>Kopiera den nuvarande signaturen till systemets urklipp</translation>
     </message>
     <message>
-        <source>Encrypt the private key for this Wagerr address</source>
-        <translation>Kryptera den privata nyckeln för denna Wagerr adressen</translation>
+        <source>Encrypt the private key for this WAGERR address</source>
+        <translation>Kryptera den privata nyckeln för denna WAGERR adressen</translation>
     </message>
     <message>
         <source>Reset all fields</source>
@@ -319,7 +319,7 @@
     </message>
     <message>
         <source>Enter the BIP 38 encrypted private key. Enter the passphrase in the middle box. Click Decrypt Key to compute the private key. After the key is decrypted, clicking 'Import Address' will add this private key to the wallet.</source>
-        <translation>Ange BIP 38 krypterade privata nyckeln. Ange lösenfrasen i med mittersta boxen. Tryck på krypetra nyckel för att beräkna den privata nyckeln. Efter att nyckeln är avkrypterad, tryck på 'Importera Adress' kommer att lägga till denna privata nyckel till plånboken.</translation>
+        <translation>Ange den BIP 38 krypterade privata nyckeln. Ange lösenfrasen i mittersta boxen. Tryck på kryptera nyckel för att göra den privat. Efter att nyckeln är krypterad, tryck på 'Importera Adress' och kommer sen att lägga till denna privata nyckel till plånboken.</translation>
     </message>
     <message>
         <source>Decrypt &amp;Key</source>
@@ -437,8 +437,16 @@
         <translation>Integritets funktioner för zWGR</translation>
     </message>
     <message>
+        <source>&amp;Governance</source>
+        <translation>&amp;Management</translation>
+    </message>
+    <message>
+        <source>Show Proposals</source>
+        <translation>Visa förslag</translation>
+    </message>
+    <message>
         <source>E&amp;xit</source>
-        <translation>gå ur</translation>
+        <translation>Exit</translation>
     </message>
     <message>
         <source>Quit application</source>
@@ -610,7 +618,7 @@
     </message>
     <message numerus="yes">
         <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>Bearbetar %n block av transaktionshistoriken.</numerusform><numerusform>Bearbetar %n block av transaktionshistoriken.</numerusform></translation>
+        <translation><numerusform>Bearbetade %n block från transaktions historiken.</numerusform><numerusform>Bearbetade %n block från transaktions historiken.</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
@@ -623,6 +631,10 @@
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;unlocked&lt;/b&gt; for anonymization and staking only</source>
         <translation>Plånboken är &lt;b&gt;krypterad&lt;/b&gt; och för tillfället &lt;b&gt;olåst&lt;/b&gt; för anonymisering och staking enbart</translation>
+    </message>
+    <message>
+        <source>Tor is &lt;b&gt;enabled&lt;/b&gt;: %1</source>
+        <translation>Tor är &lt;b&gt;aktiverat&lt;/b&gt;: %1</translation>
     </message>
     <message>
         <source>&amp;File</source>
@@ -645,12 +657,12 @@
         <translation>flik vertygsrad</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>WAGERR Kärna</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Skicka mynt till en Wagerr adress</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Skicka mynt till en WAGERR adress</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -669,24 +681,24 @@
         <translation>Utforska masternoder</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>Om Wagerr Kärnan</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>Om WAGERR Kärnan</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Visa information om Wagerr Kärnan</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Visa information om WAGERR Kärnan</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
         <translation>Ändra konfigurationsval för WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Signera meddelanden med din Wagerr adress för att visa att du äger dem</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Signera meddelanden med din WAGERR adress för att visa att du äger dem</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Verifiera meddelandet för att säkerställa att de blev signerat med den specifika Wagerr adressen.</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Verifiera meddelandet för att säkerställa att de blev signerat med den specifika WAGERR adressen.</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -729,16 +741,16 @@
         <translation>Blockera utforskarfönstret</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Visa Wagerr Core hjälp meddelande för att få en lista med möjliga Wagerr kommandorad alternativ</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Visa WAGERR Core hjälp meddelande för att få en lista med möjliga WAGERR kommandorad alternativ</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
+        <source>WAGERR Core client</source>
         <translation>WAGERR kärn klient</translation>
     </message>
     <message numerus="yes">
-        <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform>%n aktiv(a) annslutning(ar) till Wagerr nätverket</numerusform><numerusform>%n aktiv(a) annslutning(ar) till Wagerr nätverket</numerusform></translation>
+        <source>%n active connection(s) to WAGERR network</source>
+        <translation><numerusform>%n aktiva anslutningar till WAGERR nätverket</numerusform><numerusform>%n aktiva  anslutningar till WAGERR nätverket</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -762,15 +774,15 @@
     </message>
     <message numerus="yes">
         <source>%n hour(s)</source>
-        <translation><numerusform>%n timme</numerusform><numerusform>%n timmar</numerusform></translation>
+        <translation><numerusform>%n timmar</numerusform><numerusform>%n timmar</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n day(s)</source>
-        <translation><numerusform>%n dag</numerusform><numerusform>%n dagar</numerusform></translation>
+        <translation><numerusform>%n dagar</numerusform><numerusform>%n dagar</numerusform></translation>
     </message>
     <message numerus="yes">
         <source>%n week(s)</source>
-        <translation><numerusform>%n vecka</numerusform><numerusform>%n veckor</numerusform></translation>
+        <translation><numerusform>%n veckor</numerusform><numerusform>%n veckor</numerusform></translation>
     </message>
     <message>
         <source>%1 and %2</source>
@@ -850,7 +862,7 @@ MultiSend: %1</translation>
     </message>
     <message>
         <source>AutoMint is currently enabled and set to </source>
-        <translation>AutoMint är för tillfället aktiverat och inställd på</translation>
+        <translation>AutoMint är för tillfället aktiverat och inställt på</translation>
     </message>
     <message>
         <source>AutoMint is disabled</source>
@@ -863,6 +875,10 @@ MultiSend: %1</translation>
     <message>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Plånbok är &lt;b&gt;krypterad&lt;/b&gt; och tillfälligt &lt;b&gt;låst&lt;/b&gt;</translation>
+    </message>
+    <message>
+        <source>A fatal error occurred. WAGERR can no longer continue safely and will quit.</source>
+        <translation>Ett fel inträffade. WAGERR kan inte längre köras säkert och kommer att stängas ned för tillfället.</translation>
     </message>
 </context>
 <context>
@@ -1185,8 +1201,8 @@ MultiSend: %1</translation>
         <translation>Redigera skickande adress</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>Den inmatade adressen "%1" är ej en giltig Wagerr adress.</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>Den inmatade adressen "%1" är ej en giltig WAGERR adress.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1225,22 +1241,65 @@ MultiSend: %1</translation>
     </message>
 </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>Formulär</translation>
+    </message>
+    <message>
+        <source>GOVERNANCE</source>
+        <translation>MANAGEMENT</translation>
+    </message>
+    <message>
+        <source>Update Proposals</source>
+        <translation>Uppdatera förslag</translation>
+    </message>
+    <message>
+        <source>Next super block:</source>
+        <translation>Nästa Superblock</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    <message>
+        <source>Blocks to next super block:</source>
+        <translation>Block till nästa superblock:</translation>
+    </message>
+    <message>
+        <source>Days to budget payout (estimate):</source>
+        <translation>Dagar till budget utbetalning (estimerad):</translation>
+    </message>
+    <message>
+        <source>Allotted budget:</source>
+        <translation>Utvald budget:</translation>
+    </message>
+    <message>
+        <source>Budget left:</source>
+        <translation>Kvar av budget:</translation>
+    </message>
+    <message>
+        <source>Masternodes count:</source>
+        <translation>Masternode beräkning:</translation>
+    </message>
+</context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
         <translation>version</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>WAGERR Kärna</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>Om Wagerr Kärna</translation>
+        <source>About WAGERR Core</source>
+        <translation>Om WAGERR Kärna</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1286,16 +1345,16 @@ MultiSend: %1</translation>
         <translation>Välkommen</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Välkommen till Wagerr Core.</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Välkommen till WAGERR Core.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>Eftersom detta är första gången programmet körs så kan du välja var Wagerr Core ska spara sin data.</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>Eftersom detta är första gången programmet körs så kan du välja var WAGERR Core ska spara sin data.</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>WAGERR Kärnan kommer ladda ner och spara en kopia av Wagerr block chain. Minst %1GB data kommer sparas i denna katalog och den kommer växa med tiden. Plånboken kommer också sparas i denna katalog.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR Kärnan kommer ladda ner och spara en kopia av WAGERR block chain. Minst %1GB data kommer sparas i denna katalog och den kommer växa med tiden. Plånboken kommer också sparas i denna katalog.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1306,8 +1365,8 @@ MultiSend: %1</translation>
         <translation>Använd en skräddarsydd data katalog</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1448,12 +1507,12 @@ MultiSend: %1</translation>
         <translation>Mata in Adress att Skicka till</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Wagerr addresses after it matures.
-To Add: enter percentage to give and Wagerr address to add to the MultiSend vector.
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other WAGERR addresses after it matures.
+To Add: enter percentage to give and WAGERR address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>MultiSend tillåter dig att automatiskt skicka upp till 100% av dina staking eller huvudnod belöningar till en lista av andra Wagerr adresser efter att belöningarna har mognat.
-För att Lägga till: Ange procent att ge och Wagerr adress för att lägga till i MultiSend vektorn.
+        <translation>MultiSend tillåter dig att automatiskt skicka upp till 100% av dina staking eller huvudnod belöningar till en lista av andra WAGERR adresser efter att belöningarna har mognat.
+För att Lägga till: Ange procent att ge och WAGERR adress för att lägga till i MultiSend vektorn.
 För att Ta Bort: Ange adressen som ska tas bort och tryck ta bort.
 MultiSend kommer inte aktiveras om du inte tryckt på Aktivera</translation>
     </message>
@@ -1542,47 +1601,78 @@ MultiSend kommer inte aktiveras om du inte tryckt på Aktivera</translation>
         <translation>(Ingen etikett)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>Den inmatade adressen:
-</translation>
+        <source>MultiSend Active for Stakes and Masternode Rewards</source>
+        <translation>MultiSend Aktivt för Stakes och Huvudnods Belöningar</translation>
     </message>
     <message>
-        <source> is invalid.
+        <source>MultiSend Active for Stakes</source>
+        <translation>MultiSend Aktiv för Stakes</translation>
+    </message>
+    <message>
+        <source>MultiSend Active for Masternode Rewards</source>
+        <translation>MultiSend Aktivt för Huvudnods Belöningar</translation>
+    </message>
+    <message>
+        <source>MultiSend Not Active</source>
+        <translation>MultiSend inte Aktivt</translation>
+    </message>
+    <message>
+        <source>The entered address: %1 is invalid.
 Please check the address and try again.</source>
-        <translation>är ogiltig.
+        <translation>Den angivna adressen: %1 är ej giltig.
 Var vänlig kontrollera adressen och försök igen.</translation>
     </message>
     <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation>Din totala MultiSend vektor mängd överstiger 100% av din staking belöning
-</translation>
+        <source>The total amount of your MultiSend vector is over 100% of your stake reward</source>
+        <translation>Den totala mängden av din MultiSend vektor är över 100% av din stake belöning</translation>
+    </message>
+    <message>
+        <source>Saved the MultiSend to memory, but failed saving properties to the database.</source>
+        <translation>Sparade MultiSend till minne, men misslyckades spara egenskaperna till databasen.</translation>
+    </message>
+    <message>
+        <source>MultiSend Vector</source>
+        <translation>MultiSend Vektor</translation>
+    </message>
+    <message>
+        <source>Removed %1</source>
+        <translation>Borttaget %1</translation>
+    </message>
+    <message>
+        <source>Could not locate address</source>
+        <translation>Kunde inte lokalisera adress</translation>
+    </message>
+    <message>
+        <source>Unable to activate MultiSend, check MultiSend vector</source>
+        <translation>Kan ej aktivera MultiSend, kontrollera MultiSend vektor</translation>
+    </message>
+    <message>
+        <source>Need to select to send on stake and/or masternode rewards</source>
+        <translation>Behöver välja att skicka på stake och/eller huvudnods belöningar</translation>
+    </message>
+    <message>
+        <source>MultiSend activated but writing settings to DB failed</source>
+        <translation>MultiSend aktiverat men misslyckades att skriva inställningar till DB</translation>
+    </message>
+    <message>
+        <source>MultiSend activated</source>
+        <translation>MultiSend aktiverat</translation>
+    </message>
+    <message>
+        <source>First Address Not Valid</source>
+        <translation>Första Adress Ej Giltig</translation>
+    </message>
+    <message>
+        <source>MultiSend deactivated but writing settings to DB failed</source>
+        <translation>MultiSend avaktiverat men misslyckades skriva inställningar till DB</translation>
+    </message>
+    <message>
+        <source>MultiSend deactivated</source>
+        <translation>MultiSend avaktiverat</translation>
     </message>
     <message>
         <source>Please Enter 1 - 100 for percent.</source>
         <translation>Var vänlig mata in 1 - 100 i procent.</translation>
-    </message>
-    <message>
-        <source>Saved the MultiSend to memory, but failed saving properties to the database.
-</source>
-        <translation>Sparade MultiSend till minne, men misslyckades spara egenskaperna till databasen.
-</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>MultiSend Vektor</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>Borttagen</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>Kunde inte lokalisera adress
-</translation>
     </message>
 </context>
 <context>
@@ -1657,7 +1747,7 @@ Var god vänta efter att du trycker på importera.</translation>
     </message>
     <message>
         <source>Quantity Selected:</source>
-        <translation>Kvantitet Vald:</translation>
+        <translation>Vald Kvantitet:</translation>
     </message>
     <message>
         <source>0</source>
@@ -1757,73 +1847,6 @@ Var god vänta efter att du trycker på importera.</translation>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Konfigurera Fördunkling</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Grundläggande sekretess</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>Hög Sekretess</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Maximal Sekretess</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Var vänlig och välj en sekretess nivå.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Använd 2 separata huvudnoder för att blanda tillgångar upp till 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Använd 8 separata huvudnoderför att blanda tillgångar upp till 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>Använd 16 separata huvudnoder</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>Det här alternativet är det snabbaste och kommer kostar ungefär ~0.025 WGR för att anonymisera 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>Det här alternativet är måttligt snabb och kommer kostar ungefär 0.05 WGR för att anonymisera 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>Det här är det långsammaste och säkraste alternativet. Använda maximal anonymitet kommer kosta</translation>
-    </message>
-    <message>
-        <source>0.1 WGR per 25000 WGR you anonymize.</source>
-        <translation>0.1 WGR per 25000 WGR du anonymiserar.</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Fördunkling Konfiguration</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Fördunkling sattes framgångsrikt till grundläggande (%1 och 2 rundor). Du kan ändra det här när du vill genom att öppna WAGERR's konfigurationsskärm.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Fördunkling sattes framgångsrikt till hög (%1 och 8 rundor). Du kan ändra det här när du vill genom att öppna WAGERR's konfigurationsskärm.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Fördunkling sattes framgångsrikt till maximal (%1 och 16 rundor). Du kan ändra det här när du vill genom att öppna WAGERR's konfigurationsskärm.</translation>
-    </message>
-</context>
-<context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
@@ -1865,6 +1888,10 @@ Var god vänta efter att du trycker på importera.</translation>
         <translation>MB</translation>
     </message>
     <message>
+        <source>Number of script &amp;verification threads</source>
+        <translation>Antal script &amp;verifications trådar</translation>
+    </message>
+    <message>
         <source>(0 = auto, &lt;0 = leave that many cores free)</source>
         <translation>(0 = auto, &lt;0 = lämna så många "kärnor" fria)</translation>
     </message>
@@ -1877,8 +1904,8 @@ Var god vänta efter att du trycker på importera.</translation>
         <translation>Om du avaktiverar spenderandet av okonfirmerad växel så kommer växeln från en transaktion &lt;br/&gt;ej kunna användas föräns transaktionen har minst en bekräftelse. &lt;br/&gt; Detta påverkar även hur ditt saldo beräknas.</translation>
     </message>
     <message>
-        <source>Automatically open the Wagerr client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Öppna automatiskt Wagerr klient porten på denna router. Detta funkar endast om din router stödjer UPnP och är påslaget.</translation>
+        <source>Automatically open the WAGERR client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Öppna automatiskt WAGERR klient porten på denna router. Detta funkar endast om din router stödjer UPnP och är påslaget.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1889,20 +1916,28 @@ Var god vänta efter att du trycker på importera.</translation>
         <translation>Tillåt inkommande anslutningar</translation>
     </message>
     <message>
+        <source>&amp;Connect through SOCKS5 proxy (default proxy):</source>
+        <translation>&amp;Koppla upp genom SOCKS5 proxy (standard proxy):</translation>
+    </message>
+    <message>
         <source>Expert</source>
         <translation>Expert</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
-        <translation>Starta Wagerr automatiskt efter inloggning på systemet.</translation>
+        <source>Automatically start WAGERR after logging in to the system.</source>
+        <translation>Starta WAGERR automatiskt efter inloggning på systemet.</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;Starta Wagerr vid systeminloggning</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;Starta WAGERR vid systeminloggning</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
         <translation>Huruvida mynt kontroll funktioner ska visas eller inte.</translation>
+    </message>
+    <message>
+        <source>Enable coin &amp;control features</source>
+        <translation>Tillåt mynt &amp;kontroll funktioner</translation>
     </message>
     <message>
         <source>Show additional tab listing all your masternodes in first sub-tab&lt;br/&gt;and all masternodes on the network in second sub-tab.</source>
@@ -1926,9 +1961,9 @@ Var god vänta efter att du trycker på importera.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr/wagerr</source>
         <translation>Fattas språk eller är översättningen ofullständig? Hjälp till att bidra med översättning här:
-https://www.transifex.com/wagerr/wagerr-translations</translation>
+https://www.transifex.com/wagerr/wagerr</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1941,6 +1976,14 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Enable zWGR Automint</source>
         <translation>Tillåt zWGR Autoprägling</translation>
+    </message>
+    <message>
+        <source>Enable automatic zWGR minting from specific addresses</source>
+        <translation>Aktivera automatisk zWGR prägling från specifika adresser</translation>
+    </message>
+    <message>
+        <source>Enable Automint Addresses</source>
+        <translation>Aktivera autopräglingsadresser</translation>
     </message>
     <message>
         <source>Percentage of incoming WGR which get automatically converted to zWGR via Zerocoin Protocol (min: 10%)</source>
@@ -1963,8 +2006,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Staking delnings tröskel:</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Anslut till Wagerr nätverket via en SOCKS5 proxy.</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Anslut till WAGERR nätverket via en SOCKS5 proxy.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -2007,6 +2050,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>&amp;Display</translation>
     </message>
     <message>
+        <source>User Interface &amp;language:</source>
+        <translation>Användargränssnitt och &amp;språk:</translation>
+    </message>
+    <message>
         <source>User Interface Theme:</source>
         <translation>Användargränssnitts Tema:</translation>
     </message>
@@ -2023,6 +2070,14 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Dölj tomma saldon</translation>
     </message>
     <message>
+        <source>Hide orphan stakes in transaction lists</source>
+        <translation>Göm föräldralösa stakes i transaktionslistan</translation>
+    </message>
+    <message>
+        <source>Hide orphan stakes</source>
+        <translation>Göm föräldralösa stakes</translation>
+    </message>
+    <message>
         <source>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</source>
         <translation>Tredjeparts URLs (t.ex. en blockutforskare) som visar sig i transaktionsfliken som objekt i innehållsmeny. %s i URLen ersätts med transaktionshash. Flera URLs separeras med vertical stång |.</translation>
     </message>
@@ -2037,6 +2092,10 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>Reset all client options to default.</source>
         <translation>Starta om alla klient alternativ till standard.</translation>
+    </message>
+    <message>
+        <source>&amp;Reset Options</source>
+        <translation>&amp;Återställnings Inställningar</translation>
     </message>
     <message>
         <source>&amp;OK</source>
@@ -2130,8 +2189,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Nuvarande låst saldo endast i "watch only" adresser</translation>
     </message>
     <message>
-        <source>Your current Wagerr balance, unconfirmed and immature transactions included</source>
-        <translation>Ditt nuvarande Wagerr saldo, obekräftade och omogna transaktioner är inkluderade</translation>
+        <source>Your current WAGERR balance, unconfirmed and immature transactions included</source>
+        <translation>Ditt nuvarande WAGERR saldo, obekräftade och omogna transaktioner är inkluderade</translation>
     </message>
     <message>
         <source>zWGR Balance</source>
@@ -2150,8 +2209,8 @@ Immature: confirmed, but less than 1 mint of the same denomination after it was 
 Omogna: bekräftade men under 1 myntning av samma valör efter den blev präglad</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Informationen kan vara föråldrad. Din plånbok synkroniserar automatiskt med Wagerr nätverket efter att en anslutning är etablerad, men denna process har inte blivit klar än.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>nformationen kan vara föråldrad. Din plånbok synkroniserar automatiskt med WAGERR nätverket efter att en anslutning är etablerad, men denna process har inte blivit klar än.</translation>
     </message>
     <message>
         <source>OVERVIEW</source>
@@ -2267,8 +2326,8 @@ För att aktivera AutoMint ändra 'enablezeromint=0' till 'enablezeromint=1' i w
         <translation>Kan ej starta wagerr: klicka-för-att-betala hanterare</translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid Wagerr address or malformed URI parameters.</source>
-        <translation>URI kunde ej analyseras! Detta kan orsakas av en ogiltig Wagerr adress eller felproducerade URI parametrar.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid WAGERR address or malformed URI parameters.</source>
+        <translation>URI kunde ej analyseras! Detta kan orsakas av en ogiltig WAGERR adress eller felproducerade URI parametrar.</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
@@ -2353,8 +2412,8 @@ För att aktivera AutoMint ändra 'enablezeromint=0' till 'enablezeromint=1' i w
         <translation>Zerocoin Handlingar:</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>nformationen kan vara föråldrad. Din plånbok synkroniserar automatiskt med Wagerr nätverket efter att en anslutning är etablerad, men denna process har inte blivit klar än.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>nformationen kan vara föråldrad. Din plånbok synkroniserar automatiskt med WAGERR nätverket efter att en anslutning är etablerad, men denna process har inte blivit klar än.</translation>
     </message>
     <message>
         <source>Mint Zerocoin</source>
@@ -2369,36 +2428,12 @@ För att aktivera AutoMint ändra 'enablezeromint=0' till 'enablezeromint=1' i w
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</source>
-        <translation>Tillgänglig att prägla med mynt som är bekräftade och ej låsta eller som är en masternod säkerhet.</translation>
-    </message>
-    <message>
-        <source>Available for Minting:</source>
-        <translation>Tillgängligt att prägla:</translation>
-    </message>
-    <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</source>
         <translation>Starta om Zerocoin Wallet DB. Raderar transaktioner som ej kom med i blockchain.</translation>
     </message>
     <message>
         <source>Reset</source>
         <translation>Starta om</translation>
-    </message>
-    <message>
-        <source>Coin Control...</source>
-        <translation>Mynt Kontroll</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Kvantitet:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Antal:</translation>
     </message>
     <message>
         <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data.</source>
@@ -2415,10 +2450,6 @@ För att aktivera AutoMint ändra 'enablezeromint=0' till 'enablezeromint=1' i w
     <message>
         <source>PRIVACY</source>
         <translation>SEKRETESS</translation>
-    </message>
-    <message>
-        <source>Enter an amount of Wgr to convert to zWGR</source>
-        <translation>Mata in en mängd WGR att konvertera till zWGR</translation>
     </message>
     <message>
         <source>zWGR Control</source>
@@ -2461,23 +2492,11 @@ zWGR är mogna när de har över 20 bekräftelser OCH över 2 präglingar av sam
         <translation>0 zWGR</translation>
     </message>
     <message>
-        <source>Security Level for Zerocoin Transactions. More is better, but needs more time and resources.</source>
-        <translation>Säkerhetsnivå på Zerocoin Transaktioner. Mer är bättre, men behöver mer tid och resurser.</translation>
-    </message>
-    <message>
-        <source>Security Level:</source>
-        <translation>Säkerhetsnivå:</translation>
-    </message>
-    <message>
-        <source>Security Level 1 - 100 (default: 42)</source>
-        <translation>Säkerhetsnivå 1- 100 (standard: 42)</translation>
-    </message>
-    <message>
         <source>Pay &amp;To:</source>
         <translation>Betala &amp;Till:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to. Creates local payment to yourself when empty.</source>
+        <source>The WAGERR address to send the payment to. Creates local payment to yourself when empty.</source>
         <translation>WAGERR adress att skicka betalningen till. Skapar betalning till dig själv när den är tom.</translation>
     </message>
     <message>
@@ -2498,7 +2517,7 @@ zWGR är mogna när de har över 20 bekräftelser OCH över 2 präglingar av sam
     </message>
     <message>
         <source>&amp;Label:</source>
-        <translation>Etikett:</translation>
+        <translation>&amp;Etikett:</translation>
     </message>
     <message>
         <source>Enter a label for this address to add it to the list of used addresses</source>
@@ -2548,7 +2567,7 @@ zWGR är mogna när de har över 20 bekräftelser OCH över 2 präglingar av sam
         <source>Unconfirmed: less than 20 confirmations
 Immature: confirmed, but less than 1 mint of the same denomination after it was minted</source>
         <translation>Obekräftade: Under 20 bekräftelser
-Omogna: bekräftade men under 1 mint av samma valör efter den blev mintad</translation>
+Omogna: bekräftade men under 1 myntning av samma valör efter den blev präglad</translation>
     </message>
     <message>
         <source>Show the current status of automatic zWGR minting.
@@ -2617,6 +2636,22 @@ För att ändra procenten (ingen omstart krävs):
         <translation>0 x</translation>
     </message>
     <message>
+        <source>Show zWGR denominations list</source>
+        <translation>Visa zWGR valör lista</translation>
+    </message>
+    <message>
+        <source>Show Denominations</source>
+        <translation>Visa Valörer</translation>
+    </message>
+    <message>
+        <source>zWGR minting is DISABLED</source>
+        <translation>zWGR prägling är inaktiverad</translation>
+    </message>
+    <message>
+        <source>zWGR spending is NOT private (links back to the mint transaction)</source>
+        <translation>Att spendera zWGR är INTE privat (länkar tillbaka till den myntade transaktionen)</translation>
+    </message>
+    <message>
         <source>Denominations with value 5:</source>
         <translation>Valörer med värde 5:</translation>
     </message>
@@ -2671,6 +2706,10 @@ För att ändra procenten (ingen omstart krävs):
     <message>
         <source>Denom. with value 5000:</source>
         <translation>Valörer med värde 5000:</translation>
+    </message>
+    <message>
+        <source>Hide Denominations</source>
+        <translation>Göm Valörer</translation>
     </message>
     <message>
         <source>Priority:</source>
@@ -2737,32 +2776,10 @@ För att ändra procenten (ingen omstart krävs):
         <translation>Myntnings Status: Okej</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>Kopiera kvantitet</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Kopiera antal</translation>
-    </message>
-    <message>
         <source>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware.
 Please be patient...</source>
         <translation>Startar ResetMintZerocoin: skannar om hela blockchain, detta kan ta upp till 30 minuter beroende på din hårdvara.
 Ha lite tålamod...</translation>
-    </message>
-    <message>
-        <source>Spending Zerocoin.
-Computationally expensive, might need several minutes depending on the selected Security Level and your hardware.
-Please be patient...</source>
-        <translation>Spendera Zerocoin.
-Beräkningsmässigt krävande, kan behöva flera minuter beroende på den valda säkerhetsnivån och din hårdvara.
-Var god dröj...</translation>
-    </message>
-    <message>
-        <source>) needed.
-Maximum allowed: </source>
-        <translation>) behövda.
-Högsta tillåtna:</translation>
     </message>
     <message>
         <source>zWGR Spend #: </source>
@@ -2861,32 +2878,6 @@ Högsta tillåtna:</translation>
         <translation>Valör &lt;b&gt;5000&lt;/b&gt;:</translation>
     </message>
     <message>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Fel: Din plånbok är låst. Var vänlig och mata in plånbokens lösenfras först.</translation>
-    </message>
-    <message>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation>Message: Mata in en mängd &gt; 0.</translation>
-    </message>
-    <message>
-        <source>Minting </source>
-        <translation>Myntade</translation>
-    </message>
-    <message>
-        <source>Successfully minted </source>
-        <translation>Framgångsrikt Myntade</translation>
-    </message>
-    <message>
-        <source> zWGR in </source>
-        <translation>zWGR i</translation>
-    </message>
-    <message>
-        <source> sec. Used denominations:
-</source>
-        <translation>sek. Använda valörer:
-</translation>
-    </message>
-    <message>
         <source>Duration: </source>
         <translation>Varaktighet:</translation>
     </message>
@@ -2929,47 +2920,28 @@ Högsta tillåtna:</translation>
         <translation>till en nygjord (oanvänd och därför anonym) lokal adress&lt;br /&gt;</translation>
     </message>
     <message>
-        <source>with Security Level </source>
-        <translation>med Säkerhetsnivå</translation>
-    </message>
-    <message>
         <source>Confirm send coins</source>
         <translation>Bekräfta att skicka mynt</translation>
-    </message>
-    <message>
-        <source>Version 1 zWGR require a security level of 100 to successfully spend.</source>
-        <translation>Version 1 zWGR kräver en säkerhetsnivå på 100 för att kunna spenderas med framgång.</translation>
-    </message>
-    <message>
-        <source>Failed to spend zWGR</source>
-        <translation>Misslyckades med att spendera zWGR</translation>
     </message>
     <message>
         <source>Failed to fetch mint associated with serial hash</source>
         <translation>Misslyckades med att hämta myntning associerat med serie hashen</translation>
     </message>
     <message>
-        <source>Too much inputs (</source>
-        <translation>För många input (</translation>
-    </message>
-    <message>
-        <source>
-Either mint higher denominations (so fewer inputs are needed) or reduce the amount to spend.</source>
-        <translation>
-Minta antingen högre valörer (så att färre inputs behövs) eller spendera mindre.</translation>
-    </message>
-    <message>
         <source>Spend Zerocoin failed with status = </source>
         <translation>Spendering av Zerocoin misslyckades med status =</translation>
-    </message>
-    <message numerus="yes">
-        <source>PrivacyDialog</source>
-        <comment>Enter an amount of WGR to convert to zWGR</comment>
-        <translation><numerusform>SekretessRuta</numerusform><numerusform>SekretessDialog</numerusform></translation>
     </message>
     <message>
         <source>denomination: </source>
         <translation>valör:</translation>
+    </message>
+    <message>
+        <source>Spending Zerocoin.
+Computationally expensive, might need several minutes depending on your hardware.
+Please be patient...</source>
+        <translation>Spendera Zerocoin.
+Beroende på maskinvaran kan det behövas flera minuter på datorn.
+Var tålmodig...</translation>
     </message>
     <message>
         <source>serial: </source>
@@ -3001,14 +2973,77 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
 </context>
 <context>
+    <name>ProposalFrame</name>
+    <message>
+        <source>Open proposal page in browser</source>
+        <translation>Öppna förslagssida i webbläsare</translation>
+    </message>
+    <message>
+        <source> remaining payment(s).</source>
+        <translation>återstående betalningar</translation>
+    </message>
+    <message>
+        <source>Yes:</source>
+        <translation>Ja:</translation>
+    </message>
+    <message>
+        <source>Abstain:</source>
+        <translation>Avstå:</translation>
+    </message>
+    <message>
+        <source>No:</source>
+        <translation>Nej:</translation>
+    </message>
+    <message>
+        <source>Open link</source>
+        <translation>Öppna länk:</translation>
+    </message>
+    <message>
+        <source>Copy link</source>
+        <translation>Kopiera länk:</translation>
+    </message>
+    <message>
+        <source>Wallet Locked</source>
+        <translation>Plånbok låst:</translation>
+    </message>
+    <message>
+        <source>You must unlock your wallet to vote.</source>
+        <translation>Du måste låsa upp din plånbok för att rösta.</translation>
+    </message>
+    <message>
+        <source>Do you want to vote %1 on</source>
+        <translation>Vill du rösta %1 på</translation>
+    </message>
+    <message>
+        <source>using all your masternodes?</source>
+        <translation>använda alla dina masternodes ?</translation>
+    </message>
+    <message>
+        <source>Proposal Hash:</source>
+        <translation>Föreslags hash:</translation>
+    </message>
+    <message>
+        <source>Proposal URL:</source>
+        <translation>Föreslags URL:</translation>
+    </message>
+    <message>
+        <source>Confirm Vote</source>
+        <translation>Bekräfta Röst:</translation>
+    </message>
+    <message>
+        <source>Vote Results</source>
+        <translation>Röst resultat:</translation>
+    </message>
+</context>
+<context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
         <translation>Mängd</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Mata in en Wagerr adress (e.g. %1)</translation>
+        <source>Enter a WAGERR address (e.g. %1)</source>
+        <translation>Mata in en WAGERR adress (e.g. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -3035,6 +3070,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>"BLOOM"</translation>
     </message>
     <message>
+        <source>ZK_BLOOM</source>
+        <translation>ZK_BLOOM</translation>
+    </message>
+    <message>
         <source>UNKNOWN</source>
         <translation>OKÄND</translation>
     </message>
@@ -3050,12 +3089,32 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
+    </message>
+    <message>
+        <source>Error: Specified data directory "%1" does not exist.</source>
+        <translation>Fel: Den angivna datakatalogen "%1" existerar inte.</translation>
+    </message>
+    <message>
+        <source>Error reading masternode configuration file: %1</source>
+        <translation>Fel vid inläsning av masternodens konfigurationsfil: %1</translation>
+    </message>
+    <message>
+        <source>WAGERR Core didn't yet exit safely...</source>
+        <translation>WAGERR Core avslutades ännu inte säkert...</translation>
+    </message>
 </context>
 <context>
     <name>QRImageWidget</name>
     <message>
         <source>&amp;Save Image...</source>
         <translation>&amp;Spara Bild...</translation>
+    </message>
+    <message>
+        <source>&amp;Copy Image</source>
+        <translation>&amp;Kopiera Bild</translation>
     </message>
     <message>
         <source>Save QR Code</source>
@@ -3074,7 +3133,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>&amp;Information</source>
-        <translation>information</translation>
+        <translation>&amp;Information</translation>
     </message>
     <message>
         <source>General</source>
@@ -3095,6 +3154,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Number of connections</source>
         <translation>Antal anslutningar</translation>
+    </message>
+    <message>
+        <source>&amp;Open</source>
+        <translation>&amp;Öppna</translation>
     </message>
     <message>
         <source>Startup time</source>
@@ -3137,12 +3200,16 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Blockchain</translation>
     </message>
     <message>
-        <source>Open the Wagerr debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Öppna Wagerr felsökningslogg från den nuvarande data katalogen. Detta kan ta några sekunder för stora logg filer.</translation>
+        <source>Open the WAGERR debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Öppna WAGERR felsökningslogg från den nuvarande data katalogen. Detta kan ta några sekunder för stora logg filer.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
         <translation>Antal Huvudnoder "masternodes"</translation>
+    </message>
+    <message>
+        <source>&amp;Console</source>
+        <translation>&amp;Konsoll</translation>
     </message>
     <message>
         <source>Clear console</source>
@@ -3151,6 +3218,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>&amp;Network Traffic</source>
         <translation>&amp;Nätverkstrafik</translation>
+    </message>
+    <message>
+        <source>&amp;Clear</source>
+        <translation>&amp;Rensa</translation>
     </message>
     <message>
         <source>Totals</source>
@@ -3223,6 +3294,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Ping Time</source>
         <translation>Ping Tid</translation>
+    </message>
+    <message>
+        <source>&amp;Wallet Repair</source>
+        <translation>&amp;Plånboks Reparation</translation>
     </message>
     <message>
         <source>Delete local Blockchain Folders</source>
@@ -3341,8 +3416,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Ut:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
-        <translation>Välkommen till Wagerr RPC konsol.</translation>
+        <source>Welcome to the WAGERR RPC console.</source>
+        <translation>Välkommen till WAGERR RPC konsol.</translation>
     </message>
     <message>
         <source>&amp;Disconnect Node</source>
@@ -3351,6 +3426,26 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Ban Node for</source>
         <translation>förbjud Nod för att</translation>
+    </message>
+    <message>
+        <source>1 &amp;hour</source>
+        <translation>1 &amp;timme</translation>
+    </message>
+    <message>
+        <source>1 &amp;day</source>
+        <translation>1 &amp;dag</translation>
+    </message>
+    <message>
+        <source>1 &amp;week</source>
+        <translation>1 &amp;vecka</translation>
+    </message>
+    <message>
+        <source>1 &amp;year</source>
+        <translation>1 &amp;år</translation>
+    </message>
+    <message>
+        <source>&amp;Unban Node</source>
+        <translation>&amp;Ta bort bann från Nod</translation>
     </message>
     <message>
         <source>This will delete your local blockchain folders and the wallet will synchronize the complete Blockchain from scratch.&lt;br /&gt;&lt;br /&gt;</source>
@@ -3373,12 +3468,16 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Godkänn omsynkronisering av Blockchain</translation>
     </message>
     <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Använd upp- och ner-pilarna för att navigera historiken, och &lt;b&gt;Ctrl-L&lt;/b&gt; för att rensa skärm.</translation>
+        <source>Use up and down arrows to navigate history, and %1 to clear screen.</source>
+        <translation>Använd upp- och ner-pilarna för att navigera historiken, och %1 för att rensa skärm.</translation>
     </message>
     <message>
         <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
         <translation>Skriv &lt;b&gt;help&lt;/b&gt; för en överblick av tillgängliga kommandon.</translation>
+    </message>
+    <message>
+        <source>WARNING: Scammers have been active, telling users to type commands here, stealing their wallet contents. Do not use this console without fully understanding the ramifications of a command.</source>
+        <translation>VARNING: Bedrägare har varit aktiva, säger åt användare att skriva kommandon här, stjäl deras innehåll i plånboken. Använd inte denna konsoll utan att fullt förstå vad ett kommando kan leda till.</translation>
     </message>
     <message>
         <source>%1 B</source>
@@ -3448,16 +3547,28 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>En valfri etikett att associera med den nya mottagaradressen.</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Ett frivilligt meddelande att bifoga till betalningsförfrågan, som kommer visas när förfrågan öppnas. Observera: Medelandet kommer inte skickas med betalningen över Wagerr nätverket.</translation>
+        <source>Your receiving address. You can copy and use it to receive coins on this wallet. A new one will be generated once it is used.</source>
+        <translation>Din mottagaradress. Du kan kopiera och använda den för att ta emot mynt på denna plånbok. En ny kommer genereras när den har använts.</translation>
+    </message>
+    <message>
+        <source>&amp;Address:</source>
+        <translation>&amp;Adress</translation>
+    </message>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>&amp;Mängd:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Ett frivilligt meddelande att bifoga till betalningsförfrågan, som kommer visas när förfrågan öppnas. Observera: Medelandet kommer inte skickas med betalningen över WAGERR nätverket.</translation>
     </message>
     <message>
         <source>RECEIVE</source>
         <translation>ERHÅLLA</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Ett frivilligt meddelande att bifoga till betalningsförfrågan, vilket kommer visas när förfrågan öppnas.&lt;br&gt;Observera: Medelandet kommer inte skickas med betalningen över Wagerr nätverket.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Ett frivilligt meddelande att bifoga till betalningsförfrågan, vilket kommer visas när förfrågan öppnas.&lt;br&gt;Observera: Medelandet kommer inte skickas med betalningen över WAGERR nätverket.</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
@@ -3472,12 +3583,20 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>En frivillig mängd att anhålla om. Lämna den tom eller på noll för att inte fråga efter en specifik mängd.</translation>
     </message>
     <message>
+        <source>&amp;Request payment</source>
+        <translation>&amp;Förfråga betalning</translation>
+    </message>
+    <message>
         <source>Clear all fields of the form.</source>
         <translation>Rensa alla fält i formuläret.</translation>
     </message>
     <message>
         <source>Clear</source>
         <translation>Rensa</translation>
+    </message>
+    <message>
+        <source>Receiving Addresses</source>
+        <translation>Mottagar Adress</translation>
     </message>
     <message>
         <source>Requested payments history</source>
@@ -3510,6 +3629,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Copy amount</source>
         <translation>Kopiera antal</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopiera Adress</translation>
     </message>
 </context>
 <context>
@@ -3579,7 +3702,11 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>Message</source>
-        <translation>Medelande</translation>
+        <translation>Meddelande</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adress</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -3614,7 +3741,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>Insufficient funds!</source>
-        <translation>Otillräckliga pengar!</translation>
+        <translation>Otillräckliga medel !</translation>
     </message>
     <message>
         <source>Quantity:</source>
@@ -3658,7 +3785,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>If this is activated, but the change address is empty or invalid, change will be sent to a newly generated address.</source>
-        <translation>Om detta är aktiverat, men växeladressen är tom eller ogiltig så kommer växel skickas till en nybildad adress.</translation>
+        <translation>Om detta är aktiverat, men växeladressen är tom eller ogiltig så kommer växeln att skickas till en nybildad adress.</translation>
     </message>
     <message>
         <source>Custom change address</source>
@@ -3681,12 +3808,20 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>0 WGR</translation>
     </message>
     <message>
+        <source>SwiftX technology allows for near instant transactions - A flat fee of 0.01 WGR applies</source>
+        <translation>SwiftX teknologi tillåter nästan omedelbara transaktioner - En fast avgift på 0.01WGR tillkommer</translation>
+    </message>
+    <message>
         <source>Transaction Fee:</source>
         <translation>Transaktionsavgift:</translation>
     </message>
     <message>
         <source>Choose...</source>
         <translation>Välj...</translation>
+    </message>
+    <message>
+        <source>collapse fee-settings</source>
+        <translation>göm avgifts-inställningar</translation>
     </message>
     <message>
         <source>Minimize</source>
@@ -3737,8 +3872,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Om 1000 uWGRs är den valda skräddarsydda avgiften och transaktionen är bara 250 bytes så kommer "per kilobyte" bara betala 250 uWGRs i avgift,&lt;br /&gt;medans "minst totalt" betalar 1000 uWGRs. För transaktioner större än en kilobyte så betalar båda per kilobyte.</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for Wagerr transactions than the network can process.</source>
-        <translation>Att endast betala minimum avgift är okej så länge som transaktionsvolymen är mindre än rummet i blocken.&lt;br /&gt;Men var medveten om att detta kan sluta som en transaktion som aldrig blir bekräftad när det finns ett större behov av Wagerr transaktioner än nätverket kan bearbeta.</translation>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for WAGERR transactions than the network can process.</source>
+        <translation>Att endast betala minimum avgift är okej så länge som transaktionsvolymen är mindre än rummet i blocken.&lt;br /&gt;Men var medveten om att detta kan sluta som en transaktion som aldrig blir bekräftad när det finns ett större behov av WAGERR transaktioner än nätverket kan bearbeta.</translation>
     </message>
     <message>
         <source>normal</source>
@@ -3765,6 +3900,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Bekräfta skickandet</translation>
     </message>
     <message>
+        <source>S&amp;end</source>
+        <translation>S&amp;icka</translation>
+    </message>
+    <message>
         <source>Clear all fields of the form.</source>
         <translation>Rensa alla fält i formuläret.</translation>
     </message>
@@ -3775,6 +3914,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Send to multiple recipients at once</source>
         <translation>Skicka till flera mottagare på en gång</translation>
+    </message>
+    <message>
+        <source>Add &amp;Recipient</source>
+        <translation>Lägg till &amp;Mottagare</translation>
     </message>
     <message>
         <source>Anonymized WGR</source>
@@ -3825,8 +3968,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Split block verktyget fungerar inte med flera adresser. Försök igen.</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
-        <translation>Varning: Ogiltig Wagerr adress</translation>
+        <source>Warning: Invalid WAGERR address</source>
+        <translation>Varning: Ogiltig WAGERR adress</translation>
     </message>
     <message>
         <source>%1 to %2</source>
@@ -3851,10 +3994,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
         <translation>En avgift %1 gånger större än %2 per kB anses vara en galet hög avgift.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Estimated to begin confirmation within %n block(s).</source>
-        <translation><numerusform>Bekräftelse börjar om uppskattningsvis %n block.</numerusform><numerusform>Bekräftelse börjar om uppskattningsvis %n block.</numerusform></translation>
     </message>
     <message>
         <source>The recipient address is not valid, please recheck.</source>
@@ -3909,6 +4048,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Betala endast minsta avgift på %1</translation>
     </message>
     <message>
+        <source>Estimated to get 6 confirmations near instantly with &lt;b&gt;SwiftX&lt;/b&gt;!</source>
+        <translation>Upskattar att få 6 konfirmationer nästan omedelbart med &lt;b&gt;SwiftX&lt;/b&gt;!</translation>
+    </message>
+    <message>
         <source>Warning: Unknown change address</source>
         <translation>Varning: Okänd växeladress</translation>
     </message>
@@ -3928,7 +4071,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Betala &amp;Till:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
+        <source>The WAGERR address to send the payment to</source>
         <translation>WAGERR adressen att skicka betalningen till</translation>
     </message>
     <message>
@@ -3953,7 +4096,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>&amp;Label:</source>
-        <translation>Etikett:</translation>
+        <translation>&amp;Etikett:</translation>
     </message>
     <message>
         <source>Enter a label for this address to add it to the list of used addresses</source>
@@ -3961,15 +4104,15 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>A&amp;mount:</source>
-        <translation>&amp;mängd:</translation>
+        <translation>&amp;Mängd:</translation>
     </message>
     <message>
         <source>Message:</source>
         <translation>Medelande:</translation>
     </message>
     <message>
-        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Wagerr network.</source>
-        <translation>Ett medelande som var bifogat till WAGERR: URI som kommer sparas med transaktionen som din referens. Lägg märke till: Detta meddelande kommer inte skickas genom Wagerr nätverket.</translation>
+        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the WAGERR network.</source>
+        <translation>Ett medelande som var bifogat till WAGERR: URI som kommer sparas med transaktionen som din referens. Lägg märke till: Detta meddelande kommer inte skickas genom WAGERR nätverket.</translation>
     </message>
     <message>
         <source>This is an unverified payment request.</source>
@@ -3995,8 +4138,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
-        <translation>Wagerr Core stängs ner...</translation>
+        <source>WAGERR Core is shutting down...</source>
+        <translation>WAGERR Core stängs ner...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -4018,7 +4161,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Du kan signera meddelanden med din egna adress för att bevisa att du äger dem. Se upp för att signera något vagt, då phishing-attacker kan försöka lura dig att signera din identitet åt dom. Signera endast fullt detaljerade påståenden du går med på.</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
+        <source>The WAGERR address to sign the message with</source>
         <translation>WAGERR adressen för signera meddelandet med</translation>
     </message>
     <message>
@@ -4050,16 +4193,16 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Kopiera den nuvarande signaturen till systemets urklipp</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Signera meddelandet för att bevisa att du äger denna Wagerr adress</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Signera meddelandet för att bevisa att du äger denna WAGERR adress</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
+        <source>The WAGERR address the message was signed with</source>
         <translation>WAGERR adressen meddelandet blev signerat med</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Verifiera meddelandet för att säkerställa att de blev signerat med den specifika Wagerr adressen.</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Verifiera meddelandet för att säkerställa att de blev signerat med den specifika WAGERR adressen.</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -4103,15 +4246,15 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>The entered address does not refer to a key.</source>
-        <translation>Den angivna adressen refererar inte till en nyckel.</translation>
+        <translation>Den angivna adressen visar inte till en nyckel.</translation>
     </message>
     <message>
         <source>Wallet unlock was cancelled.</source>
-        <translation>Upplåsningen av plånboken var avbruten.</translation>
+        <translation>Upplåsningen av plånboken blev avbruten.</translation>
     </message>
     <message>
         <source>Private key for the entered address is not available.</source>
-        <translation>Den privata nyckel som angivits flr adressen är inte tillgänglig.</translation>
+        <translation>Den privata nyckel som angivits till adressen är inte tillgänglig.</translation>
     </message>
     <message>
         <source>Message signing failed.</source>
@@ -4145,8 +4288,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Version %1</source>
@@ -4161,8 +4304,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Dash Core utvecklarna</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
-        <translation>Wagerr Core utvecklarna</translation>
+        <source>The WAGERR Core developers</source>
+        <translation>WAGERR Core utvecklarna</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -4180,7 +4323,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <name>TransactionDesc</name>
     <message numerus="yes">
         <source>Open for %n more block(s)</source>
-        <translation><numerusform>Öppen för %n fler block</numerusform><numerusform>Öppen för %n fler block</numerusform></translation>
+        <translation><numerusform>Öppna till %n flera block</numerusform><numerusform>Öppna till %n flera block</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -4244,7 +4387,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message numerus="yes">
         <source>, broadcast through %n node(s)</source>
-        <translation><numerusform>, sänder via %n nod</numerusform><numerusform>, sänder via %n noder</numerusform></translation>
+        <translation><numerusform>, sänder via %n noder</numerusform><numerusform>,sänder via %n noder </numerusform></translation>
     </message>
     <message>
         <source>Date</source>
@@ -4288,7 +4431,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message numerus="yes">
         <source>matures in %n more block(s)</source>
-        <translation><numerusform>mognar om %n fler block</numerusform><numerusform>mognar om %n fler block</numerusform></translation>
+        <translation><numerusform>mognar på %n flera block</numerusform><numerusform>mognar på %n flera block    </numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
@@ -4387,10 +4530,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Address</source>
         <translation>Adress</translation>
-    </message>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Öppen för %n fler block</numerusform><numerusform>Öppen för %n fler block</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -4601,7 +4740,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>Masternode Reward</source>
-        <translation>Huvudnods Belöning</translation>
+        <translation>Masternode Belöning</translation>
     </message>
     <message>
         <source>Zerocoin Mint</source>
@@ -4641,7 +4780,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>Copy transaction ID</source>
-        <translation>Kopiera transactions ID</translation>
+        <translation>Kopiera transaktions ID</translation>
     </message>
     <message>
         <source>Edit label</source>
@@ -4650,6 +4789,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Show transaction details</source>
         <translation>Visa Transaktionsdetaljer</translation>
+    </message>
+    <message>
+        <source>Hide orphan stakes</source>
+        <translation>Göm föräldralösa stakes</translation>
     </message>
     <message>
         <source>Export Transaction History</source>
@@ -4689,7 +4832,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
     <message>
         <source>Exporting Failed</source>
-        <translation>Exportering Misslyckad</translation>
+        <translation>Exportering Misslyckades</translation>
     </message>
     <message>
         <source>There was an error trying to save the transaction history to %1.</source>
@@ -4773,7 +4916,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     </message>
 </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>Select zWGR to Spend</source>
         <translation>Välj zWGR att Spendera</translation>
@@ -4794,11 +4937,7 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <source>Select/Deselect All</source>
         <translation>Markera/Avmarkera alla</translation>
     </message>
-    <message>
-        <source>Is Spendable</source>
-        <translation>Är Spenderbar</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>wagerr-core</name>
     <message>
@@ -4826,8 +4965,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Beräknade ackumulator kontrollstation är inte vad som sparats av block index</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Wagerr Core is probably already running.</source>
-        <translation>Kan ej låsa in på data katalog %s. Wagerr Kärna körs förmodligen redan.</translation>
+        <source>Cannot obtain a lock on data directory %s. WAGERR Core is probably already running.</source>
+        <translation>Kan ej låsa in på data katalog %s. WAGERR Kärna körs förmodligen redan.</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
@@ -4908,10 +5047,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
         <translation>Spola databasaktivitet från minnes pool till disk log varje &lt;n&gt;megabytes (default: %u)</translation>
-    </message>
-    <message>
-        <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
-        <translation>Obekräftade betecknade utmatningar hittade, kommer vänta tills de bekräftar för att fortsätta.</translation>
     </message>
     <message>
         <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
@@ -5002,20 +5137,24 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Denna produkt inkluderar mjukvara utvecklad av OpenSSL Projektet för användning i OpenSSL Toolkit &lt;https://www.openssl.org/&gt; och kryptografisk mjukvara skriven av Eric Young och UPnP mjukvara skriven av Thomas Bernard.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Wagerr Core is probably already running.</source>
-        <translation>Kan inte binda till %s på denna dator. Wagerr Core körs förmodligen redan.</translation>
+        <source>Total length of network version string (%i) exceeds maximum length (%i). Reduce the number or size of uacomments.</source>
+        <translation>Totala längden av nätverks verisionens sträng (%i) överskrider maximala längd (%i). Minska mängden eller storleken av uakommentarer.</translation>
+    </message>
+    <message>
+        <source>Unable to bind to %s on this computer. WAGERR Core is probably already running.</source>
+        <translation>Kan inte binda till %s på denna dator. WAGERR Core körs förmodligen redan.</translation>
     </message>
     <message>
         <source>Unable to locate enough Obfuscation denominated funds for this transaction.</source>
         <translation>Kan ej lokalisera tillräckligt Fördunklingsdenominationerade pengar för denna transaktion.</translation>
     </message>
     <message>
-        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 25000 WGR.</source>
-        <translation>Kan ej lokalisera tillräckligt Fördunkling icke-denominationerade pengar för denna transaktion som inte är 25000 WGR.</translation>
+        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 WGR.</source>
+        <translation>Kan ej lokalisera tillräckligt Fördunkling icke-denominationerade pengar för denna transaktion som inte är 10000 WGR.</translation>
     </message>
     <message>
-        <source>Unable to locate enough funds for this transaction that are not equal 25000 WGR.</source>
-        <translation>Kan inte hitta tillräckligt med pengar för denna transaktion som inte är 25000 WGR.</translation>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 WGR.</source>
+        <translation>Kan inte hitta tillräckligt med pengar för denna transaktion som inte är 10000 WGR.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -5030,8 +5169,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Varning: -maxtxfee är sätt väldigt högt! Detta är transaktionsavgiften du kommer betala om du skickar en transaktion.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.</source>
-        <translation>Varning: Var vänlig kontrollera att din dators tid och datum är korrekt! Om din klocka är fel så kommer Wagerr Core inte att fungera korrekt.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong WAGERR Core will not work properly.</source>
+        <translation>Varning: Var vänlig kontrollera att din dators tid och datum är korrekt! Om din klocka är fel så kommer WAGERR Core inte att fungera korrekt.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5098,12 +5237,12 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Tillåt DNS lookups för -addnode, -seednode och -connect</translation>
     </message>
     <message>
-        <source>Already have that input.</source>
-        <translation>Har redan den inmatningen.</translation>
-    </message>
-    <message>
         <source>Always query for peer addresses via DNS lookup (default: %u)</source>
         <translation>Fråga alltid efter peer adresser via DNS lookup (standard: %u)</translation>
+    </message>
+    <message>
+        <source>Append comment to the user agent string</source>
+        <translation>Bifoga kommentar till användaragent strängen</translation>
     </message>
     <message>
         <source>Attempt to recover private keys from a corrupt wallet.dat</source>
@@ -5120,18 +5259,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Calculating missing accumulators...</source>
         <translation>Beräknar fattandes ackumulatorer...</translation>
-    </message>
-    <message>
-        <source>Can't denominate: no compatible inputs left.</source>
-        <translation>Kan ej kalla: inga kompatibla inmatningar kvar.</translation>
-    </message>
-    <message>
-        <source>Can't find random Masternode.</source>
-        <translation>Kan ej hitta slumpmässig Huvudnod.</translation>
-    </message>
-    <message>
-        <source>Can't mix while sync in progress.</source>
-        <translation>Kan ej blanda när synkronisering håller på.</translation>
     </message>
     <message>
         <source>Cannot downgrade wallet</source>
@@ -5152,10 +5279,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Cannot write default address</source>
         <translation>Kan ej skriva standard adress</translation>
-    </message>
-    <message>
-        <source>Collateral not valid.</source>
-        <translation>Kollateral ej giltig.</translation>
     </message>
     <message>
         <source>Connect only to the specified node(s)</source>
@@ -5186,8 +5309,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Copyright (C) 2015-%i The PIVX Core Developers</translation>
     </message>
     <message>
-        <source>Copyright (C) %i The Wagerr Core Developers</source>
-        <translation>Copyright (C) %i The Wagerr Core Developers</translation>
+        <source>Copyright (C) 2018-%i The WAGERR Core Developers</source>
+        <translation>Copyright (C) 2018-%i The WAGERR Core Developers</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5246,14 +5369,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Tillåt klinten att bete sig som en huvudnod (0-1, standard: %u)</translation>
     </message>
     <message>
-        <source>Entries are full.</source>
-        <translation>Poster är fulla.</translation>
-    </message>
-    <message>
-        <source>Error connecting to Masternode.</source>
-        <translation>Fel vid anslutning till Huvudnoder.</translation>
-    </message>
-    <message>
         <source>Error initializing block database</source>
         <translation>Fel vid initialisering av blockdatabas</translation>
     </message>
@@ -5274,8 +5389,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Fel vid laddning av wallet.dat: Plånbok korrupterad</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Wagerr Core</source>
-        <translation>Fel vid laddning av wallet.dat: Plånbok  kräver nyare Wagerr Kärna version</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of WAGERR Core</source>
+        <translation>Fel vid laddning av wallet.dat: Plånbok  kräver nyare WAGERR Kärna version</translation>
     </message>
     <message>
         <source>Error opening block database</source>
@@ -5290,16 +5405,16 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Fel vid återhämtning av offentlig nyckel.</translation>
     </message>
     <message>
+        <source>Error writing zerocoinDB to disk</source>
+        <translation>Fel vid skrivning av zerocoinDB till disk</translation>
+    </message>
+    <message>
         <source>Error</source>
         <translation>Fel</translation>
     </message>
     <message>
         <source>Error: A fatal internal error occured, see debug.log for details</source>
         <translation>Fel: Ett fatalt internt fel inträffade, se debug.log för detaljer</translation>
-    </message>
-    <message>
-        <source>Error: Can't select current denominated inputs</source>
-        <translation>Fel: Kan ej välja nuvarande benämnda inmatningar</translation>
     </message>
     <message>
         <source>Error: Disk space is low!</source>
@@ -5314,16 +5429,16 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Fel: Plånbok låst, kan ej genomföra transaktion!</translation>
     </message>
     <message>
-        <source>Error: You already have pending entries in the Obfuscation pool</source>
-        <translation>Fel: Du har redan avvaktande poster i Fördunklingspoolen</translation>
-    </message>
-    <message>
         <source>Failed to calculate accumulator checkpoint</source>
         <translation>Misslyckades att beräkna ackumulator kontrollstation</translation>
     </message>
     <message>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Misslyckades att lyssna på någon port. Använd -listen=0 om du vill detta.</translation>
+    </message>
+    <message>
+        <source>Failed to parse host:port string</source>
+        <translation>Misslyckades ta ut satsdelarna i host:port sträng</translation>
     </message>
     <message>
         <source>Failed to read block</source>
@@ -5334,20 +5449,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Avgift (i WGR/kB) för att lägga till transaktioner you skicka (standard: %s)</translation>
     </message>
     <message>
-        <source>Finalizing transaction.</source>
-        <translation>Slutgiltiggör transaktion.</translation>
-    </message>
-    <message>
         <source>Force safe mode (default: %u)</source>
         <translation>Tvinga säkert läga (standard: %u)</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ( waiting %s )</source>
-        <translation>Hittat tillräckligt många användare, signerar (väntar %s)</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ...</source>
-        <translation>Hittade tillräckligt många användare, signerar ...</translation>
     </message>
     <message>
         <source>Generate coins (default: %u)</source>
@@ -5374,14 +5477,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Inkludera IP adress i felsökningens utmatning (standard: %u)</translation>
     </message>
     <message>
-        <source>Incompatible mode.</source>
-        <translation>Okompatibel sätt.</translation>
-    </message>
-    <message>
-        <source>Incompatible version.</source>
-        <translation>Okompatibel version.</translation>
-    </message>
-    <message>
         <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
         <translation>Ogiltig eller ingen tillblivelse block hittat. Fel datadir för nätverk?</translation>
     </message>
@@ -5390,12 +5485,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Information</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Wagerr Core is shutting down.</source>
-        <translation>Initierings renlighetscheck misslyckades. Wagerr Kärna stängs ner.</translation>
-    </message>
-    <message>
-        <source>Input is not valid.</source>
-        <translation>inmatning är inte giltig.</translation>
+        <source>Initialization sanity check failed. WAGERR Core is shutting down.</source>
+        <translation>Initierings renlighetscheck misslyckades. WAGERR Kärna stängs ner.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -5454,10 +5545,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Fel privat nyckel.</translation>
     </message>
     <message>
-        <source>Invalid script detected.</source>
-        <translation>Ogiltigt script upptäckt.</translation>
-    </message>
-    <message>
         <source>Percentage of automatically minted Zerocoin  (1-100, default: %u)</source>
         <translation>Procent automatiskt mintad Zerocoin (1-100, default: %u)</translation>
     </message>
@@ -5476,6 +5563,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Selected coins value is less than payment target</source>
         <translation>Valda mynts värde är under betalningsmål</translation>
+    </message>
+    <message>
+        <source>Support the zerocoin light node protocol (default: %u)</source>
+        <translation>Stöd zerocoin protokollet för light node (standard: %u)</translation>
     </message>
     <message>
         <source>SwiftX options:</source>
@@ -5502,8 +5593,8 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
 </translation>
     </message>
     <message>
-        <source>Disable all Wagerr specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
-        <translation>Avaktivera all Wagerr funktionalitet (Huvudnoder, Zerocoin, SwiftX, Budgeting) (0-1, standard: %u)</translation>
+        <source>Disable all WAGERR specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
+        <translation>Avaktivera all WAGERR funktionalitet (Huvudnoder, Zerocoin, SwiftX, Budgeting) (0-1, standard: %u)</translation>
     </message>
     <message>
         <source>Enable SwiftX, show confirmations for locked transactions (bool, default: %s)</source>
@@ -5602,10 +5693,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Misslyckades skapa mint</translation>
     </message>
     <message>
-        <source>Failed to deserialize</source>
-        <translation>Misslyckades att deserialize</translation>
-    </message>
-    <message>
         <source>Failed to find Zerocoins in wallet.dat</source>
         <translation>Misslyckades hitta Zerocoins i wallet.dat</translation>
     </message>
@@ -5624,14 +5711,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</source>
         <translation>Behåll som mest &lt;n&gt; oanslutningsbara transaktioner i minne (standard: %u)</translation>
-    </message>
-    <message>
-        <source>Last Obfuscation was too recent.</source>
-        <translation>Senaste obfuscation var för ny.</translation>
-    </message>
-    <message>
-        <source>Last successful Obfuscation action was too recent.</source>
-        <translation>Den senaste framgångsrika Obfuscation-åtgärden var för ny.</translation>
     </message>
     <message>
         <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
@@ -5686,10 +5765,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Lokation av auth cookie (standard: data dir)</translation>
     </message>
     <message>
-        <source>Lock is already in place.</source>
-        <translation>Lås är redan på plats.</translation>
-    </message>
-    <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
         <translation>Lås huvudnoder från huvudnod konfigurations fil (standard: %u)</translation>
     </message>
@@ -5706,14 +5781,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Masternod val:</translation>
     </message>
     <message>
-        <source>Masternode queue is full.</source>
-        <translation>Masternodens kö är full.</translation>
-    </message>
-    <message>
-        <source>Masternode:</source>
-        <translation>Masternod:</translation>
-    </message>
-    <message>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: %u)</source>
         <translation>Maximala mottagna per-anslutning buffer, &lt;n&gt;*1000 bytes (standard: %u)</translation>
     </message>
@@ -5726,14 +5793,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Mint kom inte med i blockchain</translation>
     </message>
     <message>
-        <source>Missing input transaction information.</source>
-        <translation>Inmatad transaktions information fattas.</translation>
-    </message>
-    <message>
-        <source>Mixing in progress...</source>
-        <translation>Blandning pågår...</translation>
-    </message>
-    <message>
         <source>Need address because change is not exact</source>
         <translation>Adress behövs för att växel ej är exakt</translation>
     </message>
@@ -5742,40 +5801,12 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Port behöver specifieras med -whitebind: '%s'</translation>
     </message>
     <message>
-        <source>No Masternodes detected.</source>
-        <translation>Inga Huvudnoder upptäckta.</translation>
-    </message>
-    <message>
-        <source>No compatible Masternode found.</source>
-        <translation>Inga kompatibla Huvudnoder hittade.</translation>
-    </message>
-    <message>
-        <source>No funds detected in need of denominating.</source>
-        <translation>Inga pengar o behov av benämnelse upptäckta.</translation>
-    </message>
-    <message>
-        <source>No matching denominations found for mixing.</source>
-        <translation>Inga matchande valörer hittade till blandning.</translation>
-    </message>
-    <message>
         <source>Node relay options:</source>
         <translation>Nod relä val:</translation>
     </message>
     <message>
-        <source>Non-standard public key detected.</source>
-        <translation>Ej-standard offentlig nyckel upptäckt.</translation>
-    </message>
-    <message>
-        <source>Not compatible with existing transactions.</source>
-        <translation>Ej kompatibel med existerande transaktioner.</translation>
-    </message>
-    <message>
         <source>Not enough file descriptors available.</source>
         <translation>Ej tillräckliga fil deskriptorer tillgängliga.</translation>
-    </message>
-    <message>
-        <source>Not in the Masternode list.</source>
-        <translation>Inte i Huvudnod listan.</translation>
     </message>
     <message>
         <source>Number of automatic wallet backups (default: 10)</source>
@@ -5784,18 +5815,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Number of custom location backups to retain (default: %d)</source>
         <translation>Antal skräddarsydda platser för backup att behålla (standard: %d)</translation>
-    </message>
-    <message>
-        <source>Obfuscation is idle.</source>
-        <translation>Fördunkling är overksam.</translation>
-    </message>
-    <message>
-        <source>Obfuscation request complete:</source>
-        <translation>Fördunkling förfrågan avslutad:</translation>
-    </message>
-    <message>
-        <source>Obfuscation request incomplete:</source>
-        <translation>Fördunkling förfrågan ej avslutad:</translation>
     </message>
     <message>
         <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
@@ -5812,6 +5831,10 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Password for JSON-RPC connections</source>
         <translation>Lösenord för JSON-RPC anslutningar</translation>
+    </message>
+    <message>
+        <source>Unable to find transaction containing mint %s</source>
+        <translation>Det gick inte att hitta transaktionen som innehöll prägling %s</translation>
     </message>
     <message>
         <source>isValid(): Invalid -proxy address or hostname: '%s'</source>
@@ -5888,10 +5911,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Send transactions as zero-fee transactions if possible (default: %u)</source>
         <translation>Skicka transaktioner som avgiftsfria transaktioner om möjligt (standard: %u)</translation>
-    </message>
-    <message>
-        <source>Session not complete!</source>
-        <translation>Sessionen är inte klar</translation>
     </message>
     <message>
         <source>Session timed out.</source>
@@ -5998,18 +6017,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Sluta kör efter block har importerats från disk (standard: %u)</translation>
     </message>
     <message>
-        <source>Submitted following entries to masternode: %u / %d</source>
-        <translation>Skickade in följande poster till huvudnod: %u / %d</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation>Inskickat till huvudnod, väntar på fler poster ( %u / %d ) %s</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>Inskickat till huvudnod, väntar i kö %s</translation>
-    </message>
-    <message>
         <source>Synchronization failed</source>
         <translation>Synchronisering misslyckad</translation>
     </message>
@@ -6046,14 +6053,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Mynt spenderingen har redan använts</translation>
     </message>
     <message>
-        <source>The new spend coin transaction did not verify</source>
-        <translation>Den nya spendera mynt transaktionen kunde inte verifieras</translation>
-    </message>
-    <message>
-        <source>The selected mint coin is an invalid coin</source>
-        <translation>Den valda mint myntet är ett ogiltigt mynt</translation>
-    </message>
-    <message>
         <source>The transaction did not verify</source>
         <translation>Transaktionen verifierades inte</translation>
     </message>
@@ -6068,10 +6067,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>This is intended for regression testing tools and app development.</source>
         <translation>Det här är menat för regression testverktyg och app utveckling.</translation>
-    </message>
-    <message>
-        <source>This is not a Masternode.</source>
-        <translation>Dehär är ingen Masternod</translation>
     </message>
     <message>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
@@ -6106,18 +6101,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Transaktionens värde måste vara possitivt</translation>
     </message>
     <message>
-        <source>Transaction created successfully.</source>
-        <translation>Transaktion skapad framgångsrikt</translation>
-    </message>
-    <message>
-        <source>Transaction fees are too high.</source>
-        <translation>Transaktionsavgifter är för stora.</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>Transaktionen inte giltig.</translation>
-    </message>
-    <message>
         <source>Transaction too large for fee policy</source>
         <translation>Transaktionen för stor för avgifts policy</translation>
     </message>
@@ -6126,24 +6109,12 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Transaktion för stor</translation>
     </message>
     <message>
-        <source>Transmitting final transaction.</source>
-        <translation>Sänder ut slutgiltig transaktion.</translation>
-    </message>
-    <message>
-        <source>Try to spend with a higher security level to include more coins</source>
-        <translation>Försök att spendera med en högre säkerhetsnivå för att inkludera fler mynt</translation>
-    </message>
-    <message>
         <source>Trying to spend an already spent serial #, try again.</source>
         <translation>Försöker spendera en redan spendera serie #, försök igen.</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
         <translation>Kan ej binda till %s på denna dator (bind återgav fel %s)</translation>
-    </message>
-    <message>
-        <source>Unable to find transaction containing mint</source>
-        <translation>Kan ej hitta transaktion innehållandes mint</translation>
     </message>
     <message>
         <source>Unable to sign spork message, wrong key?</source>
@@ -6156,10 +6127,6 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
     <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
         <translation>Okänt nätverk specifierat i -onlynet: '%s'</translation>
-    </message>
-    <message>
-        <source>Unknown state: id = %u</source>
-        <translation>Okänt tillstånd: id = %u</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
@@ -6182,16 +6149,16 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Använd test nätverket</translation>
     </message>
     <message>
+        <source>User Agent comment (%s) contains unsafe characters.</source>
+        <translation>Användaragent kommentar (%s) innehåller osäkra tecken.</translation>
+    </message>
+    <message>
         <source>Username for JSON-RPC connections</source>
         <translation>Användarnamn för JSON-RPC anslutningar</translation>
     </message>
     <message>
         <source>Value is below the smallest available denomination (= 1) of zWGR</source>
         <translation>Värde är under den minsta tillgängliga valören (=1) av zWGR</translation>
-    </message>
-    <message>
-        <source>Value more than Obfuscation pool maximum allows.</source>
-        <translation>Värde högre än fördunklingspoolen maximalt tillåter.</translation>
     </message>
     <message>
         <source>Verifying blocks...</source>
@@ -6202,20 +6169,12 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Verifierar plånbok</translation>
     </message>
     <message>
-        <source>Version 1 zWGR require a security level of 100 to successfully spend.</source>
-        <translation>Version 1 zWGR kräver en säkerhetsnivå på 100 för att kunna spenderas med framgång.</translation>
-    </message>
-    <message>
         <source>Wallet %s resides outside data directory %s</source>
         <translation>Plånbok %s finns utanför data katalog %s</translation>
     </message>
     <message>
-        <source>Wallet is locked.</source>
-        <translation>Plånboken är låst.</translation>
-    </message>
-    <message>
-        <source>Wallet needed to be rewritten: restart Wagerr Core to complete</source>
-        <translation>Plånbok behöver skrivas om: starta om Wagerr Kärna för att göra klart</translation>
+        <source>Wallet needed to be rewritten: restart WAGERR Core to complete</source>
+        <translation>Plånbok behöver skrivas om: starta om WAGERR Kärna för att göra klart</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -6242,24 +6201,12 @@ Minta antingen högre valörer (så att färre inputs behövs) eller spendera mi
         <translation>Varning: Argument -debugnet stödjes ej, ignoreras. Använd -debug=net.</translation>
     </message>
     <message>
-        <source>Will retry...</source>
-        <translation>Kommer försöka igen...</translation>
-    </message>
-    <message>
         <source>You don't have enough Zerocoins in your wallet</source>
         <translation>Du har inte tillräckligt med Zerocoins i din plånbok</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation>Du behöver bygga om databasen genom att använda -reindex för att ändra -txindex</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>Dina poster lyckades läggas till.</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation>Din transaktion accepterades in i poolen!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>
