@@ -140,6 +140,9 @@ EXTENDED_SCRIPTS = [
     # 'example_test.py',
     #'feature_notifications.py', # Not Working -- TODO Fix it
     'rpc_invalidateblock.py',
+    # EXTRA TESTS FOR EXTENDED SCRIPTS
+    'wallet_cli-pt1.py',
+    'multisend_test.py'
 ]
 
 # Place EXTENDED_SCRIPTS first since it has the 3 longest running tests
