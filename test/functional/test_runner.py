@@ -58,12 +58,9 @@ BASE_SCRIPTS= [
     #'wallet_backup.py', # Not Working -- TODO Fix it
     #'p2p_pos_fakestake.py', # Not Working -- TODO Fix it
     #'p2p_pos_fakestake_accepted.py',
-    #'p2p_zpos_fakestake.py', # Not Working -- TODO Fix it
-    #'p2p_zpos_fakestake_accepted.py', # Not Working -- TODO Fix it
-    #'zerocoin_wrapped_serials.py', # Not Working needs staking TODO Fix
     # vv Tests less than 5m vv
-    #'feature_block.py', # Not Working -- TODO Fix it
-    #'rpc_fundrawtransaction.py', # Not Applicable "Not Implemented Error"
+    #'feature_block.py',
+    #'rpc_fundrawtransaction.py',
     # vv Tests less than 2m vv
     #'p2p_pos_doublespend.py', # Not working -- TODO fix it
     'wallet_basic.py',
@@ -102,22 +99,22 @@ BASE_SCRIPTS= [
     'wallet_disable.py',
     #'rpc_net.py', # Not Working -- TODO Fix it
     'wallet_keypool.py',
-    'p2p_mempool.py',
-    'mining_prioritisetransaction.py',
+    #'p2p_mempool.py',
+    #'mining_prioritisetransaction.py',
     #'p2p_invalid_block.py', # Not Working -- TODO Fix it
     #'p2p_invalid_tx.py', # Not Working -- TODO Fix it
     'rpc_signmessage.py',
     #'wallet_import_rescan.py', # Not Working -- TODO Fix it
-    'mining_basic.py',
+    #'mining_basic.py',
     #'wallet_bumpfee.py', # Not Applicable no "send_to_witness"
     #'wallet_listsinceblock.py', # Not Working -- TODO Fix it
-    'p2p_leak.py',
+    #'p2p_leak.py',
     'wallet_encryption.py',
     #'feature_cltv.py', # Not Working -- TODO Fix it
     #'wallet_resendwallettransactions.py', # Not Working -- TODO Fix it
-    'feature_minchainwork.py',
+    #'feature_minchainwork.py',
     #'p2p_fingerprint.py', # Not Working -- TODO Fix it
-    # 'feature_uacomment.py', # Not Applicable -uacomment not supported
+    'feature_uacomment.py', # Not Applicable -uacomment not supported
     #'p2p_unrequested_blocks.py', # Not Working -- TODO Fix it
     #'feature_config_args.py',  # Not Working -- TODO Fix it
     'feature_help.py',
@@ -134,7 +131,7 @@ EXTENDED_SCRIPTS = [
     'wallet_cli-pt1.py',
     'wallet_multisend.py',
     # vv Tests less than 2m vv
-    'p2p_timeouts.py', # p2p peer does not timeout
+    #'p2p_timeouts.py', # p2p peer does not timeout
     # vv Tests less than 60s vv
     #'p2p_feefilter.py', # Not Working -- TODO Fix it
     'rpc_bind.py',
