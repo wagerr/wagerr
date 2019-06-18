@@ -1,6 +1,7 @@
 ---
-name: "wagerr-linux-4.0"
+name: "wagerr-linux-3.0"
 enable_cache: true
+distro: "ubuntu"
 suites:
 - "bionic"
 architectures:
