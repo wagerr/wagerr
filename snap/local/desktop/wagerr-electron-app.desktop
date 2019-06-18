@@ -1,0 +1,15 @@
+# http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.0.html
+
+[Desktop Entry]
+Encoding=UTF-8
+Name=Wagerr Electron
+Comment=Wagerr Digital Currency Electron Official release
+GenericName=Wagerr Digital Currency Electron client main network
+Exec=wagerr.electron %u
+Terminal=false
+Type=Application
+Icon=${SNAP}/wagerr-electron-app.png
+MimeType=x-scheme-handler/wagerr;
+Categories=X-Office;X-Finance;
+Keywords=internet;wagerr;zwgr;wgr;core;wallet;electron;main;snap;launchpad;crypto;digital;currency;coin;token;zerocoin;
+Version=3.0.99

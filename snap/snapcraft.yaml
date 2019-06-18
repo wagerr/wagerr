@@ -89,6 +89,27 @@ apps:
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+  electron:
+    command: wagerr-electron-app.AppImage
+    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
+    desktop: wagerr-electron-app.desktop
+    environment:
+      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+  electron-testnet:
+    command: wagerr-electron-app.AppImage --testnet
+    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
+    desktop: wagerr-electron-app_testnet.desktop
+    environment:
+      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+  electron-regtest:
+    command: wagerr-electron-app.AppImage --regtest
+    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
+    desktop: wagerr-electron-app_regtest.desktop
+    environment:
+      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli:
     command: wagerr-cli
     plugs: [network, network-bind, home, removable-media]
@@ -300,6 +321,7 @@ parts:
         cd wagerr-electron-app
         npm install
         npm run package
+        cp -f ./wagerr-*i386.AppImage ${SNAPCRAFT_PART_INSTALL}/
       fi
       if [ $HOST = "x86_64-linux-gnu" ]; then
         echo "get wagerr electron wallet"
@@ -307,7 +329,9 @@ parts:
         cd wagerr-electron-app
         npm install
         npm run package
-        chmod a+x release/wagerr-*.AppImage
+        cd release
+        chmod a+x wagerr-*.AppImage
+        cp -f ./wagerr-*x86_64.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
       fi
 
     build-packages:
