@@ -92,6 +92,7 @@ private:
     QString strThirdPartyTxUrls;
     bool fCoinControlFeatures;
     bool fHideZeroBalances;
+    bool fHideOrphans;
     /* settings that were overriden by command-line */
     QString strOverriddenByCommandLine;
 

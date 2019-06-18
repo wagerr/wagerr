@@ -26,7 +26,8 @@ TransactionFilterProxy::TransactionFilterProxy(QObject* parent) : QSortFilterPro
                                                                   watchOnlyFilter(WatchOnlyFilter_All),
                                                                   minAmount(0),
                                                                   limitRows(-1),
-                                                                  showInactive(true)
+                                                                  showInactive(true),
+                                                                  fHideOrphans(false)
 {
 }
 
@@ -43,6 +44,8 @@ bool TransactionFilterProxy::filterAcceptsRow(int sourceRow, const QModelIndex& 
     int status = index.data(TransactionTableModel::StatusRole).toInt();
 
     if (!showInactive && status == TransactionStatus::Conflicted)
+        return false;
+    if (fHideOrphans && isOrphan(status, type))
         return false;
     if (!(TYPE(type) & typeFilter))
         return false;
