@@ -56,6 +56,7 @@ public:
     void setHideOrphans(bool fHide);
 
     int rowCount(const QModelIndex& parent = QModelIndex()) const;
+    static bool isOrphan(const int status, const int type);
 
 protected:
     bool filterAcceptsRow(int source_row, const QModelIndex& source_parent) const;
