@@ -39,7 +39,7 @@ stages:
   - test
 env:
   global:
-    - MAKEJOBS=-j3
+    - MAKEJOBS=-j4
     - RUN_UNIT_TESTS=true
     - RUN_FUNCTIONAL_TESTS=false # Not Yet Implemented
     - RUN_BENCH=false  # Set to true for any one job that has debug enabled, to quickly check bench is not crashing or hitting assertions
