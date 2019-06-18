@@ -1,10 +1,10 @@
 (note: this is a temporary file, to be added-to by anybody, and moved to release-notes at release time)
 
-WAGERR Core version *version* is now available from:  <https://github.com/wagerr-project/wagerr/releases>
+WAGERR Core version *version* is now available from:  <https://github.com/wagerr/wagerr/releases>
 
 This is a new major version release, including various bug fixes and performance improvements, as well as updated translations.
 
-Please report bugs using the issue tracker at github: <https://github.com/wagerr-project/wagerr/issues>
+Please report bugs using the issue tracker at github: <https://github.com/wagerr/wagerr/issues>
 
 
 Mandatory Update
@@ -58,4 +58,4 @@ Detailed release notes follow. This overview includes changes that affect behavi
 Thanks to everyone who directly contributed to this release:
 
 
-As well as everyone that helped translating on [Transifex](https://www.transifex.com/projects/p/wagerr-project-translations/), the QA team during Testing and the Node hosts supporting our Testnet.
+As well as everyone that helped translating on [Transifex](https://www.transifex.com/projects/p/wagerr-translations/), the QA team during Testing and the Node hosts supporting our Testnet.
