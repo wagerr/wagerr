@@ -14,7 +14,7 @@
 #
 # These caches can be manually removed if necessary. This is one of the very
 # few manual operations that is possible with Travis, and it can be done by a
-# Wagerr Core GitHub member via the Travis web interface [0].
+# WAGERR GitHub member via the Travis web interface [0].
 #
 # Travis CI uploads the cache after the script phase of the build [1].
 # However, the build is terminated without saving the chache if it takes over
@@ -25,7 +25,7 @@
 # [1] https://docs.travis-ci.com/user/caching/#build-phases
 # [2] https://docs.travis-ci.com/user/customizing-the-build#build-timeouts
 
-dist: trusty
+dist: xenial
 os: linux
 language: minimal
 cache:
@@ -39,7 +39,7 @@ stages:
   - test
 env:
   global:
-    - MAKEJOBS=-j3
+    - MAKEJOBS=-j4
     - RUN_UNIT_TESTS=true
     - RUN_FUNCTIONAL_TESTS=false # Not Yet Implemented
     - RUN_BENCH=false  # Set to true for any one job that has debug enabled, to quickly check bench is not crashing or hitting assertions
@@ -53,7 +53,7 @@ env:
     - SDK_URL=https://bitcoincore.org/depends-sources/sdks
     - WINEDEBUG=fixme-all
     - DOCKER_PACKAGES="build-essential libtool autotools-dev automake pkg-config bsdmainutils curl git ca-certificates ccache"
-    - CACHE_ERR_MSG="Error! Initial build successful, but not enough time remains to run later build stages and tests. Please manually re-run this job by using the travis restart button or asking a wagerr maintainer to restart. The next run should not time out because the build cache has been saved."
+    - CACHE_ERR_MSG="Error! Initial build successful, but not enough time remains to run later build stages and tests. Please manually re-run this job by using the travis restart button or asking a bitcoin maintainer to restart. The next run should not time out because the build cache has been saved."
 before_install:
   - set -o errexit; source .travis/test_03_before_install.sh
 install:
@@ -69,110 +69,141 @@ script:
 after_script:
   - echo $TRAVIS_COMMIT_RANGE
   - echo $TRAVIS_COMMIT_LOG
-
 jobs:
   include:
-# lint stage
+
     - stage: lint
+      name: 'lint'
       env:
       cache: false
       language: python
-      python: '3.6'
+      python: '3.5' # Oldest supported version according to doc/dependencies.md
       install:
         - set -o errexit; source .travis/lint_04_install.sh
       before_script:
         - set -o errexit; source .travis/lint_05_before_script.sh
       script:
         - set -o errexit; source .travis/lint_06_script.sh
-# ARM
+
     - stage: test
+      name: 'ARM 32-bit  [GOAL: install]  [no unit or functional tests]'
       env: >-
         HOST=arm-linux-gnueabihf
         PACKAGES="python3 g++-arm-linux-gnueabihf"
-        DEP_OPTS="NO_QT=1"
         RUN_UNIT_TESTS=false
         RUN_FUNCTIONAL_TESTS=false
         GOAL="install"
         # -Wno-psabi is to disable ABI warnings: "note: parameter passing for argument of type ... changed in GCC 7.1"
         # This could be removed once the ABI change warning does not show up by default
         BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports CXXFLAGS=-Wno-psabi"
-# AArch64
+
     - stage: test
+      name: 'ARM 64-bit  [GOAL:install] [no unit or functional tests]'
       env: >-
         HOST=aarch64-linux-gnu
         PACKAGES="python3 g++-aarch64-linux-gnu"
-        DEP_OPTS="NO_QT=1"
         RUN_UNIT_TESTS=false
         RUN_FUNCTIONAL_TESTS=false
         GOAL="install"
         BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports"
-# Win32
+
     - stage: test
+      name: 'Win32  [GOAL: deploy] [no functional tests]'
       env: >-
         HOST=i686-w64-mingw32
         DPKG_ADD_ARCH="i386"
-        DEP_OPTS="NO_QT=1"
         PACKAGES="python3 nsis g++-mingw-w64-i686 wine-binfmt wine32"
-        GOAL="install"
+        RUN_FUNCTIONAL_TESTS=false
+        GOAL="deploy"
         BITCOIN_CONFIG="--enable-reduce-exports"
-# Win64
+
     - stage: test
+      name: 'Win64  [GOAL: deploy] [no functional tests]'
       env: >-
         HOST=x86_64-w64-mingw32
-        DEP_OPTS="NO_QT=1"
         PACKAGES="python3 nsis g++-mingw-w64-x86-64 wine-binfmt wine64"
-        GOAL="install"
+        RUN_FUNCTIONAL_TESTS=false
+        GOAL="deploy"
         BITCOIN_CONFIG="--enable-reduce-exports"
-# 32-bit + dash
+
     - stage: test
+      name: '32-bit + dash  [GOAL: install] [no gui]'
       env: >-
         HOST=i686-pc-linux-gnu
         PACKAGES="g++-multilib python3-zmq"
-        DEP_OPTS="NO_QT=1"
         GOAL="install"
-        BITCOIN_CONFIG="--enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++"
+        BITCOIN_CONFIG="--enable-zmq --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++"
         CONFIG_SHELL="/bin/dash"
-# x86_64 Linux (uses qt5 dev package instead of depends Qt to speed up build and avoid timeout)
+
     - stage: test
+      name: 'x86_64 Linux  [GOAL: install]  [bionic]  [uses qt5 dev package instead of depends Qt to speed up build and avoid timeout]'
       env: >-
         HOST=x86_64-unknown-linux-gnu
         PACKAGES="python3-zmq qtbase5-dev qttools5-dev-tools protobuf-compiler libdbus-1-dev libharfbuzz-dev libprotobuf-dev"
         DEP_OPTS="NO_QT=1 NO_UPNP=1 DEBUG=1 ALLOW_HOST_PACKAGES=1"
+        RUN_FUNCTIONAL_TESTS=true
+        #TEST_RUNNER_EXTRA="--coverage --extended"  # Run extended tests so that coverage does not fail, but exclude the very slow dbcrash
         GOAL="install"
-        BITCOIN_CONFIG="--enable-zmq --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports CPPFLAGS=-DDEBUG_LOCKORDER"
-# x86_64 Linux (no depends, only system libs)
+        BITCOIN_CONFIG="--enable-zmq --with-gui=qt5 --enable-glibc-back-compat --enable-reduce-exports"
+
     - stage: test
+      name: 'x86_64 Linux  [GOAL: install]  [trusty]  [no functional tests, no depends, only system libs]'
+      env: >-
+        HOST=x86_64-unknown-linux-gnu
+        DOCKER_NAME_TAG=ubuntu:14.04
+        PACKAGES="python3-zmq qtbase5-dev qttools5-dev-tools libicu-dev libpng-dev libssl-dev libevent-dev bsdmainutils libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev libdb5.1++-dev libminiupnpc-dev libzmq3-dev libprotobuf-dev protobuf-compiler libqrencode-dev libgmp-dev"
+        NO_DEPENDS=1
+        RUN_FUNCTIONAL_TESTS=false
+        GOAL="install"
+        BITCOIN_CONFIG="--enable-zmq --with-incompatible-bdb --with-gui=no"
+
+    - stage: test
+      name: 'x86_64 Linux  [GOAL: install]  [xenial]  [no depends, only system libs]'
+      env: >-
+        HOST=x86_64-unknown-linux-gnu
+        DOCKER_NAME_TAG=ubuntu:16.04
+        PACKAGES="python3-zmq qtbase5-dev qttools5-dev-tools libssl-dev libevent-dev bsdmainutils libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev libdb5.3++-dev libminiupnpc-dev libzmq3-dev libprotobuf-dev protobuf-compiler libqrencode-dev libgmp-dev"
+        NO_DEPENDS=1
+        GOAL="install"
+        BITCOIN_CONFIG="--enable-zmq --with-incompatible-bdb --with-gui=qt5 CPPFLAGS=-DDEBUG_LOCKORDER --disable-hardening --disable-asm"
+
+    - stage: test
+      name: 'x86_64 Linux  [GOAL: install]  [bionic]  [no depends, only system libs]'
       env: >-
         HOST=x86_64-unknown-linux-gnu
         PACKAGES="python3-zmq qtbase5-dev qttools5-dev-tools libssl1.0-dev libevent-dev bsdmainutils libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev libdb5.3++-dev libminiupnpc-dev libzmq3-dev libprotobuf-dev protobuf-compiler libqrencode-dev libgmp-dev"
         NO_DEPENDS=1
         GOAL="install"
-        BITCOIN_CONFIG="--enable-zmq --with-incompatible-bdb --enable-glibc-back-compat --enable-reduce-exports --with-gui=qt5 CPPFLAGS=-DDEBUG_LOCKORDER"
-# x86_64 Linux (sanitizers)
+        BITCOIN_CONFIG="--enable-zmq --with-incompatible-bdb --with-gui=qt5 CPPFLAGS=-DDEBUG_LOCKORDER"
+
 #    - stage: test
+#      name: 'x86_64 Linux  [GOAL: install]  [bionic]  [no depends, only system libs, sanitizers: fuzzer,address]'
 #      env: >-
 #        HOST=x86_64-unknown-linux-gnu
 #        PACKAGES="clang python3-zmq qtbase5-dev qttools5-dev-tools libssl1.0-dev libevent-dev bsdmainutils libboost-system-dev libboost-filesystem-dev libboost-chrono-dev libboost-program-options-dev libboost-test-dev libboost-thread-dev libdb5.3++-dev libminiupnpc-dev libzmq3-dev libprotobuf-dev protobuf-compiler libqrencode-dev libgmp-dev"
 #        NO_DEPENDS=1
+#        RUN_UNIT_TESTS=false
+#        RUN_FUNCTIONAL_TESTS=false
 #        RUN_BENCH=true
-#        RUN_FUNCTIONAL_TESTS=false # Disabled for now, can be combined with the other x86_64 linux NO_DEPENDS job when functional tests pass the sanitizers
 #        GOAL="install"
 #        BITCOIN_CONFIG="--enable-zmq --with-incompatible-bdb --enable-glibc-back-compat --enable-reduce-exports --with-gui=qt5 CPPFLAGS=-DDEBUG_LOCKORDER --with-sanitizers=undefined CC=clang CXX=clang++"
-# x86_64 Linux, No wallet
+
 #    - stage: test
+#      name: 'x86_64 Linux  [GOAL: install]  [bionic]  [no wallet]'
 #      env: >-
 #        HOST=x86_64-unknown-linux-gnu
-#        PACKAGES="python3"
+#        PACKAGES="python3-zmq"
 #        DEP_OPTS="NO_WALLET=1"
 #        GOAL="install"
 #        BITCOIN_CONFIG="--enable-glibc-back-compat --enable-reduce-exports"
-# Cross-Mac
+
     - stage: test
+      name: 'macOS 10.10  [GOAL: deploy] [no functional tests]'
       env: >-
         HOST=x86_64-apple-darwin14
-        PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python-dev python3-setuptools-git"
+        PACKAGES="cmake imagemagick libcap-dev librsvg2-bin libz-dev libbz2-dev libtiff-tools python3-dev python3-setuptools"
         OSX_SDK=10.11
         RUN_UNIT_TESTS=false
         RUN_FUNCTIONAL_TESTS=false
-        GOAL="all deploy"
+        GOAL="deploy"
         BITCOIN_CONFIG="--enable-gui --enable-reduce-exports --enable-werror"

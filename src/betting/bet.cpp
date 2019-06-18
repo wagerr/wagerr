@@ -45,7 +45,7 @@ bool IsValidOracleTx(const CTxIn &txin)
         int nRequired;
 
         if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
-            BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
+            for (const CTxDestination &prevAddr : prevAddrs) {
                 if (std::find(oracleAddrs.begin(), oracleAddrs.end(), CBitcoinAddress(prevAddr).ToString()) != oracleAddrs.end()) {
                     return true;
                 }
@@ -1710,7 +1710,7 @@ std::vector<CPeerlessResult> getEventResults( int height )
     CBlock block;
     ReadBlockFromDisk(block, resultsBocksIndex);
 
-    BOOST_FOREACH(CTransaction& tx, block.vtx) {
+    for (CTransaction& tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet.
         const CTxIn &txin  = tx.vin[0];
         bool validResultTx = IsValidOracleTx(txin);
@@ -1815,7 +1815,7 @@ std::vector<CBetOut> GetBetPayouts(int height)
             ReadBlockFromDisk(block, BlocksIndex);
             time_t transactionTime = block.nTime;
 
-            BOOST_FOREACH(CTransaction &tx, block.vtx) {
+            for (CTransaction &tx : block.vtx) {
                 // Check all TX vouts for an OP RETURN.
                 for (unsigned int i = 0; i < tx.vout.size(); i++) {
 
@@ -2200,7 +2200,7 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
 
     int blockTime = block.GetBlockTime();
 
-    BOOST_FOREACH(CTransaction& tx, block.vtx) {
+    for (CTransaction& tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet by looking at the TX vins.
         const CTxIn &txin = tx.vin[0];
         uint256 hashBlock;
@@ -2277,7 +2277,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
             ReadBlockFromDisk(block, BlocksIndex);
             time_t transactionTime = block.nTime;
 
-            BOOST_FOREACH(CTransaction &tx, block.vtx) {
+            for (CTransaction &tx : block.vtx) {
 
                 // Ensure if event TX that has it been posted by Oracle wallet.
                 const CTxIn &txin = tx.vin[0];

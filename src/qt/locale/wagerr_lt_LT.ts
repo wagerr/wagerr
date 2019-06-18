@@ -62,12 +62,12 @@
         <translation>Gavimo adresai</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Tai jūsų Wagerr adresai mokėjimų išsiuntimams. Visada patikrinkite sumą ir gavėjo adresą prieš siųsdami monetas.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Tai jūsų WAGERR adresai mokėjimų išsiuntimams. Visada patikrinkite sumą ir gavėjo adresą prieš siųsdami monetas.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Tai jūsų Wagerr adresai mokėjimų gavimams. Rekomenduojama naudoti naują adresą kiekvienam pavedimui.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Tai jūsų WAGERR adresai mokėjimų gavimams. Rekomenduojama naudoti naują adresą kiekvienam pavedimui.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -177,7 +177,7 @@
     </message>
     <message>
         <source>WAGERR will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>Dabar Wagerr išsijungs, kad būtų užbaigtas šifravimo procesas. Atminkite, kad jūsų piniginės užšifravimas negali visiškai apsaugoti jūsų WGR nuo kenkėjiškų programų, užkrėsto jūsų kompiuterio.</translation>
+        <translation>Dabar WAGERR išsijungs, kad būtų užbaigtas šifravimo procesas. Atminkite, kad jūsų piniginės užšifravimas negali visiškai apsaugoti jūsų WGR nuo kenkėjiškų programų, užkrėsto jūsų kompiuterio.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -254,11 +254,11 @@
         <translation>Adresas:</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <source>Enter a WAGERR Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
         <translation>Įveskite Wagerr adresą, kurį norėtumėte užšifruoti naudojant BIP 38. Vidiniame laukelyje įrašykite slaptą frazę. Paspauskite užšifruoti, jei norite gauti užšifruotą privatųjį raktą.</translation>
     </message>
     <message>
-        <source>The Wagerr address to encrypt</source>
+        <source>The WAGERR address to encrypt</source>
         <translation>WAGERR adresas, kurį norite užšifruoti</translation>
     </message>
     <message>
@@ -290,8 +290,8 @@
         <translation>Kopijuoti dabartinį parašą</translation>
     </message>
     <message>
-        <source>Encrypt the private key for this Wagerr address</source>
-        <translation>Užšifruoti šio Wagerr adreso privatų raktą</translation>
+        <source>Encrypt the private key for this WAGERR address</source>
+        <translation>Užšifruoti šio WAGERR adreso privatų raktą</translation>
     </message>
     <message>
         <source>Reset all fields</source>
@@ -608,10 +608,6 @@
         <source>&amp;Command-line options</source>
         <translation>&amp;Komandinės eilutės parinktys</translation>
     </message>
-    <message numerus="yes">
-        <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>Apdorota %n operacijų istorijos blokų.</numerusform><numerusform>Apdorota %n operacijų istorijos blokų.</numerusform><numerusform>Apdorota %n operacijų istorijos blokų.</numerusform><numerusform>Apdorota %n operacijų istorijos blokų.</numerusform></translation>
-    </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
         <translation>Sinchronizuojami papildomi duomenys: %p%</translation>
@@ -645,12 +641,12 @@
         <translation>Skirtukų įrankių juosta</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Siųsti monetas į Wagerr adresą</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Siųsti monetas į WAGERR adresą</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -669,24 +665,24 @@
         <translation>Naršyti masternod'us</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;Apie Wagerr Core</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;Apie WAGERR Core</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Rodyti informaciją apie Wagerr Core</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Rodyti informaciją apie WAGERR Core</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
-        <translation>Keisti Wagerr konfigūravimo parinktis</translation>
+        <translation>Keisti WAGERR konfigūravimo parinktis</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Pasirašykite pranešimus naudodami savo Wagerr adresus, kad įrodytumėte, kad juos turite</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Pasirašykite pranešimus naudodami savo WAGERR adresus, kad įrodytumėte, kad juos turite</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Patvirtinkite pranešimus, kad jie būtų pasirašyti su nurodytais Wagerr adresais</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Patvirtinkite pranešimus, kad jie būtų pasirašyti su nurodytais WAGERR adresais</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -729,16 +725,12 @@
         <translation>Blokų naršyklės langas</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Rodyti Wagerr Core žinyną, kad gautumėte sąrašą su galimomis Wagerr komandinės eilutės parinktimis</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Rodyti WAGERR Core žinyną, kad gautumėte sąrašą su galimomis WAGERR komandinės eilutės parinktimis</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Wagerr Core piniginė</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform>%n aktyvių prisijungimų Wagerr tinkle ()</numerusform><numerusform>%n aktyvių prisijungimų Wagerr tinkle ()</numerusform><numerusform>%n aktyvių prisijungimų Wagerr tinkle ()</numerusform><numerusform>%n aktyvių prisijungimų Wagerr tinkle ()</numerusform></translation>
+        <source>WAGERR Core client</source>
+        <translation>WAGERR Core piniginė</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -760,25 +752,9 @@
         <source>Up to date</source>
         <translation>Atnaujinta</translation>
     </message>
-    <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation><numerusform>%n valanda</numerusform><numerusform>%n valandų</numerusform><numerusform>%n valandų</numerusform><numerusform>%n valandų</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s)</source>
-        <translation><numerusform>%n diena</numerusform><numerusform>%n dienų</numerusform><numerusform>%n dienų</numerusform><numerusform>%n dienų</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation><numerusform>%n savaitė</numerusform><numerusform>%n savaičių</numerusform><numerusform>%n savaičių</numerusform><numerusform>%n savaičių</numerusform></translation>
-    </message>
     <message>
         <source>%1 and %2</source>
         <translation>%1 ir %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation><numerusform>%n metai</numerusform><numerusform>%n metų</numerusform><numerusform>%n metų</numerusform><numerusform>%n metų</numerusform></translation>
     </message>
     <message>
         <source>Catching up...</source>
@@ -864,7 +840,7 @@ MultiSend: %1</translation>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Piniginė yra &lt;b&gt;užšifruota&lt;/b&gt; ir šiuo metu &lt;b&gt;užrakinta&lt;/b&gt;</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>BlockExplorer</name>
     <message>
@@ -1177,8 +1153,8 @@ MultiSend: %1</translation>
         <translation>Keisti siuntimo adresą</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>Įvestas adresas "%1" nėra galiojantis Wagerr adresas.</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>Įvestas adresas "%1" nėra galiojantis WAGERR adresas.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1217,22 +1193,33 @@ MultiSend: %1</translation>
     </message>
 </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>Forma</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
         <translation>versija</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bitai)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>Apie Wagerr Core</translation>
+        <source>About WAGERR Core</source>
+        <translation>Apie WAGERR Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1278,16 +1265,16 @@ MultiSend: %1</translation>
         <translation>Sveiki</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Sveiki atvykę į Wagerr Core</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Sveiki atvykę į WAGERR Core</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>Kadangi programa paleista pirmą kartą, galite pasirinkti kur Wagerr Core saugos savo duomenis.</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>Kadangi programa paleista pirmą kartą, galite pasirinkti kur WAGERR Core saugos savo duomenis.</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Wagerr Core atsisiųs ir saugos Wagerr blockchain'o kopiją. Šiame kataloge bus saugomas ne mažesnis kaip %1GB duomenų kiekis, kuris laikui bėgant augs. Piniginė taip pat bus saugoma šiame kataloge.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR Core atsisiųs ir saugos WAGERR blockchain'o kopiją. Šiame kataloge bus saugomas ne mažesnis kaip %1GB duomenų kiekis, kuris laikui bėgant augs. Piniginė taip pat bus saugoma šiame kataloge.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1298,8 +1285,8 @@ MultiSend: %1</translation>
         <translation>Naudoti pasirinktą duomenų katalogą:</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1440,12 +1427,12 @@ MultiSend: %1</translation>
         <translation>Įveskite adresą kuriam norite siųsti</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Wagerr addresses after it matures.
-To Add: enter percentage to give and Wagerr address to add to the MultiSend vector.
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other WAGERR addresses after it matures.
+To Add: enter percentage to give and WAGERR address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>MultiSend leidžia automatiškai išsiųsti iki 100% jūsų stake'inimo ar masternod'ų atlygio į kitus Wagerr adresus.
-Norėdami pridėti: įveskite pateiktą procentą ir Wagerr adresą, kurį norite pridėti prie MultiSend sąrašo.
+        <translation>MultiSend leidžia automatiškai išsiųsti iki 100% jūsų stake'inimo ar masternod'ų atlygio į kitus WAGERR adresus.
+Norėdami pridėti: įveskite pateiktą procentą ir WAGERR adresą, kurį norite pridėti prie MultiSend sąrašo.
 Norėdami ištrinti: įveskite adresą, kurį norite ištrinti, ir paspauskite ištrinti
 MultiSend nebus aktyvuotas, nebent paspausite "Įjungti"</translation>
     </message>
@@ -1534,42 +1521,8 @@ MultiSend nebus aktyvuotas, nebent paspausite "Įjungti"</translation>
         <translation>(nėra etiketės)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>Įvestas adresas: 
-</translation>
-    </message>
-    <message>
-        <source> is invalid.
-Please check the address and try again.</source>
-        <translation>yra netinkamas.
-Patikrinkite adresą ir bandykite dar kartą.</translation>
-    </message>
-    <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation>Bendra MultiSend sąrašo suma yra didesnė nei 100% jūsų stake'inimo atlygio
-</translation>
-    </message>
-    <message>
         <source>Please Enter 1 - 100 for percent.</source>
         <translation>Įveskite 1-100 procentų</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>MultiSend Sąrašas
-</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>Pašalintas</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>Nepavyko rasti adreso
-</translation>
     </message>
 </context>
 <context>
@@ -1728,73 +1681,6 @@ Patikrinkite adresą ir bandykite dar kartą.</translation>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Konfigūruoti Obfuscation</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Pagrindinis Privatumas</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>Aukštas Privatumas</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Maksimalus Privatumas</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Pasirinkite privatumo lygmenį.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Naudokite 2 atskirus masternod'us, kad sumaišytumėte lėšas iki 10 000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Naudokite 8 atskirus masternod'us, kad sumaišytumėte lėšas iki 10 000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>Naudokite 16 atskirų masternod'ų</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>Ši parinktis yra greičiausia ir kainuos apie ~0.025 WGR, kad anonimizuotų 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>Ši parinktis yra vidutiniškai greita ir kainuoja apie 0,05 WGR, kad anonimizuotų 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>Tai yra lėčiausias ir saugiausias variantas. Maksimalus anonimiškumas kainuos.</translation>
-    </message>
-    <message>
-        <source>0.1 WGR per 25000 WGR you anonymize.</source>
-        <translation>0.1 WGR kas 1000 WGR kuriuos anonimizuosite.</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Obfuscation Konfigūracija</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Obfuscation buvo sėkmingai nustatytas į paprastą (%1 ir 2 raundai). Bet kada galite tai pakeisti, atidarę Wagerr konfigūracijos ekraną.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Obfuscation buvo sėkmingai nustatytas į aukštą (%1 ir 8 raundai). Bet kada galite tai pakeisti, atidarę Wagerr konfigūracijos ekraną.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Obfuscation buvo sėkmingai nustatytas į maksimumą (%1 ir 16 raundai). Bet kada galite tai pakeisti, atidarę Wagerr konfigūracijos ekraną.</translation>
-    </message>
-</context>
-<context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
@@ -1844,12 +1730,12 @@ Patikrinkite adresą ir bandykite dar kartą.</translation>
         <translation>Ekspertas</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
-        <translation>Automatiškai paleisti Wagerr prisijungus prie sistemos.</translation>
+        <source>Automatically start WAGERR after logging in to the system.</source>
+        <translation>Automatiškai paleisti WAGERR prisijungus prie sistemos.</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;Paleisti Wagerr sistemai įsijungiant</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;Paleisti WAGERR sistemai įsijungiant</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1881,9 +1767,9 @@ Patikrinkite adresą ir bandykite dar kartą.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr/wagerr</source>
         <translation>Trūksta kalbos arba vertimas nebaigtas? Padėkite prisidėdami prie vertimų čia: 
-https://www.transifex.com/wagerr/wagerr-translations</translation>
+https://www.transifex.com/wagerr/wagerr</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1910,8 +1796,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Pageidautinas zWGR Automatinio Nukaldinimo Nominalas</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Jungtis prie Wagerr tinklo naudojant SOCKS5 tarpinį serverį.</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Jungtis prie WAGERR tinklo naudojant SOCKS5 tarpinį serverį.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -2053,8 +1939,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Dabartinis bendras užrakintas balansas tik žiūrėjimo adresuose</translation>
     </message>
     <message>
-        <source>Your current Wagerr balance, unconfirmed and immature transactions included</source>
-        <translation>Jūsų dabartinis Wagerr balansas, įskaitant nepatvirtintus ir nesubrendusius sandorius</translation>
+        <source>Your current WAGERR balance, unconfirmed and immature transactions included</source>
+        <translation>Jūsų dabartinis WAGERR balansas, įskaitant nepatvirtintus ir nesubrendusius sandorius</translation>
     </message>
     <message>
         <source>zWGR Balance</source>
@@ -2073,8 +1959,8 @@ Immature: confirmed, but less than 1 mint of the same denomination after it was 
 Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos to pačio nominalo po to, kai buvo konvertuotas.</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Rodoma informacija gali būti pasenusi. Jūsų piniginė automatiškai sinchronizuojasi su Wagerr tinklu po ryšio aktyvavimo, tačiau šis procesas dar nebaigtas.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Rodoma informacija gali būti pasenusi. Jūsų piniginė automatiškai sinchronizuojasi su WAGERR tinklu po ryšio aktyvavimo, tačiau šis procesas dar nebaigtas.</translation>
     </message>
     <message>
         <source>OVERVIEW</source>
@@ -2210,8 +2096,8 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos to pačio nominalo
         <translation>Zerocoin Veiksmai:</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Rodoma informacija gali būti pasenusi. Jūsų piniginė automatiškai sinchronizuojasi su Wagerr tinklu po ryšio aktyvavimo, tačiau šis procesas dar nebaigtas.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Rodoma informacija gali būti pasenusi. Jūsų piniginė automatiškai sinchronizuojasi su WAGERR tinklu po ryšio aktyvavimo, tačiau šis procesas dar nebaigtas.</translation>
     </message>
     <message>
         <source>Mint Zerocoin</source>
@@ -2226,32 +2112,8 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos to pačio nominalo
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</source>
-        <translation>Galimos konvertavimui monetos, kurios yra patvirtintos ir neužrakintos, arba Masternod'ų užstatai.</translation>
-    </message>
-    <message>
-        <source>Available for Minting:</source>
-        <translation>Prieinama Konvertavimui:</translation>
-    </message>
-    <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset</source>
         <translation>Atitaisyti</translation>
-    </message>
-    <message>
-        <source>Coin Control...</source>
-        <translation>Monetų Kontrolė...</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Kiekis:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Suma:</translation>
     </message>
     <message>
         <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data.</source>
@@ -2292,14 +2154,6 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos to pačio nominalo
     <message>
         <source>0 zWGR</source>
         <translation>0 zWGR</translation>
-    </message>
-    <message>
-        <source>Security Level:</source>
-        <translation>Saugumo Lygmuo:</translation>
-    </message>
-    <message>
-        <source>Security Level 1 - 100 (default: 42)</source>
-        <translation>Saugumo Lygmuo 1 - 100 (numatytas: 42)</translation>
     </message>
     <message>
         <source>Pay &amp;To:</source>
@@ -2357,7 +2211,7 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos to pačio nominalo
         <source>Unconfirmed: less than 20 confirmations
 Immature: confirmed, but less than 1 mint of the same denomination after it was minted</source>
         <translation>Nepatvirtinta: mažiau nei 20 patvirtinimų
-Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominalo po to, kai buvo konvertuota.</translation>
+Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos to pačio nominalo po to, kai buvo konvertuotas.</translation>
     </message>
     <message>
         <source>Denom. 1:</source>
@@ -2501,19 +2355,11 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
     </message>
     <message>
         <source>out of sync</source>
-        <translation>ne sinchronizuotas</translation>
+        <translation>nesinchronizuotas</translation>
     </message>
     <message>
         <source>Mint Status: Okay</source>
         <translation>Konvertavimo Statusas: Geras</translation>
-    </message>
-    <message>
-        <source>Copy quantity</source>
-        <translation>Kopijuoti kiekį</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Kopijuoti sumą</translation>
     </message>
     <message>
         <source>zWGR Spend #: </source>
@@ -2600,10 +2446,6 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>Nomin. &lt;b&gt;5000&lt;/b&gt;:</translation>
     </message>
     <message>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Klaida: jūsų piniginė užrakinta. Pirmiausia įveskite piniginės slaptažodį.</translation>
-    </message>
-    <message>
         <source>Invalid Wagerr Address</source>
         <translation>Netinkamas Wagerr Adresas</translation>
     </message>
@@ -2624,14 +2466,6 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>į adresą</translation>
     </message>
     <message>
-        <source>with Security Level </source>
-        <translation>su Saugumo Lygmeniu</translation>
-    </message>
-    <message>
-        <source>Failed to spend zWGR</source>
-        <translation>Nepavyko išleisti zWGR</translation>
-    </message>
-    <message>
         <source>serial: </source>
         <translation>serija:</translation>
     </message>
@@ -2645,14 +2479,17 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
     </message>
 </context>
 <context>
+    <name>ProposalFrame</name>
+    </context>
+<context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
         <translation>Suma</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Įveskite Wagerr adresą (pvz. %1)</translation>
+        <source>Enter a WAGERR address (e.g. %1)</source>
+        <translation>Įveskite WAGERR adresą (pvz. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -2685,6 +2522,10 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
     <message>
         <source>N/A</source>
         <translation>N/A</translation>
+    </message>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
@@ -2829,8 +2670,8 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>Iš:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
-        <translation>Sveiki atvykę į Wagerr RPC konsolę.</translation>
+        <source>Welcome to the WAGERR RPC console.</source>
+        <translation>Sveiki atvykę į WAGERR RPC konsolę.</translation>
     </message>
     <message>
         <source>never</source>
@@ -2840,12 +2681,12 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
-        <source>&amp;Label:</source>
-        <translation>&amp;Etiketė:</translation>
+        <source>A&amp;mount:</source>
+        <translation>S&amp;uma:</translation>
     </message>
     <message>
-        <source>&amp;Amount:</source>
-        <translation>&amp;Suma:</translation>
+        <source>&amp;Label:</source>
+        <translation>&amp;Etiketė:</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
@@ -2882,6 +2723,10 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
     <message>
         <source>Copy amount</source>
         <translation>Kopijuoti sumą</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopijuoti adresą</translation>
     </message>
 </context>
 <context>
@@ -2928,6 +2773,10 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
     <message>
         <source>Message</source>
         <translation>Žinutė</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresas</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -3158,7 +3007,7 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
-        <source>The Wagerr address to sign the message with</source>
+        <source>The WAGERR address to sign the message with</source>
         <translation>WAGERR adresas, kuriuo pasirašyti žinute</translation>
     </message>
     <message>
@@ -3182,16 +3031,16 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>Kopijuoti dabartinį parašą</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Pažymėkite žinutę, kad įrodytumėte, jog jūs šio Wagerr adreso savininkas</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Pažymėkite žinutę, kad įrodytumėte, jog jūs šio WAGERR adreso savininkas</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
+        <source>The WAGERR address the message was signed with</source>
         <translation>WAGERR adresas, kurio buvo pasirašyta žinutė</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Patikrinkite pranešimą, kad jis būtų pasirašytas su nurodytu Wagerr adresu</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Patikrinkite pranešimą, kad jis būtų pasirašytas su nurodytu WAGERR adresu</translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
@@ -3229,8 +3078,8 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
@@ -3449,7 +3298,7 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>0</source>
         <translation>0</translation>
@@ -3470,16 +3319,8 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>(numatytas: 1)</translation>
     </message>
     <message>
-        <source>Already have that input.</source>
-        <translation>Jau turi tą įvestį.</translation>
-    </message>
-    <message>
         <source>Done loading</source>
         <translation>Krovimas baigtas</translation>
-    </message>
-    <message>
-        <source>Entries are full.</source>
-        <translation>Įvestys pilnos.</translation>
     </message>
     <message>
         <source>Error loading block database</source>
@@ -3494,8 +3335,8 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>Klaida kraunant wallet.dat: Piniginė yra sugadinta</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Wagerr Core</source>
-        <translation>Klaida kraunant wallet.dat: Piniginė reikalauja naujesnės Wagerr Core versijos</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of WAGERR Core</source>
+        <translation>Klaida kraunant wallet.dat: Piniginė reikalauja naujesnės WAGERR Core versijos</translation>
     </message>
     <message>
         <source>Error opening block database</source>
@@ -3510,10 +3351,6 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>Klaida: Įvyko vidinė klaida, dėl išsamesnės informacijos žr. Debug.log</translation>
     </message>
     <message>
-        <source>Error: Can't select current denominated inputs</source>
-        <translation>Klaida: Nepavyko pasirinkti esamų nominalo įvesčių</translation>
-    </message>
-    <message>
         <source>Error: Disk space is low!</source>
         <translation>Klaida: Diske mažai vietos!</translation>
     </message>
@@ -3522,28 +3359,12 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>Klaida nuskaitant bloką</translation>
     </message>
     <message>
-        <source>Finalizing transaction.</source>
-        <translation>Sandoris užbaiginėjamas.</translation>
-    </message>
-    <message>
         <source>Importing...</source>
         <translation>Importuojama...</translation>
     </message>
     <message>
-        <source>Incompatible mode.</source>
-        <translation>Nesuderinamas režimas.</translation>
-    </message>
-    <message>
-        <source>Incompatible version.</source>
-        <translation>Nesuderinama versija.</translation>
-    </message>
-    <message>
         <source>Information</source>
         <translation>Informacija</translation>
-    </message>
-    <message>
-        <source>Input is not valid.</source>
-        <translation>Įvestis neteisinga.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -3562,16 +3383,8 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>Neteisingas privatus raktas.</translation>
     </message>
     <message>
-        <source>Invalid script detected.</source>
-        <translation>Aptiktas netinkamas programos kodas.</translation>
-    </message>
-    <message>
         <source>SwiftX options:</source>
         <translation>SwiftX nustatymai:</translation>
-    </message>
-    <message>
-        <source>Failed to deserialize</source>
-        <translation>Nepavyko deserializuoti</translation>
     </message>
     <message>
         <source>Failed to select a zerocoin</source>
@@ -3612,14 +3425,6 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
     <message>
         <source>Masternode options:</source>
         <translation>Masternod'ų nustatymai:</translation>
-    </message>
-    <message>
-        <source>Masternode:</source>
-        <translation>Masternod'as:</translation>
-    </message>
-    <message>
-        <source>Not in the Masternode list.</source>
-        <translation>Nėra Masternod'ų sąraše.</translation>
     </message>
     <message>
         <source>Options:</source>
@@ -3682,24 +3487,8 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>Sandorio sumos turi būti teigiamos</translation>
     </message>
     <message>
-        <source>Transaction created successfully.</source>
-        <translation>Sandoris sėkmingai sukurtas.</translation>
-    </message>
-    <message>
-        <source>Transaction fees are too high.</source>
-        <translation>Sandorio mokesčiai yra per dideli.</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>Sandoris negalioja.</translation>
-    </message>
-    <message>
         <source>Transaction too large</source>
         <translation>Sandoris per didelis</translation>
-    </message>
-    <message>
-        <source>Transmitting final transaction.</source>
-        <translation>Perduodamas galutinis sandoris.</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
@@ -3722,12 +3511,8 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
         <translation>Piniginė %s yra ne duomenų kataloge %s</translation>
     </message>
     <message>
-        <source>Wallet is locked.</source>
-        <translation>Piniginė užrakinta.</translation>
-    </message>
-    <message>
-        <source>Wallet needed to be rewritten: restart Wagerr Core to complete</source>
-        <translation>Piniginę reikia perrašyti: paleiskite Wagerr Core iš naujo</translation>
+        <source>Wallet needed to be rewritten: restart WAGERR Core to complete</source>
+        <translation>Piniginę reikia perrašyti: paleiskite WAGERR Core iš naujo</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -3756,14 +3541,6 @@ Nesubrendusios: patvirtintos, bet mažiau nei 1 konvertacijos tos pačio nominal
     <message>
         <source>You don't have enough Zerocoins in your wallet</source>
         <translation>Neturite pakankamai Zerocoin monetų savo piniginėje</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>Jūsų įrašai sėkmingai pridėti.</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation>Jūsų sandoris buvo priimtas į "baseiną"!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>

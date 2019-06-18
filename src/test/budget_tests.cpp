@@ -6,10 +6,11 @@
 #include "masternode-budget.h"
 #include "tinyformat.h"
 #include "utilmoneystr.h"
+#include "test_wagerr.h"
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_AUTO_TEST_SUITE(budget_tests)
+BOOST_FIXTURE_TEST_SUITE(budget_tests, TestingSetup)
 
 void CheckBudgetValue(int nHeight, std::string strNetwork, CAmount nExpectedValue)
 {

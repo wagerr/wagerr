@@ -13,13 +13,12 @@
 #include "main.h"
 #include "random.h"
 #include "sync.h"
-#include "ui_interface.h"
+#include "guiinterface.h"
 #include "util.h"
 #include "utilstrencodings.h"
 
 #include <boost/bind.hpp>
 #include <boost/filesystem.hpp>
-#include <boost/foreach.hpp>
 #include <boost/iostreams/concepts.hpp>
 #include <boost/iostreams/stream.hpp>
 #include <boost/shared_ptr.hpp>
@@ -76,7 +75,7 @@ void RPCTypeCheck(const UniValue& params,
                   bool fAllowNull)
 {
     unsigned int i = 0;
-    BOOST_FOREACH(UniValue::VType t, typesExpected) {
+    for (UniValue::VType t : typesExpected) {
         if (params.size() <= i)
             break;
 
@@ -94,7 +93,7 @@ void RPCTypeCheckObj(const UniValue& o,
                   const map<string, UniValue::VType>& typesExpected,
                   bool fAllowNull)
 {
-    BOOST_FOREACH(const PAIRTYPE(string, UniValue::VType)& t, typesExpected) {
+    for (const PAIRTYPE(string, UniValue::VType)& t : typesExpected) {
         const UniValue& v = find_value(o, t.first);
         if (!fAllowNull && v.isNull())
             throw JSONRPCError(RPC_TYPE_ERROR, strprintf("Missing %s", t.first));
@@ -199,7 +198,7 @@ string CRPCTable::help(string strCommand) const
         vCommands.push_back(make_pair(mi->second->category + mi->first, mi->second));
     sort(vCommands.begin(), vCommands.end());
 
-    BOOST_FOREACH (const PAIRTYPE(string, const CRPCCommand*) & command, vCommands) {
+    for (const PAIRTYPE(string, const CRPCCommand*) & command : vCommands) {
         const CRPCCommand* pcmd = command.second;
         string strMethod = pcmd->name;
         // We already filter duplicates, but these deprecated screw up the sort order
@@ -304,6 +303,7 @@ static const CRPCCommand vRPCCommands[] =
         {"blockchain", "findserial", &findserial, true, false, false},
         {"blockchain", "getaccumulatorvalues", &getaccumulatorvalues, true, false, false},
         {"blockchain", "getaccumulatorwitness", &getaccumulatorwitness, true, false, false},
+        {"blockchain", "getblockindexstats", &getblockindexstats, true, false, false},
         {"blockchain", "getmintsinblocks", &getmintsinblocks, true, false, false},
         {"blockchain", "getserials", &getserials, true, false, false},
         {"blockchain", "getblockchaininfo", &getblockchaininfo, true, false, false},
@@ -363,8 +363,7 @@ static const CRPCCommand vRPCCommands[] =
         { "hidden",             "waitforblock",           &waitforblock,           true,  true,  false  },
         { "hidden",             "waitforblockheight",     &waitforblockheight,     true,  true,  false  },
 
-        /* Wagerr features */
-        {"wagerr", "masternode", &masternode, true, true, false},
+        /* WAGERR features */
         {"wagerr", "listmasternodes", &listmasternodes, true, true, false},
         {"wagerr", "getmasternodecount", &getmasternodecount, true, true, false},
         {"wagerr", "masternodeconnect", &masternodeconnect, true, true, false},
@@ -380,7 +379,6 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "getmasternodestatus", &getmasternodestatus, true, true, false},
         {"wagerr", "getmasternodewinners", &getmasternodewinners, true, true, false},
         {"wagerr", "getmasternodescores", &getmasternodescores, true, true, false},
-        {"wagerr", "mnbudget", &mnbudget, true, true, false},
         {"wagerr", "preparebudget", &preparebudget, true, true, false},
         {"wagerr", "submitbudget", &submitbudget, true, true, false},
         {"wagerr", "mnbudgetvote", &mnbudgetvote, true, true, false},
@@ -461,6 +459,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "walletpassphrase", &walletpassphrase, true, false, true},
 
         {"zerocoin", "createrawzerocoinstake", &createrawzerocoinstake, false, false, true},
+        {"zerocoin", "createrawzerocoinpublicspend", &createrawzerocoinpublicspend, false, false, true},
         {"zerocoin", "getzerocoinbalance", &getzerocoinbalance, false, false, true},
         {"zerocoin", "listmintedzerocoins", &listmintedzerocoins, false, false, true},
         {"zerocoin", "listspentzerocoins", &listspentzerocoins, false, false, true},

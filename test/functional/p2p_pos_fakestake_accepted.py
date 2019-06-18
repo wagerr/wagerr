@@ -17,7 +17,7 @@ class PoSFakeStakeAccepted(WAGERR_FakeStakeTest):
     def run_test(self):
         self.description = "Covers the scenario of a valid PoS block where the coinstake input prevout is spent on main chain, but not on the fork branch. These blocks must be accepted."
         self.init_test()
-        INITAL_MINED_BLOCKS = 200   # First mined blocks (rewards collected to spend)
+        INITAL_MINED_BLOCKS = 301   # First mined blocks (rewards collected to spend)
         FORK_DEPTH = 50             # number of blocks after INITIAL_MINED_BLOCKS before the coins are spent
         MORE_MINED_BLOCKS = 10      # number of blocks after spending of the collected coins
         self.NUM_BLOCKS = 3         # Number of spammed blocks

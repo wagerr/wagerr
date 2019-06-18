@@ -93,6 +93,7 @@ public:
     int PoolMaxTransactions() const { return nPoolMaxTransactions; }
     /** Return the number of blocks in a budget cycle */
     int GetBudgetCycleBlocks() const { return nBudgetCycleBlocks; }
+    int64_t GetProposalEstablishmentTime() const { return nProposalEstablishmentTime; }
 
     /** Spork key and Masternode Handling **/
     std::string SporkKey() const { return strSporkKey; }
@@ -109,6 +110,7 @@ public:
     std::string Zerocoin_Modulus() const { return zerocoinModulus; }
     libzerocoin::ZerocoinParams* Zerocoin_Params(bool useModulusV1) const;
     int Zerocoin_MaxSpendsPerTransaction() const { return nMaxZerocoinSpendsPerTransaction; }
+    int Zerocoin_MaxPublicSpendsPerTransaction() const { return nMaxZerocoinPublicSpendsPerTransaction; }
     CAmount Zerocoin_MintFee() const { return nMinZerocoinMintFee; }
     int Zerocoin_MintRequiredConfirmations() const { return nMintRequiredConfirmations; }
     int Zerocoin_RequiredAccumulation() const { return nRequiredAccumulation; }
@@ -135,6 +137,8 @@ public:
     int Zerocoin_Block_Double_Accumulated() const { return nBlockDoubleAccumulated; }
     CAmount InvalidAmountFiltered() const { return nInvalidAmountFiltered; };
 
+    int Zerocoin_Block_Public_Spend_Enabled() const { return nPublicZCSpends; }
+
     int Zerocoin_AccumulationStartHeight() const { return nZerocoinAccumulationStartHeight; }
 
     /** Betting on blockchain **/
@@ -151,6 +155,11 @@ public:
     int64_t MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
     int64_t MinBetPayoutRange() const { return nMinBetPayoutRange; }
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
+
+    /** temp worarounds **/
+    int ZerocoinCheckTX() const { return nZerocoinCheckTX; }
+    int ZerocoinCheckTXexclude() const { return nZerocoinCheckTXexclude; }
+
 protected:
     CChainParams() {}
 
@@ -197,6 +206,7 @@ protected:
     int64_t nStartMasternodePayments;
     std::string zerocoinModulus;
     int nMaxZerocoinSpendsPerTransaction;
+    int nMaxZerocoinPublicSpendsPerTransaction;
     CAmount nMinZerocoinMintFee;
     CAmount nInvalidAmountFiltered;
     int nMintRequiredConfirmations;
@@ -207,6 +217,7 @@ protected:
     int nZerocoinStartHeight;
     int nZerocoinStartTime;
     int nZerocoinRequiredStakeDepth;
+    int64_t nProposalEstablishmentTime;
 
     int nBlockEnforceSerialRange;
     int nBlockRecalculateAccumulators;
@@ -215,6 +226,7 @@ protected:
     int nBlockEnforceInvalidUTXO;
     int nBlockZerocoinV2;
     int nBlockDoubleAccumulated;
+    int nPublicZCSpends;
 
     // fake serial attack
     int nFakeSerialBlockheightEnd = 0;
@@ -235,6 +247,10 @@ protected:
     int64_t nMinBetPayoutRange;
     int64_t nMaxBetPayoutRange;
     int nBetPlaceTimeoutBlocks;
+
+    // workarounds
+    int nZerocoinCheckTX;
+    int nZerocoinCheckTXexclude;
 };
 
 /**

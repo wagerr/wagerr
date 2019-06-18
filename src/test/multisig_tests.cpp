@@ -10,13 +10,13 @@
 #include "script/interpreter.h"
 #include "script/sign.h"
 #include "uint256.h"
+#include "test_wagerr.h"
 
 #ifdef ENABLE_WALLET
 #include "wallet/wallet_ismine.h"
 #endif
 
 #include <boost/assign/std/vector.hpp>
-#include <boost/foreach.hpp>
 #include <boost/test/unit_test.hpp>
 
 using namespace std;
@@ -24,7 +24,7 @@ using namespace boost::assign;
 
 typedef vector<unsigned char> valtype;
 
-BOOST_AUTO_TEST_SUITE(multisig_tests)
+BOOST_FIXTURE_TEST_SUITE(multisig_tests, TestingSetup)
 
 CScript
 sign_multisig(CScript scriptPubKey, vector<CKey> keys, CTransaction transaction, int whichIn)
@@ -33,7 +33,7 @@ sign_multisig(CScript scriptPubKey, vector<CKey> keys, CTransaction transaction,
 
     CScript result;
     result << OP_0; // CHECKMULTISIG bug workaround
-    BOOST_FOREACH(const CKey &key, keys)
+    for (const CKey &key : keys)
     {
         vector<unsigned char> vchSig;
         BOOST_CHECK(key.Sign(hash, vchSig));

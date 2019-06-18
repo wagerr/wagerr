@@ -20,7 +20,7 @@
    <item>
     <widget class="QTabWidget" name="tabWidget">
      <property name="currentIndex">
-      <number>4</number>
+      <number>0</number>
      </property>
      <widget class="QWidget" name="tabMain">
       <attribute name="title">
@@ -131,100 +131,109 @@
         </spacer>
        </item>
        <item>
-        <layout class="QHBoxLayout" name="horiz-autominting-layout">
-         <item>
-          <widget class="QCheckBox" name="checkBoxZeromintEnable">
-           <property name="toolTip">
-            <string>Enable automatic minting of PIV units to zPIV</string>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Enable zPIV Automint</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBoxZeromintAddresses">
-           <property name="toolTip">
-            <string>Enable automatic zPIV minting from specific addresses</string>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Enable Automint Addresses</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3">
-         <item>
-          <widget class="QLabel" name="percentage_label">
-           <property name="toolTip">
-            <string>Percentage of incoming PIV which get automatically converted to zPIV via Zerocoin Protocol (min: 10%)</string>
-           </property>
-           <property name="text">
-            <string>Percentage of autominted zPIV</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSpinBox" name="zeromintPercentage">
-           <property name="minimum">
-            <number>1</number>
-           </property>
-           <property name="maximum">
-            <number>100</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
-         <property name="sizeConstraint">
-          <enum>QLayout::SetFixedSize</enum>
-         </property>
-         <item>
-          <widget class="QLabel" name="labelPreferredDenom">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>16777215</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</string>
-           </property>
-           <property name="text">
-            <string>Preferred Automint zPIV Denomination</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QComboBox" name="preferredDenom">
-           <property name="maximumSize">
-            <size>
-             <width>16777215</width>
-             <height>27</height>
-            </size>
-           </property>
-           <property name="toolTip">
-            <string>Wait with automatic conversion to Zerocoin until enough PIV for this denomination is available</string>
-           </property>
-           <property name="maxVisibleItems">
-            <number>9</number>
-           </property>
-           <property name="maxCount">
-            <number>9</number>
-           </property>
-          </widget>
-         </item>
-        </layout>
+        <widget class="QWidget" name="verticalZwgrOptionsWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalZwgrOptionsLayout">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalAutomintingLayout">
+            <item>
+             <widget class="QCheckBox" name="checkBoxZeromintEnable">
+              <property name="toolTip">
+               <string>Enable automatic minting of WGR units to zWGR</string>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Enable zWGR Automint</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxZeromintAddresses">
+              <property name="toolTip">
+               <string>Enable automatic zWGR minting from specific addresses</string>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Enable Automint Addresses</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalZmintPercentageLayout">
+            <item>
+             <widget class="QLabel" name="percentage_label">
+              <property name="toolTip">
+               <string>Percentage of incoming WGR which get automatically converted to zWGR via Zerocoin Protocol (min: 10%)</string>
+              </property>
+              <property name="text">
+               <string>Percentage of autominted zWGR</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QSpinBox" name="zeromintPercentage">
+              <property name="minimum">
+               <number>1</number>
+              </property>
+              <property name="maximum">
+               <number>100</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout" stretch="0,0">
+            <property name="sizeConstraint">
+             <enum>QLayout::SetFixedSize</enum>
+            </property>
+            <item>
+             <widget class="QLabel" name="labelPreferredDenom">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>16777215</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Wait with automatic conversion to Zerocoin until enough WGR for this denomination is available</string>
+              </property>
+              <property name="text">
+               <string>Preferred Automint zWGR Denomination</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QComboBox" name="preferredDenom">
+              <property name="maximumSize">
+               <size>
+                <width>16777215</width>
+                <height>27</height>
+               </size>
+              </property>
+              <property name="toolTip">
+               <string>Wait with automatic conversion to Zerocoin until enough WGR for this denomination is available</string>
+              </property>
+              <property name="maxVisibleItems">
+               <number>9</number>
+              </property>
+              <property name="maxCount">
+               <number>9</number>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
+        </widget>
        </item>
       </layout>
      </widget>
@@ -552,113 +561,116 @@ https://www.transifex.com/wagerr/wagerr-translations</string>
         </layout>
        </item>
        <item>
-        <widget class="Line" name="line">
-         <property name="orientation">
-          <enum>Qt::Horizontal</enum>
-         </property>
+        <widget class="QWidget" name="verticalZwgrDisplayWidget" native="true">
+         <layout class="QVBoxLayout" name="verticalZwgrDisplayLayout">
+          <property name="margin">
+           <number>0</number>
+          </property>
+          <item>
+           <widget class="Line" name="line">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+           </widget>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_3_Display">
+            <item>
+             <widget class="QLabel" name="unitLabel">
+              <property name="text">
+               <string>Unit to show amounts in:</string>
+              </property>
+              <property name="textFormat">
+               <enum>Qt::PlainText</enum>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QValueComboBox" name="unit">
+              <property name="toolTip">
+               <string>Choose the default subdivision unit to show in the interface and when sending coins.</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_4_Display">
+            <item>
+             <widget class="QLabel" name="digitsLabel">
+              <property name="text">
+               <string>Decimal digits</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QValueComboBox" name="digits"/>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_5_Display">
+            <item>
+             <widget class="QCheckBox" name="checkBoxHideZeroBalances">
+              <property name="toolTip">
+               <string>Hide empty balances</string>
+              </property>
+              <property name="layoutDirection">
+               <enum>Qt::LeftToRight</enum>
+              </property>
+              <property name="text">
+               <string>Hide empty balances</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QCheckBox" name="checkBoxHideOrphans">
+              <property name="toolTip">
+               <string>Hide orphan stakes in transaction lists</string>
+              </property>
+              <property name="text">
+               <string>Hide orphan stakes</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <spacer name="horizontalSpacer">
+              <property name="orientation">
+               <enum>Qt::Horizontal</enum>
+              </property>
+              <property name="sizeHint" stdset="0">
+               <size>
+                <width>40</width>
+                <height>20</height>
+               </size>
+              </property>
+             </spacer>
+            </item>
+           </layout>
+          </item>
+          <item>
+           <layout class="QHBoxLayout" name="horizontalLayout_6_Display">
+            <item>
+             <widget class="QLabel" name="thirdPartyTxUrlsLabel">
+              <property name="toolTip">
+               <string>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</string>
+              </property>
+              <property name="text">
+               <string>Third party transaction URLs</string>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLineEdit" name="thirdPartyTxUrls">
+              <property name="toolTip">
+               <string>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</string>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+         </layout>
         </widget>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_3_Display">
-         <item>
-          <widget class="QLabel" name="unitLabel">
-           <property name="text">
-            <string>&amp;Unit to show amounts in:</string>
-           </property>
-           <property name="textFormat">
-            <enum>Qt::PlainText</enum>
-           </property>
-           <property name="buddy">
-            <cstring>unit</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QValueComboBox" name="unit">
-           <property name="toolTip">
-            <string>Choose the default subdivision unit to show in the interface and when sending coins.</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_4_Display">
-         <item>
-          <widget class="QLabel" name="digitsLabel">
-           <property name="text">
-            <string>Decimal digits</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QValueComboBox" name="digits"/>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_5_Display">
-         <item>
-          <widget class="QCheckBox" name="checkBoxHideZeroBalances">
-           <property name="toolTip">
-            <string>Hide empty balances</string>
-           </property>
-           <property name="layoutDirection">
-            <enum>Qt::LeftToRight</enum>
-           </property>
-           <property name="text">
-            <string>Hide empty balances</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QCheckBox" name="checkBoxHideOrphans">
-           <property name="toolTip">
-            <string>Hide orphan stakes in transaction lists</string>
-           </property>
-           <property name="text">
-            <string>Hide orphan stakes</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <spacer name="horizontalSpacer">
-           <property name="orientation">
-            <enum>Qt::Horizontal</enum>
-           </property>
-           <property name="sizeHint" stdset="0">
-            <size>
-             <width>40</width>
-             <height>20</height>
-            </size>
-           </property>
-          </spacer>
-         </item>
-        </layout>
-       </item>
-       <item>
-        <layout class="QHBoxLayout" name="horizontalLayout_6_Display">
-         <item>
-          <widget class="QLabel" name="thirdPartyTxUrlsLabel">
-           <property name="toolTip">
-            <string>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</string>
-           </property>
-           <property name="text">
-            <string>Third party transaction URLs</string>
-           </property>
-           <property name="buddy">
-            <cstring>thirdPartyTxUrls</cstring>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="thirdPartyTxUrls">
-           <property name="toolTip">
-            <string>Third party URLs (e.g. a block explorer) that appear in the transactions tab as context menu items. %s in the URL is replaced by transaction hash. Multiple URLs are separated by vertical bar |.</string>
-           </property>
-          </widget>
-         </item>
-        </layout>
        </item>
        <item>
         <spacer name="verticalSpacer">

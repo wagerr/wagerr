@@ -15,6 +15,7 @@
 #include "uint256.h"
 #include "util.h"
 #include "utilstrencodings.h"
+#include "test/test_wagerr.h"
 
 #include <vector>
 
@@ -24,7 +25,7 @@
 using namespace std;
 using namespace boost::tuples;
 
-BOOST_AUTO_TEST_SUITE(bloom_tests)
+BOOST_FIXTURE_TEST_SUITE(bloom_tests, BasicTestingSetup)
 
 BOOST_AUTO_TEST_CASE(bloom_create_insert_serialize)
 {

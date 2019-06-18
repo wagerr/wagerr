@@ -1,0 +1,15 @@
+# http://standards.freedesktop.org/desktop-entry-spec/desktop-entry-spec-1.0.html
+
+[Desktop Entry]
+Encoding=UTF-8
+Name=Wagerr Qt
+Comment=Wagerr Digital Currency QT Official release
+GenericName=Wagerr Digital Currency QT client main network
+Exec=wagerr.qt %u
+Terminal=false
+Type=Application
+Icon=${SNAP}/wagerr-qt.png
+MimeType=x-scheme-handler/wagerr;
+Categories=X-Office;X-Finance;
+Keywords=internet;wagerr;zwgr;wgr;core;wallet;qt;main;snap;launchpad;crypto;digital;currency;coin;token;zerocoin;
+Version=3.0.99

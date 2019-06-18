@@ -73,6 +73,7 @@ private:
     CAmount currentWatchImmatureBalance;
 
     bool fMinimizeChange = false;
+    bool fDenomsMinimized;
 
     int nDisplayUnit;
     bool updateLabel(const QString& address);
@@ -82,13 +83,13 @@ private slots:
     void on_payTo_textChanged(const QString& address);
     void on_addressBookButton_clicked();
 //    void coinControlFeatureChanged(bool);
-    void coinControlButtonClicked();
+// MINT disabled   void coinControlButtonClicked();
 //    void coinControlChangeChecked(int);
 //    void coinControlChangeEdited(const QString&);
-    void coinControlUpdateLabels();
+// MINT disabled    void coinControlUpdateLabels();
 
-    void coinControlClipboardQuantity();
-    void coinControlClipboardAmount();
+// MINT disabled    void coinControlClipboardQuantity();
+// MINT disabled    void coinControlClipboardAmount();
 //    void coinControlClipboardFee();
 //    void coinControlClipboardAfterFee();
 //    void coinControlClipboardBytes();
@@ -96,12 +97,15 @@ private slots:
 //    void coinControlClipboardLowOutput();
 //    void coinControlClipboardChange();
 
-    void on_pushButtonMintzWGR_clicked();
+// MINT disabled    void on_pushButtonMintzWGR_clicked();
     void on_pushButtonMintReset_clicked();
     void on_pushButtonSpentReset_clicked();
     void on_pushButtonSpendzWGR_clicked();
     void on_pushButtonZWgrControl_clicked();
+    void on_pushButtonHideDenoms_clicked();
+    void on_pushButtonShowDenoms_clicked();
     void on_pasteButton_clicked();
+    void minimizeDenomsSection(bool fMinimize);
     void updateDisplayUnit();
     void updateAutomintStatus();
     void updateSPORK16Status();

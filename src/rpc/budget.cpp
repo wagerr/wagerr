@@ -50,109 +50,6 @@ void budgetToJSON(CBudgetProposal* pbudgetProposal, UniValue& bObj)
     bObj.push_back(Pair("fValid", pbudgetProposal->fValid));
 }
 
-// This command is retained for backwards compatibility, but is depreciated.
-// Future removal of this command is planned to keep things clean.
-UniValue mnbudget(const UniValue& params, bool fHelp)
-{
-    string strCommand;
-    if (params.size() >= 1)
-        strCommand = params[0].get_str();
-
-    if (fHelp ||
-        (strCommand != "vote-alias" && strCommand != "vote-many" && strCommand != "prepare" && strCommand != "submit" && strCommand != "vote" && strCommand != "getvotes" && strCommand != "getinfo" && strCommand != "show" && strCommand != "projection" && strCommand != "check" && strCommand != "nextblock"))
-        throw runtime_error(
-            "mnbudget \"command\"... ( \"passphrase\" )\n"
-            "\nVote or show current budgets\n"
-            "This command is depreciated, please see individual command documentation for future reference\n\n"
-
-            "\nAvailable commands:\n"
-            "  prepare            - Prepare proposal for network by signing and creating tx\n"
-            "  submit             - Submit proposal for network\n"
-            "  vote-many          - Vote on a Wagerr initiative\n"
-            "  vote-alias         - Vote on a Wagerr initiative\n"
-            "  vote               - Vote on a Wagerr initiative/budget\n"
-            "  getvotes           - Show current masternode budgets\n"
-            "  getinfo            - Show current masternode budgets\n"
-            "  show               - Show all budgets\n"
-            "  projection         - Show the projection of which proposals will be paid the next cycle\n"
-            "  check              - Scan proposals and remove invalid\n"
-            "  nextblock          - Get next superblock for budget system\n");
-
-    if (strCommand == "nextblock") {
-        UniValue newParams(UniValue::VARR);
-        // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
-        }
-        return getnextsuperblock(newParams, fHelp);
-    }
-
-    if (strCommand == "prepare") {
-        UniValue newParams(UniValue::VARR);
-        // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
-        }
-        return preparebudget(newParams, fHelp);
-    }
-
-    if (strCommand == "submit") {
-        UniValue newParams(UniValue::VARR);
-        // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
-        }
-        return submitbudget(newParams, fHelp);
-    }
-
-    if (strCommand == "vote" || strCommand == "vote-many" || strCommand == "vote-alias") {
-        if (strCommand == "vote-alias")
-            throw runtime_error(
-                "vote-alias is not supported with this command\n"
-                "Please use mnbudgetvote instead.\n"
-            );
-        return mnbudgetvote(params, fHelp);
-    }
-
-    if (strCommand == "projection") {
-        UniValue newParams(UniValue::VARR);
-        // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
-        }
-        return getbudgetprojection(newParams, fHelp);
-    }
-
-    if (strCommand == "show" || strCommand == "getinfo") {
-        UniValue newParams(UniValue::VARR);
-        // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
-        }
-        return getbudgetinfo(newParams, fHelp);
-    }
-
-    if (strCommand == "getvotes") {
-        UniValue newParams(UniValue::VARR);
-        // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
-        }
-        return getbudgetvotes(newParams, fHelp);
-    }
-
-    if (strCommand == "check") {
-        UniValue newParams(UniValue::VARR);
-        // forward params but skip command
-        for (unsigned int i = 1; i < params.size(); i++) {
-            newParams.push_back(params[i]);
-        }
-        return checkbudgets(newParams, fHelp);
-    }
-
-    return NullUniValue;
-}
-
 UniValue preparebudget(const UniValue& params, bool fHelp)
 {
     int nBlockMin = 0;
@@ -457,7 +354,7 @@ UniValue mnbudgetvote(const UniValue& params, bool fHelp)
     }
 
     if (strCommand == "many") {
-        BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
             std::string errorMessage;
             std::vector<unsigned char> vchMasterNodeSignature;
             std::string strMasterNodeSignMessage;
@@ -528,7 +425,7 @@ UniValue mnbudgetvote(const UniValue& params, bool fHelp)
         std::vector<CMasternodeConfig::CMasternodeEntry> mnEntries;
         mnEntries = masternodeConfig.getEntries();
 
-        BOOST_FOREACH(CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
 
             if( strAlias != mne.getAlias()) continue;
 
@@ -714,7 +611,7 @@ UniValue getbudgetprojection(const UniValue& params, bool fHelp)
     CAmount nTotalAllotted = 0;
 
     std::vector<CBudgetProposal*> winningProps = budget.GetBudget();
-    BOOST_FOREACH (CBudgetProposal* pbudgetProposal, winningProps) {
+    for (CBudgetProposal* pbudgetProposal : winningProps) {
         nTotalAllotted += pbudgetProposal->GetAllotted();
 
         CTxDestination address1;
@@ -785,7 +682,7 @@ UniValue getbudgetinfo(const UniValue& params, bool fHelp)
     }
 
     std::vector<CBudgetProposal*> winningProps = budget.GetAllProposals();
-    BOOST_FOREACH (CBudgetProposal* pbudgetProposal, winningProps) {
+    for (CBudgetProposal* pbudgetProposal : winningProps) {
         if (strShow == "valid" && !pbudgetProposal->fValid) continue;
 
         UniValue bObj(UniValue::VOBJ);
@@ -891,7 +788,7 @@ UniValue mnfinalbudget(const UniValue& params, bool fHelp)
 
         UniValue resultsObj(UniValue::VOBJ);
 
-        BOOST_FOREACH (CMasternodeConfig::CMasternodeEntry mne, masternodeConfig.getEntries()) {
+        for (CMasternodeConfig::CMasternodeEntry mne : masternodeConfig.getEntries()) {
             std::string errorMessage;
             std::vector<unsigned char> vchMasterNodeSignature;
             std::string strMasterNodeSignMessage;
@@ -989,7 +886,7 @@ UniValue mnfinalbudget(const UniValue& params, bool fHelp)
         UniValue resultObj(UniValue::VOBJ);
 
         std::vector<CFinalizedBudget*> winningFbs = budget.GetFinalizedBudgets();
-        BOOST_FOREACH (CFinalizedBudget* finalizedBudget, winningFbs) {
+        for (CFinalizedBudget* finalizedBudget : winningFbs) {
             UniValue bObj(UniValue::VOBJ);
             bObj.push_back(Pair("FeeTX", finalizedBudget->nFeeTXHash.ToString()));
             bObj.push_back(Pair("Hash", finalizedBudget->GetHash().ToString()));

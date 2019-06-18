@@ -14,9 +14,9 @@
 #include "arith_uint256.h"
 #include <string>
 #include "version.h"
+#include "test/test_wagerr.h"
 
-BOOST_AUTO_TEST_SUITE(arith_uint256_tests)
-///BOOST_FIXTURE_TEST_SUITE(arith_uint256_tests, BasicTestingSetup)
+BOOST_FIXTURE_TEST_SUITE(arith_uint256_tests, BasicTestingSetup)
 
 /// Convert vector to arith_uint256, via uint256 blob
 inline arith_uint256 arith_uint256V(const std::vector<unsigned char>& vch)

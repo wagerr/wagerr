@@ -28,6 +28,7 @@ class ConfArgsTest(BitcoinTestFramework):
         self.assert_start_raises_init_error(0, ['-datadir='+new_data_dir], 'Error: Specified data directory "' + new_data_dir + '" does not exist.')
 
         # Check that using non-existent datadir in conf file fails
+        os.mkdir(new_data_dir)
         conf_file = os.path.join(default_data_dir, "bitcoin.conf")
         with open(conf_file, 'a', encoding='utf8') as f:
             f.write("datadir=" + new_data_dir + "\n")

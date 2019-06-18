@@ -230,7 +230,7 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
                 bool fFoundMint = false;
                 CBigNum bnValue = 0;
                 for (const CTxOut& out : tx.vout) {
-                    if (!out.scriptPubKey.IsZerocoinMint())
+                    if (!out.IsZerocoinMint())
                         continue;
 
                     PublicCoin pubcoin(Params().Zerocoin_Params(false));

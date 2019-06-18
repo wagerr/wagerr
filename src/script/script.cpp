@@ -155,6 +155,7 @@ const char* GetOpName(opcodetype opcode)
     // zerocoin
     case OP_ZEROCOINMINT           : return "OP_ZEROCOINMINT";
     case OP_ZEROCOINSPEND          : return "OP_ZEROCOINSPEND";
+    case OP_ZEROCOINPUBLICSPEND          : return "OP_ZEROCOINPUBLICSPEND";
 
     case OP_INVALIDOPCODE          : return "OP_INVALIDOPCODE";
 
@@ -249,19 +250,24 @@ bool CScript::IsPayToScriptHash() const
             this->at(22) == OP_EQUAL);
 }
 
+bool CScript::StartsWithOpcode(const opcodetype opcode) const
+{
+    return (!this->empty() && this->at(0) == opcode);
+}
+
 bool CScript::IsZerocoinMint() const
 {
-    //fast test for Zerocoin Mint CScripts
-    return (this->size() > 0 &&
-        this->at(0) == OP_ZEROCOINMINT);
+    return StartsWithOpcode(OP_ZEROCOINMINT);
 }
 
 bool CScript::IsZerocoinSpend() const
 {
-    if (this->empty())
-        return false;
+    return StartsWithOpcode(OP_ZEROCOINSPEND);
+}
 
-    return (this->at(0) == OP_ZEROCOINSPEND);
+bool CScript::IsZerocoinPublicSpend() const
+{
+    return StartsWithOpcode(OP_ZEROCOINPUBLICSPEND);
 }
 
 bool CScript::IsPushOnly(const_iterator pc) const
