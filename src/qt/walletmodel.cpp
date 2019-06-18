@@ -21,6 +21,7 @@
 #include "guiinterface.h"
 #include "wallet/wallet.h"
 #include "wallet/walletdb.h" // for BackupWallet
+#include "zwgr/deterministicmint.h"
 #include <stdint.h>
 
 #include <QDebug>
@@ -522,7 +523,6 @@ bool WalletModel::createZwgrSpend(
     std::vector<CDeterministicMint> vNewMints;
     if (!wallet->CreateZerocoinSpendTransaction(
             value,
-            100,
             wtxNew,
             reserveKey,
             receipt,
@@ -559,7 +559,6 @@ bool WalletModel::sendZwgr(
     CWalletTx wtxNew;
     return wallet->SpendZerocoin(
             value,
-            100,
             wtxNew,
             receipt,
             vMintsSelected,
@@ -589,7 +588,6 @@ bool WalletModel::convertBackZwgr(
     CWalletTx wtxNew;
     return wallet->SpendZerocoin(
             value,
-            100,
             wtxNew,
             receipt,
             vMintsSelected,
