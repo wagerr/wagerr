@@ -1,6 +1,7 @@
 ---
 name: "wagerr-win-3.0"
 enable_cache: true
+distro: "ubuntu"
 suites:
 - "bionic"
 architectures:
