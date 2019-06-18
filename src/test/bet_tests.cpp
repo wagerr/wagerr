@@ -2,6 +2,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+/*
 #include "betting/bet.h"
 #include "clientversion.h"
 #include "streams.h"
@@ -720,7 +721,7 @@ BOOST_AUTO_TEST_CASE(basics) // constructors, equality, inequality
 
 BOOST_AUTO_TEST_CASE(serialisation) // Test the event index map serialisation / deserialization methods.
 {
-    /*** TEST THE EVENTS INDEX SERIALIZATION AND DESERIALIZATION. ***/
+    // TEST THE EVENTS INDEX SERIALIZATION AND DESERIALIZATION.
     int num_tests = sizeof(pe_tests) / sizeof(*pe_tests);
     eventIndex_t eventIndex;
 
@@ -765,7 +766,7 @@ BOOST_AUTO_TEST_CASE(serialisation) // Test the event index map serialisation / 
     }
 
 
-    /*** TEST THE MAPPING INDEXES SERIALIZATION AND DESERIALIZATION. ***/
+    // TEST THE MAPPING INDEXES SERIALIZATION AND DESERIALIZATION.
     mappingIndex_t mSportsIndex;
     mappingIndex_t mRoundsIndex;
     mappingIndex_t mTeamNamesIndex;
@@ -865,3 +866,4 @@ BOOST_AUTO_TEST_CASE(serialisation) // Test the event index map serialisation / 
 }
 
  BOOST_AUTO_TEST_SUITE_END()
+ */
