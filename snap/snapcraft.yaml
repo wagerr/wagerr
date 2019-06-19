@@ -309,6 +309,7 @@ parts:
       echo "get wagerr electron wallet"
       git clone https://github.com/wagerr/wagerr-electron-app.git
       cd wagerr-electron-app
+      git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X004-electron-snap-patch.patch
       npm install
       npm run package
       cd release
