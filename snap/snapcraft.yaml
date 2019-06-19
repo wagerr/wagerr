@@ -322,7 +322,7 @@ parts:
         $APPIMAGE --appimage-extract
         mv -f ./squashfs-root/* ${SNAPCRAFT_PART_INSTALL}
         ls *.AppImage
-        cp -f ./wagerr-*.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
+        cp -f $APPIMAGE ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
         cd ..
       elif [ $HOST = "x86_64-linux-gnu" ]; then
         git clone https://github.com/wagerr/wagerr-electron-app.git
@@ -338,7 +338,7 @@ parts:
         $APPIMAGE --appimage-extract
         mv -f ./squashfs-root/* ${SNAPCRAFT_PART_INSTALL}
         ls *.AppImage
-        cp -f ./wagerr-*.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
+        cp -f $APPIMAGE ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
         cd ..
       else
         # create dummy file for all non available platforms, temp workaround **TODO**
