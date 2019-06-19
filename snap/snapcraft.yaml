@@ -314,9 +314,12 @@ parts:
         npm install
         npm run package
         cd release
-        chmod a+x wagerr-*.AppImage
-        ls *.AppImage
-        cp -f ./wagerr-*.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
+        APPIMAGE=$(find *i386*.AppImage)
+        chmod a+x $APPIMAGE
+        $APPIMAGE --appimage-extract
+        mv -f ./squashfs-root/* ${SNAPCRAFT_PART_INSTALL}
+        #ls *.AppImage
+        #cp -f ./wagerr-*.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
         cd ../..
       elif [ $HOST = "x86_64-linux-gnu" ]; then
         git clone https://github.com/wagerr/wagerr-electron-app.git
@@ -325,9 +328,12 @@ parts:
         npm install
         npm run package
         cd release
-        chmod a+x wagerr-*.AppImage
-        ls *.AppImage
-        cp -f ./wagerr-*.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
+        APPIMAGE=$(find *x86_64*.AppImage)
+        chmod a+x $APPIMAGE
+        $APPIMAGE --appimage-extract
+        mv -f ./squashfs-root/* ${SNAPCRAFT_PART_INSTALL}
+        #ls *.AppImage
+        #cp -f ./wagerr-*.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
         cd ../..
       else
         # create dummy file for all non available platforms, temp workaround **TODO**
