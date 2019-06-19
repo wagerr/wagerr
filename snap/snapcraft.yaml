@@ -306,24 +306,20 @@ parts:
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       echo "WAGERR SPECIFIC"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      if [ $HOST = "i686-linux-gnu" ]; then
-        echo "get wagerr electron wallet"
-        git clone https://github.com/wagerr/wagerr-electron-app.git
-        cd wagerr-electron-app
-        npm install
-        npm run package
-        cp -f ./wagerr-*i386.AppImage ${SNAPCRAFT_PART_INSTALL}/
-      fi
+      echo "get wagerr electron wallet"
+      git clone https://github.com/wagerr/wagerr-electron-app.git
+      cd wagerr-electron-app
+      npm install
+      npm run package
+      cd release
+      chmod a+x wagerr-*.AppImage
+      ls *.AppImage
       if [ $HOST = "x86_64-linux-gnu" ]; then
-        echo "get wagerr electron wallet"
-        git clone https://github.com/wagerr/wagerr-electron-app.git
-        cd wagerr-electron-app
-        npm install
-        npm run package
-        cd release
-        chmod a+x wagerr-*.AppImage
         cp -f ./wagerr-*x86_64.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
+      else
+        cp -f ./wagerr-*.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
       fi
+      cd ../..
       echo "-----------------------------------------------"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       echo "INSTALATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}-snap has finished" # List installed files and vars when installation is finished
