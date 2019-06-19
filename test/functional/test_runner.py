@@ -129,7 +129,7 @@ EXTENDED_SCRIPTS = [
     #'feature_fee_estimation.py', # Not Working -- TODO Fix it
     # vv Tests less than 5m vv
     'wallet_cli-pt1.py',
-    'wallet_multisend.py',
+    #'wallet_multisend.py', # fails on travis bionic
     # vv Tests less than 2m vv
     #'p2p_timeouts.py', # p2p peer does not timeout
     # vv Tests less than 60s vv
