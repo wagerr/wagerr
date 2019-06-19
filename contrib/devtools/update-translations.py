@@ -1,6 +1,5 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014 Wladimir J. van der Laan
-# Copyright (c) 2018 The Wagerr Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 '''
@@ -51,7 +50,10 @@ def find_format_specifiers(s):
         percent = s.find('%', pos)
         if percent < 0:
             break
-        specifiers.append(s[percent+1])
+        try:
+            specifiers.append(s[percent+1])
+        except:
+            print('Failed to get specifier')
         pos = percent+2
     return specifiers
 
