@@ -339,6 +339,12 @@ parts:
         # create dummy file for all non available platforms, temp workaround **TODO**
         touch ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app
       fi
+      if [ -f ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app ]; then
+        echo "Found - ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app"
+      else
+        # workaround to get snap successfull **TODO** should be removed later
+        touch ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app
+      fi
       echo "-----------------------------------------------"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       echo "INSTALATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}-snap has finished" # List installed files and vars when installation is finished
