@@ -307,20 +307,32 @@ parts:
       echo "WAGERR SPECIFIC"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       echo "get wagerr electron wallet"
-      git clone https://github.com/wagerr/wagerr-electron-app.git
-      cd wagerr-electron-app
-      git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X004-electron-snap-patch.patch
-      npm install
-      npm run package
-      cd release
-      chmod a+x wagerr-*.AppImage
-      ls *.AppImage
-      if [ $HOST = "x86_64-linux-gnu" ]; then
-        cp -f ./wagerr-*x86_64.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
-      else
+      if [ $HOST = "i686-linux-gnu" ]; then
+        git clone https://github.com/wagerr/wagerr-electron-app.git
+        cd wagerr-electron-app
+        git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X004-electron-snap-patch.patch
+        npm install
+        npm run package
+        cd release
+        chmod a+x wagerr-*.AppImage
+        ls *.AppImage
         cp -f ./wagerr-*.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
+        cd ../..
+      elif [ $HOST = "x86_64-linux-gnu" ]; then
+        git clone https://github.com/wagerr/wagerr-electron-app.git
+        cd wagerr-electron-app
+        git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X004-electron-snap-patch.patch
+        npm install
+        npm run package
+        cd release
+        chmod a+x wagerr-*.AppImage
+        ls *.AppImage
+        cp -f ./wagerr-*.AppImage ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
+        cd ../..
+      else
+        # create dummy file for all non available platforms, temp workaround **TODO**
+        touch ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
       fi
-      cd ../..
       echo "-----------------------------------------------"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       echo "INSTALATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}-snap has finished" # List installed files and vars when installation is finished
