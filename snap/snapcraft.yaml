@@ -326,6 +326,7 @@ parts:
         cd ..
       elif [ $HOST = "x86_64-linux-gnu" ]; then
         git clone https://github.com/wagerr/wagerr-electron-app.git
+        mkdir -p ./wagerr-electron-app/bin
         cp -f ${SNAPCRAFT_PART_INSTALL}/bin/wagerrd ./wagerr-electron-app/bin/wagerrd
         cp -f ${SNAPCRAFT_PART_INSTALL}/bin/wagerr-cli ./wagerr-electron-app/bin/wagerr-cli
         cd wagerr-electron-app
