@@ -114,7 +114,7 @@ BASE_SCRIPTS= [
     #'wallet_resendwallettransactions.py', # Not Working -- TODO Fix it
     #'feature_minchainwork.py',
     #'p2p_fingerprint.py', # Not Working -- TODO Fix it
-    'feature_uacomment.py', # Not Applicable -uacomment not supported
+    #'feature_uacomment.py', # Not Applicable -uacomment not supported
     #'p2p_unrequested_blocks.py', # Not Working -- TODO Fix it
     #'feature_config_args.py',  # Not Working -- TODO Fix it
     'feature_help.py',
