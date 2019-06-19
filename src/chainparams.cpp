@@ -64,12 +64,12 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
     (  257142, uint256("eca635870323e7c0785fec1e663f4cb8645b7e84b5df4511ba4c189e580bfafd"))
     (  290000, uint256("5a70e614a2e6035be0fa1dd1a67bd6caa0a78e396e889aac42bbbc08e11cdabd"))
     (  294400, uint256("01be3c3c84fd6063ba27080996d346318242d5335efec936408c1e1ae3fdb4a1"))
-    (  320000, uint256("9060f8d44058c539653f37eaac4c53de7397e457dda264c5ee1be94293e9f6bb"));
-
+    (  320000, uint256("9060f8d44058c539653f37eaac4c53de7397e457dda264c5ee1be94293e9f6bb"))         // tx 671130
+    (  695857, uint256("680a170b5363f308cc0698a53ab6a83209dab06c138c98f91110f9e11e273778"));
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-    1538190282, // * UNIX timestamp of last checkpoint block
-    671130,     // * total number of transactions between genesis and last checkpoint
+    1560967688, // * UNIX timestamp of last checkpoint block
+    1501504,     // * total number of transactions between genesis and last checkpoint
                 //   (the tx=... number in the SetBestChain debug.log lines)
     5000        // * estimated number of transactions per day after checkpoint
 };
@@ -77,11 +77,12 @@ static const Checkpoints::CCheckpointData data = {
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
     boost::assign::map_list_of
     (       1, uint256("0x00000385558ec1b9af7f939e1626a3116b9fb988c86c2f915e6451e8efcd0521"))
-    (   20040, uint256("0x03a92984c2deba55ac8f9e8194b1bc745fbad9f7a0f3ed94ebb8c372935bed9c"));
+    (   20040, uint256("0x03a92984c2deba55ac8f9e8194b1bc745fbad9f7a0f3ed94ebb8c372935bed9c"))   // tx 40878
+    (   93286, uint256("0xdc68d97761ceac8c177a81487569bfe92b720f513fbbf5c2184988f1d74c5061"));  // tx 227380
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1535967610,
-    40878,
+    1560967301,
+    227380,
     3000};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
@@ -311,7 +312,7 @@ public:
         nRejectOldSporkKey = 1538611200; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
 
         // Public coin spend enforcement
-        nPublicZCSpends = 1000000;
+        nPublicZCSpends = 94000;
 
         /** Bet related parameters **/
         nBetStartHeight = 26080;                                        // The block that betting protocols become active (Testnet).
