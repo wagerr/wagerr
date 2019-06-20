@@ -351,13 +351,11 @@ parts:
         # workaround to get snap successfull **TODO** should be removed later
         touch ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
       fi
-      fi
       if [ -f ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app--testnet ]; then
         echo "Found - ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage--testnet"
       else
         # workaround to get snap successfull **TODO** should be removed later
         touch ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage--testnet
-      fi
       fi
       if [ -f ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app--regtest ]; then
         echo "Found - ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage--regtest"
