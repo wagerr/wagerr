@@ -113,6 +113,15 @@ QDateTime ClientModel::getLastBlockDate() const
         return QDateTime::fromTime_t(Params().GenesisBlock().GetBlockTime()); // Genesis block's time of current network
 }
 
+QString ClientModel::getLastBlockHash() const
+{
+    LOCK(cs_main);
+    if (chainActive.Tip())
+        return QString::fromStdString(chainActive.Tip()->GetBlockHash().ToString());
+    else
+        return QString::fromStdString(Params().GenesisBlock().GetHash().ToString()); // Genesis block's hash of current network
+}
+
 double ClientModel::getVerificationProgress() const
 {
     LOCK(cs_main);
