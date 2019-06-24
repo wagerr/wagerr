@@ -1794,6 +1794,10 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
                 nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
             }
 
+            // check for regtest and set stake minimum age to 0
+            if (Params().NetworkID() ==  CBaseChainParams::REGTEST )
+                nStakeMinAge = 0;
+
             //check for min age
             if ((GetAdjustedTime() - nTxTime < nStakeMinAge ) && Params().NetworkID() != CBaseChainParams::REGTEST)
                 continue;
