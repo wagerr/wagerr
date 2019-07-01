@@ -172,7 +172,7 @@ class MasterNodeTest (BitcoinTestFramework):
         self.log.info("Budget Info %s" % self.nodes[0].getbudgetinfo('test1'))
         self.log.info("Budget Votes %s" % self.nodes[0].getbudgetvotes('test1'))
         self.log.info("Block Count Node 0 %s" % self.nodes[0].getblockcount())
-        
+
 """
 Not Working -- TODO -- Fix it
 geteventsliability
@@ -191,6 +191,6 @@ startmasternode
     - [ ] disabled
 
 """
-            
+
 if __name__ == '__main__':
     MasterNodeTest().main()
