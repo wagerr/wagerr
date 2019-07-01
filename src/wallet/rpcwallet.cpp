@@ -1016,6 +1016,14 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
  */
 UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
 {
+   if (fHelp || params.size() > 2)
+        throw runtime_error(
+            "getchaingamesinfo ( \"eventID\" showWinner )\n"
+
+            "\nArguments:\n"
+            "1. eventID          (numeric) The event ID.\n"
+            "2. showWinner       (bool, optional, default=false) Include a scan for the winner.\n");
+
     UniValue ret(UniValue::VARR);
     UniValue obj(UniValue::VOBJ);
 
@@ -1028,6 +1036,11 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     int resultHeight = -1;
     CBetOut winningBetOut;
     bool winningBetFound = false;
+
+    bool fShowWinner = false;
+    if (params.size() > 1) {
+        fShowWinner = params[1].get_bool();
+    }
 
     //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     CBlockIndex *BlocksIndex = NULL;
@@ -1083,7 +1096,7 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
         BlocksIndex = chainActive.Next(BlocksIndex);
     }
 
-    if (resultHeight > Params().BetStartHeight()) {
+    if (resultHeight > Params().BetStartHeight() && fShowWinner) {
         std::vector<CBetOut> betOuts = GetCGLottoBetPayouts(resultHeight);
         for (auto betOut : betOuts) {
             if (!winningBetFound && betOut.nEventId == eventID) {
