@@ -129,6 +129,8 @@ EXTENDED_SCRIPTS = [
     #'feature_fee_estimation.py', # Not Working -- TODO Fix it
     # vv Tests less than 5m vv
     'wallet_cli-pt1.py',
+    'rpc_masternodes.py',
+    #'wallet_cli-pt2.py,
     #'wallet_multisend.py', # fails on travis bionic
     # vv Tests less than 2m vv
     #'p2p_timeouts.py', # p2p peer does not timeout
@@ -138,7 +140,7 @@ EXTENDED_SCRIPTS = [
     # vv Tests less than 30s vv
     # 'example_test.py',
     'feature_notifications.py', # Not Working -- TODO Fix it
-    'rpc_invalidateblock.py'
+    'rpc_invalidateblock.py',
 ]
 
 # Place EXTENDED_SCRIPTS first since it has the 3 longest running tests
