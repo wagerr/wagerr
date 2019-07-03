@@ -1869,7 +1869,7 @@ bool CWallet::MintableCoins()
                 nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
             }
 
-            if (GetAdjustedTime() - nTxTime > nStakeMinAge)
+            if ((GetAdjustedTime() - nTxTime > nStakeMinAge) || Params().NetworkID() != CBaseChainParams::REGTEST)
                 return true;
         }
     }
