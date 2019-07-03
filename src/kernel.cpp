@@ -433,7 +433,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
 
     unsigned int nBlockFromTime = blockfrom.nTime;
     unsigned int nTxTime = block.nTime;
-    if (!txin.IsZerocoinSpend() && 
+    if (!txin.IsZerocoinSpend() &&
           nPreviousBlockHeight >= Params().Zerocoin_Block_Public_Spend_Enabled() - 1 &&
           Params().NetworkID() != CBaseChainParams::REGTEST) { //Equivalent for zWGR is checked above in ContextualCheckZerocoinStake()
         if (nTxTime < nBlockFromTime) // Transaction timestamp nTxTime
