@@ -19,11 +19,6 @@ static inline void SeedInsecureRand(bool fDeterministic = false)
     insecure_rand_ctx = FastRandomContext(insecure_rand_seed);
 }
 
-static inline uint32_t InsecureRand32(void)
-{
-    return insecure_rand_ctx.rand32();
-}
-
 static inline uint32_t InsecureRand32() { return insecure_rand_ctx.rand32(); }
 static inline uint256 InsecureRand256() { return insecure_rand_ctx.rand256(); }
 static inline uint64_t InsecureRandBits(int bits) { return insecure_rand_ctx.randbits(bits); }
