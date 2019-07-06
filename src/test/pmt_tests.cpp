@@ -21,8 +21,8 @@ class CPartialMerkleTreeTester : public CPartialMerkleTree
 public:
     // flip one bit in one of the hashes - this should break the authentication
     void Damage() {
-        unsigned int n = insecure_randrange(vHash.size());
-        int bit = insecure_randbits(8);
+        unsigned int n = InsecureRandRange(vHash.size());
+        int bit = InsecureRandBits(8);
         uint256 &hash = vHash[n];
         hash ^= ((uint256)1 << bit);
     }
@@ -62,7 +62,7 @@ BOOST_AUTO_TEST_CASE(pmt_test1)
             std::vector<bool> vMatch(nTx, false);
             std::vector<uint256> vMatchTxid1;
             for (unsigned int j=0; j<nTx; j++) {
-                bool fInclude = insecure_randbits(att / 2) == 0;
+                bool fInclude = InsecureRandBits(att / 2) == 0;
                 vMatch[j] = fInclude;
                 if (fInclude)
                     vMatchTxid1.push_back(vTxid[j]);
