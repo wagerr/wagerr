@@ -40,6 +40,7 @@
 #include <mutex>
 
 #if defined(__x86_64__) || defined(__amd64__) || defined(__i386__)
+#include <atomic>
 #include <cpuid.h>
 #endif
 
