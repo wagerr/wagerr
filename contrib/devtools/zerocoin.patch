@@ -1,0 +1,13 @@
+--- wagerr/src/wallet/wallet.cpp.orig	2019-07-04 11:28:13.827000000 +0100
++++ wagerr/src/wallet/wallet.cpp	2019-07-04 11:29:03.211000000 +0100
+@@ -1794,6 +1794,10 @@
+                 nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
+             }
+ 
++            // check for regtest and set stake minimum age to 0
++            if (Params().NetworkID() ==  CBaseChainParams::REGTEST )
++                nStakeMinAge = 30;
++
+             //check for min age
+             if ((GetAdjustedTime() - nTxTime < nStakeMinAge ) && Params().NetworkID() != CBaseChainParams::REGTEST)
+                 continue;

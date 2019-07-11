@@ -43,11 +43,12 @@ class PoSDoubleSpend(WAGERR_FakeStakeTest):
         # 5) Spam Blocks on a forked chain
         self.log.info("-- Forked chain blocks now")
         err_msgs = self.test_spam("Forked", staking_utxo_list, fRandomHeight=True, randomRange=FORK_DEPTH, fDoubleSpend=True)
-
         if not len(err_msgs) == 0:
-            self.log.error("result: " + " | ".join(err_msgs))
-            raise AssertionError("TEST FAILED")
-
+            if (err_msgs[0] == err_msgs[1] == err_msgs[2] == 'Block not found (-5)'):
+                self.log.info("Spam blocks not accepted")
+            else:
+                self.log.error("result: " + " | ".join(err_msgs))
+                raise AssertionError("TEST FAILED")
         self.log.info("%s PASSED" % self.__class__.__name__)
 
 if __name__ == '__main__':

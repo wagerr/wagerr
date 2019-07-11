@@ -74,5 +74,25 @@
                 "panel": "new"
             }
         },
+        {
+            "label": "Zerocoin patch",
+            "type": "shell",
+            "command": "patch -p1 < ./contrib/devtools/zerocoin.patch;make -j4",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
+        {
+            "label": "Zerocoin unpatch",
+            "type": "shell",
+            "command": "patch -R -p1 < ./contrib/devtools/zerocoin.patch;make -j4",
+            "group": "test",
+            "presentation": {
+                "reveal": "always",
+                "panel": "new"
+            }
+        },
     ]
 }

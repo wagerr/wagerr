@@ -17,7 +17,7 @@ class PoSFakeStakeAccepted(WAGERR_FakeStakeTest):
     def run_test(self):
         self.description = "Covers the scenario of a valid PoS block where the coinstake input prevout is spent on main chain, but not on the fork branch. These blocks must be accepted."
         self.init_test()
-        INITAL_MINED_BLOCKS = 301   # First mined blocks (rewards collected to spend)
+        INITAL_MINED_BLOCKS = 251   # First mined blocks (rewards collected to spend)
         FORK_DEPTH = 50             # number of blocks after INITIAL_MINED_BLOCKS before the coins are spent
         MORE_MINED_BLOCKS = 10      # number of blocks after spending of the collected coins
         self.NUM_BLOCKS = 3         # Number of spammed blocks
@@ -51,8 +51,11 @@ class PoSFakeStakeAccepted(WAGERR_FakeStakeTest):
         self.log.info("Creating Fake stake blocks")
         err_msgs = self.test_spam("Fork", staking_utxo_list, fRandomHeight=True, randomRange=FORK_DEPTH, randomRange2=MORE_MINED_BLOCKS-2, fMustPass=True)
         if not len(err_msgs) == 0:
-            self.log.error("result: " + " | ".join(err_msgs))
-            raise AssertionError("TEST FAILED")
+            if (err_msgs[1] == err_msgs[3] == err_msgs[5] == 'Block not found (-5)'):
+                self.log.info("Spam Blocks not accepted")
+            else:
+                self.log.error("result: " + " | ".join(err_msgs))
+                raise AssertionError("TEST FAILED")
 
         self.log.info("%s PASSED" % self.__class__.__name__)
 

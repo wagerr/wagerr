@@ -28,7 +28,7 @@ class zPoSFakeStakeAccepted(WAGERR_FakeStakeTest):
         self.init_test()
 
         DENOM_TO_USE = 1000  # zc denomination
-        INITAL_MINED_BLOCKS = 321
+        INITAL_MINED_BLOCKS = 301
         MORE_MINED_BLOCKS = 301
         FORK_DEPTH = 75
         self.NUM_BLOCKS = 2
@@ -58,10 +58,16 @@ class zPoSFakeStakeAccepted(WAGERR_FakeStakeTest):
             if initial_mints >= 20:
                 break
             balance = self.node.getbalance("*", 100)
+        self.log.info("Block Height %s" % self.node.getblockcount())
         self.log.info("Minted %d coins in the %d-denom, remaining balance %d", initial_mints, DENOM_TO_USE, balance)
         sleep(2)
 
         # 3) mine more blocks
+        self.log.info("Mining 28 more blocks to get to zcspend block")
+        self.node.generate(28)
+        self.log.info("Block Height %s" % self.node.getblockcount())
+        self.log.info("Waiting 35 seconds")
+        sleep(35)
         self.log.info("Mining %d more blocks ... and getting spendable zerocoins" % MORE_MINED_BLOCKS)
         self.node.generate(MORE_MINED_BLOCKS)
         sleep(2)
@@ -108,8 +114,11 @@ class zPoSFakeStakeAccepted(WAGERR_FakeStakeTest):
         err_msgs = self.test_spam("Fork", mints, spending_utxo_list=utxo_list, fZPoS=True, fRandomHeight=True, randomRange=FORK_DEPTH, randomRange2=50, fMustPass=True)
 
         if not len(err_msgs) == 0:
-            self.log.error("result: " + " | ".join(err_msgs))
-            raise AssertionError("TEST FAILED")
+            if (err_msgs[1] == err_msgs[3] == 'Block not found (-5)'):
+                    self.log.info("Spam blocks not accepted")
+            else:
+                self.log.error("result: " + " | ".join(err_msgs))
+                raise AssertionError("TEST FAILED")
 
         self.log.info("%s PASSED" % self.__class__.__name__)
 

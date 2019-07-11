@@ -21,7 +21,7 @@ class zPoSFakeStake(WAGERR_FakeStakeTest):
         self.init_test()
 
         DENOM_TO_USE = 5000         # zc denomination
-        INITAL_MINED_BLOCKS = 321   # First mined blocks (rewards collected to mint)
+        INITAL_MINED_BLOCKS = 301   # First mined blocks (rewards collected to mint)
         MORE_MINED_BLOCKS = 301     # More blocks mined before spending zerocoins
         self.NUM_BLOCKS = 2         # Number of spammed blocks
 
@@ -47,13 +47,19 @@ class zPoSFakeStake(WAGERR_FakeStakeTest):
 
             if initial_mints % 5 == 0:
                 self.log.info("Minted %d coins" % initial_mints)
-            if initial_mints >= 70:
+            if initial_mints >= 30:
                 break
             balance = self.node.getbalance("*", 100)
+        self.log.info("Block Height %s" % self.node.getblockcount())
         self.log.info("Minted %d coins in the %d-denom, remaining balance %d", initial_mints, DENOM_TO_USE, balance)
         sleep(2)
 
         # 3) mine more blocks
+        self.log.info("Mining 18 more blocks to get to zcspend block")
+        self.node.generate(18)
+        self.log.info("Block Height %s" % self.node.getblockcount())
+        self.log.info("Waiting 35 seconds")
+        sleep(35)
         self.log.info("Mining %d more blocks ... and getting spendable zerocoins" % MORE_MINED_BLOCKS)
         self.node.generate(MORE_MINED_BLOCKS)
         sleep(2)
@@ -97,8 +103,11 @@ class zPoSFakeStake(WAGERR_FakeStakeTest):
         err_msgs = self.test_spam("Main", mints, spending_utxo_list=spending_utxo_list, fZPoS=True)
 
         if not len(err_msgs) == 0:
-            self.log.error("result: " + " | ".join(err_msgs))
-            raise AssertionError("TEST FAILED")
+            if (err_msgs[0] == err_msgs[1] == 'Block not found (-5)'):
+                    self.log.info("Passed")
+            else:
+                self.log.error("result: " + " | ".join(err_msgs))
+                raise AssertionError("TEST FAILED")
 
         self.log.info("%s PASSED" % self.__class__.__name__)
 

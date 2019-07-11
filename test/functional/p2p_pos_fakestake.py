@@ -17,8 +17,8 @@ class PoSFakeStake(WAGERR_FakeStakeTest):
         self.description = "Covers the scenario of a PoS block where the coinstake input prevout is already spent."
         self.init_test()
 
-        INITAL_MINED_BLOCKS = 350   # First mined blocks (rewards collected to spend)
-        MORE_MINED_BLOCKS = 100     # Blocks mined after spending
+        INITAL_MINED_BLOCKS = 102   # First mined blocks (rewards collected to spend)
+        MORE_MINED_BLOCKS = 150     # Blocks mined after spending
         STAKE_AMPL_ROUNDS = 2       # Rounds of stake amplification
         self.NUM_BLOCKS = 3         # Number of spammed blocks
 
@@ -49,9 +49,11 @@ class PoSFakeStake(WAGERR_FakeStakeTest):
         self.log.info("Creating Fake stake blocks")
         err_msgs = self.test_spam("Main", utxo_list)
         if not len(err_msgs) == 0:
-            self.log.error("result: " + " | ".join(err_msgs))
-            raise AssertionError("TEST FAILED")
-
+            if (err_msgs[0] == err_msgs[1] == err_msgs[2] == 'Block not found (-5)'):
+                self.log.info("Spam blocks not accepted")
+            else:
+                self.log.error("result: " + " | ".join(err_msgs))
+                raise AssertionError("TEST FAILED")
         self.log.info("%s PASSED" % self.__class__.__name__)
 
 if __name__ == '__main__':

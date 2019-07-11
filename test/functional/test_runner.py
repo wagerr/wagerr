@@ -137,6 +137,7 @@ EXTENDED_SCRIPTS = [
     'rpc_bind.py',
     # vv Tests less than 30s vv
     # 'example_test.py',
+    'rpc_masternodes.py',
     'feature_notifications.py', # Not Working -- TODO Fix it
     'rpc_invalidateblock.py'
 ]

@@ -16,9 +16,8 @@
                 "type": "cppdbg",
                 "request": "launch",
                 "program": "${workspaceFolder}/src/test/test_ion",
-    
                 "cwd": "${workspaceFolder}",
-    
+
                 "externalConsole": false,
                 "MIMode": "gdb",
                 "setupCommands": [
@@ -34,9 +33,9 @@
                 "type": "cppdbg",
                 "request": "launch",
                 "program": "${workspaceFolder}/src/qt/test/test_wagerr-qt",
-    
+
                 "cwd": "${workspaceFolder}",
-    
+
                 "externalConsole": false,
                 "MIMode": "gdb",
                 "setupCommands": [
@@ -53,9 +52,9 @@
                 "request": "launch",
                 "program": "${workspaceFolder}/src/wagerrd",
                 "args": ["--datadir=${workspaceFolder}/../datadir"],
-    
+
                 "cwd": "${workspaceFolder}",
-    
+
                 "externalConsole": false,
                 "MIMode": "gdb",
                 "setupCommands": [
@@ -72,9 +71,9 @@
                 "request": "launch",
                 "program": "${workspaceFolder}/src/wagerrd",
                 "args": ["--datadir=${workspaceFolder}/../datadir", "--testnet"],
-    
+
                 "cwd": "${workspaceFolder}",
-    
+
                 "externalConsole": false,
                 "MIMode": "gdb",
                 "setupCommands": [
@@ -91,9 +90,9 @@
                 "request": "launch",
                 "program": "${workspaceFolder}/src/qt/wagerr-qt",
                 "args": ["--datadir=${workspaceFolder}/../datadir"],
-    
+
                 "cwd": "${workspaceFolder}",
-    
+
                 "externalConsole": false,
                 "MIMode": "gdb",
                 "setupCommands": [
@@ -2158,19 +2157,21 @@
                 "name": "p2p_zpos_fakestake.py (normal) (internal terminal)",
                 "type": "python",
                 "request": "launch",
-                "program": "${workspaceFolder}/test/functional/test_runner.py",
-                "args": ["--jobs=4", "p2p_zpos_fakestake.py"],
+                "program": "${workspaceFolder}/test/functional/p2p_zpos_fakestake.py",
                 "cwd": "${workspaceFolder}",
-                "console": "integratedTerminal"
+                "console": "integratedTerminal",
+                "preLaunchTask": "Zerocoin patch",
+                "postDebugTask": "Zerocoin unpatch"
             },
             {
                 "name": "p2p_zpos_fakestake_accepted.py (normal) (internal terminal)",
                 "type": "python",
                 "request": "launch",
-                "program": "${workspaceFolder}/test/functional/test_runner.py",
-                "args": ["--jobs=4", "p2p_zpos_fakestake_accepted.py"],
+                "program": "${workspaceFolder}/test/functional/p2p_zpos_fakestake_accepted.py",
                 "cwd": "${workspaceFolder}",
-                "console": "integratedTerminal"
+                "console": "integratedTerminal",
+                "preLaunchTask": "Zerocoin patch",
+                "postDebugTask": "Zerocoin unpatch"
             },
             {
                 "name": "p2p_pos_doublespend.py (normal) (internal terminal)",
@@ -2349,6 +2350,15 @@
                 "request": "launch",
                 "program": "${workspaceFolder}/test/functional/test_runner.py",
                 "args": ["--jobs=4", "rpc_net.py"],
+                "cwd": "${workspaceFolder}",
+                "console": "integratedTerminal"
+            },
+            {
+                "name": "rpc_masternodes.py (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/test_runner.py",
+                "args": ["--jobs=4", "rpc_masternodes.py"],
                 "cwd": "${workspaceFolder}",
                 "console": "integratedTerminal"
             },
@@ -2590,7 +2600,16 @@
                 "cwd": "${workspaceFolder}",
     
                 "console": "externalTerminal"
+            },
+            {
+                "name": "Zerocoin Tests (normal) (internal terminal)",
+                "type": "python",
+                "request": "launch",
+                "program": "${workspaceFolder}/test/functional/zerocoin_test.py",
+                "cwd": "${workspaceFolder}",
+                "preLaunchTask": "Zerocoin patch",
+                "postDebugTask": "Zerocoin unpatch",
+                "console": "integratedTerminal"
             }
         ]
     }
-    
