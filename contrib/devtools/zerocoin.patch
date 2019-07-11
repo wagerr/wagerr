@@ -3,7 +3,7 @@
 @@ -1794,6 +1794,10 @@
                  nTxTime = mapBlockIndex.at(out.tx->hashBlock)->GetBlockTime();
              }
- 
+
 +            // check for regtest and set stake minimum age to 0
 +            if (Params().NetworkID() ==  CBaseChainParams::REGTEST )
 +                nStakeMinAge = 30;
