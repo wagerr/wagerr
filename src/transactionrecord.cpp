@@ -434,20 +434,27 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     sub.address = mapValue["zerocoinmint"];
                     sub.credit += txout.nValue;
                 } else {
-                    bool isBet = false;
+                    bool isBettingEntry = false;
+                    bool isChainGameEntry = false;
                     if (txout.scriptPubKey.IsUnspendable()) {
                         vector<unsigned char> vOpCode = ParseHex(txout.scriptPubKey.ToString().substr(9, string::npos));
                         std::string opCode(vOpCode.begin(), vOpCode.end());
 
                         CPeerlessBet plBet;
                         CChainGamesBet cgBet;
-                        if (CPeerlessBet::FromOpCode(opCode, plBet) || CChainGamesBet::FromOpCode(opCode, cgBet)) {
-                            isBet = true;
+                        if (CPeerlessBet::FromOpCode(opCode, plBet)) {
+                            isBettingEntry = true;
+                        } else if (CChainGamesBet::FromOpCode(opCode, cgBet)) {
+                            isChainGameEntry = true;
                         }
                     }
-                    if (isBet) {
+                    if (isBettingEntry) {
                         // Placed a bet
                         sub.type = TransactionRecord::BetPlaced;
+                        sub.address = mapValue["to"];
+                    } else if (isChainGameEntry) {
+                        // Placed a bet
+                        sub.type = TransactionRecord::ChainGameEntry;
                         sub.address = mapValue["to"];
                     } else {
                         // Sent to IP, or other non-address transaction like OP_EVAL
@@ -592,6 +599,7 @@ std::string TransactionRecord::GetTransactionRecordType(Type type) const
         case Other: return "Other";
         case BetWin: return "BetPayout";
         case BetPlaced: return "BetPlaced";
+        case ChainGameEntry: return "ChainGameEntry";
         case Generated: return "Generated";
         case StakeMint: return "StakeMint";
         case StakeZWGR: return "StakeZWGR";

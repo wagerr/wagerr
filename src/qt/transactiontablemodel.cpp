@@ -379,6 +379,8 @@ QString TransactionTableModel::formatTxType(const TransactionRecord* wtx) const
         return tr("Converted zWGR to WGR");
     case TransactionRecord::BetPlaced:
         return tr("Bet Placed");
+    case TransactionRecord::ChainGameEntry:
+        return tr("Chain Game Entry");
     case TransactionRecord::BetWin:
         return tr("Bet Payout");
 
