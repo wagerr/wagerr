@@ -71,9 +71,6 @@
 #include "zmq/zmqnotificationinterface.h"
 #endif
 
-using namespace boost;
-using namespace std;
-
 #ifdef ENABLE_WALLET
 CWallet* pwalletMain = NULL;
 CzWGRWallet* zwalletMain = NULL;
@@ -426,17 +423,17 @@ void OnRPCPreCommand(const CRPCCommand& cmd)
 #endif
 
     // Observe safe mode
-    string strWarning = GetWarnings("rpc");
+    std::string strWarning = GetWarnings("rpc");
     if (strWarning != "" && !GetBoolArg("-disablesafemode", false) &&
         !cmd.okSafeMode)
-        throw JSONRPCError(RPC_FORBIDDEN_BY_SAFE_MODE, string("Safe mode: ") + strWarning);
+        throw JSONRPCError(RPC_FORBIDDEN_BY_SAFE_MODE, std::string("Safe mode: ") + strWarning);
 }
 
 std::string HelpMessage(HelpMessageMode mode)
 {
 
     // When adding new options to the categories, please keep and ensure alphabetical ordering.
-    string strUsage = HelpMessageGroup(_("Options:"));
+    std::string strUsage = HelpMessageGroup(_("Options:"));
     strUsage += HelpMessageOpt("-?", _("This help message"));
     strUsage += HelpMessageOpt("-version", _("Print version and exit"));
     strUsage += HelpMessageOpt("-alertnotify=<cmd>", _("Execute command when a relevant alert is received or we see a really long fork (%s in cmd is replaced by message)"));
@@ -562,7 +559,7 @@ std::string HelpMessage(HelpMessageMode mode)
         strUsage += HelpMessageOpt("-stopafterblockimport", strprintf(_("Stop running after importing blocks from disk (default: %u)"), 0));
         strUsage += HelpMessageOpt("-sporkkey=<privkey>", _("Enable spork administration functionality with the appropriate private key."));
     }
-    string debugCategories = "addrman, alert, bench, coindb, db, lock, rand, rpc, selectcoins, tor, mempool, net, proxy, http, libevent, wagerr, (obfuscation, swiftx, masternode, mnpayments, mnbudget, zero, precompute, staking)"; // Don't translate these and qt below
+    std::string debugCategories = "addrman, alert, bench, coindb, db, lock, rand, rpc, selectcoins, tor, mempool, net, proxy, http, libevent, wagerr, (obfuscation, swiftx, masternode, mnpayments, mnbudget, zero, precompute, staking)"; // Don't translate these and qt below
     if (mode == HMM_BITCOIN_QT)
         debugCategories += ", qt";
     strUsage += HelpMessageOpt("-debug=<category>", strprintf(_("Output debugging information (default: %u, supplying <category> is optional)"), 0) + ". " +
@@ -616,7 +613,7 @@ std::string HelpMessage(HelpMessageMode mode)
     strUsage += HelpMessageOpt("-mnconflock=<n>", strprintf(_("Lock masternodes from masternode configuration file (default: %u)"), 1));
     strUsage += HelpMessageOpt("-masternodeprivkey=<n>", _("Set the masternode private key"));
     strUsage += HelpMessageOpt("-masternodeaddr=<n>", strprintf(_("Set external address:port to get to this masternode (example: %s)"), "128.127.106.235:55002"));
-    strUsage += HelpMessageOpt("-budgetvotemode=<mode>", _("Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)"));
+    strUsage += HelpMessageOpt("-budgetvotemode=<mode>", _("Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (std::string, default: auto)"));
 
     strUsage += HelpMessageGroup(_("Zerocoin options:"));
 #ifdef ENABLE_WALLET
@@ -745,12 +742,12 @@ void ThreadImport(std::vector<boost::filesystem::path> vImportFiles)
     }
 
     // hardcoded $DATADIR/bootstrap.dat
-    filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";
-    if (filesystem::exists(pathBootstrap)) {
+    boost::filesystem::path pathBootstrap = GetDataDir() / "bootstrap.dat";
+    if (boost::filesystem::exists(pathBootstrap)) {
         FILE* file = fopen(pathBootstrap.string().c_str(), "rb");
         if (file) {
             CImportingNow imp;
-            filesystem::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
+            boost::filesystem::path pathBootstrapOld = GetDataDir() / "bootstrap.dat.old";
             LogPrintf("Importing bootstrap.dat...\n");
             LoadExternalBlockFile(file);
             RenameOver(pathBootstrap, pathBootstrapOld);
@@ -961,8 +958,8 @@ bool AppInit2()
 
     fDebug = !mapMultiArgs["-debug"].empty();
     // Special-case: if -debug=0/-nodebug is set, turn off debugging messages
-    const vector<string>& categories = mapMultiArgs["-debug"];
-    if (GetBoolArg("-nodebug", false) || find(categories.begin(), categories.end(), string("0")) != categories.end())
+    const std::vector<std::string>& categories = mapMultiArgs["-debug"];
+    if (GetBoolArg("-nodebug", false) || find(categories.begin(), categories.end(), std::string("0")) != categories.end())
         fDebug = false;
 
     // Check for -debugnet
@@ -1162,15 +1159,15 @@ bool AppInit2()
 // ********************************************************* Step 5: Backup wallet and verify wallet database integrity
 #ifdef ENABLE_WALLET
     if (!fDisableWallet) {
-        filesystem::path backupDir = GetDataDir() / "backups";
-        if (!filesystem::exists(backupDir)) {
+        boost::filesystem::path backupDir = GetDataDir() / "backups";
+        if (!boost::filesystem::exists(backupDir)) {
             // Always create backup folder to not confuse the operating system's file browser
-            filesystem::create_directories(backupDir);
+            boost::filesystem::create_directories(backupDir);
         }
         nWalletBackups = GetArg("-createwalletbackups", 10);
         nWalletBackups = std::max(0, std::min(10, nWalletBackups));
         if (nWalletBackups > 0) {
-            if (filesystem::exists(backupDir)) {
+            if (boost::filesystem::exists(backupDir)) {
                 // Create backup of the wallet
                 std::string dateTimeStr = DateTimeStrFormat(".%Y-%m-%d-%H-%M", GetTime());
                 std::string backupPathStr = backupDir.string();
@@ -1233,67 +1230,67 @@ bool AppInit2()
         if (GetBoolArg("-resync", false)) {
             uiInterface.InitMessage(_("Preparing for resync..."));
             // Delete the local blockchain folders to force a resync from scratch to get a consitent blockchain-state
-            filesystem::path blocksDir = GetDataDir() / "blocks";
-            filesystem::path chainstateDir = GetDataDir() / "chainstate";
-            filesystem::path sporksDir = GetDataDir() / "sporks";
-            filesystem::path zerocoinDir = GetDataDir() / "zerocoin";
-            filesystem::path eventsDat = GetDataDir() / "events.dat";
-            filesystem::path sportsDat = GetDataDir() / "sports.dat";
-            filesystem::path roundsDat = GetDataDir() / "rounds.dat";
-            filesystem::path teamsDat = GetDataDir() / "teams.dat";
-            filesystem::path tournamentsDat = GetDataDir() / "tournaments.dat";
-            filesystem::path resultsDat = GetDataDir() / "results.dat";
+            boost::filesystem::path blocksDir = GetDataDir() / "blocks";
+            boost::filesystem::path chainstateDir = GetDataDir() / "chainstate";
+            boost::filesystem::path sporksDir = GetDataDir() / "sporks";
+            boost::filesystem::path zerocoinDir = GetDataDir() / "zerocoin";
+            boost::filesystem::path eventsDat = GetDataDir() / "events.dat";
+            boost::filesystem::path sportsDat = GetDataDir() / "sports.dat";
+            boost::filesystem::path roundsDat = GetDataDir() / "rounds.dat";
+            boost::filesystem::path teamsDat = GetDataDir() / "teams.dat";
+            boost::filesystem::path tournamentsDat = GetDataDir() / "tournaments.dat";
+            boost::filesystem::path resultsDat = GetDataDir() / "results.dat";
 
             LogPrintf("Deleting blockchain folders blocks, chainstate, sporks and zerocoin\n");
             // We delete in 4 individual steps in case one of the folder is missing already
             try {
-                if (filesystem::exists(blocksDir)){
+                if (boost::filesystem::exists(blocksDir)){
                     boost::filesystem::remove_all(blocksDir);
                     LogPrintf("-resync: folder deleted: %s\n", blocksDir.string().c_str());
                 }
 
-                if (filesystem::exists(chainstateDir)){
+                if (boost::filesystem::exists(chainstateDir)){
                     boost::filesystem::remove_all(chainstateDir);
                     LogPrintf("-resync: folder deleted: %s\n", chainstateDir.string().c_str());
                 }
 
-                if (filesystem::exists(sporksDir)){
+                if (boost::filesystem::exists(sporksDir)){
                     boost::filesystem::remove_all(sporksDir);
                     LogPrintf("-resync: folder deleted: %s\n", sporksDir.string().c_str());
                 }
 
-                if (filesystem::exists(zerocoinDir)){
+                if (boost::filesystem::exists(zerocoinDir)){
                     boost::filesystem::remove_all(zerocoinDir);
                     LogPrintf("-resync: folder deleted: %s\n", zerocoinDir.string().c_str());
                 }
 
                 // Remove betting .dat files on resync.
-                if (filesystem::exists(eventsDat)) {
+                if (boost::filesystem::exists(eventsDat)) {
                     boost::filesystem::remove(eventsDat);
                     LogPrintf("-resync: file deleted: %s\n", eventsDat.string().c_str());
                 }
 
-                if (filesystem::exists(sportsDat)) {
+                if (boost::filesystem::exists(sportsDat)) {
                     boost::filesystem::remove(sportsDat);
                     LogPrintf("-resync: file deleted: %s\n", sportsDat.string().c_str());
                 }
 
-                if (filesystem::exists(roundsDat)) {
+                if (boost::filesystem::exists(roundsDat)) {
                     boost::filesystem::remove(roundsDat);
                     LogPrintf("-resync: file deleted: %s\n", roundsDat.string().c_str());
                 }
 
-                if (filesystem::exists(teamsDat)) {
+                if (boost::filesystem::exists(teamsDat)) {
                     boost::filesystem::remove(teamsDat);
                     LogPrintf("-resync: file deleted: %s\n", teamsDat.string().c_str());
                 }
 
-                if (filesystem::exists(tournamentsDat)) {
+                if (boost::filesystem::exists(tournamentsDat)) {
                     boost::filesystem::remove(tournamentsDat);
                     LogPrintf("-resync: file deleted: %s\n", tournamentsDat.string().c_str());
                 }
 
-                if (filesystem::exists(resultsDat)) {
+                if (boost::filesystem::exists(resultsDat)) {
                     boost::filesystem::remove(resultsDat);
                     LogPrintf("-resync: file deleted: %s\n", resultsDat.string().c_str());
                 }
@@ -1320,7 +1317,7 @@ bool AppInit2()
             // try again
             if (!bitdb.Open(GetDataDir())) {
                 // if it still fails, it probably means we can't even create the database env
-                string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
+                std::string msg = strprintf(_("Error initializing wallet database environment %s!"), strDataDir);
                 return InitError(msg);
             }
         }
@@ -1331,10 +1328,10 @@ bool AppInit2()
                 return false;
         }
 
-        if (filesystem::exists(GetDataDir() / strWalletFile)) {
+        if (boost::filesystem::exists(GetDataDir() / strWalletFile)) {
             CDBEnv::VerifyResult r = bitdb.Verify(strWalletFile, CWalletDB::Recover);
             if (r == CDBEnv::RECOVER_OK) {
-                string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
+                std::string msg = strprintf(_("Warning: wallet.dat corrupt, data salvaged!"
                                          " Original wallet.dat saved as wallet.{timestamp}.bak in %s; if"
                                          " your balance or transactions are incorrect you should"
                                          " restore from a backup."),
@@ -1381,7 +1378,7 @@ bool AppInit2()
 
     bool proxyRandomize = GetBoolArg("-proxyrandomize", true);
     // -proxy sets a proxy for all outgoing network traffic
-    // -noproxy (or -proxy=0) as well as the empty string can be used to not set a proxy, this is the default
+    // -noproxy (or -proxy=0) as well as the empty std::string can be used to not set a proxy, this is the default
     std::string proxyArg = GetArg("-proxy", "");
     SetLimited(NET_TOR);
     if (proxyArg != "" && proxyArg != "0") {
@@ -1403,7 +1400,7 @@ bool AppInit2()
 
     // -onion can be used to set only a proxy for .onion, or override normal proxy for .onion addresses
     // -noonion (or -onion=0) disables connecting to .onion entirely
-    // An empty string is used to not override the onion proxy (in which case it defaults to -proxy set above, or none)
+    // An empty std::string is used to not override the onion proxy (in which case it defaults to -proxy set above, or none)
     std::string onionArg = GetArg("-onion", "");
     if (onionArg != "") {
         if (onionArg == "0") { // Handle -noonion/-onion=0
@@ -1453,7 +1450,7 @@ bool AppInit2()
     }
 
     if (mapArgs.count("-externalip")) {
-        for (string strAddr : mapMultiArgs["-externalip"]) {
+        for (std::string strAddr : mapMultiArgs["-externalip"]) {
             CService addrLocal(strAddr, GetListenPort(), fNameLookup);
             if (!addrLocal.IsValid())
                 return InitError(strprintf(_("Cannot resolve -externalip address: '%s'"), strAddr));
@@ -1461,7 +1458,7 @@ bool AppInit2()
         }
     }
 
-    for (string strDest : mapMultiArgs["-seednode"])
+    for (std::string strDest : mapMultiArgs["-seednode"])
         AddOneShot(strDest);
 
 #if ENABLE_ZMQ
@@ -1480,19 +1477,19 @@ bool AppInit2()
     fReindex = GetBoolArg("-reindex", false);
 
     // Upgrading to 0.8; hard-link the old blknnnn.dat files into /blocks/
-    filesystem::path blocksDir = GetDataDir() / "blocks";
-    if (!filesystem::exists(blocksDir)) {
-        filesystem::create_directories(blocksDir);
+    boost::filesystem::path blocksDir = GetDataDir() / "blocks";
+    if (!boost::filesystem::exists(blocksDir)) {
+        boost::filesystem::create_directories(blocksDir);
         bool linked = false;
         for (unsigned int i = 1; i < 10000; i++) {
-            filesystem::path source = GetDataDir() / strprintf("blk%04u.dat", i);
-            if (!filesystem::exists(source)) break;
-            filesystem::path dest = blocksDir / strprintf("blk%05u.dat", i - 1);
+            boost::filesystem::path source = GetDataDir() / strprintf("blk%04u.dat", i);
+            if (!boost::filesystem::exists(source)) break;
+            boost::filesystem::path dest = blocksDir / strprintf("blk%05u.dat", i - 1);
             try {
-                filesystem::create_hard_link(source, dest);
+                boost::filesystem::create_hard_link(source, dest);
                 LogPrintf("Hardlinked %s -> %s\n", source.string(), dest.string());
                 linked = true;
-            } catch (filesystem::filesystem_error& e) {
+            } catch (boost::filesystem::filesystem_error& e) {
                 // Note: hardlink creation failing is not a disaster, it just means
                 // blocks will get re-downloaded from peers.
                 LogPrintf("Error hardlinking blk%04u.dat : %s\n", i, e.what());
@@ -1613,7 +1610,7 @@ bool AppInit2()
                 LoadSporksFromDB();
 
                 uiInterface.InitMessage(_("Loading block index..."));
-                string strBlockIndexError = "";
+                std::string strBlockIndexError = "";
                 if (!LoadBlockIndex(strBlockIndexError)) {
                     strLoadError = _("Error loading block database");
                     strLoadError = strprintf("%s : %s", strLoadError, strBlockIndexError);
@@ -1712,7 +1709,7 @@ bool AppInit2()
                             uiInterface.InitMessage(_("Calculating missing accumulators..."));
                             LogPrintf("%s : finding missing checkpoints\n", __func__);
 
-                            string strError;
+                            std::string strError;
                             if (!ReindexAccumulators(listAccCheckpointsNoDB, strError))
                                 return InitError(strError);
                         }
@@ -1825,7 +1822,7 @@ bool AppInit2()
             if (nLoadWalletRet == DB_CORRUPT)
                 strErrors << _("Error loading wallet.dat: Wallet corrupted") << "\n";
             else if (nLoadWalletRet == DB_NONCRITICAL_ERROR) {
-                string msg(_("Warning: error reading wallet.dat! All keys read correctly, but transaction data"
+                std::string msg(_("Warning: error reading wallet.dat! All keys read correctly, but transaction data"
                              " or address book entries might be missing or incorrect."));
                 InitWarning(msg);
             } else if (nLoadWalletRet == DB_TOO_NEW)
@@ -1946,7 +1943,7 @@ bool AppInit2()
 
     std::vector<boost::filesystem::path> vImportFiles;
     if (mapArgs.count("-loadblock")) {
-        for (string strFile : mapMultiArgs["-loadblock"])
+        for (std::string strFile : mapMultiArgs["-loadblock"])
             vImportFiles.push_back(strFile);
     }
     threadGroup.create_thread(boost::bind(&ThreadImport, vImportFiles));

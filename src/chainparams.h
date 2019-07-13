@@ -144,7 +144,7 @@ public:
     int Zerocoin_AccumulationStartHeight() const { return nZerocoinAccumulationStartHeight; }
 
     /** Betting on blockchain **/
-    std::vector<string> OracleWalletAddrs() const { return vOracleWalletAddrs; }
+    std::vector<std::string> OracleWalletAddrs() const { return vOracleWalletAddrs; }
     int BetBlocksIndexTimespan() const { return nBetBlocksIndexTimespan; }
     int BetStartHeight() const { return nBetStartHeight; }
     std::string DevPayoutAddr() const { return strDevPayoutAddr; }
@@ -238,7 +238,7 @@ protected:
 
     int nZerocoinAccumulationStartHeight;
 
-    std::vector<string> vOracleWalletAddrs;
+    std::vector<std::string> vOracleWalletAddrs;
     int nBetBlocksIndexTimespan;
     int nBetStartHeight;
     std::string strDevPayoutAddr;

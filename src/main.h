@@ -372,7 +372,7 @@ void AddWrappedSerialsInflation();
 void RecalculateZWGRSpent();
 void RecalculateZWGRMinted();
 bool RecalculateWGRSupply(int nHeightStart);
-bool ReindexAccumulators(list<uint256>& listMissingCheckpoints, string& strError);
+bool ReindexAccumulators(std::list<uint256>& listMissingCheckpoints, std::string& strError);
 
 // Fake Serial attack Range
 bool isBlockBetweenFakeSerialAttackRange(int nHeight);

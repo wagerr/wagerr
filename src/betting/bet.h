@@ -363,7 +363,7 @@ public:
 
     uint32_t nMType;
     uint32_t nId;
-    string sName;
+    std::string sName;
 
     // Default Constructor.
     CMapping() {}

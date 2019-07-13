@@ -26,7 +26,7 @@ namespace libzerocoin
     class InvalidSerialException : public std::exception {
     public:
         std::string message;
-        InvalidSerialException(const string &message) : message(message) {}
+        InvalidSerialException(const std::string &message) : message(message) {}
     };
 
     int ExtractVersionFromSerial(const CBigNum& bnSerial);
@@ -56,7 +56,7 @@ public:
 	 *
 	 * @param p cryptographic paramters
 	 * @param coin the value of the commitment.
-	 * @param denomination The denomination of the coin. 
+	 * @param denomination The denomination of the coin.
 	 */
     PublicCoin(const ZerocoinParams* p, const CBigNum& coin, const CoinDenomination d);
     const CBigNum& getValue() const { return this->value; }

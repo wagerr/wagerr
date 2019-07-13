@@ -312,58 +312,58 @@ void WalletView::gotoPlaceBetPage(QString addr)
     // go thru blockchain and get data
 
     // Set the Oracle wallet address. 
-    std::vector<string> oracleAddrs = Params().OracleWalletAddrs();
+    std::vector<std::string> oracleAddrs = Params().OracleWalletAddrs();
 
     // Set event name
     std::string evtDes;
 
     std::map<std::string, std::string> eventNames;
-    eventNames.insert(make_pair("WCUP", "World Cup"));
+    eventNames.insert(std::make_pair("WCUP", "World Cup"));
 
     std::map<std::string, std::string> roundNames;
-    roundNames.insert(make_pair("R1", "Round 1"));
-    roundNames.insert(make_pair("RD2", "Round 2"));
-    roundNames.insert(make_pair("RD3", "Round 3"));
-    roundNames.insert(make_pair("F16", "Final 16"));
-    roundNames.insert(make_pair("QFL", "Quarter Final"));
-    roundNames.insert(make_pair("SFL", "Semi Final"));
-    roundNames.insert(make_pair("FIN", "Final"));
+    roundNames.insert(std::make_pair("R1", "Round 1"));
+    roundNames.insert(std::make_pair("RD2", "Round 2"));
+    roundNames.insert(std::make_pair("RD3", "Round 3"));
+    roundNames.insert(std::make_pair("F16", "Final 16"));
+    roundNames.insert(std::make_pair("QFL", "Quarter Final"));
+    roundNames.insert(std::make_pair("SFL", "Semi Final"));
+    roundNames.insert(std::make_pair("FIN", "Final"));
 
 
     std::map<std::string, std::string> countryNames;
-    countryNames.insert(make_pair("ARG", "Argentina"));
-    countryNames.insert(make_pair("AUS", "Australia"));
-    countryNames.insert(make_pair("BRA", "Brazil"));
-    countryNames.insert(make_pair("CRC", "Costa Rica"));
-    countryNames.insert(make_pair("DEN", "Denmark"));
-    countryNames.insert(make_pair("EGY", "Egypt"));
-    countryNames.insert(make_pair("ESP", "Spain"));
-    countryNames.insert(make_pair("FRA", "France"));
-    countryNames.insert(make_pair("GER", "Germany"));
-    countryNames.insert(make_pair("IRN", "Iran"));
-    countryNames.insert(make_pair("ISL", "Iceland"));
-    countryNames.insert(make_pair("KSA", "Saudi Arabia"));
-    countryNames.insert(make_pair("MAR", "Morocco"));
-    countryNames.insert(make_pair("MEX", "Mexico"));
-    countryNames.insert(make_pair("PER", "Peru"));
-    countryNames.insert(make_pair("POR", "Portugal"));
-    countryNames.insert(make_pair("RUS", "Russia"));
-    countryNames.insert(make_pair("SRB", "Serbia"));
-    countryNames.insert(make_pair("URU", "Uruguay"));
-    countryNames.insert(make_pair("BEL", "Belgium"));
-    countryNames.insert(make_pair("COL", "Columbia"));
-    countryNames.insert(make_pair("CRO", "Croatia"));
-    countryNames.insert(make_pair("ENG", "England"));
-    countryNames.insert(make_pair("JPN", "Japan"));
-    countryNames.insert(make_pair("KOR", "Korea Republic"));
-    countryNames.insert(make_pair("NGA", "Nigeria"));
-    countryNames.insert(make_pair("NIG", "Nigeria"));
-    countryNames.insert(make_pair("PAN", "Panama"));
-    countryNames.insert(make_pair("POL", "Poland"));
-    countryNames.insert(make_pair("SEN", "Senegal"));
-    countryNames.insert(make_pair("SWE", "Sweden"));
-    countryNames.insert(make_pair("SUI", "Switzerland"));
-    countryNames.insert(make_pair("TUN", "Tunisia "));
+    countryNames.insert(std::make_pair("ARG", "Argentina"));
+    countryNames.insert(std::make_pair("AUS", "Australia"));
+    countryNames.insert(std::make_pair("BRA", "Brazil"));
+    countryNames.insert(std::make_pair("CRC", "Costa Rica"));
+    countryNames.insert(std::make_pair("DEN", "Denmark"));
+    countryNames.insert(std::make_pair("EGY", "Egypt"));
+    countryNames.insert(std::make_pair("ESP", "Spain"));
+    countryNames.insert(std::make_pair("FRA", "France"));
+    countryNames.insert(std::make_pair("GER", "Germany"));
+    countryNames.insert(std::make_pair("IRN", "Iran"));
+    countryNames.insert(std::make_pair("ISL", "Iceland"));
+    countryNames.insert(std::make_pair("KSA", "Saudi Arabia"));
+    countryNames.insert(std::make_pair("MAR", "Morocco"));
+    countryNames.insert(std::make_pair("MEX", "Mexico"));
+    countryNames.insert(std::make_pair("PER", "Peru"));
+    countryNames.insert(std::make_pair("POR", "Portugal"));
+    countryNames.insert(std::make_pair("RUS", "Russia"));
+    countryNames.insert(std::make_pair("SRB", "Serbia"));
+    countryNames.insert(std::make_pair("URU", "Uruguay"));
+    countryNames.insert(std::make_pair("BEL", "Belgium"));
+    countryNames.insert(std::make_pair("COL", "Columbia"));
+    countryNames.insert(std::make_pair("CRO", "Croatia"));
+    countryNames.insert(std::make_pair("ENG", "England"));
+    countryNames.insert(std::make_pair("JPN", "Japan"));
+    countryNames.insert(std::make_pair("KOR", "Korea Republic"));
+    countryNames.insert(std::make_pair("NGA", "Nigeria"));
+    countryNames.insert(std::make_pair("NIG", "Nigeria"));
+    countryNames.insert(std::make_pair("PAN", "Panama"));
+    countryNames.insert(std::make_pair("POL", "Poland"));
+    countryNames.insert(std::make_pair("SEN", "Senegal"));
+    countryNames.insert(std::make_pair("SWE", "Sweden"));
+    countryNames.insert(std::make_pair("SUI", "Switzerland"));
+    countryNames.insert(std::make_pair("TUN", "Tunisia "));
 
     placeBetPage->clear();
     std::vector<CEvent *> eventsVector;
@@ -391,7 +391,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                 std::string scriptPubKey = prevTxOut.scriptPubKey.ToString();
 
                 txnouttype type;
-                vector<CTxDestination> prevAddrs;
+                std::vector<CTxDestination> prevAddrs;
                 int nRequired;
                 if(ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
 
@@ -412,7 +412,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                 // TODO Remove hard-coded values from this block.
                 if ( validEventTx && scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
 
-                    vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
+                    std::vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, std::string::npos));
                     std::string evtDescr(v.begin(), v.end());
                     std::vector<std::string> strs;
                     boost::split(strs, evtDescr, boost::is_any_of("|"));

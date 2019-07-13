@@ -23,8 +23,6 @@
 #include <boost/assign/list_of.hpp>
 #include <openssl/rand.h>
 
-using namespace std;
-using namespace boost;
 
 // The main object for accessing Obfuscation
 CObfuscationPool obfuScationPool;
@@ -35,7 +33,7 @@ std::vector<CObfuscationQueue> vecObfuscationQueue;
 // Keep track of the used Masternodes
 std::vector<CTxIn> vecMasternodesUsed;
 // Keep track of the scanning errors I've seen
-map<uint256, CObfuscationBroadcastTx> mapObfuscationBroadcastTxes;
+std::map<uint256, CObfuscationBroadcastTx> mapObfuscationBroadcastTxes;
 // Keep track of the active Masternode
 CActiveMasternode activeMasternode;
 
@@ -228,7 +226,7 @@ void CObfuscationPool::CheckFinalTransaction()
             dstx.vchSig = vchSig;
             dstx.sigTime = sigTime;
 
-            mapObfuscationBroadcastTxes.insert(make_pair(txNew.GetHash(), dstx));
+            mapObfuscationBroadcastTxes.insert(std::make_pair(txNew.GetHash(), dstx));
         }
 
         CInv inv(MSG_DSTX, txNew.GetHash());
@@ -422,7 +420,7 @@ void CObfuscationPool::CheckTimeout()
 
     // check Obfuscation queue objects for timeouts
     int c = 0;
-    vector<CObfuscationQueue>::iterator it = vecObfuscationQueue.begin();
+    std::vector<CObfuscationQueue>::iterator it = vecObfuscationQueue.begin();
     while (it != vecObfuscationQueue.end()) {
         if ((*it).IsExpired()) {
             LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() : Removing expired queue entry - %d\n", c);
@@ -439,7 +437,7 @@ void CObfuscationPool::CheckTimeout()
         c = 0;
 
         // check for a timeout and reset if needed
-        vector<CObfuScationEntry>::iterator it2 = entries.begin();
+        std::vector<CObfuScationEntry>::iterator it2 = entries.begin();
         while (it2 != entries.end()) {
             if ((*it2).IsExpired()) {
                 LogPrint("obfuscation", "CObfuscationPool::CheckTimeout() : Removing expired entry - %d\n", c);
@@ -574,7 +572,7 @@ bool CObfuScationSigner::GetKeysFromSecret(std::string strSecret, CKey& keyRet, 
     return true;
 }
 
-bool CObfuScationSigner::SignMessage(std::string strMessage, std::string& errorMessage, vector<unsigned char>& vchSig, CKey key)
+bool CObfuScationSigner::SignMessage(std::string strMessage, std::string& errorMessage, std::vector<unsigned char>& vchSig, CKey key)
 {
     CHashWriter ss(SER_GETHASH, 0);
     ss << strMessageMagic;
@@ -588,7 +586,7 @@ bool CObfuScationSigner::SignMessage(std::string strMessage, std::string& errorM
     return true;
 }
 
-bool CObfuScationSigner::VerifyMessage(CPubKey pubkey, vector<unsigned char>& vchSig, std::string strMessage, std::string& errorMessage)
+bool CObfuScationSigner::VerifyMessage(CPubKey pubkey, std::vector<unsigned char>& vchSig, std::string strMessage, std::string& errorMessage)
 {
     CHashWriter ss(SER_GETHASH, 0);
     ss << strMessageMagic;

@@ -266,7 +266,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 continue;
             }
 
-            string strAddress = "";
+            std::string strAddress = "";
             CTxDestination address;
             if (ExtractDestination(txout.scriptPubKey, address))
                 strAddress = CBitcoinAddress(address).ToString();
@@ -437,7 +437,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     bool isBettingEntry = false;
                     bool isChainGameEntry = false;
                     if (txout.scriptPubKey.IsUnspendable()) {
-                        vector<unsigned char> vOpCode = ParseHex(txout.scriptPubKey.ToString().substr(9, string::npos));
+                        std::vector<unsigned char> vOpCode = ParseHex(txout.scriptPubKey.ToString().substr(9, std::string::npos));
                         std::string opCode(vOpCode.begin(), vOpCode.end());
 
                         CPeerlessBet plBet;

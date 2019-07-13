@@ -16,7 +16,6 @@
 #include "hash.h"
 #include "uint256.h"
 
-using namespace std;
 
 namespace libzerocoin {
 
@@ -39,7 +38,7 @@ namespace libzerocoin {
 ///
 
 void
-CalculateParams(ZerocoinParams &params, CBigNum N, string aux, uint32_t securityLevel)
+CalculateParams(ZerocoinParams &params, CBigNum N, std::string aux, uint32_t securityLevel)
 {
 	params.initialized = false;
 	params.accumulatorParams.initialized = false;
@@ -125,7 +124,7 @@ CalculateParams(ZerocoinParams &params, CBigNum N, string aux, uint32_t security
 /// Returns the hash of the value.
 
 uint256
-calculateGeneratorSeed(uint256 seed, uint256 pSeed, uint256 qSeed, string label, uint32_t index, uint32_t count)
+calculateGeneratorSeed(uint256 seed, uint256 pSeed, uint256 qSeed, std::string label, uint32_t index, uint32_t count)
 {
 	CHashWriter hasher(0,0);
 	uint256     hash;
@@ -133,15 +132,15 @@ calculateGeneratorSeed(uint256 seed, uint256 pSeed, uint256 qSeed, string label,
 	// Compute the hash of:
 	// <modulus>||<securitylevel>||<auxString>||groupName
 	hasher << seed;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << pSeed;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << qSeed;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << label;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << index;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << count;
 
 	return hasher.GetHash();
@@ -157,7 +156,7 @@ calculateGeneratorSeed(uint256 seed, uint256 pSeed, uint256 qSeed, string label,
 /// Returns the hash of the value.
 
 uint256
-calculateSeed(CBigNum modulus, string auxString, uint32_t securityLevel, string groupName)
+calculateSeed(CBigNum modulus, std::string auxString, uint32_t securityLevel, std::string groupName)
 {
 	CHashWriter hasher(0,0);
 	uint256     hash;
@@ -165,11 +164,11 @@ calculateSeed(CBigNum modulus, string auxString, uint32_t securityLevel, string 
 	// Compute the hash of:
 	// <modulus>||<securitylevel>||<auxString>||groupName
 	hasher << modulus;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << securityLevel;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << auxString;
-	hasher << string("||");
+	hasher << std::string("||");
 	hasher << groupName;
 
 	return hasher.GetHash();

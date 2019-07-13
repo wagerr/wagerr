@@ -24,7 +24,7 @@
 UniValue getmappingid(const UniValue& params, bool fHelp)
 {
     if (fHelp || (params.size() < 2))
-        throw runtime_error(
+        throw std::runtime_error(
                 "getmappingid\n"
                 "\nGet a mapping ID from the specified mapping index.\n"
 
@@ -72,13 +72,13 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
         type = tournamentMapping;
     }
     else{
-        throw runtime_error("No mapping exist for the mapping index you provided.");
+        throw std::runtime_error("No mapping exist for the mapping index you provided.");
     }
 
     // Check the map for the string name.
     unsigned int nFirstIndexFree = 0;
     bool FirstIndexFreeFound = false;
-    map<uint32_t, CMapping>::iterator it;
+    std::map<uint32_t, CMapping>::iterator it;
     for (it = mappingIndex.begin(); it != mappingIndex.end(); it++) {
         LogPrintf("%s - mapping - it=[%d] nId=[%d] nMType=[%d] nVersion=[%d] [%s]\n", __func__, it->first, it->second.nId, it->second.nMType, it->second.nVersion, it->second.sName);
         if (!mappingFound) {
@@ -143,7 +143,7 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
 UniValue getmappingname(const UniValue& params, bool fHelp)
 {
     if (fHelp || (params.size() < 2))
-        throw runtime_error(
+        throw std::runtime_error(
                 "getmappingname\n"
                 "\nGet a mapping string name from the specified map index.\n"
 
@@ -187,11 +187,11 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
         cmdb.GetTournaments(mappingIndex);
     }
     else{
-        throw runtime_error("Currently no mapping index exists for the mapping index you provided.");
+        throw std::runtime_error("Currently no mapping index exists for the mapping index you provided.");
     }
 
     // Check the map for the mapping ID.
-    map<uint32_t, CMapping>::iterator it;
+    std::map<uint32_t, CMapping>::iterator it;
     for (it = mappingIndex.begin(); it != mappingIndex.end(); it++) {
         if (it->first == id) {
             mapping.push_back(Pair("mapping-name", it->second.sName));
@@ -203,7 +203,7 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
     }
 
     if (!mappingFound) {
-        throw runtime_error("Currently no mapping name exists for the mapping name you provided.");
+        throw std::runtime_error("Currently no mapping name exists for the mapping name you provided.");
     }
 
     ret.push_back(mapping);

@@ -21,8 +21,6 @@
 
 #include <boost/lexical_cast.hpp>
 
-using namespace std;
-using namespace boost;
 
 std::map<uint256, CTransaction> mapTxLockReq;
 std::map<uint256, CTransaction> mapTxLockReqRejected;
@@ -87,7 +85,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
 
             DoConsensusVote(tx, nBlockHeight);
 
-            mapTxLockReq.insert(make_pair(tx.GetHash(), tx));
+            mapTxLockReq.insert(std::make_pair(tx.GetHash(), tx));
 
             LogPrintf("ProcessMessageSwiftTX::ix - Transaction Lock Request: %s %s : accepted %s\n",
                 pfrom->addr.ToString().c_str(), pfrom->cleanSubVer.c_str(),
@@ -100,7 +98,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
             return;
 
         } else {
-            mapTxLockReqRejected.insert(make_pair(tx.GetHash(), tx));
+            mapTxLockReqRejected.insert(std::make_pair(tx.GetHash(), tx));
 
             // can we get the conflicting transaction as proof?
 
@@ -110,7 +108,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
 
             for (const CTxIn& in : tx.vin) {
                 if (!mapLockedInputs.count(in.prevout)) {
-                    mapLockedInputs.insert(make_pair(in.prevout, tx.GetHash()));
+                    mapLockedInputs.insert(std::make_pair(in.prevout, tx.GetHash()));
                 }
             }
 
@@ -124,7 +122,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
 
                         //reprocess the last 15 blocks
                         ReprocessBlocks(15);
-                        mapTxLockReq.insert(make_pair(tx.GetHash(), tx));
+                        mapTxLockReq.insert(std::make_pair(tx.GetHash(), tx));
                     }
                 }
             }
@@ -143,7 +141,7 @@ void ProcessMessageSwiftTX(CNode* pfrom, std::string& strCommand, CDataStream& v
             return;
         }
 
-        mapTxLockVote.insert(make_pair(ctx.GetHash(), ctx));
+        mapTxLockVote.insert(std::make_pair(ctx.GetHash(), ctx));
 
         if (ProcessConsensusVote(pfrom, ctx)) {
             //Spam/Dos protection
@@ -252,7 +250,7 @@ int64_t CreateNewLock(CTransaction tx)
         newLock.nExpiration = GetTime() + (60 * 60); //locks expire after 60 minutes (24 confirmations)
         newLock.nTimeout = GetTime() + (60 * 5);
         newLock.txHash = tx.GetHash();
-        mapTxLocks.insert(make_pair(tx.GetHash(), newLock));
+        mapTxLocks.insert(std::make_pair(tx.GetHash(), newLock));
     } else {
         mapTxLocks[tx.GetHash()].nBlockHeight = nBlockHeight;
         LogPrint("swiftx", "CreateNewLock - Transaction Lock Exists %s !\n", tx.GetHash().ToString().c_str());
@@ -339,7 +337,7 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
         newLock.nExpiration = GetTime() + (60 * 60);
         newLock.nTimeout = GetTime() + (60 * 5);
         newLock.txHash = ctx.txHash;
-        mapTxLocks.insert(make_pair(ctx.txHash, newLock));
+        mapTxLocks.insert(std::make_pair(ctx.txHash, newLock));
     } else
         LogPrint("swiftx", "SwiftX::ProcessConsensusVote - Transaction Lock Exists %s !\n", ctx.txHash.ToString().c_str());
 
@@ -374,7 +372,7 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
                 if (mapTxLockReq.count(ctx.txHash)) {
                     for (const CTxIn& in : tx.vin) {
                         if (!mapLockedInputs.count(in.prevout)) {
-                            mapLockedInputs.insert(make_pair(in.prevout, ctx.txHash));
+                            mapLockedInputs.insert(std::make_pair(in.prevout, ctx.txHash));
                         }
                     }
                 }

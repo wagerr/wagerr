@@ -13,7 +13,6 @@
 
 #include <boost/assign/list_of.hpp>
 
-using namespace boost::assign;
 
 /**
  * Main network

@@ -37,7 +37,6 @@
 #include <boost/assign/list_of.hpp>
 #include <boost/algorithm/hex.hpp>
 
-using namespace std;
 
 //////////////////////////////////////////////////////////////////////////////
 //
@@ -56,7 +55,7 @@ class COrphan
 {
 public:
     const CTransaction* ptx;
-    set<uint256> setDependsOn;
+    std::set<uint256> setDependsOn;
     CFeeRate feeRate;
     double dPriority;
 
@@ -108,7 +107,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     CReserveKey reservekey(pwallet);
 
     // Create new block
-    unique_ptr<CBlockTemplate> pblocktemplate(new CBlockTemplate());
+    std::unique_ptr<CBlockTemplate> pblocktemplate(new CBlockTemplate());
     if (!pblocktemplate.get())
         return NULL;
     CBlock* pblock = &pblocktemplate->block; // pointer for convenience
@@ -209,14 +208,14 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         CCoinsViewCache view(pcoinsTip);
 
         // Priority order to process transactions
-        list<COrphan> vOrphan; // list memory doesn't move
-        map<uint256, vector<COrphan*> > mapDependers;
+        std::list<COrphan> vOrphan; // list memory doesn't move
+        std::map<uint256, std::vector<COrphan*> > mapDependers;
         bool fPrintPriority = GetBoolArg("-printpriority", false);
 
         // This vector will be sorted into a priority queue:
-        vector<TxPriority> vecPriority;
+        std::vector<TxPriority> vecPriority;
         vecPriority.reserve(mempool.mapTx.size());
-        for (map<uint256, CTxMemPoolEntry>::iterator mi = mempool.mapTx.begin();
+        for (std::map<uint256, CTxMemPoolEntry>::iterator mi = mempool.mapTx.begin();
              mi != mempool.mapTx.end(); ++mi) {
             const CTransaction& tx = mi->second.GetTx();
             if (tx.IsCoinBase() || tx.IsCoinStake() || !IsFinalTx(tx, nHeight)){
@@ -333,8 +332,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         TxPriorityCompare comparer(fSortedByFee);
         std::make_heap(vecPriority.begin(), vecPriority.end(), comparer);
 
-        vector<CBigNum> vBlockSerials;
-        vector<CBigNum> vTxSerials;
+        std::vector<CBigNum> vBlockSerials;
+        std::vector<CBigNum> vTxSerials;
         while (!vecPriority.empty()) {
             // Take highest priority transaction off the priority queue:
             double dPriority = vecPriority.front().get<0>();
@@ -402,9 +401,9 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                         bool fUseV1Params = libzerocoin::ExtractVersionFromSerial(spend->getCoinSerialNumber()) < libzerocoin::PrivateCoin::PUBKEY_VERSION;
                         if (!spend->HasValidSerial(Params().Zerocoin_Params(fUseV1Params)))
                             fDoubleSerial = true;
-                        if (count(vBlockSerials.begin(), vBlockSerials.end(), spend->getCoinSerialNumber()))
+                        if (std::count(vBlockSerials.begin(), vBlockSerials.end(), spend->getCoinSerialNumber()))
                             fDoubleSerial = true;
-                        if (count(vTxSerials.begin(), vTxSerials.end(), spend->getCoinSerialNumber()))
+                        if (std::count(vTxSerials.begin(), vTxSerials.end(), spend->getCoinSerialNumber()))
                             fDoubleSerial = true;
                         if (fDoubleSerial)
                             break;
@@ -734,7 +733,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
 
             if (mapHashedBlocks.count(chainActive.Tip()->nHeight) && !fLastLoopOrphan) //search our map of hashed blocks, see if bestblock has been hashed yet
             {
-                if (GetTime() - mapHashedBlocks[chainActive.Tip()->nHeight] < max(pwallet->nHashInterval, (unsigned int)1)) // wait half of the nHashDrift with max wait of 3 minutes
+                if (GetTime() - mapHashedBlocks[chainActive.Tip()->nHeight] < std::max(pwallet->nHashInterval, (unsigned int)1)) // wait half of the nHashDrift with max wait of 3 minutes
                 {
                     MilliSleep(5000);
                     continue;
@@ -750,7 +749,7 @@ void BitcoinMiner(CWallet* pwallet, bool fProofOfStake)
         if (!pindexPrev)
             continue;
 
-        unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwallet, fProofOfStake));
+        std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwallet, fProofOfStake));
         if (!pblocktemplate.get())
             continue;
 
