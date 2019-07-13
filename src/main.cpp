@@ -5182,7 +5182,7 @@ bool static LoadBlockIndexDB(std::string& strError)
         CBlockIndex* pindex = item.second;
         vSortedByHeight.push_back(std::make_pair(pindex->nHeight, pindex));
     }
-    sort(vSortedByHeight.begin(), vSortedByHeight.end());
+    std::sort(vSortedByHeight.begin(), vSortedByHeight.end());
     for (const PAIRTYPE(int, CBlockIndex*) & item : vSortedByHeight) {
         CBlockIndex* pindex = item.second;
         pindex->nChainWork = (pindex->pprev ? pindex->pprev->nChainWork : 0) + GetBlockProof(*pindex);

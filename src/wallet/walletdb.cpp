@@ -88,7 +88,7 @@ void CWalletDB::LoadAutoConvertKeys(std::set<CBitcoinAddress>& setAddresses)
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(std::string("automint"), CKeyID());
+            ssKey << std::make_pair(std::string("automint"), CKeyID());
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
@@ -1428,7 +1428,7 @@ void CWalletDB::LoadPrecomputes(std::set<uint256> setHashes)
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(std::string("precompute"), uint256(0));
+            ssKey << std::make_pair(std::string("precompute"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
@@ -1546,7 +1546,7 @@ std::list<CDeterministicMint> CWalletDB::ListDeterministicMints()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(std::string("dzwgr"), uint256(0));
+            ssKey << std::make_pair(std::string("dzwgr"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
@@ -1591,7 +1591,7 @@ std::list<CZerocoinMint> CWalletDB::ListMintedCoins()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(std::string("zerocoin"), uint256(0));
+            ssKey << std::make_pair(std::string("zerocoin"), uint256(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
@@ -1634,7 +1634,7 @@ std::list<CZerocoinSpend> CWalletDB::ListSpentCoins()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(std::string("zcserial"), CBigNum(0));
+            ssKey << std::make_pair(std::string("zcserial"), CBigNum(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
@@ -1689,7 +1689,7 @@ std::list<CZerocoinMint> CWalletDB::ListArchivedZerocoins()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(std::string("zco"), CBigNum(0));
+            ssKey << std::make_pair(std::string("zco"), CBigNum(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
@@ -1732,7 +1732,7 @@ std::list<CDeterministicMint> CWalletDB::ListArchivedDeterministicMints()
         // Read next record
         CDataStream ssKey(SER_DISK, CLIENT_VERSION);
         if (fFlags == DB_SET_RANGE)
-            ssKey << make_pair(std::string("dzco"), CBigNum(0));
+            ssKey << std::make_pair(std::string("dzco"), CBigNum(0));
         CDataStream ssValue(SER_DISK, CLIENT_VERSION);
         int ret = ReadAtCursor(pcursor, ssKey, ssValue, fFlags);
         fFlags = DB_NEXT;
