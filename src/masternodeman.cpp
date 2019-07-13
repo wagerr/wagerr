@@ -512,7 +512,7 @@ CMasternode* CMasternodeMan::GetNextMasternodeInQueueForPayment(int nBlockHeight
     if (fFilterSigTime && nCount < nMnCount / 3) return GetNextMasternodeInQueueForPayment(nBlockHeight, false, nCount);
 
     // Sort them high to low
-    sort(vecMasternodeLastPaid.rbegin(), vecMasternodeLastPaid.rend(), CompareLastPaid());
+    std::sort(vecMasternodeLastPaid.rbegin(), vecMasternodeLastPaid.rend(), CompareLastPaid());
 
     // Look at 1/10 of the oldest nodes (by last payment), calculate their scores and pay the best one
     //  -- This doesn't look at who is being paid in the +8-10 blocks, allowing for double payments very rarely
@@ -626,7 +626,7 @@ int CMasternodeMan::GetMasternodeRank(const CTxIn& vin, int64_t nBlockHeight, in
         vecMasternodeScores.push_back(std::make_pair(n2, mn.vin));
     }
 
-    sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareScoreTxIn());
+    std::sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareScoreTxIn());
 
     int rank = 0;
     for (PAIRTYPE(int64_t, CTxIn) & s : vecMasternodeScores) {
@@ -665,7 +665,7 @@ std::vector<std::pair<int, CMasternode> > CMasternodeMan::GetMasternodeRanks(int
         vecMasternodeScores.push_back(std::make_pair(n2, mn));
     }
 
-    sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareScoreMN());
+    std::sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareScoreMN());
 
     int rank = 0;
     for (PAIRTYPE(int64_t, CMasternode) & s : vecMasternodeScores) {
@@ -694,7 +694,7 @@ CMasternode* CMasternodeMan::GetMasternodeByRank(int nRank, int64_t nBlockHeight
         vecMasternodeScores.push_back(std::make_pair(n2, mn.vin));
     }
 
-    sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareScoreTxIn());
+    std::sort(vecMasternodeScores.rbegin(), vecMasternodeScores.rend(), CompareScoreTxIn());
 
     int rank = 0;
     for (PAIRTYPE(int64_t, CTxIn) & s : vecMasternodeScores) {
