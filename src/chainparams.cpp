@@ -312,7 +312,7 @@ public:
         nRejectOldSporkKey = 1538611200; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
 
         // Public coin spend enforcement
-        nPublicZCSpends = 108214;
+        nPublicZCSpends = 116000;
 
         /** Bet related parameters **/
         nBetStartHeight = 26080;                                        // The block that betting protocols become active (Testnet).
