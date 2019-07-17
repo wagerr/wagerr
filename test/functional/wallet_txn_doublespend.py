@@ -120,8 +120,8 @@ class TxnMallTest(BitcoinTestFramework):
         tx2 = self.nodes[0].gettransaction(txid2)
 
         # Both transactions should be conflicted
-        assert_equal(tx1["bcconfirmations"], 1)
-        assert_equal(tx2["bcconfirmations"], 1)
+        assert_equal(tx1["bcconfirmations"], -2)
+        assert_equal(tx2["bcconfirmations"], -2)
 
         # Node0's total balance should be starting balance, plus 100BTC for
         # two more matured blocks, minus 1240 for the double-spend, plus fees (which are
