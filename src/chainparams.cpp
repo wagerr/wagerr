@@ -162,7 +162,7 @@ public:
         nRejectOldSporkKey = 1537128000;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
 
         // Public coin spend enforcement
-        nPublicZCSpends = 1500000;
+        nPublicZCSpends = 752800;
 
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
