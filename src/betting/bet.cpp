@@ -1398,7 +1398,7 @@ void CEventDB::AddEvent(CPeerlessEvent pe)
         saved_pe.nAwayOdds = pe.nAwayOdds;
         saved_pe.nDrawOdds = pe.nDrawOdds;
         eventsIndex[saved_pe.nEventId] = saved_pe;
-        CEventDB::SetEvents(eventsIndex); 
+        CEventDB::SetEvents(eventsIndex);
     } else {
         LOCK(cs_setEvents);
         eventsIndex.insert(make_pair(pe.nEventId, pe));
@@ -1808,7 +1808,7 @@ std::vector<CBetOut> GetBetPayouts(int height)
         else if (result.nHomeScore == result.nAwayScore) {
             nMoneylineResult = moneyLineDraw;
         }
-        
+
         // Traverse the block chain to find events and bets.
         while (BlocksIndex) {
             CBlock block;
@@ -2158,7 +2158,7 @@ std::vector<CBetOut> GetBetPayouts(int height)
 }
 
 bool CChainGamesResult::FromScript(CScript script) {
-    LogPrintf("%s - %s\n", __func__, script.ToString());
+    // LogPrintf("%s - %s\n", __func__, script.ToString());
 
     CScript::const_iterator pc = script.begin();
     std::vector<unsigned char> data;
