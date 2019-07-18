@@ -166,7 +166,8 @@ public:
 
         /** Bet related parameters **/
         nBetStartHeight = 298386;                                       // The block that betting protocols become active.
-        vOracleWalletAddrs = {"WTogNAzaHf9oEbBoAv9RA49FdxyWaGLmdZ"};    // Oracle Masternode Event & Result Posting Wallet Addresses.
+        vOracleWalletAddrs = {"WcsijutAF46tSLTcojk9mR9zV9wqwUUYpC",     // Oracle Masternode Event & Result Posting Wallet Addresses.
+                              "Weqz3PFBq3SniYF5HS8kuj72q9FABKzDrP"};
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
         strDevPayoutAddr = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";        // Development fund payout address.
         strOMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";       // OMNO fund payout address.
