@@ -18,7 +18,7 @@
 #include "transactiontablemodel.h"
 #include "walletmodel.h"
 
-#include "ui_interface.h"
+#include "guiinterface.h"
 
 #include <QComboBox>
 #include <QDateTimeEdit>
@@ -261,6 +261,9 @@ void TransactionView::setModel(WalletModel* model)
         // Update transaction list with persisted settings
         chooseType(settings.value("transactionType").toInt());
         chooseDate(settings.value("transactionDate").toInt());
+
+        // Hide orphans
+        hideOrphans(settings.value("fHideOrphans", false).toBool());
     }
 }
 

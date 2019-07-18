@@ -62,12 +62,12 @@
         <translation>Vastaanottavat osoitteet</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Nämä ovat sinun Wagerr osoitteesi maksujen lähetystä varten. Tarkista aina määrä ja vastaanottava osoite ennen kolikoiden lähettämistä.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Nämä ovat sinun WAGERR osoitteesi maksujen lähetystä varten. Tarkista aina määrä ja vastaanottava osoite ennen kolikoiden lähettämistä.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Nämä ovat sinun Wagerr osoitteesi maksujen vastaanottamista varten. On suositeltavaa käyttää uutta vastaanottavaa osoitetta jokaiselle uudelle rahansiirrolle.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Nämä ovat sinun WAGERR osoitteesi maksujen vastaanottamista varten. On suositeltavaa käyttää uutta vastaanottavaa osoitetta jokaiselle uudelle rahansiirrolle.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -565,12 +565,12 @@
         <translation>&amp;Apua</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR Ydin</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Lähetä kolikkoja Wagerr osoitteeseen</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Lähetä kolikkoja WAGERR osoitteeseen</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -585,24 +585,24 @@
         <translation>Selaa masternodeja</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>Wagerr Core &amp;ytimestä</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>WAGERR Core &amp;ytimestä</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Näytä tietoja Wagerr Ytimestä</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Näytä tietoja WAGERR Ytimestä</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
         <translation>Muokkaa konfiguraatio vaihtoehtoja WAGERR:lle</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
         <translation>Allekirjoita viestejä todistaaksesi, että omistat ne.</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Vahvista viestit varmistaaksesi, että ne allekirjoitettiin tietyllä Wagerr osoiteella.</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Vahvista viestit varmistaaksesi, että ne allekirjoitettiin tietyllä WAGERR osoiteella.</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -645,11 +645,11 @@
         <translation>Lohkon tutkija näkymä</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Näytä Wagerr Ydin apuviesti saadaksesi lista mahdollisista Wagerr komentolinja komennoista.</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Näytä WAGERR Ydin apuviesti saadaksesi lista mahdollisista WAGERR komentolinja komennoista.</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
+        <source>WAGERR Core client</source>
         <translation>WAGERR Ydin asiakasohjelma</translation>
     </message>
     <message>
@@ -906,9 +906,20 @@
     </message>
     </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>Lomake</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR Ydin</translation>
     </message>
     <message>
@@ -927,11 +938,11 @@
         <translation>Tervetuloa</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Tervetuloa Wagerr Ytimeen.</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Tervetuloa WAGERR Ytimeen.</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR Ydin</translation>
     </message>
     <message>
@@ -1057,37 +1068,8 @@
         <translation>(ei nimikettä)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>Syötetty osoite:</translation>
-    </message>
-    <message>
-        <source> is invalid.
-Please check the address and try again.</source>
-        <translation>on invalidi. Ole hyvä ja tarkista osoite.</translation>
-    </message>
-    <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation>MultiSend vektorisi kokonaismäärä on yli 100% panoksesi lohkopalkkiosta.</translation>
-    </message>
-    <message>
         <source>Please Enter 1 - 100 for percent.</source>
         <translation>Syötä 1 - 100 prosenttia</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>MultiSend vektori</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>Poistettu</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>Osoitetta ei löytynyt</translation>
     </message>
 </context>
 <context>
@@ -1103,61 +1085,6 @@ Please check the address and try again.</source>
     <message>
         <source>Amount:</source>
         <translation>Määrä:</translation>
-    </message>
-    </context>
-<context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Konfiguroi Hämäys</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Perus Yksityisyys</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>Korkea Yksityisyys</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Maksimi Yksityisyys</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Valitse yksityisyyden taso.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Käytä 2 erillistä masternodea sekoittaaksesi enintään 25000 WAGERR</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Käytä 8 erillistä masternodea sekoittaaksesi enintään 25000 WAGERR</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>Käytä 16 erillistä masternodea</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>Tämä vaihtoehto on nopein ja maksaa noin ~0.025 WGR anonymoidaksesi 25000 WAGERR</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>Tämä vaihtoehto on suhteellisen nopea ja maksaa 0.05 Wagerr anonymoidaksesi 25000 WAGERR</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>Tämä on hitain ja turvallisin vaihtoehto. Täydesti anonymisoiminen ei maksa mitään.</translation>
-    </message>
-    <message>
-        <source>0.1 WGR per 25000 WGR you anonymize.</source>
-        <translation>0.1 per 25000 WAGERR, jotka anonymisoit.</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Hämäys konfiguraatio</translation>
     </message>
     </context>
 <context>
@@ -1202,12 +1129,12 @@ Please check the address and try again.</source>
         <translation>Ekspertti</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
-        <translation>Automaattisesti käynnistä Wagerr kun kirjaudut sisään.</translation>
+        <source>Automatically start WAGERR after logging in to the system.</source>
+        <translation>Automaattisesti käynnistä WAGERR kun kirjaudut sisään.</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;Aloita Wagerr järjestelmän kirjautumisessa</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;Aloita WAGERR järjestelmän kirjautumisessa</translation>
     </message>
     <message>
         <source>Enable coin &amp;control features</source>
@@ -1230,8 +1157,8 @@ Please check the address and try again.</source>
         <translation>Käyttöliittymän kielen voi säätää täällä. Tämä asetus tulee voimaan uudelleenkäynnistettyäsi lompakon.</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Yhdistä Wagerr verkkoon SOCKS5 proxyn kautta</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Yhdistä WAGERR verkkoon SOCKS5 proxyn kautta</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -1280,10 +1207,6 @@ Please check the address and try again.</source>
     <message>
         <source>User Interface Theme:</source>
         <translation>Käyttöliittymän teema:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>&amp;Yksikkö jossa määrä näytetään:</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
@@ -1394,14 +1317,6 @@ Please check the address and try again.</source>
         <translation>0</translation>
     </message>
     <message>
-        <source>Quantity:</source>
-        <translation>Määrä:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Määrä:</translation>
-    </message>
-    <message>
         <source>Choose previously used address</source>
         <translation>Valitse aikaisemmin käytetty osoite</translation>
     </message>
@@ -1462,23 +1377,22 @@ Please check the address and try again.</source>
         <translation>Muutos:</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>Kopioi määrä</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Kopioi määrä</translation>
-    </message>
-    <message>
         <source>Confirm send coins</source>
         <translation>Vahvista kolikoiden lähetys</translation>
     </message>
+    </context>
+<context>
+    <name>ProposalFrame</name>
     </context>
 <context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
         <translation>Määrä</translation>
+    </message>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Ydin</translation>
     </message>
     </context>
 <context>
@@ -1535,8 +1449,8 @@ Please check the address and try again.</source>
         <translation>Lohko ketju</translation>
     </message>
     <message>
-        <source>Open the Wagerr debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Avaa Wagerr debug loki nykyisestä sijainnista. Tämä voi kestää muutaman sekunnin suurille lokeille</translation>
+        <source>Open the WAGERR debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Avaa WAGERR debug loki nykyisestä sijainnista. Tämä voi kestää muutaman sekunnin suurille lokeille</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -1647,8 +1561,8 @@ Please check the address and try again.</source>
         <translation>Ulos:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
-        <translation>Tervetuloa Wagerr RPC konsoliin.</translation>
+        <source>Welcome to the WAGERR RPC console.</source>
+        <translation>Tervetuloa WAGERR RPC konsoliin.</translation>
     </message>
     <message>
         <source>never</source>
@@ -1686,12 +1600,16 @@ Please check the address and try again.</source>
         <translation>Vaihtoehtoinen nimike uudelle vastaanottavalle osoitteelle</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Vaihtoehtoinen viesti joka liitetään maksupyyntöön, joka näytetään kun pyyntö avataan. Huomio: Viestiä ei lähetetä maksun mukana Wagerr verkolle.</translation>
+        <source>A&amp;mount:</source>
+        <translation>M&amp;äärä:</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Vaihtoehtoinen viesti, joka liitetään maksupyyntöö, joka näytetään kun pyyntö avataan. &lt;br&gt; Huomio: Tätä viestiä ei lähetetä maksun mukana Wagerr  verkolle.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Vaihtoehtoinen viesti joka liitetään maksupyyntöön, joka näytetään kun pyyntö avataan. Huomio: Viestiä ei lähetetä maksun mukana WAGERR verkolle.</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Vaihtoehtoinen viesti, joka liitetään maksupyyntöö, joka näytetään kun pyyntö avataan. &lt;br&gt; Huomio: Tätä viestiä ei lähetetä maksun mukana WAGERR  verkolle.</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
@@ -1704,10 +1622,6 @@ Please check the address and try again.</source>
     <message>
         <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
         <translation>Pyydä vaihtoehtoinen määrä. Jätä tämä tyhjäksi tai 0, jos haluat pyytää ennaltamääräämättömän summan</translation>
-    </message>
-    <message>
-        <source>&amp;Amount:</source>
-        <translation>&amp;Määrä:</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
@@ -1752,6 +1666,10 @@ Please check the address and try again.</source>
     <message>
         <source>Copy amount</source>
         <translation>Kopioi määrä</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopioi osoite</translation>
     </message>
 </context>
 <context>
@@ -1822,6 +1740,10 @@ Please check the address and try again.</source>
     <message>
         <source>Message</source>
         <translation>Viesti</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Osoite</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -1963,8 +1885,8 @@ Please check the address and try again.</source>
         <translation>Kopioi taksa</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
-        <translation>Varoitus: Virheellinen Wagerr osoite</translation>
+        <source>Warning: Invalid WAGERR address</source>
+        <translation>Varoitus: Virheellinen WAGERR osoite</translation>
     </message>
     <message>
         <source>Are you sure you want to send?</source>
@@ -2014,7 +1936,7 @@ Please check the address and try again.</source>
         <translation>Tämä on normaali maksu.</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
+        <source>The WAGERR address to send the payment to</source>
         <translation>WAGERR osoite johon maksu lähetetään</translation>
     </message>
     <message>
@@ -2057,8 +1979,8 @@ Please check the address and try again.</source>
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
-        <translation>Wagerr Core sammuu...</translation>
+        <source>WAGERR Core is shutting down...</source>
+        <translation>WAGERR core sammuu...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -2076,7 +1998,7 @@ Please check the address and try again.</source>
         <translation>Voit allekirjoittaa viestejä osoitteillasi todistaaksesi, että omistat ne. Ole varovainen ettet allekirjoita mitään kummallista, sillä kalasteluyritykset saattavat yrittää huijata sinut luovuttamaan tietoja. Allekirjoita vain täysin yksityiskohtaisia sanomia, jotka hyväksyt.</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
+        <source>The WAGERR address to sign the message with</source>
         <translation>WAGERR osoite, jolla viesti allekirjoitetaan</translation>
     </message>
     <message>
@@ -2108,16 +2030,16 @@ Please check the address and try again.</source>
         <translation>Kopioi nykyinen allekirjoitus järjestelmän leikepöydälle</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Allekirjoita viesti todistaaksesi, että omistat tämän Wagerr osoitteen</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Allekirjoita viesti todistaaksesi, että omistat tämän WAGERR osoitteen</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
+        <source>The WAGERR address the message was signed with</source>
         <translation>WAGERR osoite, jolla viesti allekirjoitettiin</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Vahvista että viesti on allekirjoitettu kyseessä olevalla Wagerr osoitteella.</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Vahvista että viesti on allekirjoitettu kyseessä olevalla WAGERR osoitteella.</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -2199,7 +2121,7 @@ Please check the address and try again.</source>
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR Ydin</translation>
     </message>
     <message>
@@ -2215,8 +2137,8 @@ Please check the address and try again.</source>
         <translation>Dash Core kehittäjät</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
-        <translation>Wagerr Core kehittäjät</translation>
+        <source>The WAGERR Core developers</source>
+        <translation>WAGERR core kehittäjät</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -2511,7 +2433,7 @@ Please check the address and try again.</source>
     </message>
 </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>0</source>
         <translation>0</translation>
@@ -2548,10 +2470,6 @@ Please check the address and try again.</source>
         <translation>Lataus valmis</translation>
     </message>
     <message>
-        <source>Error connecting to Masternode.</source>
-        <translation>Virhe Masternodeen yhdistyksessä</translation>
-    </message>
-    <message>
         <source>Error initializing block database</source>
         <translation>Virhe aloittaessa lohko tietokantaa</translation>
     </message>
@@ -2568,8 +2486,8 @@ Please check the address and try again.</source>
         <translation>Virhe ladattaessa wallet.dat tiedostoa: Lompakko korruptoitunut</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Wagerr Core</source>
-        <translation>Virhe ladattaessa wallet.dat tiedostoa: Lompakko vaatii uudemman version Wagerr Coresta</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of WAGERR Core</source>
+        <translation>Virhe ladattaessa wallet.dat tiedostoa: Lompakko vaatii uudemman version WAGERR Coresta</translation>
     </message>
     <message>
         <source>Error reading from database, shutting down.</source>
@@ -2588,20 +2506,8 @@ Please check the address and try again.</source>
         <translation>Virhe: Lompakko lukittu, ei voida luoda rahansiirtoa!</translation>
     </message>
     <message>
-        <source>Finalizing transaction.</source>
-        <translation>Viimeistellään rahansiirto.</translation>
-    </message>
-    <message>
         <source>Importing...</source>
         <translation>Tuodaan...</translation>
-    </message>
-    <message>
-        <source>Incompatible mode.</source>
-        <translation>Yhteensopimaton tila.</translation>
-    </message>
-    <message>
-        <source>Incompatible version.</source>
-        <translation>Yhteensopimaton versio.</translation>
     </message>
     <message>
         <source>Information</source>
@@ -2614,10 +2520,6 @@ Please check the address and try again.</source>
     <message>
         <source>Invalid private key.</source>
         <translation>Virheellinen yksityisavain.</translation>
-    </message>
-    <message>
-        <source>Invalid script detected.</source>
-        <translation>Virheellinen skripti havaittu.</translation>
     </message>
     <message>
         <source>&lt;category&gt; can be:</source>
@@ -2636,20 +2538,12 @@ Please check the address and try again.</source>
         <translation>Lataa lompakkoa...</translation>
     </message>
     <message>
-        <source>Lock is already in place.</source>
-        <translation>Lukitus on jo käytössä.</translation>
-    </message>
-    <message>
         <source>Options:</source>
         <translation>Vaihtoehdot:</translation>
     </message>
     <message>
         <source>Rescanning...</source>
         <translation>Skannaa uudelleen...</translation>
-    </message>
-    <message>
-        <source>Session not complete!</source>
-        <translation>Sessio ei valmis!</translation>
     </message>
     <message>
         <source>Session timed out.</source>
@@ -2696,28 +2590,12 @@ Please check the address and try again.</source>
         <translation>Rahansiirtojen tulee olla positiivisia</translation>
     </message>
     <message>
-        <source>Transaction created successfully.</source>
-        <translation>Rahansiirto luotu onnistuneesti.</translation>
-    </message>
-    <message>
-        <source>Transaction fees are too high.</source>
-        <translation>Rahansiirron taksat ovat liian korkeat.</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>Rahansiirto ei onnistu</translation>
-    </message>
-    <message>
         <source>Transaction too large for fee policy</source>
         <translation>Rahansiirto liian iso taksaan nähden</translation>
     </message>
     <message>
         <source>Transaction too large</source>
         <translation>Rahansiirto liian suuri</translation>
-    </message>
-    <message>
-        <source>Transmitting final transaction.</source>
-        <translation>Lähetetään viimeinen rahansiirto.</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
@@ -2736,10 +2614,6 @@ Please check the address and try again.</source>
         <translation>Tarkistaa lompakkoa...</translation>
     </message>
     <message>
-        <source>Wallet is locked.</source>
-        <translation>Lompakko on lukittu.</translation>
-    </message>
-    <message>
         <source>Wallet options:</source>
         <translation>Lompakon vaihtoehdot:</translation>
     </message>
@@ -2750,10 +2624,6 @@ Please check the address and try again.</source>
     <message>
         <source>Warning: This version is obsolete, upgrade required!</source>
         <translation>Varoitus: Tämä versio on vanha, päivitys vaadittu!</translation>
-    </message>
-    <message>
-        <source>Will retry...</source>
-        <translation>Yrittää uudelleen...</translation>
     </message>
     <message>
         <source>on startup</source>

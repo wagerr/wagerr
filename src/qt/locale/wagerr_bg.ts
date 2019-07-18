@@ -62,12 +62,12 @@
         <translation>Получаващ адрес</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Това са вашите Wagerr адреси за изпращане на плащания. Винаги проверявайте количеството и адреса на получателя, преди да изпратите монети.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Това са вашите WAGERR адреси за изпращане на плащания. Винаги проверявайте количеството и адреса на получателя, преди да изпратите монети.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Това са вашите Wagerr адреси за получаване на плащания. Препоръчително е да използвате нови адреси за получаване за всяка транзакция.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Това са вашите WAGERR адреси за получаване на плащания. Препоръчително е да използвате нови адреси за получаване за всяка транзакция.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -177,7 +177,7 @@
     </message>
     <message>
         <source>WAGERR will close now to finish the encryption process. Remember that encrypting your wallet cannot fully protect your WGRs from being stolen by malware infecting your computer.</source>
-        <translation>WAGERR сега ще се затвори, за да довърши процеса по шифриране. Запомнете, че шифрирането на вашия портфейл не може напълно да защити вашия Wagerr от това, да бъде откраднат чрез злонамерен софутуер, инфектирал вашия компютър.</translation>
+        <translation>WAGERR сега ще се затвори, за да довърши процеса по шифриране. Запомнете, че шифрирането на вашия портфейл не може напълно да защити вашия WAGERR от това, да бъде откраднат чрез злонамерен софутуер, инфектирал вашия компютър.</translation>
     </message>
     <message>
         <source>Are you sure you wish to encrypt your wallet?</source>
@@ -254,11 +254,11 @@
         <translation>Адрес:</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <source>Enter a WAGERR Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
         <translation>Въведете Wagerr адрес, който искате да криптиране с BIP 38. Въведете парола в средното поле. Натиснете 'криптирай', за да се изчисли криптирания таен ключ. </translation>
     </message>
     <message>
-        <source>The Wagerr address to encrypt</source>
+        <source>The WAGERR address to encrypt</source>
         <translation>WAGERR Адреса за криптиране</translation>
     </message>
     <message>
@@ -290,8 +290,8 @@
         <translation>Копирай сегашния подпис в системния буфер</translation>
     </message>
     <message>
-        <source>Encrypt the private key for this Wagerr address</source>
-        <translation>Криптирай тайния ключ за този Wagerr адрес</translation>
+        <source>Encrypt the private key for this WAGERR address</source>
+        <translation>Криптирай тайния ключ за този WAGERR адрес</translation>
     </message>
     <message>
         <source>Reset all fields</source>
@@ -641,12 +641,12 @@
         <translation>Колан с инструменти</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR Ядро</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Изпратете монети до Wagerr адрес</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Изпратете монети до WAGERR адрес</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
@@ -665,24 +665,24 @@
         <translation>Разгледай мастърноудове</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;Относно Wagerr Ядрото</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;Относно WAGERR Ядрото</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Информациза за Wagerr Ядрото</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Информациза за WAGERR Ядрото</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
-        <translation>Промени Wagerr конфигурацията</translation>
+        <translation>Промени WAGERR конфигурацията</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Подпишете съобщения със своте Wagerr адреси, за да докажете че са Ваши</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Подпишете съобщения със своте WAGERR адреси, за да докажете че са Ваши</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Проеврете съобщения, за да се убедите, че са подписани с указаните Wagerr адреси</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Проеврете съобщения, за да се убедите, че са подписани с указаните WAGERR адреси</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -725,12 +725,12 @@
         <translation>Прозорец на блок сондата</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Разкрийте Помощ за Wagerr Ядрото, за да видите списък с възможни писмени команди.</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Разкрийте Помощ за WAGERR Ядрото, за да видите списък с възможни писмени команди.</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Клиент Wagerr Ядро</translation>
+        <source>WAGERR Core client</source>
+        <translation>Клиент WAGERR Ядро</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -840,7 +840,7 @@ Address: %4
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Портфейла е &lt;b&gt;шифриран&lt;/b&gt; и в момента е &lt;b&gt;отключен&lt;/b&gt;</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>BlockExplorer</name>
     <message>
@@ -1161,8 +1161,8 @@ Address: %4
         <translation>Редактирай адрес за изпращане</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>Зададения адрес "%1"не е валиден Wagerr адрес.</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>Зададения адрес "%1"не е валиден WAGERR адрес.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1201,13 +1201,24 @@ Address: %4
     </message>
 </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>От</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
         <translation>версия</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR Ядро</translation>
     </message>
     <message>
@@ -1215,8 +1226,8 @@ Address: %4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>Относно Wagerr Ядрото</translation>
+        <source>About WAGERR Core</source>
+        <translation>Относно WAGERR Ядрото</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1262,16 +1273,16 @@ Address: %4
         <translation>Привет</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Добре Дошли в Wagerr Ядрото</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Добре Дошли в WAGERR Ядрото</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>Тъй като това е първия път, в който стартирате програмата, имате възможността да изберете къде Wagerr Ядрото ще съхранява своите данни.</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>Тъй като това е първия път, в който стартирате програмата, имате възможността да изберете къде WAGERR Ядрото ще съхранява своите данни.</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>WAGERR Ядрото ще изтегли и запише копие на целия Wagerr блокчейн. Поне %1 гигабайта ще бъдат съхранявани в тази папка, като тенденцията е файла да расте. Портфейла също ще бъде запазен в тази папка.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR Ядрото ще изтегли и запише копие на целия WAGERR блокчейн. Поне %1 гигабайта ще бъдат съхранявани в тази папка, като тенденцията е файла да расте. Портфейла също ще бъде запазен в тази папка.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1282,7 +1293,7 @@ Address: %4
         <translation>Задай своя папка за данни:</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR Ядро</translation>
     </message>
     <message>
@@ -1424,12 +1435,12 @@ Address: %4
         <translation>Въведете адреса на Получателя</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Wagerr addresses after it matures.
-To Add: enter percentage to give and Wagerr address to add to the MultiSend vector.
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other WAGERR addresses after it matures.
+To Add: enter percentage to give and WAGERR address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>МултиИзпращане Ви позволява автоматично да изпращате до 100% от вашите стейк или мастърноуд възнаграждения към списък от други Wagerr адреси.
-Да Добавите: въведете процент и задайте Wagerr адрес към вектора за МултиИзпращане
+        <translation>МултиИзпращане Ви позволява автоматично да изпращате до 100% от вашите стейк или мастърноуд възнаграждения към списък от други WAGERR адреси.
+Да Добавите: въведете процент и задайте WAGERR адрес към вектора за МултиИзпращане
 Да Прамахнете: Въведете адрес за изстриване и натиснете истрий (del).
 МултиИзпращането няма да бъде активирано докато не кликнете "Активирай"</translation>
     </message>
@@ -1518,48 +1529,8 @@ MultiSend will not be activated unless you have clicked Activate</source>
         <translation>(без етикет)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>Въведения адрес:
-</translation>
-    </message>
-    <message>
-        <source> is invalid.
-Please check the address and try again.</source>
-        <translation>е невалиден.
-Моля проверете адреса отново и опитайте пак.</translation>
-    </message>
-    <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation>Сумата по Вашия вектор за МултиИзпращане надхвърля 100% от вашето стейк възнаграждение.
-</translation>
-    </message>
-    <message>
         <source>Please Enter 1 - 100 for percent.</source>
         <translation>Използвайте числата 1 - 100 за процент.</translation>
-    </message>
-    <message>
-        <source>Saved the MultiSend to memory, but failed saving properties to the database.
-</source>
-        <translation>МултиСенд е успешно запазен в паметта, но свойствата не бяха записани в базата данни.
-</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>Вектор по МултиИзпращане
-</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>Премахнат</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>Не намирам адреса
-</translation>
     </message>
 </context>
 <context>
@@ -1734,73 +1705,6 @@ Please be patient after clicking import.</source>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Конфигурирай Обфускацията</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Елементарна Поверителност</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>Високо ниво на Поверителност</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Максимална Поверителност</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Изберете ниво на поверителност.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Използвай 2 различни мастърноуда за смесване на средства над 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Използвай 8 различни мастърноуда за да смесите средства до 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>Използвай 16 различни мастърноуда</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>Това е най-бързия метод и ще струва около 0.025 WGR за да скриете 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>Тази опция е сравнително бърза и ще струва около 0.05 WGR за да скриете 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>Това е най-бавния и най-сигурен вариант за скриване на WGR. Използването й ще струва</translation>
-    </message>
-    <message>
-        <source>0.1 WGR per 25000 WGR you anonymize.</source>
-        <translation>0.1 WGR за 25000 скрити WGR</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Конфигурация на Обфускацията</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Обфускацията е успешно конфигурирана на елементарно ниво (%1 и 2 кръга). Moжете да промените тази настройка по всяко време от същото място.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Обфускацията е успешно конфигурирана на високо ниво (%1 и 8 кръга). Moжете да промените тази настройка по всяко време от същото място.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Обфускацията е успешно конфигурирана на максимално ниво (%1 и 16 кръга). Moжете да промените тази настройка по всяко време от същото място.</translation>
-    </message>
-</context>
-<context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
@@ -1858,8 +1762,8 @@ Please be patient after clicking import.</source>
         <translation>Aко изключите харча на непотвърдено ресто, рестото от превод&lt;br/&gt;не може да се използва, докато превода не получи поне 1 потвърждение. &lt;br/&gt;Това влияе и на начина по който общите Ви средства се преизчисляват.</translation>
     </message>
     <message>
-        <source>Automatically open the Wagerr client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Автоматично отвори Wagerr порта в рутера. Това става само ако рутера Ви подържа UPnP и последния е включен.</translation>
+        <source>Automatically open the WAGERR client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Автоматично отвори WAGERR порта в рутера. Това става само ако рутера Ви подържа UPnP и последния е включен.</translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1878,12 +1782,12 @@ Please be patient after clicking import.</source>
         <translation>Експерт</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
-        <translation>Стартирай Wagerr автоматично след влизане в системата.</translation>
+        <source>Automatically start WAGERR after logging in to the system.</source>
+        <translation>Стартирай WAGERR автоматично след влизане в системата.</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;Стартирай Wagerr заедно с операционната система</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;Стартирай WAGERR заедно с операционната система</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1915,9 +1819,9 @@ Please be patient after clicking import.</source>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr/wagerr</source>
         <translation>Липсващ език или непълен превод? Помогнете с преводите тук:
-https://www.transifex.com/wagerr/wagerr-translations</translation>
+https://www.transifex.com/wagerr/wagerr</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1952,8 +1856,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Праг на споделеното съхранение:</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Свържи се с Wagerr мрежата със SOCKS5 прокси.</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Свържи се с WAGERR мрежата със SOCKS5 прокси.</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -2002,10 +1906,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>User Interface Theme:</source>
         <translation>Тема на интерфейса:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>Мерни единици:</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
@@ -2131,8 +2031,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Сегашния баланс по портфейли в режим на наблюдение само</translation>
     </message>
     <message>
-        <source>Your current Wagerr balance, unconfirmed and immature transactions included</source>
-        <translation>Вашите Wagerr наличности, включително непотвърдените и неузрели преводи</translation>
+        <source>Your current WAGERR balance, unconfirmed and immature transactions included</source>
+        <translation>Вашите WAGERR наличности, включително непотвърдените и неузрели преводи</translation>
     </message>
     <message>
         <source>zWGR Balance</source>
@@ -2151,8 +2051,8 @@ Immature: confirmed, but less than 1 mint of the same denomination after it was 
 Неузрели: потвърдени, но с по-малко от 1 емисии от същата деноминация след като са биле емитирани</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Информацията на вашия екран може би е стара. Вашия портфейла синхронизира автоматично с Wagerr мрежата след като има успешна свръзка, но процеса отнема време и не е завършил все още.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Информацията на вашия екран може би е стара. Вашия портфейла синхронизира автоматично с WAGERR мрежата след като има успешна свръзка, но процеса отнема време и не е завършил все още.</translation>
     </message>
     <message>
         <source>OVERVIEW</source>
@@ -2260,8 +2160,8 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>Провал при стартирането на wagerr: click-to-pay обработвател</translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid Wagerr address or malformed URI parameters.</source>
-        <translation>URI не може да се парсне. Вероятна причина е невалиден Wagerr адрес или зле-форматирани URI Параметри.</translation>
+        <source>URI cannot be parsed! This can be caused by an invalid WAGERR address or malformed URI parameters.</source>
+        <translation>URI не може да се парсне. Вероятна причина е невалиден WAGERR адрес или зле-форматирани URI Параметри.</translation>
     </message>
     <message>
         <source>Payment request file cannot be read! This can be caused by an invalid payment request file.</source>
@@ -2346,8 +2246,8 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>Zerocoin Действия:</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>Информацията на вашия екран може би е стара. Вашия портфейла синхронизира автоматично с Wagerr мрежата след като има успешна свръзка, но процеса отнема време и не е завършил все още.</translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>Информацията на вашия екран може би е стара. Вашия портфейла синхронизира автоматично с WAGERR мрежата след като има успешна свръзка, но процеса отнема време и не е завършил все още.</translation>
     </message>
     <message>
         <source>Mint Zerocoin</source>
@@ -2362,36 +2262,12 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</source>
-        <translation>Наличните за емитиране са онези монети, които са биле потвърдени и не са заключени като гаранция в Главни Възли.</translation>
-    </message>
-    <message>
-        <source>Available for Minting:</source>
-        <translation>Налични за сечене:</translation>
-    </message>
-    <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</source>
         <translation>Ресетна базата данни на Zerocoin Портфейла. Изтрива преводите, които не са успели да се качат на блокчена.</translation>
     </message>
     <message>
         <source>Reset</source>
         <translation>Ресет</translation>
-    </message>
-    <message>
-        <source>Coin Control...</source>
-        <translation>Монетен контрол...</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Количество:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Сума:</translation>
     </message>
     <message>
         <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data.</source>
@@ -2408,10 +2284,6 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
     <message>
         <source>PRIVACY</source>
         <translation>КОНФИДЕНЦИАЛНОСТ</translation>
-    </message>
-    <message>
-        <source>Enter an amount of Wgr to convert to zWGR</source>
-        <translation>Въведете колко WGR  да се конвертират в zWGR</translation>
     </message>
     <message>
         <source>zWGR Control</source>
@@ -2454,23 +2326,11 @@ zWGR са узрели, тогава когато имат повече от 20 
         <translation>0 zWGR</translation>
     </message>
     <message>
-        <source>Security Level for Zerocoin Transactions. More is better, but needs more time and resources.</source>
-        <translation>Сигурност на Zerocoin Преводите. Повече - означава по-добра сигурност, но изисква повече време и ресурси.</translation>
-    </message>
-    <message>
-        <source>Security Level:</source>
-        <translation>Сигурност:</translation>
-    </message>
-    <message>
-        <source>Security Level 1 - 100 (default: 42)</source>
-        <translation>Ниво на Сигурност 1 - 100 (42 по подразбиране)</translation>
-    </message>
-    <message>
         <source>Pay &amp;To:</source>
         <translation>Плати На:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to. Creates local payment to yourself when empty.</source>
+        <source>The WAGERR address to send the payment to. Creates local payment to yourself when empty.</source>
         <translation>Адреса на който да изпратим плащането. Ако е празно - плащането е до себе си.</translation>
     </message>
     <message>
@@ -2729,32 +2589,10 @@ To change the percentage (no restart required):
         <translation>Състояние на монето-сечене: OK</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>Копирай количеството</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Копирай сумата</translation>
-    </message>
-    <message>
         <source>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware.
 Please be patient...</source>
         <translation>Стартиране на ResetMintZerocoin: сканираме цялия блокчейн, това ще изисква около 30 минути, в зависимост от вашия компютър.
 Моля изчакате...</translation>
-    </message>
-    <message>
-        <source>Spending Zerocoin.
-Computationally expensive, might need several minutes depending on the selected Security Level and your hardware.
-Please be patient...</source>
-        <translation>Харчене на Zerocoin.
-Математически скъп превод, който може да има нужда от няколко минути за потвърждение, в зависимост от избраното Ниво на Сигурност и Вашият хардуер.
-Моля проявете търпение...</translation>
-    </message>
-    <message>
-        <source>) needed.
-Maximum allowed: </source>
-        <translation>) нужни.
-Максимум позволени:</translation>
     </message>
     <message>
         <source>zWGR Spend #: </source>
@@ -2853,32 +2691,6 @@ Maximum allowed: </source>
         <translation>Деноминация. &lt;b&gt;5000&lt;/b&gt;:</translation>
     </message>
     <message>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Грешка: Портфейла е заключен. Моля първо въведете Вашата парола.</translation>
-    </message>
-    <message>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation>Съобщение: Въведете стойност &gt; 0.</translation>
-    </message>
-    <message>
-        <source>Minting </source>
-        <translation>Сечене</translation>
-    </message>
-    <message>
-        <source>Successfully minted </source>
-        <translation>Успешно изсечени</translation>
-    </message>
-    <message>
-        <source> zWGR in </source>
-        <translation>zWGR в</translation>
-    </message>
-    <message>
-        <source> sec. Used denominations:
-</source>
-        <translation>сек. Използвани деноминации:
-</translation>
-    </message>
-    <message>
         <source>Duration: </source>
         <translation>Времетраене:</translation>
     </message>
@@ -2898,7 +2710,7 @@ Maximum allowed: </source>
     </message>
     <message>
         <source>Invalid Wagerr Address</source>
-        <translation>Невалиден Wagerr адрес</translation>
+        <translation>Невалиден WAGERR адрес</translation>
     </message>
     <message>
         <source>Invalid Send Amount</source>
@@ -2921,43 +2733,16 @@ Maximum allowed: </source>
         <translation>на ново-генериран (неизползван до сега и поради това - анонимен) локален адрес &lt;br /&gt;</translation>
     </message>
     <message>
-        <source>with Security Level </source>
-        <translation>с Ниво на Сигурност</translation>
-    </message>
-    <message>
         <source>Confirm send coins</source>
         <translation>Потвърждаване на изпращането</translation>
-    </message>
-    <message>
-        <source>Version 1 zWGR require a security level of 100 to successfully spend.</source>
-        <translation>Версия 1 zWGR изисква ниво на сигурност от 100 за успешно изразходване.</translation>
-    </message>
-    <message>
-        <source>Failed to spend zWGR</source>
-        <translation>Неуспешно изразходване на zWGR</translation>
     </message>
     <message>
         <source>Failed to fetch mint associated with serial hash</source>
         <translation>Неуспешно извличане на мента, свързана със сериен хеш</translation>
     </message>
     <message>
-        <source>Too much inputs (</source>
-        <translation>Твърде много входящи (</translation>
-    </message>
-    <message>
-        <source>
-Either mint higher denominations (so fewer inputs are needed) or reduce the amount to spend.</source>
-        <translation>
-Или емитирайте по-големи деноминации (за да се ползват по малко входящи) или намалете сумата за плащане.</translation>
-    </message>
-    <message>
         <source>Spend Zerocoin failed with status = </source>
         <translation>Харченето на Zerocoin се провали със статус =</translation>
-    </message>
-    <message numerus="yes">
-        <source>PrivacyDialog</source>
-        <comment>Enter an amount of WGR to convert to zWGR</comment>
-        <translation><numerusform>PrivacyDialog</numerusform><numerusform>PrivacyDialog</numerusform></translation>
     </message>
     <message>
         <source>denomination: </source>
@@ -2993,14 +2778,17 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
 </context>
 <context>
+    <name>ProposalFrame</name>
+    </context>
+<context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
         <translation>Сума</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Задайте Wagerr адрес (например %1)</translation>
+        <source>Enter a WAGERR address (e.g. %1)</source>
+        <translation>Задайте WAGERR адрес (например %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -3042,7 +2830,11 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <source>%1 ms</source>
         <translation>%1 милисек.</translation>
     </message>
-</context>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Ядро</translation>
+    </message>
+    </context>
 <context>
     <name>QRImageWidget</name>
     <message>
@@ -3137,8 +2929,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Блокчейн</translation>
     </message>
     <message>
-        <source>Open the Wagerr debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Отвори Wagerr дебъг лог файла от сегашната папка. Това може да отнеме известно време за по-дълги файлове.</translation>
+        <source>Open the WAGERR debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Отвори WAGERR дебъг лог файла от сегашната папка. Това може да отнеме известно време за по-дълги файлове.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -3353,7 +3145,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Изходящи:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
+        <source>Welcome to the WAGERR RPC console.</source>
         <translation>Добре Дошли в RPC конзолата на WAGERR.</translation>
     </message>
     <message>
@@ -3403,10 +3195,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Confirm resync Blockchain</source>
         <translation>Потвърдете ресинх на Блокчейна</translation>
-    </message>
-    <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Използвайте стрелките за на доре и на долу, за да разгледате историята и &lt;b&gt;Ctrol-L&lt;/b&gt;за да изчистите екрана.</translation>
     </message>
     <message>
         <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
@@ -3480,16 +3268,20 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Незадължителен етикет, който да асоциираме с адреса за получаване.</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Съобщение свободен текст, което да се прикачи към платежното нареждане, за да бъде показано когато нареждането се отвори от клиента на когото е изпратено. Обърнете внимание, че съобщението няма да бъде изпратено заедно с плащането по Wagerr мрежата.</translation>
+        <source>A&amp;mount:</source>
+        <translation>Сума:</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Съобщение свободен текст, което да се прикачи към платежното нареждане, за да бъде показано когато нареждането се отвори от клиента на когото е изпратено. Обърнете внимание, че съобщението няма да бъде изпратено заедно с плащането по WAGERR мрежата.</translation>
     </message>
     <message>
         <source>RECEIVE</source>
         <translation>ПОЛУЧИ</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Съобщение свободен текст, което да се прикачи към платежното нареждане, за да бъде показано когато нареждането се отвори от клиента на когото е изпратено. &lt;br&gt;Обърнете внимание, че съобщението няма да бъде изпратено заедно с плащането по Wagerr мрежата.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Съобщение свободен текст, което да се прикачи към платежното нареждане, за да бъде показано когато нареждането се отвори от клиента на когото е изпратено. &lt;br&gt;Обърнете внимание, че съобщението няма да бъде изпратено заедно с плащането по WAGERR мрежата.</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
@@ -3502,10 +3294,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
         <translation>Незадължителна сума за поискване. Оставете полето празно или напишете нула, за да не изисквате определена сума.</translation>
-    </message>
-    <message>
-        <source>&amp;Amount:</source>
-        <translation>&amp;Сума:</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
@@ -3550,6 +3338,10 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Copy amount</source>
         <translation>Копирай сумата</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Копирай адрес</translation>
     </message>
 </context>
 <context>
@@ -3620,6 +3412,10 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Message</source>
         <translation>Съобщение</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Адрес</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -3781,7 +3577,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Ако собствената такса е настроена на 1000 uWGR и превода е само 250 байта, то тогава "за килобайт" само плаща 250 uWGR входяща такса,&lt;br /&gt; докато "минимална сума" плаща 1000 uWGR. За транзакции по-големи от килобайт, и двете плащат за килобайт.</translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for Wagerr transactions than the network can process.</source>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for WAGERR transactions than the network can process.</source>
         <translation>Няма проблем да платите минималната такса, стига обема преводи да е по-малък от наличното място в блоковете. &lt;br /&gt;Но имайте впредвид, че това може да се окаже в превод, който никога не получава потвърждение ако заявките за преводи са повече от колкото мрежата може да понесе.</translation>
     </message>
     <message>
@@ -3877,7 +3673,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Инструмента за разделяне на блока не работи, когато се изпраща до няколко адреса едновременно. Опитайте пак.</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
+        <source>Warning: Invalid WAGERR address</source>
         <translation>Предупреждение: Невалиден WGR адрес</translation>
     </message>
     <message>
@@ -3903,10 +3699,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
         <translation>Такса %1 пъти по-голяма от %2 за кБ се счита неразумно голяма такса.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Estimated to begin confirmation within %n block(s).</source>
-        <translation><numerusform>Очаквано начало на потвърждения след %n блока.</numerusform><numerusform>Очаквано начало на потвърждения след %n блока.</numerusform></translation>
     </message>
     <message>
         <source>The recipient address is not valid, please recheck.</source>
@@ -3980,7 +3772,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Плати На:</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
+        <source>The WAGERR address to send the payment to</source>
         <translation>WAGERR адреса - получател на плащането</translation>
     </message>
     <message>
@@ -4020,8 +3812,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Съобщение:</translation>
     </message>
     <message>
-        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Wagerr network.</source>
-        <translation>Съобщение, което е било прикачено към WAGERR:URI и което ще бъде запазено заедно с превода за ваша информация. Внимание: Това съобщение е само за Вас, то няма да бъде изпратено по Wagerr мрежата.</translation>
+        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the WAGERR network.</source>
+        <translation>Съобщение, което е било прикачено към WAGERR:URI и което ще бъде запазено заедно с превода за ваша информация. Внимание: Това съобщение е само за Вас, то няма да бъде изпратено по WAGERR мрежата.</translation>
     </message>
     <message>
         <source>This is an unverified payment request.</source>
@@ -4047,8 +3839,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
-        <translation>Изключване на Wagerr Ядрото...</translation>
+        <source>WAGERR Core is shutting down...</source>
+        <translation>Изключване на WAGERR Ядрото...</translation>
     </message>
     <message>
         <source>Do not shut down the computer until this window disappears.</source>
@@ -4070,7 +3862,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Може да подписвате съобщения с Вашите адреси, за да докажете че сте техен притежател. Внимавайте да не подписвате нищо съмнително, тъй като има хакерски атаки, които целят да придобият вашата самоличност. Само подписвайте пълен и ясен текст, с който сте напълно съгласни.</translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
+        <source>The WAGERR address to sign the message with</source>
         <translation>WAGERR адреса, с който да подпишете съобщението</translation>
     </message>
     <message>
@@ -4102,16 +3894,16 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Копирай сегашния подпис в системния буфер</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Подпишете съобщението, за да докажете, че притежавате този Wagerr адрес</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Подпишете съобщението, за да докажете, че притежавате този WAGERR адрес</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
+        <source>The WAGERR address the message was signed with</source>
         <translation>WAGERR адреса, който е подписано съобщението</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Поверете съобщението, за да се уверите, че е подписано със зададения Wagerr адрес</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Поверете съобщението, за да се уверите, че е подписано със зададения WAGERR адрес</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -4197,7 +3989,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR Ядро</translation>
     </message>
     <message>
@@ -4213,8 +4005,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Dash Core разработчици</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
-        <translation>Wagerr Core разработчици</translation>
+        <source>The WAGERR Core developers</source>
+        <translation>WAGERR Core разработчици</translation>
     </message>
     <message>
         <source>[testnet]</source>
@@ -4230,10 +4022,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 </context>
 <context>
     <name>TransactionDesc</name>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Отворен за още %n блока</numerusform><numerusform>Отворен за още %n блока</numerusform></translation>
-    </message>
     <message>
         <source>Open until %1</source>
         <translation>Отворен до %1</translation>
@@ -4294,10 +4082,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <source>, has not been successfully broadcast yet</source>
         <translation>, все още неуспешно обявени</translation>
     </message>
-    <message numerus="yes">
-        <source>, broadcast through %n node(s)</source>
-        <translation><numerusform>, обявени през %n възела</numerusform><numerusform>, обявени през %n нода</numerusform></translation>
-    </message>
     <message>
         <source>Date</source>
         <translation>Дата</translation>
@@ -4337,10 +4121,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Credit</source>
         <translation>Кредит</translation>
-    </message>
-    <message numerus="yes">
-        <source>matures in %n more block(s)</source>
-        <translation><numerusform>узрява след още %n блока</numerusform><numerusform>узрява след още %n блока</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
@@ -4439,10 +4219,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Address</source>
         <translation>Адрес</translation>
-    </message>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Отворен за още %n блока</numerusform><numerusform>Отворен за още %n блока</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -4825,7 +4601,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
 </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>Select zWGR to Spend</source>
         <translation>Изберете zWGR за Изпращане</translation>
@@ -4846,11 +4622,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <source>Select/Deselect All</source>
         <translation>Избери/Премахни Всички</translation>
     </message>
-    <message>
-        <source>Is Spendable</source>
-        <translation>В Налични за харечене</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>wagerr-core</name>
     <message>
@@ -4878,8 +4650,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Изчисления чекпойнт на акумулатора не е същия като записания в блок индекса.</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Wagerr Core is probably already running.</source>
-        <translation>Не може да заключи папката с данни %s. Wagerr Портфейла вероятно вече е стартиран.</translation>
+        <source>Cannot obtain a lock on data directory %s. WAGERR Core is probably already running.</source>
+        <translation>Не може да заключи папката с данни %s. WAGERR Портфейла вероятно вече е стартиран.</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
@@ -4904,6 +4676,10 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Distributed under the MIT software license, see the accompanying file COPYING or &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</source>
         <translation>Разпространява се пот MIT софтуерен лиценз, виж съпровождащия файл от &lt;http://www.opensource.org/licenses/mit-license.php&gt;.</translation>
+    </message>
+    <message>
+        <source>Enable automatic wallet backups triggered after each zWGR minting (0-1, default: %u)</source>
+        <translation>Включи автоматичните бекъпи на портфейла след всяко zWGR емитиране (0-1, по подразбиране: %u)</translation>
     </message>
     <message>
         <source>Enable or disable staking functionality for WGR inputs (0-1, default: %u)</source>
@@ -4956,10 +4732,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
         <translation>Изпразни паметта за дейности по базата данни в лог файл на диска на всеки &lt;n&gt; мегабайта (default: %u)</translation>
-    </message>
-    <message>
-        <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
-        <translation>Намерени са непотвърдени деноминации, ще изчакаме докато се потвърдят преди да продължим.</translation>
     </message>
     <message>
         <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
@@ -5050,20 +4822,20 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Този продукт включва софтуер разработен от OpenSSL Project &lt;https://www.openssl.org/&gt; и крипто софтуер написан от Ерик Юнг и UPnP софтуер от Томас Бернард.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Wagerr Core is probably already running.</source>
-        <translation>Не може да се прикачи към %s на този компютър. Wagerr Портфейла вероятно вече е стартиран.</translation>
+        <source>Unable to bind to %s on this computer. WAGERR Core is probably already running.</source>
+        <translation>Не може да се прикачи към %s на този компютър. WAGERR Портфейла вероятно вече е стартиран.</translation>
     </message>
     <message>
         <source>Unable to locate enough Obfuscation denominated funds for this transaction.</source>
         <translation>Не намираме достатъчно Обфускационно деноминирани средства за този превод.</translation>
     </message>
     <message>
-        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 25000 WGR.</source>
-        <translation>Не можем да намерим достатъчно Обфускационно не-деноминирани средства за този превод, които да не са равни на 25000 WGR.</translation>
+        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 WGR.</source>
+        <translation>Не можем да намерим достатъчно Обфускационно не-деноминирани средства за този превод, които да не са равни на 10000 WGR.</translation>
     </message>
     <message>
-        <source>Unable to locate enough funds for this transaction that are not equal 25000 WGR.</source>
-        <translation>Не намираме достатъчно средства за този превод, които да не са равни на 25000 WGR.</translation>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 WGR.</source>
+        <translation>Не намираме достатъчно средства за този превод, които да не са равни на 10000 WGR.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -5078,8 +4850,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Внимание: -paytxfee е зададена твърде голяма! Това е преводната такса, която ще платите ако изпратите този превод.</translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.</source>
-        <translation>Внимание: Проверете дали датата и часа на компютъра са верни! Ако Вашият часовник греши, Wagerr Портфейла няма да работи правилно.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong WAGERR Core will not work properly.</source>
+        <translation>Внимание: Проверете дали датата и часа на компютъра са верни! Ако Вашият часовник греши, WAGERR Портфейла няма да работи правилно.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5146,10 +4918,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Позволявай DNS запитвания за -addnote, -seednode и -connect</translation>
     </message>
     <message>
-        <source>Already have that input.</source>
-        <translation>Този въвод вече съществува.</translation>
-    </message>
-    <message>
         <source>Always query for peer addresses via DNS lookup (default: %u)</source>
         <translation>Винаги извършвай запитване за пиъри посредствим DNS търсене (по подразбиране: %u)</translation>
     </message>
@@ -5170,18 +4938,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Изчислява липсващите акумулатори...</translation>
     </message>
     <message>
-        <source>Can't denominate: no compatible inputs left.</source>
-        <translation>Не може да деноминира: не са останали съвместими входящи.</translation>
-    </message>
-    <message>
-        <source>Can't find random Masternode.</source>
-        <translation>Не откривам случан Главен възел.</translation>
-    </message>
-    <message>
-        <source>Can't mix while sync in progress.</source>
-        <translation>Не може да се миксира по време на синхронизация.</translation>
-    </message>
-    <message>
         <source>Cannot downgrade wallet</source>
         <translation>Променяне софтуерната версия на портфейла към по-ниска е невъзможно.</translation>
     </message>
@@ -5200,10 +4956,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Cannot write default address</source>
         <translation>Не можем да запишем адреса по подразбиране</translation>
-    </message>
-    <message>
-        <source>Collateral not valid.</source>
-        <translation>Гаранцията е невалидна.</translation>
     </message>
     <message>
         <source>Connect only to the specified node(s)</source>
@@ -5234,8 +4986,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Всички права запазени (c) 2015-%i PIVX Core разработчици</translation>
     </message>
     <message>
-        <source>Copyright (C) %i The Wagerr Core Developers</source>
-        <translation>Всички права запазени (c) %i Wagerr Core разработчици</translation>
+        <source>Copyright (C) 2018-%i The WAGERR Core Developers</source>
+        <translation>Всички права запазени (c) 2018-%i WAGERR Core разработчици</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5294,14 +5046,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Вкл. клиента да действа като влаген възел (0-1, по подразбиране: %u)</translation>
     </message>
     <message>
-        <source>Entries are full.</source>
-        <translation>Запълнени полета.</translation>
-    </message>
-    <message>
-        <source>Error connecting to Masternode.</source>
-        <translation>Грешка при свързването с Главен възел.</translation>
-    </message>
-    <message>
         <source>Error initializing block database</source>
         <translation>Грешка при стартирането на блок базата данни</translation>
     </message>
@@ -5322,7 +5066,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Грешка в зареждането на wallet.dat: Портфейла е повреден</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Wagerr Core</source>
+        <source>Error loading wallet.dat: Wallet requires newer version of WAGERR Core</source>
         <translation>Грешка в зареждането на wallet.dat: Портфейла изисква по-нова версия</translation>
     </message>
     <message>
@@ -5346,10 +5090,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Грешка: Фатална вътрешна грешка, вижте debug.log за повече подробности.</translation>
     </message>
     <message>
-        <source>Error: Can't select current denominated inputs</source>
-        <translation>Грешка: Така зададените деноминации не могат да бъдат избрани</translation>
-    </message>
-    <message>
         <source>Error: Disk space is low!</source>
         <translation>Грешка: Намаляващо Дисково пространство!</translation>
     </message>
@@ -5360,10 +5100,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Error: Wallet locked, unable to create transaction!</source>
         <translation>Грешка: Портфейла е заключен, неуспешен превод!</translation>
-    </message>
-    <message>
-        <source>Error: You already have pending entries in the Obfuscation pool</source>
-        <translation>Грешка: Вече имате изчакващи входящи в басейна за Обфускация</translation>
     </message>
     <message>
         <source>Failed to calculate accumulator checkpoint</source>
@@ -5382,20 +5118,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Такса (в WGR/kB), която да се добави към изходящи преводи (по подразбиране: %s)</translation>
     </message>
     <message>
-        <source>Finalizing transaction.</source>
-        <translation>Приключване на превода.</translation>
-    </message>
-    <message>
         <source>Force safe mode (default: %u)</source>
         <translation>Предизвикай безопасен режим (по подразбиране: %u)</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ( waiting %s )</source>
-        <translation>Имаме достатъчно потребители, подписване ( изчаква %s )</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ...</source>
-        <translation>Имаме достатучно потребители, подписване ...</translation>
     </message>
     <message>
         <source>Generate coins (default: %u)</source>
@@ -5422,14 +5146,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Включи и IP адресите при дебъг (по подразбиране: %u)</translation>
     </message>
     <message>
-        <source>Incompatible mode.</source>
-        <translation>Несъвместим режим.</translation>
-    </message>
-    <message>
-        <source>Incompatible version.</source>
-        <translation>Несъвместима версия.</translation>
-    </message>
-    <message>
         <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
         <translation>Няма намерен генезис блок или намерения е несъвместим. Грешен datadlr за мрежата?</translation>
     </message>
@@ -5438,12 +5154,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Информация</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Wagerr Core is shutting down.</source>
+        <source>Initialization sanity check failed. WAGERR Core is shutting down.</source>
         <translation>Стартирането на проверка на здравословното състояние на портфейла се провали. Изключваме Портфейла.</translation>
-    </message>
-    <message>
-        <source>Input is not valid.</source>
-        <translation>Зададените стойности са невалидни.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -5502,10 +5214,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Грешен личен ключ.</translation>
     </message>
     <message>
-        <source>Invalid script detected.</source>
-        <translation>Невалиден скрипт, засечен.</translation>
-    </message>
-    <message>
         <source>Percentage of automatically minted Zerocoin  (1-100, default: %u)</source>
         <translation>Процент автоматично емитирани Zerocoin (1-100, по подразбиране: %u)</translation>
     </message>
@@ -5550,8 +5258,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 </translation>
     </message>
     <message>
-        <source>Disable all Wagerr specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
-        <translation>Изключи Wagerr специфичната функционалност (Главни възли, Zerocoin, SwiftX, Бюджетиране) (0-1, po podrazbirane: %u)</translation>
+        <source>Disable all WAGERR specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
+        <translation>Изключи WAGERR специфичната функционалност (Главни възли, Zerocoin, SwiftX, Бюджетиране) (0-1, po podrazbirane: %u)</translation>
     </message>
     <message>
         <source>Enable SwiftX, show confirmations for locked transactions (bool, default: %s)</source>
@@ -5650,10 +5358,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Неуспешно емитиране</translation>
     </message>
     <message>
-        <source>Failed to deserialize</source>
-        <translation>Неуспешно изтриване на серийния номер</translation>
-    </message>
-    <message>
         <source>Failed to find Zerocoins in wallet.dat</source>
         <translation>Няма намерени Zerocoin монети в wallet.dat файла</translation>
     </message>
@@ -5672,14 +5376,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</source>
         <translation>Пази най-много &lt;n&gt; несвързани превода в паметта (по подразбиране: %u)</translation>
-    </message>
-    <message>
-        <source>Last Obfuscation was too recent.</source>
-        <translation>Последната обфускация бе твърде скоро.</translation>
-    </message>
-    <message>
-        <source>Last successful Obfuscation action was too recent.</source>
-        <translation>Последното действие по Обфускация е било твърде скоро.</translation>
     </message>
     <message>
         <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
@@ -5734,10 +5430,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Местоположение на оторизационната бисквитка (по подразбиране: data dir)</translation>
     </message>
     <message>
-        <source>Lock is already in place.</source>
-        <translation>Вече е заключен.</translation>
-    </message>
-    <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
         <translation>Заключи главен възел от конфигурационния файл (по подразбиране: %u)</translation>
     </message>
@@ -5754,14 +5446,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Опции за Главни възли</translation>
     </message>
     <message>
-        <source>Masternode queue is full.</source>
-        <translation>Опашката за Главни възли е пълна.</translation>
-    </message>
-    <message>
-        <source>Masternode:</source>
-        <translation>Главен Възел:</translation>
-    </message>
-    <message>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: %u)</source>
         <translation>Максимум буфер за Получаване, за връзка, &lt;n&gt;*1000 байта (по подразбиране: %u)</translation>
     </message>
@@ -5774,14 +5458,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Емисията не успя да се включи в блокчейна</translation>
     </message>
     <message>
-        <source>Missing input transaction information.</source>
-        <translation>Липсваща вх. информация за превода.</translation>
-    </message>
-    <message>
-        <source>Mixing in progress...</source>
-        <translation>В момента тече смесване...</translation>
-    </message>
-    <message>
         <source>Need address because change is not exact</source>
         <translation>Необходим е адрес, понеже рестото не е кръгла сума</translation>
     </message>
@@ -5790,40 +5466,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Нужно е да се зададе порт с -whitebind: '%s'</translation>
     </message>
     <message>
-        <source>No Masternodes detected.</source>
-        <translation>Не се засичат Мастърноудове.</translation>
-    </message>
-    <message>
-        <source>No compatible Masternode found.</source>
-        <translation>Не е намерен съвместим Мастърноуд.</translation>
-    </message>
-    <message>
-        <source>No funds detected in need of denominating.</source>
-        <translation>Не засякохме средства, които да имат нужда от деноминация.</translation>
-    </message>
-    <message>
-        <source>No matching denominations found for mixing.</source>
-        <translation>Не намерихме съвпадащи деноминации за смесване.</translation>
-    </message>
-    <message>
         <source>Node relay options:</source>
         <translation>Опции на възел релето:</translation>
     </message>
     <message>
-        <source>Non-standard public key detected.</source>
-        <translation>Засякохме нестандартен публичен ключ.</translation>
-    </message>
-    <message>
-        <source>Not compatible with existing transactions.</source>
-        <translation>Несъвместимост със съществуващите преводи.</translation>
-    </message>
-    <message>
         <source>Not enough file descriptors available.</source>
         <translation>Недостатъчно налични файл описания.</translation>
-    </message>
-    <message>
-        <source>Not in the Masternode list.</source>
-        <translation>Не е в списъка с Главни възли.</translation>
     </message>
     <message>
         <source>Number of automatic wallet backups (default: 10)</source>
@@ -5832,18 +5480,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Number of custom location backups to retain (default: %d)</source>
         <translation>Брой запазени резервни копия за местоположението (по подразбиране: %d)</translation>
-    </message>
-    <message>
-        <source>Obfuscation is idle.</source>
-        <translation>Обфускацията е в режим на изчакване.</translation>
-    </message>
-    <message>
-        <source>Obfuscation request complete:</source>
-        <translation>Обфускацията приключи.</translation>
-    </message>
-    <message>
-        <source>Obfuscation request incomplete:</source>
-        <translation>Обфускацията не успя да приключи.</translation>
     </message>
     <message>
         <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
@@ -5936,10 +5572,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Send transactions as zero-fee transactions if possible (default: %u)</source>
         <translation>Ако е възможно, изпращай транзакциите като нулево-таксуван превод (по подразбиране: %u)</translation>
-    </message>
-    <message>
-        <source>Session not complete!</source>
-        <translation>Недовърешна сесия!</translation>
     </message>
     <message>
         <source>Session timed out.</source>
@@ -6046,18 +5678,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Изключи се след импортирането на блоквоете от диска (default: %u)</translation>
     </message>
     <message>
-        <source>Submitted following entries to masternode: %u / %d</source>
-        <translation>Следните са изпратени до главния възел: %u / %d</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation>Изпратени до главния възел, чакаме още ( %u %d ) %s</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>Изпратено до главния възел, чака си реда %s</translation>
-    </message>
-    <message>
         <source>Synchronization failed</source>
         <translation>Неуспешна синхронизация</translation>
     </message>
@@ -6094,14 +5714,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Монетното плащане е използвано</translation>
     </message>
     <message>
-        <source>The new spend coin transaction did not verify</source>
-        <translation>Новото преводно плащане не бе потвърдено</translation>
-    </message>
-    <message>
-        <source>The selected mint coin is an invalid coin</source>
-        <translation>Избраната емисия е невалидна монета</translation>
-    </message>
-    <message>
         <source>The transaction did not verify</source>
         <translation>Превода не бе потвърден</translation>
     </message>
@@ -6116,10 +5728,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>This is intended for regression testing tools and app development.</source>
         <translation>Това е за регресионен тест и софтуерна разработка.</translation>
-    </message>
-    <message>
-        <source>This is not a Masternode.</source>
-        <translation>Това не е Главен Възел.</translation>
     </message>
     <message>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
@@ -6154,18 +5762,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Преводните суми трябва да са положително число</translation>
     </message>
     <message>
-        <source>Transaction created successfully.</source>
-        <translation>Превода е създаден успешно</translation>
-    </message>
-    <message>
-        <source>Transaction fees are too high.</source>
-        <translation>Преводните таски са твърде високи.</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>Превода е невалиден.</translation>
-    </message>
-    <message>
         <source>Transaction too large for fee policy</source>
         <translation>Твърде голям превод за таксионната политика</translation>
     </message>
@@ -6174,24 +5770,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Твърде голям превод</translation>
     </message>
     <message>
-        <source>Transmitting final transaction.</source>
-        <translation>Изпращане на последния превод.</translation>
-    </message>
-    <message>
-        <source>Try to spend with a higher security level to include more coins</source>
-        <translation>Опитайте да платите с по-високо ниво на сигурност, за да включите повече монети.</translation>
-    </message>
-    <message>
         <source>Trying to spend an already spent serial #, try again.</source>
         <translation>Опитвате се да похарчите, вече похарчен сериен номер. Опитайте отново.</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
         <translation>Не можем да прикачим %s към този компютър (прикачването даде грешка %s)</translation>
-    </message>
-    <message>
-        <source>Unable to find transaction containing mint</source>
-        <translation>Не можем да намерим превод, който съдържа емисията</translation>
     </message>
     <message>
         <source>Unable to sign spork message, wrong key?</source>
@@ -6204,10 +5788,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
         <translation>Непозната мрежа е зададена в -onlynet: '%s'</translation>
-    </message>
-    <message>
-        <source>Unknown state: id = %u</source>
-        <translation>Непознато състояние: id = %u</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
@@ -6238,10 +5818,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Стойността е под най-малката налична деноминация (= 1) в zWGR</translation>
     </message>
     <message>
-        <source>Value more than Obfuscation pool maximum allows.</source>
-        <translation>Стойността е по-голяма от позволената от басейна Обфускация.</translation>
-    </message>
-    <message>
         <source>Verifying blocks...</source>
         <translation>Проверява блоковете...</translation>
     </message>
@@ -6250,19 +5826,11 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Проверява портфейла...</translation>
     </message>
     <message>
-        <source>Version 1 zWGR require a security level of 100 to successfully spend.</source>
-        <translation>Версия 1 zWGR изисква ниво на сигурност от 100 за успешно изразходване.</translation>
-    </message>
-    <message>
         <source>Wallet %s resides outside data directory %s</source>
         <translation>Портфейла %s е извън папката с данни %s</translation>
     </message>
     <message>
-        <source>Wallet is locked.</source>
-        <translation>Портфейла е заключен.</translation>
-    </message>
-    <message>
-        <source>Wallet needed to be rewritten: restart Wagerr Core to complete</source>
+        <source>Wallet needed to be rewritten: restart WAGERR Core to complete</source>
         <translation>Портфейла трябва да се пренапише: рестартирайте програмата за завършване на процеса</translation>
     </message>
     <message>
@@ -6290,24 +5858,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Внимание: Неподдържанния аргумент -debugnet бе игнориран, използвайте -debug=net.</translation>
     </message>
     <message>
-        <source>Will retry...</source>
-        <translation>Ще опита...</translation>
-    </message>
-    <message>
         <source>You don't have enough Zerocoins in your wallet</source>
         <translation>Нямате достатъчно Zerocoin в портфейла си</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation>Трябва да построите базата данни наново, използвайки -reindex вместо -txindex</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>Въведени успешно.</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation>Превода е приет в басейна!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>

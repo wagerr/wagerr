@@ -608,10 +608,6 @@
         <source>&amp;Command-line options</source>
         <translation>&amp;Command-line options</translation>
     </message>
-    <message numerus="yes">
-        <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>Processed %n block of transaction history.</numerusform><numerusform>Processed %n blocks of transaction history.</numerusform></translation>
-    </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
         <translation>Synchronising additional data: %p%</translation>
@@ -740,10 +736,6 @@
         <source>WAGERR Core client</source>
         <translation>WAGERR Core client</translation>
     </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to WAGERR network</source>
-        <translation><numerusform>%n active connection(s) to WAGERR network</numerusform><numerusform>%n active connection(s) to WAGERR network</numerusform></translation>
-    </message>
     <message>
         <source>Synchronizing with network...</source>
         <translation>Synchronising with network...</translation>
@@ -764,25 +756,9 @@
         <source>Up to date</source>
         <translation>Up to date</translation>
     </message>
-    <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation><numerusform>%n hour</numerusform><numerusform>%n hours</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s)</source>
-        <translation><numerusform>%n day</numerusform><numerusform>%n days</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation><numerusform>%n week</numerusform><numerusform>%n weeks</numerusform></translation>
-    </message>
     <message>
         <source>%1 and %2</source>
         <translation>%1 and %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation><numerusform>%n year</numerusform><numerusform>%n years</numerusform></translation>
     </message>
     <message>
         <source>Catching up...</source>
@@ -1803,73 +1779,6 @@ Please be patient after clicking import.</translation>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Configure Obfuscation</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Basic Privacy</translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>High Privacy</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Maximum Privacy</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Please select a privacy level.</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 10000 WGR</source>
-        <translation>Use 2 separate masternodes to mix funds up to 10000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 10000 WGR</source>
-        <translation>Use 8 separate masternodes to mix funds up to 10000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>Use 16 separate masternodes</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 10000 WGR</source>
-        <translation>This option is the quickest and will cost about ~0.025 WGR to anonymise 10000 WGR</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 10000 WGR</source>
-        <translation>This option is moderately fast and will cost about 0.05 WGR to anonymise 10000 WGR</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>This is the slowest and most secure option. Using maximum anonymity will cost</translation>
-    </message>
-    <message>
-        <source>0.1 WGR per 10000 WGR you anonymize.</source>
-        <translation>0.1 WGR per 10000 WGR you anonymise.</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Obfuscation Configuration</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</translation>
-    </message>
-</context>
-<context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
@@ -1984,9 +1893,9 @@ Please be patient after clicking import.</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr-project/wagerr-project-translations</source>
+https://www.transifex.com/wagerr/wagerr</source>
         <translation>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr-project/wagerr-project-translations</translation>
+https://www.transifex.com/wagerr/wagerr</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -2071,10 +1980,6 @@ https://www.transifex.com/wagerr-project/wagerr-project-translations</translatio
     <message>
         <source>User Interface Theme:</source>
         <translation>User Interface Theme:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>&amp;Unit to show amounts in:</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
@@ -2447,36 +2352,12 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</source>
-        <translation>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</translation>
-    </message>
-    <message>
-        <source>Available for Minting:</source>
-        <translation>Available for Minting:</translation>
-    </message>
-    <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</source>
         <translation>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</translation>
     </message>
     <message>
         <source>Reset</source>
         <translation>Reset</translation>
-    </message>
-    <message>
-        <source>Coin Control...</source>
-        <translation>Coin Control...</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Quantity:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Amount:</translation>
     </message>
     <message>
         <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data.</source>
@@ -2493,10 +2374,6 @@ To enable AutoMint change 'enablezeromint=0' to 'enablezeromint=1' in wagerr.con
     <message>
         <source>PRIVACY</source>
         <translation>PRIVACY</translation>
-    </message>
-    <message>
-        <source>Enter an amount of Wgr to convert to zWGR</source>
-        <translation>Enter an amount of Wgr to convert to zWGR</translation>
     </message>
     <message>
         <source>zWGR Control</source>
@@ -2815,24 +2692,10 @@ To change the percentage (no restart required):
         <translation>Mint Status: Okay</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>Copy quantity</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Copy amount</translation>
-    </message>
-    <message>
         <source>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware.
 Please be patient...</source>
         <translation>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware.
 Please be patient...</translation>
-    </message>
-    <message>
-        <source>) needed.
-Maximum allowed: </source>
-        <translation>) needed.
-Maximum allowed: </translation>
     </message>
     <message>
         <source>zWGR Spend #: </source>
@@ -2931,32 +2794,6 @@ Maximum allowed: </translation>
         <translation>Denom. &lt;b&gt;5000&lt;/b&gt;:</translation>
     </message>
     <message>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Error: Your wallet is locked. Please enter the wallet passphrase first.</translation>
-    </message>
-    <message>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation>Message: Enter an amount &gt; 0.</translation>
-    </message>
-    <message>
-        <source>Minting </source>
-        <translation>Minting </translation>
-    </message>
-    <message>
-        <source>Successfully minted </source>
-        <translation>Successfully minted </translation>
-    </message>
-    <message>
-        <source> zWGR in </source>
-        <translation> zWGR in </translation>
-    </message>
-    <message>
-        <source> sec. Used denominations:
-</source>
-        <translation> sec. Used denominations:
-</translation>
-    </message>
-    <message>
         <source>Duration: </source>
         <translation>Duration: </translation>
     </message>
@@ -3007,23 +2844,8 @@ Maximum allowed: </translation>
         <translation>Failed to fetch mint associated with serial hash</translation>
     </message>
     <message>
-        <source>Too much inputs (</source>
-        <translation>Too much inputs (</translation>
-    </message>
-    <message>
-        <source>
-Either mint higher denominations (so fewer inputs are needed) or reduce the amount to spend.</source>
-        <translation>
-Either mint higher denominations (so fewer inputs are needed) or reduce the amount to spend.</translation>
-    </message>
-    <message>
         <source>Spend Zerocoin failed with status = </source>
         <translation>Spend Zerocoin failed with status = </translation>
-    </message>
-    <message numerus="yes">
-        <source>PrivacyDialog</source>
-        <comment>Enter an amount of WGR to convert to zWGR</comment>
-        <translation><numerusform>PrivacyDialog</numerusform><numerusform>PrivacyDialog</numerusform></translation>
     </message>
     <message>
         <source>denomination: </source>
@@ -4005,10 +3827,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
         <translation>A fee %1 times higher than %2 per kB is considered an insanely high fee.</translation>
     </message>
-    <message numerus="yes">
-        <source>Estimated to begin confirmation within %n block(s).</source>
-        <translation><numerusform>Estimated to begin confirmation within %n block.</numerusform><numerusform>Estimated to begin confirmation within %n blocks.</numerusform></translation>
-    </message>
     <message>
         <source>The recipient address is not valid, please recheck.</source>
         <translation>The recipient address is not valid, please recheck.</translation>
@@ -4335,10 +4153,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
 </context>
 <context>
     <name>TransactionDesc</name>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Open for %n more block</numerusform><numerusform>Open for %n more blocks</numerusform></translation>
-    </message>
     <message>
         <source>Open until %1</source>
         <translation>Open until %1</translation>
@@ -4399,10 +4213,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <source>, has not been successfully broadcast yet</source>
         <translation>, has not been successfully broadcast yet</translation>
     </message>
-    <message numerus="yes">
-        <source>, broadcast through %n node(s)</source>
-        <translation><numerusform>, broadcast through %n node</numerusform><numerusform>, broadcast through %n nodes</numerusform></translation>
-    </message>
     <message>
         <source>Date</source>
         <translation>Date</translation>
@@ -4442,10 +4252,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Credit</source>
         <translation>Credit</translation>
-    </message>
-    <message numerus="yes">
-        <source>matures in %n more block(s)</source>
-        <translation><numerusform>matures in %n more block</numerusform><numerusform>matures in %n more blocks</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
@@ -4544,10 +4350,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Address</source>
         <translation>Address</translation>
-    </message>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Open for %n more block</numerusform><numerusform>Open for %n more blocks</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -4934,7 +4736,7 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     </message>
 </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>Select zWGR to Spend</source>
         <translation>Select zWGR to Spend</translation>
@@ -5065,10 +4867,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
         <translation>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</translation>
-    </message>
-    <message>
-        <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
-        <translation>Found unconfirmed denominated outputs, will wait till they confirm to continue.</translation>
     </message>
     <message>
         <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
@@ -5223,8 +5021,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>You must specify a masternodeprivkey in the configuration. Please see documentation for help.</translation>
     </message>
     <message>
-        <source>(51472 could be used only on mainnet)</source>
-        <translation>(51472 could be used only on mainnet)</translation>
+        <source>(55002 could be used only on mainnet)</source>
+        <translation>(55002 could be used only on mainnet)</translation>
     </message>
     <message>
         <source>(default: %s)</source>
@@ -5235,8 +5033,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>(default: 1)</translation>
     </message>
     <message>
-        <source>(must be 51472 for mainnet)</source>
-        <translation>(must be 51472 for mainnet)</translation>
+        <source>(must be 55002 for mainnet)</source>
+        <translation>(must be 55002 for mainnet)</translation>
     </message>
     <message>
         <source>Accept command line and JSON-RPC commands</source>
@@ -5257,10 +5055,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Allow DNS lookups for -addnode, -seednode and -connect</source>
         <translation>Allow DNS lookups for -addnode, -seednode and -connect</translation>
-    </message>
-    <message>
-        <source>Already have that input.</source>
-        <translation>Already have that input.</translation>
     </message>
     <message>
         <source>Always query for peer addresses via DNS lookup (default: %u)</source>
@@ -5287,18 +5081,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Calculating missing accumulators...</translation>
     </message>
     <message>
-        <source>Can't denominate: no compatible inputs left.</source>
-        <translation>Can't denominate: no compatible inputs left.</translation>
-    </message>
-    <message>
-        <source>Can't find random Masternode.</source>
-        <translation>Can't find random Masternode.</translation>
-    </message>
-    <message>
-        <source>Can't mix while sync in progress.</source>
-        <translation>Can't mix while sync in progress.</translation>
-    </message>
-    <message>
         <source>Cannot downgrade wallet</source>
         <translation>Cannot downgrade wallet</translation>
     </message>
@@ -5317,10 +5099,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Cannot write default address</source>
         <translation>Cannot write default address</translation>
-    </message>
-    <message>
-        <source>Collateral not valid.</source>
-        <translation>Collateral not valid.</translation>
     </message>
     <message>
         <source>Connect only to the specified node(s)</source>
@@ -5347,8 +5125,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Copyright (C) 2014-%i The Dash Core Developers</translation>
     </message>
     <message>
-        <source>Copyright (C) 2015-%i The WAGERR Core Developers</source>
-        <translation>Copyright (C) 2015-%i The WAGERR Core Developers</translation>
+        <source>Copyright (C) 2015-%i The PIVX Core Developers</source>
+        <translation>Copyright (C) 2015-%i The PIVX Core Developers</translation>
+    </message>
+    <message>
+        <source>Copyright (C) 2018-%i The WAGERR Core Developers</source>
+        <translation>Copyright (C) 2018-%i The WAGERR Core Developers</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5407,14 +5189,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Enable the client to act as a masternode (0-1, default: %u)</translation>
     </message>
     <message>
-        <source>Entries are full.</source>
-        <translation>Entries are full.</translation>
-    </message>
-    <message>
-        <source>Error connecting to Masternode.</source>
-        <translation>Error connecting to Masternode.</translation>
-    </message>
-    <message>
         <source>Error initializing block database</source>
         <translation>Error initialising block database</translation>
     </message>
@@ -5463,10 +5237,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Error: A fatal internal error occurred, see debug.log for details</translation>
     </message>
     <message>
-        <source>Error: Can't select current denominated inputs</source>
-        <translation>Error: Can't select current denominated inputs</translation>
-    </message>
-    <message>
         <source>Error: Disk space is low!</source>
         <translation>Error: Disk space is low!</translation>
     </message>
@@ -5477,10 +5247,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Error: Wallet locked, unable to create transaction!</source>
         <translation>Error: Wallet locked, unable to create transaction!</translation>
-    </message>
-    <message>
-        <source>Error: You already have pending entries in the Obfuscation pool</source>
-        <translation>Error: You already have pending entries in the Obfuscation pool</translation>
     </message>
     <message>
         <source>Failed to calculate accumulator checkpoint</source>
@@ -5503,20 +5269,8 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Fee (in WGR/kB) to add to transactions you send (default: %s)</translation>
     </message>
     <message>
-        <source>Finalizing transaction.</source>
-        <translation>Finalising transaction.</translation>
-    </message>
-    <message>
         <source>Force safe mode (default: %u)</source>
         <translation>Force safe mode (default: %u)</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ( waiting %s )</source>
-        <translation>Found enough users, signing ( waiting %s )</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ...</source>
-        <translation>Found enough users, signing ...</translation>
     </message>
     <message>
         <source>Generate coins (default: %u)</source>
@@ -5543,14 +5297,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Include IP addresses in debug output (default: %u)</translation>
     </message>
     <message>
-        <source>Incompatible mode.</source>
-        <translation>Incompatible mode.</translation>
-    </message>
-    <message>
-        <source>Incompatible version.</source>
-        <translation>Incompatible version.</translation>
-    </message>
-    <message>
         <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
         <translation>Incorrect or no genesis block found. Wrong datadir for network?</translation>
     </message>
@@ -5561,10 +5307,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Initialization sanity check failed. WAGERR Core is shutting down.</source>
         <translation>Initialisation sanity check failed. WAGERR Core is shutting down.</translation>
-    </message>
-    <message>
-        <source>Input is not valid.</source>
-        <translation>Input is not valid.</translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -5621,10 +5363,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Invalid private key.</source>
         <translation>Invalid private key.</translation>
-    </message>
-    <message>
-        <source>Invalid script detected.</source>
-        <translation>Invalid script detected.</translation>
     </message>
     <message>
         <source>Percentage of automatically minted Zerocoin  (1-100, default: %u)</source>
@@ -5791,14 +5529,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</translation>
     </message>
     <message>
-        <source>Last Obfuscation was too recent.</source>
-        <translation>Last Obfuscation was too recent.</translation>
-    </message>
-    <message>
-        <source>Last successful Obfuscation action was too recent.</source>
-        <translation>Last successful Obfuscation action was too recent.</translation>
-    </message>
-    <message>
         <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
         <translation>Limit size of signature cache to &lt;n&gt; entries (default: %u)</translation>
     </message>
@@ -5851,10 +5581,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Location of the auth cookie (default: data dir)</translation>
     </message>
     <message>
-        <source>Lock is already in place.</source>
-        <translation>Lock is already in place.</translation>
-    </message>
-    <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
         <translation>Lock masternodes from masternode configuration file (default: %u)</translation>
     </message>
@@ -5871,14 +5597,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Masternode options:</translation>
     </message>
     <message>
-        <source>Masternode queue is full.</source>
-        <translation>Masternode queue is full.</translation>
-    </message>
-    <message>
-        <source>Masternode:</source>
-        <translation>Masternode:</translation>
-    </message>
-    <message>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: %u)</source>
         <translation>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: %u)</translation>
     </message>
@@ -5891,14 +5609,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Mint did not make it into blockchain</translation>
     </message>
     <message>
-        <source>Missing input transaction information.</source>
-        <translation>Missing input transaction information.</translation>
-    </message>
-    <message>
-        <source>Mixing in progress...</source>
-        <translation>Mixing in progress...</translation>
-    </message>
-    <message>
         <source>Need address because change is not exact</source>
         <translation>Need address because change is not exact</translation>
     </message>
@@ -5907,40 +5617,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Need to specify a port with -whitebind: '%s'</translation>
     </message>
     <message>
-        <source>No Masternodes detected.</source>
-        <translation>No Masternodes detected.</translation>
-    </message>
-    <message>
-        <source>No compatible Masternode found.</source>
-        <translation>No compatible Masternode found.</translation>
-    </message>
-    <message>
-        <source>No funds detected in need of denominating.</source>
-        <translation>No funds detected in need of denominating.</translation>
-    </message>
-    <message>
-        <source>No matching denominations found for mixing.</source>
-        <translation>No matching denominations found for mixing.</translation>
-    </message>
-    <message>
         <source>Node relay options:</source>
         <translation>Node relay options:</translation>
     </message>
     <message>
-        <source>Non-standard public key detected.</source>
-        <translation>Non-standard public key detected.</translation>
-    </message>
-    <message>
-        <source>Not compatible with existing transactions.</source>
-        <translation>Not compatible with existing transactions.</translation>
-    </message>
-    <message>
         <source>Not enough file descriptors available.</source>
         <translation>Not enough file descriptors available.</translation>
-    </message>
-    <message>
-        <source>Not in the Masternode list.</source>
-        <translation>Not in the Masternode list.</translation>
     </message>
     <message>
         <source>Number of automatic wallet backups (default: 10)</source>
@@ -5949,18 +5631,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Number of custom location backups to retain (default: %d)</source>
         <translation>Number of custom location backups to retain (default: %d)</translation>
-    </message>
-    <message>
-        <source>Obfuscation is idle.</source>
-        <translation>Obfuscation is idle.</translation>
-    </message>
-    <message>
-        <source>Obfuscation request complete:</source>
-        <translation>Obfuscation request complete:</translation>
-    </message>
-    <message>
-        <source>Obfuscation request incomplete:</source>
-        <translation>Obfuscation request incomplete:</translation>
     </message>
     <message>
         <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
@@ -6053,10 +5723,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Send transactions as zero-fee transactions if possible (default: %u)</source>
         <translation>Send transactions as zero-fee transactions if possible (default: %u)</translation>
-    </message>
-    <message>
-        <source>Session not complete!</source>
-        <translation>Session not complete!</translation>
     </message>
     <message>
         <source>Session timed out.</source>
@@ -6163,18 +5829,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Stop running after importing blocks from disk (default: %u)</translation>
     </message>
     <message>
-        <source>Submitted following entries to masternode: %u / %d</source>
-        <translation>Submitted following entries to masternode: %u / %d</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation>Submitted to masternode, waiting for more entries ( %u / %d ) %s</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>Submitted to masternode, waiting in queue %s</translation>
-    </message>
-    <message>
         <source>Synchronization failed</source>
         <translation>Synchronisation failed</translation>
     </message>
@@ -6227,10 +5881,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>This is intended for regression testing tools and app development.</translation>
     </message>
     <message>
-        <source>This is not a Masternode.</source>
-        <translation>This is not a Masternode.</translation>
-    </message>
-    <message>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
         <translation>Threshold for disconnecting misbehaving peers (default: %u)</translation>
     </message>
@@ -6263,18 +5913,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Transaction amounts must be positive</translation>
     </message>
     <message>
-        <source>Transaction created successfully.</source>
-        <translation>Transaction created successfully.</translation>
-    </message>
-    <message>
-        <source>Transaction fees are too high.</source>
-        <translation>Transaction fees are too high.</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>Transaction not valid.</translation>
-    </message>
-    <message>
         <source>Transaction too large for fee policy</source>
         <translation>Transaction too large for fee policy</translation>
     </message>
@@ -6283,24 +5921,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Transaction too large</translation>
     </message>
     <message>
-        <source>Transmitting final transaction.</source>
-        <translation>Transmitting final transaction.</translation>
-    </message>
-    <message>
-        <source>Try to spend with a higher security level to include more coins</source>
-        <translation>Try to spend with a higher security level to include more coins</translation>
-    </message>
-    <message>
         <source>Trying to spend an already spent serial #, try again.</source>
         <translation>Trying to spend an already spent serial #, try again.</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
         <translation>Unable to bind to %s on this computer (bind returned error %s)</translation>
-    </message>
-    <message>
-        <source>Unable to find transaction containing mint</source>
-        <translation>Unable to find transaction containing mint</translation>
     </message>
     <message>
         <source>Unable to sign spork message, wrong key?</source>
@@ -6313,10 +5939,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
         <translation>Unknown network specified in -onlynet: '%s'</translation>
-    </message>
-    <message>
-        <source>Unknown state: id = %u</source>
-        <translation>Unknown state: id = %u</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
@@ -6351,10 +5973,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Value is below the smallest available denomination (= 1) of zWGR</translation>
     </message>
     <message>
-        <source>Value more than Obfuscation pool maximum allows.</source>
-        <translation>Value more than Obfuscation pool maximum allows.</translation>
-    </message>
-    <message>
         <source>Verifying blocks...</source>
         <translation>Verifying blocks...</translation>
     </message>
@@ -6365,10 +5983,6 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
     <message>
         <source>Wallet %s resides outside data directory %s</source>
         <translation>Wallet %s resides outside data directory %s</translation>
-    </message>
-    <message>
-        <source>Wallet is locked.</source>
-        <translation>Wallet is locked.</translation>
     </message>
     <message>
         <source>Wallet needed to be rewritten: restart WAGERR Core to complete</source>
@@ -6399,24 +6013,12 @@ Either mint higher denominations (so fewer inputs are needed) or reduce the amou
         <translation>Warning: Unsupported argument -debugnet ignored, use -debug=net.</translation>
     </message>
     <message>
-        <source>Will retry...</source>
-        <translation>Will retry...</translation>
-    </message>
-    <message>
         <source>You don't have enough Zerocoins in your wallet</source>
         <translation>You don't have enough Zerocoins in your wallet</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation>You need to rebuild the database using -reindex to change -txindex</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>Your entries added successfully.</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation>Your transaction was accepted into the pool!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>

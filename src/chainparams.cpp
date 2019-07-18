@@ -64,12 +64,12 @@ static Checkpoints::MapCheckpoints mapCheckpoints =
     (  257142, uint256("eca635870323e7c0785fec1e663f4cb8645b7e84b5df4511ba4c189e580bfafd"))
     (  290000, uint256("5a70e614a2e6035be0fa1dd1a67bd6caa0a78e396e889aac42bbbc08e11cdabd"))
     (  294400, uint256("01be3c3c84fd6063ba27080996d346318242d5335efec936408c1e1ae3fdb4a1"))
-    (  320000, uint256("9060f8d44058c539653f37eaac4c53de7397e457dda264c5ee1be94293e9f6bb"));
-
+    (  320000, uint256("9060f8d44058c539653f37eaac4c53de7397e457dda264c5ee1be94293e9f6bb"))         // tx 671130
+    (  695857, uint256("680a170b5363f308cc0698a53ab6a83209dab06c138c98f91110f9e11e273778"));
 static const Checkpoints::CCheckpointData data = {
     &mapCheckpoints,
-    1538190282, // * UNIX timestamp of last checkpoint block
-    671130,     // * total number of transactions between genesis and last checkpoint
+    1560967688, // * UNIX timestamp of last checkpoint block
+    1501504,     // * total number of transactions between genesis and last checkpoint
                 //   (the tx=... number in the SetBestChain debug.log lines)
     5000        // * estimated number of transactions per day after checkpoint
 };
@@ -77,11 +77,12 @@ static const Checkpoints::CCheckpointData data = {
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
     boost::assign::map_list_of
     (       1, uint256("0x00000385558ec1b9af7f939e1626a3116b9fb988c86c2f915e6451e8efcd0521"))
-    (   20040, uint256("0x03a92984c2deba55ac8f9e8194b1bc745fbad9f7a0f3ed94ebb8c372935bed9c"));
+    (   20040, uint256("0x03a92984c2deba55ac8f9e8194b1bc745fbad9f7a0f3ed94ebb8c372935bed9c"))   // tx 40878
+    (   93286, uint256("0xdc68d97761ceac8c177a81487569bfe92b720f513fbbf5c2184988f1d74c5061"));  // tx 227380
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1535967610,
-    40878,
+    1560967301,
+    227380,
     3000};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
@@ -157,6 +158,9 @@ public:
         nBlockDoubleAccumulated = 99999999;
         nEnforceNewSporkKey = 1536868800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
         nRejectOldSporkKey = 1537128000;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
+
+        // Public coin spend enforcement
+        nPublicZCSpends = 1500000;
 
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
@@ -247,6 +251,7 @@ public:
             "8441436038339044149526344321901146575444541784240209246165157233507787077498171257724679629263863563732899121548"
             "31438167899885040445364023527381951378636564391212010397122822120720357";
         nMaxZerocoinSpendsPerTransaction = 7; // Assume about 20kb each
+        nMaxZerocoinPublicSpendsPerTransaction = 637; // Assume about 220 bytes each input
         nMinZerocoinMintFee = 1 * CENT; //high fee required for zerocoin mints
         nMintRequiredConfirmations = 20; //the maximum amount of confirmations until accumulated in 19
         nRequiredAccumulation = 1;
@@ -255,6 +260,7 @@ public:
         nZerocoinRequiredStakeDepth = 200; //The required confirmations for a zwgr to be stakable
 
         nBudget_Fee_Confirmations = 6; // Number of confirmations for the finalization fee
+        nProposalEstablishmentTime = 60 * 60 * 24; // Proposals must be at least a day old to make it into a budget
     }
 
     const Checkpoints::CCheckpointData& Checkpoints() const
@@ -292,7 +298,7 @@ public:
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
-        nZerocoinStartHeight = 350;
+        nZerocoinStartHeight = 50;            // Start accumulation coins here - first zerocoin mint occurs at block 87
         nZerocoinAccumulationStartHeight = 350;
         nZerocoinStartTime = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
@@ -305,7 +311,8 @@ public:
         nEnforceNewSporkKey = 1536019200; //!> Sporks signed after Tuesday September 4, 2018 12:00:00 AM GMT must use the new spork key
         nRejectOldSporkKey = 1538611200; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
 
-        nZerocoinStartHeight = 50;            // Start accumulation coins here - first zerocoin mint occurs at block 87
+        // Public coin spend enforcement
+        nPublicZCSpends = 116000;
 
         /** Bet related parameters **/
         nBetStartHeight = 26080;                                        // The block that betting protocols become active (Testnet).
@@ -326,6 +333,10 @@ public:
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;
         nSupplyBeforeFakeSerial = 0;
+
+        // workarond fixes
+        nZerocoinCheckTXexclude = 15195;
+        nZerocoinCheckTX = 50228;
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696182;
@@ -366,6 +377,7 @@ public:
         nStartMasternodePayments = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
         nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
                                        // here because we only have a 8 block finalization window on testnet
+        nProposalEstablishmentTime = 60 * 5; // Proposals must be at least 5 mns old to make it into a test budget
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
@@ -409,6 +421,9 @@ public:
         nBlockRecalculateAccumulators = 999999999; //Trigger a recalculation of accumulators
         nBlockFirstFraudulent = 999999999; //First block that bad serials emerged
         nBlockLastGoodCheckpoint = 999999999; //Last valid accumulator checkpoint
+
+        // Public coin spend enforcement
+        nPublicZCSpends = 350;
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;

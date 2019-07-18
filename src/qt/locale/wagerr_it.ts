@@ -62,12 +62,12 @@
         <translation>Indirizzi di ricezione</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
-        <translation>Questi sono gli indirizzi Wagerr per l'invio di pagamenti. Controlla sempre l'importo e l'indirizzo di ricezione prima di inviare valuta.</translation>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <translation>Questi sono gli indirizzi WAGERR per l'invio di pagamenti. Controlla sempre l'importo e l'indirizzo di ricezione prima di inviare valuta.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
-        <translation>Questi sono gli indirizzi Wagerr per la ricezione di pagamenti. Si raccomanda di utilizzare un indirizzo diverso per ogni transazione.</translation>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <translation>Questi sono gli indirizzi WAGERR per la ricezione di pagamenti. Si raccomanda di utilizzare un indirizzo diverso per ogni transazione.</translation>
     </message>
     <message>
         <source>&amp;Copy Address</source>
@@ -254,12 +254,12 @@
         <translation>Indirizzo:</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
-        <translation>Inserire un indirizzo Wagerr da crittografare utilizzando BIP 38. Inserire una password nel campo centrale. Cliccare su "cripta" per generare la chiave privata crittografata.</translation>
+        <source>Enter a WAGERR Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <translation>Inserire un indirizzo WAGERR da crittografare utilizzando BIP 38. Inserire una password nel campo centrale. Cliccare su "cripta" per generare la chiave privata crittografata.</translation>
     </message>
     <message>
-        <source>The Wagerr address to encrypt</source>
-        <translation>Indirizzo Wagerr da crittografare</translation>
+        <source>The WAGERR address to encrypt</source>
+        <translation>Indirizzo WAGERR da crittografare</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -290,7 +290,7 @@
         <translation>Copiare la firma corrente negli Appunti di sistema</translation>
     </message>
     <message>
-        <source>Encrypt the private key for this Wagerr address</source>
+        <source>Encrypt the private key for this WAGERR address</source>
         <translation>Crittografa la chiave privata per questo indirizzo WAGERR</translation>
     </message>
     <message>
@@ -608,10 +608,6 @@
         <source>&amp;Command-line options</source>
         <translation>Opzioni riga di &amp;Comando</translation>
     </message>
-    <message numerus="yes">
-        <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>Elaborato 1 blocco dalla cronologia delle transazioni</numerusform><numerusform>Elaborati %n blocchi dalla cronologia delle transazioni.</numerusform></translation>
-    </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
         <translation>Sincronizzazione dati addizionali: %p%</translation>
@@ -645,11 +641,11 @@
         <translation>Schede degli strumenti</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
+        <source>Send coins to a WAGERR address</source>
         <translation>Invia valuta all'indirizzo WAGERR</translation>
     </message>
     <message>
@@ -669,24 +665,24 @@
         <translation>Esplora i masternodes</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;Informazioni Wagerr Core</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;Informazioni WAGERR Core</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Visualizza informazioni su Wagerr Core</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Visualizza informazioni su WAGERR Core</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
         <translation>Modifica le opzioni di configurazione per WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Firma i messaggi con i tuoi indirizzi Wagerr per dimostrare di essere il proprietario </translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Firma i messaggi con i tuoi indirizzi WAGERR per dimostrare di essere il proprietario </translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Verifica i messaggi per assicurarsi che siano stati firmati con indirizzi Wagerr specifici</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Verifica i messaggi per assicurarsi che siano stati firmati con indirizzi WAGERR specifici</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -729,16 +725,12 @@
         <translation>Finestra Block Explorer</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Mostra il messaggio di aiuto Wagerr Core per ottenere un elenco con le possibili opzioni di riga di comando WAGERR</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Mostra il messaggio di aiuto WAGERR Core per ottenere un elenco con le possibili opzioni di riga di comando WAGERR</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
-        <translation>Wagerr Core</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform>%n connessione attiva alla rete WGRIX</numerusform><numerusform>%n connessioni attive alla rete WGRIX</numerusform></translation>
+        <source>WAGERR Core client</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -760,25 +752,9 @@
         <source>Up to date</source>
         <translation>Aggiornato</translation>
     </message>
-    <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation><numerusform>%n ora</numerusform><numerusform>%n ore</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s)</source>
-        <translation><numerusform>%n giorno</numerusform><numerusform>%n giorni</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation><numerusform>%n settimana</numerusform><numerusform>%n settimane</numerusform></translation>
-    </message>
     <message>
         <source>%1 and %2</source>
         <translation>%1 e %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation><numerusform>%n anno</numerusform><numerusform>%n anni</numerusform></translation>
     </message>
     <message>
         <source>Last received block was generated %1 ago.</source>
@@ -860,7 +836,7 @@ MultiSend: %1</translation>
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Il portafoglio è &lt;b&gt;crittografato&lt;/b&gt; e attualmente &lt;b&gt;bloccato&lt;/b&gt;</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>BlockExplorer</name>
     <message>
@@ -1173,8 +1149,8 @@ MultiSend: %1</translation>
         <translation>Modifica indirizzo di invio</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>L'indirizzo inserito "%1" non è un indirizzo Wagerr valido.</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>L'indirizzo inserito "%1" non è un indirizzo WAGERR valido.</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1213,22 +1189,33 @@ MultiSend: %1</translation>
     </message>
 </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>Modulo</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
         <translation>versione</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>(%1-bit)</source>
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>Informazioni su Wagerr Core</translation>
+        <source>About WAGERR Core</source>
+        <translation>Informazioni su WAGERR Core</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1274,16 +1261,16 @@ MultiSend: %1</translation>
         <translation>Benvenuto</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
+        <source>Welcome to WAGERR Core.</source>
         <translation>Benvenuto in WGRIX Core.</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>Essendo il primo avvio dell'applicazione, puoi scegliere dove Wagerr Core salverà i propri dati.</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>Essendo il primo avvio dell'applicazione, puoi scegliere dove WAGERR Core salverà i propri dati.</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>Wagerr Core scaricherà e salverà una copia della blockchain WAGERR. Verranno salvati almeno %1GB di dati in questa cartella, che cresceranno nel tempo. In questa cartella verrà salvato anche il portafoglio.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR Core scaricherà e salverà una copia della blockchain WAGERR. Verranno salvati almeno %1GB di dati in questa cartella, che cresceranno nel tempo. In questa cartella verrà salvato anche il portafoglio.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1294,8 +1281,8 @@ MultiSend: %1</translation>
         <translation>Utilizza una cartella dati personalizzata:</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     <message>
         <source>Error: Specified data directory "%1" cannot be created.</source>
@@ -1436,12 +1423,12 @@ MultiSend: %1</translation>
         <translation>Inserire indirizzo destinatario</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Wagerr addresses after it matures.
-To Add: enter percentage to give and Wagerr address to add to the MultiSend vector.
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other WAGERR addresses after it matures.
+To Add: enter percentage to give and WAGERR address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>MultiSend ti permette di inviare automaticamente ad una lista di indirizzi Wagerr fino al 100% delle ricompense di stake o masternodi, dopo che queste sono mature.
-Per Aggiunger: inserisci la percentuale da inviare e l'indirizzo Wagerr da aggiungere al vettore MultiSend.
+        <translation>MultiSend ti permette di inviare automaticamente ad una lista di indirizzi WAGERR fino al 100% delle ricompense di stake o masternodi, dopo che queste sono mature.
+Per Aggiunger: inserisci la percentuale da inviare e l'indirizzo WAGERR da aggiungere al vettore MultiSend.
 Per Eliminare: Inserisci l'indirizzo da eliminare e premi elimina.
 MultiSend non verrà attivato a meno che tu non prema su Attiva</translation>
     </message>
@@ -1530,47 +1517,8 @@ MultiSend non verrà attivato a meno che tu non prema su Attiva</translation>
         <translation>(nessuna etichetta)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>L'indirizzo immesso:</translation>
-    </message>
-    <message>
-        <source> is invalid.
-Please check the address and try again.</source>
-        <translation>è invalido.
-Per favore controlla l'indirizzo e riprova nuovamente.</translation>
-    </message>
-    <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
-        <translation>L'ammontare totale del tuo vettore MultiSend è superiore al 100% della tua ricompensa per lo stake
-</translation>
-    </message>
-    <message>
         <source>Please Enter 1 - 100 for percent.</source>
         <translation>Per favore inserisci 1 - 100 come percentuale.</translation>
-    </message>
-    <message>
-        <source>Saved the MultiSend to memory, but failed saving properties to the database.
-</source>
-        <translation>MultiSend è stato salvato con successo in memoria, ma il salvataggio delle proprietà nel database non è andato a buon fine.
-</translation>
-    </message>
-    <message>
-        <source>MultiSend Vector
-</source>
-        <translation>Vettore InvioMultiplo
-</translation>
-    </message>
-    <message>
-        <source>Removed </source>
-        <translation>Eliminato</translation>
-    </message>
-    <message>
-        <source>Could not locate address
-</source>
-        <translation>Impossibile trovare l'indirizzo
-</translation>
     </message>
 </context>
 <context>
@@ -1664,29 +1612,6 @@ Per favore controlla l'indirizzo e riprova nuovamente.</translation>
         <translation>Massimo (15)</translation>
     </message>
 </context>
-<context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Configura Offuscamento</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Usa 2 masternodi diversi per mescolare fino a 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Usa 8 masternodi diversi per mixare fino a 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>Usa 16 masternodi diversi</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Configurazione Offuscamento</translation>
-    </message>
-    </context>
 <context>
     <name>OpenURIDialog</name>
     <message>
@@ -1804,8 +1729,8 @@ Per favore controlla l'indirizzo e riprova nuovamente.</translation>
         <translation>Saldo corrente bloccato in indirizzi sola-lettura.</translation>
     </message>
     <message>
-        <source>Your current Wagerr balance, unconfirmed and immature transactions included</source>
-        <translation>Il tuo saldo Wagerr corrente, incluse le transazioni non confermate e non mature</translation>
+        <source>Your current WAGERR balance, unconfirmed and immature transactions included</source>
+        <translation>Il tuo saldo WAGERR corrente, incluse le transazioni non confermate e non mature</translation>
     </message>
     <message>
         <source>zWGR Balance</source>
@@ -1875,7 +1800,7 @@ Se il conio automatico è attivato questa percentuale si stabilizzerà all'incir
     </message>
     <message>
         <source>AutoMint is currently enabled and set to </source>
-        <translation>AutoMint è attivo e impostato su</translation>
+        <translation>Conio automatico è attivo e impostato su</translation>
     </message>
     <message>
         <source>To disable AutoMint add 'enablezeromint=0' in wagerr.conf.</source>
@@ -1937,32 +1862,12 @@ Per attivare il Conio automatico cambiare 'enablezeromint=0' in 'enablezeromint=
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset</source>
         <translation>Reset</translation>
     </message>
     <message>
-        <source>Coin Control...</source>
-        <translation>Controllo Monete...</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Quantità:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Totale:</translation>
-    </message>
-    <message>
         <source>PRIVACY</source>
         <translation>PRIVACY</translation>
-    </message>
-    <message>
-        <source>Enter an amount of Wgr to convert to zWGR</source>
-        <translation>Immetti un importo di WGR da convertire in zWGR</translation>
     </message>
     <message>
         <source>zWGR Control</source>
@@ -2174,7 +2079,7 @@ Per cambiare la percentuale (riavvio non necessario):
     </message>
     <message>
         <source>Fee:</source>
-        <translation>Tassa:</translation>
+        <translation>Commissione:</translation>
     </message>
     <message>
         <source>Dust:</source>
@@ -2193,20 +2098,16 @@ Per cambiare la percentuale (riavvio non necessario):
         <translation>Fondi insufficienti!</translation>
     </message>
     <message>
+        <source>medium</source>
+        <translation>media</translation>
+    </message>
+    <message>
         <source>Amount After Fee:</source>
         <translation>Importo al netto della commissione:</translation>
     </message>
     <message>
         <source>Change:</source>
         <translation>Differenza:</translation>
-    </message>
-    <message>
-        <source>Copy quantity</source>
-        <translation>Copia importo</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Copia ammontare</translation>
     </message>
     <message>
         <source>zWGR Mint</source>
@@ -2226,7 +2127,7 @@ Per cambiare la percentuale (riavvio non necessario):
     </message>
     <message>
         <source>Confirm send coins</source>
-        <translation>Converma invio monete</translation>
+        <translation>Conferma invio monete</translation>
     </message>
     <message>
         <source>Sending successful, return code: </source>
@@ -2238,10 +2139,17 @@ Per cambiare la percentuale (riavvio non necessario):
     </message>
 </context>
 <context>
+    <name>ProposalFrame</name>
+    </context>
+<context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
         <translation>Ammontare</translation>
+    </message>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
@@ -2269,6 +2177,10 @@ Per cambiare la percentuale (riavvio non necessario):
 <context>
     <name>ReceiveCoinsDialog</name>
     <message>
+        <source>A&amp;mount:</source>
+        <translation>Q&amp;uantità:</translation>
+    </message>
+    <message>
         <source>&amp;Label:</source>
         <translation>&amp;Etichetta:</translation>
     </message>
@@ -2279,6 +2191,10 @@ Per cambiare la percentuale (riavvio non necessario):
     <message>
         <source>Copy amount</source>
         <translation>Copia ammontare</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Copia indirizzo</translation>
     </message>
 </context>
 <context>
@@ -2305,6 +2221,10 @@ Per cambiare la percentuale (riavvio non necessario):
     <message>
         <source>Label</source>
         <translation>Etichetta</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Indirizzo</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -2346,8 +2266,12 @@ Per cambiare la percentuale (riavvio non necessario):
         <translation>Priorità:</translation>
     </message>
     <message>
+        <source>medium</source>
+        <translation>media</translation>
+    </message>
+    <message>
         <source>Fee:</source>
-        <translation>Tassa:</translation>
+        <translation>Commissione:</translation>
     </message>
     <message>
         <source>Dust:</source>
@@ -2359,7 +2283,7 @@ Per cambiare la percentuale (riavvio non necessario):
     </message>
     <message>
         <source>After Fee:</source>
-        <translation>Al netto della commissione:</translation>
+        <translation>Importo al netto della commissione:</translation>
     </message>
     <message>
         <source>Change:</source>
@@ -2407,15 +2331,19 @@ Per cambiare la percentuale (riavvio non necessario):
     </message>
     <message>
         <source>Copy fee</source>
-        <translation>Copia commissioni</translation>
+        <translation>Copia commissione</translation>
     </message>
     <message>
         <source>Copy after fee</source>
-        <translation>Copia al netto della commissione</translation>
+        <translation>Copia importo al netto della commissione</translation>
     </message>
     <message>
         <source>Copy bytes</source>
         <translation>Copia byte</translation>
+    </message>
+    <message>
+        <source>Copy priority</source>
+        <translation>Copia priorità</translation>
     </message>
     <message>
         <source>Copy dust</source>
@@ -2483,8 +2411,8 @@ Per cambiare la percentuale (riavvio non necessario):
 <context>
     <name>SignVerifyMessageDialog</name>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>L'indirizzo Wagerr per firmare il messaggio con</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>L'indirizzo WAGERR per firmare il messaggio con</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -2507,16 +2435,16 @@ Per cambiare la percentuale (riavvio non necessario):
         <translation>Copiare la firma corrente negli Appunti di sistema</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
+        <source>Sign the message to prove you own this WAGERR address</source>
         <translation>Firmare il messaggio per dimostrare di possedere questo indirizzo WAGERR</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>L'indirizzo Wagerr con cui è stato firmato il messaggio</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>L'indirizzo WAGERR con cui è stato firmato il messaggio</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>Verificare il messaggio per assicurarsi che sia stato firmato con l'indirizzo Wagerr specificato </translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>Verificare il messaggio per assicurarsi che sia stato firmato con l'indirizzo WAGERR specificato </translation>
     </message>
     <message>
         <source>Reset all sign message fields</source>
@@ -2554,8 +2482,8 @@ Per cambiare la percentuale (riavvio non necessario):
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
-        <translation>Wagerr Core</translation>
+        <source>WAGERR Core</source>
+        <translation>WAGERR Core</translation>
     </message>
     </context>
 <context>
@@ -2666,7 +2594,7 @@ Per cambiare la percentuale (riavvio non necessario):
     </message>
     </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>0</source>
         <translation>0</translation>

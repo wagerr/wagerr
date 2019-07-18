@@ -4,10 +4,11 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "zwgrchain.h"
+#include "zwgr/zwgrmodule.h"
 #include "invalid.h"
 #include "main.h"
 #include "txdb.h"
-#include "ui_interface.h"
+#include "guiinterface.h"
 
 // 6 comes from OPCODE (1) + vch.size() (1) + BIGNUM size (4)
 #define SCRIPT_OFFSET 6
@@ -17,11 +18,11 @@
 bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, vector<CBigNum>& vValues)
 {
     for (const CTransaction tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if(!tx.HasZerocoinMintOutputs())
             continue;
 
         for (const CTxOut txOut : tx.vout) {
-            if(!txOut.scriptPubKey.IsZerocoinMint())
+            if(!txOut.IsZerocoinMint())
                 continue;
 
             CValidationState state;
@@ -42,7 +43,7 @@ bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomina
 bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>& listPubcoins, bool fFilterInvalid)
 {
     for (const CTransaction tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if(!tx.HasZerocoinMintOutputs())
             continue;
 
         // Filter out mints that have used invalid outpoints
@@ -65,7 +66,7 @@ bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>&
                 break;
 
             const CTxOut txOut = tx.vout[i];
-            if(!txOut.scriptPubKey.IsZerocoinMint())
+            if(!txOut.IsZerocoinMint())
                 continue;
 
             CValidationState state;
@@ -84,7 +85,7 @@ bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>&
 bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMints, bool fFilterInvalid)
 {
     for (const CTransaction& tx : block.vtx) {
-        if(!tx.IsZerocoinMint())
+        if(!tx.HasZerocoinMintOutputs())
             continue;
 
         // Filter out mints that have used invalid outpoints
@@ -107,7 +108,7 @@ bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMin
                 break;
 
             const CTxOut txOut = tx.vout[i];
-            if(!txOut.scriptPubKey.IsZerocoinMint())
+            if(!txOut.IsZerocoinMint())
                 continue;
 
             CValidationState state;
@@ -284,18 +285,28 @@ std::string ReindexZerocoinDB()
                 if (tx.ContainsZerocoins()) {
                     uint256 txid = tx.GetHash();
                     //Record Serials
-                    if (tx.IsZerocoinSpend()) {
+                    if (tx.HasZerocoinSpendInputs()) {
                         for (auto& in : tx.vin) {
-                            if (!in.scriptSig.IsZerocoinSpend())
+                            bool isPublicSpend = in.IsZerocoinPublicSpend();
+                            if (!in.IsZerocoinSpend() && !isPublicSpend)
                                 continue;
-
-                            libzerocoin::CoinSpend spend = TxInToZerocoinSpend(in);
-                            vSpendInfo.push_back(make_pair(spend, txid));
+                            if (isPublicSpend) {
+                                libzerocoin::ZerocoinParams* params = Params().Zerocoin_Params(false);
+                                PublicCoinSpend publicSpend(params);
+                                CValidationState state;
+                                if (!ZWGRModule::ParseZerocoinPublicSpend(in, tx, state, publicSpend)){
+                                    return _("Failed to parse public spend");
+                                }
+                                vSpendInfo.push_back(make_pair(publicSpend, txid));
+                            } else {
+                                libzerocoin::CoinSpend spend = TxInToZerocoinSpend(in);
+                                vSpendInfo.push_back(make_pair(spend, txid));
+                            }
                         }
                     }
 
                     //Record mints
-                    if (tx.IsZerocoinMint()) {
+                    if (tx.HasZerocoinMintOutputs()) {
                         for (auto& out : tx.vout) {
                             if (!out.IsZerocoinMint())
                                 continue;
@@ -373,14 +384,15 @@ std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock
 {
     std::list<libzerocoin::CoinDenomination> vSpends;
     for (const CTransaction tx : block.vtx) {
-        if (!tx.IsZerocoinSpend())
+        if (!tx.HasZerocoinSpendInputs())
             continue;
 
         for (const CTxIn txin : tx.vin) {
-            if (!txin.scriptSig.IsZerocoinSpend())
+            bool isPublicSpend = txin.IsZerocoinPublicSpend();
+            if (!txin.IsZerocoinSpend() && !isPublicSpend)
                 continue;
 
-            if (fFilterInvalid) {
+            if (fFilterInvalid && !isPublicSpend) {
                 libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txin);
                 if (invalid_out::ContainsSerial(spend.getCoinSerialNumber()))
                     continue;

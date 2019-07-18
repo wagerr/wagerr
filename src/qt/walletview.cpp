@@ -28,7 +28,7 @@
 #include "transactionview.h"
 #include "walletmodel.h"
 
-#include "ui_interface.h"
+#include "guiinterface.h"
 
 #include <QAction>
 #include <QActionGroup>
@@ -376,7 +376,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
         CBlock block;
         ReadBlockFromDisk(block, pindex);
 
-        BOOST_FOREACH (CTransaction& tx, block.vtx) {
+        for (CTransaction& tx : block.vtx) {
 
             // Ensure event TX has been posted by Oracle wallet.
             bool validEventTx = false;
@@ -395,7 +395,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
                 int nRequired;
                 if(ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
 
-                    BOOST_FOREACH (const CTxDestination &prevAddr, prevAddrs) {
+                    for (const CTxDestination &prevAddr : prevAddrs) {
                         if (std::find(oracleAddrs.begin(), oracleAddrs.end(), CBitcoinAddress(prevAddr).ToString()) != oracleAddrs.end()) {
                             validEventTx = true;
                         }

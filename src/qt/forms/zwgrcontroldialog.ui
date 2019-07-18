@@ -118,7 +118,7 @@
     </layout>
    </item>
    <item row="1" column="0">
-    <layout class="QVBoxLayout" name="verticalLayout">
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
       <widget class="QTreeWidget" name="treeWidget">
       <property name="sizePolicy">

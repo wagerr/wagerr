@@ -12,8 +12,10 @@
 #include "timedata.h"
 #include "wallet/wallet.h"
 #include "zwgrchain.h"
+#include "main.h"
 #include "betting/bet.h"
 
+#include <iostream>
 #include <stdint.h>
 
 /* Return positive answer if transaction should be shown in list.
@@ -45,7 +47,11 @@ bool DecomposeBettingCoinstake(const CWallet* wallet, const CWalletTx& wtx, cons
 
     const int nStakeHeight = pindexWtx->nHeight;
     const CAmount nStakeValue = GetBlockValue(nStakeHeight - 1);
-    const CAmount nMNExpectedRewardValue = GetMasternodePayment(nStakeHeight, nStakeValue, 1, wtx.IsZerocoinSpend());
+
+    // ** TODO ** refactoring check
+    //const CAmount nMNExpectedRewardValue = GetMasternodePayment(nStakeHeight, nStakeValue, 1, wtx.IsZerocoinSpend());
+    const CAmount nMNExpectedRewardValue = GetMasternodePayment(nStakeHeight, nStakeValue, 1, wtx.GetZerocoinSpent());
+
 
     int nMNIndex = -1;
     CAmount nActualMNValue = 0;
@@ -167,23 +173,33 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
     std::map<std::string, std::string> mapValue = wtx.mapValue;
     bool fZSpendFromMe = false;
 
-    if (wtx.IsZerocoinSpend()) {
+    if (wtx.HasZerocoinSpendInputs()) {
         // a zerocoin spend that was created by this wallet
-        libzerocoin::CoinSpend zcspend = TxInToZerocoinSpend(wtx.vin[0]);
-        fZSpendFromMe = wallet->IsMyZerocoinSpend(zcspend.getCoinSerialNumber());
+        if (wtx.HasZerocoinPublicSpendInputs()) {
+            libzerocoin::ZerocoinParams* params = Params().Zerocoin_Params(false);
+            PublicCoinSpend publicSpend(params);
+            CValidationState state;
+            if (!ZWGRModule::ParseZerocoinPublicSpend(wtx.vin[0], wtx, state, publicSpend)){
+                throw std::runtime_error("Error parsing zc public spend");
+            }
+            fZSpendFromMe = wallet->IsMyZerocoinSpend(publicSpend.getCoinSerialNumber());
+        } else {
+            libzerocoin::CoinSpend zcspend = TxInToZerocoinSpend(wtx.vin[0]);
+            fZSpendFromMe = wallet->IsMyZerocoinSpend(zcspend.getCoinSerialNumber());
+        }
     }
 
     if (wtx.IsCoinStake()) {
         TransactionRecord sub(hash, nTime);
         CTxDestination address;
-        if (!wtx.IsZerocoinSpend() && !ExtractDestination(wtx.vout[1].scriptPubKey, address))
+        if (!wtx.HasZerocoinSpendInputs() && !ExtractDestination(wtx.vout[1].scriptPubKey, address))
             return parts;
 
         if (DecomposeBettingCoinstake(wallet, wtx, address, fZSpendFromMe || wallet->zwgrTracker->HasMintTx(hash), parts)) {
             return parts;
         }
 
-        if (wtx.IsZerocoinSpend() && (fZSpendFromMe || wallet->zwgrTracker->HasMintTx(hash))) {
+        if (wtx.HasZerocoinSpendInputs() && (fZSpendFromMe || wallet->zwgrTracker->HasMintTx(hash))) {
             //zWGR stake reward
             sub.involvesWatchAddress = false;
             sub.type = TransactionRecord::StakeZWGR;
@@ -226,7 +242,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
         }
 
         parts.push_back(sub);
-    } else if (wtx.IsZerocoinSpend()) {
+    } else if (wtx.HasZerocoinSpendInputs()) {
         //zerocoin spend outputs
         bool fFeeAssigned = false;
         for (const CTxOut& txout : wtx.vout) {
@@ -293,7 +309,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
         //
         // Credit
         //
-        BOOST_FOREACH (const CTxOut& txout, wtx.vout) {
+        for (const CTxOut& txout : wtx.vout) {
             isminetype mine = wallet->IsMine(txout);
             if (mine) {
                 TransactionRecord sub(hash, nTime);
@@ -323,7 +339,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
         int nFromMe = 0;
         bool involvesWatchAddress = false;
         isminetype fAllFromMe = ISMINE_SPENDABLE;
-        BOOST_FOREACH (const CTxIn& txin, wtx.vin) {
+        for (const CTxIn& txin : wtx.vin) {
             if (wallet->IsMine(txin)) {
                 fAllFromMeDenom = fAllFromMeDenom && wallet->IsDenominated(txin);
                 nFromMe++;
@@ -336,7 +352,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
         isminetype fAllToMe = ISMINE_SPENDABLE;
         bool fAllToMeDenom = true;
         int nToMe = 0;
-        BOOST_FOREACH (const CTxOut& txout, wtx.vout) {
+        for (const CTxOut& txout : wtx.vout) {
             if (wallet->IsMine(txout)) {
                 fAllToMeDenom = fAllToMeDenom && wallet->IsDenominatedAmount(txout.nValue);
                 nToMe++;
@@ -386,7 +402,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
             sub.credit = nCredit - nChange;
             parts.push_back(sub);
             parts.back().involvesWatchAddress = involvesWatchAddress; // maybe pass to TransactionRecord as constructor argument
-        } else if (fAllFromMe || wtx.IsZerocoinMint()) {
+        } else if (fAllFromMe || wtx.HasZerocoinMintOutputs()) {
             //
             // Debit
             //
@@ -408,7 +424,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 if (ExtractDestination(txout.scriptPubKey, address)) {
                     //This is most likely only going to happen when resyncing deterministic wallet without the knowledge of the
                     //private keys that the change was sent to. Do not display a "sent to" here.
-                    if (wtx.IsZerocoinMint())
+                    if (wtx.HasZerocoinMintOutputs())
                         continue;
                     // Sent to Wagerr Address
                     sub.type = TransactionRecord::SendToAddress;
@@ -418,20 +434,27 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     sub.address = mapValue["zerocoinmint"];
                     sub.credit += txout.nValue;
                 } else {
-                    bool isBet = false;
+                    bool isBettingEntry = false;
+                    bool isChainGameEntry = false;
                     if (txout.scriptPubKey.IsUnspendable()) {
                         vector<unsigned char> vOpCode = ParseHex(txout.scriptPubKey.ToString().substr(9, string::npos));
                         std::string opCode(vOpCode.begin(), vOpCode.end());
 
                         CPeerlessBet plBet;
                         CChainGamesBet cgBet;
-                        if (CPeerlessBet::FromOpCode(opCode, plBet) || CChainGamesBet::FromOpCode(opCode, cgBet)) {
-                            isBet = true;
+                        if (CPeerlessBet::FromOpCode(opCode, plBet)) {
+                            isBettingEntry = true;
+                        } else if (CChainGamesBet::FromOpCode(opCode, cgBet)) {
+                            isChainGameEntry = true;
                         }
                     }
-                    if (isBet) {
+                    if (isBettingEntry) {
                         // Placed a bet
                         sub.type = TransactionRecord::BetPlaced;
+                        sub.address = mapValue["to"];
+                    } else if (isChainGameEntry) {
+                        // Placed a bet
+                        sub.type = TransactionRecord::ChainGameEntry;
                         sub.address = mapValue["to"];
                     } else {
                         // Sent to IP, or other non-address transaction like OP_EVAL
@@ -576,6 +599,7 @@ std::string TransactionRecord::GetTransactionRecordType(Type type) const
         case Other: return "Other";
         case BetWin: return "BetPayout";
         case BetPlaced: return "BetPlaced";
+        case ChainGameEntry: return "ChainGameEntry";
         case Generated: return "Generated";
         case StakeMint: return "StakeMint";
         case StakeZWGR: return "StakeZWGR";

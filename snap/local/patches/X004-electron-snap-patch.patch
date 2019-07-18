@@ -1,0 +1,237 @@
+From fe95245233e8720695fc467995eccb80f16b043d Mon Sep 17 00:00:00 2001
+From: wagerrtor <tor@i2pmail.org>
+Date: Wed, 19 Jun 2019 02:39:41 +0200
+Subject: [PATCH] electron-snap-patch
+
+---
+ src/main/alerts/errors.js                     |  2 +-
+ src/main/blockchain/blockchain.js             |  4 +--
+ src/main/blockchain/daemon.js                 | 16 +++++------
+ src/main/index.js                             | 28 +++++++++----------
+ .../components/modals/ChangePassword.vue      |  2 +-
+ 5 files changed, 26 insertions(+), 26 deletions(-)
+
+diff --git a/src/main/alerts/errors.js b/src/main/alerts/errors.js
+index 1e93ea9..f3a576f 100644
+--- a/src/main/alerts/errors.js
++++ b/src/main/alerts/errors.js
+@@ -8,7 +8,7 @@ function deamonRunningError() {
+     message: 'Wagerr daemon already running!',
+     defaultId: 0,
+     detail:
+-      'Detected a running wagerrd process! \n\n Warning: Running this wallet with an already running deamon can cause inconsistent behaviour.'
++      'Detected a running wagerr.daemon process! \n\n Warning: Running this wallet with an already running deamon can cause inconsistent behaviour.'
+   });
+   app.quit();
+ }
+diff --git a/src/main/blockchain/blockchain.js b/src/main/blockchain/blockchain.js
+index 0d5bbeb..4987102 100755
+--- a/src/main/blockchain/blockchain.js
++++ b/src/main/blockchain/blockchain.js
+@@ -5,8 +5,8 @@ import PropertiesReader from 'properties-reader';
+ let testnet = 0;
+ let rpcUser = uuidv4();
+ let rpcPass = uuidv4();
+-const daemonName = 'wagerrd';
+-const cliName = 'wagerr-cli';
++const daemonName = 'wagerr.daemon';
++const cliName = 'wagerr.cli';
+ const mnoCollateral = 25000;
+ let rpcPort = 55003;
+ const minTxFee = 0.0001;
+diff --git a/src/main/blockchain/daemon.js b/src/main/blockchain/daemon.js
+index b74b39e..0815bf2 100755
+--- a/src/main/blockchain/daemon.js
++++ b/src/main/blockchain/daemon.js
+@@ -18,11 +18,11 @@ export default class Daemon {
+   constructor() {}
+ 
+   /**
+-   * Launch the wagerrd process with the given list of command line args.
++   * Launch the wagerr.daemon process with the given list of command line args.
+    */
+   runCommand(cmd) {
+     return new Promise(async resolve => {
+-      const cliPath = this.getExecutablePath('wagerr-cli');
++      const cliPath = this.getExecutablePath('wagerr.cli');
+       // Call wagerr cli to stop the wagerr daemon.
+       const wagerrcliProcess = spawn(cliPath, [
+         `-rpcuser=${blockchain.rpcUser}`,
+@@ -45,12 +45,12 @@ export default class Daemon {
+         console.log(`Daemon closing code: ${code}`);
+         // Here you can get the exit code of the script
+       });
+-      // Wait while the wagerrd exits as this can varying in time.
++      // Wait while the wagerr.daemon exits as this can varying in time.
+     });
+   }
+ 
+   launch(args) {
+-    const wagerrdPath = this.getExecutablePath('wagerrd');
++    const wagerrdPath = this.getExecutablePath('wagerr.daemon');
+     const wagerrdArgs = this.getWagerrdArgs(args);
+ 
+     console.log(`\x1b[32m Launching daemon: ${wagerrdPath}\x1b[32m`);
+@@ -62,7 +62,7 @@ export default class Daemon {
+         console.error(err);
+       }
+ 
+-      // Spawn the wagerrd and attach event callbacks.
++      // Spawn the wagerr.daemon and attach event callbacks.
+       this.wagerrdProcess = spawn(wagerrdPath, wagerrdArgs);
+       this.wagerrdProcess.stdout.on('data', data =>
+         console.log(`Daemon: ${data}`)
+@@ -76,14 +76,14 @@ export default class Daemon {
+   }
+ 
+   /**
+-   * Stop the wagerrd process.
++   * Stop the wagerr.daemon process.
+    *
+    * @returns {Promise<void>}
+    */
+   stop() {
+     return new Promise(async resolve => {
+       let running = true;
+-      const cliPath = this.getExecutablePath('wagerr-cli');
++      const cliPath = this.getExecutablePath('wagerr.cli');
+ 
+       // Call wagerr cli to stop the wagerr daemon.
+       const wagerrcliProcess = spawn(cliPath, [
+@@ -95,7 +95,7 @@ export default class Daemon {
+       wagerrcliProcess.stdout.on('data', data =>
+         console.log(`Daemon: ${data}`)
+       );
+-      // Wait while the wagerrd exits as this can varying in time.
++      // Wait while the wagerr.daemon exits as this can varying in time.
+       while (running) {
+         running = await this.isWagerrdRunning();
+       }
+diff --git a/src/main/index.js b/src/main/index.js
+index f27e172..8521cf2 100644
+--- a/src/main/index.js
++++ b/src/main/index.js
+@@ -124,7 +124,7 @@ async function createMainWindow() {
+ 
+ /**
+  * Start the Wagerr daemon and render the UI so the Wagerr Vue App can communicate with
+- * the RPC functions exposed by wagerrd.
++ * the RPC functions exposed by wagerr.daemon.
+  *
+  * @returns {Promise<void>}
+  */
+@@ -132,13 +132,13 @@ async function init(args) {
+   console.log('\x1b[32mInitialising Wagerr Electron App...\x1b[0m');
+   daemon = new Daemon();
+ 
+-  // Check if the wagerrd binary exists.
+-  const wagerrExe = daemon.getExecutablePath('wagerrd');
+-  const wagerrcliExe = daemon.getExecutablePath('wagerr-cli');
++  // Check if the wagerr.daemon binary exists.
++  const wagerrExe = daemon.getExecutablePath('wagerr.daemon');
++  const wagerrcliExe = daemon.getExecutablePath('wagerr.cli');
+ 
+   if (!fs.existsSync(wagerrExe) || !fs.existsSync(wagerrcliExe)) {
+     console.error(
+-      '\x1b[32mThe wagerrd and wagerr-cli binaries do not exist. Please download and place in the bin directory.\x1b[0m'
++      '\x1b[32mThe wagerr.daemon and wagerr.cli binaries do not exist. Please download and place in the bin directory.\x1b[0m'
+     );
+     process.exit(1);
+   }
+@@ -159,7 +159,7 @@ async function init(args) {
+   if (!isRunning) {
+     daemon.launch(args);
+   } else {
+-    // Show popup warning the users a wagerrd instance is all ready running.
++    // Show popup warning the users a wagerr.daemon instance is all ready running.
+     forcelyQuit = true;
+     errors.deamonRunningError();
+   }
+@@ -230,7 +230,7 @@ ipcMain.on('salvage-wallet', async (event, arg) => {
+     global.restarting = true;
+ 
+     await daemon.stop().catch(function() {
+-      console.log('Wagerrd may not have shutdown correctly.');
++      console.log('wagerr.daemon may not have shutdown correctly.');
+     });
+     await mainWindow.close();
+     await init(arg);
+@@ -252,7 +252,7 @@ ipcMain.on('rescan-blockchain', async (event, arg) => {
+     global.restarting = true;
+ 
+     await daemon.stop().catch(function() {
+-      console.log('Wagerrd may not have shutdown correctly.');
++      console.log('wagerr.daemon may not have shutdown correctly.');
+     });
+     await mainWindow.close();
+     await init(arg);
+@@ -275,7 +275,7 @@ ipcMain.on('recover-tx-1', async (event, arg) => {
+     global.restarting = true;
+ 
+     await daemon.stop().catch(function() {
+-      console.log('Wagerrd may not have shutdown correctly.');
++      console.log('wagerr.daemon may not have shutdown correctly.');
+     });
+     await mainWindow.close();
+     await init(arg);
+@@ -297,7 +297,7 @@ ipcMain.on('recover-tx-2', async (event, arg) => {
+     global.restarting = true;
+ 
+     await daemon.stop().catch(function() {
+-      console.log('Wagerrd may not have shutdown correctly.');
++      console.log('wagerr.daemon may not have shutdown correctly.');
+     });
+     await mainWindow.close();
+     await init(arg);
+@@ -319,7 +319,7 @@ ipcMain.on('upgrade-wallet', async (event, arg) => {
+     global.restarting = true;
+ 
+     await daemon.stop().catch(function() {
+-      console.log('Wagerrd may not have shutdown correctly.');
++      console.log('wagerr.daemon may not have shutdown correctly.');
+     });
+     await mainWindow.close();
+     await init(arg);
+@@ -341,7 +341,7 @@ ipcMain.on('reindex-blockchain', async (event, arg) => {
+     global.restarting = true;
+ 
+     await daemon.stop().catch(function() {
+-      console.log('Wagerrd may not have shutdown correctly.');
++      console.log('wagerr.daemon may not have shutdown correctly.');
+     });
+     await mainWindow.close();
+     await init(arg);
+@@ -363,7 +363,7 @@ ipcMain.on('resync-blockchain', async (event, arg) => {
+     global.restarting = true;
+ 
+     await daemon.stop().catch(function() {
+-      console.log('Wagerrd may not have shutdown correctly.');
++      console.log('wagerr.daemon may not have shutdown correctly.');
+     });
+     await mainWindow.close();
+     await init(arg);
+@@ -385,7 +385,7 @@ ipcMain.on('restart-wagerrd', async (event, arg) => {
+     global.restarting = true;
+ 
+     await daemon.stop().catch(function() {
+-      console.log('Wagerrd may not have shutdown correctly.');
++      console.log('wagerr.daemon may not have shutdown correctly.');
+     });
+     await mainWindow.close();
+     await init(arg);
+diff --git a/src/renderer/components/modals/ChangePassword.vue b/src/renderer/components/modals/ChangePassword.vue
+index ac4a615..ca05c82 100644
+--- a/src/renderer/components/modals/ChangePassword.vue
++++ b/src/renderer/components/modals/ChangePassword.vue
+@@ -106,7 +106,7 @@ export default {
+       });
+     },
+ 
+-    // Update the wallet password using the JSON RPC call the the wagerrd.
++    // Update the wallet password using the JSON RPC call the the wagerr.daemon.
+     changePassword: function() {
+       let self = this;
+ 
+-- 
+2.17.1
+

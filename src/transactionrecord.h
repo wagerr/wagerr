@@ -81,6 +81,7 @@ public:
         MNReward,
         BetWin,
         BetPlaced,
+        ChainGameEntry,
         RecvFromOther,
         SendToSelf,
         ZerocoinMint,

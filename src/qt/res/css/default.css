@@ -1723,6 +1723,16 @@ QWidget#GovernancePage .ProposalFrame#proposalFramePassing {
     border:1px solid #00ef00;
 }
 
+QWidget#GovernancePage .ProposalFrame#proposalFrameNotEstablished {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #0080ff, stop: 1 #00a3ff);
+    border:1px solid #00a3ff;
+}
+
+QWidget#GovernancePage .ProposalFrame#proposalFramePassingUnfunded {
+    background-color:qlineargradient(x1: 0, y1: 0, x2: 1, y2: 0, stop: 0 #cccc00, stop: 1 #efef00);
+    border:1px solid #efef00;
+}
+
 QWidget#GovernancePage .ProposalFrame > QLabel#strProposalName, QLabel#strMonthlyPayout, QLabel#strRemainingPaymentCount {
     font-size:18pt;
 }

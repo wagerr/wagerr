@@ -9,6 +9,8 @@
 #include "streams.h"
 #include "uint256.h"
 #include "version.h"
+#include "random.h"
+#include "test/test_wagerr.h"
 
 #include <vector>
 
@@ -28,7 +30,7 @@ public:
     }
 };
 
-BOOST_AUTO_TEST_SUITE(pmt_tests)
+BOOST_FIXTURE_TEST_SUITE(pmt_tests, BasicTestingSetup)
 
 BOOST_AUTO_TEST_CASE(pmt_test1)
 {

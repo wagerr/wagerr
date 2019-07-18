@@ -62,11 +62,11 @@
         <translation>Modtageradresse</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
+        <source>These are your WAGERR addresses for sending payments. Always check the amount and the receiving address before sending coins.</source>
         <translation>Dine adresser til at sende betalinger med. Kontroller altid både beløb og modtageradresse før afsendelse.</translation>
     </message>
     <message>
-        <source>These are your Wagerr addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
+        <source>These are your WAGERR addresses for receiving payments. It is recommended to use a new receiving address for each transaction.</source>
         <translation>Dette er dine modtager adresser. Det anbefales at anvende en ny adresse til hver transaktion</translation>
     </message>
     <message>
@@ -254,11 +254,11 @@
         <translation>Adresse</translation>
     </message>
     <message>
-        <source>Enter a Wagerr Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
+        <source>Enter a WAGERR Address that you would like to encrypt using BIP 38. Enter a passphrase in the middle box. Press encrypt to compute the encrypted private key.</source>
         <translation>Indtast en WAGERR-adresse, som du gerne vil kryptere ved hjælp af BIP 38. Indtast en adgangskode i mellemkassen. Tryk på krypteringen for at beregne den krypterede private nøgle.</translation>
     </message>
     <message>
-        <source>The Wagerr address to encrypt</source>
+        <source>The WAGERR address to encrypt</source>
         <translation>WAGERR-adressen for at kryptere</translation>
     </message>
     <message>
@@ -290,7 +290,7 @@
         <translation>Kopier den aktuelle underskrift til udklipsholderen.</translation>
     </message>
     <message>
-        <source>Encrypt the private key for this Wagerr address</source>
+        <source>Encrypt the private key for this WAGERR address</source>
         <translation>Krypter den private nøgle for denne WAGERR-adresse</translation>
     </message>
     <message>
@@ -608,10 +608,6 @@
         <source>&amp;Command-line options</source>
         <translation>&amp;Kommandolinieparametre</translation>
     </message>
-    <message numerus="yes">
-        <source>Processed %n blocks of transaction history.</source>
-        <translation><numerusform>Behandlet %n blok af transaktionshistorik.</numerusform><numerusform>Behandlet %n blokke af transaktionshistorik.</numerusform></translation>
-    </message>
     <message>
         <source>Synchronizing additional data: %p%</source>
         <translation>Synkroniserer yderligere data %p%</translation>
@@ -645,16 +641,16 @@
         <translation>Værktøjslinier</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR kerne</translation>
     </message>
     <message>
-        <source>Send coins to a Wagerr address</source>
-        <translation>Send mønter til en Wagerr adresse</translation>
+        <source>Send coins to a WAGERR address</source>
+        <translation>Send mønter til en WAGERR adresse</translation>
     </message>
     <message>
         <source>Request payments (generates QR codes and wagerr: URIs)</source>
-        <translation>Anmod om betaling (genrerer QR kode og Wagerr URL)</translation>
+        <translation>Anmod om betaling (genrerer QR kode og WAGERR URL)</translation>
     </message>
     <message>
         <source>&amp;Privacy</source>
@@ -669,24 +665,24 @@
         <translation>Vis masternoder</translation>
     </message>
     <message>
-        <source>&amp;About Wagerr Core</source>
-        <translation>&amp;Om Wagerr kerne</translation>
+        <source>&amp;About WAGERR Core</source>
+        <translation>&amp;Om WAGERR kerne</translation>
     </message>
     <message>
-        <source>Show information about Wagerr Core</source>
-        <translation>Vis information om Wagerr kerne</translation>
+        <source>Show information about WAGERR Core</source>
+        <translation>Vis information om WAGERR kerne</translation>
     </message>
     <message>
         <source>Modify configuration options for WAGERR</source>
         <translation>Ret konfigurationsindstillinger for WAGERR</translation>
     </message>
     <message>
-        <source>Sign messages with your Wagerr addresses to prove you own them</source>
-        <translation>Underskriv beskeder med Deres Wagerr adresser for at bekræfte at De ejer dem.</translation>
+        <source>Sign messages with your WAGERR addresses to prove you own them</source>
+        <translation>Underskriv beskeder med Deres WAGERR adresser for at bekræfte at De ejer dem.</translation>
     </message>
     <message>
-        <source>Verify messages to ensure they were signed with specified Wagerr addresses</source>
-        <translation>Verificer besked for at sikre, at den er underskrevet med den opgivne Wagerr adresse</translation>
+        <source>Verify messages to ensure they were signed with specified WAGERR addresses</source>
+        <translation>Verificer besked for at sikre, at den er underskrevet med den opgivne WAGERR adresse</translation>
     </message>
     <message>
         <source>&amp;BIP38 tool</source>
@@ -718,7 +714,7 @@
     </message>
     <message>
         <source>Open a WAGERR: URI or payment request</source>
-        <translation>Åbn en Wagerr URl eller betalingsanmodning</translation>
+        <translation>Åbn en WAGERR URl eller betalingsanmodning</translation>
     </message>
     <message>
         <source>&amp;Blockchain explorer</source>
@@ -729,16 +725,12 @@
         <translation>Blockexplorer vindue</translation>
     </message>
     <message>
-        <source>Show the Wagerr Core help message to get a list with possible Wagerr command-line options</source>
-        <translation>Vis hjelpetekster fra Wagerr kernen for at få en liste med mulige Wagerr kommandolinie-startparametre</translation>
+        <source>Show the WAGERR Core help message to get a list with possible WAGERR command-line options</source>
+        <translation>Vis hjelpetekster fra WAGERR kernen for at få en liste med mulige WAGERR kommandolinie-startparametre</translation>
     </message>
     <message>
-        <source>Wagerr Core client</source>
+        <source>WAGERR Core client</source>
         <translation>WAGERR kerneklient</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n active connection(s) to Wagerr network</source>
-        <translation><numerusform>%n aktiv forbindelse til WAGERR-netværk</numerusform><numerusform>%n aktiv forbindelse(s) til Wagerr netværk</numerusform></translation>
     </message>
     <message>
         <source>Synchronizing with network...</source>
@@ -760,25 +752,9 @@
         <source>Up to date</source>
         <translation>Opdateret!</translation>
     </message>
-    <message numerus="yes">
-        <source>%n hour(s)</source>
-        <translation><numerusform>%n timer</numerusform><numerusform>%n timer</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n day(s)</source>
-        <translation><numerusform>%n dage</numerusform><numerusform>%n dage</numerusform></translation>
-    </message>
-    <message numerus="yes">
-        <source>%n week(s)</source>
-        <translation><numerusform>%n uger</numerusform><numerusform>%n uger</numerusform></translation>
-    </message>
     <message>
         <source>%1 and %2</source>
         <translation>%1 og %2</translation>
-    </message>
-    <message numerus="yes">
-        <source>%n year(s)</source>
-        <translation><numerusform>%n år</numerusform><numerusform>%n år</numerusform></translation>
     </message>
     <message>
         <source>Catching up...</source>
@@ -864,7 +840,7 @@ Adresse: %4
         <source>Wallet is &lt;b&gt;encrypted&lt;/b&gt; and currently &lt;b&gt;locked&lt;/b&gt;</source>
         <translation>Tegnebogen er &lt;b&gt;krypteret og låst&lt;/b&gt;</translation>
     </message>
-</context>
+    </context>
 <context>
     <name>BlockExplorer</name>
     <message>
@@ -1185,8 +1161,8 @@ Adresse: %4
         <translation>Ret afsenderadresse</translation>
     </message>
     <message>
-        <source>The entered address "%1" is not a valid Wagerr address.</source>
-        <translation>Den indtastede adresse %1 er ikke en gyldig Wagerr adresse</translation>
+        <source>The entered address "%1" is not a valid WAGERR address.</source>
+        <translation>Den indtastede adresse %1 er ikke en gyldig WAGERR adresse</translation>
     </message>
     <message>
         <source>The entered address "%1" is already in the address book.</source>
@@ -1225,13 +1201,24 @@ Adresse: %4
     </message>
 </context>
 <context>
+    <name>GovernancePage</name>
+    <message>
+        <source>Form</source>
+        <translation>Formular</translation>
+    </message>
+    <message>
+        <source>0</source>
+        <translation>0</translation>
+    </message>
+    </context>
+<context>
     <name>HelpMessageDialog</name>
     <message>
         <source>version</source>
         <translation>version</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR kerne</translation>
     </message>
     <message>
@@ -1239,8 +1226,8 @@ Adresse: %4
         <translation>(%1-bit)</translation>
     </message>
     <message>
-        <source>About Wagerr Core</source>
-        <translation>om Wagerr kerne</translation>
+        <source>About WAGERR Core</source>
+        <translation>om WAGERR kerne</translation>
     </message>
     <message>
         <source>Command-line options</source>
@@ -1286,16 +1273,16 @@ Adresse: %4
         <translation>Velkommen</translation>
     </message>
     <message>
-        <source>Welcome to Wagerr Core.</source>
-        <translation>Velkommen til Wagerr kerne</translation>
+        <source>Welcome to WAGERR Core.</source>
+        <translation>Velkommen til WAGERR kerne</translation>
     </message>
     <message>
-        <source>As this is the first time the program is launched, you can choose where Wagerr Core will store its data.</source>
-        <translation>Da det er første gang programmet startes, kan De vælge hvor Wagerr kernen skal lagre sine data</translation>
+        <source>As this is the first time the program is launched, you can choose where WAGERR Core will store its data.</source>
+        <translation>Da det er første gang programmet startes, kan De vælge hvor WAGERR kernen skal lagre sine data</translation>
     </message>
     <message>
-        <source>Wagerr Core will download and store a copy of the Wagerr block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
-        <translation>WAGERR kernen vil nu hente og gemme en kopi af Wagerr blockchain. Der skal være mindst %1GB ledigt på lagermediet, og behovet vil stige efterhånden som tiden går. Selve tegnebogen vil også blive gemt her.</translation>
+        <source>WAGERR Core will download and store a copy of the WAGERR block chain. At least %1GB of data will be stored in this directory, and it will grow over time. The wallet will also be stored in this directory.</source>
+        <translation>WAGERR kernen vil nu hente og gemme en kopi af WAGERR blockchain. Der skal være mindst %1GB ledigt på lagermediet, og behovet vil stige efterhånden som tiden går. Selve tegnebogen vil også blive gemt her.</translation>
     </message>
     <message>
         <source>Use the default data directory</source>
@@ -1306,7 +1293,7 @@ Adresse: %4
         <translation>Anvend en mappe valgt af brugeren</translation>
     </message>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR kerne</translation>
     </message>
     <message>
@@ -1448,12 +1435,12 @@ Adresse: %4
         <translation>Indtast modtageradresse</translation>
     </message>
     <message>
-        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other Wagerr addresses after it matures.
-To Add: enter percentage to give and Wagerr address to add to the MultiSend vector.
+        <source>MultiSend allows you to automatically send up to 100% of your stake or masternode reward to a list of other WAGERR addresses after it matures.
+To Add: enter percentage to give and WAGERR address to add to the MultiSend vector.
 To Delete: Enter address to delete and press delete.
 MultiSend will not be activated unless you have clicked Activate</source>
-        <translation>Multisend tillader at De automatisk kan sende op til 100% af Deres belønninger fra såvel indskud som masternodebelønninger til en liste over andre Wagerr adressater når den er tilstrækkelig stor. 
-For at tilføje: Indtast procentsatsen De ønsker at overføre samt den Wagerr adresse som skal modtage via Multisendsystemet. 
+        <translation>Multisend tillader at De automatisk kan sende op til 100% af Deres belønninger fra såvel indskud som masternodebelønninger til en liste over andre WAGERR adressater når den er tilstrækkelig stor. 
+For at tilføje: Indtast procentsatsen De ønsker at overføre samt den WAGERR adresse som skal modtage via Multisendsystemet. 
 For at fjerne: Indtast adressen som skal slettes og klik på slet. 
 Multisend vil ikke fungere med mindre systemet er aktiveret.</translation>
     </message>
@@ -1542,48 +1529,26 @@ Multisend vil ikke fungere med mindre systemet er aktiveret.</translation>
         <translation>(ingen opmærknig)</translation>
     </message>
     <message>
-        <source>The entered address:
-</source>
-        <translation>Den indtastede adresse:
-</translation>
-    </message>
-    <message>
-        <source> is invalid.
-Please check the address and try again.</source>
-        <translation>er ikke gyldig. 
-Kontroller adressen og prøv igen.</translation>
-    </message>
-    <message>
-        <source>The total amount of your MultiSend vector is over 100% of your stake reward
-</source>
+        <source>The total amount of your MultiSend vector is over 100% of your stake reward</source>
         <translation>Den totale sum af Deres Multisendgruppe er over 100% af Deres indskudsbelønning
 </translation>
     </message>
     <message>
-        <source>Please Enter 1 - 100 for percent.</source>
-        <translation>Indtast en procentsats 1-100 </translation>
-    </message>
-    <message>
-        <source>Saved the MultiSend to memory, but failed saving properties to the database.
-</source>
+        <source>Saved the MultiSend to memory, but failed saving properties to the database.</source>
         <translation>Gemt MultiSend til hukommelse, men fejlede gemme egenskaber til databasen.
 </translation>
     </message>
     <message>
-        <source>MultiSend Vector
-</source>
-        <translation>Multisendgruppe
-</translation>
+        <source>Removed %1</source>
+        <translation>Fjernet %1</translation>
     </message>
     <message>
-        <source>Removed </source>
-        <translation>Fjernet</translation>
+        <source>Could not locate address</source>
+        <translation>Kunne ikke finde adresse</translation>
     </message>
     <message>
-        <source>Could not locate address
-</source>
-        <translation>Kunne ikke finde adresse
-</translation>
+        <source>Please Enter 1 - 100 for percent.</source>
+        <translation>Indtast en procentsats 1-100 </translation>
     </message>
 </context>
 <context>
@@ -1758,73 +1723,6 @@ Vær tålmodig efter at du har klikket på import.</translation>
     </message>
 </context>
 <context>
-    <name>ObfuscationConfig</name>
-    <message>
-        <source>Configure Obfuscation</source>
-        <translation>Konfigurer tilslørin</translation>
-    </message>
-    <message>
-        <source>Basic Privacy</source>
-        <translation>Grundlæggende tilsløret </translation>
-    </message>
-    <message>
-        <source>High Privacy</source>
-        <translation>Grundigt tilsløret</translation>
-    </message>
-    <message>
-        <source>Maximum Privacy</source>
-        <translation>Meget grundigt tilsløret</translation>
-    </message>
-    <message>
-        <source>Please select a privacy level.</source>
-        <translation>Vælg tilsløringsniveau</translation>
-    </message>
-    <message>
-        <source>Use 2 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Brug 2 separate masternoder for at tilsløre beløb op til 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 8 separate masternodes to mix funds up to 25000 WGR</source>
-        <translation>Brug 8 separate masternoder for at tilsløre op til 25000 WGR</translation>
-    </message>
-    <message>
-        <source>Use 16 separate masternodes</source>
-        <translation>Brug 16 separate masternoder</translation>
-    </message>
-    <message>
-        <source>This option is the quickest and will cost about ~0.025 WGR to anonymize 25000 WGR</source>
-        <translation>Dette valg er det hurtigste og vil koste i omegnen af 0.025 WGR for at anonymiser 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This option is moderately fast and will cost about 0.05 WGR to anonymize 25000 WGR</source>
-        <translation>Dette valg er relativt hurtigt og vil koste i omegnen af 0.05 WGR for at anonymiser 25000 WGR</translation>
-    </message>
-    <message>
-        <source>This is the slowest and most secure option. Using maximum anonymity will cost</source>
-        <translation>Denne mulighed er den langsomste og det mest sikre valg. Valg af maksimal tilsløring vil koste</translation>
-    </message>
-    <message>
-        <source>0.1 WGR per 25000 WGR you anonymize.</source>
-        <translation>0.1 pr 25000 WGR for at tilsløre.</translation>
-    </message>
-    <message>
-        <source>Obfuscation Configuration</source>
-        <translation>Tilsløringskonfiguration</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to basic (%1 and 2 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Tilsløring blev sat til grundlæggende (%1 og 2 gennemløb) De kan ændre dette hvornår De vil ved at åbne Wagerr konfigurationsbillede.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to high (%1 and 8 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Tilsløring blev sat til høj (%1 og 8 gennemløb) De kan ændre dette hvornår De vil ved at åbne Wagerr konfigurationsbillede.</translation>
-    </message>
-    <message>
-        <source>Obfuscation was successfully set to maximum (%1 and 16 rounds). You can change this at any time by opening WAGERR's configuration screen.</source>
-        <translation>Tilsløring blev sat til maksimum (%1 og 16 gennemløb) De kan ændre dette hvornår De vil ved at åbne Wagerr konfigurationsbillede.</translation>
-    </message>
-</context>
-<context>
     <name>OpenURIDialog</name>
     <message>
         <source>Open URI</source>
@@ -1882,8 +1780,8 @@ Vær tålmodig efter at du har klikket på import.</translation>
         <translation>Hvis De slår "brug af ubekræftede penge tilbage" vil penge tilbage &lt;br/&gt; ikke kunne benyttes før transaktionen er bekræftet mindst en gang. &lt;br/&gt;Dette har også indflydelse på opgørelsen af saldoen.</translation>
     </message>
     <message>
-        <source>Automatically open the Wagerr client port on the router. This only works when your router supports UPnP and it is enabled.</source>
-        <translation>Åbn Wagerr klientporten på ruteren automatisk. Virker kun hvis UPnP er slået til i ruteren. </translation>
+        <source>Automatically open the WAGERR client port on the router. This only works when your router supports UPnP and it is enabled.</source>
+        <translation>Åbn WAGERR klientporten på ruteren automatisk. Virker kun hvis UPnP er slået til i ruteren. </translation>
     </message>
     <message>
         <source>Accept connections from outside</source>
@@ -1902,12 +1800,12 @@ Vær tålmodig efter at du har klikket på import.</translation>
         <translation>Ekspert</translation>
     </message>
     <message>
-        <source>Automatically start Wagerr after logging in to the system.</source>
-        <translation>Start Wagerr automatisk, når der logges på systemet</translation>
+        <source>Automatically start WAGERR after logging in to the system.</source>
+        <translation>Start WAGERR automatisk, når der logges på systemet</translation>
     </message>
     <message>
-        <source>&amp;Start Wagerr on system login</source>
-        <translation>&amp;start Wagerr når der logges på systemet</translation>
+        <source>&amp;Start WAGERR on system login</source>
+        <translation>&amp;start WAGERR når der logges på systemet</translation>
     </message>
     <message>
         <source>Whether to show coin control features or not.</source>
@@ -1935,13 +1833,13 @@ Vær tålmodig efter at du har klikket på import.</translation>
     </message>
     <message>
         <source>The user interface language can be set here. This setting will take effect after restarting WAGERR.</source>
-        <translation>Vælg sprog her. Ændringerne træder i kraft næste gang Wagerr klienten startes</translation>
+        <translation>Vælg sprog her. Ændringerne træder i kraft næste gang WAGERR klienten startes</translation>
     </message>
     <message>
         <source>Language missing or translation incomplete? Help contributing translations here:
-https://www.transifex.com/wagerr/wagerr-translations</source>
+https://www.transifex.com/wagerr/wagerr</source>
         <translation>Det valgte sprog mangler, eller oversættelsen er mangelfuld. Hjælp ved at bidrage med oversættelser her:
-https://www.transifex.com/wagerr/wagerr-translations</translation>
+https://www.transifex.com/wagerr/wagerr</translation>
     </message>
     <message>
         <source>Map port using &amp;UPnP</source>
@@ -1976,8 +1874,8 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Indtastningsgrænse for indsats:</translation>
     </message>
     <message>
-        <source>Connect to the Wagerr network through a SOCKS5 proxy.</source>
-        <translation>Tilslut Wagerr netværket gennem en SOCKS5 PROXY</translation>
+        <source>Connect to the WAGERR network through a SOCKS5 proxy.</source>
+        <translation>Tilslut WAGERR netværket gennem en SOCKS5 PROXY</translation>
     </message>
     <message>
         <source>Proxy &amp;IP:</source>
@@ -2026,10 +1924,6 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
     <message>
         <source>User Interface Theme:</source>
         <translation>Brugers tema:</translation>
-    </message>
-    <message>
-        <source>&amp;Unit to show amounts in:</source>
-        <translation>&amp;Enhed som beløb vises i</translation>
     </message>
     <message>
         <source>Choose the default subdivision unit to show in the interface and when sending coins.</source>
@@ -2155,7 +2049,7 @@ https://www.transifex.com/wagerr/wagerr-translations</translation>
         <translation>Nuværende låst balance i kun-adresser</translation>
     </message>
     <message>
-        <source>Your current Wagerr balance, unconfirmed and immature transactions included</source>
+        <source>Your current WAGERR balance, unconfirmed and immature transactions included</source>
         <translation>Din nuværende WAGERR-saldo, ubekræftede og umodne transaktioner inkluderet</translation>
     </message>
     <message>
@@ -2175,8 +2069,8 @@ Immature: confirmed, but less than 1 mint of the same denomination after it was 
 Uplettet: bekræftet, men mindre end 1 minutter med samme betegnelse, efter at den blev mønnet</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>De viste informationer kan være uddaterede. Deres tegnebog synkronisere automatism med Wagerr netværket så snart en forbindelse er etalbleret, men denne proces er ikke færdiggjort endnu. </translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>De viste informationer kan være uddaterede. Deres tegnebog synkronisere automatism med WAGERR netværket så snart en forbindelse er etalbleret, men denne proces er ikke færdiggjort endnu. </translation>
     </message>
     <message>
         <source>OVERVIEW</source>
@@ -2288,10 +2182,10 @@ For at aktivere AutoMint-ændring 'enablezeromint = 0' til 'enablezeromint = 1' 
     </message>
     <message>
         <source>Cannot start wagerr: click-to-pay handler</source>
-        <translation>Kan ikke starte Wagerr "klik for at betale" systemet</translation>
+        <translation>Kan ikke starte WAGERR "klik for at betale" systemet</translation>
     </message>
     <message>
-        <source>URI cannot be parsed! This can be caused by an invalid Wagerr address or malformed URI parameters.</source>
+        <source>URI cannot be parsed! This can be caused by an invalid WAGERR address or malformed URI parameters.</source>
         <translation>URl kan ikke fortolkes! Det kan skyldes en ugyldig adresse, eller forkerte URl parametre.</translation>
     </message>
     <message>
@@ -2377,8 +2271,8 @@ For at aktivere AutoMint-ændring 'enablezeromint = 0' til 'enablezeromint = 1' 
         <translation>Zerocoin Aktioner:</translation>
     </message>
     <message>
-        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the Wagerr network after a connection is established, but this process has not completed yet.</source>
-        <translation>De viste informationer kan være uddaterede. Deres tegnebog synkronisere automatism med Wagerr netværket så snart en forbindelse er etalbleret, men denne proces er ikke færdiggjort endnu. </translation>
+        <source>The displayed information may be out of date. Your wallet automatically synchronizes with the WAGERR network after a connection is established, but this process has not completed yet.</source>
+        <translation>De viste informationer kan være uddaterede. Deres tegnebog synkronisere automatism med WAGERR netværket så snart en forbindelse er etalbleret, men denne proces er ikke færdiggjort endnu. </translation>
     </message>
     <message>
         <source>Mint Zerocoin</source>
@@ -2393,36 +2287,12 @@ For at aktivere AutoMint-ændring 'enablezeromint = 0' til 'enablezeromint = 1' 
         <translation>zWGR</translation>
     </message>
     <message>
-        <source>Available for minting are coins which are confirmed and not locked or Masternode collaterals.</source>
-        <translation>Til rådighed for mintning er mønter, som er bekræftet og ikke låst eller Masternode collaterals.</translation>
-    </message>
-    <message>
-        <source>Available for Minting:</source>
-        <translation>Til rådighed til Minting:</translation>
-    </message>
-    <message>
-        <source>0.000 000 00 WGR</source>
-        <translation>0.000 000 00 WGR</translation>
-    </message>
-    <message>
         <source>Reset Zerocoin Wallet DB. Deletes transactions that did not make it into the blockchain.</source>
         <translation>Nulstil Zerocoin Wallet DB. Sletter transaktioner, der ikke gjorde det i blokkæden.</translation>
     </message>
     <message>
         <source>Reset</source>
         <translation>Nulstil</translation>
-    </message>
-    <message>
-        <source>Coin Control...</source>
-        <translation>Møntkontrol...</translation>
-    </message>
-    <message>
-        <source>Quantity:</source>
-        <translation>Antal:</translation>
-    </message>
-    <message>
-        <source>Amount:</source>
-        <translation>Beløb</translation>
     </message>
     <message>
         <source>Rescan the complete blockchain for  Zerocoin mints and their meta-data.</source>
@@ -2439,10 +2309,6 @@ For at aktivere AutoMint-ændring 'enablezeromint = 0' til 'enablezeromint = 1' 
     <message>
         <source>PRIVACY</source>
         <translation>PRIVATLIV</translation>
-    </message>
-    <message>
-        <source>Enter an amount of Wgr to convert to zWGR</source>
-        <translation>Indtast en mængde Wgr for at konvertere til zWgr</translation>
     </message>
     <message>
         <source>zWGR Control</source>
@@ -2485,23 +2351,11 @@ zWGR er modne, når de har mere end 20 bekræftelser OG mere end 2 minutter med 
         <translation>0 zWGR</translation>
     </message>
     <message>
-        <source>Security Level for Zerocoin Transactions. More is better, but needs more time and resources.</source>
-        <translation>Sikkerhedsniveau for Zerocoin Transaktioner. Mere er bedre, men har brug for mere tid og ressourcer.</translation>
-    </message>
-    <message>
-        <source>Security Level:</source>
-        <translation>Sikkerhedsniveau:</translation>
-    </message>
-    <message>
-        <source>Security Level 1 - 100 (default: 42)</source>
-        <translation>Sikkerhedsniveau 1 - 100 (standard: 42)</translation>
-    </message>
-    <message>
         <source>Pay &amp;To:</source>
         <translation>Betal &amp;Til</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to. Creates local payment to yourself when empty.</source>
+        <source>The WAGERR address to send the payment to. Creates local payment to yourself when empty.</source>
         <translation>WAGERR-adressen for at sende betalingen til. Opretter lokal betaling til dig selv, når du er tom.</translation>
     </message>
     <message>
@@ -2760,32 +2614,10 @@ For at ændre procentdelen (ingen genstart kræves):.
         <translation>Mint Status: Okay</translation>
     </message>
     <message>
-        <source>Copy quantity</source>
-        <translation>Kopiér antal</translation>
-    </message>
-    <message>
-        <source>Copy amount</source>
-        <translation>Kopiér beløb</translation>
-    </message>
-    <message>
         <source>Starting ResetMintZerocoin: rescanning complete blockchain, this will need up to 30 minutes depending on your hardware.
 Please be patient...</source>
         <translation>Starter ResetMintZerocoin: Genskanning af komplet blockchain, dette vil tage op til 30 minutter afhængigt af din hardware.
 Vær tålmodig...</translation>
-    </message>
-    <message>
-        <source>Spending Zerocoin.
-Computationally expensive, might need several minutes depending on the selected Security Level and your hardware.
-Please be patient...</source>
-        <translation>Tilbringe Zerocoin
-Computationally dyrt, kan have brug for flere minutter afhængigt af det valgte sikkerhedsniveau og din hardware.
-Vær tålmodig..</translation>
-    </message>
-    <message>
-        <source>) needed.
-Maximum allowed: </source>
-        <translation>) havde brug for.
-Maksimum tilladt:</translation>
     </message>
     <message>
         <source>zWGR Spend #: </source>
@@ -2884,32 +2716,6 @@ Maksimum tilladt:</translation>
         <translation>Denom. &lt;b&gt;5000&lt;/b&gt;:</translation>
     </message>
     <message>
-        <source>Error: Your wallet is locked. Please enter the wallet passphrase first.</source>
-        <translation>Fejl: Din tegnebog er låst. Indtast venligst lommebrevets kodeord først.</translation>
-    </message>
-    <message>
-        <source>Message: Enter an amount &gt; 0.</source>
-        <translation>Meddelelse: Indtast et beløb&gt; 0.</translation>
-    </message>
-    <message>
-        <source>Minting </source>
-        <translation>Minting</translation>
-    </message>
-    <message>
-        <source>Successfully minted </source>
-        <translation>Mynt succesfuldt</translation>
-    </message>
-    <message>
-        <source> zWGR in </source>
-        <translation> zWGR i</translation>
-    </message>
-    <message>
-        <source> sec. Used denominations:
-</source>
-        <translation>sek. Brugte betegnelser:.
-</translation>
-    </message>
-    <message>
         <source>Duration: </source>
         <translation>Varighed:</translation>
     </message>
@@ -2929,7 +2735,7 @@ Maksimum tilladt:</translation>
     </message>
     <message>
         <source>Invalid Wagerr Address</source>
-        <translation> Ugyldig Wagerr adresse</translation>
+        <translation> Ugyldig WAGERR adresse</translation>
     </message>
     <message>
         <source>Invalid Send Amount</source>
@@ -2952,43 +2758,16 @@ Maksimum tilladt:</translation>
         <translation>til en nyligt genereret (ubrugt og derfor anonym) lokal adresse &lt;br /&gt;</translation>
     </message>
     <message>
-        <source>with Security Level </source>
-        <translation>med sikkerhedsniveau</translation>
-    </message>
-    <message>
         <source>Confirm send coins</source>
         <translation>Bekræft at De vil sende mønter</translation>
-    </message>
-    <message>
-        <source>Version 1 zWGR require a security level of 100 to successfully spend.</source>
-        <translation>Version 1 zWGR kræver et sikkerhedsniveau på 100 til succes.</translation>
-    </message>
-    <message>
-        <source>Failed to spend zWGR</source>
-        <translation>Kunne ikke bruge zWGR</translation>
     </message>
     <message>
         <source>Failed to fetch mint associated with serial hash</source>
         <translation>Kunne ikke hente mynte i forbindelse med seriel hash</translation>
     </message>
     <message>
-        <source>Too much inputs (</source>
-        <translation>For mange input (</translation>
-    </message>
-    <message>
-        <source>
-Either mint higher denominations (so fewer inputs are needed) or reduce the amount to spend.</source>
-        <translation>
-Enten mint højere nomineringer (så færre input er nødvendige) eller reducere det beløb, der skal bruges.</translation>
-    </message>
-    <message>
         <source>Spend Zerocoin failed with status = </source>
         <translation>Brug Zerocoin mislykkedes med status =</translation>
-    </message>
-    <message numerus="yes">
-        <source>PrivacyDialog</source>
-        <comment>Enter an amount of WGR to convert to zWGR</comment>
-        <translation><numerusform>PrivacyDialog</numerusform><numerusform>PrivacyDialog</numerusform></translation>
     </message>
     <message>
         <source>denomination: </source>
@@ -3024,14 +2803,17 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     </message>
 </context>
 <context>
+    <name>ProposalFrame</name>
+    </context>
+<context>
     <name>QObject</name>
     <message>
         <source>Amount</source>
         <translation>Beløb</translation>
     </message>
     <message>
-        <source>Enter a Wagerr address (e.g. %1)</source>
-        <translation>Indtast en Wagerr adresse (F.eks. %1)</translation>
+        <source>Enter a WAGERR address (e.g. %1)</source>
+        <translation>Indtast en WAGERR adresse (F.eks. %1)</translation>
     </message>
     <message>
         <source>%1 d</source>
@@ -3073,7 +2855,11 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <source>%1 ms</source>
         <translation>%1 ms</translation>
     </message>
-</context>
+    <message>
+        <source>WAGERR Core</source>
+        <translation>WAGERR kerne</translation>
+    </message>
+    </context>
 <context>
     <name>QRImageWidget</name>
     <message>
@@ -3168,8 +2954,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Block chain</translation>
     </message>
     <message>
-        <source>Open the Wagerr debug log file from the current data directory. This can take a few seconds for large log files.</source>
-        <translation>Åbn Wagerr debug logfilen fra den aktuelle datamappe. Det kan godt tage lidt tid hvis filen er meget stor.</translation>
+        <source>Open the WAGERR debug log file from the current data directory. This can take a few seconds for large log files.</source>
+        <translation>Åbn WAGERR debug logfilen fra den aktuelle datamappe. Det kan godt tage lidt tid hvis filen er meget stor.</translation>
     </message>
     <message>
         <source>Number of Masternodes</source>
@@ -3384,8 +3170,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Ud:</translation>
     </message>
     <message>
-        <source>Welcome to the Wagerr RPC console.</source>
-        <translation>Velkommen til Wagerr RPC konsollet</translation>
+        <source>Welcome to the WAGERR RPC console.</source>
+        <translation>Velkommen til WAGERR RPC konsollet</translation>
     </message>
     <message>
         <source>&amp;Disconnect Node</source>
@@ -3434,10 +3220,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Confirm resync Blockchain</source>
         <translation>Bekræft resync Blockchain</translation>
-    </message>
-    <message>
-        <source>Use up and down arrows to navigate history, and &lt;b&gt;Ctrl-L&lt;/b&gt; to clear screen.</source>
-        <translation>Brug piltasterne for at navigere rundt i historiedata, og &lt;b&gt;Ctrl-L&lt;/b&gt; for at tømme skærmen.</translation>
     </message>
     <message>
         <source>Type &lt;b&gt;help&lt;/b&gt; for an overview of available commands.</source>
@@ -3511,16 +3293,24 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Valgfri opmærkning som tilknyttes den nye modtageradresse.</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Valgfri besked som vedhæftes betalingsanmodnigen, og som bliver vist når anmodningen åbnes. Note: Beskeden fremsendes ikke sammen med betalingen, når denne sendes ud på Wagerr netværket.</translation>
+        <source>&amp;Address:</source>
+        <translation>&amp;adresse</translation>
+    </message>
+    <message>
+        <source>A&amp;mount:</source>
+        <translation>A&amp;mount</translation>
+    </message>
+    <message>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened. Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Valgfri besked som vedhæftes betalingsanmodnigen, og som bliver vist når anmodningen åbnes. Note: Beskeden fremsendes ikke sammen med betalingen, når denne sendes ud på WAGERR netværket.</translation>
     </message>
     <message>
         <source>RECEIVE</source>
         <translation>MODTAGE</translation>
     </message>
     <message>
-        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the Wagerr network.</source>
-        <translation>Valgfri besked som vedhæftes betalingsanmodnigen, og som bliver vist når anmodningen åbnes. &lt;br&gt;Note: Beskeden fremsendes ikke sammen med betalingen, når denne sendes ud på Wagerr netværket.</translation>
+        <source>An optional message to attach to the payment request, which will be displayed when the request is opened.&lt;br&gt;Note: The message will not be sent with the payment over the WAGERR network.</source>
+        <translation>Valgfri besked som vedhæftes betalingsanmodnigen, og som bliver vist når anmodningen åbnes. &lt;br&gt;Note: Beskeden fremsendes ikke sammen med betalingen, når denne sendes ud på WAGERR netværket.</translation>
     </message>
     <message>
         <source>Use this form to request payments. All fields are &lt;b&gt;optional&lt;/b&gt;.</source>
@@ -3533,10 +3323,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>An optional amount to request. Leave this empty or zero to not request a specific amount.</source>
         <translation>Beløbsfeltet er valgfrit. Efterlad det tomt, eller med værdien 0 for at anmode om et beløb, som afsenderen bestemmer.</translation>
-    </message>
-    <message>
-        <source>&amp;Amount:</source>
-        <translation>&amp;Beløb</translation>
     </message>
     <message>
         <source>&amp;Request payment</source>
@@ -3581,6 +3367,10 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Copy amount</source>
         <translation>Kopiér beløb</translation>
+    </message>
+    <message>
+        <source>Copy address</source>
+        <translation>Kopiér adresse</translation>
     </message>
 </context>
 <context>
@@ -3651,6 +3441,10 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Message</source>
         <translation>Besked</translation>
+    </message>
+    <message>
+        <source>Address</source>
+        <translation>Adresse</translation>
     </message>
     <message>
         <source>Amount</source>
@@ -3812,7 +3606,7 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Hvis den brugerfastsatte gebyrbetaling er sat til 1000 uWGRs og transaktionen kun fylder 250 bytes, så vil "pr. kilobyte" kun udbetale 250 uWGR i gebyr, &lt;br /&gt; mens "Total-mindst" udbetaler 1000 uWGRs. For transaktioner større end en kilobyte betales i begge tilfælde i forhold til antallet af kilobytes </translation>
     </message>
     <message>
-        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for Wagerr transactions than the network can process.</source>
+        <source>Paying only the minimum fee is just fine as long as there is less transaction volume than space in the blocks.&lt;br /&gt;But be aware that this can end up in a never confirming transaction once there is more demand for WAGERR transactions than the network can process.</source>
         <translation>Betaling af mindste transaktionsgebyr vil være fint så længe der er færre transaktioner end der er plads til i blokkene. &lt;br /&gt; Men opmærksomheden henledes på, at det kan resultere i en transaktion der aldrig bliver bekræftet i det øjeblik der er større behov for transaktioner end netværket har plads til. </translation>
     </message>
     <message>
@@ -3908,8 +3702,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Split blok værktøjet virker ikke med flere adresser. Prøv igen</translation>
     </message>
     <message>
-        <source>Warning: Invalid Wagerr address</source>
-        <translation>Advarsel! Ugyldig Wagerr adresse</translation>
+        <source>Warning: Invalid WAGERR address</source>
+        <translation>Advarsel! Ugyldig WAGERR adresse</translation>
     </message>
     <message>
         <source>%1 to %2</source>
@@ -3934,10 +3728,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>A fee %1 times higher than %2 per kB is considered an insanely high fee.</source>
         <translation>Et gebyr %1 gange højere end %2 pr. kilobyte er vanvittigt højt.</translation>
-    </message>
-    <message numerus="yes">
-        <source>Estimated to begin confirmation within %n block(s).</source>
-        <translation><numerusform>Forventer bekræftelse indenfor %n blokke</numerusform><numerusform>Forventer bekræftelse indenfor %n blokke</numerusform></translation>
     </message>
     <message>
         <source>The recipient address is not valid, please recheck.</source>
@@ -4011,7 +3801,7 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Betal &amp;Til</translation>
     </message>
     <message>
-        <source>The Wagerr address to send the payment to</source>
+        <source>The WAGERR address to send the payment to</source>
         <translation>WAGERR adressen, som betalingen skal sendes til</translation>
     </message>
     <message>
@@ -4051,7 +3841,7 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Besked</translation>
     </message>
     <message>
-        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the Wagerr network.</source>
+        <source>A message that was attached to the WAGERR: URI which will be stored with the transaction for your reference. Note: This message will not be sent over the WAGERR network.</source>
         <translation>En besked, der var vedhæftet til WAGERR: URl wil blive gemt sammen med transaktionen som reference. Note: Beskeden bliver medsendt transaktionen over netværket.</translation>
     </message>
     <message>
@@ -4078,7 +3868,7 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
 <context>
     <name>ShutdownWindow</name>
     <message>
-        <source>Wagerr Core is shutting down...</source>
+        <source>WAGERR Core is shutting down...</source>
         <translation>WAGERR kernen lukker ned</translation>
     </message>
     <message>
@@ -4101,8 +3891,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>De kan underskrive beskeder med Deres adresser or at bevise ejerskab. Vær forsigtig med at underskrive noget De er usikker på såsom forsøg op at narre Dem til at oplyse Deres identitet. Skriv kun under på noget De kan stå inde for, og som De er enig i. </translation>
     </message>
     <message>
-        <source>The Wagerr address to sign the message with</source>
-        <translation>Den Wagerr adresse, der skal bruges til at underskrive beskeden med.</translation>
+        <source>The WAGERR address to sign the message with</source>
+        <translation>Den WAGERR adresse, der skal bruges til at underskrive beskeden med.</translation>
     </message>
     <message>
         <source>Choose previously used address</source>
@@ -4133,16 +3923,16 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Kopier den aktuelle underskrift til udklipsholderen.</translation>
     </message>
     <message>
-        <source>Sign the message to prove you own this Wagerr address</source>
-        <translation>Underskriv beskeden for at bevise, at De ejer denne Wagerr adresse.</translation>
+        <source>Sign the message to prove you own this WAGERR address</source>
+        <translation>Underskriv beskeden for at bevise, at De ejer denne WAGERR adresse.</translation>
     </message>
     <message>
-        <source>The Wagerr address the message was signed with</source>
-        <translation>Beskeden er underskrevet med denne Wagerr adresse</translation>
+        <source>The WAGERR address the message was signed with</source>
+        <translation>Beskeden er underskrevet med denne WAGERR adresse</translation>
     </message>
     <message>
-        <source>Verify the message to ensure it was signed with the specified Wagerr address</source>
-        <translation>verificer beskeden for at sikre, at den blev underskrevet med den rigtige Wagerr adresse.</translation>
+        <source>Verify the message to ensure it was signed with the specified WAGERR address</source>
+        <translation>verificer beskeden for at sikre, at den blev underskrevet med den rigtige WAGERR adresse.</translation>
     </message>
     <message>
         <source>Sign &amp;Message</source>
@@ -4228,7 +4018,7 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
 <context>
     <name>SplashScreen</name>
     <message>
-        <source>Wagerr Core</source>
+        <source>WAGERR Core</source>
         <translation>WAGERR kerne</translation>
     </message>
     <message>
@@ -4244,7 +4034,7 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>DASH "core" udviklerne</translation>
     </message>
     <message>
-        <source>The Wagerr Core developers</source>
+        <source>The WAGERR Core developers</source>
         <translation>WAGERR "core" udviklerne</translation>
     </message>
     <message>
@@ -4261,10 +4051,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
 </context>
 <context>
     <name>TransactionDesc</name>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Åbn for %n flere blokke</numerusform><numerusform>Åbn for %n flere blokke</numerusform></translation>
-    </message>
     <message>
         <source>Open until %1</source>
         <translation>Åbn frem til %1</translation>
@@ -4325,10 +4111,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <source>, has not been successfully broadcast yet</source>
         <translation>, er ikke udsendt endnu</translation>
     </message>
-    <message numerus="yes">
-        <source>, broadcast through %n node(s)</source>
-        <translation><numerusform>, sendt gennem %n noder</numerusform><numerusform>, sendt gennem %n noder</numerusform></translation>
-    </message>
     <message>
         <source>Date</source>
         <translation>Dato</translation>
@@ -4368,10 +4150,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Credit</source>
         <translation>Kredit</translation>
-    </message>
-    <message numerus="yes">
-        <source>matures in %n more block(s)</source>
-        <translation><numerusform>Modnes efter %n blokke</numerusform><numerusform>Modnes efter %n blokke</numerusform></translation>
     </message>
     <message>
         <source>not accepted</source>
@@ -4470,10 +4248,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Address</source>
         <translation>Adresse</translation>
-    </message>
-    <message numerus="yes">
-        <source>Open for %n more block(s)</source>
-        <translation><numerusform>Åbn for %n flere blokke</numerusform><numerusform>Åbn for %n flere blokke</numerusform></translation>
     </message>
     <message>
         <source>Open until %1</source>
@@ -4856,7 +4630,7 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     </message>
 </context>
 <context>
-    <name>ZWgrControlDialog</name>
+    <name>XWgrControlDialog</name>
     <message>
         <source>Select zWGR to Spend</source>
         <translation>Vælg zWGR for at bruge</translation>
@@ -4877,11 +4651,7 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <source>Select/Deselect All</source>
         <translation>Vælg / Fravælg alle</translation>
     </message>
-    <message>
-        <source>Is Spendable</source>
-        <translation>Kan tilbringes</translation>
-    </message>
-</context>
+    </context>
 <context>
     <name>wagerr-core</name>
     <message>
@@ -4909,8 +4679,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Beregnet akkumulator kontrolpunkt er ikke det, der er registreret af blok indeks</translation>
     </message>
     <message>
-        <source>Cannot obtain a lock on data directory %s. Wagerr Core is probably already running.</source>
-        <translation>Kan ikke låse datamappen %s. Wagerr Core kører sandsynligvis allerede.</translation>
+        <source>Cannot obtain a lock on data directory %s. WAGERR Core is probably already running.</source>
+        <translation>Kan ikke låse datamappen %s. WAGERR core kører sandsynligvis allerede.</translation>
     </message>
     <message>
         <source>Change automatic finalized budget voting behavior. mode=auto: Vote for only exact finalized budget match to my generated budget. (string, default: auto)</source>
@@ -4992,10 +4762,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Flush database activity from memory pool to disk log every &lt;n&gt; megabytes (default: %u)</source>
         <translation>Opsaml databaseaktiviteterne fra hukommelsespool og gem dem i loggen på disken for hver &lt;n&gt; megabytes (default: %u)</translation>
-    </message>
-    <message>
-        <source>Found unconfirmed denominated outputs, will wait till they confirm to continue.</source>
-        <translation>Der er fundet ubekræftede designerede outputs. Vent indtil de bekræftes for at fortsætte.</translation>
     </message>
     <message>
         <source>If paytxfee is not set, include enough fee so transactions begin confirmation on average within n blocks (default: %u)</source>
@@ -5086,20 +4852,20 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Dette produkt anvender software udviklet i OpenSSL projektet til brug i OpenSSL værktøjssættet &lt;https://www.openssl.org/&gt; og kryptosoftware skrevet afEric Young og UPnP software skrevet af Thomas Bernard.</translation>
     </message>
     <message>
-        <source>Unable to bind to %s on this computer. Wagerr Core is probably already running.</source>
-        <translation>Det var ikke muligt at forbinde %s på denne computer. Wagerr kører sandsynligvis allerede.</translation>
+        <source>Unable to bind to %s on this computer. WAGERR Core is probably already running.</source>
+        <translation>Det var ikke muligt at forbinde %s på denne computer. WAGERR kører sandsynligvis allerede.</translation>
     </message>
     <message>
         <source>Unable to locate enough Obfuscation denominated funds for this transaction.</source>
         <translation>Det er ikke muligt at allokere tilstrækkeligt med tilsløret designeret indestående for at gennemføre denne transaktion.</translation>
     </message>
     <message>
-        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 25000 WGR.</source>
-        <translation>Det er ikke muligt at allokere tilstrækkeligt med tilsløret  ikke-designeret indestående for at gennemføre denne transaktion, der ikke ækvivalerer 25000 WGR.</translation>
+        <source>Unable to locate enough Obfuscation non-denominated funds for this transaction that are not equal 10000 WGR.</source>
+        <translation>Det er ikke muligt at allokere tilstrækkeligt med tilsløret  ikke-designeret indestående for at gennemføre denne transaktion, der ikke ækvivalerer 10000 WGR.</translation>
     </message>
     <message>
-        <source>Unable to locate enough funds for this transaction that are not equal 25000 WGR.</source>
-        <translation>Det var ikke muligt at allokere tilstrækkelige midler til denne transaktion som er forskellig fra 25000 WGR.</translation>
+        <source>Unable to locate enough funds for this transaction that are not equal 10000 WGR.</source>
+        <translation>Det var ikke muligt at allokere tilstrækkelige midler til denne transaktion som er forskellig fra 10000 WGR.</translation>
     </message>
     <message>
         <source>Use separate SOCKS5 proxy to reach peers via Tor hidden services (default: %s)</source>
@@ -5114,8 +4880,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Advarsel! -paytxfee er sat meget højt. Det er dette gebyr De kommer til at betale for transaktionen, hvis De gennemfører. </translation>
     </message>
     <message>
-        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.</source>
-        <translation>Advarsel! Kontroller at computerens dato og tid er korrekt indstillet. Hvis tiden ikke er rigtig, vil Wagerr Core ikke fungere ordentligt.</translation>
+        <source>Warning: Please check that your computer's date and time are correct! If your clock is wrong WAGERR Core will not work properly.</source>
+        <translation>Advarsel! Kontroller at computerens dato og tid er korrekt indstillet. Hvis tiden ikke er rigtig, vil WAGERR core ikke fungere ordentligt.</translation>
     </message>
     <message>
         <source>Warning: The network does not appear to fully agree! Some miners appear to be experiencing issues.</source>
@@ -5182,10 +4948,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Tillad DNS opslag for -addnode, -seednode og -connect</translation>
     </message>
     <message>
-        <source>Already have that input.</source>
-        <translation>Dette er allerede angivet</translation>
-    </message>
-    <message>
         <source>Always query for peer addresses via DNS lookup (default: %u)</source>
         <translation>Forespørg altid peer adresser via DNS opslag (default: %u)</translation>
     </message>
@@ -5206,18 +4968,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Beregning af manglende akkumulatorer ...</translation>
     </message>
     <message>
-        <source>Can't denominate: no compatible inputs left.</source>
-        <translation>Kan ikke designere: Ingen kompatible inputs tilbage.</translation>
-    </message>
-    <message>
-        <source>Can't find random Masternode.</source>
-        <translation>Kan ikke finde en tilfældig masternode.</translation>
-    </message>
-    <message>
-        <source>Can't mix while sync in progress.</source>
-        <translation>Kan ikke usynliggøre så længe der synkroniseres.</translation>
-    </message>
-    <message>
         <source>Cannot downgrade wallet</source>
         <translation>Kan ikke nedgradere tegnebogen</translation>
     </message>
@@ -5236,10 +4986,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Cannot write default address</source>
         <translation>Kan ikke skrive standardadressen</translation>
-    </message>
-    <message>
-        <source>Collateral not valid.</source>
-        <translation>Sikkerhed ikke gyldig</translation>
     </message>
     <message>
         <source>Connect only to the specified node(s)</source>
@@ -5270,8 +5016,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Copyright (C) 2015-%i The PIVX Core Developers</translation>
     </message>
     <message>
-        <source>Copyright (C) %i The Wagerr Core Developers</source>
-        <translation>Copyright (C) %i The Wagerr Core Developers</translation>
+        <source>Copyright (C) 2018-%i The WAGERR Core Developers</source>
+        <translation>Copyright (C) 2018-%i The WAGERR Core Developers</translation>
     </message>
     <message>
         <source>Corrupted block database detected</source>
@@ -5330,14 +5076,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Slå tilstanden "masternode" til (0-1 default: %u)</translation>
     </message>
     <message>
-        <source>Entries are full.</source>
-        <translation>Der er ikke plads til flere poster</translation>
-    </message>
-    <message>
-        <source>Error connecting to Masternode.</source>
-        <translation>Fejl ved oprettelse af forbindelse til masternode.</translation>
-    </message>
-    <message>
         <source>Error initializing block database</source>
         <translation>Fejl ved initialisering af blokdatabasen</translation>
     </message>
@@ -5358,8 +5096,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Fejl ved indlæsning af wallet.dat: Tegnebogen er beskadiget</translation>
     </message>
     <message>
-        <source>Error loading wallet.dat: Wallet requires newer version of Wagerr Core</source>
-        <translation>Fejl ved indlæsning af wallet.dat: Tegnebogen kræver en nyere version af Wagerr Core</translation>
+        <source>Error loading wallet.dat: Wallet requires newer version of WAGERR Core</source>
+        <translation>Fejl ved indlæsning af wallet.dat: Tegnebogen kræver en nyere version af WAGERR core</translation>
     </message>
     <message>
         <source>Error opening block database</source>
@@ -5374,16 +5112,16 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Fejl ved genskabelse af den offentlige nøgle</translation>
     </message>
     <message>
+        <source>Error writing zerocoinDB to disk</source>
+        <translation>Fejl ved at skrive zerocoinDB til disk</translation>
+    </message>
+    <message>
         <source>Error</source>
         <translation>Fejl!</translation>
     </message>
     <message>
         <source>Error: A fatal internal error occured, see debug.log for details</source>
         <translation>Fejl! En fatal intern fejl opstod. Se debug.log for nærmere detaljer</translation>
-    </message>
-    <message>
-        <source>Error: Can't select current denominated inputs</source>
-        <translation>Fejl! Kan ikke vælge de aktuelt designerede inputs</translation>
     </message>
     <message>
         <source>Error: Disk space is low!</source>
@@ -5398,16 +5136,16 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Fejl! Tegnebogen er låst. Det er ikke muligt at oprette transaktionen.</translation>
     </message>
     <message>
-        <source>Error: You already have pending entries in the Obfuscation pool</source>
-        <translation>Fejl! De har allerede ventende transaktioner i tilsløringsgruppen</translation>
-    </message>
-    <message>
         <source>Failed to calculate accumulator checkpoint</source>
         <translation>Kunne ikke beregne akkumulatorkontrolpunktet</translation>
     </message>
     <message>
         <source>Failed to listen on any port. Use -listen=0 if you want this.</source>
         <translation>Lytning på uspecificerede porte mislykkedes. Brug -listen=0 hvis De ønsker denne funktion.</translation>
+    </message>
+    <message>
+        <source>Failed to parse host:port string</source>
+        <translation>Failed to parse host:port string</translation>
     </message>
     <message>
         <source>Failed to read block</source>
@@ -5418,20 +5156,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Gebyr (i WGR/kB) som skal tilføjes transaktionen der sendes (default: %s)</translation>
     </message>
     <message>
-        <source>Finalizing transaction.</source>
-        <translation>Færdiggør transaktionen.</translation>
-    </message>
-    <message>
         <source>Force safe mode (default: %u)</source>
         <translation>Gennemtving beskyttet tilstand (default: %u)</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ( waiting %s )</source>
-        <translation>Der er fundet tilstrækkeligt med brugere der underskriver (venter %s)</translation>
-    </message>
-    <message>
-        <source>Found enough users, signing ...</source>
-        <translation>Der er fundet tilstrækkeligt med brugere der underskriver...</translation>
     </message>
     <message>
         <source>Generate coins (default: %u)</source>
@@ -5458,14 +5184,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Inkluder IP adressen i debug output (default: %u)</translation>
     </message>
     <message>
-        <source>Incompatible mode.</source>
-        <translation>Ikke kompatibel i denne tilstand</translation>
-    </message>
-    <message>
-        <source>Incompatible version.</source>
-        <translation>Ikke kompatibel version</translation>
-    </message>
-    <message>
         <source>Incorrect or no genesis block found. Wrong datadir for network?</source>
         <translation>Forkert, eller ikke genesis blok fundet. Er De sikker på, at det er den rigtige datadir der benyttes til netværket?</translation>
     </message>
@@ -5474,12 +5192,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Info:</translation>
     </message>
     <message>
-        <source>Initialization sanity check failed. Wagerr Core is shutting down.</source>
-        <translation>Initiering af sanitetskontrollen fejlede. Wagerr Core lukker ned. </translation>
-    </message>
-    <message>
-        <source>Input is not valid.</source>
-        <translation>Ugyldigt input</translation>
+        <source>Initialization sanity check failed. WAGERR Core is shutting down.</source>
+        <translation>Initiering af sanitetskontrollen fejlede. WAGERR core lukker ned. </translation>
     </message>
     <message>
         <source>Insufficient funds</source>
@@ -5538,10 +5252,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Ugyldig privat nøgle</translation>
     </message>
     <message>
-        <source>Invalid script detected.</source>
-        <translation>Ugyldigt script fundet.</translation>
-    </message>
-    <message>
         <source>Percentage of automatically minted Zerocoin  (1-100, default: %u)</source>
         <translation>Procentdel af automatisk mintede Zerocoin (10-100, standard: %u)</translation>
     </message>
@@ -5586,8 +5296,8 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
 </translation>
     </message>
     <message>
-        <source>Disable all Wagerr specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
-        <translation>Slå alle Wagerr funktioner fra (Masternoder, Tilsløring, SwiftTX, Budgetting)(0-1,default:%u)</translation>
+        <source>Disable all WAGERR specific functionality (Masternodes, Zerocoin, SwiftX, Budgeting) (0-1, default: %u)</source>
+        <translation>Slå alle WAGERR funktioner fra (Masternoder, Tilsløring, SwiftTX, Budgetting)(0-1,default:%u)</translation>
     </message>
     <message>
         <source>Enable SwiftX, show confirmations for locked transactions (bool, default: %s)</source>
@@ -5686,10 +5396,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Kunne ikke oprette mynte</translation>
     </message>
     <message>
-        <source>Failed to deserialize</source>
-        <translation>Kunne ikke deserialisere</translation>
-    </message>
-    <message>
         <source>Failed to find Zerocoins in wallet.dat</source>
         <translation>Kunne ikke finde Zerocoins i wallet.dat</translation>
     </message>
@@ -5708,14 +5414,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Keep at most &lt;n&gt; unconnectable transactions in memory (default: %u)</source>
         <translation>Behold højest &lt;n&gt; transaktioner i hukommelsen, der ikke kan forbindes (default: %u)</translation>
-    </message>
-    <message>
-        <source>Last Obfuscation was too recent.</source>
-        <translation>Seneste tilsløring var for ny</translation>
-    </message>
-    <message>
-        <source>Last successful Obfuscation action was too recent.</source>
-        <translation>Seneste succesfulde tilsløring var for ny</translation>
     </message>
     <message>
         <source>Limit size of signature cache to &lt;n&gt; entries (default: %u)</source>
@@ -5770,10 +5468,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Placering af auth cookie (standard: data dir)</translation>
     </message>
     <message>
-        <source>Lock is already in place.</source>
-        <translation>Er allerede låst</translation>
-    </message>
-    <message>
         <source>Lock masternodes from masternode configuration file (default: %u)</source>
         <translation>Lås masternoder fra masternode konfiguratinsfilen (default: %u)</translation>
     </message>
@@ -5790,14 +5484,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Masternodeoptioner</translation>
     </message>
     <message>
-        <source>Masternode queue is full.</source>
-        <translation>Masternodens kø er fyldt op.</translation>
-    </message>
-    <message>
-        <source>Masternode:</source>
-        <translation>Masternode:</translation>
-    </message>
-    <message>
         <source>Maximum per-connection receive buffer, &lt;n&gt;*1000 bytes (default: %u)</source>
         <translation>Maksimal størrelse på per-connection receive buffer, &lt;n&gt;*1000 bytes (default: %u)</translation>
     </message>
@@ -5810,14 +5496,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Mint gjorde det ikke til blockchain</translation>
     </message>
     <message>
-        <source>Missing input transaction information.</source>
-        <translation>Manglende transaktionsinformationsinput</translation>
-    </message>
-    <message>
-        <source>Mixing in progress...</source>
-        <translation>Usynliggørelse i gang</translation>
-    </message>
-    <message>
         <source>Need address because change is not exact</source>
         <translation>Har brug for adresse, fordi ændring ikke er nøjagtig</translation>
     </message>
@@ -5826,40 +5504,12 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Der skal specificeres en port med -whitebind: '%s'</translation>
     </message>
     <message>
-        <source>No Masternodes detected.</source>
-        <translation>Ingen masternoder fundet.</translation>
-    </message>
-    <message>
-        <source>No compatible Masternode found.</source>
-        <translation>Ingen kompatible masternoder fundet.</translation>
-    </message>
-    <message>
-        <source>No funds detected in need of denominating.</source>
-        <translation>Ingen midler fundet til eventuel designering</translation>
-    </message>
-    <message>
-        <source>No matching denominations found for mixing.</source>
-        <translation>ingen matchende designerede midler til usynliggørelse.</translation>
-    </message>
-    <message>
         <source>Node relay options:</source>
         <translation>Node videresendelsesoptioner:</translation>
     </message>
     <message>
-        <source>Non-standard public key detected.</source>
-        <translation>Ikke standard offentlig nøgle fundet</translation>
-    </message>
-    <message>
-        <source>Not compatible with existing transactions.</source>
-        <translation>Ikke kompatibel med eksisterende transaktioner</translation>
-    </message>
-    <message>
         <source>Not enough file descriptors available.</source>
         <translation>Ikke nok fildescriptors tilgængelige</translation>
-    </message>
-    <message>
-        <source>Not in the Masternode list.</source>
-        <translation>Findes ikke i masternodelisten</translation>
     </message>
     <message>
         <source>Number of automatic wallet backups (default: 10)</source>
@@ -5868,18 +5518,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Number of custom location backups to retain (default: %d)</source>
         <translation>Antal brugerdefinerede positionsbackups til at beholde (standard: %d)</translation>
-    </message>
-    <message>
-        <source>Obfuscation is idle.</source>
-        <translation>Tilsløringssystem ledigt</translation>
-    </message>
-    <message>
-        <source>Obfuscation request complete:</source>
-        <translation>Tilsløring færdig.</translation>
-    </message>
-    <message>
-        <source>Obfuscation request incomplete:</source>
-        <translation>Tilsløringsanmodning ikke færdiggjort</translation>
     </message>
     <message>
         <source>Only accept block chain matching built-in checkpoints (default: %u)</source>
@@ -5972,10 +5610,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Send transactions as zero-fee transactions if possible (default: %u)</source>
         <translation>Send transaktioner som nugebyrstransaktioner hvis muligt (default: %u)</translation>
-    </message>
-    <message>
-        <source>Session not complete!</source>
-        <translation>Sessionen blev ikke færdiggjort!</translation>
     </message>
     <message>
         <source>Session timed out.</source>
@@ -6082,18 +5716,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Stop kørsel efter import af blokke fra disken (default: %u)</translation>
     </message>
     <message>
-        <source>Submitted following entries to masternode: %u / %d</source>
-        <translation>Afsendt følgende posteringer til masternode %u / %d</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting for more entries ( %u / %d ) %s</source>
-        <translation>Afsendt til masternode. Afventer flere posteringer (%u /%d) %s</translation>
-    </message>
-    <message>
-        <source>Submitted to masternode, waiting in queue %s</source>
-        <translation>Afsendt til masternode, venter i kø %s</translation>
-    </message>
-    <message>
         <source>Synchronization failed</source>
         <translation>Synkronisering mislykkedes.</translation>
     </message>
@@ -6130,14 +5752,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Møntudgifterne er blevet brugt</translation>
     </message>
     <message>
-        <source>The new spend coin transaction did not verify</source>
-        <translation>Den nye udgiftsmønttransaktion bekræftede ikke</translation>
-    </message>
-    <message>
-        <source>The selected mint coin is an invalid coin</source>
-        <translation>Den valgte mintmønter er en ugyldig mønt</translation>
-    </message>
-    <message>
         <source>The transaction did not verify</source>
         <translation>Transaktionen bekræftede ikke</translation>
     </message>
@@ -6152,10 +5766,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>This is intended for regression testing tools and app development.</source>
         <translation>Dette er ment som et tilbagekørings test- og appudviklingsværktøj.</translation>
-    </message>
-    <message>
-        <source>This is not a Masternode.</source>
-        <translation>Dette er ikke en masternode</translation>
     </message>
     <message>
         <source>Threshold for disconnecting misbehaving peers (default: %u)</source>
@@ -6190,18 +5800,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Transaktionsbeløbet skal være positivt</translation>
     </message>
     <message>
-        <source>Transaction created successfully.</source>
-        <translation>Transaktionen blev oprettet.</translation>
-    </message>
-    <message>
-        <source>Transaction fees are too high.</source>
-        <translation>Transaktionsgebyrerne er for høje</translation>
-    </message>
-    <message>
-        <source>Transaction not valid.</source>
-        <translation>Transaktionen er ugyldig</translation>
-    </message>
-    <message>
         <source>Transaction too large for fee policy</source>
         <translation>Transaktionen er for stor til at opfylde gebyrpolitikken</translation>
     </message>
@@ -6210,24 +5808,12 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Transaktionen er for stor</translation>
     </message>
     <message>
-        <source>Transmitting final transaction.</source>
-        <translation>Afsender sluttransaktionen.</translation>
-    </message>
-    <message>
-        <source>Try to spend with a higher security level to include more coins</source>
-        <translation>Prøv at bruge med et højere sikkerhedsniveau til at inkludere flere mønter</translation>
-    </message>
-    <message>
         <source>Trying to spend an already spent serial #, try again.</source>
         <translation>Forsøger at bruge en allerede brugt serie #, prøv igen.</translation>
     </message>
     <message>
         <source>Unable to bind to %s on this computer (bind returned error %s)</source>
         <translation>Det er ikke muligt at forbide til %s på denne computer (bind returnerede fejl %s)</translation>
-    </message>
-    <message>
-        <source>Unable to find transaction containing mint</source>
-        <translation>Kunne ikke finde transaktioner indeholdende mynte</translation>
     </message>
     <message>
         <source>Unable to sign spork message, wrong key?</source>
@@ -6240,10 +5826,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
     <message>
         <source>Unknown network specified in -onlynet: '%s'</source>
         <translation>Ukendt netværk specificeret i -onlynet: '%s'</translation>
-    </message>
-    <message>
-        <source>Unknown state: id = %u</source>
-        <translation>Ukendt stade: id = %u</translation>
     </message>
     <message>
         <source>Upgrade wallet to latest format</source>
@@ -6274,10 +5856,6 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Værdien er under den mindste tilgængelige værdi (= 1) for zWGR</translation>
     </message>
     <message>
-        <source>Value more than Obfuscation pool maximum allows.</source>
-        <translation>Værdien er højere end tilsløringsgruppen tillader</translation>
-    </message>
-    <message>
         <source>Verifying blocks...</source>
         <translation>Verificerer blokke</translation>
     </message>
@@ -6286,20 +5864,12 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Verificerer  tegnebog</translation>
     </message>
     <message>
-        <source>Version 1 zWGR require a security level of 100 to successfully spend.</source>
-        <translation>Version 1 zWGR kræver et sikkerhedsniveau på 100 til succes.</translation>
-    </message>
-    <message>
         <source>Wallet %s resides outside data directory %s</source>
         <translation>Tegnbogen %s befinder sig udenfor datamappen %s</translation>
     </message>
     <message>
-        <source>Wallet is locked.</source>
-        <translation>Tegnebogen er låst</translation>
-    </message>
-    <message>
-        <source>Wallet needed to be rewritten: restart Wagerr Core to complete</source>
-        <translation>Tegnebogen måtte genskrives. Genstart Wagerr Core for at gøre færdig</translation>
+        <source>Wallet needed to be rewritten: restart WAGERR Core to complete</source>
+        <translation>Tegnebogen måtte genskrives. Genstart WAGERR core for at gøre færdig</translation>
     </message>
     <message>
         <source>Wallet options:</source>
@@ -6326,24 +5896,12 @@ Enten mint højere nomineringer (så færre input er nødvendige) eller reducere
         <translation>Advarsel! Argumentet -debugnet understøttes ikke og blev ignoret. Brug -debug=net.</translation>
     </message>
     <message>
-        <source>Will retry...</source>
-        <translation>Prøver igen</translation>
-    </message>
-    <message>
         <source>You don't have enough Zerocoins in your wallet</source>
         <translation>Du har ikke nok Zerocoins i din tegnebog</translation>
     </message>
     <message>
         <source>You need to rebuild the database using -reindex to change -txindex</source>
         <translation>Databasen skal genopbygges ved hjælp af -reindex for at ændre -txindex</translation>
-    </message>
-    <message>
-        <source>Your entries added successfully.</source>
-        <translation>Posterne blev tilføjet.</translation>
-    </message>
-    <message>
-        <source>Your transaction was accepted into the pool!</source>
-        <translation>Transaktionen blev accepteret af POOL!</translation>
     </message>
     <message>
         <source>Zapping all transactions from wallet...</source>
