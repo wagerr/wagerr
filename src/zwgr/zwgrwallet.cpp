@@ -267,7 +267,7 @@ void CzWGRWallet::SyncWithChain(bool fGenerateMintPool)
 
                     //Fill out wtx so that a transaction record can be created
                     wtx.nTimeReceived = pindex->GetBlockTime();
-                    pwalletMain->AddToWallet(wtx);
+                    pwalletMain->AddToWallet(wtx, false, &walletdb);
                     setAddedTx.insert(txHash);
                 }
 
@@ -323,7 +323,8 @@ bool CzWGRWallet::SetMintSeen(const CBigNum& bnValue, const int& nHeight, const 
             wtx.SetMerkleBranch(block);
 
         wtx.nTimeReceived = pindex->nTime;
-        pwalletMain->AddToWallet(wtx);
+        CWalletDB walletdb(strWalletFile);
+        pwalletMain->AddToWallet(wtx, false, &walletdb);
     }
 
     // Add to zwgrTracker which also adds to database
