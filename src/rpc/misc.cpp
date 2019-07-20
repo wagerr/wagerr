@@ -345,7 +345,7 @@ UniValue spork(const UniValue& params, bool fHelp)
         "}\n"
 
         "\nResult (name):\n"
-        " \"success|failure\"       (string) Wither or not the update succeeded.\n"
+        " \"success|failure\"       (string) Whether or not the update succeeded.\n"
 
         "\nExamples:\n" +
         HelpExampleCli("spork", "show") + HelpExampleRpc("spork", "show"));
