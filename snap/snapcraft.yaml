@@ -1,7 +1,7 @@
 # Copyright (c) 2018-2019 The Ion developers
 # Copyright (c) 2018-2019 The Wagerr developers
 # Copyright (c) 2019 The OBSR developers
-name: ckti-master-wagerr
+name: wagerr
 base: core18
 version: 3.0.99
 summary:   wagerr, digital currency for decentralized betting
