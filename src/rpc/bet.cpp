@@ -106,8 +106,6 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
         cm.nId = nFirstIndexFree;
         cm.sName = name;
         cm.nVersion = 1;
-
-        CMappingDB cmdb;
         
 //          Remove Ability to add to local cache
 //          All Data should come from OP_Code Submission and cached from chain.
