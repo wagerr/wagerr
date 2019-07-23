@@ -99,7 +99,7 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
         }
     }
 
-    // If no mapping found then create a new one and add to the given map index.
+    // If no mapping found then create a new one.
     if (!mappingFound) {
         CMapping cm;
         cm.nMType = type;
@@ -108,20 +108,10 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
         cm.nVersion = 1;
 
         CMappingDB cmdb;
-
-        if (mIndex == "sports") {
-            cmdb.AddSport(cm);
-        }
-        else if (mIndex == "rounds") {
-            cmdb.AddRound(cm);
-        }
-        else if (mIndex == "teamnames") {
-            cmdb.AddTeam(cm);
-        }
-        else if (mIndex == "tournaments") {
-            cmdb.AddTournament(cm);
-        }
-
+        
+//          Remove Ability to add to local cache
+//          All Data should come from OP_Code Submission and cached from chain.
+        
         mapping.push_back(Pair("mapping-id",  (uint64_t) nFirstIndexFree));
         mapping.push_back(Pair("exists", false));
         mapping.push_back(Pair("mapping-index", mIndex));
