@@ -453,7 +453,7 @@ bool WalletModel::isCoinStakeMine(QString id){
     uint256 hashTx;
     hashTx.SetHex(id.toStdString());
     const CWalletTx* tx = getTx(hashTx);
-    return tx->IsCoinStake() && wallet->IsMine(tx->vout[1]) == ISMINE_ALL;
+    return tx->IsCoinStake() && wallet->IsMine(tx->vin[0]);
 }
 
 WalletModel::SendCoinsReturn WalletModel::prepareBetTransaction(WalletModelTransaction& transaction, CAmount amount, const std::string& eventId, const std::string& teamToWin)
@@ -542,9 +542,6 @@ bool WalletModel::createZwgrSpend(
     for(std::pair<CBitcoinAddress*, CAmount> pair : outputs){
         value += pair.second;
     }
-
-    // Default: assume something goes wrong. Depending on the problem this gets more specific below
-    int nStatus = ZWGR_SPEND_ERROR;
 
     if (wallet->IsLocked()) {
         receipt.SetStatus("Error: Wallet locked, unable to create transaction!", ZWGR_WALLET_LOCKED);
