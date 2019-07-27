@@ -52,9 +52,6 @@ void budgetToJSON(CBudgetProposal* pbudgetProposal, UniValue& bObj)
 void checkBudgetInputs(const UniValue& params, std::string &strProposalName, std::string &strURL,
                        int &nPaymentCount, int &nBlockStart, CBitcoinAddress &address, CAmount &nAmount)
 {
-    int nBlockMin = 0;
-    CBlockIndex* pindexPrev = chainActive.Tip();
-
     strProposalName = SanitizeString(params[0].get_str());
     if (strProposalName.size() > 20)
         throw std::runtime_error("Invalid proposal name, limit of 20 characters.");
@@ -67,22 +64,20 @@ void checkBudgetInputs(const UniValue& params, std::string &strProposalName, std
     if (nPaymentCount < 1)
         throw std::runtime_error("Invalid payment count, must be more than zero.");
 
-    // Start must be in the next budget cycle
-    if (pindexPrev != NULL) nBlockMin = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
+    CBlockIndex* pindexPrev = chainActive.Tip();
+    if (pindexPrev == NULL)
+        throw std::runtime_error("Try again after active chain is loaded");
+
+    // Start must be in the next budget cycle or later
+    const int budgetCycleBlocks = Params().GetBudgetCycleBlocks();
+    int pHeight = pindexPrev->nHeight;
+
+    int nBlockMin = pHeight - (pHeight % budgetCycleBlocks) + budgetCycleBlocks;
 
     nBlockStart = params[3].get_int();
-    if (nBlockStart % Params().GetBudgetCycleBlocks() != 0) {
-        int nNext = pindexPrev->nHeight - pindexPrev->nHeight % Params().GetBudgetCycleBlocks() + Params().GetBudgetCycleBlocks();
-        throw std::runtime_error(strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nNext));
+    if ((nBlockStart < nBlockMin) || ((nBlockStart % budgetCycleBlocks) != 0)) {
+        throw std::runtime_error(strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nBlockMin));
     }
-
-    int nBlockEnd = nBlockStart + (Params().GetBudgetCycleBlocks() * nPaymentCount); // End must be AFTER current cycle
-
-    if (nBlockStart < nBlockMin)
-        throw std::runtime_error("Invalid block start, must be more than current height.");
-
-    if (nBlockEnd < pindexPrev->nHeight)
-        throw std::runtime_error("Invalid ending block, starting block + (payment_cycle*payments) must be more than current height.");
 
     address = params[4].get_str();
     if (!address.IsValid())
@@ -112,6 +107,10 @@ UniValue preparebudget(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("preparebudget", "\"test-proposal\" \"https://forum.wagerr.com/t/test-proposal\" 2 820800 \"WUHPW8qfcgfpfnLBxbhFXHcxBWs6R2J3KD\" 500") +
             HelpExampleRpc("preparebudget", "\"test-proposal\" \"https://forum.wagerr.com/t/test-proposal\" 2 820800 \"WUHPW8qfcgfpfnLBxbhFXHcxBWs6R2J3KD\" 500"));
+
+    if (!pwalletMain) {
+        throw std::runtime_error("Try again after wallet is fully started");
+    }
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
