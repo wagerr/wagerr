@@ -3774,30 +3774,28 @@ int CMerkleTx::SetMerkleBranch(const CBlock& block)
     return chainActive.Height() - pindex->nHeight + 1;
 }
 
-int CMerkleTx::GetDepthInMainChainINTERNAL(const CBlockIndex*& pindexRet) const
+int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX) const
 {
     if (hashUnset())
         return 0;
     AssertLockHeld(cs_main);
+    int nResult;
 
     // Find the block it claims to be in
     BlockMap::iterator mi = mapBlockIndex.find(hashBlock);
-    if (mi == mapBlockIndex.end())
-        return 0;
-    CBlockIndex* pindex = (*mi).second;
-    if (!pindex || !chainActive.Contains(pindex))
-        return 0;
-
-    pindexRet = pindex;
-    return ((nIndex == -1) ? (-1) : 1) * (chainActive.Height() - pindex->nHeight + 1);
-}
-
-int CMerkleTx::GetDepthInMainChain(const CBlockIndex*& pindexRet, bool enableIX) const
-{
-    AssertLockHeld(cs_main);
-    int nResult = GetDepthInMainChainINTERNAL(pindexRet);
-    if (nResult == 0 && !mempool.exists(GetHash()))
-        return -1; // Not in chain, not in mempool
+    if (mi == mapBlockIndex.end()) {
+        nResult = 0;
+    }
+    else {
+        CBlockIndex* pindex = (*mi).second;
+        if (!pindex || !chainActive.Contains(pindex)) {
+            nResult = 0;
+        }
+        else {
+            pindexRet = pindex;
+            nResult = ((nIndex == -1) ? (-1) : 1) * (chainActive.Height() - pindex->nHeight + 1);
+        }
+    }
 
     if (enableIX) {
         if (nResult < 6) {
