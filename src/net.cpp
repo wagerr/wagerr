@@ -230,7 +230,7 @@ void AdvertiseLocal(CNode* pnode)
             addrLocal.SetIP(pnode->addrLocal);
         }
         if (addrLocal.IsRoutable()) {
-            LogPrintf("AdvertizeLocal: advertising address %s\n", addrLocal.ToString());
+            LogPrintf("%s: advertising address %s\n", __func__, addrLocal.ToString());
             FastRandomContext insecure_rand;
             pnode->PushAddress(addrLocal, insecure_rand);
         }
