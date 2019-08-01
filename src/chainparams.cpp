@@ -429,7 +429,7 @@ public:
         nPublicZCSpends = 350;
 
         /** Bet related parameters **/
-        nBetStartHeight = 251;                                          // The block that betting protocols become active (REgtest).
+        nBetStartHeight = 251;                                          // The block that betting protocols become active (Regtest).
         vOracleWalletAddrs = {"TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1",     // Oracle Masternode Event & Result Posting Wallet Address (Regtest).
                               "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu" };
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
