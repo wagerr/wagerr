@@ -54,19 +54,19 @@ void checkBudgetInputs(const UniValue& params, std::string &strProposalName, std
 {
     strProposalName = SanitizeString(params[0].get_str());
     if (strProposalName.size() > 20)
-        throw std::runtime_error("Invalid proposal name, limit of 20 characters.");
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid proposal name, limit of 20 characters.");
 
     strURL = SanitizeString(params[1].get_str());
     if (strURL.size() > 64)
-        throw std::runtime_error("Invalid url, limit of 64 characters.");
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid url, limit of 64 characters.");
 
     nPaymentCount = params[2].get_int();
     if (nPaymentCount < 1)
-        throw std::runtime_error("Invalid payment count, must be more than zero.");
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid payment count, must be more than zero.");
 
     CBlockIndex* pindexPrev = chainActive.Tip();
-    if (pindexPrev == NULL)
-        throw std::runtime_error("Try again after active chain is loaded");
+    if (!pindexPrev)
+        throw JSONRPCError(RPC_IN_WARMUP, "Try again after active chain is loaded");
 
     // Start must be in the next budget cycle or later
     const int budgetCycleBlocks = Params().GetBudgetCycleBlocks();
@@ -76,7 +76,7 @@ void checkBudgetInputs(const UniValue& params, std::string &strProposalName, std
 
     nBlockStart = params[3].get_int();
     if ((nBlockStart < nBlockMin) || ((nBlockStart % budgetCycleBlocks) != 0)) {
-        throw std::runtime_error(strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nBlockMin));
+        throw JSONRPCError(RPC_INVALID_PARAMETER, strprintf("Invalid block start - must be a budget cycle block. Next valid block: %d", nBlockMin));
     }
 
     address = params[4].get_str();
@@ -109,7 +109,7 @@ UniValue preparebudget(const UniValue& params, bool fHelp)
             HelpExampleRpc("preparebudget", "\"test-proposal\" \"https://forum.wagerr.com/t/test-proposal\" 2 820800 \"WUHPW8qfcgfpfnLBxbhFXHcxBWs6R2J3KD\" 500"));
 
     if (!pwalletMain) {
-        throw std::runtime_error("Try again after wallet is fully started");
+        throw JSONRPCError(RPC_IN_WARMUP, "Try again after active chain is loaded");
     }
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
