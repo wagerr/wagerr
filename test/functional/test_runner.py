@@ -89,6 +89,7 @@ BASE_SCRIPTS= [
     'rpc_bip38.py',
 
     # vv Tests less than 30s vv
+    'rpc_spork.py',
     #'interface_zmq.py',  # Not Working -- TODO Fix it
     'interface_bitcoin_cli.py',
     #'mempool_resurrect.py', # Not Working -- TODO Fix it

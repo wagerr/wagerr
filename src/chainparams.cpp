@@ -475,6 +475,13 @@ public:
         fMineBlocksOnDemand = true;
         fSkipProofOfWorkCheck = true;
         fTestnetToBeDeprecatedFieldRPC = false;
+
+        /* Spork Key for RegTest:
+        WIF private key: 6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH
+        private key hex: a792662ff7b4cca1603fb9b67a4bce9e8ffb9718887977a5a0b2a522e3eab97e
+        */
+        strSporkKey = "04fb58d71ffcf7d5385d85020045f108637a5296d1552f56ce561a29f78834101519c306be7d9c328a82b77726038b0eab01b8f3187c76656f9996257bf616e77f";
+        strSporkKeyOld = "04fb58d71ffcf7d5385d85020045f108637a5296d1552f56ce561a29f78834101519c306be7d9c328a82b77726038b0eab01b8f3187c76656f9996257bf616e77f";
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
