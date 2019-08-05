@@ -161,6 +161,9 @@ public:
         nEnforceNewSporkKey = 1536868800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
         nRejectOldSporkKey = 1537128000;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
 
+        // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
+        nBIP65Height = 751858;
+
         // Public coin spend enforcement
         nPublicZCSpends = 752800;
 
@@ -314,6 +317,9 @@ public:
         nEnforceNewSporkKey = 1536019200; //!> Sporks signed after Tuesday September 4, 2018 12:00:00 AM GMT must use the new spork key
         nRejectOldSporkKey = 1538611200; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
 
+        // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
+        nBIP65Height = 98580;
+
         // Public coin spend enforcement
         nPublicZCSpends = 116000;
 
@@ -425,8 +431,27 @@ public:
         nBlockFirstFraudulent = 999999999; //First block that bad serials emerged
         nBlockLastGoodCheckpoint = 999999999; //Last valid accumulator checkpoint
 
+        // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
+        nBIP65Height = 1;
+
         // Public coin spend enforcement
         nPublicZCSpends = 350;
+
+        /** Bet related parameters **/
+        nBetStartHeight = 251;                                          // The block that betting protocols become active (Regtest).
+        vOracleWalletAddrs = {"TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1",     // Oracle Masternode Event & Result Posting Wallet Address (Regtest).
+                              "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu" };
+        nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
+        strDevPayoutAddr = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";        // Development fund payout address (Regtest).
+        strOMNOPayoutAddr = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";       // OMNO fund payout address (Regtest).
+        nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
+        nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
+        nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
+        nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
+        nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
+        nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;
