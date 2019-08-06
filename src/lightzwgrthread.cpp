@@ -60,7 +60,7 @@ void CLightWorker::ThreadLightZWGRSimplified() {
                                 heightStop
                         );
 
-                    } catch (NotEnoughMintsException e) {
+                    } catch (NotEnoughMintsException& e) {
                         LogPrintStr(std::string("ThreadLightZWGRSimplified: ") + e.message + "\n");
                         rejectWork(genWit, blockHeight, NOT_ENOUGH_MINTS);
                         continue;

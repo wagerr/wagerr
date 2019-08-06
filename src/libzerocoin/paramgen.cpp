@@ -120,7 +120,7 @@ int main(int argc, char **argv)
 			outfile << resultHex;
 			outfile.close();
 			cout << endl << "Result has been written to file '" << outfileName << "'." << endl;
-		} catch (std::runtime_error &e) {
+		} catch (std::runtime_error& e) {
 			cout << "Unable to write to file:" << e.what() << endl;
 		}
 	}
