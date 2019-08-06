@@ -274,7 +274,7 @@ int CommandLineRPC(int argc, char* argv[])
                     throw;
             }
         } while (fWait);
-    } catch (boost::thread_interrupted) {
+    } catch (boost::thread_interrupted&) {
         throw;
     } catch (std::exception& e) {
         strPrint = std::string("error: ") + e.what();

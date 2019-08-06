@@ -1032,7 +1032,7 @@ bool ContextualCheckZerocoinSpendNoSerialCheck(const CTransaction& tx, const lib
         try {
             if (!spend->HasValidSignature())
                 return error("%s: V2 zWGR spend does not have a valid signature\n", __func__);
-        } catch (libzerocoin::InvalidSerialException &e) {
+        } catch (libzerocoin::InvalidSerialException& e) {
             // Check if we are in the range of the attack
             if(!isBlockBetweenFakeSerialAttackRange(pindex->nHeight))
                 return error("%s: Invalid serial detected, txid %s, in block %d\n", __func__, tx.GetHash().GetHex(), pindex->nHeight);
@@ -6681,7 +6681,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
                     ss << height;
                     pfrom->PushMessage("accvalueresponse", ss);
                 }
-            } catch (std::exception &e) {
+            } catch (std::exception& e) {
                 // TODO: Response with an error?
                 PrintExceptionContinue(&e, "ProcessMessages()");
             }
@@ -6708,7 +6708,7 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
                     ss << gen.getRequestNum();
                     pfrom->PushMessage("pubcoins", ss);
                 }
-            } catch (std::exception &e) {
+            } catch (std::exception& e) {
                 // TODO: Response with an error?
                 PrintExceptionContinue(&e, "ProcessMessages()");
             }
@@ -7053,7 +7053,7 @@ bool ProcessMessages(CNode* pfrom)
             } else {
                 PrintExceptionContinue(&e, "ProcessMessages()");
             }
-        } catch (boost::thread_interrupted) {
+        } catch (boost::thread_interrupted&) {
             throw;
         } catch (std::exception& e) {
             PrintExceptionContinue(&e, "ProcessMessages()");
