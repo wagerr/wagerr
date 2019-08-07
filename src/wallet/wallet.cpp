@@ -4778,7 +4778,7 @@ void ThreadPrecomputeSpends()
     try {
         pwallet->PrecomputeSpends();
         boost::this_thread::interruption_point();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         LogPrintf("ThreadPrecomputeSpends() exception: %s \n", e.what());
     } catch (...) {
         LogPrintf("ThreadPrecomputeSpends() error \n");

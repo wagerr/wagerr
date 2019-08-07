@@ -95,7 +95,7 @@ void FreespaceChecker::check()
                 replyMessage = tr("Path already exists, and is not a directory.");
             }
         }
-    } catch (fs::filesystem_error& e) {
+    } catch (const fs::filesystem_error& e) {
         /* Parent directory does not exist or is not accessible */
         replyStatus = ST_ERROR;
         replyMessage = tr("Cannot create data directory here.");
@@ -174,7 +174,7 @@ bool Intro::pickDataDirectory()
             try {
                 TryCreateDirectory(GUIUtil::qstringToBoostPath(dataDir));
                 break;
-            } catch (fs::filesystem_error& e) {
+            } catch (const fs::filesystem_error& e) {
                 QMessageBox::critical(0, tr("Wagerr Core"),
                     tr("Error: Specified data directory \"%1\" cannot be created.").arg(dataDir));
                 /* fall through, back to choosing screen */
