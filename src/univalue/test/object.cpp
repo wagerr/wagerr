@@ -20,16 +20,16 @@
         try { \
             (stmt); \
         } catch (excMatch & e) { \
-	} catch (...) { \
-	    assert(0); \
-	} \
+    } catch (...) { \
+        assert(0); \
+    } \
     }
 #define BOOST_CHECK_NO_THROW(stmt) { \
         try { \
             (stmt); \
-	} catch (...) { \
-	    assert(0); \
-	} \
+    } catch (...) { \
+        assert(0); \
+    } \
     }
 
 BOOST_FIXTURE_TEST_SUITE(univalue_tests, BasicTestingSetup)
