@@ -169,7 +169,7 @@ Testb_CalcParamSizes()
         if (pLen < 3072 || qLen < 320) {
             result = false;
         }
-    } catch (exception &e) {
+    } catch (const exception &e) {
         result = false;
     }
 #endif
@@ -187,7 +187,7 @@ Testb_GenerateGroupParams()
 
         try {
             group = libzerocoin::deriveIntegerGroupParams(libzerocoin::calculateSeed(gGetTestModulus(), "test", ZEROCOIN_DEFAULT_SECURITYLEVEL, "TEST GROUP"), pLen, qLen);
-        } catch (std::runtime_error& e) {
+        } catch (const std::runtime_error& e) {
             std::cout << "Caught exception " << e.what() << std::endl;
             return false;
         }
@@ -221,7 +221,7 @@ Testb_ParamGen()
         timer.stop();
 
         std::cout << "\tPARAMGEN ELAPSED TIME: " << timer.duration() << " ms\t" << timer.duration()*0.001 << " s" << std::endl;
-    } catch (std::runtime_error& e) {
+    } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
         result = false;
     }
@@ -272,7 +272,7 @@ Testb_Accumulator()
             return false;
         }
 
-    } catch (std::runtime_error& e) {
+    } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
         return false;
     }
@@ -290,7 +290,7 @@ Testb_MintCoin()
             ggCoins[i] = new libzerocoin::PrivateCoin(gg_Params, libzerocoin::CoinDenomination::ZQ_ONE);
         }
         timer.stop();
-    } catch (std::exception& e) {
+    } catch (const std::exception& e) {
         return false;
     }
 
@@ -361,7 +361,7 @@ Testb_MintAndSpend()
         std::cout << "\tSPEND VERIFY ELAPSED TIME: " << timer.duration() << " ms\t" << timer.duration()*0.001 << " s" << std::endl;
 
         return ret;
-    } catch (std::runtime_error& e) {
+    } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
         return false;
     }

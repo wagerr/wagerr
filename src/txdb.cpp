@@ -152,7 +152,7 @@ bool CCoinsViewDB::GetStats(CCoinsStats& stats) const
                 ss << VARINT(0);
             }
             pcursor->Next();
-        } catch (std::exception& e) {
+        } catch (const std::exception& e) {
             return error("%s : Deserialize or I/O error - %s", __func__, e.what());
         }
     }
@@ -286,7 +286,7 @@ bool CBlockTreeDB::LoadBlockIndexGuts()
             } else {
                 break; // if shutdown requested or finished loading block index
             }
-        } catch (std::exception& e) {
+        } catch (const std::exception& e) {
             return error("%s : Deserialize or I/O error - %s", __func__, e.what());
         }
     }
@@ -399,7 +399,7 @@ bool CZerocoinDB::WipeCoins(std::string strType)
             } else {
                 break; // if shutdown requested or finished loading block index
             }
-        } catch (std::exception& e) {
+        } catch (const std::exception& e) {
             return error("%s : Deserialize or I/O error - %s", __func__, e.what());
         }
     }
