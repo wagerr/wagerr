@@ -258,7 +258,7 @@ int ExtractVersionFromSerial(const CBigNum& bnSerial)
         uint256 nMark = bnSerial.getuint256() >> (256 - PrivateCoin::V2_BITSHIFT);
         if (nMark == 0xf)
             return PrivateCoin::PUBKEY_VERSION;
-    } catch (std::range_error& e) {
+    } catch (const std::range_error& e) {
         //std::cout << "ExtractVersionFromSerial(): " << e.what() << std::endl;
         // Only serial version 2 appeared with this range error..
         return 2;

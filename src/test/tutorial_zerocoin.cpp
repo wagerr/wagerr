@@ -266,7 +266,7 @@ ZerocoinTutorial()
         // We're done
         return true;
 
-    } catch (std::runtime_error& e) {
+    } catch (const std::runtime_error& e) {
         std::cout << e.what() << std::endl;
         return false;
     }
