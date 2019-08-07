@@ -276,8 +276,8 @@ bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strK
 
 bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCollateralAddress, CPubKey pubKeyCollateralAddress, CKey keyMasternode, CPubKey pubKeyMasternode, std::string& errorMessage, CMasternodeBroadcast &mnb)
 {
-	// wait for reindex and/or import to finish
-	if (fImporting || fReindex) return false;
+    // wait for reindex and/or import to finish
+    if (fImporting || fReindex) return false;
 
     CMasternodePing mnp(vin);
     if (!mnp.Sign(keyMasternode, pubKeyMasternode)) {
@@ -344,8 +344,8 @@ bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secr
 
 bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secretKey, std::string strTxHash, std::string strOutputIndex)
 {
-	// wait for reindex and/or import to finish
-	if (fImporting || fReindex) return false;
+    // wait for reindex and/or import to finish
+    if (fImporting || fReindex) return false;
 
     // Find possible candidates
     TRY_LOCK(pwalletMain->cs_wallet, fWallet);
@@ -396,8 +396,8 @@ bool CActiveMasternode::GetMasterNodeVin(CTxIn& vin, CPubKey& pubkey, CKey& secr
 // Extract Masternode vin information from output
 bool CActiveMasternode::GetVinFromOutput(COutput out, CTxIn& vin, CPubKey& pubkey, CKey& secretKey)
 {
-	// wait for reindex and/or import to finish
-	if (fImporting || fReindex) return false;
+    // wait for reindex and/or import to finish
+    if (fImporting || fReindex) return false;
 
     CScript pubScript;
 

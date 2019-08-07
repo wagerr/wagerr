@@ -2154,7 +2154,7 @@ void CNode::EndMessage() UNLOCK_FUNCTION(cs_vSend)
         Fuzz(GetArg("-fuzzmessagestest", 10));
 
     if (ssSend.size() == 0) {
-	    LEAVE_CRITICAL_SECTION(cs_vSend);
+        LEAVE_CRITICAL_SECTION(cs_vSend);
         return;
     }
 
