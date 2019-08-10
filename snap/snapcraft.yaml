@@ -130,7 +130,6 @@ parts:
       OVERRIDEBINPREFIX="false"
       OVERRIDEDATADIR="false"
       OVERRIDECONF="${OVERRIDEDATADIR}"
-      BINPREF1="wagerr"
       COPYCONF=0    # copy example config into users data folder, 1 = enabled
       JOBS=8        # 0 means off and make will run without -j
       PATCH=1       # 1 = enabled
@@ -237,26 +236,26 @@ parts:
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       if [ $FIXPPCBUILD = 1 ]; then
         if [ $SNAPCRAFT_ARCH_TRIPLET = "powerpc64le-linux-gnu" ]; then
-          if [ -e $SNAPCRAFT_PART_BUILD/src/qt/${BINPREF1}-qt ]; then
-            echo "PPC64EL fix - ${BINPREF1}-qt exists, fix unrequired"
+          if [ -e $SNAPCRAFT_PART_BUILD/src/qt/${BINPREF}-qt ]; then
+            echo "PPC64EL fix - ${BINPREF}-qt exists, fix unrequired"
           else
-            echo "echo ${BINPREF1}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/${BINPREF1}-qt
-            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/${BINPREF1}-qt
-            echo "PPC64EL fix - ${BINPREF1}-qt does not exist, fix required, dummy as ${BINPREF1}-qt"
+            echo "echo ${BINPREF}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/${BINPREF}-qt
+            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/${BINPREF}-qt
+            echo "PPC64EL fix - ${BINPREF}-qt does not exist, fix required, dummy as ${BINPREF}-qt"
           fi
-          if [ -e $SNAPCRAFT_PART_BUILD/src/qt/test/test_${BINPREF1}-qt ]; then
-            echo "PPC64EL fix - test_${BINPREF1}-qt exists, fix unrequired"
+          if [ -e $SNAPCRAFT_PART_BUILD/src/qt/test/test_${BINPREF}-qt ]; then
+            echo "PPC64EL fix - test_${BINPREF}-qt exists, fix unrequired"
           else
-            echo "echo test_${BINPREF1}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF1}-qt
-            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF1}-qt
-            echo "PPC64EL fix - test_${BINPREF1}-qt does not exist, fix required, dummy as test_${BINPREF1}-qt"
+            echo "echo test_${BINPREF}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}-qt
+            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}-qt
+            echo "PPC64EL fix - test_${BINPREF}-qt does not exist, fix required, dummy as test_${BINPREF}-qt"
           fi
-          if [ -e $SNAPCRAFT_PART_BUILD/src/test/test_${BINPREF1} ]; then
-            echo "PPC64EL fix - test_${BINPREF1} exists, fix unrequired"
+          if [ -e $SNAPCRAFT_PART_BUILD/src/test/test_${BINPREF} ]; then
+            echo "PPC64EL fix - test_${BINPREF} exists, fix unrequired"
           else
-            echo "echo test_${BINPREF1} is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF1}
-            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF1}
-            echo "PPC64EL fix - test_${BINPREF1} does not exist, fix required, dummy as test_${BINPREF1}"
+            echo "echo test_${BINPREF} is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}
+            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}
+            echo "PPC64EL fix - test_${BINPREF} does not exist, fix required, dummy as test_${BINPREF}"
           fi
         fi
         else
