@@ -32,7 +32,7 @@ void UpdateTime(CBlockHeader* block, const CBlockIndex* pindexPrev);
     /** Run the miner threads */
     void GenerateBitcoins(bool fGenerate, CWallet* pwallet, int nThreads);
     /** Generate a new block, without valid proof-of-work */
-    CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, CWallet* pwallet, bool fProofOfStake);
+    CBlockTemplate* CreateNewBlockWithKey(CReserveKey& reservekey, CWallet* pwallet);
 
     void BitcoinMiner(CWallet* pwallet, bool fProofOfStake);
     void ThreadStakeMinter();

@@ -155,7 +155,9 @@ UniValue generate(const UniValue& params, bool fHelp)
     while (nHeight < nHeightEnd)
     {
 
-        std::unique_ptr<CBlockTemplate> pblocktemplate(CreateNewBlockWithKey(reservekey, pwalletMain, fPoS));
+        std::unique_ptr<CBlockTemplate> pblocktemplate(
+                fPoS ? CreateNewBlock(CScript(), pwalletMain, fPoS) : CreateNewBlockWithKey(reservekey, pwalletMain)
+                        );
         if (!pblocktemplate.get())
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Couldn't create new block");
         CBlock *pblock = &pblocktemplate->block;
