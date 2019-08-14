@@ -138,9 +138,10 @@ public:
         nRejectBlockOutdatedMajority = 10260; // 95%
         nToCheckBlockUpgradeMajority = 10800; // Approximate expected amount of blocks in 7 days (1440*7.5)
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60;              // WAGERR: 1 day
+        nTargetTimespan = 1 * 60;              // WAGERR: 1 minute
         nTargetSpacing = 1 * 60;               // WAGERR: 1 minute
         nMaturity = 100;
+        nStakeMinAge = 60 * 60;                // WAGERR: 1 hour
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 398360470 * COIN;
 
@@ -420,6 +421,7 @@ public:
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         nLastPOWBlock = 250;
         nMaturity = 100;
+        nStakeMinAge = 0;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
