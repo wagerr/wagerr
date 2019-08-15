@@ -403,7 +403,7 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
         if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true))
             return error("%s : INFO: read txPrev failed, tx id prev: %s, block id %s",
                     __func__, txin.prevout.hash.GetHex(), block.GetHash().GetHex());
- 
+
         //verify signature and script
         if (!VerifyScript(txin.scriptSig, txPrev.vout[txin.prevout.n].scriptPubKey, STANDARD_SCRIPT_VERIFY_FLAGS, TransactionSignatureChecker(&tx, 0)))
             return error("%s : VerifySignature failed on coinstake %s", __func__, tx.GetHash().ToString().c_str());
