@@ -3998,7 +3998,7 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
     LogPrint("bench", "    - %s took %.2fms [%.3fms/spend]\n", __func__, 0.001 * (nTimeFinished - nTimeStart), 0.001 * (nTimeFinished - nTimeStart) / mapMintsSelected.size());
 
      receipt.SetStatus(_("Spend Valid"), ZWGR_SPEND_OKAY); // Everything okay
-
+ 
      return true;
  }
 
@@ -4869,7 +4869,7 @@ void CWallet::PrecomputeSpends()
                 if (witnessData->nHeightAccStart) { // Witness is already valid
                     nHeightStop = std::min(chainActive.Height() - nRequiredStakeDepthBuffer,
                                            (witnessData->nHeightAccEnd ? witnessData->nHeightAccEnd
-                                                                       : witnessData->nHeightAccStart)
+                                                                       : witnessData->nHeightAccStart) +
                                            nAdjustableCacheLength);
                 } else if (item_map.count(serialHash)) { // Check Database cache
                     // Get the witness data from the cache
@@ -4881,7 +4881,7 @@ void CWallet::PrecomputeSpends()
                     // Set the stop height from the variables received from the database cache
                     nHeightStop = std::min(chainActive.Height() - nRequiredStakeDepthBuffer,
                                            (witnessData->nHeightAccEnd ? witnessData->nHeightAccEnd
-                                                                       : witnessData->nHeightAccStart)
+                                                                       : witnessData->nHeightAccStart) +
                                            nAdjustableCacheLength);
 
                     LogPrint("precompute", "%s: Got Witness Data from lru cache: %s\n", __func__,
@@ -4902,7 +4902,7 @@ void CWallet::PrecomputeSpends()
                     // Set the stop height from the variables received from the database cache
                     nHeightStop = std::min(chainActive.Height() - nRequiredStakeDepthBuffer,
                                            (witnessData->nHeightAccEnd ? witnessData->nHeightAccEnd
-                                                                       : witnessData->nHeightAccStart)
+                                                                       : witnessData->nHeightAccStart) +
                                            nAdjustableCacheLength);
 
                     // Add the serialHash found into the cache
@@ -5051,7 +5051,7 @@ bool CWallet::FillCoinStake(const CKeyStore& keystore, CMutableTransaction& txNe
 
         for (const CTxOut& out : voutPayouts)
             txNew.vout.push_back(out);
-
+        
         //Masternode payment
         FillBlockPayee(txNew, nFee, true, stakeInput->IsZWGR());
 
