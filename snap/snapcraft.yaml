@@ -3,7 +3,7 @@
 # Copyright (c) 2019 The OBSR developers
 name: wagerr
 base: core18
-version: 3.0.99
+version: 3.0.1
 summary:   wagerr, digital currency for decentralized betting
 description: |
   Wagerr is a decentralized sportsbook that changes the way the world
@@ -89,27 +89,6 @@ apps:
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
-  electron:
-    command: wagerr-electron-app.AppImage
-    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
-    desktop: wagerr-electron-app.desktop
-    environment:
-      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
-      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
-  electron-testnet:
-    command: wagerr-electron-app.AppImage--testnet
-    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
-    desktop: wagerr-electron-app_testnet.desktop
-    environment:
-      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
-      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
-  electron-regtest:
-    command: wagerr-electron-app.AppImage--regtest
-    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
-    desktop: wagerr-electron-app_regtest.desktop
-    environment:
-      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
-      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli:
     command: wagerr-cli
     plugs: [network, network-bind, home, removable-media]
@@ -138,7 +117,7 @@ parts:
   wagerr:
     source: https://github.com/wagerr/wagerr
     source-type: git
-    source-tag: master
+    source-tag: v3.0.1
     plugin: nil
     override-build: |
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
@@ -306,73 +285,6 @@ parts:
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
       echo "WAGERR SPECIFIC"
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "get wagerr electron wallet"
-      if [ $HOST = "i686-linux-gnu" ]; then
-        git clone https://github.com/wagerr/wagerr-electron-app.git
-        mkdir -p ./wagerr-electron-app/bin
-        cp -f ${SNAPCRAFT_PART_INSTALL}/bin/wagerrd ./wagerr-electron-app/bin/wagerrd
-        cp -f ${SNAPCRAFT_PART_INSTALL}/bin/wagerr-cli ./wagerr-electron-app/bin/wagerr-cli
-        cd wagerr-electron-app
-        #git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X004-electron-snap-patch.patch
-        npm install
-        npm run package
-        cd release
-        APPIMAGE=$(find *i386*.AppImage)
-        chmod a+x $APPIMAGE
-        $APPIMAGE --appimage-extract
-        mv -f ./squashfs-root/* ${SNAPCRAFT_PART_INSTALL}
-        ls *.AppImage
-        cp -f $APPIMAGE ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
-        cd ..
-      elif [ $HOST = "x86_64-linux-gnu" ]; then
-        git clone https://github.com/wagerr/wagerr-electron-app.git
-        mkdir -p ./wagerr-electron-app/bin
-        cp -f ${SNAPCRAFT_PART_INSTALL}/bin/wagerrd ./wagerr-electron-app/bin/wagerrd
-        cp -f ${SNAPCRAFT_PART_INSTALL}/bin/wagerr-cli ./wagerr-electron-app/bin/wagerr-cli
-        cd wagerr-electron-app
-        #git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X004-electron-snap-patch.patch
-        npm install
-        npm run package
-        cd release
-        APPIMAGE=$(find *x86_64*.AppImage)
-        chmod a+x $APPIMAGE
-        $APPIMAGE --appimage-extract
-        mv -f ./squashfs-root/* ${SNAPCRAFT_PART_INSTALL}
-        ls *.AppImage
-        cp -f $APPIMAGE ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
-        cd ..
-      else
-        # create dummy file for all non available platforms, temp workaround **TODO**
-        touch ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
-      fi
-      if [ -f ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app ]; then
-        echo "Found - ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage"
-      else
-        # workaround to get snap successfull **TODO** should be removed later
-        touch ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage
-      fi
-      if [ -f ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app--testnet ]; then
-        echo "Found - ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage--testnet"
-      else
-        # workaround to get snap successfull **TODO** should be removed later
-        touch ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage--testnet
-      fi
-      if [ -f ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app--regtest ]; then
-        echo "Found - ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage--regtest"
-      else
-        # workaround to get snap successfull **TODO** should be removed later
-        touch ${SNAPCRAFT_PART_INSTALL}/wagerr-electron-app.AppImage--regtest
-      fi
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "INSTALATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}-snap has finished" # List installed files and vars when installation is finished
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      if [ $EXTRALOG = 1 ]; then
-        find ${SNAPCRAFT_PART_INSTALL} -type f
-        env
-      else
-        echo "RUN TESTS disabled, skipping"
-      fi
     build-packages:
       - curl
       - wget
@@ -392,6 +304,7 @@ parts:
       - help2man
       - doxygen
       - npm
+      - libts-dev
     stage-packages:
       - libxkbcommon0
       - ttf-ubuntu-font-family
