@@ -2812,8 +2812,6 @@ bool RecalculateWGRSupply(int nHeightStart)
 
     CBlockIndex* pindex = chainActive[nHeightStart];
     CAmount nSupplyPrev = pindex->pprev->nMoneySupply;
-     if (nHeightStart == Params().Zerocoin_StartHeight())
-         nSupplyPrev = CAmount(5449796547496199);
  
     uiInterface.ShowProgress(_("Recalculating WGR supply..."), 0);
     while (true) {

@@ -83,21 +83,21 @@ int GetWrapppedSerialInflation(libzerocoin::CoinDenomination denom){
     if(Params().NetworkID() == CBaseChainParams::MAIN) {
         switch (denom) {
             case libzerocoin::CoinDenomination::ZQ_ONE:
-                return 7;
+                return 24;
             case libzerocoin::CoinDenomination::ZQ_FIVE:
-                return 6;
+                return 0;
             case libzerocoin::CoinDenomination::ZQ_TEN:
-                return 36;
+                return 40;
             case libzerocoin::CoinDenomination::ZQ_FIFTY:
-                return 22;
+                return 9;
             case libzerocoin::CoinDenomination::ZQ_ONE_HUNDRED:
-                return 244;
+                return 0;
             case libzerocoin::CoinDenomination::ZQ_FIVE_HUNDRED:
-                return 22;
+                return 0;
             case libzerocoin::CoinDenomination::ZQ_ONE_THOUSAND:
-                return 42;
+                return 0;
             case libzerocoin::CoinDenomination::ZQ_FIVE_THOUSAND:
-                return 98;
+                return 0;
             default:
                 throw std::runtime_error("GetWrapSerialInflation :: Invalid denom");
         }
