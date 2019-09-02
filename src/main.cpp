@@ -2826,6 +2826,7 @@ bool RecalculateWGRSupply(int nHeightStart)
 
         CAmount nValueIn = 0;
         CAmount nValueOut = 0;
+        CAmount nValueBurned = 0;
         for (const CTransaction tx : block.vtx) {
             for (unsigned int i = 0; i < tx.vin.size(); i++) {
                 if (tx.IsCoinBase())
@@ -2842,22 +2843,11 @@ bool RecalculateWGRSupply(int nHeightStart)
                 assert(GetTransaction(prevout.hash, txPrev, hashBlock, true));
                 nValueIn += txPrev.vout[prevout.n].nValue;
             }
-
-            for (unsigned int i = 0; i < tx.vout.size(); i++) {
-                if (i == 0 && tx.IsCoinStake())
-                    continue;
-
-                if (pindex->nHeight >= Params().BetStartHeight()) {
-                    if (tx.vout[i].scriptPubKey.IsUnspendable())
-                        continue;
-                }
-
-                nValueOut += tx.vout[i].nValue;
-            }
+            tx.AddVoutValues(nValueOut, nValueBurned);
         }
 
         // Rewrite money supply
-        pindex->nMoneySupply = nSupplyPrev + nValueOut - nValueIn;
+        pindex->nMoneySupply = nSupplyPrev + nValueOut - nValueIn - nValueBurned;
         nSupplyPrev = pindex->nMoneySupply;
 
         // Add fraudulent funds to the supply and remove any recovered funds.
@@ -3240,13 +3230,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // track money supply and mint amount info
     CAmount nMoneySupplyPrev = pindex->pprev ? pindex->pprev->nMoneySupply : 0;
-    pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn;
+    pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn - nValueBurned;
     pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
     
-    // adjust MoneySupply to account for WGR bet/burned, after first calculating actual Mint (pindex->nMint above)
-    if (pindex->nHeight >= Params().BetStartHeight() ) {
-        pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn - nValueBurned;
-    }
 //    LogPrintf("XX69----------> ConnectBlock(): nValueOut: %s, nValueIn: %s, nFees: %s, nMint: %s zWgrSpent: %s\n",
 //              FormatMoney(nValueOut), FormatMoney(nValueIn),
 //              FormatMoney(nFees), FormatMoney(pindex->nMint), FormatMoney(nAmountZerocoinSpent));
