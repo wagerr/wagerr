@@ -155,7 +155,9 @@ bool CCoinsViewDB::GetStats(CCoinsStats& stats) const
                         stats.nTransactionOutputs++;
                         ss << VARINT(i + 1);
                         ss << out;
-                        nTotalAmount += out.nValue;
+                        if (!out.scriptPubKey.IsUnspendable() && !out.IsZerocoinMint()) {
+                            nTotalAmount += out.nValue;
+                        }
                     }
                 }
                 stats.nSerializedSize += 32 + slValue.size();
