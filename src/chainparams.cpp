@@ -78,14 +78,15 @@ static const Checkpoints::CCheckpointData data = {
 
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
     boost::assign::map_list_of
-    (       1, uint256("0x00000385558ec1b9af7f939e1626a3116b9fb988c86c2f915e6451e8efcd0521"))
-    (   20040, uint256("0x03a92984c2deba55ac8f9e8194b1bc745fbad9f7a0f3ed94ebb8c372935bed9c"))   // tx 40878
-    (   93286, uint256("0xdc68d97761ceac8c177a81487569bfe92b720f513fbbf5c2184988f1d74c5061"));  // tx 227380
+    (       0, uint256("00000fdc268f54ff1368703792dc046b1356e60914c2b5b6348032144bcb2de5"))
+    (       1, uint256("00000ee56853cd05cda3148653fe2815075d2251299a23c84de189e70c5d9757"))     // 1567576895   2
+    (     450, uint256("defe8866695382de16183afd0321d651e91cafe9d7080ed6cc7ab9e17fc1074d"))     // 1567615777   635
+    (     469, uint256("c4751ac19dedcce9b51243f9d333d33018099ba0757c23842780d814e84aeef1"));    // 1567623780   673
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1560967301,
-    227380,
-    3000};
+    1567615777,
+    673,
+    1000};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
     boost::assign::map_list_of(0, uint256("0x671d0510c128608897d98d1819d26b40810c8b7e4901447a909c87a9edc2f5ec"));
@@ -309,23 +310,23 @@ public:
         nZerocoinAccumulationStartHeight = 350;
         nZerocoinStartTime = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
         nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
-        nBlockRecalculateAccumulators = 1400; //Trigger a recalculation of accumulators
-        nBlockFirstFraudulent = 21012; //First block that bad serials emerged (currently we do not have any) *** TODO ***
+        nBlockRecalculateAccumulators = -1; //Trigger a recalculation of accumulators
+        nBlockFirstFraudulent = 99999999; //First block that bad serials emerged (currently we do not have any) *** TODO ***
         nBlockLastGoodCheckpoint = 350; //Last valid accumulator checkpoint (currently we do not have any) *** TODO ***
         nBlockEnforceInvalidUTXO = 350; //Start enforcing the invalid UTXO's
         nInvalidAmountFiltered = 0; //Amount of invalid coins filtered through exchanges, that should be considered valid
-        nBlockZerocoinV2 = 26050; //The block that zerocoin v2 becomes active
+        nBlockZerocoinV2 = 600; //The block that zerocoin v2 becomes active
         nEnforceNewSporkKey = 1536019200; //!> Sporks signed after Tuesday September 4, 2018 12:00:00 AM GMT must use the new spork key
         nRejectOldSporkKey = 1538611200; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
 
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
-        nBIP65Height = 98580;
+        nBIP65Height = 600;
 
         // Public coin spend enforcement
-        nPublicZCSpends = 116000;
+        nPublicZCSpends = 600;
 
         /** Bet related parameters **/
-        nBetStartHeight = 26080;                                        // The block that betting protocols become active (Testnet).
+        nBetStartHeight = 600;                                        // The block that betting protocols become active (Testnet).
         vOracleWalletAddrs = {"TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2",     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
                               "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc" };
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
@@ -345,8 +346,8 @@ public:
         nSupplyBeforeFakeSerial = 0;
 
         // workarond fixes
-        nZerocoinCheckTXexclude = 15195;
-        nZerocoinCheckTX = 50228;
+        nZerocoinCheckTXexclude = -1;
+        nZerocoinCheckTX = -1;
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696182;
