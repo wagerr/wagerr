@@ -377,7 +377,8 @@ bool isBlockBetweenFakeSerialAttackRange(int nHeight);
 
 // Public coin spend
 bool CheckPublicCoinSpendEnforced(int blockHeight, bool isPublicSpend);
-bool CheckPublicCoinSpendVersion(int blockHeight, int version);
+int CurrentPublicCoinSpendVersion();
+bool CheckPublicCoinSpendVersion(int version);
 
 /**
  * Check if transaction will be final in the next block to be created.
