@@ -4174,7 +4174,7 @@ bool CWallet::MintsToInputVectorPublicSpend(std::map<CBigNum, CZerocoinMint>& ma
     if (!nHeight)
         return error("%s: Unable to get chain tip height", __func__);
 
-    int spendVersion = Params().Zerocoin_PublicSpendVersion(nHeight);
+    int spendVersion = CurrentPublicCoinSpendVersion();
 
     int nLockAttempts = 0;
     while (nLockAttempts < 100) {

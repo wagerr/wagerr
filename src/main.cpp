@@ -1012,8 +1012,12 @@ bool CheckPublicCoinSpendEnforced(int blockHeight, bool isPublicSpend) {
     return true;
 }
 
-bool CheckPublicCoinSpendVersion(int blockHeight, int version) {
-    return version >= Params().Zerocoin_PublicSpendVersion(blockHeight);
+int CurrentPublicCoinSpendVersion() {
+    return sporkManager.IsSporkActive(SPORK_18_ZEROCOIN_PUBLICSPEND_V4) ? 4 : 3;
+}
+
+bool CheckPublicCoinSpendVersion(int version) {
+    return version == CurrentPublicCoinSpendVersion();
 }
 
 bool ContextualCheckZerocoinSpend(const CTransaction& tx, const libzerocoin::CoinSpend* spend, CBlockIndex* pindex, const uint256& hashBlock)
@@ -1053,12 +1057,6 @@ bool ContextualCheckZerocoinSpendNoSerialCheck(const CTransaction& tx, const lib
             return error("%s: trying to spend zWGR without the correct spend type. txid=%s\n", __func__,
                          tx.GetHash().GetHex());
         }
-    }
-
-    // Check spend version
-    if (pindex->nHeight >= Params().Zerocoin_Block_Public_Spend_Enabled() &&
-            !CheckPublicCoinSpendVersion(pindex->nHeight, (int)spend->getVersion())) {
-        return error("%s: Invalid public spend version for tx %s", __func__, tx.GetHash().GetHex());
     }
 
     bool fUseV1Params = spend->getCoinVersion() < libzerocoin::PrivateCoin::PUBKEY_VERSION;
@@ -1447,6 +1445,13 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
                     if (!ContextualCheckZerocoinSpend(tx, &publicSpend, chainActive.Tip(), 0))
                         return state.Invalid(error("%s: ContextualCheckZerocoinSpend failed for tx %s",
                                 __func__, tx.GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-zwgr");
+
+                    // Check that the version matches the one enforced with SPORK_18
+                    if (!CheckPublicCoinSpendVersion(publicSpend.getVersion())) {
+                        return state.Invalid(error("%s : Public Zerocoin spend version %d not accepted. must be version %d.",
+                                __func__, publicSpend.getVersion(), CurrentPublicCoinSpendVersion()), REJECT_INVALID, "bad-txns-invalid-zwgr");
+                    }
+
                 } else {
                     libzerocoin::CoinSpend spend = TxInToZerocoinSpend(txIn);
                     if (!ContextualCheckZerocoinSpend(tx, &spend, chainActive.Tip(), 0))
@@ -4416,6 +4421,11 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
                             return false;
                         }
                         spend = publicSpend;
+                        // check that the version matches the one enforced with SPORK_18 (don't ban if it fails)
+                        if (!IsInitialBlockDownload() && !CheckPublicCoinSpendVersion(spend.getVersion())) {
+                            return state.DoS(0, error("%s : Public Zerocoin spend version %d not accepted. must be version %d.",
+                                    __func__, spend.getVersion(), CurrentPublicCoinSpendVersion()), REJECT_INVALID, "bad-zcspend-version");
+                        }
                     } else {
                         spend = TxInToZerocoinSpend(txIn);
                     }
