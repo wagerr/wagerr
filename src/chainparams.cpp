@@ -134,13 +134,6 @@ bool CChainParams::HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t
     return (contextHeight - utxoFromBlockHeight >= nStakeMinDepth);
 }
 
-int CChainParams::Zerocoin_PublicSpendVersion(const int nHeight) const
-{
-    if (nHeight < nPublicZCSpendsV4)
-        return 3;
-    return 4;
-}
-
 class CMainParams : public CChainParams
 {
 public:
@@ -196,10 +189,10 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 751858;
 
-        nBlockStakeModifierlV2 = 891276;
+        nBlockStakeModifierV2 = 891276;
+
         // Public coin spend enforcement
         nPublicZCSpends = 752800;
-        nPublicZCSpendsV4 = 2880000;
 
         // New P2P messages signatures
         nBlockEnforceNewMessageSignatures = 2967000;
@@ -370,10 +363,10 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 600;
 
-        nBlockStakeModifierlV2 = 92500;
+        nBlockStakeModifierV2 = 92500;
+
         // Public coin spend enforcement
         nPublicZCSpends = 600;
-        nPublicZCSpendsV4 = 2106100;
 
         // New P2P messages signatures
         nBlockEnforceNewMessageSignatures = 2214000;
@@ -502,10 +495,10 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 1;
 
-        nBlockStakeModifierlV2 = 400;
+        nBlockStakeModifierV2 = 400;
+
         // Public coin spend enforcement
         nPublicZCSpends = 350;
-        nPublicZCSpendsV4 = 450;
 
         // New P2P messages signatures
         nBlockEnforceNewMessageSignatures = 1;
