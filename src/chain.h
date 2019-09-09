@@ -1,5 +1,8 @@
 // Copyright (c) 2009-2010 Satoshi Nakamoto
 // Copyright (c) 2009-2014 The Bitcoin developers
+// Copyright (c) 2011-2013 The PPCoin developers
+// Copyright (c) 2013-2014 The NovaCoin Developers
+// Copyright (c) 2014-2018 The BlackCoin Developers
 // Copyright (c) 2015-2017 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT software license, see the accompanying
@@ -11,6 +14,7 @@
 #include "chainparams.h"
 #include "pow.h"
 #include "primitives/block.h"
+#include "timedata.h"
 #include "tinyformat.h"
 #include "uint256.h"
 #include "util.h"
@@ -339,6 +343,27 @@ public:
 
         std::sort(pbegin, pend);
         return pbegin[(pend - pbegin) / 2];
+    }
+
+    int64_t MaxFutureBlockTime() const
+    {
+        return GetAdjustedTime() + Params().FutureBlockTimeDrift(nHeight+1);
+    }
+
+    int64_t MinPastBlockTime() const
+    {
+        // Time Protocol v1: pindexPrev->MedianTimePast + 1
+        if (!Params().IsTimeProtocolV2(nHeight+1))
+            return GetMedianTimePast();
+
+        // on the transition from Time Protocol v1 to v2
+        // pindexPrev->nTime might be in the future (up to the allowed drift)
+        // so we allow the nBlockTimeProtocolV2 to be at most (180-14) seconds earlier than previous block
+        if (nHeight + 1 == Params().BlockStartTimeProtocolV2())
+            return GetBlockTime() - Params().FutureBlockTimeDrift(nHeight) + Params().FutureBlockTimeDrift(nHeight + 1);
+
+        // Time Protocol v2: pindexPrev->nTime
+        return GetBlockTime();
     }
 
     bool IsProofOfWork() const

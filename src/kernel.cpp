@@ -1,4 +1,6 @@
-// Copyright (c) 2012-2013 The PPCoin developers
+// Copyright (c) 2011-2013 The PPCoin developers
+// Copyright (c) 2013-2014 The NovaCoin Developers
+// Copyright (c) 2014-2018 The BlackCoin Developers
 // Copyright (c) 2015-2018 The PIVX developers
 // Copyright (c) 2018 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
@@ -10,7 +12,6 @@
 #include "db.h"
 #include "kernel.h"
 #include "script/interpreter.h"
-#include "timedata.h"
 #include "util.h"
 #include "stakeinput.h"
 #include "utilmoneystr.h"
@@ -117,8 +118,10 @@ static bool SelectBlockFromCandidates(
 // must hash with a future stake modifier to generate the proof.
 uint256 ComputeStakeModifier(const CBlockIndex* pindexPrev, const uint256& kernel)
 {
-    if (!pindexPrev)
-        return uint256(); // genesis block's modifier is 0
+    // genesis block's modifier is 0
+    // all block's modifiers are 0 on regtest
+    if (!pindexPrev || Params().NetworkID() == CBaseChainParams::REGTEST)
+        return uint256();
 
     CHashWriter ss(SER_GETHASH, 0);
     ss << kernel;
@@ -239,7 +242,7 @@ bool ComputeNextStakeModifier(const CBlockIndex* pindexPrev, uint64_t& nStakeMod
 
 // The stake modifier used to hash for a stake kernel is chosen as the stake
 // modifier about a selection interval later than the coin generating the kernel
-bool GetKernelStakeModifier(uint256 hashBlockFrom, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake)
+bool GetKernelStakeModifier(const uint256& hashBlockFrom, uint64_t& nStakeModifier, int& nStakeModifierHeight, int64_t& nStakeModifierTime, bool fPrintProofOfStake)
 {
     nStakeModifier = 0;
     if (!mapBlockIndex.count(hashBlockFrom))
@@ -343,50 +346,77 @@ bool GetHashProofOfStake(const CBlockIndex* pindexPrev, CStakeInput* stake, cons
     return true;
 }
 
-bool Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int nBits, unsigned int& nTimeTx, uint256& hashProofOfStake)
+bool Stake(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, unsigned int nBits, int64_t& nTimeTx, uint256& hashProofOfStake)
 {
-    int prevHeight = pindexPrev->nHeight;
+    const int nHeight = pindexPrev->nHeight + 1;
 
     // get stake input pindex
     CBlockIndex* pindexFrom = stakeInput->GetIndexFrom();
     if (!pindexFrom || pindexFrom->nHeight < 1) return error("%s : no pindexfrom", __func__);
 
+    // Time protocol V2: one-try
+    if (Params().IsTimeProtocolV2(nHeight)) {
+        // store a time stamp of when we last hashed on this block
+        mapHashedBlocks.clear();
+        mapHashedBlocks[pindexPrev->nHeight] = GetTime();
+
+        // check required min depth for stake
+        const int nHeightBlockFrom = pindexFrom->nHeight;
+        if (nHeight < nHeightBlockFrom + Params().COINSTAKE_MIN_DEPTH())
+            return error("%s : min depth violation, nHeight=%d, nHeightBlockFrom=%d", __func__, nHeight, nHeightBlockFrom);
+
+        nTimeTx = GetCurrentTimeSlot();
+        // double check that we are not on the same slot as prev block
+        if (nTimeTx <= pindexPrev->nTime && Params().NetworkID() != CBaseChainParams::REGTEST)
+            return false;
+
+        // check stake kernel
+        return CheckStakeKernelHash(pindexPrev, nBits, stakeInput, nTimeTx, hashProofOfStake);
+    }
+
+    // Time protocol V1: iterate the hashing (can be removed after hard-fork)
     const uint32_t nTimeBlockFrom = pindexFrom->nTime;
-    const int nHeightBlockFrom = pindexFrom->nHeight;
+    return StakeV1(pindexPrev, stakeInput, nTimeBlockFrom, nBits, nTimeTx, hashProofOfStake);
+}
 
-    // check for maturity (min age/depth) requirements
-    if (!Params().HasStakeMinAgeOrDepth(prevHeight + 1, nTimeTx, nHeightBlockFrom, nTimeBlockFrom))
-        return error("%s : min age violation - height=%d - nTimeTx=%d, nTimeBlockFrom=%d, nHeightBlockFrom=%d",
-                         __func__, prevHeight + 1, nTimeTx, nTimeBlockFrom, nHeightBlockFrom);
-
-    // iterate the hashing
+bool StakeV1(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, const uint32_t nTimeBlockFrom, unsigned int nBits, int64_t& nTimeTx, uint256& hashProofOfStake)
+{
     bool fSuccess = false;
-    const unsigned int nHashDrift = 60;
-    unsigned int nTryTime = nTimeTx - 1;
-    // iterate from nTimeTx up to nTimeTx + nHashDrift
-    // but not after the max allowed future blocktime drift (3 minutes for PoS)
-    const unsigned int maxTime = std::min(nTimeTx + nHashDrift, Params().MaxFutureBlockTime(GetAdjustedTime(), true));
+    // iterate from maxTime down to pindexPrev->nTime (or min time due to maturity, 60 min after blockFrom)
+    const unsigned int prevBlockTime = pindexPrev->nTime;
+    const unsigned int maxTime = pindexPrev->MaxFutureBlockTime();
+    unsigned int minTime = std::max(prevBlockTime, nTimeBlockFrom + 3600);
+    if (Params().NetworkID() == CBaseChainParams::REGTEST)
+        minTime = prevBlockTime;
+    unsigned int nTryTime = maxTime;
 
-    while (nTryTime < maxTime)
-    {
+    // check required maturity for stake
+    if (maxTime <= minTime)
+        return error("%s : stake age violation, nTimeBlockFrom = %d, prevBlockTime = %d -- maxTime = %d ", __func__, nTimeBlockFrom, prevBlockTime, maxTime);
+
+    while (nTryTime > minTime) {
+        // store a time stamp of when we last hashed on this block
+        mapHashedBlocks.clear();
+        mapHashedBlocks[pindexPrev->nHeight] = GetTime();
+
         //new block came in, move on
-        if (chainActive.Height() != prevHeight)
-            break;
+        if (chainActive.Height() != pindexPrev->nHeight) break;
 
-        ++nTryTime;
-
+        --nTryTime;
         // if stake hash does not meet the target then continue to next iteration
         if (!CheckStakeKernelHash(pindexPrev, nBits, stakeInput, nTryTime, hashProofOfStake))
-            continue;
+             continue;
 
         // if we made it this far, then we have successfully found a valid kernel hash
         fSuccess = true;
-        nTimeTx = nTryTime;
         break;
     }
 
+    nTimeTx = nTryTime;
+
     mapHashedBlocks.clear();
-    mapHashedBlocks[chainActive.Tip()->nHeight] = GetTime(); //store a time stamp of when we last hashed on this block
+    mapHashedBlocks[pindexPrev->nHeight] = GetTime(); //store a time stamp of when we last hashed on this block
+
     return fSuccess;
 }
 
@@ -416,7 +446,7 @@ bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake)
     return true;
 }
 
-bool initStakeInput(const CBlock block, std::unique_ptr<CStakeInput>& stake, int nPreviousBlockHeight) {
+bool initStakeInput(const CBlock& block, std::unique_ptr<CStakeInput>& stake, int nPreviousBlockHeight) {
     const CTransaction tx = block.vtx[1];
     if (!tx.IsCoinStake())
         return error("%s : called on non-coinstake %s", __func__, tx.GetHash().ToString().c_str());
@@ -454,7 +484,7 @@ bool initStakeInput(const CBlock block, std::unique_ptr<CStakeInput>& stake, int
 }
 
 // Check kernel hash target and coinstake signature
-bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::unique_ptr<CStakeInput>& stake, int nPreviousBlockHeight)
+bool CheckProofOfStake(const CBlock& block, uint256& hashProofOfStake, std::unique_ptr<CStakeInput>& stake, int nPreviousBlockHeight)
 {
     // Initialize the stake object
     if(!initStakeInput(block, stake, nPreviousBlockHeight))
@@ -486,13 +516,6 @@ bool CheckProofOfStake(const CBlock block, uint256& hashProofOfStake, std::uniqu
     return true;
 }
 
-// Check whether the coinstake timestamp meets protocol
-bool CheckCoinStakeTimestamp(int64_t nTimeBlock, int64_t nTimeTx)
-{
-    // v0.3 protocol
-    return (nTimeBlock == nTimeTx);
-}
-
 // Get stake modifier checksum
 unsigned int GetStakeModifierChecksum(const CBlockIndex* pindex)
 {
@@ -516,3 +539,18 @@ bool CheckStakeModifierCheckpoints(int nHeight, unsigned int nStakeModifierCheck
     }
     return true;
 }
+
+// Timestamp for time protocol V2: slot duration 15 seconds
+int64_t GetTimeSlot(const int64_t nTime)
+{
+    const int slotLen = Params().TimeSlotLength();
+    return (nTime / slotLen) * slotLen;
+}
+
+int64_t GetCurrentTimeSlot()
+{
+    return GetTimeSlot(GetAdjustedTime());
+}
+
+
+

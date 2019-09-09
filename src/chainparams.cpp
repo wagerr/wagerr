@@ -126,12 +126,33 @@ int CChainParams::COINBASE_MATURITY(const int contextHeight) const {
 bool CChainParams::HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
         const int utxoFromBlockHeight, const uint32_t utxoFromBlockTime) const
 {
-    // before stake modifier V2, the age required was 60 * 60 (1 hour) / not required on regtest
+    // before stake modifier V2, the age required was 60 * 60 (1 hour). Not required for regtest
     if (!IsStakeModifierV2(contextHeight))
-        return (NetworkID() == CBaseChainParams::REGTEST || (utxoFromBlockTime + 3600 <= contextTime));
+        return NetworkID() == CBaseChainParams::REGTEST || (utxoFromBlockTime + nStakeMinAge <= contextTime);
 
     // after stake modifier V2, we require the utxo to be nStakeMinDepth deep in the chain
     return (contextHeight - utxoFromBlockHeight >= nStakeMinDepth);
+}
+
+int CChainParams::FutureBlockTimeDrift(const int nHeight) const
+{
+    if (IsTimeProtocolV2(nHeight))
+        // PoS (TimeV2): 14 seconds
+        return TimeSlotLength() - 1;
+
+    // PoS (TimeV1): 3 minutes
+    // PoW: 2 hours
+    return (nHeight > LAST_POW_BLOCK()) ? nFutureTimeDriftPoS : nFutureTimeDriftPoW;
+}
+
+bool CChainParams::IsValidBlockTimeStamp(const int64_t nTime, const int nHeight) const
+{
+    // Before time protocol V2, blocks can have arbitrary timestamps
+    if (!IsTimeProtocolV2(nHeight))
+        return true;
+
+    // Time protocol v2 requires time in slots
+    return (nTime % TimeSlotLength()) == 0;
 }
 
 class CMainParams : public CChainParams
@@ -153,6 +174,8 @@ public:
         vAlertPubKey = ParseHex("04300ed6502f7210f8864f1facb2b817f085d5dc7ebf1577dfe14f4fc7ab37d851aa54aa3d2d252823063524750faaf24427ede912bf4958f7b3e63c7cce8dd036");
         nDefaultPort = 55002;
         bnProofOfWorkLimit = ~uint256(0) >> 20; // Wagerr starting difficulty is 1 / 2^12
+        bnProofOfStakeLimit = ~uint256(0) >> 24;
+        bnProofOfStakeLimit_V2 = ~uint256(0) >> 20; // 60/4 = 15 ==> use 2**4 higher limit
         nSubsidyHalvingInterval = 210000;
         nMaxReorganizationDepth = 100;
         nMaxBettingUndoDepth = 200;
@@ -160,14 +183,19 @@ public:
         nRejectBlockOutdatedMajority = 10260; // 95%
         nToCheckBlockUpgradeMajority = 10800; // Approximate expected amount of blocks in 7 days (1440*7.5)
         nMinerThreads = 0;
-        nTargetSpacing = 1 * 60;        // 1 minute
+        nTargetSpacing = 1 * 60;                        // 1 minute
+        nTargetTimespan = 40 * 60;                      // 40 minutes
+        nTimeSlotLength = 15;                           // 15 seconds
+        nTargetTimespan_V2 = 2 * nTimeSlotLength * 60;  // 30 minutes
         nMaturityV1 = 100;
         nMaturityV2 = 60;
+        nStakeMinAge = 60 * 60;                         // 1 hour
         nStakeMinDepth = 600;
         nFutureTimeDriftPoW = 7200;
         nFutureTimeDriftPoS = 180;
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 398360470 * COIN;
+        nTimeSlotLength = 15;           // 15 seconds
 
         /** Height or Time Based Activations **/
         nLastPOWBlock = 1001;                   // PoW Phase 3 End
@@ -190,12 +218,13 @@ public:
         nBIP65Height = 751858;
 
         nBlockStakeModifierV2 = 891276;
+        nBlockTimeProtocolV2 = std::numeric_limits<int>::max();
 
         // Public coin spend enforcement
         nPublicZCSpends = 752800;
 
         // New P2P messages signatures
-        nBlockEnforceNewMessageSignatures = 2967000;
+        nBlockEnforceNewMessageSignatures = nBlockTimeProtocolV2;
 
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
@@ -339,7 +368,6 @@ public:
         nRejectBlockOutdatedMajority = 5472; // 95%
         nToCheckBlockUpgradeMajority = 5760; // 4 days
         nMinerThreads = 0;
-        nTargetSpacing = 1 * 60;  // WAGERR: 1 minute
         nLastPOWBlock = 300;
         nMaturityV1 = 15;
         nMaturityV2 = 10;
@@ -364,12 +392,13 @@ public:
         nBIP65Height = 600;
 
         nBlockStakeModifierV2 = 92500;
+        nBlockTimeProtocolV2 = std::numeric_limits<int>::max();
 
         // Public coin spend enforcement
         nPublicZCSpends = 600;
 
         // New P2P messages signatures
-        nBlockEnforceNewMessageSignatures = 2214000;
+        nBlockEnforceNewMessageSignatures = nBlockTimeProtocolV2;
 
         /** Bet related parameters **/
         nBetStartHeight = 1100;                                         // The block that betting protocols become active (Testnet).
@@ -475,14 +504,15 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
-        nTargetSpacing = 1 * 60;        // WAGERR: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         nLastPOWBlock = 250;
         nMaturityV1 = 100;
         nMaturityV2 = 60;
+        nStakeMinAge = 0;
         nStakeMinDepth = 0;
+        nTimeSlotLength = 1;            // time not masked on RegNet
         nMasternodeCountDrift = 4;
-        nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMT
+        nModifierUpdateBlock = 0;
         nMaxMoneyOut = 398360470 * COIN;
         nZerocoinStartHeight = 300;
         nBlockZerocoinV2 = 300;
@@ -496,6 +526,7 @@ public:
         nBIP65Height = 1;
 
         nBlockStakeModifierV2 = 400;
+        nBlockTimeProtocolV2 = 500;
 
         // Public coin spend enforcement
         nPublicZCSpends = 350;
