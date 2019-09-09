@@ -52,6 +52,7 @@ public:
     const std::vector<unsigned char>& AlertKey() const { return vAlertPubKey; }
     int GetDefaultPort() const { return nDefaultPort; }
     const uint256& ProofOfWorkLimit() const { return bnProofOfWorkLimit; }
+    const uint256& ProofOfStakeLimit(const bool fV2) const { return fV2 ? bnProofOfStakeLimit_V2 : bnProofOfStakeLimit; }
     int SubsidyHalvingInterval() const { return nSubsidyHalvingInterval; }
     /** Used to check majorities for block version upgrade */
     int EnforceBlockUpgradeMajority() const { return nEnforceBlockUpgradeMajority; }
@@ -79,17 +80,22 @@ public:
     /** Make standard checks */
     bool RequireStandard() const { return fRequireStandard; }
     int64_t TargetSpacing() const { return nTargetSpacing; }
+    int64_t TargetTimespan(const bool fV2 = true) const { return fV2 ? nTargetTimespan_V2 : nTargetTimespan; }
 
     /** returns the coinbase maturity **/
     int COINBASE_MATURITY(const int contextHeight) const;
 
     /** returns the coinstake maturity (min depth required) **/
+    int COINSTAKE_MIN_AGE() const { return nStakeMinAge; }
     int COINSTAKE_MIN_DEPTH() const { return nStakeMinDepth; }
     bool HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime, const int utxoFromBlockHeight, const uint32_t utxoFromBlockTime) const;
 
-    /** returns the max future time (and drift in seconds) allowed for a block in the future **/
-    int FutureBlockTimeDrift(const bool isPoS) const { return isPoS ? nFutureTimeDriftPoS : nFutureTimeDriftPoW; }
-    uint32_t MaxFutureBlockTime(uint32_t time, const bool isPoS) const { return time + FutureBlockTimeDrift(isPoS); }
+    /** Time Protocol V2 **/
+    int BlockStartTimeProtocolV2() const { return nBlockTimeProtocolV2; }
+    bool IsTimeProtocolV2(const int nHeight) const { return nHeight >= BlockStartTimeProtocolV2(); }
+    int TimeSlotLength() const { return nTimeSlotLength; }
+    int FutureBlockTimeDrift(const int nHeight) const;
+    bool IsValidBlockTimeStamp(const int64_t nTime, const int nHeight) const;
 
     CAmount MaxMoneyOut() const { return nMaxMoneyOut; }
     /** The masternode count that we will allow the see-saw reward payments to be off by */
@@ -188,6 +194,8 @@ protected:
     std::vector<unsigned char> vAlertPubKey;
     int nDefaultPort;
     uint256 bnProofOfWorkLimit;
+    uint256 bnProofOfStakeLimit;
+    uint256 bnProofOfStakeLimit_V2;
     int nMaxReorganizationDepth;
     int nMaxBettingUndoDepth;
     int nSubsidyHalvingInterval;
@@ -195,13 +203,17 @@ protected:
     int nRejectBlockOutdatedMajority;
     int nToCheckBlockUpgradeMajority;
     int64_t nTargetSpacing;
+    int64_t nTargetTimespan;
+    int64_t nTargetTimespan_V2;
     int nLastPOWBlock;
     int nMasternodeCountDrift;
     int nMaturityV1;
     int nMaturityV2;
     int nStakeMinDepth;
+    int nStakeMinAge;
     int nFutureTimeDriftPoW;
     int nFutureTimeDriftPoS;
+    int nTimeSlotLength;
 
     int nModifierUpdateBlock;
     CAmount nMaxMoneyOut;
@@ -253,6 +265,7 @@ protected:
     int nPublicZCSpends;
     int nBIP65Height;
     int nBlockStakeModifierV2;
+    int nBlockTimeProtocolV2;
     int nBlockEnforceNewMessageSignatures;
 
     // fake serial attack

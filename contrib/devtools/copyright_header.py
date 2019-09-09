@@ -123,6 +123,9 @@ EXPECTED_HOLDER_NAMES = [
     "The WAGERR developers\n",
     "The Wagerr developers\n",
     "The PPCoin developers\n",
+    "The NovaCoin Developers\n",
+    "The BlackCoin Developers\n",
+    "The Blackcoin More developers\n",
 ]
 
 DOMINANT_STYLE_COMPILED = {}

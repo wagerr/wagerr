@@ -486,15 +486,19 @@ class CBlockHeader():
         r += ser_uint256(prevout.hash)
         return r
 
-    def solve_stake(self, prevouts):
+    def solve_stake(self, prevouts, isModifierV2=False):
         target0 = uint256_from_compact(self.nBits)
         loop = True
         while loop:
             for prevout in prevouts:
-                nvalue, txBlockTime, stakeModifier, hashStake = prevouts[prevout]
+                nvalue, txBlockTime, hashStake = prevouts[prevout]
                 target = int(target0 * nvalue / 100) % 2**256
                 data = b""
-                data += ser_uint64(stakeModifier)
+                if isModifierV2:
+                    data += ser_uint256(0)
+                else:
+                    data += ser_uint64(0)
+                #data += ser_uint64(stakeModifier)
                 data += struct.pack("<I", txBlockTime)
                 # prevout for zPoS is serial hashes hex strings
                 if isinstance(prevout, COutPoint):

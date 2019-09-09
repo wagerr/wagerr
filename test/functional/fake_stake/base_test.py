@@ -15,7 +15,7 @@ from test_framework.test_framework import BitcoinTestFramework
 from test_framework.script import CScript, OP_CHECKSIG
 from test_framework.util import hash256, bytes_to_hex_str, hex_str_to_bytes, connect_nodes_bi, p2p_port
 
-from .util import TestNode, create_transaction, utxo_to_stakingPrevOuts, dir_size
+from .util import TestNode, create_transaction, utxo_to_stakingPrevOuts, dir_size, nBlockStakeModifierlV2
 ''' -------------------------------------------------------------------------
 WAGERR_FakeStakeTest CLASS ----------------------------------------------------
 
@@ -114,7 +114,7 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
         block = create_block(int(hashPrevBlock, 16), coinbase, nTime)
 
         # Find valid kernel hash - Create a new private key used for block signing.
-        if not block.solve_stake(stakingPrevOuts):
+        if not block.solve_stake(stakingPrevOuts, (height >= nBlockStakeModifierlV2)):
             raise Exception("Not able to solve for any prev_outpoint")
 
         # Sign coinstake TX and add it to the block
@@ -314,10 +314,8 @@ class WAGERR_FakeStakeTest(BitcoinTestFramework):
                 txBlocktime = utxo_tx['blocktime']
                 txBlockhash = utxo_tx['blockhash']
 
-            # get Stake Modifier
-            stakeModifier = int(self.node.getblock(txBlockhash)['modifier'], 16)
             # assemble prevout object
-            utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime, stakeModifier, zpos)
+            utxo_to_stakingPrevOuts(utxo, stakingPrevOuts, txBlocktime, zpos)
 
         return stakingPrevOuts
 
