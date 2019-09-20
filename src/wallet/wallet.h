@@ -198,7 +198,7 @@ private:
 
 public:
     bool MintableCoins();
-    bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, bool fPrecompute = false);
+    bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, int blockHeight, bool fPrecompute = false);
     bool IsCollateralAmount(CAmount nInputAmount) const;
 
     // Zerocoin additions

@@ -112,6 +112,17 @@ libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params(bool useModulusV1) co
     return &ZCParamsDec;
 }
 
+bool CChainParams::HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
+        const int utxoFromBlockHeight, const uint32_t utxoFromBlockTime) const
+{
+    // before stake modifier V2, the age required was 60 * 60 (1 hour) / not required on regtest
+    if (!IsStakeModifierV2(contextHeight))
+        return (NetworkID() == CBaseChainParams::REGTEST || (utxoFromBlockTime + 3600 <= contextTime));
+
+    // after stake modifier V2, we require the utxo to be nStakeMinDepth deep in the chain
+    return (contextHeight - utxoFromBlockHeight >= nStakeMinDepth);
+}
+
 class CMainParams : public CChainParams
 {
 public:
@@ -137,10 +148,11 @@ public:
         nRejectBlockOutdatedMajority = 10260; // 95%
         nToCheckBlockUpgradeMajority = 10800; // Approximate expected amount of blocks in 7 days (1440*7.5)
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60;              // WAGERR: 1 minute
-        nTargetSpacing = 1 * 60;               // WAGERR: 1 minute
+        nTargetSpacing = 1 * 60;        // 1 minute
         nMaturity = 100;
-        nStakeMinAge = 60 * 60;                // WAGERR: 1 hour
+        nStakeMinDepth = 600;
+        nFutureTimeDriftPoW = 7200;
+        nFutureTimeDriftPoS = 180;
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 398360470 * COIN;
 
@@ -164,6 +176,7 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 751858;
 
+        nBlockStakeModifierlV2 = 99999999;
         // Public coin spend enforcement
         nPublicZCSpends = 752800;
 
@@ -297,10 +310,10 @@ public:
         nRejectBlockOutdatedMajority = 5472; // 95%
         nToCheckBlockUpgradeMajority = 5760; // 4 days
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // WAGERR: 1 day
         nTargetSpacing = 1 * 60;  // WAGERR: 1 minute
         nLastPOWBlock = 300;
         nMaturity = 15;
+        nStakeMinDepth = 100;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
@@ -320,6 +333,7 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 600;
 
+        nBlockStakeModifierlV2 = 99999999;
         // Public coin spend enforcement
         nPublicZCSpends = 600;
 
@@ -415,12 +429,11 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
-        nTargetTimespan = 24 * 60 * 60; // WAGERR: 1 day
         nTargetSpacing = 1 * 60;        // WAGERR: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         nLastPOWBlock = 250;
         nMaturity = 100;
-        nStakeMinAge = 0;
+        nStakeMinDepth = 0;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
@@ -435,6 +448,7 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 1;
 
+        nBlockStakeModifierlV2 = 400;
         // Public coin spend enforcement
         nPublicZCSpends = 350;
 
