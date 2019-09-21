@@ -228,6 +228,8 @@ public:
         // New P2P messages signatures
         nBlockEnforceNewMessageSignatures = nBlockTimeProtocolV2;
 
+        nBlockV7StartHeight = 2967000;
+
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
         /** Bet related parameters **/
@@ -404,6 +406,8 @@ public:
         // New P2P messages signatures
         nBlockEnforceNewMessageSignatures = nBlockTimeProtocolV2;
 
+        nBlockV7StartHeight = 2214000;
+
         /** Bet related parameters **/
         nBetStartHeight = 1100;                                         // The block that betting protocols become active (Testnet).
         vOracleWalletAddrs = {"TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2",     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
@@ -535,6 +539,7 @@ public:
 
         // Public coin spend enforcement
         nPublicZCSpends = 350;
+        nBlockV7StartHeight = nPublicZCSpends + 1;
 
         // New P2P messages signatures
         nBlockEnforceNewMessageSignatures = 1;
