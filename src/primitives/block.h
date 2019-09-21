@@ -28,14 +28,14 @@ class CBlockHeader
 {
 public:
     // header
-    static const int32_t CURRENT_VERSION=6;     //!> Version 6 supports V2 Stake Modifiers
+    static const int32_t CURRENT_VERSION=7;     //!> Version 7 removes nAccumulatorCheckpoint from serialization
     int32_t nVersion;
     uint256 hashPrevBlock;
     uint256 hashMerkleRoot;
     uint32_t nTime;
     uint32_t nBits;
     uint32_t nNonce;
-    uint256 nAccumulatorCheckpoint;
+    uint256 nAccumulatorCheckpoint;             // only for version 4, 5 and 6.
 
     CBlockHeader()
     {
@@ -55,7 +55,7 @@ public:
         READWRITE(nNonce);
 
         //zerocoin active, header changes to include accumulator checksum
-        if(nVersion > 3)
+        if(nVersion > 3 && nVersion < 7)
             READWRITE(nAccumulatorCheckpoint);
     }
 
