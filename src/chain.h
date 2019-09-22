@@ -240,7 +240,7 @@ public:
         nTime = block.nTime;
         nBits = block.nBits;
         nNonce = block.nNonce;
-        if(block.nVersion > 3)
+        if(block.nVersion > 3 && block.nVersion < 7)
             nAccumulatorCheckpoint = block.nAccumulatorCheckpoint;
 
         if (block.IsProofOfStake()) {

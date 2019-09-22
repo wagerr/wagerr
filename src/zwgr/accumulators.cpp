@@ -45,7 +45,7 @@ int GetChecksumHeight(uint32_t nChecksum, libzerocoin::CoinDenomination denomina
         return 0;
 
     //Search through blocks to find the checksum
-    while (pindex) {
+    while (pindex->nHeight <= Params().Zerocoin_Block_Last_Checkpoint()) {
         if (ParseChecksum(pindex->nAccumulatorCheckpoint, denomination) == nChecksum)
             return pindex->nHeight;
 
@@ -158,10 +158,11 @@ bool LoadAccumulatorValuesFromDB(const uint256 nCheckpoint)
 //Erase accumulator checkpoints for a certain block range
 bool EraseCheckpoints(int nStartHeight, int nEndHeight)
 {
-    if (chainActive.Height() < nStartHeight)
+    const int maxHeight = std::min(Params().Zerocoin_Block_Last_Checkpoint(), chainActive.Height());
+    if (maxHeight < nStartHeight)
         return false;
 
-    nEndHeight = std::min(chainActive.Height(), nEndHeight);
+    nEndHeight = std::min(maxHeight, nEndHeight);
 
     CBlockIndex* pindex = chainActive[nStartHeight];
     uint256 nCheckpointPrev = pindex->pprev->nAccumulatorCheckpoint;
@@ -196,6 +197,9 @@ bool InitializeAccumulators(const int nHeight, int& nHeightCheckpoint, Accumulat
 {
     if (nHeight < Params().Zerocoin_StartHeight())
         return error("%s: height is below zerocoin activated", __func__);
+
+    if (nHeight > Params().Zerocoin_Block_Last_Checkpoint())
+        return error("%s: height is above last accumulator checkpoint", __func__);
 
     //On a specific block, a recalculation of the accumulators will be forced
     if (nHeight == Params().Zerocoin_Block_RecalculateAccumulators() && Params().NetworkID() != CBaseChainParams::REGTEST) {
@@ -245,6 +249,11 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
 {
     if (nHeight < Params().Zerocoin_Block_V2_Start()) {
         nCheckpoint = 0;
+        return true;
+    }
+
+    if (nHeight > Params().Zerocoin_Block_Last_Checkpoint()) {
+        nCheckpoint = chainActive[Params().Zerocoin_Block_Last_Checkpoint()]->nAccumulatorCheckpoint;
         return true;
     }
 
@@ -319,6 +328,10 @@ bool ValidateAccumulatorCheckpoint(const CBlock& block, CBlockIndex* pindex, Acc
     //It is VERY IMPORTANT that when this is being run and height < v2_start, then zWGR need to be disabled at the same time!!
     if (pindex->nHeight < Params().Zerocoin_Block_V2_Start() || fVerifyingBlocks)
         return true;
+
+    if (pindex->nHeight > Params().Zerocoin_Block_Last_Checkpoint()) {
+        return true;
+    }
 
     if (pindex->nHeight % 10 == 0) {
         uint256 nCheckpointCalculated = 0;
@@ -437,6 +450,11 @@ bool GetAccumulatorValue(int& nHeight, const libzerocoin::CoinDenomination denom
     if (nHeight > chainActive.Height())
         return error("%s: height %d is more than active chain height", __func__, nHeight);
 
+    if (nHeight > Params().Zerocoin_Block_Last_Checkpoint()) {
+        nHeight = Params().Zerocoin_Block_Last_Checkpoint();
+        return GetAccumulatorValue(nHeight, denom, bnAccValue);
+    }
+
     //Every situation except for about 20 blocks should use this method
     uint256 nCheckpointBeforeMint = chainActive[nHeight]->nAccumulatorCheckpoint;
     if (nHeight > Params().Zerocoin_Block_V2_Start() + 20) {
@@ -529,6 +547,9 @@ void AccumulateRange(CoinWitnessData* coinWitness, int nHeightEnd)
 
 bool GenerateAccumulatorWitness(CoinWitnessData* coinWitness, AccumulatorMap& mapAccumulators, CBlockIndex* pindexCheckpoint)
 {
+    int nChainHeight = chainActive.Height();
+    if (nChainHeight > Params().Zerocoin_Block_Last_Checkpoint())
+        return error("%s : trying to generate accumulator witness after block v7 start", __func__);
     try {
         // Lock
         LogPrint("zero", "%s: generating\n", __func__);
@@ -555,7 +576,6 @@ bool GenerateAccumulatorWitness(CoinWitnessData* coinWitness, AccumulatorMap& ma
         }
 
         //add the pubcoins from the blockchain up to the next checksum starting from the block
-        int nChainHeight = chainActive.Height();
         int nHeightMax = nChainHeight % 10;
         nHeightMax = nChainHeight - nHeightMax - 20; // at least two checkpoints deep
 
@@ -612,6 +632,7 @@ bool calculateAccumulatedBlocksFor(
         std::list<CBigNum>& ret,
         std::string& strError
 ){
+    nHeightStop = std::min(nHeightStop, Params().Zerocoin_Block_Last_Checkpoint() - 10);
     bool fDoubleCounted = false;
     int nMintsAdded = 0;
     while (pindex) {
@@ -668,6 +689,7 @@ bool calculateAccumulatedBlocksFor(
         std::string& strError
 ){
 
+    nHeightStop = std::min(nHeightStop, Params().Zerocoin_Block_Last_Checkpoint() - 10);
     int amountOfScannedBlocks = 0;
     bool fDoubleCounted = false;
     int nMintsAdded = 0;
