@@ -163,6 +163,7 @@ public:
     CAmount InvalidAmountFiltered() const { return nInvalidAmountFiltered; };
 
     int Zerocoin_Block_Public_Spend_Enabled() const { return nPublicZCSpends; }
+    int Zerocoin_Block_Last_Checkpoint() const { return nBlockLastAccumulatorCheckpoint; }
 
     int Zerocoin_AccumulationStartHeight() const { return nZerocoinAccumulationStartHeight; }
 
@@ -271,6 +272,7 @@ protected:
     int nBlockTimeProtocolV2;
     int nBlockEnforceNewMessageSignatures;
     int nBlockV7StartHeight;
+    int nBlockLastAccumulatorCheckpoint;
 
     // fake serial attack
     int nFakeSerialBlockheightEnd = 0;
