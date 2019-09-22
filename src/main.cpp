@@ -2615,7 +2615,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
 
     bettingsViewCache.SetLastHeight(pindex->pprev->nHeight);
 
-    if (!fVerifyingBlocks) {
+    if (!fVerifyingBlocks && pindex->nHeight <= Params().Zerocoin_Block_Last_Checkpoint()) {
         //if block is an accumulator checkpoint block, remove checkpoint and checksums from db
         uint256 nCheckpoint = pindex->nAccumulatorCheckpoint;
         if(nCheckpoint != pindex->pprev->nAccumulatorCheckpoint) {
@@ -2853,7 +2853,7 @@ bool ReindexAccumulators(std::list<uint256>& listMissingCheckpoints, std::string
 
         // find each checkpoint that is missing
         CBlockIndex* pindex = chainActive[nZerocoinStart];
-        while (pindex) {
+        while (pindex->nHeight <= Params().Zerocoin_Block_Last_Checkpoint()) {
             uiInterface.ShowProgress(_("Calculating missing accumulators..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - nZerocoinStart) / (double)(chainActive.Height() - nZerocoinStart) * 100))));
 
             if (ShutdownRequested())

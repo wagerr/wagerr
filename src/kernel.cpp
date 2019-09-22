@@ -434,8 +434,9 @@ bool ContextualCheckZerocoinStake(int nPreviousBlockHeight, CStakeInput* stake)
         if (depth < Params().Zerocoin_RequiredStakeDepth())
             return error("%s : zWGR stake does not have required confirmation depth. Current height %d,  stakeInput height %d.", __func__, nPreviousBlockHeight, pindexFrom->nHeight);
 
-        //The checksum needs to be the exact checksum from 200 blocks ago
-        uint256 nCheckpoint200 = chainActive[nPreviousBlockHeight - Params().Zerocoin_RequiredStakeDepth()]->nAccumulatorCheckpoint;
+        //The checksum needs to be the exact checksum from 200 blocks ago or latest checksum
+        const int checkpointHeight = std::min(Params().Zerocoin_Block_Last_Checkpoint(), (nPreviousBlockHeight - Params().Zerocoin_RequiredStakeDepth()));
+        uint256 nCheckpoint200 = chainActive[checkpointHeight]->nAccumulatorCheckpoint;
         uint32_t nChecksum200 = ParseChecksum(nCheckpoint200, libzerocoin::AmountToZerocoinDenomination(zWGR->GetValue()));
         if (nChecksum200 != zWGR->GetChecksum())
             return error("%s : accumulator checksum is different than the block 200 blocks previous. stake=%d block200=%d", __func__, zWGR->GetChecksum(), nChecksum200);

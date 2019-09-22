@@ -16,10 +16,13 @@
 
 uint256 CBlockHeader::GetHash() const
 {
-    if(nVersion < 4)
+    if (nVersion < 4)
         return HashQuark(BEGIN(nVersion), END(nNonce));
 
-    return Hash(BEGIN(nVersion), END(nAccumulatorCheckpoint));
+    if (nVersion < 7)
+        return Hash(BEGIN(nVersion), END(nAccumulatorCheckpoint));
+
+    return Hash(BEGIN(nVersion), END(nNonce));
 }
 
 std::string CBlock::ToString() const
