@@ -682,15 +682,22 @@ bool CPeerlessSpreadsEvent::FromOpCode(std::string opCode, CPeerlessSpreadsEvent
     }
 
     // Ensure the peerless result OpCode has the correct BTX format version number.
-    if (ReadBTXFormatVersion(opCode) != BTX_FORMAT_VERSION) {
+    pse.nVersion = ReadBTXFormatVersion(opCode);
+    if (pse.nVersion == 1) {
+        pse.nEventId   = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
+        pse.nPoints    = FromChars(opCode[7], opCode[8]);
+        pse.nHomeOdds  = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+        pse.nAwayOdds  = FromChars(opCode[13], opCode[14], opCode[15], opCode[16]);
+    } else if (pse.nVersion == 2) {
+        pse.nEventId   = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
+        pse.nPoints    = (int16_t)(FromChars(opCode[7], opCode[8]) & 0xffff);
+        pse.nHomeOdds  = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
+        pse.nAwayOdds  = FromChars(opCode[13], opCode[14], opCode[15], opCode[16]);
+    } else {
         // TODO - add proper error handling
         return false;
     }
 
-    pse.nEventId   = FromChars(opCode[3], opCode[4], opCode[5], opCode[6]);
-    pse.nPoints    = FromChars(opCode[7], opCode[8]);
-    pse.nHomeOdds  = FromChars(opCode[9], opCode[10], opCode[11], opCode[12]);
-    pse.nAwayOdds  = FromChars(opCode[13], opCode[14], opCode[15], opCode[16]);
 
     return true;
 }
@@ -1498,7 +1505,7 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height)
         uint64_t nSpreadsOdds       = 0;
         uint64_t nTotalsOdds        = 0;
         uint64_t nTotalsPoints      = result.nHomeScore + result.nAwayScore;
-        uint64_t nSpreadsDifference = 0;
+        int64_t nSpreadsDifference = 0;
         bool HomeFavorite               = false;
 
         // We keep temp values as we can't be sure of the order of the TX's being stored in a block.
@@ -1629,36 +1636,51 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height)
 
                             UpdateSpreads = true;
 
-                            // If the home team is the favourite.
-                            if (HomeFavorite){
-                                //  Choose the spreads winner.
-                                if (nSpreadsDifference == 0) {
-                                    nSpreadsWinner = WinnerType::awayWin;
+                            if (pse.nVersion == 1) {
+                                // If the home team is the favourite.
+                                if (HomeFavorite){
+                                    //  Choose the spreads winner.
+                                    if (nSpreadsDifference == 0) {
+                                        nSpreadsWinner = WinnerType::awayWin;
+                                    }
+                                    else if (pse.nPoints < nSpreadsDifference) {
+                                        nSpreadsWinner = WinnerType::homeWin;
+                                    }
+                                    else if (pse.nPoints > nSpreadsDifference) {
+                                        nSpreadsWinner = WinnerType::awayWin;
+                                    }
+                                    else {
+                                        nSpreadsWinner = WinnerType::push;
+                                    }
                                 }
-                                else if (pse.nPoints < nSpreadsDifference) {
-                                    nSpreadsWinner = WinnerType::homeWin;
-                                }
-                                else if (pse.nPoints > nSpreadsDifference) {
-                                    nSpreadsWinner = WinnerType::awayWin;
-                                }
+                                // If the away team is the favourite.
                                 else {
-                                    nSpreadsWinner = WinnerType::push;
+                                    // Cho0se the winner.
+                                    if (nSpreadsDifference == 0) {
+                                        nSpreadsWinner = WinnerType::homeWin;
+                                    }
+                                    else if (pse.nPoints > nSpreadsDifference) {
+                                        nSpreadsWinner = WinnerType::homeWin;
+                                    }
+                                    else if (pse.nPoints < nSpreadsDifference) {
+                                        nSpreadsWinner = WinnerType::awayWin;
+                                    }
+                                    else {
+                                        nSpreadsWinner = WinnerType::push;
+                                    }
                                 }
-                            }
-                            // If the away team is the favourite.
-                            else {
-                                // Cho0se the winner.
-                                if (nSpreadsDifference == 0) {
-                                    nSpreadsWinner = WinnerType::homeWin;
-                                }
-                                else if (pse.nPoints > nSpreadsDifference) {
-                                    nSpreadsWinner = WinnerType::homeWin;
-                                }
-                                else if (pse.nPoints < nSpreadsDifference) {
-                                    nSpreadsWinner = WinnerType::awayWin;
-                                }
-                                else {
-                                    nSpreadsWinner = WinnerType::push;
+                            } else { // if (nVersion == 2)
+                                if (nSpreadsDifference == 0) {  // This seems redundant
+                                    nSpreadsWinner = HomeFavorite ? WinnerType::awayWin : WinnerType::homeWin;
+                                } else {
+                                    int32_t difference = result.nHomeScore - result.nAwayScore;
+                                    if (pse.nPoints < difference) {
+                                        nSpreadsWinner = WinnerType::homeWin;
+                                    } else if (pse.nPoints > difference) {
+                                        nSpreadsWinner = WinnerType::awayWin;
+                                    } else { // if (pse.nPoints = difference)
+                                        nSpreadsWinner = WinnerType::push;
+                                    }
                                 }
                             }
 

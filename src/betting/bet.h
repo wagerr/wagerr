@@ -115,7 +115,7 @@ public:
     uint32_t nHomeOdds = 0;
     uint32_t nAwayOdds = 0;
     uint32_t nDrawOdds = 0;
-    uint32_t nSpreadPoints = 0;
+    int32_t nSpreadPoints = 0;  // Should be int16_t
     uint32_t nSpreadHomeOdds = 0;
     uint32_t nSpreadAwayOdds = 0;
     uint32_t nTotalPoints = 0;
@@ -399,7 +399,8 @@ class CPeerlessSpreadsEvent
 {
 public:
     uint32_t nEventId;
-    uint32_t nPoints;
+    uint8_t nVersion;
+    int32_t nPoints;    // Should be int16_t
     uint32_t nHomeOdds;
     uint32_t nAwayOdds;
 
