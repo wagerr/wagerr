@@ -25,6 +25,7 @@
 #include "masternode-payments.h"
 #include "masternodeman.h"
 #include "merkleblock.h"
+#include "messagesigner.h"
 #include "net.h"
 #include "obfuscation.h"
 #include "pow.h"
@@ -6469,10 +6470,8 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
                 std::string strMessage = tx.GetHash().ToString() + std::to_string(sigTime);
 
                 std::string errorMessage = "";
-                if (!obfuScationSigner.VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, errorMessage)) {
-                    LogPrintf("dstx: Got bad masternode address signature %s \n", vin.ToString());
-                    //pfrom->Misbehaving(20);
-                    return false;
+                if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, errorMessage)) {
+                    return error("dstx: Got bad masternode address signature %s, error: %s", vin.ToString(), errorMessage);
                 }
 
                 LogPrintf("dstx: Got Masternode transaction %s\n", tx.GetHash().ToString());

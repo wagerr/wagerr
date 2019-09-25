@@ -9,6 +9,7 @@
 #include "init.h"
 #include "main.h"
 #include "masternodeman.h"
+#include "messagesigner.h"
 #include "script/sign.h"
 #include "swifttx.h"
 #include "guiinterface.h"
@@ -26,8 +27,6 @@
 
 // The main object for accessing Obfuscation
 CObfuscationPool obfuScationPool;
-// A helper object for signing messages from Masternodes
-CObfuScationSigner obfuScationSigner;
 // The current Obfuscations in progress on the network
 std::vector<CObfuscationQueue> vecObfuscationQueue;
 // Keep track of the used Masternodes
@@ -204,18 +203,18 @@ void CObfuscationPool::CheckFinalTransaction()
         CKey key2;
         CPubKey pubkey2;
 
-        if (!obfuScationSigner.SetKey(strMasterNodePrivKey, strError, key2, pubkey2)) {
-            LogPrintf("CObfuscationPool::Check() - ERROR: Invalid Masternodeprivkey: '%s'\n", strError);
+        if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, key2, pubkey2)) {
+            LogPrintf("%s : Invalid masternode key %s", __func__, strMasterNodePrivKey);
             return;
         }
 
-        if (!obfuScationSigner.SignMessage(strMessage, strError, vchSig, key2)) {
-            LogPrintf("CObfuscationPool::Check() - Sign message failed\n");
+        if (!CMessageSigner::SignMessage(strMessage, vchSig, key2)) {
+            LogPrintf("%s : Sign message failed", __func__);
             return;
         }
 
-        if (!obfuScationSigner.VerifyMessage(pubkey2, vchSig, strMessage, strError)) {
-            LogPrintf("CObfuscationPool::Check() - Verify message failed\n");
+        if (!CMessageSigner::VerifyMessage(pubkey2, vchSig, strMessage, strError)) {
+            LogPrintf("%s : Verify message failed, error: %s", __func__, strError);
             return;
         }
 
@@ -526,107 +525,26 @@ void CObfuscationPool::NewBlock()
     obfuScationPool.CheckTimeout();
 }
 
-bool CObfuScationSigner::IsVinAssociatedWithPubkey(CTxIn& vin, CPubKey& pubkey)
-{
-    CScript payee2;
-    payee2 = GetScriptForDestination(pubkey.GetID());
-
-    CTransaction txVin;
-    uint256 hash;
-    if (GetTransaction(vin.prevout.hash, txVin, hash, true)) {
-        for (CTxOut out : txVin.vout) {
-            if (out.nValue == 25000 * COIN) {
-                if (out.scriptPubKey == payee2) return true;
-            }
-        }
-    }
-
-    return false;
-}
-
-bool CObfuScationSigner::SetKey(std::string strSecret, std::string& errorMessage, CKey& key, CPubKey& pubkey)
-{
-    CBitcoinSecret vchSecret;
-    bool fGood = vchSecret.SetString(strSecret);
-
-    if (!fGood) {
-        errorMessage = _("Invalid private key.");
-        return false;
-    }
-
-    key = vchSecret.GetKey();
-    pubkey = key.GetPubKey();
-
-    return true;
-}
-
-bool CObfuScationSigner::GetKeysFromSecret(std::string strSecret, CKey& keyRet, CPubKey& pubkeyRet)
-{
-    CBitcoinSecret vchSecret;
-
-    if (!vchSecret.SetString(strSecret)) return false;
-
-    keyRet = vchSecret.GetKey();
-    pubkeyRet = keyRet.GetPubKey();
-
-    return true;
-}
-
-bool CObfuScationSigner::SignMessage(std::string strMessage, std::string& errorMessage, std::vector<unsigned char>& vchSig, CKey key)
-{
-    CHashWriter ss(SER_GETHASH, 0);
-    ss << strMessageMagic;
-    ss << strMessage;
-
-    if (!key.SignCompact(ss.GetHash(), vchSig)) {
-        errorMessage = _("Signing failed.");
-        return false;
-    }
-
-    return true;
-}
-
-bool CObfuScationSigner::VerifyMessage(CPubKey pubkey, std::vector<unsigned char>& vchSig, std::string strMessage, std::string& errorMessage)
-{
-    CHashWriter ss(SER_GETHASH, 0);
-    ss << strMessageMagic;
-    ss << strMessage;
-
-    CPubKey pubkey2;
-    if (!pubkey2.RecoverCompact(ss.GetHash(), vchSig)) {
-        errorMessage = _("Error recovering public key.");
-        return false;
-    }
-
-    if (fDebug && pubkey2.GetID() != pubkey.GetID())
-        LogPrintf("CObfuScationSigner::VerifyMessage -- keys don't match: %s %s\n", pubkey2.GetID().ToString(), pubkey.GetID().ToString());
-
-    return (pubkey2.GetID() == pubkey.GetID());
-}
-
 bool CObfuscationQueue::Sign()
 {
     if (!fMasterNode) return false;
 
+    std::string strError = "";
     std::string strMessage = vin.ToString() + std::to_string(nDenom) + std::to_string(time) + std::to_string(ready);
 
     CKey key2;
     CPubKey pubkey2;
-    std::string errorMessage = "";
 
-    if (!obfuScationSigner.SetKey(strMasterNodePrivKey, errorMessage, key2, pubkey2)) {
-        LogPrintf("CObfuscationQueue():Relay - ERROR: Invalid Masternodeprivkey: '%s'\n", errorMessage);
-        return false;
+    if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, key2, pubkey2)) {
+        return error("%s : Invalid masternode key", __func__);
     }
 
-    if (!obfuScationSigner.SignMessage(strMessage, errorMessage, vchSig, key2)) {
-        LogPrintf("CObfuscationQueue():Relay - Sign message failed");
-        return false;
+    if (!CMessageSigner::SignMessage(strMessage, vchSig, key2)) {
+        return error("%s : Sign message failed", __func__);
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubkey2, vchSig, strMessage, errorMessage)) {
-        LogPrintf("CObfuscationQueue():Relay - Verify message failed");
-        return false;
+    if (!CMessageSigner::VerifyMessage(pubkey2, vchSig, strMessage, strError)) {
+        return error("%s : Verify message failed, error: %s", __func__, strError);
     }
 
     return true;

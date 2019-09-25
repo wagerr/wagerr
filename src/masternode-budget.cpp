@@ -13,6 +13,7 @@
 #include "masternode-sync.h"
 #include "masternode.h"
 #include "masternodeman.h"
+#include "messagesigner.h"
 #include "obfuscation.h"
 #include "util.h"
 #include <boost/filesystem.hpp>
@@ -1784,20 +1785,19 @@ void CBudgetVote::Relay()
 
 bool CBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 {
-    // Choose coins to use
+    std::string strError = "";
+    std::string strMessage = vin.prevout.ToStringShort() + nProposalHash.ToString() + std::to_string(nVote) + std::to_string(nTime);
+    
     CPubKey pubKeyCollateralAddress;
     CKey keyCollateralAddress;
 
-    std::string errorMessage;
-    std::string strMessage = vin.prevout.ToStringShort() + nProposalHash.ToString() + std::to_string(nVote) + std::to_string(nTime);
-
-    if (!obfuScationSigner.SignMessage(strMessage, errorMessage, vchSig, keyMasternode)) {
+    if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
         LogPrint("mnbudget","CBudgetVote::Sign - Error upon calling SignMessage");
         return false;
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubKeyMasternode, vchSig, strMessage, errorMessage)) {
-        LogPrint("mnbudget","CBudgetVote::Sign - Error upon calling VerifyMessage");
+    if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+        LogPrint("mnbudget","CBudgetVote::Sign - Error upon calling VerifyMessage: %s", strError);
         return false;
     }
 
@@ -1806,7 +1806,7 @@ bool CBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 
 bool CBudgetVote::SignatureValid(bool fSignatureCheck)
 {
-    std::string errorMessage;
+    std::string strError = "";
     std::string strMessage = vin.prevout.ToStringShort() + nProposalHash.ToString() + std::to_string(nVote) + std::to_string(nTime);
 
     CMasternode* pmn = mnodeman.Find(vin);
@@ -1820,8 +1820,8 @@ bool CBudgetVote::SignatureValid(bool fSignatureCheck)
 
     if (!fSignatureCheck) return true;
 
-    if (!obfuScationSigner.VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, errorMessage)) {
-        LogPrint("mnbudget","CBudgetVote::SignatureValid() - Verify message failed\n");
+    if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError)) {
+        LogPrint("mnbudget","CBudgetVote::SignatureValid() - Verify message failed, error: %s\n", strError);
         return false;
     }
 
@@ -2224,11 +2224,11 @@ TrxValidationStatus CFinalizedBudget::IsTransactionValid(const CTransaction& txN
 
 void CFinalizedBudget::SubmitVote()
 {
+    std::string strError = "";
     CPubKey pubKeyMasternode;
     CKey keyMasternode;
-    std::string errorMessage;
 
-    if (!obfuScationSigner.SetKey(strMasterNodePrivKey, errorMessage, keyMasternode, pubKeyMasternode)) {
+    if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, keyMasternode, pubKeyMasternode)) {
         LogPrint("mnbudget","CFinalizedBudget::SubmitVote - Error upon calling SetKey\n");
         return;
     }
@@ -2239,7 +2239,6 @@ void CFinalizedBudget::SubmitVote()
         return;
     }
 
-    std::string strError = "";
     if (budget.UpdateFinalizedBudget(vote, NULL, strError)) {
         LogPrint("mnbudget","CFinalizedBudget::SubmitVote  - new finalized budget vote - %s\n", vote.GetHash().ToString());
 
@@ -2314,20 +2313,19 @@ void CFinalizedBudgetVote::Relay()
 
 bool CFinalizedBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 {
-    // Choose coins to use
+    std::string strError = "";
+    std::string strMessage = vin.prevout.ToStringShort() + nBudgetHash.ToString() + std::to_string(nTime);
+    
     CPubKey pubKeyCollateralAddress;
     CKey keyCollateralAddress;
 
-    std::string errorMessage;
-    std::string strMessage = vin.prevout.ToStringShort() + nBudgetHash.ToString() + std::to_string(nTime);
-
-    if (!obfuScationSigner.SignMessage(strMessage, errorMessage, vchSig, keyMasternode)) {
+    if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
         LogPrint("mnbudget","CFinalizedBudgetVote::Sign - Error upon calling SignMessage");
         return false;
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubKeyMasternode, vchSig, strMessage, errorMessage)) {
-        LogPrint("mnbudget","CFinalizedBudgetVote::Sign - Error upon calling VerifyMessage");
+    if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+        LogPrint("mnbudget","CFinalizedBudgetVote::Sign - Error upon calling VerifyMessage: %s", strError);
         return false;
     }
 
@@ -2336,8 +2334,7 @@ bool CFinalizedBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 
 bool CFinalizedBudgetVote::SignatureValid(bool fSignatureCheck)
 {
-    std::string errorMessage;
-
+    std::string strError;
     std::string strMessage = vin.prevout.ToStringShort() + nBudgetHash.ToString() + std::to_string(nTime);
 
     CMasternode* pmn = mnodeman.Find(vin);
@@ -2349,8 +2346,8 @@ bool CFinalizedBudgetVote::SignatureValid(bool fSignatureCheck)
 
     if (!fSignatureCheck) return true;
 
-    if (!obfuScationSigner.VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, errorMessage)) {
-        LogPrint("mnbudget","CFinalizedBudgetVote::SignatureValid() - Verify message failed %s %s\n", strMessage, errorMessage);
+    if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError)) {
+        LogPrint("mnbudget","CFinalizedBudgetVote::SignatureValid() - Verify message failed %s: %s\n", strMessage, strError);
         return false;
     }
 
