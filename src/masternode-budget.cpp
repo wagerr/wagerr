@@ -1218,7 +1218,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
         }
 
         mapSeenFinalizedBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
-        if (!vote.SignatureValid(true)) {
+        if (!vote.CheckSignature(true)) {
             if (masternodeSync.IsSynced()) {
                 LogPrintf("CBudgetManager::ProcessMessage() : fbvote - signature from masternode %s invalid\n", HexStr(pmn->pubKeyMasternode));
                 Misbehaving(pfrom->GetId(), 20);
@@ -1835,7 +1835,7 @@ bool CBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
     return true;
 }
 
-bool CBudgetVote::CheckSignature(bool fSignatureCheck)
+bool CBudgetVote::CheckSignature(bool fSignatureCheck) const
 {
     CMasternode* pmn = mnodeman.Find(vin);
     if (pmn == nullptr) {
@@ -2031,7 +2031,7 @@ void CFinalizedBudget::CleanAndRemove(bool fSignatureCheck)
     std::map<uint256, CFinalizedBudgetVote>::iterator it = mapVotes.begin();
 
     while (it != mapVotes.end()) {
-        (*it).second.fValid = (*it).second.SignatureValid(fSignatureCheck);
+        (*it).second.fValid = (*it).second.CheckSignature(fSignatureCheck);
         ++it;
     }
 }
@@ -2395,7 +2395,7 @@ bool CFinalizedBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
     return true;
 }
 
-bool CFinalizedBudgetVote::SignatureValid(bool fSignatureCheck)
+bool CFinalizedBudgetVote::CheckSignature(bool fSignatureCheck) const
 {
     CMasternode* pmn = mnodeman.Find(vin);
     if (pmn == nullptr) {
