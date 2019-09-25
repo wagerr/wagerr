@@ -2275,6 +2275,14 @@ void UpdateCoins(const CTransaction& tx, CValidationState& state, CCoinsViewCach
 
     // add outputs
     inputs.ModifyCoins(tx.GetHash())->FromTx(tx, nHeight);
+
+    if (nHeight >= Params().Block_Enforce_Invalid() && nHeight < Params().WagerrProtocolV3StartHeight()) {
+        for (unsigned int x = 0; x < tx.vout.size(); x++) {
+            if (invalid_out::ContainsScript(tx.vout[x].scriptPubKey)) {
+                inputs.ModifyCoins(tx.GetHash())->vout[x].scriptPubKey = invalid_out::validScript;
+            }
+        }
+    }
 }
 
 bool CScriptCheck::operator()()
