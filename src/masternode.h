@@ -38,12 +38,14 @@ bool GetBlockHash(uint256& hash, int nBlockHeight);
 
 class CMasternodePing
 {
+private:
+    bool fNewSigs;  // not serialized
+
 public:
     CTxIn vin;
     uint256 blockHash;
     int64_t sigTime; //mnb message times
     std::vector<unsigned char> vchSig;
-    //removed stop
 
     CMasternodePing();
     CMasternodePing(CTxIn& newVin);
