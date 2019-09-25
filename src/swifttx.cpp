@@ -291,7 +291,7 @@ void DoConsensusVote(CTransaction& tx, int64_t nBlockHeight)
         LogPrintf("SwiftX::DoConsensusVote - Failed to sign consensus vote\n");
         return;
     }
-    if (!ctx.SignatureValid()) {
+    if (!ctx.CheckSignature()) {
         LogPrintf("SwiftX::DoConsensusVote - Signature invalid\n");
         return;
     }
@@ -323,7 +323,7 @@ bool ProcessConsensusVote(CNode* pnode, CConsensusVote& ctx)
         return false;
     }
 
-    if (!ctx.SignatureValid()) {
+    if (!ctx.CheckSignature()) {
         LogPrintf("SwiftX::ProcessConsensusVote - Signature invalid\n");
         // don't ban, it could just be a non-synced masternode
         mnodeman.AskForMN(pnode, ctx.vinMasternode);
@@ -534,7 +534,7 @@ bool CConsensusVote::Sign()
     return true;
 }
 
-bool CConsensusVote::SignatureValid() const
+bool CConsensusVote::CheckSignature() const
 {
     CMasternode* pmn = mnodeman.Find(vinMasternode);
     if (pmn == nullptr) {
@@ -575,7 +575,7 @@ bool CTransactionLock::SignaturesValid()
             return false;
         }
 
-        if (!vote.SignatureValid()) {
+        if (!vote.CheckSignature()) {
             LogPrintf("CTransactionLock::SignaturesValid() - Signature not valid\n");
             return false;
         }
