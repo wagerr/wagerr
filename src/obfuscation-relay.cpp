@@ -4,6 +4,7 @@
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "messagesigner.h"
 #include "obfuscation-relay.h"
 
 CObfuScationRelay::CObfuScationRelay()
@@ -36,25 +37,22 @@ std::string CObfuScationRelay::ToString()
 
 bool CObfuScationRelay::Sign(std::string strSharedKey)
 {
+    std::string strError = "";
     std::string strMessage = in.ToString() + out.ToString();
 
     CKey key2;
     CPubKey pubkey2;
-    std::string errorMessage = "";
 
-    if (!obfuScationSigner.SetKey(strSharedKey, errorMessage, key2, pubkey2)) {
-        LogPrintf("CObfuScationRelay():Sign - ERROR: Invalid shared key: '%s'\n", errorMessage.c_str());
-        return false;
+    if (!CMessageSigner::GetKeysFromSecret(strSharedKey, key2, pubkey2)) {
+        return error("%s : Invalid shared key %s", __func__, strSharedKey);
     }
 
-    if (!obfuScationSigner.SignMessage(strMessage, errorMessage, vchSig2, key2)) {
-        LogPrintf("CObfuScationRelay():Sign - Sign message failed\n");
-        return false;
+    if (!CMessageSigner::SignMessage(strMessage, vchSig2, key2)) {
+        return error("%s : Sign message failed", __func__);
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubkey2, vchSig2, strMessage, errorMessage)) {
-        LogPrintf("CObfuScationRelay():Sign - Verify message failed\n");
-        return false;
+    if (!CMessageSigner::VerifyMessage(pubkey2, vchSig2, strMessage, strError)) {
+        return error("%s : Verify message failed, error: %s", __func__, strError);
     }
 
     return true;
@@ -62,20 +60,18 @@ bool CObfuScationRelay::Sign(std::string strSharedKey)
 
 bool CObfuScationRelay::VerifyMessage(std::string strSharedKey)
 {
+    std::string strError = "";
     std::string strMessage = in.ToString() + out.ToString();
 
     CKey key2;
     CPubKey pubkey2;
-    std::string errorMessage = "";
 
-    if (!obfuScationSigner.SetKey(strSharedKey, errorMessage, key2, pubkey2)) {
-        LogPrintf("CObfuScationRelay()::VerifyMessage - ERROR: Invalid shared key: '%s'\n", errorMessage.c_str());
-        return false;
+    if (!CMessageSigner::GetKeysFromSecret(strSharedKey, key2, pubkey2)) {
+        return error("%s : Invalid shared key %s", __func__, strSharedKey);
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubkey2, vchSig2, strMessage, errorMessage)) {
-        LogPrintf("CObfuScationRelay()::VerifyMessage - Verify message failed\n");
-        return false;
+    if (!CMessageSigner::VerifyMessage(pubkey2, vchSig2, strMessage, strError)) {
+        return error("%s : Verify message failed, error: %s", __func__, strError);
     }
 
     return true;

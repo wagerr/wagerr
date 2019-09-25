@@ -9,6 +9,7 @@
 #include "masternode.h"
 #include "masternodeconfig.h"
 #include "masternodeman.h"
+#include "messagesigner.h"
 #include "protocol.h"
 #include "spork.h"
 
@@ -101,9 +102,8 @@ void CActiveMasternode::ManageStatus()
             CPubKey pubKeyMasternode;
             CKey keyMasternode;
 
-            if (!obfuScationSigner.SetKey(strMasterNodePrivKey, errorMessage, keyMasternode, pubKeyMasternode)) {
-                notCapableReason = "Error upon calling SetKey: " + errorMessage;
-                LogPrintf("Register::ManageStatus() - %s\n", notCapableReason);
+            if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, keyMasternode, pubKeyMasternode)) {
+                LogPrintf("%s : Invalid masternode key", __func__);
                 return;
             }
 
@@ -163,8 +163,8 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
     CPubKey pubKeyMasternode;
     CKey keyMasternode;
 
-    if (!obfuScationSigner.SetKey(strMasterNodePrivKey, errorMessage, keyMasternode, pubKeyMasternode)) {
-        errorMessage = strprintf("Error upon calling SetKey: %s\n", errorMessage);
+    if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, keyMasternode, pubKeyMasternode)) {
+        errorMessage = "Error upon calling SetKey.\n";
         return false;
     }
 
@@ -207,12 +207,12 @@ bool CActiveMasternode::SendMasternodePing(std::string& errorMessage)
 
         std::string strMessage = service.ToString() + std::to_string(masterNodeSignatureTime) + std::to_string(false);
 
-        if (!obfuScationSigner.SignMessage(strMessage, retErrorMessage, vchMasterNodeSignature, keyMasternode)) {
-            errorMessage = "dseep sign message failed: " + retErrorMessage;
+        if (!CMessageSigner::SignMessage(strMessage, vchMasterNodeSignature, keyMasternode)) {
+            errorMessage = "dseep sign message failed.";
             return false;
         }
 
-        if (!obfuScationSigner.VerifyMessage(pubKeyMasternode, vchMasterNodeSignature, strMessage, retErrorMessage)) {
+        if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchMasterNodeSignature, strMessage, retErrorMessage)) {
             errorMessage = "dseep verify message failed: " + retErrorMessage;
             return false;
         }
@@ -251,8 +251,8 @@ bool CActiveMasternode::CreateBroadcast(std::string strService, std::string strK
         return false;
     }
 
-    if (!obfuScationSigner.SetKey(strKeyMasternode, errorMessage, keyMasternode, pubKeyMasternode)) {
-        errorMessage = strprintf("Can't find keys for masternode %s - %s", strService, errorMessage);
+    if (!CMessageSigner::GetKeysFromSecret(strKeyMasternode, keyMasternode, pubKeyMasternode)) {
+        errorMessage = strprintf("Can't find keys for masternode %s", strService);
         LogPrintf("CActiveMasternode::CreateBroadcast() - %s\n", errorMessage);
         return false;
     }
@@ -314,13 +314,13 @@ bool CActiveMasternode::CreateBroadcast(CTxIn vin, CService service, CKey keyCol
 
     std::string strMessage = service.ToString() + std::to_string(masterNodeSignatureTime) + vchPubKey + vchPubKey2 + std::to_string(PROTOCOL_VERSION) + donationAddress + std::to_string(donationPercantage);
 
-    if (!obfuScationSigner.SignMessage(strMessage, retErrorMessage, vchMasterNodeSignature, keyCollateralAddress)) {
-        errorMessage = "dsee sign message failed: " + retErrorMessage;
+    if (!CMessageSigner::SignMessage(strMessage, vchMasterNodeSignature, keyCollateralAddress)) {
+        errorMessage = "dsee sign message failed.";
         LogPrintf("CActiveMasternode::Register() - Error: %s\n", errorMessage.c_str());
         return false;
     }
 
-    if (!obfuScationSigner.VerifyMessage(pubKeyCollateralAddress, vchMasterNodeSignature, strMessage, retErrorMessage)) {
+    if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchMasterNodeSignature, strMessage, retErrorMessage)) {
         errorMessage = "dsee verify message failed: " + retErrorMessage;
         LogPrintf("CActiveMasternode::Register() - Error: %s\n", errorMessage.c_str());
         return false;
