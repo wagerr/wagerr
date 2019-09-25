@@ -66,7 +66,7 @@ CMasternode::CMasternode()
     addr = CService();
     pubKeyCollateralAddress = CPubKey();
     pubKeyMasternode = CPubKey();
-    sig = std::vector<unsigned char>();
+    vchSig = std::vector<unsigned char>();
     activeState = MASTERNODE_ENABLED;
     sigTime = GetAdjustedTime();
     lastPing = CMasternodePing();
@@ -91,7 +91,7 @@ CMasternode::CMasternode(const CMasternode& other)
     addr = other.addr;
     pubKeyCollateralAddress = other.pubKeyCollateralAddress;
     pubKeyMasternode = other.pubKeyMasternode;
-    sig = other.sig;
+    vchSig = other.vchSig;
     activeState = other.activeState;
     sigTime = other.sigTime;
     lastPing = other.lastPing;
@@ -116,7 +116,7 @@ CMasternode::CMasternode(const CMasternodeBroadcast& mnb)
     addr = mnb.addr;
     pubKeyCollateralAddress = mnb.pubKeyCollateralAddress;
     pubKeyMasternode = mnb.pubKeyMasternode;
-    sig = mnb.sig;
+    vchSig = mnb.vchSig;
     activeState = MASTERNODE_ENABLED;
     sigTime = mnb.sigTime;
     lastPing = mnb.lastPing;
@@ -143,7 +143,7 @@ bool CMasternode::UpdateFromNewBroadcast(CMasternodeBroadcast& mnb)
         pubKeyMasternode = mnb.pubKeyMasternode;
         pubKeyCollateralAddress = mnb.pubKeyCollateralAddress;
         sigTime = mnb.sigTime;
-        sig = mnb.sig;
+        vchSig = mnb.vchSig;
         protocolVersion = mnb.protocolVersion;
         addr = mnb.addr;
         lastTimeChecked = 0;
@@ -356,7 +356,7 @@ CMasternodeBroadcast::CMasternodeBroadcast()
     addr = CService();
     pubKeyCollateralAddress = CPubKey();
     pubKeyMasternode1 = CPubKey();
-    sig = std::vector<unsigned char>();
+    vchSig = std::vector<unsigned char>();
     activeState = MASTERNODE_ENABLED;
     sigTime = GetAdjustedTime();
     lastPing = CMasternodePing();
@@ -376,7 +376,7 @@ CMasternodeBroadcast::CMasternodeBroadcast(CService newAddr, CTxIn newVin, CPubK
     addr = newAddr;
     pubKeyCollateralAddress = pubKeyCollateralAddressNew;
     pubKeyMasternode = pubKeyMasternodeNew;
-    sig = std::vector<unsigned char>();
+    vchSig = std::vector<unsigned char>();
     activeState = MASTERNODE_ENABLED;
     sigTime = GetAdjustedTime();
     lastPing = CMasternodePing();
@@ -396,7 +396,7 @@ CMasternodeBroadcast::CMasternodeBroadcast(const CMasternode& mn)
     addr = mn.addr;
     pubKeyCollateralAddress = mn.pubKeyCollateralAddress;
     pubKeyMasternode = mn.pubKeyMasternode;
-    sig = mn.sig;
+    vchSig = mn.vchSig;
     activeState = mn.activeState;
     sigTime = mn.sigTime;
     lastPing = mn.lastPing;
@@ -538,7 +538,7 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
     }
 
     std::string strError = "";
-    if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, sig, GetStrMessage(), strError))
+    if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, GetStrMessage(), strError))
     {
         // don't ban for old masternodes, their sigs could be broken because of the bug
         nDos = protocolVersion < MIN_PEER_MNANNOUNCE ? 0 : 100;
@@ -717,22 +717,23 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
     if (Params().NewSigsActive(nHeight)) {
         uint256 hash = GetSignatureHash();
 
-        if(!CHashSigner::SignHash(hash, keyCollateralAddress, sig)) {
+        if(!CHashSigner::SignHash(hash, keyCollateralAddress, vchSig)) {
             return error("%s : SignHash() failed", __func__);
         }
 
-        if (!CHashSigner::VerifyHash(hash, pubKeyCollateralAddress, sig, strError)) {
+        if (!CHashSigner::VerifyHash(hash, pubKeyCollateralAddress, vchSig, strError)) {
             return error("%s : VerifyHash() failed, error: %s", __func__, strError);
         }
+
     } else {
         // use old signature format
         std::string strMessage = GetStrMessage();
 
-        if (!CMessageSigner::SignMessage(strMessage, sig, keyCollateralAddress)) {
+        if (!CMessageSigner::SignMessage(strMessage, vchSig, keyCollateralAddress)) {
             return error("%s : SignMessage() failed", __func__);
         }
 
-        if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, sig, strMessage, strError)) {
+        if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, strMessage, strError)) {
             return error("%s : VerifyMessage() failed, error: %s\n", __func__, strError);
         }
     }
@@ -741,18 +742,18 @@ bool CMasternodeBroadcast::Sign(CKey& keyCollateralAddress)
 }
 
 
-bool CMasternodeBroadcast::VerifySignature() const
+bool CMasternodeBroadcast::CheckSignature() const
 {
     std::string strError = "";
     uint256 hash = GetSignatureHash();
 
-    if (CHashSigner::VerifyHash(hash, pubKeyCollateralAddress, sig, strError))
+    if (CHashSigner::VerifyHash(hash, pubKeyCollateralAddress, vchSig, strError))
         return true;
 
     // if new signature fails, try old format
     std::string strMessage = GetStrMessage();
 
-    if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, sig, strMessage, strError)) {
+    if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, strMessage, strError)) {
         return error("%s : Got bad masternode signature for %s: %s\n", __func__,
                 vin.prevout.hash.ToString(), strError);
     }

@@ -129,7 +129,7 @@ public:
     CPubKey pubKeyMasternode;
     CPubKey pubKeyCollateralAddress1;
     CPubKey pubKeyMasternode1;
-    std::vector<unsigned char> sig;
+    std::vector<unsigned char> vchSig;
     int activeState;
     int64_t sigTime; //mnb message time
     int cacheInputAge;
@@ -162,7 +162,7 @@ public:
         swap(first.addr, second.addr);
         swap(first.pubKeyCollateralAddress, second.pubKeyCollateralAddress);
         swap(first.pubKeyMasternode, second.pubKeyMasternode);
-        swap(first.sig, second.sig);
+        swap(first.vchSig, second.vchSig);
         swap(first.activeState, second.activeState);
         swap(first.sigTime, second.sigTime);
         swap(first.lastPing, second.lastPing);
@@ -203,7 +203,7 @@ public:
         READWRITE(addr);
         READWRITE(pubKeyCollateralAddress);
         READWRITE(pubKeyMasternode);
-        READWRITE(sig);
+        READWRITE(vchSig);
         READWRITE(sigTime);
         READWRITE(protocolVersion);
         READWRITE(activeState);
@@ -308,7 +308,7 @@ public:
     std::string GetStrMessage() const;
 
     bool Sign(CKey& keyCollateralAddress);
-    bool VerifySignature() const;
+    bool CheckSignature() const;
     void Relay();
 
     ADD_SERIALIZE_METHODS;
@@ -320,7 +320,7 @@ public:
         READWRITE(addr);
         READWRITE(pubKeyCollateralAddress);
         READWRITE(pubKeyMasternode);
-        READWRITE(sig);
+        READWRITE(vchSig);
         READWRITE(sigTime);
         READWRITE(protocolVersion);
         READWRITE(lastPing);
