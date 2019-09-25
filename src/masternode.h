@@ -302,10 +302,14 @@ public:
 
     bool CheckAndUpdate(int& nDoS);
     bool CheckInputsAndAdd(int& nDos);
+
+    uint256 GetHash() const;
+    uint256 GetSignatureHash() const;
+    std::string GetStrMessage() const;
+
     bool Sign(CKey& keyCollateralAddress);
-    bool VerifySignature();
+    bool VerifySignature() const;
     void Relay();
-    std::string GetStrMessage();
 
     ADD_SERIALIZE_METHODS;
 
@@ -321,14 +325,6 @@ public:
         READWRITE(protocolVersion);
         READWRITE(lastPing);
         READWRITE(nLastDsq);
-    }
-
-    uint256 GetHash()
-    {
-        CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
-        ss << sigTime;
-        ss << pubKeyCollateralAddress;
-        return ss.GetHash();
     }
 
     /// Create Masternode broadcast, needs to be relayed manually after that
