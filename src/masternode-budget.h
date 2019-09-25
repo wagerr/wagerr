@@ -83,15 +83,10 @@ public:
         return ret;
     }
 
-    uint256 GetHash()
-    {
-        CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
-        ss << vin;
-        ss << nProposalHash;
-        ss << nVote;
-        ss << nTime;
-        return ss.GetHash();
-    }
+    uint256 GetHash() const;
+    uint256 GetSignatureHash() const { return GetHash(); }
+    std::string GetStrMessage() const;
+
 
     ADD_SERIALIZE_METHODS;
 
