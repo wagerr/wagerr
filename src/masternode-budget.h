@@ -72,7 +72,7 @@ public:
     CBudgetVote(CTxIn vin, uint256 nProposalHash, int nVoteIn);
 
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
-    bool SignatureValid(bool fSignatureCheck);
+    bool CheckSignature(bool fSignatureCheck);
     void Relay();
 
     std::string GetVoteString()

@@ -1144,7 +1144,7 @@ void CBudgetManager::ProcessMessage(CNode* pfrom, std::string& strCommand, CData
 
 
         mapSeenMasternodeBudgetVotes.insert(std::make_pair(vote.GetHash(), vote));
-        if (!vote.SignatureValid(true)) {
+        if (!vote.CheckSignature(true)) {
             if (masternodeSync.IsSynced()) {
                 LogPrintf("CBudgetManager::ProcessMessage() : mvote - signature invalid\n");
                 Misbehaving(pfrom->GetId(), 20);
@@ -1624,7 +1624,7 @@ void CBudgetProposal::CleanAndRemove(bool fSignatureCheck)
     std::map<uint256, CBudgetVote>::iterator it = mapVotes.begin();
 
     while (it != mapVotes.end()) {
-        (*it).second.fValid = (*it).second.SignatureValid(fSignatureCheck);
+        (*it).second.fValid = (*it).second.CheckSignature(fSignatureCheck);
         ++it;
     }
 }
@@ -1835,7 +1835,7 @@ bool CBudgetVote::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
     return true;
 }
 
-bool CBudgetVote::SignatureValid(bool fSignatureCheck)
+bool CBudgetVote::CheckSignature(bool fSignatureCheck)
 {
     CMasternode* pmn = mnodeman.Find(vin);
     if (pmn == nullptr) {

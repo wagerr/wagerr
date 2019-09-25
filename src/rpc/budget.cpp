@@ -727,7 +727,7 @@ UniValue mnbudgetrawvote(const UniValue& params, bool fHelp)
     vote.nTime = nTime;
     vote.vchSig = vchSig;
 
-    if (!vote.SignatureValid(true)) {
+    if (!vote.CheckSignature(true)) {
         return "Failure to verify signature.";
     }
 
