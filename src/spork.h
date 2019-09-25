@@ -44,9 +44,12 @@ public:
     CSporkMessage(SporkId nSporkID, int64_t nValue, int64_t nTimeSigned) : nSporkID(nSporkID), nValue(nValue), nTimeSigned(nTimeSigned) {}
     CSporkMessage() : nSporkID((SporkId)0), nValue(0), nTimeSigned(0) {}
 
-    uint256 GetHash() { return HashQuark(BEGIN(nSporkID), END(nTimeSigned)); }
+    uint256 GetHash() const { return HashQuark(BEGIN(nSporkID), END(nTimeSigned)); }
+    uint256 GetSignatureHash() const;
+    std::string GetStrMessage() const;
+
     bool Sign(std::string strSignKey);
-    bool CheckSignature(bool fRequireNew = false);
+    bool CheckSignature(bool fRequireNew = false) const;
     void Relay();
 
     ADD_SERIALIZE_METHODS;
