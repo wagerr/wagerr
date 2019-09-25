@@ -228,36 +228,77 @@ std::string CSporkManager::ToString() const
     return strprintf("Sporks: %llu", mapSporksActive.size());
 }
 
+uint256 CSporkMessage::GetSignatureHash() const
+{
+    CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
+    ss << nSporkID;
+    ss << nValue;
+    ss << nTimeSigned;
+    return ss.GetHash();
+}
+
+std::string CSporkMessage::GetStrMessage() const
+{
+    return std::to_string(nSporkID) +
+            std::to_string(nValue) +
+            std::to_string(nTimeSigned);
+}
+
 bool CSporkMessage::Sign(std::string strSignKey)
 {
-    std::string strError = "";
-    std::string strMessage = std::to_string(nSporkID) + std::to_string(nValue) + std::to_string(nTimeSigned);
+    int nHeight;
+    {
+        LOCK(cs_main);
+        nHeight = chainActive.Height();
+    }
 
+    std::string strError = "";
     CKey key;
     CPubKey pubkey;
 
     if (!CMessageSigner::GetKeysFromSecret(strSignKey, key, pubkey)) {
-        return error("%s : SetKey error.", __func__);
+        return error("%s : Invalid strSignKey", __func__);
     }
 
-    if (!CMessageSigner::SignMessage(strMessage, vchSig, key)) {
-        return error("%s : Sign message failed", __func__);
-    }
+    if (Params().NewSigsActive(nHeight)) {
+        uint256 hash = GetSignatureHash();
 
-    if (!CMessageSigner::VerifyMessage(pubkey, vchSig, strMessage, strError)) {
-        return error("%s : Verify message failed, error: %s", __func__, strError);
+        if(!CHashSigner::SignHash(hash, key, vchSig)) {
+            return error("%s : SignHash() failed", __func__);
+        }
+
+        if (!CHashSigner::VerifyHash(hash, pubkey, vchSig, strError)) {
+            return error("%s : VerifyHash() failed, error: %s", __func__, strError);
+        }
+
+    } else {
+        // use old signature format
+        std::string strMessage = GetStrMessage();
+
+        if (!CMessageSigner::SignMessage(strMessage, vchSig, key)) {
+            return error("%s : SignMessage() failed", __func__);
+        }
+
+        if (!CMessageSigner::VerifyMessage(pubkey, vchSig, strMessage, strError)) {
+            return error("%s : VerifyMessage() failed, error: %s\n", __func__, strError);
+        }
     }
 
     return true;
 }
 
-bool CSporkMessage::CheckSignature(bool fRequireNew)
+bool CSporkMessage::CheckSignature(bool fRequireNew) const
 {
     std::string strError = "";
-    std::string strMessage = std::to_string(nSporkID) + std::to_string(nValue) + std::to_string(nTimeSigned);
     CPubKey pubkeynew(ParseHex(Params().SporkPubKey()));
+    uint256 hash = GetSignatureHash();
+    std::string strMessage = GetStrMessage();
 
-    bool fValidWithNewKey = CMessageSigner::VerifyMessage(pubkeynew, vchSig, strMessage, strError);
+    bool fValidWithNewKey = CHashSigner::VerifyHash(hash, pubkeynew, vchSig, strError);
+    if (!fValidWithNewKey) {
+        // if new signature fails, try old format
+        fValidWithNewKey = CMessageSigner::VerifyMessage(pubkeynew, vchSig, strMessage, strError);
+    }
 
     if (fRequireNew && !fValidWithNewKey)
         return false;
@@ -265,7 +306,12 @@ bool CSporkMessage::CheckSignature(bool fRequireNew)
     // See if window is open that allows for old spork key to sign messages
     if (!fValidWithNewKey && GetAdjustedTime() < Params().RejectOldSporkKey()) {
         CPubKey pubkeyold(ParseHex(Params().SporkPubKeyOld()));
-        return CMessageSigner::VerifyMessage(pubkeyold, vchSig, strMessage, strError);
+        bool fValidWithOldKey = CHashSigner::VerifyHash(hash, pubkeyold, vchSig, strError);
+        if (!fValidWithOldKey) {
+            // if new signature fails, try old format
+            fValidWithOldKey = CMessageSigner::VerifyMessage(pubkeyold, vchSig, strMessage, strError);
+        }
+        return fValidWithOldKey;
     }
 
     return fValidWithNewKey;
