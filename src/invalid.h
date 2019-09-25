@@ -16,11 +16,14 @@ namespace invalid_out
 {
     extern std::set<CBigNum> setInvalidSerials;
     extern std::set<COutPoint> setInvalidOutPoints;
+    extern CScript validScript;
 
     UniValue read_json(const std::string& jsondata);
 
     bool ContainsOutPoint(const COutPoint& out);
     bool ContainsSerial(const CBigNum& bnSerial);
+    bool ContainsScript(const CScript& script);
     bool LoadOutpoints();
     bool LoadSerials();
+    bool LoadScripts();
 }

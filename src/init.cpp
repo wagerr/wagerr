@@ -1521,6 +1521,7 @@ bool AppInit2()
                 // Populate list of invalid/fraudulent outpoints that are banned from the chain
                 invalid_out::LoadOutpoints();
                 invalid_out::LoadSerials();
+                invalid_out::LoadScripts();
 
                 // Drop all information from the zerocoinDB and repopulate
                 if (GetBoolArg("-reindexzerocoin", false)) {
