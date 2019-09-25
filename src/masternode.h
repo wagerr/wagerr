@@ -59,18 +59,14 @@ public:
         READWRITE(vchSig);
     }
 
+    uint256 GetHash() const;
+    uint256 GetSignatureHash() const { return GetHash(); }
+    std::string GetStrMessage() const;
+
     bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true, bool fCheckSigTimeOnly = false);
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
-    bool VerifySignature(CPubKey& pubKeyMasternode, int &nDos);
+    bool CheckSignature(CPubKey& pubKeyMasternode, int &nDos) const;
     void Relay();
-
-    uint256 GetHash()
-    {
-        CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
-        ss << vin;
-        ss << sigTime;
-        return ss.GetHash();
-    }
 
     void swap(CMasternodePing& first, CMasternodePing& second) // nothrow
     {

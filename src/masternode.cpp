@@ -711,53 +711,104 @@ std::string CMasternodeBroadcast::GetStrMessage()
     );
 }
 
-CMasternodePing::CMasternodePing()
+CMasternodePing::CMasternodePing() :
+        vin(),
+        blockHash(0),
+        sigTime(0),
+        vchSig()
+{ }
+
+CMasternodePing::CMasternodePing(CTxIn& newVin) :
+        vin(),
+        sigTime(0),
+        vchSig()
 {
-    vin = CTxIn();
-    blockHash = uint256(0);
-    sigTime = 0;
-    vchSig = std::vector<unsigned char>();
+    int nHeight;
+    {
+        LOCK(cs_main);
+        nHeight = chainActive.Height();
+        if (nHeight > 12)
+            blockHash = chainActive[nHeight - 12]->GetBlockHash();
+    }
 }
 
-CMasternodePing::CMasternodePing(CTxIn& newVin)
+uint256 CMasternodePing::GetHash() const
 {
-    vin = newVin;
-    blockHash = chainActive[chainActive.Height() - 12]->GetBlockHash();
-    sigTime = GetAdjustedTime();
-    vchSig = std::vector<unsigned char>();
+    CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
+    ss << vin;
+    ss << sigTime;
+    return ss.GetHash();
 }
 
+std::string CMasternodePing::GetStrMessage() const
+{
+    return vin.ToString() + blockHash.ToString() + std::to_string(sigTime);
+}
 
 bool CMasternodePing::Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode)
 {
-    std::string strError = "";
-    std::string strMasterNodeSignMessage;
-
-    sigTime = GetAdjustedTime();
-    std::string strMessage = vin.ToString() + blockHash.ToString() + std::to_string(sigTime);
-
-    if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
-        LogPrint("masternode","%s : SignMessage() - Error.", __func__);
-        return false;
+    int nHeight;
+    {
+        LOCK(cs_main);
+        nHeight = chainActive.Height();
     }
 
-    if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
-        LogPrint("masternode","%s : VerifyMessage() - Error: %s\n", __func__, strError);
-        return false;
+    std::string strError = "";
+    sigTime = GetAdjustedTime();
+
+    if (Params().NewSigsActive(nHeight)) {
+        uint256 hash = GetSignatureHash();
+
+        if(!CHashSigner::SignHash(hash, keyMasternode, vchSig)) {
+            return error("%s : SignHash() failed", __func__);
+        }
+
+        if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
+            return error("%s : VerifyHash() failed, error: %s", __func__, strError);
+        }
+    } else {
+        // use old signature format
+        std::string strMessage = GetStrMessage();
+
+        if (!CMessageSigner::SignMessage(strMessage, vchSig, keyMasternode)) {
+            return error("%s - SignMessage() failed", __func__);
+        }
+
+        if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+            return error("%s - VerifyMessage() failed, error: %s\n", __func__, strError);
+        }
     }
 
     return true;
 }
 
-bool CMasternodePing::VerifySignature(CPubKey& pubKeyMasternode, int &nDos)
+bool CMasternodePing::CheckSignature(CPubKey& pubKeyMasternode, int &nDos) const
 {
-    std::string strError = "";
-    std::string strMessage = vin.ToString() + blockHash.ToString() + std::to_string(sigTime);
-
-    if(!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)){
-        nDos = 33;
-        return error("CMasternodePing::VerifySignature - Got bad Masternode ping signature %s Error: %s", vin.ToString(), strError);
+    int nHeight;
+    {
+        LOCK(cs_main);
+        nHeight = chainActive.Height();
     }
+
+    std::string strError = "";
+
+    if (Params().NewSigsActive(nHeight)) {
+        uint256 hash = GetSignatureHash();
+
+        if (!CHashSigner::VerifyHash(hash, pubKeyMasternode, vchSig, strError)) {
+            nDos = 33;
+            return error("%s : Got bad masternode ping hash signature, error: %s\n", __func__, strError);
+        }
+
+    } else {
+        std::string strMessage = GetStrMessage();
+
+        if (!CMessageSigner::VerifyMessage(pubKeyMasternode, vchSig, strMessage, strError)) {
+            nDos = 33;
+            return error("%s : Got bad masternode ping message signature, error: %s\n", __func__, strError);
+        }
+    }
+
     return true;
 }
 
@@ -777,7 +828,7 @@ bool CMasternodePing::CheckAndUpdate(int& nDos, bool fRequireEnabled, bool fChec
 
     if(fCheckSigTimeOnly) {
         CMasternode* pmn = mnodeman.Find(vin);
-        if(pmn) return VerifySignature(pmn->pubKeyMasternode, nDos);
+        if(pmn) return CheckSignature(pmn->pubKeyMasternode, nDos);
         return true;
     }
 
@@ -792,7 +843,7 @@ bool CMasternodePing::CheckAndUpdate(int& nDos, bool fRequireEnabled, bool fChec
         // update only if there is no known ping for this masternode or
         // last ping was more then MASTERNODE_MIN_MNP_SECONDS-60 ago comparing to this one
         if (!pmn->IsPingedWithin(MASTERNODE_MIN_MNP_SECONDS - 60, sigTime)) {
-            if (!VerifySignature(pmn->pubKeyMasternode, nDos))
+            if (!CheckSignature(pmn->pubKeyMasternode, nDos))
                 return false;
 
             BlockMap::iterator mi = mapBlockIndex.find(blockHash);
