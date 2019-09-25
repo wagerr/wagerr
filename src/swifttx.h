@@ -85,7 +85,7 @@ public:
     std::string GetStrMessage() const;
 
     bool Sign();
-    bool SignatureValid() const;
+    bool CheckSignature() const;
 
     ADD_SERIALIZE_METHODS;
 
