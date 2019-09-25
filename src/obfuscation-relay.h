@@ -42,8 +42,11 @@ public:
 
     std::string ToString();
 
+    uint256 GetSignatureHash() const;
+    std::string GetStrMessage() const;
+
     bool Sign(std::string strSharedKey);
-    bool VerifyMessage(std::string strSharedKey);
+    bool CheckSignature(std::string strSharedKey) const;
     void Relay();
     void RelayThroughNode(int nRank);
 };
