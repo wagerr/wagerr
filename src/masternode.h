@@ -285,6 +285,9 @@ public:
 
     int64_t GetLastPaid();
     bool IsValidNetAddr();
+
+    /// Is the input associated with collateral public key? (and there is 25000 WGR - checking if valid masternode)
+    bool IsInputAssociatedWithPubkey() const;
 };
 
 
