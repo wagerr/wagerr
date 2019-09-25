@@ -906,7 +906,7 @@ UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
     if (!DecodeHexMnb(mnb, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Masternode broadcast message decode failed");
 
-    if(!mnb.VerifySignature())
+    if(!mnb.CheckSignature())
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Masternode broadcast signature verification failed");
 
     UniValue resultObj(UniValue::VOBJ);
@@ -915,7 +915,7 @@ UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
     resultObj.push_back(Pair("addr", mnb.addr.ToString()));
     resultObj.push_back(Pair("pubkeycollateral", CBitcoinAddress(mnb.pubKeyCollateralAddress.GetID()).ToString()));
     resultObj.push_back(Pair("pubkeymasternode", CBitcoinAddress(mnb.pubKeyMasternode.GetID()).ToString()));
-    resultObj.push_back(Pair("vchsig", EncodeBase64(&mnb.sig[0], mnb.sig.size())));
+    resultObj.push_back(Pair("vchsig", EncodeBase64(&mnb.vchSig[0], mnb.vchSig.size())));
     resultObj.push_back(Pair("sigtime", mnb.sigTime));
     resultObj.push_back(Pair("protocolversion", mnb.protocolVersion));
     resultObj.push_back(Pair("nlastdsq", mnb.nLastDsq));
@@ -950,7 +950,7 @@ UniValue relaymasternodebroadcast(const UniValue& params, bool fHelp)
     if (!DecodeHexMnb(mnb, params[0].get_str()))
         throw JSONRPCError(RPC_DESERIALIZATION_ERROR, "Masternode broadcast message decode failed");
 
-    if(!mnb.VerifySignature())
+    if(!mnb.CheckSignature())
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Masternode broadcast signature verification failed");
 
     mnodeman.UpdateMasternodeList(mnb);
