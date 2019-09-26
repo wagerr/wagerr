@@ -39,13 +39,13 @@ bool GetBlockHash(uint256& hash, int nBlockHeight);
 class CMasternodePing
 {
 private:
+    std::vector<unsigned char> vchSig;
     bool fNewSigs;  // not serialized
 
 public:
     CTxIn vin;
     uint256 blockHash;
     int64_t sigTime; //mnb message times
-    std::vector<unsigned char> vchSig;
 
     CMasternodePing();
     CMasternodePing(CTxIn& newVin);
@@ -64,6 +64,7 @@ public:
     uint256 GetHash() const;
     uint256 GetSignatureHash() const { return GetHash(); }
     std::string GetStrMessage() const;
+    std::string GetSignatureBase64() const { return EncodeBase64(&vchSig[0], vchSig.size()); }
 
     bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true, bool fCheckSigTimeOnly = false);
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
@@ -104,6 +105,9 @@ public:
 //
 class CMasternode
 {
+protected:
+    std::vector<unsigned char> vchSig;
+
 private:
     // critical section to protect the inner data structures
     mutable CCriticalSection cs;
@@ -129,7 +133,6 @@ public:
     CPubKey pubKeyMasternode;
     CPubKey pubKeyCollateralAddress1;
     CPubKey pubKeyMasternode1;
-    std::vector<unsigned char> vchSig;
     int activeState;
     int64_t sigTime; //mnb message time
     int cacheInputAge;
@@ -150,6 +153,10 @@ public:
     CMasternode(const CMasternode& other);
     CMasternode(const CMasternodeBroadcast& mnb);
 
+    std::string GetSignatureBase64() const { return EncodeBase64(&vchSig[0], vchSig.size()); }
+    std::vector<unsigned char> GetVchSig() const { return vchSig; }
+    void SetVchSig(const std::vector<unsigned char>& vchSigIn) { vchSig = vchSigIn; }
+
 
     void swap(CMasternode& first, CMasternode& second) // nothrow
     {
@@ -162,7 +169,6 @@ public:
         swap(first.addr, second.addr);
         swap(first.pubKeyCollateralAddress, second.pubKeyCollateralAddress);
         swap(first.pubKeyMasternode, second.pubKeyMasternode);
-        swap(first.vchSig, second.vchSig);
         swap(first.activeState, second.activeState);
         swap(first.sigTime, second.sigTime);
         swap(first.lastPing, second.lastPing);
@@ -174,6 +180,10 @@ public:
         swap(first.nLastDsq, second.nLastDsq);
         swap(first.nScanningErrorCount, second.nScanningErrorCount);
         swap(first.nLastScanningErrorBlockHeight, second.nLastScanningErrorBlockHeight);
+        // swap signatures
+        std::vector<unsigned char> secondSig = second.GetVchSig();
+        second.SetVchSig(first.GetVchSig());
+        first.SetVchSig(secondSig);
     }
 
     CMasternode& operator=(CMasternode from)
