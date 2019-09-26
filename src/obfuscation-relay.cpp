@@ -7,24 +7,30 @@
 #include "messagesigner.h"
 #include "obfuscation-relay.h"
 
-CObfuScationRelay::CObfuScationRelay()
-{
-    vinMasternode = CTxIn();
-    nBlockHeight = 0;
-    nRelayType = 0;
-    in = CTxIn();
-    out = CTxOut();
-}
+CObfuScationRelay::CObfuScationRelay() :
+        vchSig(),
+        vchSig2(),
+        vinMasternode(),
+        nBlockHeight(0),
+        nRelayType(0),
+        in(),
+        out()
+{ }
 
-CObfuScationRelay::CObfuScationRelay(CTxIn& vinMasternodeIn, std::vector<unsigned char>& vchSigIn, int nBlockHeightIn, int nRelayTypeIn, CTxIn& in2, CTxOut& out2)
-{
-    vinMasternode = vinMasternodeIn;
-    vchSig = vchSigIn;
-    nBlockHeight = nBlockHeightIn;
-    nRelayType = nRelayTypeIn;
-    in = in2;
-    out = out2;
-}
+CObfuScationRelay::CObfuScationRelay(CTxIn& vinMasternodeIn,
+                                     std::vector<unsigned char>& vchSigIn,
+                                     int nBlockHeightIn,
+                                     int nRelayTypeIn,
+                                     CTxIn& in2,
+                                     CTxOut& out2):
+        vchSig(vchSigIn),
+        vchSig2(),
+        vinMasternode(vinMasternodeIn),
+        nBlockHeight(nBlockHeightIn),
+        nRelayType(nRelayTypeIn),
+        in(in2),
+        out(out2)
+{ }
 
 std::string CObfuScationRelay::ToString()
 {
