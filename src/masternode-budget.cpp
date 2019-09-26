@@ -1863,29 +1863,27 @@ bool CBudgetVote::CheckSignature(bool fSignatureCheck) const
     return true;
 }
 
-CFinalizedBudget::CFinalizedBudget()
-{
-    strBudgetName = "";
-    nBlockStart = 0;
-    vecBudgetPayments.clear();
-    mapVotes.clear();
-    nFeeTXHash = 0;
-    nTime = 0;
-    fValid = true;
-    fAutoChecked = false;
-}
+CFinalizedBudget::CFinalizedBudget() :
+        fAutoChecked(false),
+        fValid(true),
+        strBudgetName(""),
+        nBlockStart(0),
+        vecBudgetPayments(),
+        mapVotes(),
+        nFeeTXHash(0),
+        nTime(0)
+{ }
 
-CFinalizedBudget::CFinalizedBudget(const CFinalizedBudget& other)
-{
-    strBudgetName = other.strBudgetName;
-    nBlockStart = other.nBlockStart;
-    vecBudgetPayments = other.vecBudgetPayments;
-    mapVotes = other.mapVotes;
-    nFeeTXHash = other.nFeeTXHash;
-    nTime = other.nTime;
-    fValid = true;
-    fAutoChecked = false;
-}
+CFinalizedBudget::CFinalizedBudget(const CFinalizedBudget& other) :
+        fAutoChecked(false),
+        fValid(true),
+        strBudgetName(other.strBudgetName),
+        nBlockStart(other.nBlockStart),
+        vecBudgetPayments(other.vecBudgetPayments),
+        mapVotes(other.mapVotes),
+        nFeeTXHash(other.nFeeTXHash),
+        nTime(other.nTime)
+{ }
 
 bool CFinalizedBudget::AddOrUpdateVote(CFinalizedBudgetVote& vote, std::string& strError)
 {
@@ -2285,33 +2283,22 @@ void CFinalizedBudget::SubmitVote()
 }
 
 CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast() :
-        vchSig()
-{
-    strBudgetName = "";
-    nBlockStart = 0;
-    vecBudgetPayments.clear();
-    mapVotes.clear();
-    nFeeTXHash = 0;
-}
+        CFinalizedBudget()
+{ }
 
 CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(const CFinalizedBudget& other) :
-        vchSig()
-{
-    strBudgetName = other.strBudgetName;
-    nBlockStart = other.nBlockStart;
-    for (CTxBudgetPayment out : other.vecBudgetPayments)
-        vecBudgetPayments.push_back(out);
-    mapVotes = other.mapVotes;
-    nFeeTXHash = other.nFeeTXHash;
-}
+        CFinalizedBudget(other)
+{ }
 
-CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(std::string strBudgetNameIn, int nBlockStartIn, std::vector<CTxBudgetPayment> vecBudgetPaymentsIn, uint256 nFeeTXHashIn)
+CFinalizedBudgetBroadcast::CFinalizedBudgetBroadcast(std::string strBudgetNameIn,
+                                                     int nBlockStartIn,
+                                                     std::vector<CTxBudgetPayment> vecBudgetPaymentsIn,
+                                                     uint256 nFeeTXHashIn)
 {
     strBudgetName = strBudgetNameIn;
     nBlockStart = nBlockStartIn;
     for (CTxBudgetPayment out : vecBudgetPaymentsIn)
         vecBudgetPayments.push_back(out);
-    mapVotes.clear();
     nFeeTXHash = nFeeTXHashIn;
 }
 
