@@ -37,12 +37,26 @@ private:
     std::vector<unsigned char> vchSig;
 
 public:
+    int nMessVersion;
     SporkId nSporkID;
     int64_t nValue;
     int64_t nTimeSigned;
 
-    CSporkMessage(SporkId nSporkID, int64_t nValue, int64_t nTimeSigned) : nSporkID(nSporkID), nValue(nValue), nTimeSigned(nTimeSigned) {}
-    CSporkMessage() : nSporkID((SporkId)0), nValue(0), nTimeSigned(0) {}
+    CSporkMessage() :
+        vchSig(),
+        nMessVersion(MessageVersion::MESS_VER_HASH),
+        nSporkID((SporkId)0),
+        nValue(0),
+        nTimeSigned(0)
+    {}
+
+    CSporkMessage(int nMessVersion, SporkId nSporkID, int64_t nValue, int64_t nTimeSigned) :
+        vchSig(),
+        nMessVersion(nMessVersion),
+        nSporkID(nSporkID),
+        nValue(nValue),
+        nTimeSigned(nTimeSigned)
+    { }
 
     uint256 GetHash() const { return HashQuark(BEGIN(nSporkID), END(nTimeSigned)); }
     uint256 GetSignatureHash() const;
@@ -57,10 +71,20 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
-        READWRITE(nSporkID);
-        READWRITE(nValue);
-        READWRITE(nTimeSigned);
-        READWRITE(vchSig);
+        try
+        {
+            READWRITE(nMessVersion);
+            READWRITE(nSporkID);
+            READWRITE(nValue);
+            READWRITE(nTimeSigned);
+            READWRITE(vchSig);
+        } catch (...) {
+            nMessVersion = MessageVersion::MESS_VER_STRMESS;
+            READWRITE(nSporkID);
+            READWRITE(nValue);
+            READWRITE(nTimeSigned);
+            READWRITE(vchSig);
+        }
     }
 };
 
