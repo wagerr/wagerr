@@ -10,6 +10,7 @@
 #include "base58.h"
 #include "key.h"
 #include "main.h"
+#include "messagesigner.h"
 #include "net.h"
 #include "sync.h"
 #include "timedata.h"
@@ -40,9 +41,9 @@ class CMasternodePing
 {
 private:
     std::vector<unsigned char> vchSig;
-    bool fNewSigs;  // not serialized
 
 public:
+    int nMessVersion;
     CTxIn vin;
     uint256 blockHash;
     int64_t sigTime; //mnb message times
@@ -55,10 +56,20 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
-        READWRITE(vin);
-        READWRITE(blockHash);
-        READWRITE(sigTime);
-        READWRITE(vchSig);
+        try
+        {
+            READWRITE(nMessVersion);
+            READWRITE(vin);
+            READWRITE(blockHash);
+            READWRITE(sigTime);
+            READWRITE(vchSig);
+        } catch (...) {
+            nMessVersion = MessageVersion::MESS_VER_STRMESS;
+            READWRITE(vin);
+            READWRITE(blockHash);
+            READWRITE(sigTime);
+            READWRITE(vchSig);
+        }
     }
 
     uint256 GetHash() const;
@@ -306,6 +317,7 @@ public:
 class CMasternodeBroadcast : public CMasternode
 {
 public:
+    int nMessVersion;
     CMasternodeBroadcast();
     CMasternodeBroadcast(CService newAddr, CTxIn newVin, CPubKey newPubkey, CPubKey newPubkey2, int protocolVersionIn);
     CMasternodeBroadcast(const CMasternode& mn);
@@ -326,15 +338,29 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
-        READWRITE(vin);
-        READWRITE(addr);
-        READWRITE(pubKeyCollateralAddress);
-        READWRITE(pubKeyMasternode);
-        READWRITE(vchSig);
-        READWRITE(sigTime);
-        READWRITE(protocolVersion);
-        READWRITE(lastPing);
-        READWRITE(nLastDsq);
+        try {
+            READWRITE(nMessVersion);
+            READWRITE(vin);
+            READWRITE(addr);
+            READWRITE(pubKeyCollateralAddress);
+            READWRITE(pubKeyMasternode);
+            READWRITE(vchSig);
+            READWRITE(sigTime);
+            READWRITE(protocolVersion);
+            READWRITE(lastPing);
+            READWRITE(nLastDsq);
+        } catch(...) {
+            nMessVersion = MessageVersion::MESS_VER_STRMESS;
+            READWRITE(vin);
+            READWRITE(addr);
+            READWRITE(pubKeyCollateralAddress);
+            READWRITE(pubKeyMasternode);
+            READWRITE(vchSig);
+            READWRITE(sigTime);
+            READWRITE(protocolVersion);
+            READWRITE(lastPing);
+            READWRITE(nLastDsq);
+        }
     }
 
     /// Create Masternode broadcast, needs to be relayed manually after that

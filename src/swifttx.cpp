@@ -511,6 +511,7 @@ bool CConsensusVote::Sign()
     }
 
     if (Params().NewSigsActive(nHeight)) {
+        nMessVersion = MessageVersion::MESS_VER_HASH;
         uint256 hash = GetSignatureHash();
 
         if(!CHashSigner::SignHash(hash, key2, vchSig)) {
@@ -520,8 +521,10 @@ bool CConsensusVote::Sign()
         if (!CHashSigner::VerifyHash(hash, pubkey2, vchSig, strError)) {
             return error("%s : VerifyHash() failed, error: %s", __func__, strError);
         }
+
     } else {
         // use old signature format
+        nMessVersion = MessageVersion::MESS_VER_STRMESS;
         std::string strMessage = GetStrMessage();
 
         if (!CMessageSigner::SignMessage(strMessage, vchSig, key2)) {
@@ -545,17 +548,17 @@ bool CConsensusVote::CheckSignature() const
 
     std::string strError = "";
 
-    uint256 hash = GetSignatureHash();
+    if (nMessVersion == MessageVersion::MESS_VER_HASH) {
+        uint256 hash = GetSignatureHash();
+        if(!CHashSigner::VerifyHash(hash, pmn->pubKeyMasternode, vchSig, strError))
+            return error("%s : VerifyHash failed for %s: %s", __func__,
+                    vinMasternode.prevout.hash.ToString(), strError);
 
-    if (CHashSigner::VerifyHash(hash, pmn->pubKeyMasternode, vchSig, strError))
-        return true;
-
-    // if new signature fails, try old format
-    std::string strMessage = GetStrMessage();
-
-    if (!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError)) {
-        return error("%s : Got bad masternode signature for %s: %s\n", __func__,
-                vinMasternode.prevout.hash.ToString(), strError);
+    } else {
+        std::string strMessage = GetStrMessage();
+        if(!CMessageSigner::VerifyMessage(pmn->pubKeyMasternode, vchSig, strMessage, strError))
+            return error("%s : VerifyMessage failed for %s: %s", __func__,
+                    vinMasternode.prevout.hash.ToString(), strError);
     }
 
     return true;

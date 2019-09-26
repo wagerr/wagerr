@@ -145,7 +145,8 @@ void CSporkManager::ProcessSpork(CNode* pfrom, std::string& strCommand, CDataStr
 bool CSporkManager::UpdateSpork(SporkId nSporkID, int64_t nValue)
 {
 
-    CSporkMessage spork = CSporkMessage(nSporkID, nValue, GetTime());
+    CSporkMessage spork = CSporkMessage(MessageVersion::MESS_VER_HASH,
+            nSporkID, nValue, GetTime());
 
     if(spork.Sign(strMasterPrivKey)){
         spork.Relay();
@@ -261,6 +262,7 @@ bool CSporkMessage::Sign(std::string strSignKey)
     }
 
     if (Params().NewSigsActive(nHeight)) {
+        nMessVersion = MessageVersion::MESS_VER_HASH;
         uint256 hash = GetSignatureHash();
 
         if(!CHashSigner::SignHash(hash, key, vchSig)) {
@@ -273,6 +275,7 @@ bool CSporkMessage::Sign(std::string strSignKey)
 
     } else {
         // use old signature format
+        nMessVersion = MessageVersion::MESS_VER_STRMESS;
         std::string strMessage = GetStrMessage();
 
         if (!CMessageSigner::SignMessage(strMessage, vchSig, key)) {
@@ -294,11 +297,12 @@ bool CSporkMessage::CheckSignature(bool fRequireNew) const
     uint256 hash = GetSignatureHash();
     std::string strMessage = GetStrMessage();
 
-    bool fValidWithNewKey = CHashSigner::VerifyHash(hash, pubkeynew, vchSig, strError);
-    if (!fValidWithNewKey) {
-        // if new signature fails, try old format
-        fValidWithNewKey = CMessageSigner::VerifyMessage(pubkeynew, vchSig, strMessage, strError);
-    }
+    const bool fNewSigs = (nMessVersion == MessageVersion::MESS_VER_HASH);
+
+    bool fValidWithNewKey =
+            fNewSigs ?
+                    CHashSigner::VerifyHash(hash, pubkeynew, vchSig, strError) :
+                    CMessageSigner::VerifyMessage(pubkeynew, vchSig, strMessage, strError);
 
     if (fRequireNew && !fValidWithNewKey)
         return false;
@@ -306,11 +310,12 @@ bool CSporkMessage::CheckSignature(bool fRequireNew) const
     // See if window is open that allows for old spork key to sign messages
     if (!fValidWithNewKey && GetAdjustedTime() < Params().RejectOldSporkKey()) {
         CPubKey pubkeyold(ParseHex(Params().SporkPubKeyOld()));
-        bool fValidWithOldKey = CHashSigner::VerifyHash(hash, pubkeyold, vchSig, strError);
-        if (!fValidWithOldKey) {
-            // if new signature fails, try old format
-            fValidWithOldKey = CMessageSigner::VerifyMessage(pubkeyold, vchSig, strMessage, strError);
-        }
+
+        bool fValidWithOldKey =
+                fNewSigs ?
+                        CHashSigner::VerifyHash(hash, pubkeyold, vchSig, strError) :
+                        CMessageSigner::VerifyMessage(pubkeyold, vchSig, strMessage, strError);
+
         return fValidWithOldKey;
     }
 
