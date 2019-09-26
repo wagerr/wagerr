@@ -67,17 +67,19 @@ int64_t GetAverageVoteTime();
 
 class CConsensusVote
 {
+private:
+    std::vector<unsigned char> vchSig;
+
 public:
     CTxIn vinMasternode;
     uint256 txHash;
     int nBlockHeight;
-    std::vector<unsigned char> vchSig;
 
     CConsensusVote() :
+        vchSig(),
         vinMasternode(),
         txHash(),
-        nBlockHeight(0),
-        vchSig()
+        nBlockHeight(0)
     {}
 
     uint256 GetHash() const;

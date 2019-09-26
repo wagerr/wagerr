@@ -59,6 +59,9 @@ bool IsBudgetCollateralValid(uint256 nTxCollateralHash, uint256 nExpectedHash, s
 
 class CBudgetVote
 {
+private:
+    std::vector<unsigned char> vchSig;
+
 public:
     bool fValid;  //if the vote is currently valid / counted
     bool fSynced; //if we've sent this to our peers
@@ -66,13 +69,13 @@ public:
     uint256 nProposalHash;
     int nVote;
     int64_t nTime;
-    std::vector<unsigned char> vchSig;
 
     CBudgetVote();
     CBudgetVote(CTxIn vin, uint256 nProposalHash, int nVoteIn);
 
     bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternode);
     bool CheckSignature(bool fSignatureCheck) const;
+    void SetVchSig(const std::vector<unsigned char>& vchSigIn) { vchSig = vchSigIn; }
     void Relay();
 
     std::string GetVoteString()
@@ -107,13 +110,15 @@ public:
 
 class CFinalizedBudgetVote
 {
+private:
+    std::vector<unsigned char> vchSig;
+
 public:
     bool fValid;  //if the vote is currently valid / counted
     bool fSynced; //if we've sent this to our peers
     CTxIn vin;
     uint256 nBudgetHash;
     int64_t nTime;
-    std::vector<unsigned char> vchSig;
 
     CFinalizedBudgetVote();
     CFinalizedBudgetVote(CTxIn vinIn, uint256 nBudgetHashIn);

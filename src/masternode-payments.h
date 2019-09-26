@@ -161,24 +161,26 @@ public:
 // for storing the winning payments
 class CMasternodePaymentWinner
 {
+private:
+    std::vector<unsigned char> vchSig;
+
 public:
     CTxIn vinMasternode;
     int nBlockHeight;
     CScript payee;
-    std::vector<unsigned char> vchSig;
 
     CMasternodePaymentWinner() :
+        vchSig(),
         vinMasternode(),
         nBlockHeight(0),
-        payee(),
-        vchSig()
+        payee()
     {}
 
     CMasternodePaymentWinner(CTxIn vinIn) :
+        vchSig(),
         vinMasternode(vinIn),
         nBlockHeight(0),
-        payee(),
-        vchSig()
+        payee()
     {}
 
     uint256 GetHash() const;
