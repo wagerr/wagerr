@@ -232,6 +232,7 @@ std::string CSporkManager::ToString() const
 uint256 CSporkMessage::GetSignatureHash() const
 {
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
+    ss << nMessVersion;
     ss << nSporkID;
     ss << nValue;
     ss << nTimeSigned;

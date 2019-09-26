@@ -687,6 +687,7 @@ uint256 CMasternodeBroadcast::GetHash() const
 uint256 CMasternodeBroadcast::GetSignatureHash() const
 {
     CHashWriter ss(SER_GETHASH, PROTOCOL_VERSION);
+    ss << nMessVersion;
     ss << addr;
     ss << sigTime;
     ss << pubKeyCollateralAddress;
