@@ -70,6 +70,7 @@ bool CObfuScationRelay::Sign(std::string strSharedKey)
     }
 
     if (Params().NewSigsActive(nHeight)) {
+        nMessVersion = MessageVersion::MESS_VER_HASH;
         uint256 hash = GetSignatureHash();
 
         if(!CHashSigner::SignHash(hash, key2, vchSig2)) {
@@ -82,6 +83,7 @@ bool CObfuScationRelay::Sign(std::string strSharedKey)
 
     } else {
         // use old signature format
+        nMessVersion = MessageVersion::MESS_VER_STRMESS;
         std::string strMessage = GetStrMessage();
 
         if (!CMessageSigner::SignMessage(strMessage, vchSig2, key2)) {
@@ -106,16 +108,15 @@ bool CObfuScationRelay::CheckSignature(std::string strSharedKey) const
         return error("%s : Invalid shared key %s", __func__, strSharedKey);
     }
 
-    uint256 hash = GetSignatureHash();
+    if (nMessVersion == MessageVersion::MESS_VER_HASH) {
+        uint256 hash = GetSignatureHash();
+        if(!CHashSigner::VerifyHash(hash, pubkey2, vchSig, strError))
+            return error("%s : VerifyHash failed, error: %s", __func__, strError);
 
-    if (CHashSigner::VerifyHash(hash, pubkey2, vchSig2, strError))
-        return true;
-
-    // if new signature fails, try old format
-    std::string strMessage = GetStrMessage();
-
-    if (!CMessageSigner::VerifyMessage(pubkey2, vchSig2, strMessage, strError)) {
-        return error("%s : Got bad masternode signature: %s\n", __func__, strError);
+    } else {
+        std::string strMessage = GetStrMessage();
+        if(!CMessageSigner::VerifyMessage(pubkey2, vchSig, strMessage, strError))
+            return error("%s : VerifyMessage failed, error: %s", __func__, strError);
     }
 
     return true;

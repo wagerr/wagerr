@@ -165,12 +165,14 @@ private:
     std::vector<unsigned char> vchSig;
 
 public:
+    int nMessVersion;
     CTxIn vinMasternode;
     int nBlockHeight;
     CScript payee;
 
     CMasternodePaymentWinner() :
         vchSig(),
+        nMessVersion(MessageVersion::MESS_VER_HASH),
         vinMasternode(),
         nBlockHeight(0),
         payee()
@@ -178,6 +180,7 @@ public:
 
     CMasternodePaymentWinner(CTxIn vinIn) :
         vchSig(),
+        nMessVersion(MessageVersion::MESS_VER_HASH),
         vinMasternode(vinIn),
         nBlockHeight(0),
         payee()
@@ -203,10 +206,20 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
-        READWRITE(vinMasternode);
-        READWRITE(nBlockHeight);
-        READWRITE(payee);
-        READWRITE(vchSig);
+        try
+        {
+            READWRITE(nMessVersion);
+            READWRITE(vinMasternode);
+            READWRITE(nBlockHeight);
+            READWRITE(payee);
+            READWRITE(vchSig);
+        } catch (...) {
+            nMessVersion = MessageVersion::MESS_VER_STRMESS;
+            READWRITE(vinMasternode);
+            READWRITE(nBlockHeight);
+            READWRITE(payee);
+            READWRITE(vchSig);
+        }
     }
 
     std::string ToString()
