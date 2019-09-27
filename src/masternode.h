@@ -188,10 +188,6 @@ public:
         swap(first.nLastDsq, second.nLastDsq);
         swap(first.nScanningErrorCount, second.nScanningErrorCount);
         swap(first.nLastScanningErrorBlockHeight, second.nLastScanningErrorBlockHeight);
-        // swap signatures
-        std::vector<unsigned char> secondSig = second.GetVchSig();
-        second.SetVchSig(first.GetVchSig());
-        first.SetVchSig(secondSig);
     }
 
     CMasternode& operator=(CMasternode from)
