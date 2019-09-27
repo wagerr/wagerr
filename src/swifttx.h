@@ -65,30 +65,26 @@ int GetTransactionLockSignatures(uint256 txHash);
 
 int64_t GetAverageVoteTime();
 
-class CConsensusVote
+class CConsensusVote : public CSignedMessage
 {
-private:
-    std::vector<unsigned char> vchSig;
-
 public:
-    int nMessVersion;
     CTxIn vinMasternode;
     uint256 txHash;
     int nBlockHeight;
 
     CConsensusVote() :
-        vchSig(),
+        CSignedMessage(),
         vinMasternode(),
         txHash(),
         nBlockHeight(0)
     {}
 
     uint256 GetHash() const;
-    uint256 GetSignatureHash() const;
-    std::string GetStrMessage() const;
 
-    bool Sign();
-    bool CheckSignature() const;
+    // override CSignedMessage functions
+    uint256 GetSignatureHash() const override;
+    std::string GetStrMessage() const override;
+    const CTxIn GetVin() const override { return vinMasternode; };
 
     ADD_SERIALIZE_METHODS;
 
