@@ -73,7 +73,7 @@ public:
     // override CSignedMessage functions
     uint256 GetSignatureHash() const override { return GetHash(); }
     std::string GetStrMessage() const override;
-    const CPubKey* GetPublicKey(std::string& strErrorRet) const override;
+    const CTxIn GetVin() const override  { return vin; };
 
     bool CheckAndUpdate(int& nDos, bool fRequireEnabled = true, bool fCheckSigTimeOnly = false);
     void Relay();
@@ -161,7 +161,8 @@ public:
     // override CSignedMessage functions
     uint256 GetSignatureHash() const override;
     std::string GetStrMessage() const override;
-    const CPubKey* GetPublicKey(std::string& strErrorRet) const override;
+    const CTxIn GetVin() const override { return vin; };
+    const CPubKey GetPublicKey(std::string& strErrorRet) const override { return pubKeyMasternode; }
 
     void swap(CMasternode& first, CMasternode& second) // nothrow
     {

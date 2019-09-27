@@ -85,7 +85,7 @@ public:
     // override CSignedMessage functions
     uint256 GetSignatureHash() const override { return GetHash(); }
     std::string GetStrMessage() const override;
-    const CPubKey* GetPublicKey(std::string& strErrorRet) const override;
+    const CTxIn GetVin() const override { return vin; };
 
     ADD_SERIALIZE_METHODS;
 
@@ -133,7 +133,7 @@ public:
     // override CSignedMessage functions
     uint256 GetSignatureHash() const override { return GetHash(); }
     std::string GetStrMessage() const override;
-    const CPubKey* GetPublicKey(std::string& strErrorRet) const override;
+    const CTxIn GetVin() const override { return vin; };
 
     ADD_SERIALIZE_METHODS;
 
