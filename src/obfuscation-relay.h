@@ -12,14 +12,12 @@
 #include "masternodeman.h"
 
 
-class CObfuScationRelay
+class CObfuScationRelay : public CSignedMessage
 {
 private:
-    std::vector<unsigned char> vchSig;
     std::vector<unsigned char> vchSig2;
 
 public:
-    int nMessVersion;
     CTxIn vinMasternode;
     int nBlockHeight;
     int nRelayType;
@@ -58,11 +56,12 @@ public:
 
     std::string ToString();
 
-    uint256 GetSignatureHash() const;
-    std::string GetStrMessage() const;
+    // override CSignedMessage functions
+    uint256 GetSignatureHash() const override;
+    std::string GetStrMessage() const override;
+    const CTxIn GetVin() const override { return vinMasternode; };
+    bool Sign(std::string strSharedKey);   // use vchSig2
 
-    bool Sign(std::string strSharedKey);
-    bool CheckSignature(std::string strSharedKey) const;
     void Relay();
     void RelayThroughNode(int nRank);
 };
