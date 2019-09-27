@@ -159,39 +159,34 @@ public:
 };
 
 // for storing the winning payments
-class CMasternodePaymentWinner
+class CMasternodePaymentWinner : public CSignedMessage
 {
-private:
-    std::vector<unsigned char> vchSig;
-
 public:
-    int nMessVersion;
     CTxIn vinMasternode;
     int nBlockHeight;
     CScript payee;
 
     CMasternodePaymentWinner() :
-        vchSig(),
-        nMessVersion(MessageVersion::MESS_VER_HASH),
+        CSignedMessage(),
         vinMasternode(),
         nBlockHeight(0),
         payee()
     {}
 
     CMasternodePaymentWinner(CTxIn vinIn) :
-        vchSig(),
-        nMessVersion(MessageVersion::MESS_VER_HASH),
+        CSignedMessage(),
         vinMasternode(vinIn),
         nBlockHeight(0),
         payee()
     {}
 
     uint256 GetHash() const;
-    uint256 GetSignatureHash() const { return GetHash(); }
-    std::string GetStrMessage() const;
 
-    bool Sign(CKey& keyMasternode, CPubKey& pubKeyMasternod);
-    bool CheckSignature() const;
+    // override CSignedMessage functions
+    uint256 GetSignatureHash() const override { return GetHash(); }
+    std::string GetStrMessage() const override;
+    const CPubKey* GetPublicKey(std::string& strErrorRet) const override;
+
     bool IsValid(CNode* pnode, std::string& strError);
     void Relay();
 
@@ -199,7 +194,6 @@ public:
     {
         payee = payeeIn;
     }
-
 
     ADD_SERIALIZE_METHODS;
 
