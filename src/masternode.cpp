@@ -417,7 +417,7 @@ bool CMasternodeBroadcast::Create(CTxIn txin, CService service, CKey keyCollater
     // wait for reindex and/or import to finish
     if (fImporting || fReindex) return false;
 
-    bool fNewSigs = true;
+    bool fNewSigs = false;
     {
         LOCK(cs_main);
         fNewSigs = chainActive.NewSigsActive();
