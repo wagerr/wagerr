@@ -22,13 +22,17 @@ bool CMessageSigner::GetKeysFromSecret(const std::string& strSecret, CKey& keyRe
     return true;
 }
 
-bool CMessageSigner::SignMessage(const std::string& strMessage, std::vector<unsigned char>& vchSigRet, const CKey& key)
+uint256 CMessageSigner::GetMessageHash(const std::string& strMessage)
 {
     CHashWriter ss(SER_GETHASH, 0);
     ss << strMessageMagic;
     ss << strMessage;
+    return ss.GetHash();
+}
 
-    return CHashSigner::SignHash(ss.GetHash(), key, vchSigRet);
+bool CMessageSigner::SignMessage(const std::string& strMessage, std::vector<unsigned char>& vchSigRet, const CKey& key)
+{
+    return CHashSigner::SignHash(GetMessageHash(strMessage), key, vchSigRet);
 }
 
 bool CMessageSigner::VerifyMessage(const CPubKey& pubkey, const std::vector<unsigned char>& vchSig, const std::string& strMessage, std::string& strErrorRet)
@@ -38,11 +42,7 @@ bool CMessageSigner::VerifyMessage(const CPubKey& pubkey, const std::vector<unsi
 
 bool CMessageSigner::VerifyMessage(const CKeyID& keyID, const std::vector<unsigned char>& vchSig, const std::string& strMessage, std::string& strErrorRet)
 {
-    CHashWriter ss(SER_GETHASH, 0);
-    ss << strMessageMagic;
-    ss << strMessage;
-
-    return CHashSigner::VerifyHash(ss.GetHash(), keyID, vchSig, strErrorRet);
+    return CHashSigner::VerifyHash(GetMessageHash(strMessage), keyID, vchSig, strErrorRet);
 }
 
 bool CHashSigner::SignHash(const uint256& hash, const CKey& key, std::vector<unsigned char>& vchSigRet)
@@ -72,3 +72,97 @@ bool CHashSigner::VerifyHash(const uint256& hash, const CKeyID& keyID, const std
 
     return true;
 }
+
+/** CSignedMessage Class
+ *  Functions inherited by network signed-messages
+ */
+
+bool CSignedMessage::Sign(const CKey& key, const CPubKey& pubKey, const bool fNewSigs)
+{
+    std::string strError = "";
+
+    if (fNewSigs) {
+        nMessVersion = MessageVersion::MESS_VER_HASH;
+        uint256 hash = GetSignatureHash();
+
+        if(!CHashSigner::SignHash(hash, key, vchSig)) {
+            return error("%s : SignHash() failed", __func__);
+        }
+
+        if (!CHashSigner::VerifyHash(hash, pubKey, vchSig, strError)) {
+            return error("%s : VerifyHash() failed, error: %s", __func__, strError);
+        }
+
+    } else {
+        nMessVersion = MessageVersion::MESS_VER_STRMESS;
+        std::string strMessage = GetStrMessage();
+
+        if (!CMessageSigner::SignMessage(strMessage, vchSig, key)) {
+            return error("%s : SignMessage() failed", __func__);
+        }
+
+        if (!CMessageSigner::VerifyMessage(pubKey, vchSig, strMessage, strError)) {
+            return error("%s : VerifyMessage() failed, error: %s\n", __func__, strError);
+        }
+    }
+
+    return true;
+}
+
+bool CSignedMessage::Sign(const std::string strSignKey, const bool fNewSigs)
+{
+    CKey key;
+    CPubKey pubkey;
+
+    if (!CMessageSigner::GetKeysFromSecret(strSignKey, key, pubkey)) {
+        return error("%s : Invalid strSignKey", __func__);
+    }
+
+    return Sign(key, pubkey, fNewSigs);
+}
+
+bool CSignedMessage::CheckSignature(const CPubKey& pubKey) const
+{
+    std::string strError = "";
+
+    if (nMessVersion == MessageVersion::MESS_VER_HASH) {
+        uint256 hash = GetSignatureHash();
+        if(!CHashSigner::VerifyHash(hash, pubKey, vchSig, strError))
+            return error("%s : VerifyHash failed: %s", __func__, strError);
+
+    } else {
+        std::string strMessage = GetStrMessage();
+        if(!CMessageSigner::VerifyMessage(pubKey, vchSig, strMessage, strError))
+            return error("%s : VerifyMessage failed: %s", __func__, strError);
+    }
+
+    return true;
+}
+
+bool CSignedMessage::CheckSignature(const bool fSignatureCheck) const
+{
+    std::string strError = "";
+
+    const CPubKey* pPubkey = GetPublicKey(strError);
+    if (pPubkey == nullptr)
+        return error("%s : ERROR: %s", __func__, strError);
+
+    return !fSignatureCheck || CheckSignature(*pPubkey);
+}
+
+std::string CSignedMessage::GetSignatureBase64() const
+{
+    return EncodeBase64(&vchSig[0], vchSig.size());
+}
+
+void CSignedMessage::swap(CSignedMessage& first, CSignedMessage& second) // nothrow
+{
+    // enable ADL (not necessary in our case, but good practice)
+    using std::swap;
+
+    // by swapping the members of two classes,
+    // the two classes are effectively swapped
+    swap(first.vchSig, second.vchSig);
+    swap(first.nMessVersion, second.nMessVersion);
+}
+
