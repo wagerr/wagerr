@@ -7,6 +7,7 @@
 #define MESSAGESIGNER_H
 
 #include "key.h"
+#include "primitives/transaction.h" // for CTxIn
 
 enum MessageVersion {
         MESS_VER_STRMESS    = 0,
@@ -75,7 +76,11 @@ public:
     // Must be implemented in child classes
     virtual uint256 GetSignatureHash() const = 0;
     virtual std::string GetStrMessage() const = 0;
-    virtual const CPubKey* GetPublicKey(std::string& strErrorRet) const = 0;
+    virtual const CTxIn GetVin() const = 0;
+
+    // GetPublicKey defaults to public key of masternode with vin from GetVin.
+    // Child classes can override if public key is directly accessible.
+    virtual const CPubKey GetPublicKey(std::string& strErrorRet) const;
 
     // Setters and getters
     void SetVchSig(const std::vector<unsigned char>& vchSigIn) { vchSig = vchSigIn; }
