@@ -116,7 +116,6 @@ bool fDebug = false;
 bool fPrintToConsole = false;
 bool fPrintToDebugLog = true;
 bool fDaemon = false;
-bool fServer = false;
 std::string strMiscWarning;
 bool fLogTimestamps = false;
 bool fLogIPs = false;
