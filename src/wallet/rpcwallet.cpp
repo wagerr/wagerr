@@ -5157,9 +5157,9 @@ extern UniValue DoZwgrSpend(const CAmount nAmount, bool fMintChange, bool fMinim
         if(!address.IsValid())
             throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "Invalid WAGERR address");
         outputs.push_back(std::pair<CBitcoinAddress*, CAmount>(&address, nAmount));
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, outputs);
-    } else                   // Spend to newly generated local address
-        fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, outputs);
+    }
+
+    fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, outputs);
 
     if (!fSuccess)
         throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
