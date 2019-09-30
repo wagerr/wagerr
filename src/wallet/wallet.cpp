@@ -4214,7 +4214,6 @@ bool CWallet::CreateZerocoinSpendTransaction(
             txNew.vin.clear();
             txNew.vout.clear();
 
-            //if there is an address to send to then use it, if not generate a new address to send to
             CAmount nChange = nValueSelected - nValue;
 
             if (nChange < 0) {
@@ -4222,12 +4221,20 @@ bool CWallet::CreateZerocoinSpendTransaction(
                 return false;
             }
 
-            if (nChange > 0 && !changeAddress) {
-                receipt.SetStatus(_("Need address because change is not exact"), nStatus);
+            if (nChange > 0 && !changeAddress && addressesTo.size() == 0) {
+                receipt.SetStatus(_("Need destination or change address because change is not exact"), nStatus);
                 return false;
             }
 
-            // add an outputs for each address
+            //if there are addresses to send to then use them, if not generate a new address to send to
+            CBitcoinAddress destinationAddr;
+            if (addressesTo.size() == 0) {
+                CPubKey pubkey;
+                assert(reserveKey.GetReservedKey(pubkey)); // should never fail
+                destinationAddr = CBitcoinAddress(pubkey.GetID());
+                addressesTo.push_back(std::make_pair(&destinationAddr, nValue));
+            }
+
             for (std::pair<CBitcoinAddress*,CAmount> pair : addressesTo){
                 CScript scriptZerocoinSpend = GetScriptForDestination(pair.first->Get());
                 //add output to wagerr address to the transaction (the actual primary spend taking place)
@@ -4242,7 +4249,7 @@ bool CWallet::CreateZerocoinSpendTransaction(
                 // Change address
                 if(changeAddress){
                     scriptChange = GetScriptForDestination(changeAddress->Get());
-                }else{
+                } else {
                     // Reserve a new key pair from key pool
                     CPubKey vchPubKey;
                     assert(reserveKey.GetReservedKey(vchPubKey)); // should never fail
