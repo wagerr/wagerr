@@ -10,7 +10,7 @@
 #include "net.h"
 #include "spork.h"
 #include "sporkdb.h"
-
+#include <iostream>
 
 #define MAKE_SPORK_DEF(name, defaultValue) CSporkDef(name, defaultValue, #name)
 
@@ -61,13 +61,14 @@ void CSporkManager::LoadSporksFromDB()
         mapSporksActive[spork.nSporkID] = spork;
         std::time_t result = spork.nValue;
         // If SPORK Value is greater than 1,000,000 assume it's actually a Date and then convert to a more readable format
+        std::string sporkName = sporkManager.GetSporkNameByID(spork.nSporkID);
         if (spork.nValue > 1000000) {
-            LogPrintf("%s : loaded spork %s with value %d : %s", __func__,
-                      sporkManager.GetSporkNameByID(spork.nSporkID), spork.nValue,
-                      std::ctime(&result));
+            char* res = std::ctime(&result);
+            LogPrintf("%s : loaded spork %s with value %d : %s\n", __func__, sporkName.c_str(), spork.nValue,
+                      ((res) ? res : "no time") );
         } else {
             LogPrintf("%s : loaded spork %s with value %d\n", __func__,
-                      sporkManager.GetSporkNameByID(spork.nSporkID), spork.nValue);
+                      sporkName, spork.nValue);
         }
     }
 }
