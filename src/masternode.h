@@ -161,7 +161,7 @@ public:
     uint256 GetSignatureHash() const override;
     std::string GetStrMessage() const override;
     const CTxIn GetVin() const override { return vin; };
-    const CPubKey GetPublicKey(std::string& strErrorRet) const override { return pubKeyMasternode; }
+    const CPubKey GetPublicKey(std::string& strErrorRet) const override { return pubKeyCollateralAddress; }
 
     void swap(CMasternode& first, CMasternode& second) // nothrow
     {
