@@ -112,8 +112,8 @@ protected:
 
 public:
     TransactionSignatureChecker(const CTransaction* txToIn, unsigned int nInIn) : txTo(txToIn), nIn(nInIn) {}
-    bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode) const;
-    bool CheckLockTime(const CScriptNum& nLockTime) const;
+    bool CheckSig(const std::vector<unsigned char>& scriptSig, const std::vector<unsigned char>& vchPubKey, const CScript& scriptCode) const override;
+    bool CheckLockTime(const CScriptNum& nLockTime) const override;
 };
 
 class MutableTransactionSignatureChecker : public TransactionSignatureChecker
