@@ -498,11 +498,11 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
     }
 
     std::string strError = "";
-    if (!CMessageSigner::VerifyMessage(pubKeyCollateralAddress, vchSig, GetStrMessage(), strError))
+    if (!CheckSignature())
     {
         // don't ban for old masternodes, their sigs could be broken because of the bug
         nDos = protocolVersion < MIN_PEER_MNANNOUNCE ? 0 : 100;
-        return error("CMasternodeBroadcast::CheckAndUpdate - Got bad Masternode address signature : %s", strError);
+        return error("%s : Got bad Masternode address signature", __func__);
     }
 
     if (Params().NetworkID() == CBaseChainParams::MAIN) {
@@ -520,8 +520,8 @@ bool CMasternodeBroadcast::CheckAndUpdate(int& nDos)
     // unless someone is doing something fishy
     // (mapSeenMasternodeBroadcast in CMasternodeMan::ProcessMessage should filter legit duplicates)
     if(pmn->sigTime >= sigTime) {
-        return error("CMasternodeBroadcast::CheckAndUpdate - Bad sigTime %d for Masternode %20s %105s (existing broadcast is at %d)",
-                      sigTime, addr.ToString(), vin.ToString(), pmn->sigTime);
+        return error("%s : Bad sigTime %d for Masternode %20s %105s (existing broadcast is at %d)",
+                      __func__, sigTime, addr.ToString(), vin.ToString(), pmn->sigTime);
     }
 
     // masternode is not enabled yet/already, nothing to update
@@ -646,13 +646,13 @@ CMasternodePing::CMasternodePing() :
         CSignedMessage(),
         vin(),
         blockHash(0),
-        sigTime(0)
+        sigTime(GetAdjustedTime())
 { }
 
 CMasternodePing::CMasternodePing(CTxIn& newVin) :
         CSignedMessage(),
-        vin(),
-        sigTime(0)
+        vin(newVin),
+        sigTime(GetAdjustedTime())
 {
     int nHeight;
     {
