@@ -351,6 +351,8 @@ UniValue startmasternode (const UniValue& params, bool fHelp)
 
             if (result) {
                 successful++;
+                mnodeman.UpdateMasternodeList(mnb);
+                mnb.Relay();
                 statusObj.push_back(Pair("error", ""));
             } else {
                 failed++;
