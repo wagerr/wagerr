@@ -105,7 +105,7 @@ bool CMasternodeConfig::read(std::string& strErr)
     return true;
 }
 
-bool CMasternodeConfig::CMasternodeEntry::castOutputIndex(int &n)
+bool CMasternodeConfig::CMasternodeEntry::castOutputIndex(int &n) const
 {
     try {
         n = std::stoi(outputIndex);
