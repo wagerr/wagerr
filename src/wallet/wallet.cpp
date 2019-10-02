@@ -1239,8 +1239,9 @@ bool CWalletTx::WriteToDisk()
  * Scan the block chain (starting in pindexStart) for transactions
  * from or to us. If fUpdate is true, found transactions that already
  * exist in the wallet will be updated.
+ * @returns -1 if process was cancelled or the number of tx added to the wallet.
  */
-int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
+int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate, bool fromStartup)
 {
     int ret = 0;
     int64_t nNow = GetTime();
@@ -1264,6 +1265,12 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate)
         while (pindex) {
             if (pindex->nHeight % 100 == 0 && dProgressTip - dProgressStart > 0.0)
                 ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((Checkpoints::GuessVerificationProgress(pindex, false) - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
+
+            if (fromStartup) {
+                if (ShutdownRequested()) {
+                    return -1;
+                }
+            }
 
             CBlock block;
             ReadBlockFromDisk(block, pindex);
