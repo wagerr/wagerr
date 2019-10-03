@@ -1804,8 +1804,7 @@ bool AppInit2()
             LogPrintf("Rescanning last %i blocks (from block %i)...\n", chainActive.Height() - pindexRescan->nHeight, pindexRescan->nHeight);
             const int64_t nWalletRescanTime = GetTimeMillis();
             if (pwalletMain->ScanForWalletTransactions(pindexRescan, true, true) == -1) {
-                LogPrintf("Shutdown requested over the txs scan. Exiting.\n");
-                return false;
+                return error("Shutdown requested over the txs scan. Exiting.");
             }
             LogPrintf("Rescan completed in %15dms\n", GetTimeMillis() - nWalletRescanTime);
             pwalletMain->SetBestChain(chainActive.GetLocator());

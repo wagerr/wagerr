@@ -1266,10 +1266,8 @@ int CWallet::ScanForWalletTransactions(CBlockIndex* pindexStart, bool fUpdate, b
             if (pindex->nHeight % 100 == 0 && dProgressTip - dProgressStart > 0.0)
                 ShowProgress(_("Rescanning..."), std::max(1, std::min(99, (int)((Checkpoints::GuessVerificationProgress(pindex, false) - dProgressStart) / (dProgressTip - dProgressStart) * 100))));
 
-            if (fromStartup) {
-                if (ShutdownRequested()) {
-                    return -1;
-                }
+            if (fromStartup && ShutdownRequested()) {
+                return -1;
             }
 
             CBlock block;
