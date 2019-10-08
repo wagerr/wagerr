@@ -24,6 +24,9 @@ typedef std::vector<unsigned char> valtype;
 // Maximum number of bytes pushable to the stack
 static const unsigned int MAX_SCRIPT_ELEMENT_SIZE = 520;
 
+// Maximum script length in bytes
+static const int MAX_SCRIPT_SIZE = 10000;
+
 // Maximum number of non-push operations per script
 static const int MAX_OPS_PER_SCRIPT = 201;
 
