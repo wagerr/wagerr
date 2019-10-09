@@ -438,6 +438,160 @@ UniValue listbets(const UniValue& params, bool fHelp)
     return ret;
 }
 
+UniValue getbet(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 2)
+        throw runtime_error(
+            "getbet \"txid\" ( includeWatchonly )\n"
+            "\nGet detailed information about in-wallet bet <txid>\n"
+
+            "\nArguments:\n"
+            "1. \"txid\"    (string, required) The transaction id\n"
+            "2. \"includeWatchonly\"    (bool, optional, default=false) Whether to include watchonly addresses in balance calculation and details[]\n"
+            
+            "\nResult:\n"
+            "{\n"
+            "  \"tx-id\":\"accountname\",           (string) The transaction id.\n"
+            "  \"event-id\":\"accountname\",        (string) The ID of the event being bet on.\n"
+            "  \"starting\":\"accountname\",        (string) The event start time.\n"
+            "  \"home\":\"accountname\",            (string) The home team name.\n"
+            "  \"away\":\"accountname\",            (string) The away team name.\n"
+            "  \"tournament\":\"accountname\",      (string) The tournament name\n"
+            "  \"team-to-win\":\"wagerraddress\",   (string) The team to win.\n"
+            "  \"amount\": x.xxx,                   (numeric) The amount bet in WGR.\n"
+            "  \"result\":\"wagerraddress\",        (string) The bet result i.e win/lose.\n"
+            "}\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getbet", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\"") +
+            HelpExampleCli("getbet", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\" true") +
+            HelpExampleRpc("getbet", "\"1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d\""));
+
+    LOCK(cs_main);
+
+    uint256 txHash;
+    txHash.SetHex(params[0].get_str());
+    CBlockIndex* blockindex = nullptr;
+
+    CTransaction tx;
+    uint256 hash_block;
+    if (!GetTransaction(txHash, tx, hash_block, true, blockindex)) {
+        std::string errmsg;
+        if (blockindex) {
+            if (!(blockindex->nStatus & BLOCK_HAVE_DATA)) {
+                throw JSONRPCError(RPC_MISC_ERROR, "Block not available");
+            }
+            errmsg = "No such transaction found in the provided block";
+        } else {
+            errmsg = fTxIndex
+              ? "No such mempool or blockchain transaction"
+              : "No such mempool transaction. Use -txindex to enable blockchain transaction queries";
+        }
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, errmsg + ". Use gettransaction for wallet transactions.");
+    }
+
+    UniValue ret(UniValue::VOBJ);
+
+    CEventDB edb;
+    eventIndex_t eventIndex;
+    edb.GetEvents(eventIndex);
+
+    mappingIndex_t teamsIndex;
+    CMappingDB mtdb("teams.dat");
+    mtdb.GetTeams(teamsIndex);
+
+    mappingIndex_t tournamentsIndex;
+    CMappingDB mtodb("tournaments.dat");
+    mtodb.GetTournaments(tournamentsIndex);
+
+    for (unsigned int i = 0; i < tx.vout.size(); i++) {
+        const CTxOut& txout = tx.vout[i];
+        std::string scriptPubKey = txout.scriptPubKey.ToString();
+
+        // TODO Remove hard-coded values from this block.
+        if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+            vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
+            std::string opCode(vOpCode.begin(), vOpCode.end());
+
+            CPeerlessBet plBet;
+            if (CPeerlessBet::FromOpCode(opCode, plBet)) {
+                ret.push_back(Pair("tx-id", txHash.ToString().c_str()));
+                ret.push_back(Pair("event-id", (uint64_t)plBet.nEventId));
+
+                // Retrieve the event details
+                if (eventIndex.count(plBet.nEventId)) {
+                    CPeerlessEvent plEvent = eventIndex.find(plBet.nEventId)->second;
+
+                    ret.push_back(Pair("starting", plEvent.nStartTime));
+                    if (teamsIndex.count(plEvent.nHomeTeam)) {
+                        ret.push_back(Pair("home", teamsIndex.find(plEvent.nHomeTeam)->second.sName));
+                    }
+                    if (teamsIndex.count(plEvent.nAwayTeam)) {
+                        ret.push_back(Pair("away", teamsIndex.find(plEvent.nAwayTeam)->second.sName));
+                    }
+                    if (tournamentsIndex.count(plEvent.nTournament)) {
+                        ret.push_back(Pair("tournament", tournamentsIndex.find(plEvent.nTournament)->second.sName));
+                    }
+                }
+
+                ret.push_back(Pair("team-to-win", (uint64_t)plBet.nOutcome));
+                ret.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+
+                // Check if the users bet has a result posted, if so check to see it its a winning or losing bet.
+                CResultDB rdb;
+                resultsIndex_t resultsIndex;
+                rdb.GetResults(resultsIndex);
+
+                if (resultsIndex.size() > 0) {
+                    std::string betResult = "pending";
+
+                    if (resultsIndex.count(plBet.nEventId)) {
+                        CPeerlessResult plResult = resultsIndex.find(plBet.nEventId)->second;
+
+                        switch (plBet.nOutcome) {
+                        case OutcomeType::moneyLineWin:
+                            betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
+
+                            break;
+                        case OutcomeType::moneyLineLose:
+                            betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
+
+                            break;
+                        case OutcomeType::moneyLineDraw:
+                            betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
+
+                            break;
+                        case OutcomeType::spreadHome:
+                            betResult = "Check block explorer for result.";
+
+                            break;
+                        case OutcomeType::spreadAway:
+                            betResult = "Check block explorer for result.";
+
+                            break;
+                        case OutcomeType::totalOver:
+                            betResult = "Check block explorer for result.";
+
+                            break;
+                        case OutcomeType::totalUnder:
+                            betResult = "Check block explorer for result.";
+
+                            break;
+                        default:
+                            LogPrintf("Invalid bet outcome");
+                        }
+                    }
+
+                    ret.push_back(Pair("result", betResult));
+                }
+            }
+            break;
+        }
+    }
+
+    return ret;
+}
+
 UniValue listchaingamesbets(const UniValue& params, bool fHelp)
 {
     // TODO The command-line parameters for this command aren't handled as.
