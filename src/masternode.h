@@ -52,19 +52,15 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
+        READWRITE(vin);
+        READWRITE(blockHash);
+        READWRITE(sigTime);
+        READWRITE(vchSig);
         try
         {
             READWRITE(nMessVersion);
-            READWRITE(vin);
-            READWRITE(blockHash);
-            READWRITE(sigTime);
-            READWRITE(vchSig);
         } catch (...) {
             nMessVersion = MessageVersion::MESS_VER_STRMESS;
-            READWRITE(vin);
-            READWRITE(blockHash);
-            READWRITE(sigTime);
-            READWRITE(vchSig);
         }
     }
 
@@ -330,29 +326,17 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp(Stream& s, Operation ser_action, int nType, int nVersion)
     {
-        try {
-            READWRITE(nMessVersion);
-            READWRITE(vin);
-            READWRITE(addr);
-            READWRITE(pubKeyCollateralAddress);
-            READWRITE(pubKeyMasternode);
-            READWRITE(vchSig);
-            READWRITE(sigTime);
-            READWRITE(protocolVersion);
-            READWRITE(lastPing);
-            READWRITE(nLastDsq);
-        } catch(...) {
-            nMessVersion = MessageVersion::MESS_VER_STRMESS;
-            READWRITE(vin);
-            READWRITE(addr);
-            READWRITE(pubKeyCollateralAddress);
-            READWRITE(pubKeyMasternode);
-            READWRITE(vchSig);
-            READWRITE(sigTime);
-            READWRITE(protocolVersion);
-            READWRITE(lastPing);
-            READWRITE(nLastDsq);
-        }
+        READWRITE(vin);
+        READWRITE(addr);
+        READWRITE(pubKeyCollateralAddress);
+        READWRITE(pubKeyMasternode);
+        READWRITE(vchSig);
+        READWRITE(sigTime);
+        READWRITE(protocolVersion);
+        READWRITE(lastPing);
+        READWRITE(nMessVersion);    // abuse nLastDsq (which will be removed) for old serialization
+        if (ser_action.ForRead())
+            nLastDsq = 0;
     }
 
     /// Create Masternode broadcast, needs to be relayed manually after that
