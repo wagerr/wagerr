@@ -55,51 +55,6 @@ std::string CObfuScationRelay::GetStrMessage() const
     return in.ToString() + out.ToString();
 }
 
-bool CObfuScationRelay::Sign(std::string strSharedKey)
-{
-    int nHeight;
-    {
-        LOCK(cs_main);
-        nHeight = chainActive.Height();
-    }
-
-    std::string strError = "";
-    CKey key2;
-    CPubKey pubkey2;
-
-    if (!CMessageSigner::GetKeysFromSecret(strSharedKey, key2, pubkey2)) {
-        return error("%s : Invalid shared key %s", __func__, strSharedKey);
-    }
-
-    if (Params().NewSigsActive(nHeight)) {
-        nMessVersion = MessageVersion::MESS_VER_HASH;
-        uint256 hash = GetSignatureHash();
-
-        if(!CHashSigner::SignHash(hash, key2, vchSig2)) {
-            return error("%s : SignHash() failed", __func__);
-        }
-
-        if (!CHashSigner::VerifyHash(hash, pubkey2, vchSig2, strError)) {
-            return error("%s : VerifyHash() failed, error: %s", __func__, strError);
-        }
-
-    } else {
-        // use old signature format
-        nMessVersion = MessageVersion::MESS_VER_STRMESS;
-        std::string strMessage = GetStrMessage();
-
-        if (!CMessageSigner::SignMessage(strMessage, vchSig2, key2)) {
-            return error("%s : SignMessage() failed", __func__);
-        }
-
-        if (!CMessageSigner::VerifyMessage(pubkey2, vchSig2, strMessage, strError)) {
-            return error("%s : VerifyMessage() failed, error: %s\n", __func__, strError);
-        }
-    }
-
-    return true;
-}
-
 void CObfuScationRelay::Relay()
 {
     int nCount = std::min(mnodeman.CountEnabled(ActiveProtocol()), 20);
