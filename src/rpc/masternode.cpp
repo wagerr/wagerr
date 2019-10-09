@@ -889,12 +889,14 @@ UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
             "  \"sigvalid\": \"xxx\"            (string) \"true\"/\"false\" whether or not the mnb signature checks out.\n"
             "  \"protocolversion\": \"nnn\"     (numeric) Masternode's protocol version\n"
             "  \"nlastdsq\": \"nnn\"            (numeric) The last time the masternode sent a DSQ message (for mixing) (DEPRECATED)\n"
+            "  \"nMessVersion\": \"nnn\"        (numeric) MNB Message version number\n"
             "  \"lastping\" : {                 (object) JSON object with information about the masternode's last ping\n"
             "      \"vin\": \"xxxx\"            (string) The unspent output of the masternode which is signing the message\n"
             "      \"blockhash\": \"xxxx\"      (string) Current chaintip blockhash minus 12\n"
             "      \"sigtime\": \"nnn\"         (numeric) Signature time for this ping\n"
             "      \"sigvalid\": \"xxx\"        (string) \"true\"/\"false\" whether or not the mnp signature checks out.\n"
             "      \"vchsig\": \"xxxx\"         (string) Base64-encoded signature of this ping (verifiable via pubkeymasternode)\n"
+            "      \"nMessVersion\": \"nnn\"    (numeric) MNP Message version number\n"
             "  }\n"
             "}\n"
 
@@ -917,6 +919,7 @@ UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
     resultObj.push_back(Pair("sigvalid", mnb.CheckSignature() ? "true" : "false"));
     resultObj.push_back(Pair("protocolversion", mnb.protocolVersion));
     resultObj.push_back(Pair("nlastdsq", mnb.nLastDsq));
+    resultObj.push_back(Pair("nMessVersion", mnb.nMessVersion));
 
     UniValue lastPingObj(UniValue::VOBJ);
     lastPingObj.push_back(Pair("vin", mnb.lastPing.vin.prevout.ToString()));
@@ -924,6 +927,7 @@ UniValue decodemasternodebroadcast(const UniValue& params, bool fHelp)
     lastPingObj.push_back(Pair("sigtime", mnb.lastPing.sigTime));
     lastPingObj.push_back(Pair("sigvalid", mnb.lastPing.CheckSignature(mnb.pubKeyMasternode) ? "true" : "false"));
     lastPingObj.push_back(Pair("vchsig", mnb.lastPing.GetSignatureBase64()));
+    lastPingObj.push_back(Pair("nMessVersion", mnb.lastPing.nMessVersion));
 
     resultObj.push_back(Pair("lastping", lastPingObj));
 
