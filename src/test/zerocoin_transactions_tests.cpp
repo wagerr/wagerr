@@ -5,6 +5,7 @@
 
 #include "libzerocoin/Denominations.h"
 #include "libzerocoin/Coin.h"
+#include "libzerocoin/CoinRandomnessSchnorrSignature.h"
 #include "amount.h"
 #include "chainparams.h"
 #include "coincontrol.h"
@@ -57,64 +58,234 @@ BOOST_AUTO_TEST_CASE(zerocoin_spend_test)
 
 }
 
+BOOST_AUTO_TEST_CASE(zerocoin_schnorr_signature_test)
+{
+    const int NUM_OF_TESTS = 50;
+    SelectParams(CBaseChainParams::MAIN);
+    libzerocoin::ZerocoinParams *ZCParams_v1 = Params().Zerocoin_Params(true);
+    (void)ZCParams_v1;
+    libzerocoin::ZerocoinParams *ZCParams_v2 = Params().Zerocoin_Params(false);
+    (void)ZCParams_v2;
+
+    for (int i=0; i<NUM_OF_TESTS; i++) {
+
+        // mint a v1 coin
+        CBigNum s = CBigNum::randBignum(ZCParams_v1->coinCommitmentGroup.groupOrder);
+        CBigNum r = CBigNum::randBignum(ZCParams_v1->coinCommitmentGroup.groupOrder);
+        CBigNum c = ZCParams_v1->coinCommitmentGroup.g.pow_mod(s, ZCParams_v1->coinCommitmentGroup.modulus).mul_mod(
+                ZCParams_v1->coinCommitmentGroup.h.pow_mod(r, ZCParams_v1->coinCommitmentGroup.modulus), ZCParams_v1->coinCommitmentGroup.modulus);
+        for (uint32_t attempt = 0; attempt < MAX_COINMINT_ATTEMPTS; attempt++) {
+            if (c.isPrime(ZEROCOIN_MINT_PRIME_PARAM)) break;
+            CBigNum r_delta = CBigNum::randBignum(ZCParams_v1->coinCommitmentGroup.groupOrder);
+            r = (r + r_delta) % ZCParams_v1->coinCommitmentGroup.groupOrder;
+            c = ZCParams_v1->coinCommitmentGroup.g.pow_mod(s, ZCParams_v1->coinCommitmentGroup.modulus).mul_mod(
+                    ZCParams_v1->coinCommitmentGroup.h.pow_mod(r, ZCParams_v1->coinCommitmentGroup.modulus), ZCParams_v1->coinCommitmentGroup.modulus);
+        }
+        BOOST_CHECK_MESSAGE(c.isPrime(ZEROCOIN_MINT_PRIME_PARAM), "Unable to mint v1 coin");
+        libzerocoin::PrivateCoin privCoin_v1(ZCParams_v1, libzerocoin::CoinDenomination::ZQ_ONE, s, r);
+        const CBigNum randomness_v1 = privCoin_v1.getRandomness();
+        const CBigNum pubCoinValue_v1 = privCoin_v1.getPublicCoin().getValue();
+        const CBigNum serialNumber_v1 = privCoin_v1.getSerialNumber();
+
+        // mint a v2 coin
+        libzerocoin::PrivateCoin privCoin_v2(ZCParams_v2, libzerocoin::CoinDenomination::ZQ_ONE, true);
+        const CBigNum randomness_v2 = privCoin_v2.getRandomness();
+        const CBigNum pubCoinValue_v2 = privCoin_v2.getPublicCoin().getValue();
+        const CBigNum serialNumber_v2 = privCoin_v2.getSerialNumber();
+
+        // get a random msghash
+        const uint256 msghash = CBigNum::randKBitBignum(256).getuint256();
+
+        // sign the msghash with the randomness of the v1 coin
+        libzerocoin::CoinRandomnessSchnorrSignature crss_v1(ZCParams_v1, randomness_v1, msghash);
+        CDataStream ser_crss_v1(SER_NETWORK, PROTOCOL_VERSION);
+        ser_crss_v1 << crss_v1;
+
+        // sign the msghash with the randomness of the v2 coin
+        libzerocoin::CoinRandomnessSchnorrSignature crss_v2(ZCParams_v2, randomness_v2, msghash);
+        CDataStream ser_crss_v2(SER_NETWORK, PROTOCOL_VERSION);
+        ser_crss_v2 << crss_v2;
+
+        // unserialize the v1 signature into a fresh object and verify it
+        libzerocoin::CoinRandomnessSchnorrSignature new_crss_v1(ser_crss_v1);
+        BOOST_CHECK_MESSAGE(
+                new_crss_v1.Verify(ZCParams_v1, serialNumber_v1, pubCoinValue_v1, msghash),
+                "Failed to verify schnorr signature with v1 coin"
+                );
+
+        // unserialize the v2 signature into a fresh object and verify it
+        libzerocoin::CoinRandomnessSchnorrSignature new_crss_v2(ser_crss_v2);
+        BOOST_CHECK_MESSAGE(
+                new_crss_v2.Verify(ZCParams_v2, serialNumber_v2, pubCoinValue_v2, msghash),
+                "Failed to verify schnorr signature with v2 coin"
+                );
+
+        // verify failure on different msghash
+        uint256 msghash2;
+        do {
+            msghash2 = CBigNum::randKBitBignum(256).getuint256();
+        } while (msghash2 == msghash);
+        BOOST_CHECK_MESSAGE(
+            !new_crss_v1.Verify(ZCParams_v1, serialNumber_v1, pubCoinValue_v1, msghash2),
+            "schnorr signature with v1 coin verifies on wrong msghash"
+            );
+        BOOST_CHECK_MESSAGE(
+            !new_crss_v2.Verify(ZCParams_v2, serialNumber_v2, pubCoinValue_v2, msghash2),
+            "schnorr signature with v2 coin verifies on wrong msghash"
+            );
+
+        // verify failure swapping serials
+        BOOST_CHECK_MESSAGE(
+            !new_crss_v1.Verify(ZCParams_v1, serialNumber_v2, pubCoinValue_v1, msghash),
+            "schnorr signature with v1 coin verifies on wrong serial"
+            );
+        BOOST_CHECK_MESSAGE(
+            !new_crss_v2.Verify(ZCParams_v2, serialNumber_v1, pubCoinValue_v2, msghash),
+            "schnorr signature with v2 coin verifies on wrong serial"
+            );
+
+        // verify failure swapping public coins
+        BOOST_CHECK_MESSAGE(
+            !new_crss_v1.Verify(ZCParams_v1, serialNumber_v1, pubCoinValue_v2, msghash),
+            "schnorr signature with v1 coin verifies on wrong public coin value"
+            );
+        BOOST_CHECK_MESSAGE(
+            !new_crss_v2.Verify(ZCParams_v2, serialNumber_v2, pubCoinValue_v1, msghash),
+            "schnorr signature with v2 coin verifies on wrong public coin value"
+            );
+
+    }
+
+}
+
 BOOST_AUTO_TEST_CASE(zerocoin_public_spend_test)
 {
     SelectParams(CBaseChainParams::MAIN);
-    libzerocoin::ZerocoinParams *ZCParams = Params().Zerocoin_Params(false);
-    (void)ZCParams;
+    libzerocoin::ZerocoinParams *ZCParams_v1 = Params().Zerocoin_Params(true);
+    libzerocoin::ZerocoinParams *ZCParams_v2 = Params().Zerocoin_Params(false);
+    (void)ZCParams_v1;
+    (void)ZCParams_v2;
 
-    libzerocoin::PrivateCoin privCoin(ZCParams, libzerocoin::CoinDenomination::ZQ_ONE, true);
-    const CPrivKey privKey = privCoin.getPrivKey();
+    // create v1 coin
+    CBigNum s = CBigNum::randBignum(ZCParams_v1->coinCommitmentGroup.groupOrder);
+    CBigNum r = CBigNum::randBignum(ZCParams_v1->coinCommitmentGroup.groupOrder);
+    CBigNum c = ZCParams_v1->coinCommitmentGroup.g.pow_mod(s, ZCParams_v1->coinCommitmentGroup.modulus).mul_mod(
+            ZCParams_v1->coinCommitmentGroup.h.pow_mod(r, ZCParams_v1->coinCommitmentGroup.modulus), ZCParams_v1->coinCommitmentGroup.modulus);
+    for (uint32_t attempt = 0; attempt < MAX_COINMINT_ATTEMPTS; attempt++) {
+        if (c.isPrime(ZEROCOIN_MINT_PRIME_PARAM)) break;
+        CBigNum r_delta = CBigNum::randBignum(ZCParams_v1->coinCommitmentGroup.groupOrder);
+        r = (r + r_delta) % ZCParams_v1->coinCommitmentGroup.groupOrder;
+        c = ZCParams_v1->coinCommitmentGroup.g.pow_mod(s, ZCParams_v1->coinCommitmentGroup.modulus).mul_mod(
+                ZCParams_v1->coinCommitmentGroup.h.pow_mod(r, ZCParams_v1->coinCommitmentGroup.modulus), ZCParams_v1->coinCommitmentGroup.modulus);
+    }
+    BOOST_CHECK_MESSAGE(c.isPrime(ZEROCOIN_MINT_PRIME_PARAM), "Unable to mint v1 coin");
+    libzerocoin::PrivateCoin privCoin_v1(ZCParams_v1, libzerocoin::CoinDenomination::ZQ_ONE, s, r);
 
-    CZerocoinMint mint = CZerocoinMint(
-            privCoin.getPublicCoin().getDenomination(),
-            privCoin.getPublicCoin().getValue(),
-            privCoin.getRandomness(),
-            privCoin.getSerialNumber(),
+    CZerocoinMint mint_v1 = CZerocoinMint(
+            privCoin_v1.getPublicCoin().getDenomination(),
+            privCoin_v1.getPublicCoin().getValue(),
+            privCoin_v1.getRandomness(),
+            privCoin_v1.getSerialNumber(),
             false,
-            privCoin.getVersion(),
+            1,
             nullptr);
-    mint.SetPrivKey(privKey);
 
+    // create v2 coin
+    libzerocoin::PrivateCoin privCoin_v2(ZCParams_v2, libzerocoin::CoinDenomination::ZQ_ONE, true);
+    CPrivKey privKey = privCoin_v2.getPrivKey();
 
-    // Mint tx
-    CTransaction prevTx;
+    CZerocoinMint mint_v2 = CZerocoinMint(
+            privCoin_v2.getPublicCoin().getDenomination(),
+            privCoin_v2.getPublicCoin().getValue(),
+            privCoin_v2.getRandomness(),
+            privCoin_v2.getSerialNumber(),
+            false,
+            privCoin_v2.getVersion(),
+            &privKey);
 
-    CScript scriptSerializedCoin = CScript()
-    << OP_ZEROCOINMINT << privCoin.getPublicCoin().getValue().getvch().size() << privCoin.getPublicCoin().getValue().getvch();
-    CTxOut out = CTxOut(libzerocoin::ZerocoinDenominationToAmount(privCoin.getPublicCoin().getDenomination()), scriptSerializedCoin);
-    prevTx.vout.push_back(out);
+    // Mint txs
+    CTransaction prevTx_v1;
+    CTransaction prevTx_v2;
 
-    mint.SetOutputIndex(0);
-    mint.SetTxHash(prevTx.GetHash());
+    CScript scriptSerializedCoin_v1 = CScript()
+    << OP_ZEROCOINMINT << privCoin_v1.getPublicCoin().getValue().getvch().size() << privCoin_v1.getPublicCoin().getValue().getvch();
+    CTxOut out_v1 = CTxOut(libzerocoin::ZerocoinDenominationToAmount(privCoin_v1.getPublicCoin().getDenomination()), scriptSerializedCoin_v1);
+    prevTx_v1.vout.push_back(out_v1);
 
-    // Spend tx
-    CMutableTransaction tx;
-    tx.vout.resize(1);
-    tx.vout[0].nValue = 1*CENT;
-    tx.vout[0].scriptPubKey = GetScriptForDestination(CBitcoinAddress("D9Ti4LEhF1n6dR2hGd2SyNADD51AVgva6q").Get());
+    CScript scriptSerializedCoin_v2 = CScript()
+    << OP_ZEROCOINMINT << privCoin_v2.getPublicCoin().getValue().getvch().size() << privCoin_v2.getPublicCoin().getValue().getvch();
+    CTxOut out_v2 = CTxOut(libzerocoin::ZerocoinDenominationToAmount(privCoin_v2.getPublicCoin().getDenomination()), scriptSerializedCoin_v2);
+    prevTx_v2.vout.push_back(out_v2);
 
-    CTxIn in;
-    if (!ZWGRModule::createInput(in, mint, tx.GetHash())){
-        BOOST_CHECK_MESSAGE(false, "Failed to create zc input");
-    }
+    mint_v1.SetOutputIndex(0);
+    mint_v1.SetTxHash(prevTx_v1.GetHash());
 
-    PublicCoinSpend publicSpend(ZCParams);
-    if (!ZWGRModule::validateInput(in, out, tx, publicSpend)){
-        BOOST_CHECK_MESSAGE(false, "Failed to validate zc input");
-    }
+    mint_v2.SetOutputIndex(0);
+    mint_v2.SetTxHash(prevTx_v2.GetHash());
 
-    PublicCoinSpend publicSpendTest(ZCParams);
-    BOOST_CHECK_MESSAGE(ZWGRModule::parseCoinSpend(in, tx, out, publicSpendTest), "Failed to parse public spend");
-    libzerocoin::CoinSpend *spend = &publicSpendTest;
+    // Spend txs
+    CMutableTransaction tx1, tx2, tx3;
+    tx1.vout.resize(1);
+    tx1.vout[0].nValue = 1*CENT;
+    tx1.vout[0].scriptPubKey = GetScriptForDestination(CBitcoinAddress("D9Ti4LEhF1n6dR2hGd2SyNADD51AVgva6q").Get());
+    tx2.vout.resize(1);
+    tx2.vout[0].nValue = 1*CENT;
+    tx2.vout[0].scriptPubKey = GetScriptForDestination(CBitcoinAddress("D9Ti4LEhF1n6dR2hGd2SyNADD51AVgva6q").Get());
+    tx3.vout.resize(1);
+    tx3.vout[0].nValue = 1*CENT;
+    tx3.vout[0].scriptPubKey = GetScriptForDestination(CBitcoinAddress("D9Ti4LEhF1n6dR2hGd2SyNADD51AVgva6q").Get());
 
-    BOOST_CHECK_MESSAGE(publicSpendTest.HasValidSignature(), "Failed to validate public spend signature");
-    BOOST_CHECK_MESSAGE(spend->HasValidSignature(), "Failed to validate spend signature");
+    CTxIn in1, in2, in3;
 
-    // Verify that fails with a different denomination
-    in.nSequence = 500;
-    PublicCoinSpend publicSpend2(ZCParams);
-    BOOST_CHECK_MESSAGE(!ZWGRModule::validateInput(in, out, tx, publicSpend2), "Different denomination");
+    // check spendVersion = 3 for v2 coins
+    // -----------------------------------
+    int spendVersion = 3;
+    BOOST_CHECK_MESSAGE(ZWGRModule::createInput(in1, mint_v2, tx1.GetHash(), spendVersion),
+            "Failed to create zc input for mint v2 and spendVersion 3");
+
+    std::cout << "Spend v3 size: " << ::GetSerializeSize(in1, SER_NETWORK, PROTOCOL_VERSION) << " bytes" << std::endl;
+
+    PublicCoinSpend publicSpend1(ZCParams_v2);
+    BOOST_CHECK_MESSAGE(ZWGRModule::validateInput(in1, out_v2, tx1, publicSpend1),
+            "Failed to validate zc input for mint v2 and spendVersion 3");
+
+    // Verify that it fails with a different denomination
+    in1.nSequence = 500;
+    PublicCoinSpend publicSpend1b(ZCParams_v2);
+    BOOST_CHECK_MESSAGE(!ZWGRModule::validateInput(in1, out_v2, tx1, publicSpend1b), "Different denomination for mint v2 and spendVersion 3");
+
+    // check spendVersion = 4 for v2 coins
+    // -----------------------------------
+    spendVersion = 4;
+    BOOST_CHECK_MESSAGE(ZWGRModule::createInput(in2, mint_v2, tx2.GetHash(), spendVersion),
+            "Failed to create zc input for mint v2 and spendVersion 4");
+
+    std::cout << "Spend v4 (coin v2) size: " << ::GetSerializeSize(in2, SER_NETWORK, PROTOCOL_VERSION) << " bytes" << std::endl;
+
+    PublicCoinSpend publicSpend2(ZCParams_v2);
+    BOOST_CHECK_MESSAGE(ZWGRModule::validateInput(in2, out_v2, tx2, publicSpend2),
+            "Failed to validate zc input for mint v2 and spendVersion 4");
+
+    // Verify that it fails with a different denomination
+    in2.nSequence = 500;
+    PublicCoinSpend publicSpend2b(ZCParams_v2);
+    BOOST_CHECK_MESSAGE(!ZWGRModule::validateInput(in2, out_v2, tx2, publicSpend2b), "Different denomination for mint v2 and spendVersion 4");
+
+    // check spendVersion = 4 for v1 coins
+    // -----------------------------------
+    BOOST_CHECK_MESSAGE(ZWGRModule::createInput(in3, mint_v1, tx3.GetHash(), spendVersion),
+            "Failed to create zc input for mint v1 and spendVersion 4");
+
+    std::cout << "Spend v4 (coin v1) size: " << ::GetSerializeSize(in3, SER_NETWORK, PROTOCOL_VERSION) << " bytes" << std::endl;
+
+    PublicCoinSpend publicSpend3(ZCParams_v1);
+    BOOST_CHECK_MESSAGE(ZWGRModule::validateInput(in3, out_v1, tx3, publicSpend3),
+            "Failed to validate zc input for mint v1 and spendVersion 4");
+
+    // Verify that it fails with a different denomination
+    in3.nSequence = 500;
+    PublicCoinSpend publicSpend3b(ZCParams_v1);
+    BOOST_CHECK_MESSAGE(!ZWGRModule::validateInput(in3, out_v1, tx3, publicSpend3b), "Different denomination for mint v1 and spendVersion 4");
 
 }
 

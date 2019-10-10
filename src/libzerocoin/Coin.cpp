@@ -295,7 +295,15 @@ bool IsValidSerial(const ZerocoinParams* params, const CBigNum& bnSerial)
 
 bool IsValidCommitmentToCoinRange(const ZerocoinParams* params, const CBigNum& bnCommitment)
 {
-    return bnCommitment > CBigNum(0) && bnCommitment < params->serialNumberSoKCommitmentGroup.modulus;
+    return bnCommitment > BN_ZERO && bnCommitment < params->serialNumberSoKCommitmentGroup.modulus;
+}
+
+
+CBigNum ExtractSerialFromPubKey(const CPubKey pubkey)
+{
+    uint256 hashedPubkey = Hash(pubkey.begin(), pubkey.end()) >> PrivateCoin::V2_BITSHIFT;
+    uint256 uintSerial = (uint256(0xF) << (256 - PrivateCoin::V2_BITSHIFT)) | hashedPubkey;
+    return CBigNum(uintSerial);
 }
 
 

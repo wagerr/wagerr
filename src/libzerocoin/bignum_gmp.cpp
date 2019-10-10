@@ -86,7 +86,7 @@ CBigNum CBigNum::randKBitBignum(const uint32_t k)
     CBigNum ret(buf);
     if (ret < 0)
         mpz_neg(ret.bn, ret.bn);
-    return ret % (CBigNum(1) << k);
+    return ret % (BN_ONE << k);
 }
 
 /**Returns the size in bits of the underlying bignum.
@@ -116,7 +116,7 @@ unsigned int CBigNum::getuint() const
 int CBigNum::getint() const
 {
     unsigned long n = getulong();
-    if (mpz_cmp(bn, CBigNum(0).bn) >= 0) {
+    if (mpz_cmp(bn, BN_ZERO.bn) >= 0) {
         return (n > (unsigned long)std::numeric_limits<int>::max() ? std::numeric_limits<int>::max() : n);
     } else {
         return (n > (unsigned long)std::numeric_limits<int>::max() ? std::numeric_limits<int>::min() : -(int)n);
@@ -156,7 +156,7 @@ void CBigNum::setvch(const std::vector<unsigned char>& vch)
 
 std::vector<unsigned char> CBigNum::getvch() const
 {
-    if (mpz_cmp(bn, CBigNum(0).bn) == 0) {
+    if (mpz_cmp(bn, BN_ZERO.bn) == 0) {
         return std::vector<unsigned char>(0);
     }
     size_t size = (mpz_sizeinbase (bn, 2) + CHAR_BIT-1) / CHAR_BIT;
@@ -238,7 +238,7 @@ CBigNum CBigNum::mul_mod(const CBigNum& b, const CBigNum& m) const
 CBigNum CBigNum::pow_mod(const CBigNum& e, const CBigNum& m) const
 {
     CBigNum ret;
-    if (e > CBigNum(0) && mpz_odd_p(m.bn))
+    if (e > BN_ZERO && mpz_odd_p(m.bn))
         mpz_powm_sec (ret.bn, bn, e.bn, m.bn);
     else
         mpz_powm (ret.bn, bn, e.bn, m.bn);
@@ -298,12 +298,12 @@ bool CBigNum::isPrime(const int checks) const
 
 bool CBigNum::isOne() const
 {
-    return mpz_cmp(bn, CBigNum(1).bn) == 0;
+    return mpz_cmp(bn, BN_ONE.bn) == 0;
 }
 
 bool CBigNum::operator!() const
 {
-    return mpz_cmp(bn, CBigNum(0).bn) == 0;
+    return mpz_cmp(bn, BN_ZERO.bn) == 0;
 }
 
 CBigNum& CBigNum::operator+=(const CBigNum& b)
@@ -339,13 +339,13 @@ CBigNum& CBigNum::operator>>=(unsigned int shift)
 CBigNum& CBigNum::operator++()
 {
     // prefix operator
-    mpz_add(bn, bn, CBigNum(1).bn);
+    mpz_add(bn, bn, BN_ONE.bn);
     return *this;
 }
 
 CBigNum& CBigNum::operator--()
 {
     // prefix operator
-    mpz_sub(bn, bn, CBigNum(1).bn);
+    mpz_sub(bn, bn, BN_ONE.bn);
     return *this;
 }
