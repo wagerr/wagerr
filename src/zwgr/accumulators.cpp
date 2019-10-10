@@ -892,33 +892,35 @@ std::map<libzerocoin::CoinDenomination, int> GetMintMaturityHeight()
     std::map<libzerocoin::CoinDenomination, std::pair<int, int > > mapDenomMaturity;
     for (auto denom : libzerocoin::zerocoinDenomList)
         mapDenomMaturity.insert(std::make_pair(denom, std::make_pair(0, 0)));
+    {
+        LOCK(cs_main);
+        int nConfirmedHeight = chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations();
 
-    int nConfirmedHeight = chainActive.Height() - Params().Zerocoin_MintRequiredConfirmations();
+        // A mint need to get to at least the min maturity height before it will spend.
+        int nMinimumMaturityHeight = nConfirmedHeight - (nConfirmedHeight % 10);
+        CBlockIndex* pindex = chainActive[nConfirmedHeight];
 
-    // A mint need to get to at least the min maturity height before it will spend.
-    int nMinimumMaturityHeight = nConfirmedHeight - (nConfirmedHeight % 10);
-    CBlockIndex* pindex = chainActive[nConfirmedHeight];
+        while (pindex && pindex->nHeight > Params().Zerocoin_StartHeight()) {
+            bool isFinished = true;
+            for (auto denom : libzerocoin::zerocoinDenomList) {
+                //If the denom has not already had a mint added to it, then see if it has a mint added on this block
+                if (mapDenomMaturity.at(denom).first < Params().Zerocoin_RequiredAccumulation()) {
+                    mapDenomMaturity.at(denom).first += count(pindex->vMintDenominationsInBlock.begin(),
+                                                              pindex->vMintDenominationsInBlock.end(), denom);
 
-    while (pindex && pindex->nHeight > Params().Zerocoin_StartHeight()) {
-        bool isFinished = true;
-        for (auto denom : libzerocoin::zerocoinDenomList) {
-            //If the denom has not already had a mint added to it, then see if it has a mint added on this block
-            if (mapDenomMaturity.at(denom).first < Params().Zerocoin_RequiredAccumulation()) {
-                mapDenomMaturity.at(denom).first += count(pindex->vMintDenominationsInBlock.begin(),
-                                                          pindex->vMintDenominationsInBlock.end(), denom);
+                    //if mint was found then record this block as the first block that maturity occurs.
+                    if (mapDenomMaturity.at(denom).first >= Params().Zerocoin_RequiredAccumulation())
+                        mapDenomMaturity.at(denom).second = std::min(pindex->nHeight, nMinimumMaturityHeight);
 
-                //if mint was found then record this block as the first block that maturity occurs.
-                if (mapDenomMaturity.at(denom).first >= Params().Zerocoin_RequiredAccumulation())
-                    mapDenomMaturity.at(denom).second = std::min(pindex->nHeight, nMinimumMaturityHeight);
-
-                //Signal that we are finished
-                isFinished = false;
+                    //Signal that we are finished
+                    isFinished = false;
+                }
             }
-        }
 
-        if (isFinished)
-            break;
-        pindex = chainActive[pindex->nHeight - 1];
+            if (isFinished)
+                break;
+            pindex = chainActive[pindex->nHeight - 1];
+        }
     }
 
     //Generate final map

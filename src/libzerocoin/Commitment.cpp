@@ -66,7 +66,8 @@ CommitmentProofOfKnowledge::CommitmentProofOfKnowledge(const IntegerGroupParams*
     uint32_t randomSize = COMMITMENT_EQUALITY_CHALLENGE_SIZE + COMMITMENT_EQUALITY_SECMARGIN +
                           std::max(std::max(this->ap->modulus.bitSize(), this->bp->modulus.bitSize()),
                                    std::max(this->ap->groupOrder.bitSize(), this->bp->groupOrder.bitSize()));
-    CBigNum maxRange = (CBigNum(2).pow(randomSize) - CBigNum(1));
+
+    CBigNum maxRange = (BN_TWO.pow(randomSize) - BN_ONE);
 
     r1 = CBigNum::randBignum(maxRange);
     r2 = CBigNum::randBignum(maxRange);
@@ -114,11 +115,11 @@ bool CommitmentProofOfKnowledge::Verify(const CBigNum& A, const CBigNum& B) cons
     if ((uint32_t)this->S1.bitSize() > maxSize ||
             (uint32_t)this->S2.bitSize() > maxSize ||
             (uint32_t)this->S3.bitSize() > maxSize ||
-            this->S1 < CBigNum(0) ||
-            this->S2 < CBigNum(0) ||
-            this->S3 < CBigNum(0) ||
-            this->challenge < CBigNum(0) ||
-            this->challenge > (CBigNum(2).pow(COMMITMENT_EQUALITY_CHALLENGE_SIZE) - CBigNum(1))) {
+            this->S1 < BN_ZERO ||
+            this->S2 < BN_ZERO ||
+            this->S3 < BN_ZERO ||
+            this->challenge < BN_ZERO ||
+            this->challenge > (BN_TWO.pow(COMMITMENT_EQUALITY_CHALLENGE_SIZE) - BN_ONE)) {
         // Invalid inputs. Reject.
         return false;
     }

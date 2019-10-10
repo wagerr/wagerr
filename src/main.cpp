@@ -1012,6 +1012,10 @@ bool CheckPublicCoinSpendEnforced(int blockHeight, bool isPublicSpend) {
     return true;
 }
 
+bool CheckPublicCoinSpendVersion(int blockHeight, int version) {
+    return version >= Params().Zerocoin_PublicSpendVersion(blockHeight);
+}
+
 bool ContextualCheckZerocoinSpend(const CTransaction& tx, const libzerocoin::CoinSpend* spend, CBlockIndex* pindex, const uint256& hashBlock)
 {
     if(!ContextualCheckZerocoinSpendNoSerialCheck(tx, spend, pindex, hashBlock)){
@@ -1051,17 +1055,16 @@ bool ContextualCheckZerocoinSpendNoSerialCheck(const CTransaction& tx, const lib
         }
     }
 
-    bool v1Serial = spend->getVersion() < libzerocoin::PrivateCoin::PUBKEY_VERSION;
-    if (pindex->nHeight >= Params().Zerocoin_Block_Public_Spend_Enabled()) {
-        //Reject V1 old serials.
-        if (v1Serial) {
-            return error("%s : zWGR v1 serial spend not spendable, serial %s, tx %s\n", __func__,
-                         spend->getCoinSerialNumber().GetHex(), tx.GetHash().GetHex());
-        }
+    // Check spend version
+    if (pindex->nHeight >= Params().Zerocoin_Block_Public_Spend_Enabled() &&
+            !CheckPublicCoinSpendVersion(pindex->nHeight, (int)spend->getVersion())) {
+        return error("%s: Invalid public spend version for tx %s", __func__, tx.GetHash().GetHex());
     }
 
+    bool fUseV1Params = spend->getCoinVersion() < libzerocoin::PrivateCoin::PUBKEY_VERSION;
+
     //Reject serial's that are not in the acceptable value range
-    if (!spend->HasValidSerial(Params().Zerocoin_Params(v1Serial)))  {
+    if (!spend->HasValidSerial(Params().Zerocoin_Params(fUseV1Params)))  {
         // Up until this block our chain was not checking serials correctly..
         if (!isBlockBetweenFakeSerialAttackRange(pindex->nHeight))
             return error("%s : zWGR spend with serial %s from tx %s is not in valid range\n", __func__,
