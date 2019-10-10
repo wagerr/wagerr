@@ -75,9 +75,9 @@ void CoinWitnessCacheData::SetNull()
     nHeightCheckpoint = 0;
     nHeightAccStart = 0;
     nHeightAccEnd = 0;
-    coinAmount = CBigNum(0);
+    coinAmount = BN_ZERO;
     coinDenom = libzerocoin::CoinDenomination::ZQ_ERROR;
-    accumulatorAmount = CBigNum(0);
+    accumulatorAmount = BN_ZERO;
     accumulatorDenom = libzerocoin::CoinDenomination::ZQ_ERROR;
 
 }

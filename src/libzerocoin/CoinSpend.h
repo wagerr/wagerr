@@ -54,8 +54,7 @@ public:
         strm >> *this;
 
         //Need to reset some parameters if v2
-        int serialVersion = ExtractVersionFromSerial(coinSerialNumber);
-        if (serialVersion >= PrivateCoin::PUBKEY_VERSION) {
+        if (getCoinVersion() >= PrivateCoin::PUBKEY_VERSION) {
             accumulatorPoK = AccumulatorProofOfKnowledge(&paramsV2->accumulatorParams);
             serialNumberSoK = SerialNumberSignatureOfKnowledge(paramsV2);
             commitmentPoK = CommitmentProofOfKnowledge(&paramsV2->serialNumberSoKCommitmentGroup, &paramsV2->accumulatorParams.accumulatorPoKCommitmentGroup);
@@ -118,6 +117,7 @@ public:
     CBigNum getAccCommitment() const { return accCommitmentToCoinValue; }
     CBigNum getSerialComm() const { return serialCommitmentToCoinValue; }
     uint8_t getVersion() const { return version; }
+    int getCoinVersion() const { return libzerocoin::ExtractVersionFromSerial(coinSerialNumber); }
     CPubKey getPubKey() const { return pubkey; }
     SpendType getSpendType() const { return spendType; }
     std::vector<unsigned char> getSignature() const { return vchSig; }
@@ -130,6 +130,7 @@ public:
     bool HasValidSignature() const;
     void setTxOutHash(uint256 txOutHash) { this->ptxHash = txOutHash; };
     void setDenom(libzerocoin::CoinDenomination denom) { this->denomination = denom; }
+    void setPubKey(CPubKey pkey, bool fUpdateSerial = false);
 
     CBigNum CalculateValidSerial(ZerocoinParams* params);
     std::string ToString() const;

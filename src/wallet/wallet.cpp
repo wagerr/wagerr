@@ -1975,6 +1975,9 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
             if (!out.tx->IsInMainChain())
                 continue;
 
+            if (!out.tx->hashBlock)
+                continue;
+
             CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
             //check for maturity (min age/depth)
             if (!Params().HasStakeMinAgeOrDepth(blockHeight, GetAdjustedTime(), utxoBlock->nHeight, utxoBlock->GetBlockTime()))
@@ -4162,6 +4165,17 @@ bool CWallet::MintsToInputVectorPublicSpend(std::map<CBigNum, CZerocoinMint>& ma
     // Default error status if not changed below
     receipt.SetStatus(_("Transaction Mint Started"), ZWGR_TXMINT_GENERAL);
 
+    // Get the chain tip to determine the active public spend version
+    int nHeight = 0;
+    {
+        LOCK(cs_main);
+        nHeight = chainActive.Height();
+    }
+    if (!nHeight)
+        return error("%s: Unable to get chain tip height", __func__);
+
+    int spendVersion = Params().Zerocoin_PublicSpendVersion(nHeight);
+
     int nLockAttempts = 0;
     while (nLockAttempts < 100) {
         TRY_LOCK(zwgrTracker->cs_spendcache, lockSpendcache);
@@ -4211,7 +4225,7 @@ bool CWallet::MintsToInputVectorPublicSpend(std::map<CBigNum, CZerocoinMint>& ma
 
             mint.SetOutputIndex(outputIndex);
             CTxIn in;
-            if(!ZWGRModule::createInput(in, mint, hashTxOut)){
+            if(!ZWGRModule::createInput(in, mint, hashTxOut, spendVersion)) {
                 receipt.SetStatus(_("Cannot create public spend input"), ZWGR_TXMINT_GENERAL);
                 return false;
             }
@@ -4433,6 +4447,7 @@ bool CWallet::CreateZerocoinSpendTransaction(
             }
 
             //hash with only the output info in it to be used in Signature of Knowledge
+            // and in CoinRandomness Schnorr Signature
             uint256 hashTxOut = txNew.GetHash();
 
             CBlockIndex* pindexCheckpoint = nullptr;

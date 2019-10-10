@@ -31,7 +31,7 @@ AccumulatorProofOfKnowledge::AccumulatorProofOfKnowledge(const AccumulatorAndPro
     CBigNum r = commitmentToCoin.getRandomness();
 
     CBigNum aM_4 = params->accumulatorModulus/CBigNum((long)4);
-    CBigNum aR = CBigNum(2).pow(params->k_prime + params->k_dprime);
+    CBigNum aR = BN_TWO.pow(params->k_prime + params->k_dprime);
     CBigNum aR_t_aM_4 = aM_4 * aR;
 
     CBigNum r_1 = CBigNum::randBignum(aM_4);
@@ -43,7 +43,7 @@ AccumulatorProofOfKnowledge::AccumulatorProofOfKnowledge(const AccumulatorAndPro
     this->C_r = g_n.pow_mod(r_2, params->accumulatorModulus) * h_n.pow_mod(r_3, params->accumulatorModulus);
 
     CBigNum r_alpha = CBigNum::randBignum(params->maxCoinValue * aR);
-    if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
+    if(!(CBigNum::randBignum(BN_THREE) % 2)) {
         r_alpha = 0-r_alpha;
     }
 
@@ -54,24 +54,24 @@ AccumulatorProofOfKnowledge::AccumulatorProofOfKnowledge(const AccumulatorAndPro
     CBigNum r_xi = CBigNum::randBignum(params->accumulatorPoKCommitmentGroup.modulus);
 
     CBigNum r_epsilon =  CBigNum::randBignum(aR_t_aM_4);
-    if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
+    if(!(CBigNum::randBignum(BN_THREE) % 2)) {
         r_epsilon = 0-r_epsilon;
     }
     CBigNum r_eta = CBigNum::randBignum(aR_t_aM_4);
-    if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
+    if(!(CBigNum::randBignum(BN_THREE) % 2)) {
         r_eta = 0-r_eta;
     }
     CBigNum r_zeta = CBigNum::randBignum(aR_t_aM_4);
-    if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
+    if(!(CBigNum::randBignum(BN_THREE) % 2)) {
         r_zeta = 0-r_zeta;
     }
 
     CBigNum r_beta = CBigNum::randBignum(aR_t_aM_4 * params->accumulatorPoKCommitmentGroup.modulus);
-    if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
+    if(!(CBigNum::randBignum(BN_THREE) % 2)) {
         r_beta = 0-r_beta;
     }
     CBigNum r_delta = CBigNum::randBignum(aR_t_aM_4 * params->accumulatorPoKCommitmentGroup.modulus);
-    if(!(CBigNum::randBignum(CBigNum(3)) % 2)) {
+    if(!(CBigNum::randBignum(BN_THREE) % 2)) {
         r_delta = 0-r_delta;
     }
 
@@ -136,7 +136,7 @@ bool AccumulatorProofOfKnowledge:: Verify(const Accumulator& a, const CBigNum& v
     bool result_t3 = (t_3 == t_3_prime);
     bool result_t4 = (t_4 == t_4_prime);
 
-    bool result_range = ((s_alpha >= -(params->maxCoinValue * CBigNum(2).pow(params->k_prime + params->k_dprime + 1))) && (s_alpha <= (params->maxCoinValue * CBigNum(2).pow(params->k_prime + params->k_dprime + 1))));
+    bool result_range = ((s_alpha >= -(params->maxCoinValue * BN_TWO.pow(params->k_prime + params->k_dprime + 1))) && (s_alpha <= (params->maxCoinValue * BN_TWO.pow(params->k_prime + params->k_dprime + 1))));
 
     return result_st1 && result_st2 && result_st3 && result_t1 && result_t2 && result_t3 && result_t4 && result_range;
 }
