@@ -463,7 +463,7 @@ void CMasternodePayments::ProcessMessageMasternodePayments(CNode* pfrom, std::st
 
         // reject old signatures 6000 blocks after hard-fork
         if (winner.nMessVersion != MessageVersion::MESS_VER_HASH && Params().NewSigsActive(winner.nBlockHeight - 6000)) {
-            LogPrintf("%s : nMessVersion=%d not accepted anymore at block %d", __func__, winner.nMessVersion, nHeight);
+            LogPrintf("%s : nMessVersion=%d not accepted anymore at block %d\n", __func__, winner.nMessVersion, nHeight);
             return;
         }
 
@@ -756,7 +756,7 @@ bool CMasternodePayments::ProcessBlock(int nBlockHeight)
     CKey keyMasternode;
 
     if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, keyMasternode, pubKeyMasternode)) {
-        LogPrint("masternode","CMasternodePayments::ProcessBlock() - Error upon calling SetKey.\n");
+        LogPrint("masternode","CMasternodePayments::ProcessBlock() - Error upon calling GetKeysFromSecret.\n");
         return false;
     }
 
