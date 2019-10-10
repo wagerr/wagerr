@@ -195,6 +195,8 @@ bool CBase58Data::SetString(const char* psz, unsigned int nVersionBytes)
 
 bool CBase58Data::SetString(const std::string& str)
 {
+    if (str.empty())
+        return false;
     return SetString(str.c_str());
 }
 
