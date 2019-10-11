@@ -919,8 +919,9 @@ void WalletModel::getOutputs(const std::vector<COutPoint>& vOutpoints, std::vect
     LOCK2(cs_main, wallet->cs_wallet);
     for (const COutPoint& outpoint : vOutpoints) {
         if (!wallet->mapWallet.count(outpoint.hash)) continue;
-        int nDepth = wallet->mapWallet[outpoint.hash].GetDepthInMainChain();
-        if (nDepth < 0) continue;
+        bool fConflicted;
+        const int nDepth = wallet->mapWallet[outpoint.hash].GetDepthAndMempool(fConflicted);
+        if (nDepth < 0 || fConflicted) continue;
         COutput out(&wallet->mapWallet[outpoint.hash], outpoint.n, nDepth, true);
         vOutputs.push_back(out);
     }
@@ -945,8 +946,9 @@ void WalletModel::listCoins(std::map<QString, std::vector<COutput> >& mapCoins) 
     // add locked coins
     for (const COutPoint& outpoint : vLockedCoins) {
         if (!wallet->mapWallet.count(outpoint.hash)) continue;
-        int nDepth = wallet->mapWallet[outpoint.hash].GetDepthInMainChain();
-        if (nDepth < 0) continue;
+        bool fConflicted;
+        int nDepth = wallet->mapWallet[outpoint.hash].GetDepthAndMempool(fConflicted);
+        if (nDepth < 0 || fConflicted) continue;
         COutput out(&wallet->mapWallet[outpoint.hash], outpoint.n, nDepth, true);
         if (outpoint.n < out.tx->vout.size() && wallet->IsMine(out.tx->vout[outpoint.n]) == ISMINE_SPENDABLE)
             vCoins.push_back(out);
