@@ -34,14 +34,19 @@ QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
         else
             return tr("Open until %1").arg(GUIUtil::dateTimeStr(wtx.nLockTime));
     } else {
-        int signatures = wtx.GetTransactionLockSignatures();
+        const int signatures = wtx.GetTransactionLockSignatures();
         QString strUsingIX = "";
+        bool fConflicted;
+        const int nDepth = wtx.GetDepthAndMempool(fConflicted);
+
+        if (nDepth < 0 || fConflicted)
+            return tr("conflicted");
+
+        const bool isOffline = (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0);
+
         if (signatures >= 0) {
             if (signatures >= SWIFTTX_SIGNATURES_REQUIRED) {
-                int nDepth = wtx.GetDepthInMainChain();
-                if (nDepth < 0)
-                    return tr("conflicted");
-                else if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0)
+                if (isOffline)
                     return tr("%1/offline (verified via SwiftX)").arg(nDepth);
                 else if (nDepth < 6)
                     return tr("%1/confirmed (verified via SwiftX)").arg(nDepth);
@@ -49,20 +54,14 @@ QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
                     return tr("%1 confirmations (verified via SwiftX)").arg(nDepth);
             } else {
                 if (!wtx.IsTransactionLockTimedOut()) {
-                    int nDepth = wtx.GetDepthInMainChain();
-                    if (nDepth < 0)
-                        return tr("conflicted");
-                    else if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0)
+                    if (isOffline)
                         return tr("%1/offline (SwiftX verification in progress - %2 of %3 signatures)").arg(nDepth).arg(signatures).arg(SWIFTTX_SIGNATURES_TOTAL);
                     else if (nDepth < 6)
                         return tr("%1/confirmed (SwiftX verification in progress - %2 of %3 signatures )").arg(nDepth).arg(signatures).arg(SWIFTTX_SIGNATURES_TOTAL);
                     else
                         return tr("%1 confirmations (SwiftX verification in progress - %2 of %3 signatures)").arg(nDepth).arg(signatures).arg(SWIFTTX_SIGNATURES_TOTAL);
                 } else {
-                    int nDepth = wtx.GetDepthInMainChain();
-                    if (nDepth < 0)
-                        return tr("conflicted");
-                    else if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0)
+                    if (isOffline)
                         return tr("%1/offline (SwiftX verification failed)").arg(nDepth);
                     else if (nDepth < 6)
                         return tr("%1/confirmed (SwiftX verification failed)").arg(nDepth);
@@ -71,10 +70,7 @@ QString TransactionDesc::FormatTxStatus(const CWalletTx& wtx)
                 }
             }
         } else {
-            int nDepth = wtx.GetDepthInMainChain();
-            if (nDepth < 0)
-                return tr("conflicted");
-            else if (GetAdjustedTime() - wtx.nTimeReceived > 2 * 60 && wtx.GetRequestCount() == 0)
+            if (isOffline)
                 return tr("%1/offline").arg(nDepth);
             else if (nDepth < 6)
                 return tr("%1/unconfirmed").arg(nDepth);
