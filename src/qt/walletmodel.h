@@ -250,6 +250,7 @@ public:
     int64_t getKeyCreationTime(const CBitcoinAddress& address);
     CBitcoinAddress getNewAddress(std::string label = "") const;
     bool isMine(CBitcoinAddress address);
+    bool isMine(const QString& addressStr);
     void getOutputs(const std::vector<COutPoint>& vOutpoints, std::vector<COutput>& vOutputs);
     bool isSpent(const COutPoint& outpoint) const;
     void listCoins(std::map<QString, std::vector<COutput> >& mapCoins) const;
