@@ -249,12 +249,17 @@ bool CCoinsViewCache::HaveInputs(const CTransaction& tx) const
     return true;
 }
 
+bool CCoinsViewCache::IsOutputAvailable(const uint256& txId, int index) {
+    const CCoins* coins = AccessCoins(txId);
+    return !coins || !coins->IsAvailable(index);
+}
+
 double CCoinsViewCache::GetPriority(const CTransaction& tx, int nHeight) const
 {
     if (tx.IsCoinBase() || tx.IsCoinStake())
         return 0.0;
     double dResult = 0.0;
-    for (const CTxIn& txin:  tx.vin) {
+    for (const CTxIn& txin : tx.vin) {
         const CCoins* coins = AccessCoins(txin.prevout.hash);
         assert(coins);
         if (!coins->IsAvailable(txin.prevout.n)) continue;
