@@ -294,7 +294,7 @@ UniValue mnbudgetvote(const UniValue& params, bool fHelp)
                 failed++;
                 statusObj.push_back(Pair("node", "local"));
                 statusObj.push_back(Pair("result", "failed"));
-                statusObj.push_back(Pair("error", "Masternode signing error, could not set key correctly."));
+                statusObj.push_back(Pair("error", "Masternode signing error, GetKeysFromSecret failed."));
                 resultsObj.push_back(statusObj);
                 break;
             }
@@ -853,7 +853,7 @@ UniValue mnfinalbudget(const UniValue& params, bool fHelp)
         CKey keyMasternode;
 
         if (!CMessageSigner::GetKeysFromSecret(strMasterNodePrivKey, keyMasternode, pubKeyMasternode))
-            return "Error upon calling SetKey";
+            return "Error upon calling GetKeysFromSecret";
 
         CMasternode* pmn = mnodeman.Find(activeMasternode.vin);
         if (pmn == NULL) {
