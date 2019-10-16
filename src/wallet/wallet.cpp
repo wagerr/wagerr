@@ -472,8 +472,11 @@ bool CWallet::IsSpent(const uint256& hash, unsigned int n) const
         const uint256& wtxid = it->second;
         std::map<uint256, CWalletTx>::const_iterator mit = mapWallet.find(wtxid);
         if (mit != mapWallet.end()) {
-            int depth = mit->second.GetDepthInMainChain();
-            if (depth > 0  || (depth == 0 && !mit->second.isAbandoned()))
+            bool fConflicted;
+            const int nDepth = mit->second.GetDepthAndMempool(fConflicted);
+            // not in mempool txes can spend coins only if not coinstakes
+            const bool fConflictedCoinstake = fConflicted && mit->second.IsCoinStake();
+            if (nDepth > 0  || (nDepth == 0 && !mit->second.isAbandoned() && !fConflictedCoinstake) )
                 return true; // Spent
         }
     }
