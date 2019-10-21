@@ -5027,9 +5027,9 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
 
 UniValue spendzerocoin(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() > 4 || params.size() < 3)
+    if (fHelp || params.size() > 5 || params.size() < 3)
         throw std::runtime_error(
-            "spendzerocoin amount mintchange minimizechange ( \"address\" )\n"
+            "spendzerocoin amount mintchange minimizechange ( \"address\" ispublicspend)\n"
             "\nSpend zWGR to a WGR address.\n" +
             HelpRequiringPassphrase() + "\n"
 
@@ -5081,7 +5081,7 @@ UniValue spendzerocoin(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_WALLET_ERROR, "zWGR minting is DISABLED, cannot mint change");
     bool fMinimizeChange = params[2].get_bool();    // Minimize change
     std::string address_str = params.size() > 3 ? params[3].get_str() : "";
-    bool ispublicspend = params.size() > 4 ? params[3].get_bool() : true;
+    bool ispublicspend = params.size() > 4 ? params[4].get_bool() : true;
 
     std::vector<CZerocoinMint> vMintsSelected;
 
@@ -5205,7 +5205,7 @@ extern UniValue DoZwgrSpend(const CAmount nAmount, bool fMintChange, bool fMinim
         outputs.push_back(std::pair<CBitcoinAddress*, CAmount>(&address, nAmount));
     }
 
-    fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, outputs);
+    fSuccess = pwalletMain->SpendZerocoin(nAmount, wtx, receipt, vMintsSelected, fMintChange, fMinimizeChange, outputs, nullptr, ispublicspend);
 
     if (!fSuccess)
         throw JSONRPCError(RPC_WALLET_ERROR, receipt.GetStatusMessage());
