@@ -918,25 +918,6 @@ int GetInputAge(CTxIn& vin)
     }
 }
 
-int GetInputAgeIX(uint256 nTXHash, CTxIn& vin)
-{
-    int sigs = 0;
-    int nResult = GetInputAge(vin);
-    if (nResult < 0) nResult = 0;
-
-    if (nResult < 6) {
-        std::map<uint256, CTransactionLock>::iterator i = mapTxLocks.find(nTXHash);
-        if (i != mapTxLocks.end()) {
-            sigs = (*i).second.CountSignatures();
-        }
-        if (sigs >= SWIFTTX_SIGNATURES_REQUIRED) {
-            return nSwiftTXDepth + nResult;
-        }
-    }
-
-    return -1;
-}
-
 int GetIXConfirmations(uint256 nTXHash)
 {
     int sigs = 0;
@@ -1376,8 +1357,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
     // is it already in the memory pool?
     uint256 hash = tx.GetHash();
     if (pool.exists(hash)) {
-        LogPrintf("%s tx already in mempool\n", __func__);
-        return false;
+        return error("%s tx already in mempool", __func__);
     }
 
     // ----------- swiftTX transaction scanning -----------
@@ -1392,11 +1372,13 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         }
     }
 
+    bool hasZcSpendInputs = tx.HasZerocoinSpendInputs();
+
     // Check for conflicts with in-memory transactions
-    if (!tx.HasZerocoinSpendInputs()) {
+    if (!hasZcSpendInputs) {
         LOCK(pool.cs); // protect pool.mapNextTx
-        for (unsigned int i = 0; i < tx.vin.size(); i++) {
-            COutPoint outpoint = tx.vin[i].prevout;
+        for (const auto &in : tx.vin) {
+            COutPoint outpoint = in.prevout;
             if (pool.mapNextTx.count(outpoint)) {
                 // Disable replacement feature for now
                 return false;
@@ -1411,7 +1393,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         CBettingsView bettingsViewCache(bettingsView);
 
         CAmount nValueIn = 0;
-        if (tx.HasZerocoinSpendInputs()) {
+        if (hasZcSpendInputs) {
             nValueIn = tx.GetZerocoinSpent();
 
             //Check that txid is not already in the chain
@@ -1523,7 +1505,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         // itself can contain sigops MAX_TX_SIGOPS is less than
         // MAX_BLOCK_SIGOPS; we still consider this an invalid rather than
         // merely non-standard transaction.
-        if (!tx.HasZerocoinSpendInputs()) {
+        if (!hasZcSpendInputs) {
             unsigned int nSigOps = GetLegacySigOpCount(tx);
             unsigned int nMaxSigOps = MAX_TX_SIGOPS_CURRENT;
             nSigOps += GetP2SHSigOpCount(tx, view);
@@ -1535,7 +1517,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         CAmount nValueOut = tx.GetValueOut();
         CAmount nFees = nValueIn - nValueOut;
         double dPriority = 0;
-        if (!tx.HasZerocoinSpendInputs())
+        if (!hasZcSpendInputs)
             view.GetPriority(tx, chainActive.Height());
 
         CTxMemPoolEntry entry(tx, nFees, GetTime(), dPriority, chainActive.Height());
@@ -1547,7 +1529,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             mempool.PrioritiseTransaction(hash, hash.ToString(), 1000, 0.1 * COIN);
         } else if (!ignoreFees) {
             CAmount txMinFee = GetMinRelayFee(tx, nSize, true);
-            if (fLimitFree && nFees < txMinFee && !tx.HasZerocoinSpendInputs())
+            if (fLimitFree && nFees < txMinFee && !hasZcSpendInputs)
                 return state.DoS(0, error("%s : not enough fees %s, %d < %d",
                         __func__, hash.ToString(), nFees, txMinFee), REJECT_INSUFFICIENTFEE, "insufficient fee");
 
@@ -1555,14 +1537,14 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             if (tx.HasZerocoinMintOutputs()) {
                 if(nFees < Params().Zerocoin_MintFee() * tx.GetZerocoinMintCount())
                     return state.DoS(0, false, REJECT_INSUFFICIENTFEE, "insufficient fee for zerocoinmint");
-            } else if (!tx.HasZerocoinSpendInputs() && GetBoolArg("-relaypriority", true) && nFees < ::minRelayTxFee.GetFee(nSize) && !AllowFree(view.GetPriority(tx, chainActive.Height() + 1))) {
+            } else if (!hasZcSpendInputs && GetBoolArg("-relaypriority", true) && nFees < ::minRelayTxFee.GetFee(nSize) && !AllowFree(view.GetPriority(tx, chainActive.Height() + 1))) {
                 return state.DoS(0, false, REJECT_INSUFFICIENTFEE, "insufficient priority");
             }
 
             // Continuously rate-limit free (really, very-low-fee) transactions
             // This mitigates 'penny-flooding' -- sending thousands of free transactions just to
             // be annoying or make others' transactions take longer to confirm.
-            if (fLimitFree && nFees < ::minRelayTxFee.GetFee(nSize) && !tx.HasZerocoinSpendInputs()) {
+            if (fLimitFree && nFees < ::minRelayTxFee.GetFee(nSize) && !hasZcSpendInputs) {
                 static CCriticalSection csFreeLimiter;
                 static double dFreeCount;
                 static int64_t nLastTime;
@@ -1591,7 +1573,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         // This is just a quick inline towards that goal, the mempool by default will not accept them. Blocking
         // any subsequent network relay.
         if ((Params().NetworkID() != CBaseChainParams::REGTEST) &&
-            nFees == 0 && !tx.HasZerocoinSpendInputs()) {
+            nFees == 0 && !hasZcSpendInputs) {
             return error("%s : zero fees not accepted %s, %d > %d",
                     __func__, hash.ToString(), nFees, ::minRelayTxFee.GetFee(nSize) * 10000);
         }
@@ -1632,10 +1614,10 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
         pool.addUnchecked(hash, entry);
     }
 
-    SyncWithWallets(tx, NULL);
+    SyncWithWallets(tx, nullptr);
 
     //Track zerocoinspends and ensure that they are given priority to make it into the blockchain
-    if (tx.HasZerocoinSpendInputs())
+    if (hasZcSpendInputs)
         mapZerocoinspends[tx.GetHash()] = GetAdjustedTime();
 
     return true;
@@ -1684,8 +1666,8 @@ bool AcceptableInputs(CTxMemPool& pool, CValidationState& state, const CTransact
     // Check for conflicts with in-memory transactions
     if (!tx.HasZerocoinSpendInputs()) {
         LOCK(pool.cs); // protect pool.mapNextTx
-        for (unsigned int i = 0; i < tx.vin.size(); i++) {
-            COutPoint outpoint = tx.vin[i].prevout;
+        for (const auto &in : tx.vin) {
+            COutPoint outpoint = in.prevout;
             if (pool.mapNextTx.count(outpoint)) {
                 // Disable replacement feature for now
                 return false;
@@ -2301,9 +2283,6 @@ bool CScriptCheck::operator()()
     return true;
 }
 
-CBitcoinAddress addressExp1("DQZzqnSR6PXxagep1byLiRg9ZurCZ5KieQ");
-CBitcoinAddress addressExp2("DTQYdnNqKuEHXyNeeYhPQGGGdqHbXYwjpj");
-
 std::map<COutPoint, COutPoint> mapInvalidOutPoints;
 std::map<CBigNum, CAmount> mapInvalidSerials;
 void AddInvalidSpendsToMap(const CBlock& block)
@@ -2365,7 +2344,7 @@ void AddInvalidSpendsToMap(const CBlock& block)
     }
 }
 
-bool ValidOutPoint(const COutPoint out, int nHeight)
+bool ValidOutPoint(const COutPoint& out, int nHeight)
 {
     bool isInvalid = nHeight >= Params().Block_Enforce_Invalid() && invalid_out::ContainsOutPoint(out);
     return !isInvalid;
@@ -3027,31 +3006,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         fCLTVIsActivated = pindex->pprev->nHeight >= Params().BIP65Height();
     }
 
-    // Do not allow blocks that contain transactions which 'overwrite' older transactions,
-    // unless those are already completely spent.
-    // If such overwrites are allowed, coinbases and transactions depending upon those
-    // can be duplicated to remove the ability to spend the first instance -- even after
-    // being sent to another address.
-    // See BIP30 and http://r6.ca/blog/20120206T005236Z.html for more information.
-    // This logic is not necessary for memory pool transactions, as AcceptToMemoryPool
-    // already refuses previously-known transaction ids entirely.
-    // This rule was originally applied all blocks whose timestamp was after March 15, 2012, 0:00 UTC.
-    // Now that the whole chain is irreversibly beyond that time it is applied to all blocks except the
-    // two in the chain that violate it. This prevents exploiting the issue against nodes in their
-    // initial block download.
-    bool fEnforceBIP30 = (!pindex->phashBlock) || // Enforce on CreateNewBlock invocations which don't have a hash.
-                         !((pindex->nHeight == 91842 && pindex->GetBlockHash() == uint256("0x00000000000a4d0a398161ffc163c503763b1f4360639393e0e4c8e300e0caec")) ||
-                             (pindex->nHeight == 91880 && pindex->GetBlockHash() == uint256("0x00000000000743f190a18c5577a3c2d2a1f610ae9601ac046a38084ccb7cd721")));
-    if (fEnforceBIP30) {
-        for (const CTransaction& tx : block.vtx) {
-            const CCoins* coins = view.AccessCoins(tx.GetHash());
-            if (coins && !coins->IsPruned())
-                return state.DoS(100, error("ConnectBlock() : tried to overwrite transaction"),
-                    REJECT_INVALID, "bad-txns-BIP30");
-        }
-    }
-
-    CCheckQueueControl<CScriptCheck> control(fScriptChecks && nScriptCheckThreads ? &scriptcheckqueue : NULL);
+    CCheckQueueControl<CScriptCheck> control(fScriptChecks && nScriptCheckThreads ? &scriptcheckqueue : nullptr);
 
     int64_t nTimeStart = GetTimeMicros();
     CAmount nFees = 0;
@@ -3072,6 +3027,20 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     uint256 hashBlock = block.GetHash();
     for (unsigned int i = 0; i < block.vtx.size(); i++) {
         const CTransaction& tx = block.vtx[i];
+
+        // First check for BIP30.
+        // Do not allow blocks that contain transactions which 'overwrite' older transactions,
+        // unless those are already completely spent.
+        // If such overwrites are allowed, coinbases and transactions depending upon those
+        // can be duplicated to remove the ability to spend the first instance -- even after
+        // being sent to another address.
+        // See BIP30 and http://r6.ca/blog/20120206T005236Z.html for more information.
+        // This logic is not necessary for memory pool transactions, as AcceptToMemoryPool
+        // already refuses previously-known transaction ids entirely.
+        const CCoins* coins = view.AccessCoins(tx.GetHash());
+        if (coins && !coins->IsPruned())
+            return state.DoS(100, error("ConnectBlock() : tried to overwrite transaction"),
+                             REJECT_INVALID, "bad-txns-BIP30");
 
         nInputs += tx.vin.size();
         nSigOps += GetLegacySigOpCount(tx);
@@ -3151,7 +3120,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                     REJECT_INVALID, "bad-txns-inputs-missingorspent");
 
             // Check that the inputs are not marked as invalid/fraudulent
-            for (CTxIn in : tx.vin) {
+            for (const CTxIn& in : tx.vin) {
                 if (!ValidOutPoint(in.prevout, pindex->nHeight)) {
                     return state.DoS(100, error("%s : tried to spend invalid input %s in tx %s", __func__, in.prevout.ToString(),
                                   tx.GetHash().GetHex()), REJECT_INVALID, "bad-txns-invalid-inputs");
@@ -3200,11 +3169,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
         CTxUndo undoDummy;
         if (i > 0) {
-            blockundo.vtxundo.push_back(CTxUndo());
+            blockundo.vtxundo.emplace_back();
         }
         UpdateCoins(tx, state, view, i == 0 ? undoDummy : blockundo.vtxundo.back(), pindex->nHeight);
 
-        vPos.push_back(std::make_pair(tx.GetHash(), pos));
+        vPos.emplace_back(tx.GetHash(), pos);
         pos.nTxOffset += ::GetSerializeSize(tx, SER_DISK, CLIENT_VERSION);
     }
 
@@ -3224,10 +3193,6 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     CAmount nMoneySupplyPrev = pindex->pprev ? pindex->pprev->nMoneySupply : 0;
     pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn - nValueBurned;
     pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
-
-//    LogPrintf("XX69----------> ConnectBlock(): nValueOut: %s, nValueIn: %s, nFees: %s, nMint: %s zWgrSpent: %s\n",
-//              FormatMoney(nValueOut), FormatMoney(nValueIn),
-//              FormatMoney(nFees), FormatMoney(pindex->nMint), FormatMoney(nAmountZerocoinSpent));
 
     int64_t nTime1 = GetTimeMicros();
     nTimeConnect += nTime1 - nTimeStart;
@@ -3303,14 +3268,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     // Write undo information to disk
     if (pindex->GetUndoPos().IsNull() || !pindex->IsValid(BLOCK_VALID_SCRIPTS)) {
         if (pindex->GetUndoPos().IsNull()) {
-            CDiskBlockPos pos;
-            if (!FindUndoPos(state, pindex->nFile, pos, ::GetSerializeSize(blockundo, SER_DISK, CLIENT_VERSION) + 40))
+            CDiskBlockPos diskPosBlock;
+            if (!FindUndoPos(state, pindex->nFile, diskPosBlock, ::GetSerializeSize(blockundo, SER_DISK, CLIENT_VERSION) + 40))
                 return error("ConnectBlock() : FindUndoPos failed");
-            if (!blockundo.WriteToDisk(pos, pindex->pprev->GetBlockHash()))
+            if (!blockundo.WriteToDisk(diskPosBlock, pindex->pprev->GetBlockHash()))
                 return state.Abort("Failed to write undo data");
 
             // update nUndoPos in block index
-            pindex->nUndoPos = pos.nPos;
+            pindex->nUndoPos = diskPosBlock.nPos;
             pindex->nStatus |= BLOCK_HAVE_UNDO;
         }
 
@@ -3321,7 +3286,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     //Record zWGR serials
     if (pwalletMain) {
         std::set<uint256> setAddedTx;
-        for (std::pair<libzerocoin::CoinSpend, uint256> pSpend : vSpends) {
+        for (const std::pair<libzerocoin::CoinSpend, uint256>& pSpend : vSpends) {
             // Send signal to wallet if this is ours
             if (pwalletMain->IsMyZerocoinSpend(pSpend.first.getCoinSerialNumber())) {
                 LogPrintf("%s: %s detected zerocoinspend in transaction %s \n", __func__,
@@ -3334,7 +3299,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                     continue;
 
                 //Search block for matching tx, turn into wtx, set merkle branch, add to wallet
-                for (CTransaction tx : block.vtx) {
+                for (const CTransaction& tx : block.vtx) {
                     if (tx.GetHash() == pSpend.second) {
                         CWalletTx wtx(pwalletMain, tx);
                         wtx.nTimeReceived = pindex->GetBlockTime();
@@ -3348,8 +3313,11 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     // Flush spend/mint info to disk
-    if (!zerocoinDB->WriteCoinSpendBatch(vSpends)) return state.Abort(("Failed to record coin serials to database"));
-    if (!zerocoinDB->WriteCoinMintBatch(vMints)) return state.Abort(("Failed to record new mints to database"));
+    if (!vSpends.empty() && !zerocoinDB->WriteCoinSpendBatch(vSpends))
+        return state.Abort(("Failed to record coin serials to database"));
+
+    if (!vMints.empty() && !zerocoinDB->WriteCoinMintBatch(vMints))
+        return state.Abort(("Failed to record new mints to database"));
 
     //Record accumulator checksums
     DatabaseChecksums(mapAccumulators);
