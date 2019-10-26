@@ -433,20 +433,27 @@ void CWallet::SyncMetaData(std::pair<TxSpends::iterator, TxSpends::iterator> ran
     // So: find smallest nOrderPos:
 
     int nMinOrderPos = std::numeric_limits<int>::max();
-    const CWalletTx* copyFrom = NULL;
+    const CWalletTx* copyFrom = nullptr;
     for (TxSpends::iterator it = range.first; it != range.second; ++it) {
-        const uint256& hash = it->second;
-        int n = mapWallet[hash].nOrderPos;
+        const CWalletTx* wtx = &mapWallet.at(it->second);
+        int n = wtx->nOrderPos;
         if (n < nMinOrderPos) {
             nMinOrderPos = n;
-            copyFrom = &mapWallet[hash];
+            copyFrom = wtx;
         }
     }
+
+    if (!copyFrom) {
+        return;
+    }
+
     // Now copy data from copyFrom to rest:
     for (TxSpends::iterator it = range.first; it != range.second; ++it) {
         const uint256& hash = it->second;
         CWalletTx* copyTo = &mapWallet[hash];
         if (copyFrom == copyTo) continue;
+        assert(copyFrom && "Oldest wallet transaction in range assumed to have been found.");
+        if (!copyFrom->IsEquivalentTo(*copyTo)) continue;
         copyTo->mapValue = copyFrom->mapValue;
         copyTo->vOrderForm = copyFrom->vOrderForm;
         // fTimeReceivedIsTxTime not copied on purpose
@@ -5558,21 +5565,18 @@ bool CWalletTx::IsTrusted() const
     // Quick answer in most cases
     if (!IsFinalTx(*this))
         return false;
-    int nDepth = GetDepthInMainChain();
+
+    bool fConflicted;
+    int nDepth = GetDepthAndMempool(fConflicted);
+
+    if (fConflicted) // Don't trust unconfirmed transactions from us unless they are in the mempool.
+        return false;
     if (nDepth >= 1)
         return true;
     if (nDepth < 0)
         return false;
     if (!bSpendZeroConfChange || !IsFromMe(ISMINE_ALL)) // using wtx's cached debit
         return false;
-
-    // Don't trust unconfirmed transactions from us unless they are in the mempool.
-    {
-        LOCK(mempool.cs);
-        if (!mempool.exists(GetHash())) {
-            return false;
-        }
-    }
 
     // Trusted if all inputs are from us and are in the mempool:
     for (const CTxIn& txin : vin) {
@@ -5592,6 +5596,15 @@ int CWalletTx::GetDepthAndMempool(bool& fConflicted, bool enableIX) const
     int ret = GetDepthInMainChain(enableIX);
     fConflicted = (ret == 0 && !InMempool());  // not in chain nor in mempool
     return ret;
+}
+
+bool CWalletTx::IsEquivalentTo(const CWalletTx& _tx) const
+{
+    CMutableTransaction tx1 {*this};
+    CMutableTransaction tx2 {_tx};
+    for (auto& txin : tx1.vin) txin.scriptSig = CScript();
+    for (auto& txin : tx2.vin) txin.scriptSig = CScript();
+    return CTransaction(tx1) == CTransaction(tx2);
 }
 
 void CWalletTx::MarkDirty()
