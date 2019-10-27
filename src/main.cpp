@@ -2853,7 +2853,7 @@ bool ReindexAccumulators(std::list<uint256>& listMissingCheckpoints, std::string
 
         // find each checkpoint that is missing
         CBlockIndex* pindex = chainActive[nZerocoinStart];
-        while (pindex->nHeight <= Params().Zerocoin_Block_Last_Checkpoint()) {
+        while (pindex && pindex->nHeight <= Params().Zerocoin_Block_Last_Checkpoint()) {
             uiInterface.ShowProgress(_("Calculating missing accumulators..."), std::max(1, std::min(99, (int)((double)(pindex->nHeight - nZerocoinStart) / (double)(chainActive.Height() - nZerocoinStart) * 100))));
 
             if (ShutdownRequested())
