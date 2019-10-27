@@ -136,8 +136,8 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
     const int nHeight = pindexPrev->nHeight + 1;
 
-    // Make sure to create the correct block version after zerocoin is enabled
-    if(nHeight >= Params().Block_V7_StartHeight()) {
+    // Make sure to create the correct block version
+    if (nHeight >= Params().Block_V7_StartHeight()) {
         pblock->nVersion = 7;       //!> Removes accumulator checkpoints
     } else {
         pblock->nVersion = 6;       //!> Supports V2 Stake Modifiers.

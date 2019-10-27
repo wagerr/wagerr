@@ -45,7 +45,7 @@ int GetChecksumHeight(uint32_t nChecksum, libzerocoin::CoinDenomination denomina
         return 0;
 
     //Search through blocks to find the checksum
-    while (pindex->nHeight <= Params().Zerocoin_Block_Last_Checkpoint()) {
+    while (pindex && pindex->nHeight <= Params().Zerocoin_Block_Last_Checkpoint()) {
         if (ParseChecksum(pindex->nAccumulatorCheckpoint, denomination) == nChecksum)
             return pindex->nHeight;
 
@@ -276,7 +276,7 @@ bool CalculateAccumulatorCheckpoint(int nHeight, uint256& nCheckpoint, Accumulat
     int nTotalMintsFound = 0;
     CBlockIndex *pindex = chainActive[nHeightCheckpoint >= 20 ? nHeightCheckpoint - 20 : 0];
 
-    while (pindex->nHeight < nHeight - 10) {
+    while (pindex && pindex->nHeight < nHeight - 10) {
         // checking whether we should stop this process due to a shutdown request
         if (ShutdownRequested())
             return false;
@@ -362,7 +362,7 @@ int ComputeAccumulatedCoins(int nHeightEnd, libzerocoin::CoinDenomination denom)
 {
     CBlockIndex* pindex = chainActive[GetZerocoinStartHeight()];
     int n = 0;
-    while (pindex->nHeight < nHeightEnd) {
+    while (pindex && pindex->nHeight < nHeightEnd) {
         n += count(pindex->vMintDenominationsInBlock.begin(), pindex->vMintDenominationsInBlock.end(), denom);
         pindex = chainActive.Next(pindex);
     }
