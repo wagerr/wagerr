@@ -31,7 +31,7 @@
 bool IsValidOracleTx(const CTxIn &txin)
 {
     COutPoint prevout = txin.prevout;
-    std::vector<string> oracleAddrs = Params().OracleWalletAddrs();
+    std::vector<std::string> oracleAddrs = Params().OracleWalletAddrs();
 
     uint256 hashBlock;
     CTransaction txPrev;
@@ -41,7 +41,7 @@ bool IsValidOracleTx(const CTxIn &txin)
         std::string scriptPubKey = prevTxOut.scriptPubKey.ToString();
 
         txnouttype type;
-        vector<CTxDestination> prevAddrs;
+        std::vector<CTxDestination> prevAddrs;
         int nRequired;
 
         if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
@@ -1144,7 +1144,7 @@ void CMappingDB::SetSports(const mappingIndex_t &sportsIndex)
 void CMappingDB::AddSport(const CMapping sm)
 {
     LOCK(cs_setSports);
-    mSportsIndex.insert(make_pair(sm.nId, sm));
+    mSportsIndex.insert(std::make_pair(sm.nId, sm));
 }
 
 /**
@@ -1177,7 +1177,7 @@ void CMappingDB::SetRounds(const mappingIndex_t &roundsIndex)
 void CMappingDB::AddRound(const CMapping rm)
 {
     LOCK(cs_setRounds);
-    mRoundsIndex.insert(make_pair(rm.nId, rm));
+    mRoundsIndex.insert(std::make_pair(rm.nId, rm));
 }
 
 /**
@@ -1210,7 +1210,7 @@ void CMappingDB::SetTeams(const mappingIndex_t &teamsIndex)
 void CMappingDB::AddTeam(const CMapping tm)
 {
     LOCK(cs_setTeams);
-    mTeamsIndex.insert(make_pair(tm.nId, tm));
+    mTeamsIndex.insert(std::make_pair(tm.nId, tm));
 }
 
 /**
@@ -1243,7 +1243,7 @@ void CMappingDB::SetTournaments(const mappingIndex_t &tournamentsIndex)
 void CMappingDB::AddTournament(const CMapping tm)
 {
     LOCK(cs_setTournaments);
-    mTournamentsIndex.insert(make_pair(tm.nId, tm));
+    mTournamentsIndex.insert(std::make_pair(tm.nId, tm));
 }
 
 /**
@@ -1318,7 +1318,7 @@ bool CMappingDB::Read(mappingIndex_t& mappingIndex, uint256& lastBlockHash)
     if (fileSize >= sizeof(uint256))
         dataSize = fileSize - sizeof(uint256);
 
-    vector<unsigned char> vchData;
+    std::vector<unsigned char> vchData;
     vchData.resize(dataSize);
     uint256 hashIn;
 
@@ -1401,7 +1401,7 @@ void CEventDB::AddEvent(CPeerlessEvent pe)
         CEventDB::SetEvents(eventsIndex);
     } else {
         LOCK(cs_setEvents);
-        eventsIndex.insert(make_pair(pe.nEventId, pe));
+        eventsIndex.insert(std::make_pair(pe.nEventId, pe));
     }
 }
 
@@ -1492,7 +1492,7 @@ bool CEventDB::Read(eventIndex_t& eventIndex, uint256& lastBlockHash)
     if (fileSize >= sizeof(uint256))
         dataSize = fileSize - sizeof(uint256);
 
-    vector<unsigned char> vchData;
+    std::vector<unsigned char> vchData;
     vchData.resize(dataSize);
     uint256 hashIn;
 
@@ -1574,7 +1574,7 @@ void CResultDB::AddResult(CPeerlessResult pr)
     // Else save the new result.
     else {
         LOCK(cs_setResults);
-        resultsIndex.insert(make_pair(pr.nEventId, pr));
+        resultsIndex.insert(std::make_pair(pr.nEventId, pr));
     }
 }
 
@@ -1662,7 +1662,7 @@ bool CResultDB::Read(resultsIndex_t& resultsIndex, uint256& lastBlockHash)
     if (fileSize >= sizeof(uint256))
         dataSize = fileSize - sizeof(uint256);
 
-    vector<unsigned char> vchData;
+    std::vector<unsigned char> vchData;
     vchData.resize(dataSize);
     uint256 hashIn;
 
@@ -1726,7 +1726,7 @@ std::vector<CPeerlessResult> getEventResults( int height )
                 if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
 
                     // Get OP CODE from transactions.
-                    vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, string::npos));
+                    std::vector<unsigned char> v = ParseHex(scriptPubKey.substr(9, std::string::npos));
                     std::string opCode(v.begin(), v.end());
 
                     CPeerlessResult plResult;
@@ -1830,7 +1830,7 @@ std::vector<CBetOut> GetBetPayouts(int height)
                         bool validOracleTx = IsValidOracleTx(txin);
 
                         // Get the OP CODE from the transaction scriptPubKey.
-                        vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
+                        std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, std::string::npos));
                         std::string opCode(vOpCode.begin(), vOpCode.end());
 
                         // Peerless event OP RETURN transaction.
@@ -2236,7 +2236,7 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
 }
 
 /**
- * Creates the bet payout vector for all winning CGLotto events.
+ * Creates the bet payout std::vector for all winning CGLotto events.
  *
  * @return payout vector.
  */
@@ -2297,7 +2297,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 
                     if (scriptPubKey.length() > 0 && 0 == strncmp(scriptPubKey.c_str(), "OP_RETURN", 9)) {
                         // Get the OP CODE from the transaction scriptPubKey.
-                        vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
+                        std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, std::string::npos));
                         std::string opCode(vOpCode.begin(), vOpCode.end());
 
                         // If bet was placed less than 20 mins before event start or after event start discard it.

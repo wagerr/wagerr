@@ -12,7 +12,6 @@
 #include "masternode.h"
 #include <boost/lexical_cast.hpp>
 
-using namespace std;
 
 extern CCriticalSection cs_vecPayments;
 extern CCriticalSection cs_mapMasternodeBlocks;

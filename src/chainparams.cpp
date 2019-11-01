@@ -16,8 +16,6 @@
 
 #include <boost/assign/list_of.hpp>
 
-using namespace std;
-using namespace boost::assign;
 
 struct SeedSpec6 {
     uint8_t addr[16];
@@ -114,6 +112,17 @@ libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params(bool useModulusV1) co
     return &ZCParamsDec;
 }
 
+bool CChainParams::HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
+        const int utxoFromBlockHeight, const uint32_t utxoFromBlockTime) const
+{
+    // before stake modifier V2, the age required was 60 * 60 (1 hour) / not required on regtest
+    if (!IsStakeModifierV2(contextHeight))
+        return (NetworkID() == CBaseChainParams::REGTEST || (utxoFromBlockTime + 3600 <= contextTime));
+
+    // after stake modifier V2, we require the utxo to be nStakeMinDepth deep in the chain
+    return (contextHeight - utxoFromBlockHeight >= nStakeMinDepth);
+}
+
 class CMainParams : public CChainParams
 {
 public:
@@ -139,10 +148,11 @@ public:
         nRejectBlockOutdatedMajority = 10260; // 95%
         nToCheckBlockUpgradeMajority = 10800; // Approximate expected amount of blocks in 7 days (1440*7.5)
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60;              // WAGERR: 1 minute
-        nTargetSpacing = 1 * 60;               // WAGERR: 1 minute
+        nTargetSpacing = 1 * 60;        // 1 minute
         nMaturity = 100;
-        nStakeMinAge = 60 * 60;                // WAGERR: 1 hour
+        nStakeMinDepth = 600;
+        nFutureTimeDriftPoW = 7200;
+        nFutureTimeDriftPoS = 180;
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 398360470 * COIN;
 
@@ -166,6 +176,7 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 751858;
 
+        nBlockStakeModifierlV2 = 99999999;
         // Public coin spend enforcement
         nPublicZCSpends = 752800;
 
@@ -205,7 +216,7 @@ public:
         CMutableTransaction txNew;
         txNew.vin.resize(1);
         txNew.vout.resize(1);
-        txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
+        txNew.vin[0].scriptSig = CScript() << 486604799 << CScriptNum(4) << std::vector<unsigned char>((const unsigned char*)pszTimestamp, (const unsigned char*)pszTimestamp + strlen(pszTimestamp));
         txNew.vout[0].nValue = 0 * COIN;
         txNew.vout[0].scriptPubKey = CScript() << ParseHex("046013426db3d877adca7cea18ebeca33e88fafc53ab4040e0fe1bd0429712178c10571dfed6b3f1f19bcff0805cdf1c798e7a84ef0f5e0f4459aabd7e94ced9e6") << OP_CHECKSIG;
         genesis.vtx.push_back(txNew);
@@ -299,10 +310,10 @@ public:
         nRejectBlockOutdatedMajority = 5472; // 95%
         nToCheckBlockUpgradeMajority = 5760; // 4 days
         nMinerThreads = 0;
-        nTargetTimespan = 1 * 60; // WAGERR: 1 day
         nTargetSpacing = 1 * 60;  // WAGERR: 1 minute
         nLastPOWBlock = 300;
         nMaturity = 15;
+        nStakeMinDepth = 100;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
@@ -322,6 +333,7 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 600;
 
+        nBlockStakeModifierlV2 = 99999999;
         // Public coin spend enforcement
         nPublicZCSpends = 600;
 
@@ -417,12 +429,11 @@ public:
         nRejectBlockOutdatedMajority = 950;
         nToCheckBlockUpgradeMajority = 1000;
         nMinerThreads = 1;
-        nTargetTimespan = 24 * 60 * 60; // WAGERR: 1 day
         nTargetSpacing = 1 * 60;        // WAGERR: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         nLastPOWBlock = 250;
         nMaturity = 100;
-        nStakeMinAge = 0;
+        nStakeMinDepth = 0;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMT
         nMaxMoneyOut = 398360470 * COIN;
@@ -437,6 +448,7 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 1;
 
+        nBlockStakeModifierlV2 = 400;
         // Public coin spend enforcement
         nPublicZCSpends = 350;
 
@@ -477,6 +489,13 @@ public:
         fMineBlocksOnDemand = true;
         fSkipProofOfWorkCheck = true;
         fTestnetToBeDeprecatedFieldRPC = false;
+
+        /* Spork Key for RegTest:
+        WIF private key: 6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH
+        private key hex: a792662ff7b4cca1603fb9b67a4bce9e8ffb9718887977a5a0b2a522e3eab97e
+        */
+        strSporkKey = "04fb58d71ffcf7d5385d85020045f108637a5296d1552f56ce561a29f78834101519c306be7d9c328a82b77726038b0eab01b8f3187c76656f9996257bf616e77f";
+        strSporkKeyOld = "04fb58d71ffcf7d5385d85020045f108637a5296d1552f56ce561a29f78834101519c306be7d9c328a82b77726038b0eab01b8f3187c76656f9996257bf616e77f";
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {

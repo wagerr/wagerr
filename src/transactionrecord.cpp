@@ -174,19 +174,8 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
     bool fZSpendFromMe = false;
 
     if (wtx.HasZerocoinSpendInputs()) {
-        // a zerocoin spend that was created by this wallet
-        if (wtx.HasZerocoinPublicSpendInputs()) {
-            libzerocoin::ZerocoinParams* params = Params().Zerocoin_Params(false);
-            PublicCoinSpend publicSpend(params);
-            CValidationState state;
-            if (!ZWGRModule::ParseZerocoinPublicSpend(wtx.vin[0], wtx, state, publicSpend)){
-                throw std::runtime_error("Error parsing zc public spend");
-            }
-            fZSpendFromMe = wallet->IsMyZerocoinSpend(publicSpend.getCoinSerialNumber());
-        } else {
-            libzerocoin::CoinSpend zcspend = TxInToZerocoinSpend(wtx.vin[0]);
-            fZSpendFromMe = wallet->IsMyZerocoinSpend(zcspend.getCoinSerialNumber());
-        }
+        libzerocoin::CoinSpend zcspend = wtx.HasZerocoinPublicSpendInputs() ? ZWGRModule::parseCoinSpend(wtx.vin[0]) : TxInToZerocoinSpend(wtx.vin[0]);
+        fZSpendFromMe = wallet->IsMyZerocoinSpend(zcspend.getCoinSerialNumber());
     }
 
     if (wtx.IsCoinStake()) {
@@ -266,7 +255,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                 continue;
             }
 
-            string strAddress = "";
+            std::string strAddress = "";
             CTxDestination address;
             if (ExtractDestination(txout.scriptPubKey, address))
                 strAddress = CBitcoinAddress(address).ToString();
@@ -437,7 +426,7 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     bool isBettingEntry = false;
                     bool isChainGameEntry = false;
                     if (txout.scriptPubKey.IsUnspendable()) {
-                        vector<unsigned char> vOpCode = ParseHex(txout.scriptPubKey.ToString().substr(9, string::npos));
+                        std::vector<unsigned char> vOpCode = ParseHex(txout.scriptPubKey.ToString().substr(9, std::string::npos));
                         std::string opCode(vOpCode.begin(), vOpCode.end());
 
                         CPeerlessBet plBet;

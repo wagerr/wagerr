@@ -15,9 +15,9 @@
 // For Script size (BIGNUM/Uint256 size)
 #define BIGNUM_SIZE   4
 
-bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, vector<CBigNum>& vValues)
+bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomination denom, std::vector<CBigNum>& vValues)
 {
-    for (const CTransaction tx : block.vtx) {
+    for (const CTransaction& tx : block.vtx) {
         if(!tx.HasZerocoinMintOutputs())
             continue;
 
@@ -42,14 +42,14 @@ bool BlockToMintValueVector(const CBlock& block, const libzerocoin::CoinDenomina
 
 bool BlockToPubcoinList(const CBlock& block, std::list<libzerocoin::PublicCoin>& listPubcoins, bool fFilterInvalid)
 {
-    for (const CTransaction tx : block.vtx) {
+    for (const CTransaction& tx : block.vtx) {
         if(!tx.HasZerocoinMintOutputs())
             continue;
 
         // Filter out mints that have used invalid outpoints
         if (fFilterInvalid) {
             bool fValid = true;
-            for (const CTxIn in : tx.vin) {
+            for (const CTxIn& in : tx.vin) {
                 if (!ValidOutPoint(in.prevout, INT_MAX)) {
                     fValid = false;
                     break;
@@ -91,7 +91,7 @@ bool BlockToZerocoinMintList(const CBlock& block, std::list<CZerocoinMint>& vMin
         // Filter out mints that have used invalid outpoints
         if (fFilterInvalid) {
             bool fValid = true;
-            for (const CTxIn in : tx.vin) {
+            for (const CTxIn& in : tx.vin) {
                 if (!ValidOutPoint(in.prevout, INT_MAX)) {
                     fValid = false;
                     break;
@@ -297,10 +297,10 @@ std::string ReindexZerocoinDB()
                                 if (!ZWGRModule::ParseZerocoinPublicSpend(in, tx, state, publicSpend)){
                                     return _("Failed to parse public spend");
                                 }
-                                vSpendInfo.push_back(make_pair(publicSpend, txid));
+                                vSpendInfo.push_back(std::make_pair(publicSpend, txid));
                             } else {
                                 libzerocoin::CoinSpend spend = TxInToZerocoinSpend(in);
-                                vSpendInfo.push_back(make_pair(spend, txid));
+                                vSpendInfo.push_back(std::make_pair(spend, txid));
                             }
                         }
                     }
@@ -314,7 +314,7 @@ std::string ReindexZerocoinDB()
                             CValidationState state;
                             libzerocoin::PublicCoin coin(Params().Zerocoin_Params(pindex->nHeight < Params().Zerocoin_Block_V2_Start()));
                             TxOutToPublicCoin(out, coin, state);
-                            vMintInfo.push_back(make_pair(coin, txid));
+                            vMintInfo.push_back(std::make_pair(coin, txid));
                         }
                     }
                 }
@@ -363,7 +363,7 @@ libzerocoin::CoinSpend TxInToZerocoinSpend(const CTxIn& txin)
 bool TxOutToPublicCoin(const CTxOut& txout, libzerocoin::PublicCoin& pubCoin, CValidationState& state)
 {
     CBigNum publicZerocoin;
-    vector<unsigned char> vchZeroMint;
+    std::vector<unsigned char> vchZeroMint;
     vchZeroMint.insert(vchZeroMint.end(), txout.scriptPubKey.begin() + SCRIPT_OFFSET,
                        txout.scriptPubKey.begin() + txout.scriptPubKey.size());
     publicZerocoin.setvch(vchZeroMint);
@@ -383,11 +383,11 @@ bool TxOutToPublicCoin(const CTxOut& txout, libzerocoin::PublicCoin& pubCoin, CV
 std::list<libzerocoin::CoinDenomination> ZerocoinSpendListFromBlock(const CBlock& block, bool fFilterInvalid)
 {
     std::list<libzerocoin::CoinDenomination> vSpends;
-    for (const CTransaction tx : block.vtx) {
+    for (const CTransaction& tx : block.vtx) {
         if (!tx.HasZerocoinSpendInputs())
             continue;
 
-        for (const CTxIn txin : tx.vin) {
+        for (const CTxIn& txin : tx.vin) {
             bool isPublicSpend = txin.IsZerocoinPublicSpend();
             if (!txin.IsZerocoinSpend() && !isPublicSpend)
                 continue;
