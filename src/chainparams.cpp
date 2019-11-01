@@ -176,7 +176,7 @@ public:
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 751858;
 
-        nBlockStakeModifierlV2 = 99999999;
+        nBlockStakeModifierlV2 = 891276;
         // Public coin spend enforcement
         nPublicZCSpends = 752800;
 
