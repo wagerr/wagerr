@@ -1,5 +1,5 @@
 ---
-name: "wagerr-linux-3.0"
+name: "wagerr-linux-3.1"
 enable_cache: true
 distro: "ubuntu"
 suites:
