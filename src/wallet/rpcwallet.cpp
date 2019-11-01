@@ -438,7 +438,7 @@ UniValue listbets(const UniValue& params, bool fHelp)
 UniValue getbet(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 2)
-        throw runtime_error(
+        throw std::runtime_error(
             "getbet \"txid\" ( includeWatchonly )\n"
             "\nGet detailed information about in-wallet bet <txid>\n"
 
@@ -507,7 +507,7 @@ UniValue getbet(const UniValue& params, bool fHelp)
 
         // TODO Remove hard-coded values from this block.
         if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
-            vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, string::npos));
+            std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, std::string::npos));
             std::string opCode(vOpCode.begin(), vOpCode.end());
 
             CPeerlessBet plBet;
