@@ -5934,9 +5934,9 @@ UniValue createautomintaddress(const UniValue& params, bool fHelp)
 
 UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() < 4 || params.size() > 5)
+    if (fHelp || params.size() < 4 || params.size() > 6)
         throw std::runtime_error(
-            "spendrawzerocoin \"serialHex\" denom \"randomnessHex\" [\"address\"]\n"
+            "spendrawzerocoin \"serialHex\" denom \"randomnessHex\" ( \"address\" \"mintTxId\" fRelay)\n"
             "\nCreate and broadcast a TX spending the provided zericoin.\n"
 
             "\nArguments:\n"
@@ -5944,7 +5944,10 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
             "2. \"randomnessHex\"    (string, required) A zerocoin randomness value (hex)\n"
             "3. denom                (numeric, required) A zerocoin denomination (decimal)\n"
             "4. \"priv key\"         (string, required) The private key associated with this coin (hex)\n"
-            "5. \"address\"          (string, optional) WAGERR address to spend to. If not specified, spend to change add.\n"
+            "5. \"address\"          (string, optional) WAGERR address to spend to. If not specified, "
+            "                        or empty string, spend to change address.\n"
+            "6. \"mintTxId\"         (string, optional) txid of the transaction containing the mint. If not"
+            "                        specified, or empty string, the blockchain will be scanned (could take a while)"
 
             "\nResult:\n"
                 "\"txid\"             (string) The transaction txid in hex\n"
@@ -5973,12 +5976,8 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
     bool fGood = vchSecret.SetString(priv_key_str);
     CKey key = vchSecret.GetKey();
     if (!key.IsValid() && fGood)
-        return JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "privkey is not valid");
+        throw JSONRPCError(RPC_INVALID_ADDRESS_OR_KEY, "privkey is not valid");
     privkey = key.GetPrivKey();
-
-    std::string address_str = "";
-    if (params.size() == 5)
-        address_str = params[4].get_str();
 
     // Create the coin associated with these secrets
     libzerocoin::PrivateCoin coin(Params().Zerocoin_Params(false), denom, serial, randomness);
@@ -5987,10 +5986,47 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
 
     // Create the mint associated with this coin
     CZerocoinMint mint(denom, coin.getPublicCoin().getValue(), randomness, serial, false, CZerocoinMint::CURRENT_VERSION, &privkey);
-    std::vector<CZerocoinMint> vMintsSelected = {mint};
-    CAmount nAmount = mint.GetDenominationAsAmount();
 
-    return DoZwgrSpend(nAmount, false, true, vMintsSelected, address_str);
+    std::string address_str = "";
+    if (params.size() > 4)
+        address_str = params[4].get_str();
+
+    if (params.size() > 5) {
+        // update mint txid
+        mint.SetTxHash(ParseHashV(params[5], "parameter 5"));
+    } else {
+        // If the mint tx is not provided, look for it
+        const CBigNum& mintValue = mint.GetValue();
+        bool found = false;
+        {
+            LOCK2(cs_main, pwalletMain->cs_wallet);
+            CBlockIndex* pindex = chainActive.Tip();
+            while (!found && pindex && pindex->nHeight >= Params().Zerocoin_StartHeight()) {
+                LogPrintf("%s : Checking block %d...\n", __func__, pindex->nHeight);
+                if (pindex->MintedDenomination(denom)) {
+                    CBlock block;
+                    if (!ReadBlockFromDisk(block, pindex))
+                        throw JSONRPCError(RPC_INTERNAL_ERROR, "Unable to read block from disk");
+                    std::list<CZerocoinMint> listMints;
+                    BlockToZerocoinMintList(block, listMints, true);
+                    for (const CZerocoinMint& m : listMints) {
+                        if (m.GetValue() == mintValue && m.GetDenomination() == denom) {
+                            // mint found. update txid
+                            mint.SetTxHash(m.GetTxHash());
+                            found = true;
+                            break;
+                        }
+                    }
+                }
+                pindex = pindex->pprev;
+            }
+        }
+        if (!found)
+            throw JSONRPCError(RPC_INVALID_PARAMETER, "Mint tx not found");
+    }
+
+    std::vector<CZerocoinMint> vMintsSelected = {mint};
+    return DoZwgrSpend(mint.GetDenominationAsAmount(), false, true, vMintsSelected, address_str);
 }
 
 UniValue clearspendcache(const UniValue& params, bool fHelp)
