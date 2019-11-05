@@ -4033,12 +4033,12 @@ bool CWallet::MintToTxIn(
         CZerocoinSpendReceipt& receipt,
         libzerocoin::SpendType spendType,
         CBlockIndex* pindexCheckpoint,
-        bool publicCoinSpend)
+        bool isPublicSpend)
 {
     std::map<CBigNum, CZerocoinMint> mapMints;
     mapMints.insert(std::make_pair(mint.GetValue(), mint));
     std::vector<CTxIn> vin;
-    if (publicCoinSpend) {
+    if (isPublicSpend) {
         if (MintsToInputVectorPublicSpend(mapMints, hashTxOut, vin, receipt, spendType, pindexCheckpoint)) {
             newTxIn = vin[0];
             return true;

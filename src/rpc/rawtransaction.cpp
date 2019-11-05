@@ -934,7 +934,7 @@ UniValue createrawzerocoinstake(const UniValue& params, bool fHelp)
     if (fHelp || params.size() != 1)
         throw std::runtime_error(
             "createrawzerocoinstake mint_input \n"
-            "\nCreates raw zWGR coinstakes (without MN output).\n" +
+            "\nCreates raw zWGR coinstakes (without MN output). Only for regtest\n" +
             HelpRequiringPassphrase() + "\n"
 
             "\nArguments:\n"
@@ -950,6 +950,9 @@ UniValue createrawzerocoinstake(const UniValue& params, bool fHelp)
             HelpExampleCli("createrawzerocoinstake", "0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f") +
             HelpExampleRpc("createrawzerocoinstake", "0d8c16eee7737e3cc1e4e70dc006634182b175e039700931283b202715a0818f"));
 
+
+    if (Params().NetworkID() != CBaseChainParams::REGTEST)
+        throw JSONRPCError(RPC_WALLET_ERROR, "createrawzerocoinstake is available only on regtest net");
 
     assert(pwalletMain != NULL);
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -995,8 +998,8 @@ UniValue createrawzerocoinstake(const UniValue& params, bool fHelp)
 
     // create the zerocoinspend input
     CTxIn newTxIn;
-    // !TODO: mint checks
-    if (!pwalletMain->MintToTxIn(input_mint, hashTxOut, newTxIn, receipt, libzerocoin::SpendType::STAKE))
+    // Use v2 spends for input (with v3 zwgr staking is disabled)
+    if (!pwalletMain->MintToTxIn(input_mint, hashTxOut, newTxIn, receipt, libzerocoin::SpendType::STAKE, nullptr, false))
         throw JSONRPCError(RPC_WALLET_ERROR, "failed to create zc-spend stake input");
 
     coinstake_tx.vin.push_back(newTxIn);
