@@ -4966,17 +4966,20 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
             "  ]\n"
 
             "\nResult:\n"
-            "[\n"
-            "  {\n"
-            "    \"txid\": \"xxx\",         (string) Transaction ID.\n"
-            "    \"value\": amount,       (numeric) Minted amount.\n"
-            "    \"pubcoin\": \"xxx\",      (string) Pubcoin in hex format.\n"
-            "    \"randomness\": \"xxx\",   (string) Hex encoded randomness.\n"
-            "    \"serial\": \"xxx\",       (string) Serial in hex format.\n"
-            "    \"time\": nnn            (numeric) Time to mint this transaction.\n"
-            "  }\n"
-            "  ,...\n"
-            "]\n"
+            "{\n"
+            "   \"txid\": \"xxx\",       (string) Transaction ID.\n"
+            "   \"time\": nnn            (numeric) Time to mint this transaction.\n"
+            "   \"mints\":\n"
+            "   [\n"
+            "      {\n"
+            "         \"denomination\": nnn,     (numeric) Minted denomination.\n"
+            "         \"pubcoin\": \"xxx\",      (string) Pubcoin in hex format.\n"
+            "         \"randomness\": \"xxx\",   (string) Hex encoded randomness.\n"
+            "         \"serial\": \"xxx\",       (string) Serial in hex format.\n"
+            "      },\n"
+            "      ...\n"
+            "   ]\n"
+            "}\n"
 
             "\nExamples:\n"
             "\nMint 50 from anywhere\n" +
@@ -5044,20 +5047,22 @@ UniValue mintzerocoin(const UniValue& params, bool fHelp)
     if (strError != "")
         throw JSONRPCError(RPC_WALLET_ERROR, strError);
 
+    UniValue retObj(UniValue::VOBJ);
+    retObj.push_back(Pair("txid", wtx.GetHash().ToString()));
+    retObj.push_back(Pair("time", GetTimeMillis() - nTime));
     UniValue arrMints(UniValue::VARR);
     for (CDeterministicMint dMint : vDMints) {
         UniValue m(UniValue::VOBJ);
-        m.push_back(Pair("txid", wtx.GetHash().ToString()));
-        m.push_back(Pair("value", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination()))));
+        m.push_back(Pair("denomination", ValueFromAmount(libzerocoin::ZerocoinDenominationToAmount(dMint.GetDenomination()))));
         m.push_back(Pair("pubcoinhash", dMint.GetPubcoinHash().GetHex()));
         m.push_back(Pair("serialhash", dMint.GetSerialHash().GetHex()));
         m.push_back(Pair("seedhash", dMint.GetSeedHash().GetHex()));
         m.push_back(Pair("count", (int64_t)dMint.GetCount()));
-        m.push_back(Pair("time", GetTimeMillis() - nTime));
         arrMints.push_back(m);
     }
+    retObj.push_back(Pair("mints", arrMints));
 
-    return arrMints;
+    return retObj;
 }
 
 UniValue spendzerocoin(const UniValue& params, bool fHelp)
