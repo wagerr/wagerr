@@ -529,10 +529,10 @@ public:
         nZerocoinStartHeight = 300;
         nBlockZerocoinV2 = 300;
         nZerocoinStartTime = 1518696283;
-        nBlockEnforceSerialRange = 1; //Enforce serial range starting this block
-        nBlockRecalculateAccumulators = 999999999; //Trigger a recalculation of accumulators
-        nBlockFirstFraudulent = 999999999; //First block that bad serials emerged
-        nBlockLastGoodCheckpoint = 999999999; //Last valid accumulator checkpoint
+        nBlockEnforceSerialRange = 1;               //Enforce serial range starting this block
+        nBlockRecalculateAccumulators = 999999999;  //Trigger a recalculation of accumulators
+        nBlockFirstFraudulent = 999999999;          //First block that bad serials emerged
+        nBlockLastGoodCheckpoint = 999999999;       //Last valid accumulator checkpoint
 
         /** Block height at which BIP34 becomes active */
         nBIP34Height = 1;
@@ -541,6 +541,9 @@ public:
 
         nBlockStakeModifierV2 = 400;
         nBlockTimeProtocolV2 = 500;
+
+        nMintRequiredConfirmations = 10;
+        nZerocoinRequiredStakeDepth = nMintRequiredConfirmations;
 
         // Public coin spend enforcement
         nPublicZCSpends = 350;
