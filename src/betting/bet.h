@@ -7,10 +7,12 @@
 
 #include "util.h"
 #include "chainparams.h"
-
-#include <boost/filesystem/path.hpp>
-#include <map>
-
+#include "leveldbwrapper.h"
+#include <flushablestorage/flushablestorage.h>
+#include <boost/variant.hpp>
+#include <boost/filesystem.hpp>
+#include <boost/signals2/signal.hpp>
+#include <boost/exception/to_string.hpp>
 // The supported bet outcome types.
 typedef enum OutcomeType {
     moneyLineWin  = 0x01,
@@ -49,7 +51,8 @@ typedef enum BetTxTypes{
     cgBetTxType          = 0x07,  // Chain games bet transaction type identifier.
     cgResultTxType       = 0x08,  // Chain games result transaction type identifier.
     plSpreadsEventTxType = 0x09,  // Spread odds transaction type identifier.
-    plTotalsEventTxType  = 0x0a   // Totals odds transaction type identifier.
+    plTotalsEventTxType  = 0x0a,  // Totals odds transaction type identifier.
+    plEventPatchTxType   = 0x0b   // Peerless event patch transaction type identifier.
 } BetTxTypes;
 
 // The supported mapping TX types.
@@ -96,18 +99,6 @@ class CBetOut : public CTxOut {
         return CTxOut::IsEmpty() && nBetValue == 0 && nEventId == 0;
     }
 };
-
-/** Ensures a TX has come from an OMNO wallet. **/
-bool IsValidOracleTx(const CTxIn &txin);
-
-/** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
-int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward);
-
-/** Aggregates the amount of WGR to be minted to pay out all CG Lotto winners as well as OMNO rewards. **/
-int64_t GetCGBlockPayouts(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& nMNBetReward);
-
-/** Validating the payout block using the payout vector. **/
-bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block);
 
 class CPeerlessEvent
 {
@@ -188,12 +179,12 @@ public:
         READWRITE(nTotalPushPotentialLiability);
         READWRITE(nMoneyLineHomeBets);
         READWRITE(nMoneyLineAwayBets);
-        READWRITE(nMoneyLineDrawBets);     
+        READWRITE(nMoneyLineDrawBets);
         READWRITE(nSpreadHomeBets);
         READWRITE(nSpreadAwayBets);
         READWRITE(nSpreadPushBets);
         READWRITE(nTotalOverBets);
-        READWRITE(nTotalUnderBets); 
+        READWRITE(nTotalUnderBets);
         READWRITE(nTotalPushBets);
     }
 };
@@ -356,6 +347,29 @@ public:
     static bool FromOpCode(std::string opCode, CPeerlessTotalsEvent &pte);
 };
 
+class CPeerlessEventPatch
+{
+public:
+    int nVersion;
+    uint32_t nEventId;
+    uint64_t nStartTime;
+
+    CPeerlessEventPatch() {}
+
+    static bool ToOpCode(CPeerlessEventPatch pe, std::string &opCode);
+    static bool FromOpCode(std::string opCode, CPeerlessEventPatch &pe);
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(this->nVersion);
+        nVersion = this->nVersion;
+        READWRITE(nEventId);
+        READWRITE(nStartTime);
+    }
+};
+
 class CMapping
 {
 public:
@@ -365,10 +379,12 @@ public:
     uint32_t nId;
     std::string sName;
 
-    // Default Constructor.
-    CMapping() {}
+    MappingTypes GetType() const;
 
-    static bool ToOpCode(CMapping &mapping, std::string &opCode);
+    static std::string ToTypeName(MappingTypes type);
+    static MappingTypes FromTypeName(const std::string& name);
+
+    static bool ToOpCode(const CMapping& mapping, std::string &opCode);
     static bool FromOpCode(std::string opCode, CMapping &mapping);
 
     ADD_SERIALIZE_METHODS;
@@ -383,107 +399,307 @@ public:
     }
 };
 
-// Define new map type to store Wagerr mappings.
-typedef std::map<uint32_t, CMapping> mappingIndex_t;
+// DataBase Code
 
-class CMappingDB
+// MappingKey
+typedef struct MappingKey {
+    uint32_t nMType;
+    uint32_t nId;
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nMType);
+        READWRITE(nId);
+    }
+} MappingKey;
+
+// ResultKey
+using ResultKey = uint32_t;
+
+// EventKey
+using EventKey = uint32_t;
+
+// UndoKey
+using BettingUndoKey = uint256;
+
+using BettingUndoVariant = boost::variant<CMapping, CPeerlessEvent, CPeerlessResult>;
+
+typedef enum BettingUndoTypes {
+    UndoMapping,
+    UndoPeerlessEvent,
+    UndoPeerlessResult
+} BettingUndoTypes;
+
+class CBettingUndo
 {
-protected:
-    // Global variables that stores the different Wagerr mappings.
-    static mappingIndex_t mSportsIndex;
-    static mappingIndex_t mRoundsIndex;
-    static mappingIndex_t mTeamsIndex;
-    static mappingIndex_t mTournamentsIndex;
+public:
+    uint32_t height = 0;
 
-    static CCriticalSection cs_setSports;
-    static CCriticalSection cs_setRounds;
-    static CCriticalSection cs_setTeams;
-    static CCriticalSection cs_setTournaments;
+    CBettingUndo() { }
+
+    CBettingUndo(const BettingUndoVariant& undoVar, const uint32_t height) : height{height}, undoVariant{undoVar} { }
+
+    bool Inited() {
+        return !undoVariant.empty();
+    }
+
+    BettingUndoVariant Get() {
+        return undoVariant;
+    }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(height);
+        int undoType;
+        if (ser_action.ForRead()) {
+            READWRITE(undoType);
+            switch ((BettingUndoTypes)undoType)
+            {
+                case UndoMapping:
+                {
+                    CMapping mapping{};
+                    READWRITE(mapping);
+                    undoVariant = mapping;
+                    break;
+                }
+                case UndoPeerlessEvent:
+                {
+                    CPeerlessEvent event{};
+                    READWRITE(event);
+                    undoVariant = event;
+                    break;
+                }
+                case UndoPeerlessResult:
+                {
+                    CPeerlessResult result{};
+                    READWRITE(result);
+                    undoVariant = result;
+                    break;
+                }
+                default:
+                    std::runtime_error("Undefined undo type");
+            }
+        }
+        else {
+            undoType = undoVariant.which();
+            READWRITE(undoType);
+            switch ((BettingUndoTypes)undoType)
+            {
+                case UndoMapping:
+                {
+                    CMapping mapping = boost::get<CMapping>(undoVariant);
+                    READWRITE(mapping);
+                    break;
+                }
+                case UndoPeerlessEvent:
+                {
+                    CPeerlessEvent event = boost::get<CPeerlessEvent>(undoVariant);
+                    READWRITE(event);
+                    break;
+                }
+                case UndoPeerlessResult:
+                {
+                    CPeerlessResult result = boost::get<CPeerlessResult>(undoVariant);
+                    READWRITE(result);
+                    break;
+                }
+                default:
+                    std::runtime_error("Undefined undo type");
+            }
+        }
+    }
 
 private:
-    std::string mDBFileName;
-    boost::filesystem::path mFilePath;
-
-public:
-    // Default constructor.
-    CMappingDB() {}
-
-    // Parametrized Constructor.
-    CMappingDB(std::string fileName);
-
-    bool Write(const mappingIndex_t& mappingIndex,  uint256 latestBlockHash);
-    bool Read(mappingIndex_t& mappingIndex, uint256& lastBlockHash);
-
-    static void GetSports(mappingIndex_t &sportsIndex);
-    static void SetSports(const mappingIndex_t &sportsIndex);
-    static void AddSport(CMapping sm);
-
-    static void GetRounds(mappingIndex_t &roundsIndex);
-    static void SetRounds(const mappingIndex_t &roundsIndex);
-    static void AddRound(CMapping rm);
-
-    static void GetTeams(mappingIndex_t &teamsIndex);
-    static void SetTeams(const mappingIndex_t &teamsIndex);
-    static void AddTeam(CMapping ts);
-
-    static void GetTournaments(mappingIndex_t &tournamentsIndex);
-    static void SetTournaments(const mappingIndex_t &tournamentsIndex);
-    static void AddTournament(CMapping ts);
+    BettingUndoVariant undoVariant;
 };
 
-// Define new map type to store Wagerr events.
-typedef std::map<uint32_t, CPeerlessEvent> eventIndex_t;
-
-class CEventDB
+class CBettingDB
 {
-protected:
-    // Global variable that stores the current live Wagerr events.
-    static eventIndex_t eventsIndex;
-    static CCriticalSection cs_setEvents;
-
-private:
-    boost::filesystem::path pathEvents;
-
 public:
-    // Default constructor.
-    CEventDB();
+    // Default Constructor.
+    explicit CBettingDB(CStorageKV& db) : db{db} { }
+    // Cache copy constructor (we should set global flushable storage ref as flushable storage of cached copy)
+    explicit CBettingDB(CBettingDB& bdb) : CBettingDB(bdb.GetDb()) { }
 
-    bool Write(const eventIndex_t& eventIndex,  uint256 latestProcessedBlock);
-    bool Read(eventIndex_t& eventIndex, uint256& lastBlockHash);
+    ~CBettingDB() {}
 
-    static void GetEvents(eventIndex_t &eventIndex);
-    static void SetEvents(const eventIndex_t &eventIndex);
+    bool Flush() { return db.Flush(); }
 
-    static void AddEvent(CPeerlessEvent pe);
-    static void RemoveEvent(CPeerlessResult pr);
+    std::unique_ptr<CStorageKVIterator> NewIterator() {
+        return db.NewIterator();
+    }
+
+    template<typename KeyType>
+    bool Exists(const KeyType& key) {
+        return GetDb().Exists(DbTypeToBytes(key));
+    }
+
+    template<typename KeyType, typename ValueType>
+    bool Write(const KeyType& key, const ValueType& value) {
+        if (GetDb().Exists(DbTypeToBytes(key)))
+            return false;
+        return GetDb().Write(DbTypeToBytes(key), DbTypeToBytes(value));
+    }
+
+    template<typename KeyType, typename ValueType>
+    bool Update(const KeyType& key, const ValueType& value) {
+        return Erase(key) && Write(key, value);
+    }
+
+    template<typename KeyType>
+    bool Erase(const KeyType& key) {
+        if (!GetDb().Exists(DbTypeToBytes(key)))
+            return false;
+        return GetDb().Erase(DbTypeToBytes(key));
+    }
+
+    template<typename KeyType, typename ValueType>
+    bool Read(const KeyType& key, ValueType& value) {
+        std::vector<char> value_v;
+        if (GetDb().Read(DbTypeToBytes(key), value_v)) {
+            BytesToDbType(value_v, value);
+            return true;
+        }
+        return false;
+    }
+
+    static std::size_t dbWrapperCacheSize() { return 10 << 20; }
+
+    static std::string MakeDbPath(const char* name) {
+        using namespace boost::filesystem;
+
+        std::string result{};
+        path dir{GetDataDir()};
+
+        dir /= "betting";
+        dir /= name;
+
+        if (boost::filesystem::is_directory(dir) || boost::filesystem::create_directories(dir) ) {
+            result = boost::to_string(dir);
+            result.erase(0, 1);
+            result.erase(result.size() - 1);
+        }
+
+        return result;
+    }
+
+    template<typename T>
+    static std::vector<char> DbTypeToBytes(const T& value) {
+        CDataStream stream(SER_DISK, CLIENT_VERSION);
+        stream << value;
+        return std::vector<char>(stream.begin(), stream.end());
+    }
+
+    template<typename T>
+    static void BytesToDbType(const std::vector<char>& bytes, T& value) {
+        CDataStream stream(bytes, SER_DISK, CLIENT_VERSION);
+        stream >> value;
+        assert(stream.size() == 0);
+    }
+protected:
+    CFlushableStorageKV& GetDb() { return db; }
+    CFlushableStorageKV db;
 };
 
-// Define new map type to store Wagerr results.
-typedef std::map<uint32_t, CPeerlessResult> resultsIndex_t;
-
-class CResultDB
+/** Container for several db objects */
+class CBettingsView
 {
-protected:
-    // Global variable that stores the Wagerr results.
-    static resultsIndex_t resultsIndex;
-    static CCriticalSection cs_setResults;
-
-private:
-    boost::filesystem::path pathResults;
-
+    // fields will be init in init.cpp
 public:
-    // Default constructor.
-    CResultDB();
+    std::unique_ptr<CBettingDB> mappings; // "mappings"
+    std::unique_ptr<CStorageKV> mappingsStorage;
+    std::unique_ptr<CBettingDB> results; // "results"
+    std::unique_ptr<CStorageKV> resultsStorage;
+    std::unique_ptr<CBettingDB> events; // "events"
+    std::unique_ptr<CStorageKV> eventsStorage;
+    std::unique_ptr<CBettingDB> undos; // "undos"
+    std::unique_ptr<CStorageKV> undosStorage;
 
-    bool Write(const resultsIndex_t& resultsIndex,  uint256 latestProcessedBlock);
-    bool Read(resultsIndex_t& resultsIndex, uint256& lastBlockHash);
+    // default constructor
+    CBettingsView() { }
 
-    static void GetResults(resultsIndex_t &resultsIndex);
-    static void SetResults(const resultsIndex_t &resultsIndex);
+    // copy constructor for creating DB cache
+    CBettingsView(CBettingsView* phr) {
+        mappings = MakeUnique<CBettingDB>(*phr->mappings.get());
+        results = MakeUnique<CBettingDB>(*phr->results.get());
+        events = MakeUnique<CBettingDB>(*phr->events.get());
+        undos = MakeUnique<CBettingDB>(*phr->undos.get());
+    }
 
-    static void AddResult(CPeerlessResult pe);
-    static void RemoveResult(CPeerlessResult pe);
+    bool Flush() {
+        return mappings->Flush() && results->Flush() && events->Flush() && undos->Flush();
+    }
+
+    void SetLastHeight(uint32_t height) {
+        if (!undos->Exists(std::string("LastHeight"))) {
+            undos->Write(std::string("LastHeight"), height);
+        }
+        else {
+            undos->Update(std::string("LastHeight"), height);
+        }
+    }
+
+    uint32_t GetLastHeight() {
+        uint32_t height;
+        if (!undos->Read(std::string("LastHeight"), height))
+            return 0;
+        return height;
+    }
+
+    bool SaveBettingUndo(const BettingUndoKey& key, CBettingUndo undo) {
+        assert(!undos->Exists(key));
+        return undos->Write(key, undo);
+    }
+
+    bool EraseBettingUndo(const BettingUndoKey& key) {
+        return undos->Erase(key);
+    }
+
+    CBettingUndo GetBettingUndo(const BettingUndoKey& key) {
+        CBettingUndo undo;
+        if (undos->Read(key, undo))
+            return undo;
+        else
+            return CBettingUndo();
+    }
+
+    void PruneOlderUndos(const uint32_t height) {
+        CBettingUndo undo;
+        BettingUndoKey key;
+        std::string str;
+        auto it = undos->NewIterator();
+        std::vector<char> lastHeightKey = CBettingDB::DbTypeToBytes(std::string("LastHeight"));
+        for (it->Seek(std::vector<char>{}); it->Valid(); it->Next()) {
+            // check that key is serialized "LastHeight" key and skip if true
+            if (it->Key() == lastHeightKey) {
+                continue;
+            }
+            CBettingDB::BytesToDbType(it->Key(), key);
+            CBettingDB::BytesToDbType(it->Value(), undo);
+            if (undo.height < height) {
+                undos->Erase(key);
+            }
+        }
+    }
 };
+
+extern CBettingsView *bettingsView;
+
+/** Ensures a TX has come from an OMNO wallet. **/
+bool IsValidOracleTx(const CTxIn &txin);
+
+/** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
+int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward);
+
+/** Aggregates the amount of WGR to be minted to pay out all CG Lotto winners as well as OMNO rewards. **/
+int64_t GetCGBlockPayouts(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& nMNBetReward);
+
+/** Validating the payout block using the payout vector. **/
+bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block);
 
 /** Find peerless events. **/
 std::vector<CPeerlessResult> getEventResults(int height);
@@ -497,16 +713,15 @@ std::vector<CBetOut> GetBetPayouts(int height);
 /** Get the chain games winner and return the payout vector. **/
 std::vector<CBetOut> GetCGLottoBetPayouts(int height);
 
-/** Set a peerless event spread odds **/
-void SetEventSpreadOdds(CPeerlessSpreadsEvent sEventOdds);
+/** Parse the transaction for betting data **/
+void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height);
 
-/** Set a peerless event total odds **/
-void SetEventTotalOdds(CPeerlessTotalsEvent tEventOdds);
+/** Get the chain height **/
+int GetActiveChainHeight(const bool lockHeld = false);
 
-/** Set a peerless event money line odds **/
-void SetEventMLOdds(CPeerlessUpdateOdds mEventOdds);
+bool RecoveryBettingDB(boost::signals2::signal<void(const std::string&)> & progress);
 
-/** Set a peerless event accumulators **/
-void SetEventAccummulators (CPeerlessBet plBet, CAmount betAmount);
+bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height);
+
 
 #endif // WAGERR_BET_H
