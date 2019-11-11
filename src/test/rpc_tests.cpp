@@ -12,6 +12,7 @@
 #include "util.h"
 
 #include "test/test_wagerr.h"
+#include "betting/bet.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>
@@ -270,8 +271,25 @@ BOOST_AUTO_TEST_CASE(rpc_ban)
 
 BOOST_AUTO_TEST_CASE(rpc_bet)
 {
+    auto mapsPath = CBettingDB::MakeDbPath("mappings");
+    auto eventsPath = CBettingDB::MakeDbPath("events");
+    auto resultsPath = CBettingDB::MakeDbPath("results");
+    auto undosPath = CBettingDB::MakeDbPath("undos");
+
+    boost::filesystem::remove_all(mapsPath);
+    boost::filesystem::remove_all(eventsPath);
+    boost::filesystem::remove_all(resultsPath);
+    boost::filesystem::remove_all(undosPath);
+
     BOOST_CHECK_NO_THROW(CallRPC(std::string("getmappingid sports Soccer")));
     BOOST_CHECK_NO_THROW(CallRPC(std::string("getmappingname sports 0")));
+    BOOST_CHECK_NO_THROW(CallRPC(std::string("listbets")));
+    BOOST_CHECK_NO_THROW(CallRPC(std::string("listevents")));
+
+    boost::filesystem::remove_all(mapsPath);
+    boost::filesystem::remove_all(eventsPath);
+    boost::filesystem::remove_all(resultsPath);
+    boost::filesystem::remove_all(undosPath);
 }
 
 BOOST_AUTO_TEST_SUITE_END()
