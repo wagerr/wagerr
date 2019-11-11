@@ -12,7 +12,6 @@
 #include "zwgr/accumulatormap.h"
 #include "addrman.h"
 #include "alert.h"
-#include "betting/bet.h"
 #include "blocksignature.h"
 #include "chainparams.h"
 #include "checkpoints.h"
@@ -2466,7 +2465,7 @@ bool CheckInputs(const CTransaction& tx, CValidationState& state, const CCoinsVi
     return true;
 }
 
-bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool* pfClean)
+bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, CBettingsView& bettingsViewCache, bool* pfClean)
 {
     if (pindex->GetBlockHash() != view.GetBestBlock())
         LogPrintf("%s : pindex=%s view=%s\n", __func__, pindex->GetBlockHash().GetHex(), view.GetBestBlock().GetHex());
@@ -2598,10 +2597,19 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
                 coins->vout[out.n] = undo.txout;
             }
         }
+        // Revert betting dats
+        if (pindex->nHeight > Params().BetStartHeight()) {
+            if (!UndoBettingTx(bettingsViewCache, tx, pindex->nHeight)) {
+                error("DisconnectBlock(): custom transaction and undo data inconsistent");
+                return false;
+            }
+        }
     }
 
     // move best block pointer to prevout block
     view.SetBestBlock(pindex->pprev->GetBlockHash());
+
+    bettingsViewCache.SetLastHeight(pindex->pprev->nHeight);
 
     if (!fVerifyingBlocks) {
         //if block is an accumulator checkpoint block, remove checkpoint and checksums from db
@@ -2955,7 +2963,7 @@ static int64_t nTimeIndex = 0;
 static int64_t nTimeCallbacks = 0;
 static int64_t nTimeTotal = 0;
 
-bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, bool fJustCheck, bool fAlreadyChecked)
+bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pindex, CCoinsViewCache& view, CBettingsView& bettingsViewCache, bool fJustCheck, bool fAlreadyChecked)
 {
     AssertLockHeld(cs_main);
     // Check it again in case a previous version let a bad block in
@@ -2968,10 +2976,16 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         LogPrintf("%s: hashPrev=%s view=%s\n", __func__, hashPrevBlock.GetHex(), view.GetBestBlock().GetHex());
     assert(hashPrevBlock == view.GetBestBlock());
 
+    if (pindex->nHeight != 0) {
+        if (bettingsViewCache.GetLastHeight() != (uint32_t)pindex->nHeight - 1)
+            return state.Abort("ConnectBlock() : Bettings database is corrupted (height mismatch)! Bettings DB prev block = " + std::to_string(bettingsViewCache.GetLastHeight()) + ", current block = " + std::to_string(pindex->nHeight) + ". Please restart with -reindex to recover.");
+    }
+
     // Special case for the genesis block, skipping connection of its transactions
     // (its coinbase is unspendable)
     if (block.GetHash() == Params().HashGenesisBlock()) {
         view.SetBestBlock(pindex->GetBlockHash());
+        bettingsViewCache.SetLastHeight(pindex->nHeight);
         return true;
     }
 
@@ -3188,7 +3202,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     CAmount nMoneySupplyPrev = pindex->pprev ? pindex->pprev->nMoneySupply : 0;
     pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn - nValueBurned;
     pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
-    
+
 //    LogPrintf("XX69----------> ConnectBlock(): nValueOut: %s, nValueIn: %s, nFees: %s, nMint: %s zWgrSpent: %s\n",
 //              FormatMoney(nValueOut), FormatMoney(nValueIn),
 //              FormatMoney(nFees), FormatMoney(pindex->nMint), FormatMoney(nAmountZerocoinSpent));
@@ -3385,6 +3399,20 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             mapZerocoinspends.erase(it);
     }
 
+    // Look through the block for any events, results or mapping TX.
+    if (!fJustCheck) {
+        if (pindex->nHeight > Params().BetStartHeight()) {
+            for (const CTransaction& tx : block.vtx) {
+                ParseBettingTx(bettingsViewCache, tx, pindex->nHeight);
+            }
+            if (!(pindex->nHeight % 100)) {
+                int heightLimit = pindex->nHeight - Params().MaxReorganizationDepth();
+                bettingsViewCache.PruneOlderUndos((uint32_t)heightLimit);
+            }
+        }
+        bettingsViewCache.SetLastHeight(pindex->nHeight);
+    }
+
     return true;
 }
 
@@ -3437,6 +3465,9 @@ bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
             // Finally flush the chainstate (which may refer to block index entries).
             if (!pcoinsTip->Flush())
                 return state.Abort("Failed to write to coin database");
+            // Flush betting database
+            if (!bettingsView->Flush())
+                return state.Abort("Failed to write to betting database");
             // Update best block in wallet (so we can detect restored wallets).
             if (mode != FLUSH_STATE_IF_NEEDED) {
                 GetMainSignals().SetBestChain(chainActive.GetLocator());
@@ -3516,9 +3547,11 @@ bool static DisconnectTip(CValidationState& state)
     int64_t nStart = GetTimeMicros();
     {
         CCoinsViewCache view(pcoinsTip);
-        if (!DisconnectBlock(block, state, pindexDelete, view))
+        CBettingsView bettingsViewCache(bettingsView);
+        if (!DisconnectBlock(block, state, pindexDelete, view, bettingsViewCache))
             return error("DisconnectTip() : DisconnectBlock %s failed", pindexDelete->GetBlockHash().ToString());
         assert(view.Flush());
+        assert(bettingsViewCache.Flush());
     }
     LogPrint("bench", "- Disconnect block: %.2fms\n", (GetTimeMicros() - nStart) * 0.001);
     // Write the chain state to disk, if necessary.
@@ -3559,6 +3592,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, CBlock* 
     assert(pindexNew->pprev == chainActive.Tip());
     mempool.check(pcoinsTip);
     CCoinsViewCache view(pcoinsTip);
+    CBettingsView bettingsViewCache(bettingsView);
 
     if (pblock == NULL)
         fAlreadyChecked = false;
@@ -3578,7 +3612,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, CBlock* 
     LogPrint("bench", "  - Load block from disk: %.2fms [%.2fs]\n", (nTime2 - nTime1) * 0.001, nTimeReadFromDisk * 0.000001);
     {
         CInv inv(MSG_BLOCK, pindexNew->GetBlockHash());
-        bool rv = ConnectBlock(*pblock, state, pindexNew, view, false, fAlreadyChecked);
+        bool rv = ConnectBlock(*pblock, state, pindexNew, view, bettingsViewCache, false, fAlreadyChecked);
         GetMainSignals().BlockChecked(*pblock, state);
         if (!rv) {
             if (state.IsInvalid())
@@ -3590,6 +3624,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, CBlock* 
         nTimeConnectTotal += nTime3 - nTime2;
         LogPrint("bench", "  - Connect total: %.2fms [%.2fs]\n", (nTime3 - nTime2) * 0.001, nTimeConnectTotal * 0.000001);
         assert(view.Flush());
+        assert(bettingsViewCache.Flush());
     }
     int64_t nTime4 = GetTimeMicros();
     nTimeFlush += nTime4 - nTime3;
@@ -4215,7 +4250,6 @@ bool CheckBlock(const CBlock& block, CValidationState& state, bool fCheckPOW, bo
     // These are checks that are independent of context.
     const bool IsPoS = block.IsProofOfStake();
     LogPrint("debug", "%s: block=%s  is proof of stake=%d\n", __func__, block.GetHash().ToString().c_str(), IsPoS);
-
 
     // Check that the header is valid (particularly PoW).  This is mostly
     // redundant with the call in AcceptBlockHeader.
@@ -4853,136 +4887,6 @@ bool AcceptBlock(CBlock& block, CValidationState& state, CBlockIndex** ppindex, 
         return state.Abort(std::string("System error: ") + e.what());
     }
 
-    bool eiUpdated = false;
-    // Look through the block for any events, results or mapping TX.
-    if (pindex->nHeight > Params().BetStartHeight()) {
-        for (CTransaction& tx : block.vtx) {
-
-            // Ensure the event TX has come from Oracle wallet.
-            const CTxIn &txin = tx.vin[0];
-            bool validOracleTx = IsValidOracleTx(txin);
-
-            // Search for any new bets
-            for (unsigned int i = 0; i < tx.vout.size(); i++) {
-                const CTxOut& txout = tx.vout[i];
-                std::string s = txout.scriptPubKey.ToString();
-
-                if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
-                    std::vector<unsigned char> v = ParseHex(s.substr(9, std::string::npos));
-                    std::string opCode(v.begin(), v.end());
-
-                    CPeerlessBet plBet;
-                    if (CPeerlessBet::FromOpCode(opCode, plBet)) {
-                        CAmount betAmount = txout.nValue;
-                        SetEventAccummulators(plBet, betAmount);
-                        eiUpdated = true;
-                    }
-                }
-            }
-
-            // If a valid OMNO transaction.
-            if (validOracleTx) {
-
-                for (unsigned int i = 0; i < tx.vout.size(); i++) {
-                    const CTxOut& txout = tx.vout[i];
-                    std::string s = txout.scriptPubKey.ToString();
-
-                    if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
-                        std::vector<unsigned char> v = ParseHex(s.substr(9, std::string::npos));
-                        std::string opCode(v.begin(), v.end());
-
-                        // TODO - Optimise the OP code validation, we don't need to compare current OP code against all TX types.
-                        // if it matches any TX type the rest should be skipped.
-
-                        // If events found in block add them to the events index.
-                        CPeerlessEvent plEvent;
-                        if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
-                            CEventDB::AddEvent(plEvent);
-                            eiUpdated = true;
-                        }
-
-                        // If results found in block remove event from event index and add result to result index.
-                        CPeerlessResult plResult;
-                        if (CPeerlessResult::FromOpCode(opCode, plResult)) {
-//                            CEventDB::RemoveEvent(plResult);
-                            CResultDB::AddResult(plResult);
-                            eiUpdated = true;
-                        }
-
-                        // If update money line odds TX found in block, update the event index.
-                        CPeerlessUpdateOdds puo;
-                        if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
-                            SetEventMLOdds(puo);
-                            eiUpdated = true;
-                        }
-
-                        // If spread odds TX found then update the spread odds for that event object.
-                        CPeerlessSpreadsEvent spreadEvent;
-                        if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
-                            SetEventSpreadOdds(spreadEvent);
-                            eiUpdated = true;
-                        }
-
-                        // If total odds TX found then update the total odds for that event object.
-                        CPeerlessTotalsEvent totalsEvent;
-                        if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
-                            SetEventTotalOdds(totalsEvent);
-                            eiUpdated = true;
-                        }
-
-                        // If mapping found then add it to the relating std::map index and write the std::map index to disk.
-                        CMapping cMapping;
-                        if (CMapping::FromOpCode(opCode, cMapping)) {
-                            if (cMapping.nMType == sportMapping) {
-                                CMappingDB::AddSport(cMapping);
-
-                                mappingIndex_t sportsIndex;
-                                CMappingDB mdb("sports.dat");
-                                mdb.Write(sportsIndex, block.GetHash());
-                            }
-                            else if (cMapping.nMType == roundMapping) {
-                                CMappingDB::AddRound(cMapping);
-
-                                mappingIndex_t roundsIndex;
-                                CMappingDB mdb("rounds.dat");
-                                mdb.Write(roundsIndex, block.GetHash());
-                            }
-                            else if (cMapping.nMType == teamMapping) {
-                                CMappingDB::AddTeam(cMapping);
-
-                                mappingIndex_t teamsIndex;
-                                CMappingDB mdb("teams.dat");
-                                mdb.Write(teamsIndex, block.GetHash());
-                            }
-                            else if (cMapping.nMType == tournamentMapping) {
-                                CMappingDB::AddTournament(cMapping);
-
-                                mappingIndex_t tournamentsIndex;
-                                CMappingDB mdb("tournaments.dat");
-                                mdb.Write(tournamentsIndex, block.GetHash());
-                            }
-                        }
-                    }
-                }
-
-                // Write event and result indexes to events.dat and results.dat respectively.
-                if (eiUpdated) {
-                    // Update the global event index.
-                    CEventDB edb;
-                    eventIndex_t eventIndex;
-                    edb.GetEvents(eventIndex);
-                    edb.Write(eventIndex, block.GetHash());
-
-                    // Update the global results index.
-                    CResultDB rdb;
-                    resultsIndex_t resultsIndex;
-                    rdb.GetResults(resultsIndex);
-                    rdb.Write(resultsIndex, block.GetHash());
-                }
-            }
-        }
-    }
-
     return true;
 }
 
@@ -5142,6 +5046,7 @@ bool TestBlockValidity(CValidationState& state, const CBlock& block, CBlockIndex
     }
 
     CCoinsViewCache viewNew(pcoinsTip);
+    CBettingsView bettingsViewNew(bettingsView);
     CBlockIndex indexDummy(block);
     indexDummy.pprev = pindexPrev;
     indexDummy.nHeight = pindexPrev->nHeight + 1;
@@ -5153,7 +5058,7 @@ bool TestBlockValidity(CValidationState& state, const CBlock& block, CBlockIndex
         return false;
     if (!ContextualCheckBlock(block, state, pindexPrev))
         return false;
-    if (!ConnectBlock(block, state, &indexDummy, viewNew, true))
+    if (!ConnectBlock(block, state, &indexDummy, viewNew, bettingsViewNew, true))
         return false;
     assert(state.IsValid());
 
@@ -5372,6 +5277,7 @@ bool CVerifyDB::VerifyDB(CCoinsView* coinsview, int nCheckLevel, int nCheckDepth
     nCheckLevel = std::max(0, std::min(4, nCheckLevel));
     LogPrintf("Verifying last %i blocks at level %i\n", nCheckDepth, nCheckLevel);
     CCoinsViewCache coins(coinsview);
+    CBettingsView bettings(bettingsView);
     CBlockIndex* pindexState = chainActive.Tip();
     CBlockIndex* pindexFailure = NULL;
     int nGoodTransactions = 0;
@@ -5400,7 +5306,7 @@ bool CVerifyDB::VerifyDB(CCoinsView* coinsview, int nCheckLevel, int nCheckDepth
         // check level 3: check for inconsistencies during memory-only disconnect of tip blocks
         if (nCheckLevel >= 3 && pindex == pindexState && (coins.GetCacheSize() + pcoinsTip->GetCacheSize()) <= nCoinCacheSize) {
             bool fClean = true;
-            if (!DisconnectBlock(block, state, pindex, coins, &fClean))
+            if (!DisconnectBlock(block, state, pindex, coins, bettings, &fClean))
                 return error("VerifyDB() : *** irrecoverable inconsistency in block data at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
             pindexState = pindex->pprev;
             if (!fClean) {
@@ -5425,7 +5331,7 @@ bool CVerifyDB::VerifyDB(CCoinsView* coinsview, int nCheckLevel, int nCheckDepth
             CBlock block;
             if (!ReadBlockFromDisk(block, pindex))
                 return error("VerifyDB() : *** ReadBlockFromDisk failed at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
-            if (!ConnectBlock(block, state, pindex, coins, false))
+            if (!ConnectBlock(block, state, pindex, coins, bettings, false))
                 return error("VerifyDB() : *** found unconnectable block at %d, hash=%s", pindex->nHeight, pindex->GetBlockHash().ToString());
         }
     }
@@ -5602,7 +5508,7 @@ bool LoadExternalBlockFile(FILE* fileIn, CDiskBlockPos* dbp)
                     }
                 }
             } catch (std::exception& e) {
-                LogPrintf("%s : Deserialize or I/O error - %s", __func__, e.what());
+                LogPrintf("%s : Deserialize or I/O error - %s\n", __func__, e.what());
             }
         }
     } catch (std::runtime_error& e) {
