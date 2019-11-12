@@ -3465,7 +3465,7 @@ bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
             // Finally flush the chainstate (which may refer to block index entries).
             if (!pcoinsTip->Flush())
                 return state.Abort("Failed to write to coin database");
-            // Flush betting database
+            // Flush global betting database to persistent storage (LevelDB)
             if (!bettingsView->Flush())
                 return state.Abort("Failed to write to betting database");
             // Update best block in wallet (so we can detect restored wallets).
@@ -3551,6 +3551,7 @@ bool static DisconnectTip(CValidationState& state)
         if (!DisconnectBlock(block, state, pindexDelete, view, bettingsViewCache))
             return error("DisconnectTip() : DisconnectBlock %s failed", pindexDelete->GetBlockHash().ToString());
         assert(view.Flush());
+        // flush to global chache
         assert(bettingsViewCache.Flush());
     }
     LogPrint("bench", "- Disconnect block: %.2fms\n", (GetTimeMicros() - nStart) * 0.001);
@@ -3624,6 +3625,7 @@ bool static ConnectTip(CValidationState& state, CBlockIndex* pindexNew, CBlock* 
         nTimeConnectTotal += nTime3 - nTime2;
         LogPrint("bench", "  - Connect total: %.2fms [%.2fs]\n", (nTime3 - nTime2) * 0.001, nTimeConnectTotal * 0.000001);
         assert(view.Flush());
+        // flush to global chache
         assert(bettingsViewCache.Flush());
     }
     int64_t nTime4 = GetTimeMicros();
