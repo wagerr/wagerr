@@ -2,16 +2,16 @@
 # Copyright (c) 2018-2019 The Wagerr developers
 # Copyright (c) 2019 The OBSR developers
 name: wagerr
-base: core18
-version: 3.1.0
+version: '3.1.0'
+
 summary:   wagerr, digital currency for decentralized betting
 description: |
-  Wagerr is a decentralized sportsbook that changes the way the world
-  bets on sports.
+  Wagerr is a decentralized sportsbook that changes
+  the way the world bets on sports.
   
   - built for everyone.
-    Wagerr uses distributed
-    blockchain technology to execute betting contracts. It escrows
+    Wagerr uses distributed blockchain technology to
+    execute betting contracts. It escrows
     stakes, verifies results, and pays out winners. By eliminating
     centralauthorities, Wagerr solves the most pernicious problems in
     the industry. Reducing corruption and risk results in predictable
@@ -47,264 +47,215 @@ description: |
   - reddit (https://www.reddit.com/r/Wagerr/)
   - bitcointalk (https://bitcointalk.org/index.php?topic=1911583.0)
   - facebook (https://www.facebook.com/wagerr/)
-grade: stable
+
 confinement: strict
+grade: stable
+base: core18
+
 apps:
   daemon:
-    command: wagerrd
+    command: app/resources/bin/wagerrd
     plugs: [network, network-bind, home, removable-media]
     #desktop: wagerrd.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-testnet:
-    command: wagerrd --testnet
+    command: app/resources/bin/wagerrd --testnet
     plugs: [network, network-bind, home, removable-media]
     #desktop: wagerrd_testnet.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   daemon-regtest:
-    command: wagerrd --regtest
+    command: app/resources/bin/wagerrd --regtest
     plugs: [network, network-bind, home, removable-media]
     #desktop: wagerrd_regtest.desktop
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   qt:
-    command: wagerr-qt
-    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
+    command: app/resources/bin/wagerr-qt
+    plugs: [network, network-bind,  unity7, desktop, desktop-legacy, wayland, x11, opengl, home, gsettings, screen-inhibit-control, audio-playback, system-observe, browser-support, hardware-observe ]
     desktop: wagerr-qt.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri:$SNAP/usr/lib"
   qt-testnet:
-    command: wagerr-qt --testnet
-    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
+    command: app/resources/bin/wagerr-qt --testnet
+    plugs: [network, network-bind,  unity7, desktop, desktop-legacy, wayland, x11, opengl, home, gsettings, screen-inhibit-control, audio-playback, system-observe, browser-support, hardware-observe ]
     desktop: wagerr-qt_testnet.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri:$SNAP/usr/lib"
   qt-regtest:
-    command: wagerr-qt --regtest
-    plugs: [network, network-bind, network-status, unity7, desktop, desktop-legacy, wayland, x11, mir, opengl, home, gsettings, removable-media, screen-inhibit-control, pulseaudio, media-hub]
+    command: app/resources/bin/wagerr-qt --regtest
+    plugs: [network, network-bind,  unity7, desktop, desktop-legacy, wayland, x11, opengl, home, gsettings, screen-inhibit-control, audio-playback, system-observe, browser-support, hardware-observe ]
     desktop: wagerr-qt_regtest.desktop
     environment:
       QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri:$SNAP/usr/lib"
+  electron:
+    command: app/wagerr-electron-app --no-sandbox
+    plugs: [network, network-bind,  unity7, desktop, desktop-legacy, wayland, x11, opengl, home, gsettings, screen-inhibit-control, audio-playback, system-observe, browser-support, hardware-observe ]
+    desktop: wagerr-electron-app.desktop
+    environment:
+      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri:$SNAP/usr/lib"
+  electron-testnet:
+    command: app/wagerr-electron-app --no-sandbox --testnet
+    plugs: [network, network-bind,  unity7, desktop, desktop-legacy, wayland, x11, opengl, home, gsettings, screen-inhibit-control, audio-playback, system-observe, browser-support, hardware-observe ]
+    desktop: wagerr-electron-app.desktop
+    environment:
+      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri:$SNAP/usr/lib"
+  electron-regtest:
+    command: app/wagerr-electron-app --no-sandbox --regtest
+    plugs: [network, network-bind,  unity7, desktop, desktop-legacy, wayland, x11, opengl, home, gsettings, screen-inhibit-control, audio-playback, system-observe, browser-support, hardware-observe ]
+    desktop: wagerr-electron-app.desktop
+    environment:
+      QT_XKB_CONFIG_ROOT: $SNAP_USER_DATA:$SNAP/usr/share:$QT_XKB_CONFIG_ROOT
+      XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
+      LD_LIBRARY_PATH: "$LD_LIBRARY_PATH:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/pulseaudio:$SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri:$SNAP/usr/lib"
   cli:
-    command: wagerr-cli
+    command: app/resources/bin/wagerr-cli
     plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli-testnet:
-    command: wagerr-cli --testnet
+    command: app/resources/bin/wagerr-cli --testnet
     plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   cli-regtest:
-    command: wagerr-cli --regtest
+    command: app/resources/bin/wagerr-cli --regtest
     plugs: [network, network-bind, home, removable-media]
     environment:
       XDG_DATA_DIRS: $SNAP_USER_DATA:$SNAP/usr/share:$XDG_DATA_DIRS
   tx:
-    command: wagerr-tx
+    command: app/resources/bin/wagerr-tx
     plugs: [home]
   test:
-    command: test_wagerr
+    command: app/resources/bin/test_wagerr
     plugs: [home]
-  testqt:
-    command: test_wagerr-qt
-    plugs: [home]
+
+layout:
+  /usr/lib/dri:
+    bind: $SNAP/usr/lib/$SNAPCRAFT_ARCH_TRIPLET/dri
+
 parts:
   wagerr:
-    source: https://github.com/wagerr/wagerr
+    source: https://github.com/wagerr/wagerr-electron-app.git
     source-type: git
-    source-tag: v3.1.0
+    source-tag: v1.1.2
     plugin: nil
+
     override-build: |
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "CUSTOM SETTINGS"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      #    use override prefix if binaries differ from project name, for ion it does,
-      #    project is called ioncore because ion exists already as package. For anybody
-      #    offering non official release and using own SNAP, this variable should be used
-      #    default value is "false", to enable it, use your projects binary prefix
-      OVERRIDEBINPREFIX="false"
-      OVERRIDEDATADIR="false"
-      OVERRIDECONF="${OVERRIDEDATADIR}"
-      COPYCONF=0    # copy example config into users data folder, 1 = enabled
-      JOBS=4        # 0 means off and make will run without -j
-      PATCH=1       # 1 = enabled
-      SPLASHPNGS=0  # patch pngs to differ visaully from those installed from self compilation or other source like deb
-      FIXPPCBUILD=1 # if ppc builds fail due to failed qt, apps part will return error and build will fail, 1 = enabled
-      EXTRALOG=1    # prints env and all installed files at the end of current script
-      RUNTESTS=0    # run make check after post install part
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "SET OVERRIDE VARIABLES IF SET" # checks OVERRIDEBINPREFIX, OVERRIDEDATADIR and OVERRIDECONF
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      if [ $OVERRIDEBINPREFIX = "false" ]; then
-        BINPREF="${SNAPCRAFT_PROJECT_NAME}"
-      else
-        BINPREF="${OVERRIDEBINPREFIX}"
-      fi
-      if [ $OVERRIDEDATADIR = "false" ]; then
-        DATADIR="${SNAPCRAFT_PROJECT_NAME}"
-      else
-        DATADIR="${OVERRIDEDATADIR}"
-      fi
-      if [ $OVERRIDECONF = "false" ]; then
-        CONF="${SNAPCRAFT_PROJECT_NAME}"
-      else
-        CONF="${OVERRIDECONF}"
-      fi
-      echo "BINPREF VARIABLE - ${BINPREF}"
-      echo "DATADIR VARIABLE - ${DATADIR}"
-      echo "CONF VARIABLE - ${CONF}"
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "OVERRIDE ARCHITECTURE" # applies currently only on i386,  for i386 architecture, we will use i686-linux-gnu to compile dependencies
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
+      git apply $SNAPCRAFT_PROJECT_DIR/snap/local/patches/X001_snap_electron.patch
       if [ $SNAPCRAFT_ARCH_TRIPLET = "i386-linux-gnu" ]; then
         HOST="i686-linux-gnu"
       else
         HOST="${SNAPCRAFT_ARCH_TRIPLET}"
       fi
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "APPLY PATCHES ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # patches which have to be applied for compilation, replace splash screen
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      cd ${SNAPCRAFT_PART_BUILD}
-      if [ $PATCH = 1 ]; then
-        echo "apply patches:"
-        git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X001-default_data_dir.patch
-        git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X002-fix-bdb-tmp-folder.patch
-        git apply $SNAPCRAFT_PART_BUILD/snap/local/patches/X003-fix-use-snap-instead-of-dirty.patch
-        sed -i 's/tar --strip-components/tar --no-same-owner --strip-components/' ${SNAPCRAFT_PART_BUILD}/depends/funcs.mk
-      else
-        echo "APPLY .patch files during compilation is disabled, skipping"
-      fi
-      if [ $SPLASHPNGS = 1 ]; then
-        echo "replace splash screen with snapcrafts"
-        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/images/splash.png $SNAPCRAFT_PART_BUILD/src/qt/res/images/splash.png
-        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/images/splash_regtest.png $SNAPCRAFT_PART_BUILD/src/qt/res/images/splash_regtest.png
-        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/images/splash_testnet.png $SNAPCRAFT_PART_BUILD/src/qt/res/images/splash_testnet.png
-        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/icons/favicon.ico $SNAPCRAFT_PART_BUILD/share/pixmaps/favicon.ico
-        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/icons/favicon_testnet.ico $SNAPCRAFT_PART_BUILD/share/pixmaps/favicon_testnet.ico
-        mv -f $SNAPCRAFT_PART_BUILD/contrib/snap/icons/favicon_regtest.ico $SNAPCRAFT_PART_BUILD/share/pixmaps/favicon_regtest.ico
-        mv -f $SNAPCRAFT_PART_BUILD/snap/local/desktop/${BINPREF}.png $SNAPCRAFT_PART_BUILD/src/qt/res/icons/${BINPREF}.png
-        mv -f $SNAPCRAFT_PART_BUILD/snap/local/desktop/${BINPREF}_testnet.png $SNAPCRAFT_PART_BUILD/src/qt/res/icons/${BINPREF}_testnet.png
-        mv -f $SNAPCRAFT_PART_BUILD/snap/local/desktop/${BINPREF}_regtest.png $SNAPCRAFT_PART_BUILD/src/qt/res/icons/${BINPREF}_regtest.png
-      else
-        echo "patch icons and images is disabled, skipping"
-      fi
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "BUILD DEPENDENCIES"
-      echo "PRECOMPILE ${SNAPCRAFT_ARCH_TRIPLET} DEPENDENCIES FOR ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # cd to depends folder, download and precompile
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      cd ${SNAPCRAFT_PART_BUILD}/depends
-      make download-linux
-      if [ $JOBS = 0 ]; then
-        make
-      else
-        make -j${JOBS} HOST=${HOST}
-      fi
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "CONFIGURATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # run configure with prefix to include depends
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      cd ${SNAPCRAFT_PART_BUILD}
-      echo "Configure and build ${BINPREF}"
-      ./autogen.sh
-      ./configure --prefix=`pwd`/depends/${HOST}
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "COMPILATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # run make to compile using -j
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      if [ $JOBS = 0 ]; then
-        make
-      else
-        make -j${JOBS} HOST=${HOST}
-      fi
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "INSTALLATION OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # run make install with a prefix where to install
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      make install prefix=${SNAPCRAFT_PART_INSTALL}
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "POST INSTALL SCRIPTS OF ${BINPREF}-${SNAPCRAFT_PROJECT_VERSION}" # run make install with a prefix where to install
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      if [ $FIXPPCBUILD = 1 ]; then
-        if [ $SNAPCRAFT_ARCH_TRIPLET = "powerpc64le-linux-gnu" ]; then
-          if [ -e $SNAPCRAFT_PART_BUILD/src/qt/${BINPREF}-qt ]; then
-            echo "PPC64EL fix - ${BINPREF}-qt exists, fix unrequired"
-          else
-            echo "echo ${BINPREF}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/${BINPREF}-qt
-            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/${BINPREF}-qt
-            echo "PPC64EL fix - ${BINPREF}-qt does not exist, fix required, dummy as ${BINPREF}-qt"
-          fi
-          if [ -e $SNAPCRAFT_PART_BUILD/src/qt/test/test_${BINPREF}-qt ]; then
-            echo "PPC64EL fix - test_${BINPREF}-qt exists, fix unrequired"
-          else
-            echo "echo test_${BINPREF}-qt is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}-qt
-            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}-qt
-            echo "PPC64EL fix - test_${BINPREF}-qt does not exist, fix required, dummy as test_${BINPREF}-qt"
-          fi
-          if [ -e $SNAPCRAFT_PART_BUILD/src/test/test_${BINPREF} ]; then
-            echo "PPC64EL fix - test_${BINPREF} exists, fix unrequired"
-          else
-            echo "echo test_${BINPREF} is not installed" > ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}
-            chmod +x ${SNAPCRAFT_PART_INSTALL}/usr/bin/test_${BINPREF}
-            echo "PPC64EL fix - test_${BINPREF} does not exist, fix required, dummy as test_${BINPREF}"
-          fi
+      if [ $HOST = "x86_64-linux-gnu" ]; then
+        wget https://github.com/wagerr/wagerr/releases/download/v3.1.0/wagerr-3.1.0-x86_64-linux-gnu.tar.gz
+        sha256sum=f3262d8c68fefc0cc1c13b1844ac3666556d36b4a124c45b945ea0b648a6ee99
+        sha256sumdl=`sha256sum wagerr-3.1.0-x86_64-linux-gnu.tar.gz | awk '{print $1}'`
+        if [ $sha256sum != $sha256sumdl ] ; then
+          echo "sha256sums do not match exiting build"
+          exit 1
         fi
-        else
-          echo "PPC64EL fix disabled, skipping"
-      fi
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "CONFIG FILE" # create .wagerr folder and copy example config - !!!warning!!!: do not copy as wagerr.conf
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      mkdir -p ${SNAP_USER_COMMON}/.${DATADIR}
-      if [ $COPYCONF = 1 ]; then
-        cp ${SNAPCRAFT_PART_BUILD}/contrib/debian/manpages/${CONF}.conf.5 ${SNAP_USER_COMMON}/.${DATADIR}/${CONF}-example.conf
+        tar -xf wagerr-3.1.0-x86_64-linux-gnu.tar.gz
+        mkdir bin
+        cp -p wagerr-3.1.0/bin/* ./bin
+        rm -rf wagerr-3.1.0*
+        # build using npm
+        npm install
+        npm run package
+        mkdir $SNAPCRAFT_PART_INSTALL/app
+        cd release
+        APPIMAGE=$(find *x86_64*.AppImage)
+        chmod a+x $APPIMAGE
+        ./$APPIMAGE --appimage-extract
+        mv ./squashfs-root/* $SNAPCRAFT_PART_INSTALL/app
+        find $SNAPCRAFT_PART_INSTALL/app/ -type d -exec chmod 755 {} \;
+        $SNAPCRAFT_PART_INSTALL/usr/lib/${HOST}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders > $SNAPCRAFT_PART_INSTALL/usr/lib/${HOST}/gdk-pixbuf-2.0/2.10.0/loaders.cache
+      elif [ $HOST = "i686-linux-gnu" ]; then
+        wget https://github.com/wagerr/wagerr/releases/download/v3.1.0/wagerr-3.1.0-i686-pc-linux-gnu.tar.gz
+        sha256sum=8aaf651a53b8103302197a43ff93ddb48f3877cd454f1965edf9f391ee870d4b
+        sha256sumdl=`sha256sum wagerr-3.1.0-i686-pc-linux-gnu.tar.gz | awk '{print $1}'`
+        if [ $sha256sum != $sha256sumdl ] ; then
+          echo "sha256sums do not match exiting build"
+          exit 1
+        fi
+        tar -xf wagerr-3.1.0-i686-pc-linux-gnu.tar.gz
+        git clone https://github.com/wagerr/wagerr-electron-app.git
+        mkdir bin
+        cp -p wagerr-3.1.0/bin/* ./bin
+        rm -rf wagerr-3.1.0*
+        # build using npm
+        npm install
+        npm run package
+        mkdir $SNAPCRAFT_PART_INSTALL/app
+        cd release
+        APPIMAGE=$(find *i386*.AppImage)
+        chmod a+x $APPIMAGE
+        ./$APPIMAGE --appimage-extract
+        mv ./squashfs-root/* $SNAPCRAFT_PART_INSTALL/app
+        find $SNAPCRAFT_PART_INSTALL/app/ -type d -exec chmod 755 {} \;
+        $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders > $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders.cache
+      elif [ $HOST = "arm-linux-gnueabihf" ]; then
+        wget https://github.com/wagerr/wagerr/releases/download/v3.1.0/wagerr-3.1.0-arm-linux-gnueabihf.tar.gz
+        sha256sum=ae0505b33cf81649c6f913b792a44ef51859683d17ac32b97ddd897d76eb3fda
+        sha256sumdl=`sha256sum wagerr-3.1.0-arm-linux-gnu.tar.gz | awk '{print $1}'`
+        if [ $sha256sum != $sha256sumdl ] ; then
+          echo "sha256sums do not match exiting build"
+          exit 1
+        fi
+        tar -xf wagerr-3.1.0-arm-linux-gnueabihf.tar.gz
+        mkdir bin
+        cp -p wagerr-3.1.0/bin/* ./bin
+        rm -rf wagerr-3.1.0*
+        # build using npm
+        npm install
+        npm run package
+        mkdir $SNAPCRAFT_PART_INSTALL/app
+        cd release
+        APPIMAGE=$(find *armv7l*.AppImage)
+        chmod a+x $APPIMAGE
+        ./$APPIMAGE --appimage-extract
+        mv ./squashfs-root/* $SNAPCRAFT_PART_INSTALL/app
+        find $SNAPCRAFT_PART_INSTALL/app/ -type d -exec chmod 755 {} \;
+        $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders > $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders.cache
+      elif [ $HOST = "aarch64-linux-gnu" ]; then
+        wget https://github.com/wagerr/wagerr/releases/download/v3.1.0/wagerr-3.1.0-aarch64-linux-gnu.tar.gz
+        sha256sum=a036758284013053d37272debed67a2bbd40dca72734b068b924f6192cd15025
+        sha256sumdl=`sha256sum wagerr-3.1.0-aarch64-linux-gnu.tar.gz | awk '{print $1}'`
+        if [ $sha256sum != $sha256sumdl ] ; then
+          echo "sha256sums do not match exiting build"
+          exit 1
+        fi
+        tar -xf wagerr-3.1.0-aarch64-linux-gnu.tar.gz
+        mkdir bin
+        cp -p wagerr-3.1.0/bin/* ./bin
+        rm -rf wagerr-3.1.0*
+        # build using npm
+        npm install
+        npm run package
+        mkdir $SNAPCRAFT_PART_INSTALL/app
+        cd release
+        APPIMAGE=$(find *arm64*.AppImage)
+        chmod a+x $APPIMAGE
+        ./$APPIMAGE --appimage-extract
+        mv ./squashfs-root/* $SNAPCRAFT_PART_INSTALL/app
+        find $SNAPCRAFT_PART_INSTALL/app/ -type d -exec chmod 755 {} \;
+        $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/gdk-pixbuf-query-loaders > $SNAPCRAFT_PART_INSTALL/usr/lib/${SNAPCRAFT_ARCH_TRIPLET}/gdk-pixbuf-2.0/2.10.0/loaders.cache
       else
-        echo "COPY CONFIG FILE disabled, skipping"
+        echo "${HOST} unsupported"
       fi
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "RUN TESTS" # if tests fail to pass, build and release will fail
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      cd ${SNAPCRAFT_PART_BUILD}
-      if [ $RUNTESTS = 1 ]; then
-        make check
-      else
-        echo "RUN TESTS disabled, skipping"
-      fi
-      echo "-----------------------------------------------"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-      echo "WAGERR SPECIFIC"
-      echo "+++++++++++++++++++++++++++++++++++++++++++++++"
-    build-packages:
-      - curl
-      - wget
-      - gcc
-      - gcc-8
-      - g++
-      - g++-8
-      - make
-      - autoconf
-      - automake
-      - cmake
-      - pkg-config
-      - libtool
-      - bsdmainutils
-      - binutils
-      - python3
-      - help2man
-      - doxygen
-      - npm
-      - libts-dev
+
     stage-packages:
       - libxkbcommon0
       - ttf-ubuntu-font-family
@@ -317,6 +268,35 @@ parts:
       - locales-all
       - qtwayland5
       - ca-certificates
+      - libnss3
+      - libgtk-3-0
+      - libxtst6
+      - libxss1
+      - libasound2
+      - libglu1-mesa
+
+    build-packages:
+      - curl
+      - wget
+      - gcc
+      - gcc-8
+      - g++
+      - g++-8
+      - git
+      - make
+      - autoconf
+      - automake
+      - cmake
+      - pkg-config
+      - libtool
+      - bsdmainutils
+      - binutils
+      - python3
+      - help2man
+      - doxygen
+      - npm
+      - libgtk-3-dev
+      - libgdk-pixbuf2.0-dev
     after:
       - patches
   patches:
@@ -327,3 +307,4 @@ parts:
   desktop:
     source: snap/local/desktop
     plugin: dump
+
