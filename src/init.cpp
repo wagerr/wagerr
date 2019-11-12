@@ -1463,8 +1463,18 @@ bool AppInit2()
                 pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip = new CCoinsViewCache(pcoinscatcher);
 
+                // Flushable database model has the following structure:
+                // globalDB: --(r, w, del, exist)--> { CacheDB_glob_map -> { LevelDB } }.
+                // If we need make cache from global DB, for example,
+                // in those places where it is made in the original BitcoinCore,
+                // we should make CBettingsView cacheDb(globalDb) and the structure will be:
+                // cacheDB: --(r, w, del, exist)--> { CacheDB_loc_map -> { CacheDB_glob_map -> { LevelDB } } }.
+                // The Flush() operation at cacheDB will copy data from CacheDB_loc_map to CacheDB_glob_map
+                // and the Flush() at globalDB will write data from CacheDB_glob_map to LevelDB (persistent storage).
                 bettingsView = new CBettingsView();
+                // create Level DB storage for global betting database
                 bettingsView->mappingsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("mappings"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                // create cacheble betting DB with LevelDB storage as main storage
                 bettingsView->mappings = MakeUnique<CBettingDB>(*bettingsView->mappingsStorage.get());
 
                 bettingsView->eventsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("events"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
