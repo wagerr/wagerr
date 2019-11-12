@@ -3,6 +3,59 @@
         "version": "0.2.0",
         "configurations": [
             {
+                "name": "(gdb) Run Wagerr",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceFolder}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "(gdb) Test Wagerr",
+                "type": "cppdbg",
+                "request": "launch",
+                "program": "${workspaceFolder}/src/test/test_wagerr",
+                "args": [],
+                "stopAtEntry": false,
+                "cwd": "${workspaceFolder}",
+                "environment": [],
+                "externalConsole": false,
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
+                "name": "(gdb) Attach to wagerrd",
+                "type": "cppdbg",
+                "request": "attach",
+                "program": "${workspaceFolder}/src/wagerrd",
+                "processId": "${command:pickProcess}",
+                "MIMode": "gdb",
+                "setupCommands": [
+                    {
+                        "description": "Enable pretty-printing for gdb",
+                        "text": "-enable-pretty-printing",
+                        "ignoreFailures": true
+                    }
+                ]
+            },
+            {
                 "name": "bitcoin-util test (verbos) (internal terminal)",
                 "type": "python",
                 "request": "launch",
