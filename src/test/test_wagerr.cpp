@@ -53,7 +53,9 @@ TestingSetup::TestingSetup()
         pcoinsTip = new CCoinsViewCache(pcoinsdbview);
 
         bettingsView = new CBettingsView();
+        // create Level DB storage for global betting database
         bettingsView->mappingsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("test-mappings"), CBettingDB::dbWrapperCacheSize(), true);
+        // create cacheble betting DB with LevelDB storage as main storage
         bettingsView->mappings = MakeUnique<CBettingDB>(*bettingsView->mappingsStorage.get());
 
         bettingsView->eventsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("test-events"), CBettingDB::dbWrapperCacheSize(), true);
