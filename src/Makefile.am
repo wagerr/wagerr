@@ -120,7 +120,7 @@ BITCOIN_CORE_H = \
   key.h \
   keystore.h \
   leveldbwrapper.h \
-  flushablestorage.h \
+  flushablestorage/flushablestorage.h \
   limitedmap.h \
   main.h \
   masternode.h \
