@@ -133,7 +133,7 @@ class BitcoinTestFramework():
         except KeyError as e:
             self.log.exception("Key error")
         except Exception as e:
-            self.log.exception("Unexpected exception caught during testing")
+            self.log.exception("Unexpected exception caught during testing: " % e.message)
         except KeyboardInterrupt as e:
             self.log.warning("Exiting after keyboard interrupt")
 
@@ -434,7 +434,7 @@ class BitcoinTestFramework():
 
             for i in range(MAX_NODES):
                 for entry in os.listdir(cache_path(i)):
-                    if entry not in ['wallet.dat', 'chainstate', 'blocks', 'sporks', 'zerocoin', 'backups']:
+                    if entry not in ['wallet.dat', 'chainstate', 'blocks', 'sporks', 'zerocoin', 'backups', 'betting']:
                         os.remove(cache_path(i, entry))
 
         for i in range(self.num_nodes):
