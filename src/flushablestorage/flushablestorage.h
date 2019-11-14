@@ -83,7 +83,7 @@ private:
 // Flushable Key-Value Storage Iterator
 class CFlushableStorageKVIterator : public CStorageKVIterator {
 public:
-    explicit CFlushableStorageKVIterator(std::unique_ptr<CStorageKVIterator>&& pIt_, MapKV& map_) : pIt{std::move(pIt_)}, map{map_} {
+    explicit CFlushableStorageKVIterator(std::unique_ptr<CStorageKVIterator>&& pIt_, MapKV& map_) : pIt{std::move(pIt_)}, map(map_) {
         inited = parentOk = mapOk = false;
     }
          // No copying allowed
@@ -165,7 +165,7 @@ private:
 // Flushable Key-Value Storage
 class CFlushableStorageKV : public CStorageKV {
 public:
-    explicit CFlushableStorageKV(CStorageKV& db_) : db{db_} { }
+    explicit CFlushableStorageKV(CStorageKV& db_) : db(db_) { }
     CFlushableStorageKV(const CFlushableStorageKV& db) = delete;
     ~CFlushableStorageKV() override { }
     bool Exists(const std::vector<char>& key) override {
