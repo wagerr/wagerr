@@ -379,6 +379,8 @@ public:
     uint32_t nId;
     std::string sName;
 
+    CMapping() {}
+
     MappingTypes GetType() const;
 
     static std::string ToTypeName(MappingTypes type);
