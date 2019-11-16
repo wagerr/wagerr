@@ -1,5 +1,5 @@
 ---
-name: "wagerr-linux-3.0"
+name: "wagerr-linux-3.1.0"
 enable_cache: true
 distro: "ubuntu"
 suites:
@@ -20,6 +20,14 @@ packages:
 - "g++-8-riscv64-linux-gnu"
 - "gcc-8-riscv64-linux-gnu"
 - "binutils-riscv64-linux-gnu"
+- "g++-s390x-linux-gnu"
+- "g++-8-s390x-linux-gnu"
+- "gcc-8-s390x-linux-gnu"
+- "binutils-s390x-linux-gnu"
+- "g++-powerpc64le-linux-gnu"
+- "g++-8-powerpc64le-linux-gnu"
+- "gcc-8-powerpc64le-linux-gnu"
+- "binutils-powerpc64le-linux-gnu"
 - "g++-8-multilib"
 - "gcc-8-multilib"
 - "binutils-gold"
@@ -40,7 +48,7 @@ script: |
   set -e -o pipefail
 
   WRAP_DIR=$HOME/wrapped
-  HOSTS="i686-pc-linux-gnu x86_64-linux-gnu arm-linux-gnueabihf aarch64-linux-gnu riscv64-linux-gnu"
+  HOSTS="i686-pc-linux-gnu x86_64-linux-gnu arm-linux-gnueabihf aarch64-linux-gnu riscv64-linux-gnu s390x-linux-gnu powerpc64le-linux-gnu"
   CONFIGFLAGS="--enable-glibc-back-compat --enable-reduce-exports --disable-bench --disable-gui-tests"
   FAKETIME_HOST_PROGS="gcc g++"
   FAKETIME_PROGS="date ar ranlib nm"
