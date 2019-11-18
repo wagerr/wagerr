@@ -2188,19 +2188,19 @@ bool CChainGamesResult::FromScript(CScript script) {
  * @param height The block we want to check for the result.
  * @return results array.
  */
-std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEventResults(int height)
+std::vector<CChainGamesResult> getCGLottoEventResults(int height)
 {
     std::vector<CChainGamesResult> chainGameResults;
     std::vector<std::string> blockTotalValues;
-    CAmount totalBlockValue = 0;
+    //CAmount totalBlockValue = 0;         retiré le 17/11/2019
 
     // Get the current block so we can look for any results in it.
-    CBlockIndex *resultsBocksIndex = chainActive[height];
+    CBlockIndex *resultsBocksIndex = chainActive[height];;
 
     CBlock block;
     ReadBlockFromDisk(block, resultsBocksIndex);
 
-    int blockTime = block.GetBlockTime();
+    //int blockTime = block.GetBlockTime();      withdrawn le 17/11/2019
 
     for (CTransaction& tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet by looking at the TX vins.
@@ -2214,6 +2214,7 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
             // Look for result OP RETURN code in the tx vouts.
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
                 CScript script = tx.vout[i].scriptPubKey;
+                //totalBlockValue = tx.vout[i].nValue + totalBlockValue;	
 
                 CChainGamesResult cgResult;
                 if (cgResult.FromScript(script)) {
@@ -2222,19 +2223,21 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
             }
         }
     }
-
+/*
     unsigned long long LGTotal = blockTime + totalBlockValue;
     char strTotal[256];
-    sprintf(strTotal, "%lld", LGTotal);
-
+    sprintf(strTotal, "%lld", LGTotal);                 withdrawn 17/11/2019
+*/
     // If a CGLotto result is found, append total block value to each result
+    /*
     if (chainGameResults.size() != 0) {
         for (unsigned int i = 0; i < chainGameResults.size(); i++) {
             blockTotalValues.emplace_back(strTotal);
         }
-    }
+    }                   withdrawn on 17/11/2019
+    */
 
-    return std::make_pair(chainGameResults,blockTotalValues);
+    return chainGameResults;
 }
 
 /**
@@ -2246,20 +2249,20 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 {
     std::vector<CBetOut> vexpectedCGLottoBetPayouts;
     int nCurrentHeight = chainActive.Height();
-    long long totalValueOfBlock = 0;
+    //long long totalValueOfBlock = 0;
 
-    std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> resultArray = getCGLottoEventResults(height);
-    std::vector<CChainGamesResult> allChainGames = resultArray.first;
-    std::vector<std::string> blockSizeArray = resultArray.second;
+    std::vector<CChainGamesResult> resultArray = getCGLottoEventResults(height);
+    std::vector<CChainGamesResult> allChainGames = resultArray;//.first;
+    //std::vector<std::string> blockSizeArray = resultArray.second;
 
     // Find payout for each CGLotto game
-    for (unsigned int currResult = 0; currResult < resultArray.second.size(); currResult++) {
+    for (unsigned int currResult = 0; currResult < resultArray.size(); currResult++) {
 
         CChainGamesResult currentChainGame = allChainGames[currResult];
         uint32_t currentEventID = currentChainGame.nEventId;
         CAmount eventFee = 0;
 
-        totalValueOfBlock = stoll(blockSizeArray[0]);
+        //totalValueOfBlock = stoll(blockSizeArray[0]);
 
         //reset total bet amount and candidate array for this event
         std::vector<std::string> candidates;
@@ -2399,7 +2402,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
             LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
             LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
             LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerNr);
-            LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
+            //LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
             LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
 
             // Only add valid payouts to the vector.
