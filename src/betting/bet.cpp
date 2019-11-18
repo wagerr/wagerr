@@ -2192,15 +2192,12 @@ std::vector<CChainGamesResult> getCGLottoEventResults(int height)
 {
     std::vector<CChainGamesResult> chainGameResults;
     std::vector<std::string> blockTotalValues;
-    //CAmount totalBlockValue = 0;         retiré le 17/11/2019
 
     // Get the current block so we can look for any results in it.
     CBlockIndex *resultsBocksIndex = chainActive[height];;
 
     CBlock block;
     ReadBlockFromDisk(block, resultsBocksIndex);
-
-    //int blockTime = block.GetBlockTime();      withdrawn le 17/11/2019
 
     for (CTransaction& tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet by looking at the TX vins.
@@ -2214,7 +2211,6 @@ std::vector<CChainGamesResult> getCGLottoEventResults(int height)
             // Look for result OP RETURN code in the tx vouts.
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
                 CScript script = tx.vout[i].scriptPubKey;
-                //totalBlockValue = tx.vout[i].nValue + totalBlockValue;	
 
                 CChainGamesResult cgResult;
                 if (cgResult.FromScript(script)) {
@@ -2223,19 +2219,7 @@ std::vector<CChainGamesResult> getCGLottoEventResults(int height)
             }
         }
     }
-/*
-    unsigned long long LGTotal = blockTime + totalBlockValue;
-    char strTotal[256];
-    sprintf(strTotal, "%lld", LGTotal);                 withdrawn 17/11/2019
-*/
-    // If a CGLotto result is found, append total block value to each result
-    /*
-    if (chainGameResults.size() != 0) {
-        for (unsigned int i = 0; i < chainGameResults.size(); i++) {
-            blockTotalValues.emplace_back(strTotal);
-        }
-    }                   withdrawn on 17/11/2019
-    */
+
 
     return chainGameResults;
 }
