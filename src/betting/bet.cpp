@@ -1325,7 +1325,6 @@ std::vector<CBetOut> GetBetPayouts(int height)
                             LogPrintf("PSE EVENT OP CODE - %s \n", opCode.c_str());
 
                             UpdateSpreads = true;
-                            spreadsFound  = true;
 
                             // If the home team is the favourite.
                             if (HomeFavorite){
@@ -1379,7 +1378,6 @@ std::vector<CBetOut> GetBetPayouts(int height)
                             LogPrintf("PTE EVENT OP CODE - %s \n", opCode.c_str());
 
                             UpdateTotals = true;
-                            totalsFound  = true;
 
                             // Find totals outcome (result).
                             if (pte.nPoints == nTotalsPoints) {
@@ -1524,6 +1522,8 @@ std::vector<CBetOut> GetBetPayouts(int height)
             // If we need to update the spreads odds using temp values.
             if (UpdateSpreads) {
                 UpdateSpreads = false;
+                spreadsFound = true;
+
                 //set the payout odds (using the temp odds)
                 nSpreadsOdds = nTempSpreadsOdds;
                 //clear the winner vector (used to determine which bets to payout).
@@ -1549,6 +1549,8 @@ std::vector<CBetOut> GetBetPayouts(int height)
             // If we need to update the totals odds using the temp values.
             if (UpdateTotals) {
                 UpdateTotals = false;
+                totalsFound = true;
+
                 nTotalsOdds  = nTempTotalsOdds;
                 vTotalsResult.clear();
 
