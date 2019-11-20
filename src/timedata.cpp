@@ -4,14 +4,13 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
-#include "timedata.h"
-
+#include "chainparams.h"
+#include "guiinterface.h"
 #include "netbase.h"
 #include "sync.h"
-#include "guiinterface.h"
+#include "timedata.h"
 #include "util.h"
 #include "utilstrencodings.h"
-
 
 
 static CCriticalSection cs_nTimeOffset;
@@ -78,33 +77,20 @@ void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
         int64_t nMedian = vTimeOffsets.median();
         std::vector<int64_t> vSorted = vTimeOffsets.sorted();
         // Only let other nodes change our time by so much
-        if (abs64(nMedian) < 70 * 60) {
+        if (abs64(nMedian) < Params().TimeSlotLength()) {
             nTimeOffset = nMedian;
         } else {
-            nTimeOffset = 0;
-
-            static bool fDone;
-            if (!fDone) {
-                // If nobody has a time different than ours but within 5 minutes of ours, give a warning
-                bool fMatch = false;
-                for (int64_t nOffset : vSorted)
-                    if (nOffset != 0 && abs64(nOffset) < 5 * 60)
-                        fMatch = true;
-
-                if (!fMatch) {
-                    fDone = true;
-                    std::string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.");
-                    strMiscWarning = strMessage;
-                    LogPrintf("*** %s\n", strMessage);
-                    uiInterface.ThreadSafeMessageBox(strMessage, "", CClientUIInterface::MSG_WARNING);
-                }
-            }
+            nTimeOffset = (nMedian > 0 ? 1 : -1) * Params().TimeSlotLength();
+            std::string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.");
+            strMiscWarning = strMessage;
+            LogPrintf("*** %s\n", strMessage);
+            uiInterface.ThreadSafeMessageBox(strMessage, "", CClientUIInterface::MSG_ERROR);
         }
         if (fDebug) {
             for (int64_t n : vSorted)
                 LogPrintf("%+d  ", n);
             LogPrintf("|  ");
         }
-        LogPrintf("nTimeOffset = %+d  (%+d minutes)\n", nTimeOffset, nTimeOffset / 60);
+        LogPrintf("nTimeOffset = %+d\n", nTimeOffset);
     }
 }
