@@ -294,6 +294,53 @@ bool CPeerlessBet::ToOpCode(CPeerlessBet pb, std::string &opCode)
 }
 
 /**
+ * Convert vector of CPeerlessBet objects to OpCode string
+ * of parlay bet
+ *
+ * @param legs   The vector of CPeerlessBet objects
+ * @param opCode The Parlay Bet OpCode string
+ * @return       Bool
+ */
+bool CPeerlessBet::ParlayToOpCode(const std::vector<CPeerlessBet>& legs, std::string& opCode)
+{
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << 'B' << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) plParlayBetTxType << legs;
+    opCode = HexStr(ss.begin(), ss.end());
+
+    return true;
+}
+
+/**
+ * Split a OpCode string into byte components and store in vector of peerless
+ * bet object.
+ *
+ * @param opCode The Parlay Bet OpCode string
+ * @param legs   The vector of CPeerlessBet objects
+ * @return       Bool
+ */
+bool CPeerlessBet::ParlayFromOpCode(const std::string& opCode, std::vector<CPeerlessBet>& legs)
+{
+    CDataStream ss(ParseHex(opCode), SER_NETWORK, CLIENT_VERSION);
+    std::vector<CPeerlessBet> vBets;
+    uint8_t byte;
+    legs.clear();
+    // get BTX prefix
+    ss >> byte;
+    if (byte != 'B') return false;
+    // get BTX format version
+    ss >> byte;
+    if (byte != (uint8_t) BTX_FORMAT_VERSION) return false;
+    // get parlay bet tx type
+    ss >> byte;
+    if (byte != (uint8_t) plParlayBetTxType) return false;
+    // get legs
+    ss >> legs;
+    if (legs.size() > Params().MaxParlayLegs()) return false;
+
+    return true;
+}
+
+/**
  * Split a PeerlessResult OpCode string into byte components and store in peerless
  * result object.
  *
@@ -1170,7 +1217,7 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
  *
  * @return payout vector.
  */
-std::vector<CBetOut> GetBetPayouts(int height)
+std::vector<CBetOut> GetBetPayoutsLegacy(int height)
 {
     std::vector<CBetOut> vExpectedPayouts;
     int nCurrentHeight = chainActive.Height();
@@ -1440,7 +1487,7 @@ std::vector<CBetOut> GetBetPayouts(int height)
                                             winnings = betAmount * nSpreadsOdds;
                                         }
                                         else if (totalsFound && (pb.nOutcome == vTotalsResult.at(0) || pb.nOutcome == vTotalsResult.at(1))) {
-                                           winnings = betAmount * nTotalsOdds;
+                                            winnings = betAmount * nTotalsOdds;
                                         }
 
                                         // Calculate the bet winnings for the current bet.

@@ -64,6 +64,9 @@ TestingSetup::TestingSetup()
         bettingsView->resultsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("test-results"), CBettingDB::dbWrapperCacheSize(), true);
         bettingsView->results = MakeUnique<CBettingDB>(*bettingsView->resultsStorage.get());
 
+        bettingsView->betsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("test-bets"), CBettingDB::dbWrapperCacheSize(), true);
+        bettingsView->bets = MakeUnique<CBettingDB>(*bettingsView->betsStorage.get());
+
         bettingsView->undosStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("test-undos"), CBettingDB::dbWrapperCacheSize(), true);
         bettingsView->undos = MakeUnique<CBettingDB>(*bettingsView->resultsStorage.get());
         InitBlockIndex();
