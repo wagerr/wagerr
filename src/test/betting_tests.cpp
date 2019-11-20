@@ -32,7 +32,6 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_test)
     mapping.nId = 1;
     mapping.nMType = teamMapping;
     mapping.sName = "Team1";
-    mapping.nVersion = PROTOCOL_VERSION;
     key = {mapping.nMType, mapping.nId};
 
     BOOST_CHECK(dbCache.Write(key, mapping));
@@ -43,7 +42,6 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_test)
     mapping.nId = 2;
     mapping.nMType = sportMapping;
     mapping.sName = "Sport1";
-    mapping.nVersion = PROTOCOL_VERSION;
     key = {mapping.nMType, mapping.nId};
 
     BOOST_CHECK(dbCache.Write(key, mapping));
@@ -70,7 +68,6 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_test)
     mapping.nId = 1;
     mapping.nMType = teamMapping;
     mapping.sName = "Team1-2";
-    mapping.nVersion = PROTOCOL_VERSION;
     BOOST_CHECK(!dbCache.Write(key, mapping));
 
     // check update

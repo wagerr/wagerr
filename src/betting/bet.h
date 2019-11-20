@@ -8,6 +8,7 @@
 #include "util.h"
 #include "chainparams.h"
 #include "leveldbwrapper.h"
+#include "base58.h"
 #include <flushablestorage/flushablestorage.h>
 #include <boost/variant.hpp>
 #include <boost/filesystem.hpp>
@@ -52,7 +53,8 @@ typedef enum BetTxTypes{
     cgResultTxType       = 0x08,  // Chain games result transaction type identifier.
     plSpreadsEventTxType = 0x09,  // Spread odds transaction type identifier.
     plTotalsEventTxType  = 0x0a,  // Totals odds transaction type identifier.
-    plEventPatchTxType   = 0x0b   // Peerless event patch transaction type identifier.
+    plEventPatchTxType   = 0x0b,  // Peerless event patch transaction type identifier.
+    plParlayBetTxType    = 0x0c   // Peerless Parlay Bet transaction type identifier.
 } BetTxTypes;
 
 // The supported mapping TX types.
@@ -103,8 +105,6 @@ class CBetOut : public CTxOut {
 class CPeerlessEvent
 {
 public:
-    int nVersion;
-
     uint32_t nEventId;
     uint64_t nStartTime;
     uint32_t nSport;
@@ -150,8 +150,6 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
-        READWRITE(this->nVersion);
-        nVersion = this->nVersion;
         READWRITE(nEventId);
         READWRITE(nStartTime);
         READWRITE(nSport);
@@ -207,13 +205,79 @@ public:
 
     static bool ToOpCode(CPeerlessBet pb, std::string &opCode);
     static bool FromOpCode(std::string opCode, CPeerlessBet &pb);
+    static bool ParlayToOpCode(const std::vector<CPeerlessBet>& legs, std::string &opCode);
+    static bool ParlayFromOpCode(const std::string& opCode, std::vector<CPeerlessBet>& legs);
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t outcome;
+        READWRITE(nEventId);
+        if (ser_action.ForRead()) {
+            READWRITE(outcome);
+            nOutcome = (OutcomeType) outcome;
+        }
+        else {
+            outcome = (uint8_t) nOutcome;
+            READWRITE(outcome);
+        }
+    }
+};
+
+// class for serializing bets on DB
+class CUniversalBet
+{
+public:
+    CAmount betAmount;
+    CBitcoinAddress playerAddress;
+    // one elem means single bet, else it is parlay bet, max size = 5
+    std::vector<CPeerlessBet> legs;
+    // calculated odds for this bet
+    uint32_t betOdds;
+    COutPoint betOutPoint;
+
+    explicit CUniversalBet() { }
+    explicit CUniversalBet(const CAmount amount, const CBitcoinAddress address, const std::vector<CPeerlessBet> vLegs, uint32_t odds, const COutPoint outPoint) :
+        betAmount(amount), playerAddress(address), legs(vLegs), betOdds(odds), betOutPoint(outPoint) { }
+    explicit CUniversalBet(const CUniversalBet& bet)
+    {
+        betAmount = bet.betAmount;
+        playerAddress = bet.playerAddress;
+        legs = bet.legs;
+        betOutPoint = bet.betOutPoint;
+        betOdds = bet.betOdds;
+        completed = bet.completed;
+    }
+
+    bool IsCompleted() { return completed; }
+    void SetCompleted() { completed = true; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(betAmount);
+        if (ser_action.ForRead()) {
+            std::string addrStr;
+            READWRITE(addrStr);
+            playerAddress.SetString(addrStr);
+        }
+        else {
+            READWRITE(playerAddress.ToString());
+        }
+        READWRITE(legs);
+        READWRITE(betOutPoint);
+        READWRITE(completed);
+    }
+
+private:
+    bool completed = false;
 };
 
 class CPeerlessResult
 {
 public:
-    int nVersion;
-
     uint32_t nEventId;
     uint32_t nResultType;
     uint32_t nHomeScore;
@@ -239,8 +303,6 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
-        READWRITE(this->nVersion);
-        nVersion = this->nVersion;
         READWRITE(nEventId);
         READWRITE(nResultType);
         READWRITE(nHomeScore);
@@ -350,7 +412,6 @@ public:
 class CPeerlessEventPatch
 {
 public:
-    int nVersion;
     uint32_t nEventId;
     uint64_t nStartTime;
 
@@ -363,8 +424,6 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
-        READWRITE(this->nVersion);
-        nVersion = this->nVersion;
         READWRITE(nEventId);
         READWRITE(nStartTime);
     }
@@ -373,7 +432,6 @@ public:
 class CMapping
 {
 public:
-    int nVersion;
 
     uint32_t nMType;
     uint32_t nId;
@@ -393,8 +451,6 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
-        READWRITE(this->nVersion);
-        nVersion = this->nVersion;
         READWRITE(nMType);
         READWRITE(nId);
         READWRITE(sName);
@@ -450,6 +506,9 @@ typedef struct ResultKey {
 
 // EventKey
 using EventKey = ResultKey;
+
+// UniversalBetKey
+
 
 // UndoKey
 using BettingUndoKey = uint256;
@@ -652,6 +711,8 @@ public:
     std::unique_ptr<CStorageKV> resultsStorage;
     std::unique_ptr<CBettingDB> events; // "events"
     std::unique_ptr<CStorageKV> eventsStorage;
+    std::unique_ptr<CBettingDB> bets; // "bets"
+    std::unique_ptr<CStorageKV> betsStorage;
     std::unique_ptr<CBettingDB> undos; // "undos"
     std::unique_ptr<CStorageKV> undosStorage;
 
@@ -663,6 +724,7 @@ public:
         mappings = MakeUnique<CBettingDB>(*phr->mappings.get());
         results = MakeUnique<CBettingDB>(*phr->results.get());
         events = MakeUnique<CBettingDB>(*phr->events.get());
+        bets = MakeUnique<CBettingDB>(*phr->bets.get());
         undos = MakeUnique<CBettingDB>(*phr->undos.get());
     }
 
@@ -744,7 +806,7 @@ std::vector<CPeerlessResult> getEventResults(int height);
 std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEventResults(int height);
 
 /** Get the peerless winning bets from the block chain and return the payout vector. **/
-std::vector<CBetOut> GetBetPayouts(int height);
+std::vector<CBetOut> GetBetPayoutsLegacy(int height);
 
 /** Get the chain games winner and return the payout vector. **/
 std::vector<CBetOut> GetCGLottoBetPayouts(int height);

@@ -197,7 +197,9 @@ public:
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
         nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
         nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
+        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = 556623;
@@ -352,7 +354,9 @@ public:
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
         nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
         nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
+        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;
@@ -467,7 +471,9 @@ public:
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
         nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
         nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
+        nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
+        nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;
