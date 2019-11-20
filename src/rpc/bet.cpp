@@ -61,7 +61,7 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
     for (it->Seek(CBettingDB::DbTypeToBytes(MappingKey{type, 0})); it->Valid() && (CBettingDB::BytesToDbType(it->Key(), key), key.nMType == type); it->Next()) {
         CMapping mapping{};
         CBettingDB::BytesToDbType(it->Value(), mapping);
-        LogPrintf("%s - mapping - it=[%d,%d] nId=[%d] nMType=[%d] nVersion=[%d] [%s]\n", __func__, key.nMType, key.nId, mapping.nId, mapping.nMType, mapping.nVersion, mapping.sName);
+        LogPrintf("%s - mapping - it=[%d,%d] nId=[%d] nMType=[%d] [%s]\n", __func__, key.nMType, key.nId, mapping.nId, mapping.nMType, mapping.sName);
         if (!mappingFound) {
             if (mapping.sName == name) {
                 mappings.push_back(Pair("mapping-id", (uint64_t) mapping.nId));
@@ -86,7 +86,6 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
         m.nMType   = type;
         m.nId      = nFirstIndexFree;
         m.sName    = name;
-        m.nVersion = 1;
 
         if (bettingsView->mappings->Write(MappingKey{m.nMType, m.nId}, m)) {
             mappings.push_back(Pair("mapping-id",  (uint64_t) nFirstIndexFree));
