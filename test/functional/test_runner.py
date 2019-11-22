@@ -108,6 +108,7 @@ BASE_SCRIPTS= [
     #'rpc_deprecated.py', # No deprecated commands in Wagerr
     'wallet_disable.py',
     #'rpc_net.py', # Not Working -- TODO Fix it
+    'p2p_time_offset.py',
     'wallet_keypool.py',
     #'p2p_mempool.py',
     #'mining_prioritisetransaction.py',
