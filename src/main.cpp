@@ -6212,7 +6212,8 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
             pfrom->fSuccessfullyConnected = true;
             AddTimeData(pfrom->addr, nTimeOffset);
         } else {
-            LogPrintf("timeOffset (%d seconds) too large. Disconnecting node %s\n", nTimeOffset, pfrom->addr.ToString());
+            LogPrintf("timeOffset (%d seconds) too large (max is %d seconds). Disconnecting node %s\n",
+                    nTimeOffset, 2 * Params().TimeSlotLength() - 1, pfrom->addr.ToString());
             pfrom->fDisconnect = true;
         }
     }
