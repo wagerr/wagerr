@@ -4,11 +4,12 @@
 // Distributed under the MIT software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
+#include "timedata.h"
+
 #include "chainparams.h"
 #include "guiinterface.h"
 #include "netbase.h"
 #include "sync.h"
-#include "timedata.h"
 #include "util.h"
 #include "utilstrencodings.h"
 
@@ -41,7 +42,7 @@ static int64_t abs64(int64_t n)
 
 #define BITCOIN_TIMEDATA_MAX_SAMPLES 200
 
-void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
+void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample, int nOffsetLimit)
 {
     LOCK(cs_nTimeOffset);
     // Ignore duplicates (Except on regtest where all nodes have the same ip)
@@ -77,10 +78,10 @@ void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
         int64_t nMedian = vTimeOffsets.median();
         std::vector<int64_t> vSorted = vTimeOffsets.sorted();
         // Only let other nodes change our time by so much
-        if (abs64(nMedian) < Params().TimeSlotLength()) {
+        if (abs64(nMedian) < nOffsetLimit) {
             nTimeOffset = nMedian;
         } else {
-            nTimeOffset = (nMedian > 0 ? 1 : -1) * Params().TimeSlotLength();
+            nTimeOffset = (nMedian > 0 ? 1 : -1) * nOffsetLimit;
             std::string strMessage = _("Warning: Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.");
             strMiscWarning = strMessage;
             LogPrintf("*** %s\n", strMessage);

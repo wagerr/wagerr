@@ -6208,12 +6208,13 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
 
         int64_t nTimeOffset = nTime - GetTime();
         pfrom->nTimeOffset = nTimeOffset;
-        if (nTimeOffset < 2 * Params().TimeSlotLength()) {
+        const int nTimeSlotLength = Params().TimeSlotLength();
+        if (nTimeOffset < 2 * nTimeSlotLength) {
             pfrom->fSuccessfullyConnected = true;
-            AddTimeData(pfrom->addr, nTimeOffset);
+            AddTimeData(pfrom->addr, nTimeOffset, nTimeSlotLength);
         } else {
             LogPrintf("timeOffset (%d seconds) too large (max is %d seconds). Disconnecting node %s\n",
-                    nTimeOffset, 2 * Params().TimeSlotLength() - 1, pfrom->addr.ToString());
+                    nTimeOffset, 2 * nTimeSlotLength - 1, pfrom->addr.ToString());
             pfrom->fDisconnect = true;
         }
     }
