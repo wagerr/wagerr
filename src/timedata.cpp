@@ -44,11 +44,11 @@ static int64_t abs64(int64_t n)
 void AddTimeData(const CNetAddr& ip, int64_t nOffsetSample)
 {
     LOCK(cs_nTimeOffset);
-    // Ignore duplicates
+    // Ignore duplicates (Except on regtest where all nodes have the same ip)
     static std::set<CNetAddr> setKnown;
     if (setKnown.size() == BITCOIN_TIMEDATA_MAX_SAMPLES)
         return;
-    if (!setKnown.insert(ip).second)
+    if (!setKnown.insert(ip).second && Params().NetworkID() != CBaseChainParams::REGTEST)
         return;
 
     // Add data

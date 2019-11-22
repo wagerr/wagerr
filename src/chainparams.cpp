@@ -514,7 +514,6 @@ public:
         nMaturityV2 = 60;
         nStakeMinAge = 0;
         nStakeMinDepth = 0;
-        nTimeSlotLength = 1;            // time not masked on RegNet
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0;
         nMaxMoneyOut = 398360470 * COIN;
