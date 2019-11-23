@@ -219,7 +219,8 @@ public:
         nBIP65Height = 751858;
 
         nBlockStakeModifierV2 = 891276;
-        nBlockTimeProtocolV2 = std::numeric_limits<int>::max();
+        // Activation height for TimeProtocolV2, Blocks V7 and newMessageSignatures
+        nBlockTimeProtocolV2 = std::numeric_limits<int>::max(); // !TODO: change me
 
         // Public coin spend enforcement
         nPublicZCSpends = 752800;
@@ -229,7 +230,7 @@ public:
 
         // Blocks v7
         nBlockLastAccumulatorCheckpoint = 1686240;
-        nBlockV7StartHeight = 2967000;
+        nBlockV7StartHeight = nBlockTimeProtocolV2;
 
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
@@ -399,6 +400,7 @@ public:
         nBIP65Height = 600;
 
         nBlockStakeModifierV2 = 92500;
+        // Activation height for TimeProtocolV2, Blocks V7 and newMessageSignatures
         nBlockTimeProtocolV2 = std::numeric_limits<int>::max();
 
         // Public coin spend enforcement
@@ -409,7 +411,7 @@ public:
 
         // Blocks v7
         nBlockLastAccumulatorCheckpoint = nPublicZCSpends - 10;
-        nBlockV7StartHeight = 2214000;
+        nBlockV7StartHeight = nBlockTimeProtocolV2;
 
         /** Bet related parameters **/
         nBetStartHeight = 1100;                                         // The block that betting protocols become active (Testnet).
