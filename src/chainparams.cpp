@@ -195,7 +195,6 @@ public:
         nFutureTimeDriftPoS = 180;
         nMasternodeCountDrift = 20;
         nMaxMoneyOut = 398360470 * COIN;
-        nTimeSlotLength = 15;           // 15 seconds
 
         /** Height or Time Based Activations **/
         nLastPOWBlock = 1001;                   // PoW Phase 3 End
