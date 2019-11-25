@@ -832,6 +832,33 @@ void SocketSendData(CNode* pnode)
     pnode->vSendMsg.erase(pnode->vSendMsg.begin(), it);
 }
 
+void CheckOffsetDisconnectedPeers(const CNetAddr& ip)
+{
+    int nConnections = 0;
+    {
+        LOCK(cs_vNodes);
+        for (CNode* pnode : vNodes) {
+            if (pnode->fSuccessfullyConnected)
+                nConnections++;
+            if (nConnections == ENOUGH_CONNECTIONS)
+                return;
+        }
+    }
+
+    // Not enough connections. Insert peer.
+    static std::set<CNetAddr> setOffsetDisconnectedPeers;
+    setOffsetDisconnectedPeers.insert(ip);
+    if (setOffsetDisconnectedPeers.size() >= MAX_TIMEOFFSET_DISCONNECTIONS) {
+        // clear the set
+        setOffsetDisconnectedPeers.clear();
+        // Trigger the warning
+        std::string strMessage = _("Warning: Peers are being disconnected due time differences. Please check that your computer's date and time are correct! If your clock is wrong Wagerr Core will not work properly.");
+        strMiscWarning = strMessage;
+        LogPrintf("*** %s\n", strMessage);
+        uiInterface.ThreadSafeMessageBox(strMessage, "", CClientUIInterface::MSG_ERROR);
+    }
+}
+
 static std::list<CNode*> vNodesDisconnected;
 
 void ThreadSocketHandler()
