@@ -3405,7 +3405,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     if (!fJustCheck) {
         if (pindex->nHeight > Params().BetStartHeight()) {
             for (const CTransaction& tx : block.vtx) {
-                ParseBettingTx(bettingsViewCache, tx, pindex->nHeight);
+                ParseBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime());
             }
             if (!(pindex->nHeight % 100)) {
                 int heightLimit = pindex->nHeight - Params().MaxReorganizationDepth();

@@ -1800,11 +1800,13 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
     return vexpectedCGLottoBetPayouts;
 }
 
-void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
+void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime)
 {
     // Ensure the event TX has come from Oracle wallet.
     const CTxIn& txin{tx.vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin)};
+    uint64_t oddsDivisor{Params().OddsDivisor()};
+    uint64_t betXPermille{Params().BetXPermille()};
 
     LogPrintf("ParseBettingTx: start\n");
 
@@ -1820,90 +1822,160 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             std::vector<unsigned char> v = ParseHex(s.substr(9, std::string::npos));
             std::string opCode(v.begin(), v.end());
 
+            CAmount betAmount{txout.nValue};
+            // Get player address
+            uint256 hashBlock;
+            CTransaction txPrev;
+            CBitcoinAddress address;
+            CTxDestination prevAddr;
+            // if we cant extract playerAddress - skip vout
+            if (!GetTransaction(tx.vin[0].prevout.hash, txPrev, hashBlock, true) &&
+                !ExtractDestination(txPrev.vout[tx.vin[0].prevout.n].scriptPubKey, prevAddr)) continue;
+            address = CBitcoinAddress(prevAddr);
+
+            std::vector<CPeerlessBet> legs;
+            std::vector<CPeerlessEvent> lockedEvents;
+            if (CPeerlessBet::ParlayFromOpCode(opCode, legs)) {
+                // delete duplicated legs
+                std::sort(legs.begin(), legs.end());
+                legs.erase(std::unique(legs.begin(), legs.end()), legs.end());
+
+                for (auto it = legs.begin(); it != legs.end();) {
+                    CPeerlessBet &bet{*it};
+                    CPeerlessEvent plEvent;
+                    EventKey eventKey{bet.nEventId};
+                    if (bettingsViewCache.events->Read(eventKey, plEvent) &&
+                            !(plEvent.nStartTime > 0 && blockTime > plEvent.nStartTime)) {
+                        switch (bet.nOutcome) {
+                            case moneyLineWin:
+                                plEvent.nMoneyLineHomeBets += 1;
+                                break;
+                            case moneyLineLose:
+                                plEvent.nMoneyLineAwayBets += 1;
+                                break;
+                            case moneyLineDraw:
+                                plEvent.nMoneyLineDrawBets += 1;
+                                break;
+                            case spreadHome:
+                                plEvent.nSpreadHomeBets += 1;
+                                plEvent.nSpreadPushBets += 1;
+                                break;
+                            case spreadAway:
+                                plEvent.nSpreadAwayBets += 1;
+                                plEvent.nSpreadPushBets += 1;
+                                break;
+                            case totalOver:
+                                plEvent.nTotalOverBets += 1;
+                                plEvent.nTotalPushBets += 1;
+                                break;
+                            case totalUnder:
+                                plEvent.nTotalUnderBets += 1;
+                                plEvent.nTotalPushBets += 1;
+                                break;
+                            default:
+                                std::runtime_error("Unknown bet outcome type!");
+                        }
+                        lockedEvents.emplace_back(plEvent);
+                        it++;
+                        bettingsViewCache.events->Update(eventKey, plEvent);
+                    }
+                    else {
+                        // if invalid event or bet placed after event start - exclude bet
+                        it = legs.erase(it);
+                    }
+                }
+                bettingsViewCache.bets->Write(UniversalBetKey{static_cast<uint32_t>(height), out}, CUniversalBet(betAmount, address, legs, lockedEvents, out, blockTime));
+                continue;
+            }
+
             CPeerlessBet plBet;
             if (CPeerlessBet::FromOpCode(opCode, plBet)) {
-                CAmount betAmount{txout.nValue};
-                uint64_t oddsDivisor{Params().OddsDivisor()};
-                uint64_t betXPermille{Params().BetXPermille()};
                 CPeerlessEvent plEvent;
                 EventKey eventKey{plBet.nEventId};
 
                 LogPrintf("CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
                 // Find the event in DB
-                if (bettingsViewCache.events->Read(eventKey, plEvent)) {
+                if (bettingsViewCache.events->Read(eventKey, plEvent) &&
+                            !(plEvent.nStartTime > 0 && blockTime > plEvent.nStartTime)) {
                     CAmount payout = 0 * COIN;
                     CAmount burn = 0;
                     CAmount winnings = 0;
 
+                    // if bet placed after event start - drop this bet
+                    if (plEvent.nStartTime > 0 && blockTime > plEvent.nStartTime) continue;
+
                     // save prev event state to undo
                     bettingsViewCache.SaveBettingUndo(undoId, CBettingUndo{BettingUndoVariant{plEvent}, (uint32_t)height});
                     // Check which outcome the bet was placed on and add to accumulators
-                    if (plBet.nOutcome == moneyLineWin){
-                        winnings = betAmount * plEvent.nHomeOdds;
-                        // To avoid internal overflow issues, first divide and then multiply.
-                        // This will not cause inaccuracy, because the Odds (and thus the winnings) are scaled by a
-                        // factor 10000 (the oddsDivisor)
-                        burn = (winnings - betAmount * oddsDivisor) / 2000 * betXPermille;
-                        payout = winnings - burn;
-                        plEvent.nMoneyLineHomePotentialLiability += payout / COIN ;
-                        plEvent.nMoneyLineHomeBets += 1;
+                    switch (plBet.nOutcome) {
+                        case moneyLineWin:
+                            winnings = betAmount * plEvent.nHomeOdds;
+                            // To avoid internal overflow issues, first divide and then multiply.
+                            // This will not cause inaccuracy, because the Odds (and thus the winnings) are scaled by a
+                            // factor 10000 (the oddsDivisor)
+                            burn = (winnings - betAmount * oddsDivisor) / 2000 * betXPermille;
+                            payout = winnings - burn;
+                            plEvent.nMoneyLineHomePotentialLiability += payout / COIN ;
+                            plEvent.nMoneyLineHomeBets += 1;
+                            break;
+                        case moneyLineLose:
+                            winnings = betAmount * plEvent.nAwayOdds;
+                            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
+                            payout = winnings - burn;
+                            plEvent.nMoneyLineAwayPotentialLiability += payout / COIN ;
+                            plEvent.nMoneyLineAwayBets += 1;
+                            break;
+                        case moneyLineDraw:
+                            winnings = betAmount * plEvent.nDrawOdds;
+                            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
+                            payout = winnings - burn;
+                            plEvent.nMoneyLineDrawPotentialLiability += payout / COIN ;
+                            plEvent.nMoneyLineDrawBets += 1;
+                            break;
+                        case spreadHome:
+                            winnings = betAmount * plEvent.nSpreadHomeOdds;
+                            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
+                            payout = winnings - burn;
 
-                    } else if (plBet.nOutcome == moneyLineLose){
-                        winnings = betAmount * plEvent.nAwayOdds;
-                        burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
-                        payout = winnings - burn;
-                        plEvent.nMoneyLineAwayPotentialLiability += payout / COIN ;
-                        plEvent.nMoneyLineAwayBets += 1;
+                            plEvent.nSpreadHomePotentialLiability += payout / COIN ;
+                            plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
+                            plEvent.nSpreadHomeBets += 1;
+                            plEvent.nSpreadPushBets += 1;
+                            break;
+                        case spreadAway:
+                            winnings = betAmount * plEvent.nSpreadAwayOdds;
+                            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
+                            payout = winnings - burn;
 
-                    } else if (plBet.nOutcome == moneyLineDraw){
-                        winnings = betAmount * plEvent.nDrawOdds;
-                        burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
-                        payout = winnings - burn;
-                        plEvent.nMoneyLineDrawPotentialLiability += payout / COIN ;
-                        plEvent.nMoneyLineDrawBets += 1;
+                            plEvent.nSpreadAwayPotentialLiability += payout / COIN ;
+                            plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
+                            plEvent.nSpreadAwayBets += 1;
+                            plEvent.nSpreadPushBets += 1;
+                            break;
+                        case totalOver:
+                            winnings = betAmount * plEvent.nTotalOverOdds;
+                            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
+                            payout = winnings - burn;
 
-                    } else if (plBet.nOutcome == spreadHome){
-                        winnings = betAmount * plEvent.nSpreadHomeOdds;
-                        burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
-                        payout = winnings - burn;
+                            plEvent.nTotalOverPotentialLiability += payout / COIN ;
+                            plEvent.nTotalPushPotentialLiability += betAmount / COIN;
+                            plEvent.nTotalOverBets += 1;
+                            plEvent.nTotalPushBets += 1;
+                            break;
+                        case totalUnder:
+                            winnings = betAmount * plEvent.nTotalUnderOdds;
+                            burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
+                            payout = winnings - burn;
 
-                        plEvent.nSpreadHomePotentialLiability += payout / COIN ;
-                        plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
-                        plEvent.nSpreadHomeBets += 1;
-                        plEvent.nSpreadPushBets += 1;
-
-                    } else if (plBet.nOutcome == spreadAway){
-                        winnings = betAmount * plEvent.nSpreadAwayOdds;
-                        burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
-                        payout = winnings - burn;
-
-                        plEvent.nSpreadAwayPotentialLiability += payout / COIN ;
-                        plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
-                        plEvent.nSpreadAwayBets += 1;
-                        plEvent.nSpreadPushBets += 1;
-
-                    } else if (plBet.nOutcome == totalOver){
-                        winnings = betAmount * plEvent.nTotalOverOdds;
-                        burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
-                        payout = winnings - burn;
-
-                        plEvent.nTotalOverPotentialLiability += payout / COIN ;
-                        plEvent.nTotalPushPotentialLiability += betAmount / COIN;
-                        plEvent.nTotalOverBets += 1;
-                        plEvent.nTotalPushBets += 1;
-
-                    } else if (plBet.nOutcome == totalUnder){
-                        winnings = betAmount * plEvent.nTotalUnderOdds;
-                        burn = (winnings - betAmount*oddsDivisor) / 2000 * betXPermille;
-                        payout = winnings - burn;
-
-                        plEvent.nTotalUnderPotentialLiability += payout / COIN;
-                        plEvent.nTotalPushPotentialLiability += betAmount / COIN;
-                        plEvent.nTotalUnderBets += 1;
-                        plEvent.nTotalPushBets += 1;
-
+                            plEvent.nTotalUnderPotentialLiability += payout / COIN;
+                            plEvent.nTotalPushPotentialLiability += betAmount / COIN;
+                            plEvent.nTotalUnderBets += 1;
+                            plEvent.nTotalPushBets += 1;
+                            break;
+                        default:
+                            std::runtime_error("Unknown bet outcome type!");
+                            break;
                     }
-
                     if (!bettingsViewCache.events->Update(eventKey, plEvent)) {
                         LogPrintf("Failed to update event!\n");
                     }
@@ -1911,6 +1983,13 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 else {
                     LogPrintf("Failed to find event!\n");
                 }
+                else {
+                    continue;
+                }
+                // add single bet into vector
+                legs.emplace_back(plBet.nEventId, plBet.nOutcome);
+                lockedEvents.emplace_back(plEvent);
+                bettingsViewCache.bets->Write(UniversalBetKey{static_cast<uint32_t>(height), out}, CUniversalBet(betAmount, address, legs, lockedEvents, out, blockTime));
                 continue;
             }
         }

@@ -105,40 +105,40 @@ class CBetOut : public CTxOut {
 class CPeerlessEvent
 {
 public:
-    uint32_t nEventId;
-    uint64_t nStartTime;
-    uint32_t nSport;
-    uint32_t nTournament;
-    uint32_t nStage;
-    uint32_t nHomeTeam;
-    uint32_t nAwayTeam;
-    uint32_t nHomeOdds;
-    uint32_t nAwayOdds;
-    uint32_t nDrawOdds;
-    uint32_t nSpreadPoints;
-    uint32_t nSpreadHomeOdds;
-    uint32_t nSpreadAwayOdds;
-    uint32_t nTotalPoints;
-    uint32_t nTotalOverOdds;
-    uint32_t nTotalUnderOdds;
-    uint32_t nMoneyLineHomePotentialLiability;
-    uint32_t nMoneyLineAwayPotentialLiability;
-    uint32_t nMoneyLineDrawPotentialLiability;
-    uint32_t nSpreadHomePotentialLiability;
-    uint32_t nSpreadAwayPotentialLiability;
-    uint32_t nSpreadPushPotentialLiability;
-    uint32_t nTotalOverPotentialLiability;
-    uint32_t nTotalUnderPotentialLiability;
-    uint32_t nTotalPushPotentialLiability;
-    uint32_t nMoneyLineHomeBets;
-    uint32_t nMoneyLineAwayBets;
-    uint32_t nMoneyLineDrawBets;
-    uint32_t nSpreadHomeBets;
-    uint32_t nSpreadAwayBets;
-    uint32_t nSpreadPushBets;
-    uint32_t nTotalOverBets;
-    uint32_t nTotalUnderBets;
-    uint32_t nTotalPushBets;
+    uint32_t nEventId = 0;
+    uint64_t nStartTime = 0;
+    uint32_t nSport = 0;
+    uint32_t nTournament = 0;
+    uint32_t nStage = 0;
+    uint32_t nHomeTeam = 0;
+    uint32_t nAwayTeam = 0;
+    uint32_t nHomeOdds = 0;
+    uint32_t nAwayOdds = 0;
+    uint32_t nDrawOdds = 0;
+    uint32_t nSpreadPoints = 0;
+    uint32_t nSpreadHomeOdds = 0;
+    uint32_t nSpreadAwayOdds = 0;
+    uint32_t nTotalPoints = 0;
+    uint32_t nTotalOverOdds = 0;
+    uint32_t nTotalUnderOdds = 0;
+    uint32_t nMoneyLineHomePotentialLiability = 0;
+    uint32_t nMoneyLineAwayPotentialLiability = 0;
+    uint32_t nMoneyLineDrawPotentialLiability = 0;
+    uint32_t nSpreadHomePotentialLiability = 0;
+    uint32_t nSpreadAwayPotentialLiability = 0;
+    uint32_t nSpreadPushPotentialLiability = 0;
+    uint32_t nTotalOverPotentialLiability = 0;
+    uint32_t nTotalUnderPotentialLiability = 0;
+    uint32_t nTotalPushPotentialLiability = 0;
+    uint32_t nMoneyLineHomeBets = 0;
+    uint32_t nMoneyLineAwayBets = 0;
+    uint32_t nMoneyLineDrawBets = 0;
+    uint32_t nSpreadHomeBets = 0;
+    uint32_t nSpreadAwayBets = 0;
+    uint32_t nSpreadPushBets = 0;
+    uint32_t nTotalOverBets = 0;
+    uint32_t nTotalUnderBets = 0;
+    uint32_t nTotalPushBets = 0;
 
     // Default Constructor.
     CPeerlessEvent() {}
@@ -202,6 +202,15 @@ public:
         nEventId = eventId;
         nOutcome = outcome;
     }
+    bool operator<(const CPeerlessBet& rhs)
+    {
+        return nEventId == rhs.nEventId ? nOutcome < rhs.nOutcome : nEventId < rhs.nEventId;
+    }
+
+    bool operator==(const CPeerlessBet& rhs)
+    {
+        return nEventId == rhs.nEventId && nOutcome == rhs.nOutcome;
+    }
 
     static bool ToOpCode(CPeerlessBet pb, std::string &opCode);
     static bool FromOpCode(std::string opCode, CPeerlessBet &pb);
@@ -233,20 +242,22 @@ public:
     CBitcoinAddress playerAddress;
     // one elem means single bet, else it is parlay bet, max size = 5
     std::vector<CPeerlessBet> legs;
-    // calculated odds for this bet
-    uint32_t betOdds;
+    // vector for member event condition
+    std::vector<CPeerlessEvent> lockedEvents;
     COutPoint betOutPoint;
+    int64_t betTime;
 
     explicit CUniversalBet() { }
-    explicit CUniversalBet(const CAmount amount, const CBitcoinAddress address, const std::vector<CPeerlessBet> vLegs, uint32_t odds, const COutPoint outPoint) :
-        betAmount(amount), playerAddress(address), legs(vLegs), betOdds(odds), betOutPoint(outPoint) { }
+    explicit CUniversalBet(const CAmount amount, const CBitcoinAddress address, const std::vector<CPeerlessBet> vLegs, const std::vector<CPeerlessEvent> vEvents, const COutPoint outPoint, const int64_t time) :
+        betAmount(amount), playerAddress(address), legs(vLegs), lockedEvents(vEvents), betOutPoint(outPoint), betTime(time) { }
     explicit CUniversalBet(const CUniversalBet& bet)
     {
         betAmount = bet.betAmount;
         playerAddress = bet.playerAddress;
         legs = bet.legs;
+        lockedEvents = bet.lockedEvents;
         betOutPoint = bet.betOutPoint;
-        betOdds = bet.betOdds;
+        betTime = bet.betTime;
         completed = bet.completed;
     }
 
@@ -257,16 +268,18 @@ public:
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        std::string addrStr;
         READWRITE(betAmount);
         if (ser_action.ForRead()) {
-            std::string addrStr;
             READWRITE(addrStr);
             playerAddress.SetString(addrStr);
         }
         else {
-            READWRITE(playerAddress.ToString());
+            addrStr = playerAddress.ToString();
+            READWRITE(addrStr);
         }
         READWRITE(legs);
+        READWRITE(lockedEvents);
         READWRITE(betOutPoint);
         READWRITE(completed);
     }
@@ -508,7 +521,21 @@ typedef struct ResultKey {
 using EventKey = ResultKey;
 
 // UniversalBetKey
+typedef struct UniversalBetKey {
+    uint32_t blockHeight;
+    COutPoint outPoint;
 
+    UniversalBetKey() : blockHeight(0), outPoint(COutPoint()) { }
+    UniversalBetKey(uint32_t height, COutPoint out) : blockHeight(height), outPoint(outPoint) { }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(blockHeight);
+        READWRITE(outPoint);
+    }
+} UniversalBetKey;
 
 // UndoKey
 using BettingUndoKey = uint256;
@@ -812,7 +839,7 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height);
 std::vector<CBetOut> GetCGLottoBetPayouts(int height);
 
 /** Parse the transaction for betting data **/
-void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height);
+void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime);
 
 /** Get the chain height **/
 int GetActiveChainHeight(const bool lockHeld = false);

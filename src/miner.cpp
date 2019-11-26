@@ -210,6 +210,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         CBlockIndex* pindexPrev = chainActive.Tip();
         const int nHeight = pindexPrev->nHeight + 1;
         CCoinsViewCache view(pcoinsTip);
+        CBettingsView bettingsViewCache(bettingsView);
 
         // Priority order to process transactions
         std::list<COrphan> vOrphan; // list memory doesn't move
@@ -488,7 +489,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             std::vector<CBetOut> vCGLottoPayouts;
             CAmount nMNBetReward = 0;
 
-            if( nHeight > Params().BetStartHeight()) {
+            if (nHeight > Params().BetStartHeight()) {
                 // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
                 vPLPayouts = GetBetPayoutsLegacy(nHeight - 1);
                 vCGLottoPayouts = GetCGLottoBetPayouts(nHeight - 1);
