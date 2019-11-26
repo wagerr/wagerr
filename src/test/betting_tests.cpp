@@ -85,7 +85,7 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_test)
     dbCache.Flush();
     BOOST_CHECK(!db.Read(key, mapping_r));
 
-    std::cout << "Test of flushable DB passed" << std::endl;
+    std::cout << "Testing of flushable DB passed" << std::endl;
 }
 
 BOOST_AUTO_TEST_CASE(betting_flushable_db_iterator_test)
@@ -160,6 +160,27 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_iterator_test)
     BOOST_CHECK(!it->Valid());
 
     std::cout << "Testing of flushable DB iterator passed" << std::endl;
+}
+
+BOOST_AUTO_TEST_CASE(betting_serialization_test)
+{
+    std::vector<CPeerlessBet> vLegs;
+    for (uint32_t i = 0; i < Params().MaxParlayLegs(); i++) {
+        vLegs.emplace_back(i + 1024, (OutcomeType) i);
+    }
+
+    std::string opCode;
+    BOOST_CHECK(CPeerlessBet::ParlayToOpCode(vLegs, opCode));
+
+    std::vector<CPeerlessBet> vLegsOut;
+    BOOST_CHECK(CPeerlessBet::ParlayFromOpCode(opCode, vLegsOut));
+
+    for (uint32_t i = 0; i < vLegsOut.size(); i++) {
+        BOOST_CHECK_EQUAL(vLegs[i].nEventId, vLegsOut[i].nEventId);
+        BOOST_CHECK_EQUAL(vLegs[i].nOutcome, vLegsOut[i].nOutcome);
+    }
+
+    std::cout << "Testing of parlay bet serialization passed" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

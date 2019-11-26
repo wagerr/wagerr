@@ -284,6 +284,7 @@ extern UniValue getchaingamesinfo(const UniValue& params, bool fHelp);
 extern UniValue placechaingamesbet(const UniValue& params, bool fHelp);
 extern UniValue geteventsliability(const UniValue& params, bool fHelp);
 extern UniValue placebet(const UniValue& params, bool fHelp);
+extern UniValue placeparlaybet(const UniValue& params, bool fHelp);
 extern UniValue listbets(const UniValue& params, bool fHelp);
 extern UniValue getmappingid(const UniValue& params, bool fHelp);
 extern UniValue getmappingname(const UniValue& params, bool fHelp);

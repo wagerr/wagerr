@@ -168,6 +168,7 @@ public:
     int64_t MaxParlayBetPayoutRange() const { return nMaxBetPayoutRange; }
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
     int MaxParlayLegs() const { return nMaxParlayLegs; }
+    int ParlayBetStartHeight() const { return nParlayBetStartHeight; }
 
     /** temp worarounds **/
     int ZerocoinCheckTX() const { return nZerocoinCheckTX; }
@@ -267,6 +268,7 @@ protected:
     int64_t nMaxParlayBetPayoutRange;
     int nBetPlaceTimeoutBlocks;
     int nMaxParlayLegs;
+    int nParlayBetStartHeight;
 
     // workarounds
     int nZerocoinCheckTX;

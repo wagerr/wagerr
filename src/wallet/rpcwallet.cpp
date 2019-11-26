@@ -1025,10 +1025,10 @@ UniValue placebet(const UniValue& params, bool fHelp)
             "2. outcome         (numeric, required) 1 means home team win,\n"
             "                                       2 means away team win,\n"
             "                                       3 means a draw."
-            "3. amount          (numeric, required) The amount in wgr to send. eg 10\n"
-            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
+            "3. amount          (numeric, required) The amount in wgr to send.\n"
+            "4. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
-            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
+            "5. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
             "                             to which you're sending the transaction. This is not part of the \n"
             "                             transaction, just kept in your wallet.\n"
             "\nResult:\n"
@@ -1073,6 +1073,82 @@ UniValue placebet(const UniValue& params, bool fHelp)
     // ideally be investigated and corrected/justified when time allows.
     std::string opCode;
     CPeerlessBet::ToOpCode(plBet, opCode);
+
+    // Unhex the validated bet opcode
+    std::vector<unsigned char> vectorValue;
+    std::string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
+UniValue placeparlaybet(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 2 || params.size() > 4)
+        throw std::runtime_error(
+            "placebet \"event-id\" outcome amount ( \"comment\" \"comment-to\" )\n"
+            "\nWARNING - Betting closes 20 minutes before event start time.\n"
+            "Any bets placed after this time will be invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on an event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. Legs array     (array of json objects, required) The list of bets.\n"
+            "  [\n"
+            "    {\n"
+            "      \"eventId\": id      (numeric, required) The event to bet on.\n"
+            "      \"outcome\": type    (numeric, required) 1 - home win, 2 - away win, 3 - draw,\n"
+            "                                               4 - spread home, 5 - spread away,\n"
+            "                                               6 - total over, 7 - total under\n"
+            "    }\n"
+            "  ]\n"
+            "2. amount          (numeric, required) The amount in wgr to send. Min: 25, max: 4000.\n"
+            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for.\n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization\n"
+            "                             to which you're sending the transaction. This is not part of the\n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placebet", "\"000\" \"1\" 25\"donation\" \"seans outpost\"") +
+            HelpExampleRpc("placebet", "\"000\", \"1\", 25, \"donation\", \"seans outpost\""));
+
+    std::vector<CPeerlessBet> vLegs;
+    UniValue legsArr = params[0].get_array();
+    for (int i = 0; i < legsArr.size(); i++) {
+        const UniValue obj = legsArr[i].get_obj();
+
+        RPCTypeCheckObj(obj, boost::assign::map_list_of("eventId", UniValue::VNUM)("outcome", UniValue::VNUM));
+
+        uint32_t eventId = find_value(obj, "eventId").get_int();
+        OutcomeType outcomeType = (OutcomeType) find_value(obj, "outcome").get_int();
+        vLegs.emplace_back(eventId, outcomeType);
+    }
+
+    std::string opCode;
+    CPeerlessBet::ParlayToOpCode(vLegs, opCode);
+
+    CAmount nAmount = AmountFromValue(params[1]);
+
+    // Validate parlay bet amount so its between 25 - 4000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxParlayBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 4000 WGR inclusive.");
+    }
+
+    // Wallet comments
+    CWalletTx wtx;
+    if (params.size() > 2 && !params[2].isNull() && !params[2].get_str().empty())
+        wtx.mapValue["comment"] = params[2].get_str();
+    if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
+        wtx.mapValue["to"] = params[3].get_str();
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    CBitcoinAddress address("");
 
     // Unhex the validated bet opcode
     std::vector<unsigned char> vectorValue;
