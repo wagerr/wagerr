@@ -476,7 +476,7 @@ public:
         nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nParlayBetStartHeight = 1000000;                                // TODO: pick block height for enabling parlay betting and new payout system
+        nParlayBetStartHeight = nBetStartHeight;                        // TODO: pick block height for enabling parlay betting and new payout system
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;

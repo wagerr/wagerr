@@ -2601,6 +2601,13 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
         }
         // Revert betting dats
         if (pindex->nHeight > Params().BetStartHeight()) {
+            // revert complete bet payouts marker
+            if (pindex->nHeight > Params().ParlayBetStartHeight()) {
+                if (!UndoBetPayouts(bettingsViewCache, pindex->nHeight - 1)) {
+                    error("DisconnectBlock(): undo payout data inconsistent");
+                    return false;
+                }
+            }
             if (!UndoBettingTx(bettingsViewCache, tx, pindex->nHeight)) {
                 error("DisconnectBlock(): custom transaction and undo data inconsistent");
                 return false;
@@ -3249,7 +3256,12 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         //const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
 
         // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
-        vExpectedPLPayouts = GetBetPayoutsLegacy(pindex->nHeight - 1);
+        if (pindex->nHeight > Params().ParlayBetStartHeight()) {
+            vExpectedPLPayouts = GetBetPayouts(bettingsViewCache, pindex->nHeight - 1);
+        }
+        else {
+            vExpectedPLPayouts = GetBetPayoutsLegacy(pindex->nHeight - 1);
+        }
         vExpectedCGLottoPayouts = GetCGLottoBetPayouts(pindex->nHeight - 1);
 
         // Get the total amount of WGR that needs to be minted to payout all winning bets.
