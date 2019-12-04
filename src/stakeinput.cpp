@@ -80,7 +80,8 @@ bool CZWgrStake::GetModifier(uint64_t& nStakeModifier)
 
     if(Params().NetworkID() == CBaseChainParams::REGTEST) {
         // Stake modifier is fixed for now, move it to 60 blocks after this pindex in the future..
-        nStakeModifier = pindexFrom->nStakeModifier;
+        // TODO: its temporary fix PoS in regtest.
+        nStakeModifier = pindexFrom->GetBlockTime();
         return true;
     }
 
