@@ -263,6 +263,8 @@ public:
 
     bool IsCompleted() { return completed; }
     void SetCompleted() { completed = true; }
+    // for undo
+    void SetUncompleted() { completed = false; }
 
     ADD_SERIALIZE_METHODS;
 
@@ -834,6 +836,10 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
 
 /** Get the peerless winning bets from the block chain and return the payout vector. **/
 std::vector<CBetOut> GetBetPayoutsLegacy(int height);
+/** Using betting database for handle bets **/
+std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height);
+/** Undo bets as marked completed when generating payouts **/
+bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height);
 
 /** Get the chain games winner and return the payout vector. **/
 std::vector<CBetOut> GetCGLottoBetPayouts(int height);
