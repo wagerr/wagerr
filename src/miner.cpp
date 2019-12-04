@@ -491,7 +491,12 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
             if (nHeight > Params().BetStartHeight()) {
                 // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
-                vPLPayouts = GetBetPayoutsLegacy(nHeight - 1);
+                if (nHeight > Params().ParlayBetStartHeight()) {
+                    vPLPayouts = GetBetPayouts(bettingsViewCache, nHeight - 1);
+                }
+                else {
+                    vPLPayouts = GetBetPayoutsLegacy(nHeight - 1);
+                }
                 vCGLottoPayouts = GetCGLottoBetPayouts(nHeight - 1);
 
                 // Get the total amount of WGR that needs to be minted to payout all winning bets.
