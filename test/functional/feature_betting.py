@@ -9,11 +9,12 @@
 - Stop the node and restart it with -reindex-chainstate. Verify that the node has reindexed up to block 3.
 """
 
-from test_framework.opcode import make_mapping, make_mlpatch, make_mlevent, post_opcode
+from test_framework.betting_opcode import *
 from test_framework.authproxy import JSONRPCException
 from test_framework.test_framework import BitcoinTestFramework
 from test_framework.util import wait_until, rpc_port, assert_equal, assert_raises_rpc_error
 from distutils.dir_util import copy_tree, remove_tree
+import pprint
 import time
 import os
 
@@ -22,9 +23,25 @@ WGR_WALLET_EVENT = { "addr": "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", "key": "TCDjD
 WGR_WALLET_DEV = { "addr": "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs", "key": "TFCrxaUt3EjHzMGKXeBqA7sfy3iaeihg5yZPSrf9KEyy4PHUMWVe" }
 WGR_WALLET_OMNO = { "addr": "THofaueWReDjeZQZEECiySqV9GP4byP3qr", "key": "TDJnwRkSk8JiopQrB484Ny9gMcL1x7bQUUFFFNwJZmmWA7U79uRk" }
 
+sport_names = ["Football", "MMA", "CSGO", "DOTA2"]
+round_names = ["round1", "round2", "round3", "round4"]
+tournament_names = ["UEFA Champions League", "UFC244", "PGL Major Krakow", "EPICENTER Major"]
+team_names = ["Real Madrid", "Barcelona", "Jorge Masvidal", "Nate Diaz", "Astralis", "Gambit", "Virtus Pro", "Team Liquid"]
+
+outcome_home_win = 1
+outcome_away_win = 2
+outcome_draw = 3
+outcome_spread_home = 4
+outcome_spread_away = 5
+outcome_total_over = 6
+outcome_total_under = 7
+
+ODDS_DIVISOR = 10000
+BETX_PERMILLE = 60
+
 class BettingTest(BitcoinTestFramework):
     def get_cache_dir_name(self, node_index, block_count):
-        return ".test-chain-{0}-{1}-.node{2}".format(self.num_nodes, block_count, node_index);
+        return ".test-chain-{0}-{1}-.node{2}".format(self.num_nodes, block_count, node_index)
 
     def get_node_setting(self, node_index, setting_name):
         with open(os.path.join(self.nodes[node_index].datadir, "wagerr.conf"), 'r', encoding='utf8') as f:
@@ -55,7 +72,8 @@ class BettingTest(BitcoinTestFramework):
     def set_test_params(self):
         self.extra_args = None
         self.setup_clean_chain = True
-        self.num_nodes = 3
+        self.num_nodes = 4
+        self.players = []
 
     def connect_network(self):
         for pair in [[n, n + 1 if n + 1 < self.num_nodes else 0] for n in range(self.num_nodes)]:
@@ -98,175 +116,578 @@ class BettingTest(BitcoinTestFramework):
             return True
         return False
 
-    def check_premine(self, block_count=250):
-        self.log.info("Check Premine...")
+    def check_minting(self, block_count=250):
+        self.log.info("Check Minting...")
 
-        if block_count > 5 and not self.load_cache(block_count):
-            block_count = block_count - 3
-            assert_equal(len(self.nodes), self.num_nodes)
-            for n in range(self.num_nodes):
-                self.nodes[n].generate(int(block_count / self.num_nodes))
-                self.sync_all()
-            if block_count > self.nodes[1].getblockcount():
-                self.nodes[1].generate(block_count - self.nodes[1].getblockcount())
-            self.sync_all()
-            for n in range(self.num_nodes):
-                assert_equal(self.nodes[n].getblockcount(), block_count)
+        self.nodes[1].importprivkey(WGR_WALLET_ORACLE['key'])
+        self.nodes[1].importprivkey(WGR_WALLET_EVENT['key'])
+        self.nodes[1].importprivkey(WGR_WALLET_DEV['key'])
+        self.nodes[1].importprivkey(WGR_WALLET_OMNO['key'])
 
-            self.nodes[0].sendtoaddress(WGR_WALLET_ORACLE["addr"], 100)
-            self.nodes[0].sendtoaddress(WGR_WALLET_EVENT["addr"], 100)
-            self.nodes[0].sendtoaddress(WGR_WALLET_DEV["addr"], 1000)
-            self.nodes[0].sendtoaddress(WGR_WALLET_OMNO["addr"], 2000)
-            self.nodes[0].generate(1)
-            self.sync_all()
-            block_count = block_count + 1
-            self.nodes[0].sendtoaddress(self.nodes[1].getnewaddress(), int(self.nodes[0].getbalance()) / 3)
-            self.nodes[0].sendtoaddress(self.nodes[2].getnewaddress(), int(self.nodes[0].getbalance()) / 2)
-            self.nodes[0].generate(1)
-            self.sync_all()
-            block_count = block_count + 1
-            self.nodes[0].importprivkey(WGR_WALLET_ORACLE["key"])
-            self.nodes[1].importprivkey("TCDjD2i4e32kx2Fc87bDJKGBedEyG7oZPaZfp7E1PQG29YnvArQ8")
-            self.nodes[2].importprivkey("TFCrxaUt3EjHzMGKXeBqA7sfy3iaeihg5yZPSrf9KEyy4PHUMWVe")
-            self.nodes[3].importprivkey("TDJnwRkSk8JiopQrB484Ny9gMcL1x7bQUUFFFNwJZmmWA7U79uRk")
-            self.nodes[0].generate(1)
-            self.sync_all()
-            block_count = block_count + 1
-            self.save_cache(True)
+        self.players.append(self.nodes[2].getnewaddress())
+        self.players.append(self.nodes[3].getnewaddress())
+
+        for i in range(block_count - 1):
+            blocks = self.nodes[0].generate(1)
+            blockinfo = self.nodes[0].getblock(blocks[0])
+            # get coinbase tx
+            rawTx = self.nodes[0].getrawtransaction(blockinfo['tx'][0])
+            decodedTx = self.nodes[0].decoderawtransaction(rawTx)
+            address = decodedTx['vout'][0]['scriptPubKey']['addresses'][0]
+            if (i > 0):
+                # minting must process to sigle address
+                assert_equal(address, prevAddr)
+            prevAddr = address
+
+        for i in range(20):
+            self.nodes[0].sendtoaddress(WGR_WALLET_ORACLE['addr'], 2000)
+            self.nodes[0].sendtoaddress(WGR_WALLET_EVENT['addr'], 2000)
+            self.nodes[0].sendtoaddress(self.players[0], 2000)
+            self.nodes[0].sendtoaddress(self.players[1], 2000)
+
+        self.nodes[0].generate(1)
+
+        self.sync_all()
 
         for n in range(self.num_nodes):
-            #self.log.info("Node %d(%d) balance %s", n, self.nodes[n].getblockcount(), self.nodes[n].getbalance())
-            assert_equal(self.nodes[n].getblockcount(), block_count)
+            assert_equal( self.nodes[n].getblockcount(), block_count)
 
-        self.log.info("Premine Success")
+        # check oracle balance
+        assert_equal(self.nodes[1].getbalance(), 80000)
+        # check players balance
+        assert_equal(self.nodes[2].getbalance(), 40000)
+        assert_equal(self.nodes[3].getbalance(), 40000)
 
-    def check_balances(self, balances):
-        self.log.info("Check Balances...")
-
-        for n in range(self.num_nodes):
-            print(n, " - ", int(self.nodes[n].getbalance()))
-
-        assert_equal(len(balances), self.num_nodes)
-        for n in range(self.num_nodes):
-            assert_equal(int(self.nodes[n].getbalance()), balances[n])
-
-        self.log.info("Balances Success")
+        self.log.info("Minting Success")
 
     def check_mapping(self):
         self.log.info("Check Mapping...")
 
-        type_names = ["sports", "rounds", "tournaments", "teamnames"]
-        sport_names = ["Soccer","Football"]
-        team_names = ["Chicago Bulls", "Washington Capitals"]
+        self.nodes[0].generate(1)
+        self.sync_all()
 
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingid, "", "")
 
-        for i in range(3):
-            mapping = self.nodes[0].getmappingid(type_names[0], sport_names[0])
-            assert_equal(len(mapping), 1)
-            assert_equal(mapping[0]['mapping-id'], 0)
-            assert_equal(mapping[0]['exists'], i > 0)
-            assert_equal(mapping[0]['mapping-index'], type_names[0])
-            mapping = self.nodes[0].getmappingid(type_names[1], "")
-            assert_equal(len(mapping), 1)
-            assert_equal(mapping[0]['mapping-id'], 0)
-            assert_equal(mapping[0]['exists'], i > 0)
-            assert_equal(mapping[0]['mapping-index'], type_names[1])
-            mapping = self.nodes[0].getmappingid(type_names[3], team_names[0])
-            assert_equal(len(mapping), 1)
-            assert_equal(mapping[0]['mapping-id'], 0)
-            assert_equal(mapping[0]['exists'], i > 0)
-            assert_equal(mapping[0]['mapping-index'], type_names[3])
-            mapping = self.nodes[0].getmappingid(type_names[3], team_names[1])
-            assert_equal(len(mapping), 1)
-            assert_equal(mapping[0]['mapping-id'], 1)
-            assert_equal(mapping[0]['exists'], i > 0)
-            assert_equal(mapping[0]['mapping-index'], type_names[3])
+        # add sports to mapping
+        for id in range(len(sport_names)):
+            mapping_opcode = make_mapping(SPORT_MAPPING, id, sport_names[id])
+            post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
+        # add rounds to mapping
+        for id in range(len(round_names)):
+            mapping_opcode = make_mapping(ROUND_MAPPING, id, round_names[id])
+            post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
+        # add teams to mapping
+        for id in range(len(team_names)):
+            mapping_opcode = make_mapping(TEAM_MAPPING, id, team_names[id])
+            post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
+        # add tournaments to mapping
+        for id in range(len(tournament_names)):
+            mapping_opcode = make_mapping(TOURNAMENT_MAPPING, id, tournament_names[id])
+            post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
 
-        for n in range(self.num_nodes):
-            try:
-                mapping = self.nodes[n].getmappingname(type_names[0], str(0))
-                assert_equal(len(mapping), 1)
-                assert_equal(mapping[0]['mapping-name'], sport_names[0])
-                assert_equal(mapping[0]['exists'], True)
-                assert_equal(mapping[0]['mapping-index'], type_names[0])
+        self.sync_all()
 
-                mapping = self.nodes[n].getmappingname(type_names[3], str(0))
-                assert_equal(len(mapping), 1)
-                assert_equal(mapping[0]['mapping-name'], team_names[0])
-                assert_equal(mapping[0]['exists'], True)
-                assert_equal(mapping[0]['mapping-index'], type_names[3])
+        self.nodes[0].generate(1)
+        self.sync_all()
 
-                mapping = self.nodes[n].getmappingname(type_names[3], str(0))
-                assert_equal(len(mapping), 1)
-                assert_equal(mapping[0]['mapping-name'], team_names[0])
-                assert_equal(mapping[0]['exists'], True)
-                assert_equal(mapping[0]['mapping-index'], type_names[3])
+        for node in self.nodes:
+            # Check sports mapping
+            for id in range(len(sport_names)):
+                mapping = node.getmappingname("sports", id)[0]
+                assert_equal(mapping['exists'], True)
+                assert_equal(mapping['mapping-name'], sport_names[id])
+                assert_equal(mapping['mapping-index'], SPORT_MAPPING)
 
-                mapping = make_mapping(1, 111 + n, sport_names[1])
-                # time.sleep(15)
-                post_opcode(self.nodes[n], mapping, WGR_WALLET_ORACLE["addr"])
-                self.nodes[n].generate(1)
-                self.sync_all()
+            # Check rounds mapping
+            for id in range(len(round_names)):
+                mapping = node.getmappingname("rounds", id)[0]
+                assert_equal(mapping['exists'], True)
+                assert_equal(mapping['mapping-name'], round_names[id])
+                assert_equal(mapping['mapping-index'], ROUND_MAPPING)
 
-            except JSONRPCException as e:
-                assert_equal(str(e), "No mapping saved for the mapping type you provided.")
-                assert_equal(n > 0, True)
+            # Check teams mapping
+            for id in range(len(team_names)):
+                mapping = node.getmappingname("teamnames", id)[0]
+                assert_equal(mapping['exists'], True)
+                assert_equal(mapping['mapping-name'], team_names[id])
+                assert_equal(mapping['mapping-index'], TEAM_MAPPING)
 
-        for n in range(self.num_nodes):
-            mapping = self.nodes[n].getmappingname(type_names[0], str(111))
-            assert_equal(len(mapping), 1)
-            assert_equal(mapping[0]['mapping-name'], sport_names[1])
-            assert_equal(mapping[0]['exists'], True)
-            assert_equal(mapping[0]['mapping-index'], type_names[0])
+            # Check tournaments mapping
+            for id in range(len(tournament_names)):
+                mapping = node.getmappingname("tournaments", id)[0]
+                assert_equal(mapping['exists'], True)
+                assert_equal(mapping['mapping-name'], tournament_names[id])
+                assert_equal(mapping['mapping-index'], TOURNAMENT_MAPPING)
 
         self.log.info("Mapping Success")
 
-    def check_ml_event(self):
-        self.log.info("Check ML Event...")
+    def check_event(self):
+        self.log.info("Check Event creation...")
 
-        mlevent = make_mlevent(42, 1576543210, 0, 0, 0, 0, 1, 10, 20, 30)
-        post_opcode(self.nodes[2], mlevent)
-        self.nodes[0].generate(1)
-        time.sleep(10)
+        self.start_time = int(time.time() + 60 * 60)
+        # array for odds of events
+        self.odds_events = []
+
+        # 0: Football - UEFA Champions League - Real Madrid vs Barcelona
+        mlevent = make_event(0, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("Football"), # Sport ID
+                            tournament_names.index("UEFA Champions League"), # Tournament ID
+                            round_names.index("round1"), # Round ID
+                            team_names.index("Real Madrid"), # Home Team
+                            team_names.index("Barcelona"), # Away Team
+                            15000, # home odds
+                            18000, # away odds
+                            13000) # draw odds
+        self.odds_events.append({'homeOdds': 15000, 'awayOdds': 18000, 'drawOdds': 13000})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        # 1: MMA - UFC244 - Jorge Masvidal vs Nate Diaz
+        mlevent = make_event(1, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("MMA"), # Sport ID
+                            tournament_names.index("UFC244"), # Tournament ID
+                            round_names.index("round1"), # Round ID
+                            team_names.index("Jorge Masvidal"), # Home Team
+                            team_names.index("Nate Diaz"), # Away Team
+                            14000, # home odds
+                            28000, # away odds
+                            50000) # draw odds
+        self.odds_events.append({'homeOdds': 14000, 'awayOdds': 28000, 'drawOdds': 50000})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        # 2: CSGO - PGL Major Krakow - Astralis vs Gambit
+        mlevent = make_event(2, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("CSGO"), # Sport ID
+                            tournament_names.index("PGL Major Krakow"), # Tournament ID
+                            round_names.index("round1"), # Round ID
+                            team_names.index("Astralis"), # Home Team
+                            team_names.index("Gambit"), # Away Team
+                            14000, # home odds
+                            33000, # away odds
+                            0) # draw odds
+        self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+        # 3: DOTA2 - EPICENTER Major - Virtus Pro vs Team Liquid
+        mlevent = make_event(3, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("DOTA2"), # Sport ID
+                            tournament_names.index("EPICENTER Major"), # Tournament ID
+                            round_names.index("round1"), # Round ID
+                            team_names.index("Virtus Pro"), # Home Team
+                            team_names.index("Team Liquid"), # Away Team
+                            24000, # home odds
+                            17000, # away odds
+                            0) # draw odds
+        self.odds_events.append({'homeOdds': 24000, 'awayOdds': 17000, 'drawOdds': 0})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
         self.sync_all()
-        self.log.info("Events0: %s", self.nodes[0].listevents())
-        self.log.info("Events1: %s", self.nodes[1].listevents())
-        self.log.info("Events2: %s", self.nodes[2].listevents())
 
-        self.log.info("ML Event Success")
-
-    def check_ml_patch(self):
-        self.log.info("Check ML Patch...")
-
-        for n in range(self.num_nodes):
-            assert_equal(self.nodes[n].listevents()[0]['starting'], 1576543210)
-        mlevent = make_mlpatch(42, 1570000000)
-        post_opcode(self.nodes[2], mlevent)
         self.nodes[0].generate(1)
-        time.sleep(10)
+
         self.sync_all()
-        for n in range(self.num_nodes):
-            assert_equal(self.nodes[n].listevents()[0]['starting'], 1570000000)
 
-        self.log.info("ML Patch Success")
+        for node in self.nodes:
+            list_events = node.listevents()
+            found_events = 0
+            for event in list_events:
+                event_id = event['event_id']
+                assert_equal(event['sport'], sport_names[event_id])
+                assert_equal(event['tournament'], tournament_names[event_id])
+                assert_equal(event['teams']['home'], team_names[2 * event_id])
+                assert_equal(event['teams']['away'], team_names[(2 * event_id) + 1])
 
-    def check_recovery(self):
-        self.log.info("Check Recovery...")
-        self.log.info("Recovery Success")
+                found_events = found_events | (1 << event['event_id'])
+            # check that all events found
+            assert_equal(found_events, 0b1111)
 
-    def check_reindex(self):
-        self.log.info("Check Reindex...")
-        self.log.info("Reindex Success")
+        self.log.info("Event creation Success")
+
+    def check_event_patch(self):
+        self.log.info("Check Event Patch...")
+
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                assert_equal(event['starting'], self.start_time)
+
+        self.start_time = int(time.time() + 60 * 20) # new time - curr + 20mins
+
+        for id in range(len(tournament_names)):
+            event_patch = make_event_patch(id, self.start_time)
+            post_opcode(self.nodes[1], event_patch, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                assert_equal(event['starting'], self.start_time)
+
+        self.log.info("Event Patch Success")
+
+    def check_update_odds(self):
+        self.log.info("Check updating odds...")
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                event_id = event['event_id']
+                # 0 mean ml odds in odds array
+                assert_equal(event['odds'][0]['mlHome'], self.odds_events[event_id]['homeOdds'])
+                assert_equal(event['odds'][0]['mlAway'], self.odds_events[event_id]['awayOdds'])
+                assert_equal(event['odds'][0]['mlDraw'], self.odds_events[event_id]['drawOdds'])
+
+        # Change odd for event 1 - UFC244
+        event_id = tournament_names.index("UFC244")
+        self.odds_events[event_id]['homeOdds'] = 16000
+        self.odds_events[event_id]['awayOdds'] = 25000
+        self.odds_events[event_id]['drawOdds'] = 80000
+        update_odds_opcode = make_update_ml_odds(event_id,
+                                                self.odds_events[event_id]['homeOdds'],
+                                                self.odds_events[event_id]['awayOdds'],
+                                                self.odds_events[event_id]['drawOdds'])
+        post_opcode(self.nodes[1], update_odds_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                event_id = event['event_id']
+                # 0 mean ml odds in odds array
+                assert_equal(event['odds'][0]['mlHome'], self.odds_events[event_id]['homeOdds'])
+                assert_equal(event['odds'][0]['mlAway'], self.odds_events[event_id]['awayOdds'])
+                assert_equal(event['odds'][0]['mlDraw'], self.odds_events[event_id]['drawOdds'])
+
+        self.log.info("Updating odds Success")
+
+    def check_spread_event(self):
+        self.log.info("Check Spread events...")
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                # 1 mean spreads odds in odds array
+                assert_equal(event['odds'][1]['spreadPoints'], 0)
+                assert_equal(event['odds'][1]['spreadHome'], 0)
+                assert_equal(event['odds'][1]['spreadAway'], 0)
+        # make spread for event 0: UEFA Champions League
+        spread_event_opcode = make_spread_event(0, 1, 28000, 14000)
+        post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                if event['event_id'] == 0:
+                    assert_equal(event['odds'][1]['spreadPoints'], 1)
+                    assert_equal(event['odds'][1]['spreadHome'], 28000)
+                    assert_equal(event['odds'][1]['spreadAway'], 14000)
+
+        self.log.info("Spread events Success")
+
+    def check_total_event(self):
+        self.log.info("Check Total events...")
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                # 2 mean totals odds in odds array
+                assert_equal(event['odds'][2]['totalsPoints'], 0)
+                assert_equal(event['odds'][2]['totalsOver'], 0)
+                assert_equal(event['odds'][2]['totalsUnder'], 0)
+
+        # make totals for event 2: PGL Major Krakow
+        totals_event_opcode = make_total_event(2, 26, 21000, 23000)
+        post_opcode(self.nodes[1], totals_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                if event['event_id'] == 2:
+                    assert_equal(event['odds'][2]['totalsPoints'], 26)
+                    assert_equal(event['odds'][2]['totalsOver'], 21000)
+                    assert_equal(event['odds'][2]['totalsUnder'], 23000)
+
+        self.log.info("Total events Success")
+
+    def check_ml_bet(self):
+        self.log.info("Check Money Line Bets...")
+        # place bet to ml event 3: DOTA2 - EPICENTER Major - Virtus Pro vs Team Liquid
+        # player 1 bet to Team Liquid with odds 17000
+        player1_balance = self.nodes[2].getbalance()
+        player1_bet = 100
+        self.nodes[2].placebet(3, outcome_away_win, player1_bet)
+        winnings = player1_bet * self.odds_events[3]['awayOdds']
+        player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        # change odds
+        # note: we can change event odds in same block with bets, because bets TXs
+        # will handling before oracle TXs
+        self.odds_events[3]['homeOdds'] = 28000
+        self.odds_events[3]['awayOdds'] = 14000
+        self.odds_events[3]['drawOdds'] = 0
+        update_odds_opcode = make_update_ml_odds(3,
+                                                self.odds_events[3]['homeOdds'],
+                                                self.odds_events[3]['awayOdds'],
+                                                self.odds_events[3]['drawOdds'])
+        post_opcode(self.nodes[1], update_odds_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # print("player1 balance: ", self.nodes[2].getbalance())
+        # print("player1 exp win: ", player1_expected_win)
+
+        #player 2 bet to Team Liquid with odds 14000
+        player2_balance = self.nodes[3].getbalance()
+        player2_bet = 200
+        self.nodes[3].placebet(3, outcome_away_win, player2_bet)
+        winnings = player2_bet * self.odds_events[3]['awayOdds']
+        player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # print("player2 balance: ", self.nodes[3].getbalance())
+        # print("player2 exp win: ", player2_expected_win)
+
+        # print("player1 address: ", self.players[0])
+        # print("player2 address: ", self.players[1])
+
+        # print("BETS:\n", pprint.pformat(self.nodes[0].listbetsdb(True)))
+
+        # place result for event 3: Team Liquid wins.
+        result_opcode = make_result(3, STANDARD_RESULT, 0, 1)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # generate block with payouts
+        blockhash = self.nodes[0].generate(1)[0]
+        block = self.nodes[0].getblock(blockhash)
+
+        # print(pprint.pformat(block))
+
+        # print("player1 balance: ", self.nodes[2].getbalance())
+        # print("player2 balance: ", self.nodes[3].getbalance())
+
+        assert_equal(player1_balance + player1_expected_win, self.nodes[2].getbalance())
+        assert_equal(player2_balance + player2_expected_win, self.nodes[3].getbalance())
+
+        self.log.info("Money Line Bets Success")
+
+    def check_spreads_bet(self):
+        self.log.info("Check Spreads Bets...")
+
+        # place spread bet to event 0: UEFA Champions League, expect that event result will be 2:0 for home team
+        # player 1 bet to spread away, mean that away won't lose with spread points = 1
+        player1_balance = self.nodes[2].getbalance()
+        player1_bet = 300
+        self.nodes[2].placebet(0, outcome_spread_away, player1_bet)
+        winnings = player1_bet * 14000
+        player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        # change spread condition for event 0
+        spread_event_opcode = make_spread_event(0, 2, 23000, 15000)
+        post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # player 1 bet to spread away, mean that away won't lose with spread points = 2
+        # for our results it means refund
+        player2_balance = self.nodes[3].getbalance()
+        player2_bet = 200
+        self.nodes[2].placebet(0, outcome_spread_away, player2_bet)
+        winnings = player2_bet * ODDS_DIVISOR
+        player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        # place result for event 0: RM wins BARC with 2:0.
+        result_opcode = make_result(0, STANDARD_RESULT, 2, 0)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # generate block with payouts
+        blockhash = self.nodes[0].generate(1)[0]
+        block = self.nodes[0].getblock(blockhash)
+
+        # print(pprint.pformat(block))
+
+        # print("player1 balance: ", self.nodes[2].getbalance())
+        # print("player2 balance: ", self.nodes[3].getbalance())
+
+        assert_equal(player1_balance + player1_expected_win, self.nodes[2].getbalance())
+        assert_equal(player2_balance + player2_expected_win, self.nodes[3].getbalance())
+
+        self.log.info("Spreads Bets Success")
+
+    def check_totals_bet(self):
+        self.log.info("Check Totals Bets...")
+        # place spread bet to event 2: PGL Major Krakow
+        # player 1 bet to total over with odds 21000
+        player1_balance = self.nodes[2].getbalance()
+        player1_bet = 200
+        self.nodes[2].placebet(2, outcome_total_over, player1_bet)
+        winnings = player1_bet * 21000
+        player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        # change totals condition for event 2
+        spread_event_opcode = make_total_event(2, 28, 28000, 17000)
+        post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # player 1 bet to total under with odds 17000
+        player2_balance = self.nodes[3].getbalance()
+        player2_bet = 200
+        self.nodes[2].placebet(2, outcome_spread_away, player2_bet)
+        winnings = player2_bet * 17000
+        player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        # place result for event 2: Gambit wins with score 11:16
+        result_opcode = make_result(0, STANDARD_RESULT, 11, 16)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # generate block with payouts
+        blockhash = self.nodes[0].generate(1)[0]
+        block = self.nodes[0].getblock(blockhash)
+
+        # print(pprint.pformat(block))
+
+        # print("player1 balance: ", self.nodes[2].getbalance())
+        # print("player2 balance: ", self.nodes[3].getbalance())
+
+        assert_equal(player1_balance + player1_expected_win, self.nodes[2].getbalance())
+        assert_equal(player2_balance + player2_expected_win, self.nodes[3].getbalance())
+
+        self.log.info("Totals Bets Success")
+
+    def check_parlays_bet(self):
+        self.log.info("Check Parlay Bets...")
+        # add new events
+        # 4: CSGO - PGL Major Krakow - Astralis vs Gambit round2
+        mlevent = make_event(4, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("CSGO"), # Sport ID
+                            tournament_names.index("PGL Major Krakow"), # Tournament ID
+                            round_names.index("round2"), # Round ID
+                            team_names.index("Astralis"), # Home Team
+                            team_names.index("Gambit"), # Away Team
+                            14000, # home odds
+                            33000, # away odds
+                            0) # draw odds
+        self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        # 5: CSGO - PGL Major Krakow - Astralis vs Gambit round3
+        mlevent = make_event(5, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("CSGO"), # Sport ID
+                            tournament_names.index("PGL Major Krakow"), # Tournament ID
+                            round_names.index("round3"), # Round ID
+                            team_names.index("Astralis"), # Home Team
+                            team_names.index("Gambit"), # Away Team
+                            14000, # home odds
+                            33000, # away odds
+                            0) # draw odds
+        self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        # 6: Football - UEFA Champions League - Barcelona vs Real Madrid round2
+        mlevent = make_event(6, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("Football"), # Sport ID
+                            tournament_names.index("UEFA Champions League"), # Tournament ID
+                            round_names.index("round2"), # Round ID
+                            team_names.index("Barcelona"), # Home Team
+                            team_names.index("Real Madrid"), # Away Team
+                            14000, # home odds
+                            33000, # away odds
+                            0) # draw odds
+        self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # player 1 make express to events 4, 5, 6 - home win
+        player1_balance = self.nodes[2].getbalance()
+        player1_bet = 200
+        self.nodes[2].placeparlaybet([{'eventId': 4, 'outcome': outcome_home_win}, {'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}], player1_bet)
+
+        # player 2 make express to events 4, 5, 6 - home win
+        player2_balance = self.nodes[3].getbalance()
+        player2_bet = 500
+        self.nodes[3].placeparlaybet([{'eventId': 4, 'outcome': outcome_home_win}, {'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}], player2_bet)
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # place result for event 4: Astralis wins with score 16:9
+        result_opcode = make_result(4, STANDARD_RESULT, 16, 9)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+        # place result for event 5: Astralis wins with score 16:14
+        result_opcode = make_result(5, STANDARD_RESULT, 16, 14)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+        # place result for event 6: Barcelona wins with score 3:2
+        result_opcode = make_result(6, STANDARD_RESULT, 3, 2)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # generate block with payouts
+        blockhash = self.nodes[0].generate(1)[0]
+        block = self.nodes[0].getblock(blockhash)
+
+        # print(pprint.pformat(block))
+
+        # print("player1 balance: ", self.nodes[2].getbalance())
+        # print("player2 balance: ", self.nodes[3].getbalance())
+
+        self.log.info("Parlay Bets Success")
 
     def run_test(self):
-        self.check_premine()
-        self.check_balances([64452424, 81453523, 64454523])
+        self.check_minting()
         self.check_mapping()
-        self.check_ml_event()
-        self.check_ml_patch()
-        self.check_recovery()
-        self.check_reindex()
+        self.check_event()
+        self.check_event_patch()
+        self.check_update_odds()
+        self.check_spread_event()
+        self.check_total_event()
+        self.check_ml_bet()
+        self.check_spreads_bet()
+        self.check_totals_bet()
+        self.check_parlays_bet()
 
 if __name__ == '__main__':
     BettingTest().main()
