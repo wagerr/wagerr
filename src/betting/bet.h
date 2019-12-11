@@ -534,7 +534,15 @@ typedef struct UniversalBetKey {
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
-        READWRITE(blockHeight);
+        uint32_t be_val;
+        if (ser_action.ForRead()) {
+            READWRITE(be_val);
+            blockHeight = ntohl(be_val);
+        }
+        else {
+            be_val = htonl(blockHeight);
+            READWRITE(be_val);
+        }
         READWRITE(outPoint);
     }
 } UniversalBetKey;
@@ -676,15 +684,17 @@ public:
 
     template<typename KeyType>
     bool Erase(const KeyType& key) {
-        if (!GetDb().Exists(DbTypeToBytes(key)))
+        auto vKey = DbTypeToBytes(key);
+        if (!GetDb().Exists(vKey))
             return false;
-        return GetDb().Erase(DbTypeToBytes(key));
+        return GetDb().Erase(vKey);
     }
 
     template<typename KeyType, typename ValueType>
     bool Read(const KeyType& key, ValueType& value) {
+        auto vKey = DbTypeToBytes(key);
         std::vector<unsigned char> value_v;
-        if (GetDb().Read(DbTypeToBytes(key), value_v)) {
+        if (GetDb().Read(vKey, value_v)) {
             BytesToDbType(value_v, value);
             return true;
         }
@@ -758,7 +768,7 @@ public:
     }
 
     bool Flush() {
-        return mappings->Flush() && results->Flush() && events->Flush() && undos->Flush();
+        return mappings->Flush() && results->Flush() && events->Flush() && bets->Flush() && undos->Flush();
     }
 
     void SetLastHeight(uint32_t height) {
@@ -777,21 +787,21 @@ public:
         return height;
     }
 
-    bool SaveBettingUndo(const BettingUndoKey& key, CBettingUndo undo) {
+    bool SaveBettingUndo(const BettingUndoKey& key, std::vector<CBettingUndo> vUndos) {
         assert(!undos->Exists(key));
-        return undos->Write(key, undo);
+        return undos->Write(key, vUndos);
     }
 
     bool EraseBettingUndo(const BettingUndoKey& key) {
         return undos->Erase(key);
     }
 
-    CBettingUndo GetBettingUndo(const BettingUndoKey& key) {
-        CBettingUndo undo;
-        if (undos->Read(key, undo))
-            return undo;
+    std::vector<CBettingUndo> GetBettingUndo(const BettingUndoKey& key) {
+        std::vector<CBettingUndo> vUndos;
+        if (undos->Read(key, vUndos))
+            return vUndos;
         else
-            return CBettingUndo();
+            return std::vector<CBettingUndo>{};
     }
 
     void PruneOlderUndos(const uint32_t height) {
@@ -852,7 +862,7 @@ int GetActiveChainHeight(const bool lockHeld = false);
 
 bool RecoveryBettingDB(boost::signals2::signal<void(const std::string&)> & progress);
 
-bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height);
+bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height, const int64_t blockTime);
 
 
 #endif // WAGERR_BET_H

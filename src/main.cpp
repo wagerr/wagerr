@@ -2608,7 +2608,7 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
                     return false;
                 }
             }
-            if (!UndoBettingTx(bettingsViewCache, tx, pindex->nHeight)) {
+            if (!UndoBettingTx(bettingsViewCache, tx, pindex->nHeight, pindex->GetBlockTime())) {
                 error("DisconnectBlock(): custom transaction and undo data inconsistent");
                 return false;
             }
