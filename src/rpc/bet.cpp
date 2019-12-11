@@ -109,11 +109,12 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
  */
 UniValue getmappingname(const UniValue& params, bool fHelp)
 {
-    if (fHelp || (params.size() < 2))
+    if (fHelp || (params.size() != 2))
         throw std::runtime_error(
                 "getmappingname\n"
                 "\nGet a mapping string name from the specified map index.\n"
-
+                "1. Mapping type  (string, requied) Type of mapping (\"sports\", \"rounds\", \"teams\", \"tournaments\").\n"
+                "2. Mapping id    (numeric, requied) Mapping id.\n"
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
@@ -127,7 +128,7 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
                 HelpExampleCli("getmappingname", "") + HelpExampleRpc("getmappingname", ""));
 
     const std::string mIndex{params[0].get_str()};
-    const uint32_t id{static_cast<uint32_t>(std::stoul(params[1].get_str()))};
+    const uint32_t id{static_cast<uint32_t>(params[1].get_int())};
     const MappingTypes type{CMapping::FromTypeName(mIndex)};
     UniValue result{UniValue::VARR};
     UniValue mapping{UniValue::VOBJ};

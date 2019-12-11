@@ -289,6 +289,7 @@ extern UniValue listbets(const UniValue& params, bool fHelp);
 extern UniValue getmappingid(const UniValue& params, bool fHelp);
 extern UniValue getmappingname(const UniValue& params, bool fHelp);
 extern UniValue getbet(const UniValue& params, bool fHelp);
+extern UniValue listbetsdb(const UniValue& params, bool fHelp);
 
 extern UniValue getrawtransaction(const UniValue& params, bool fHelp); // in rpc/rawtransaction.cpp
 extern UniValue listunspent(const UniValue& params, bool fHelp);
