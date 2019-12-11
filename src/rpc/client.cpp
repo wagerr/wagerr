@@ -45,6 +45,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"listbets", 2},
         {"listbets", 3},
         {"getbet", 1},
+        {"listbetsdb", 0},
         {"placechaingamesbet", 0},
         {"placechaingamesbet", 1},
         {"placechaingamesbet", 2},

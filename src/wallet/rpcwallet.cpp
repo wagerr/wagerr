@@ -71,7 +71,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
 
     std::string sportFilter = "";
 
-    if (params.size() >= 1) {
+    if (params.size() > 0) {
         sportFilter = params[0].get_str();
     }
 
@@ -571,6 +571,76 @@ UniValue getbet(const UniValue& params, bool fHelp)
     }
 
     return ret;
+}
+
+UniValue listbetsdb(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 2)
+        throw std::runtime_error(
+            "listbetsdb\n"
+            "\nGet bets form bets DB.\n"
+
+            "\nArguments:\n"
+            "1. \"includeHandled\"   (bool, optional) Include bets which already handled, default - false.\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"legs\":\n"
+            "      [\n"
+            "        {\n"
+            "          \"event-id\": id,\n"
+            "          \"outcome\": type\n"
+            "        },\n"
+            "        ...\n"
+            "      ],                          (list) The list of legs.\n"
+            "    \"address\": playerAddress    (string) The player address.\n"
+            "    \"amount\": x.xxx,            (numeric) The amount bet in WGR.\n"
+            "    \"time\":\"betting time\",    (string) The betting time.\n"
+            "  },\n"
+            "  ...\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("listbetsdb", "true"));
+
+    UniValue ret(UniValue::VARR);
+
+    bool includeHandled = false;
+
+    if (params.size() > 0) {
+        includeHandled = params[0].get_bool();
+    }
+
+    auto it = bettingsView->bets->NewIterator();
+    UniversalBetKey key{0, COutPoint()};
+    auto v = CBettingDB::DbTypeToBytes(key);
+    std::cout << "listbetsdb: BetKey: " << HexStr(v.begin(), v.end()) << std::endl;
+    for(it->Seek(std::vector<char>{}); it->Valid(); it->Next()) {
+        CUniversalBet uniBet;
+        CBettingDB::BytesToDbType(it->Value(), uniBet);
+
+        if (!includeHandled && uniBet.IsCompleted()) continue;
+
+        UniValue uValue(UniValue::VOBJ);
+        UniValue uLegs(UniValue::VARR);
+
+        for (auto leg : uniBet.legs) {
+            UniValue uLeg(UniValue::VOBJ);
+            uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
+            uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+            uLegs.push_back(uLeg);
+        }
+
+        uValue.push_back(Pair("legs", uLegs));
+        uValue.push_back(Pair("address", uniBet.playerAddress.ToString()));
+        uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
+        uValue.push_back(Pair("time", (uint64_t) uniBet.betTime));
+        ret.push_back(uValue);
+    }
+
+    return ret;
+
 }
 
 UniValue listchaingamesbets(const UniValue& params, bool fHelp)
@@ -1089,7 +1159,7 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
         throw std::runtime_error(
-            "placebet \"event-id\" outcome amount ( \"comment\" \"comment-to\" )\n"
+            "placebet [{\"eventId\": event_id, \"outcome\": outcome_type}, ...] ( \"comment\" \"comment-to\" )\n"
             "\nWARNING - Betting closes 20 minutes before event start time.\n"
             "Any bets placed after this time will be invalid and will not be paid out! \n"
             "\nPlace an amount as a bet on an event. The amount is rounded to the nearest 0.00000001\n" +
@@ -1113,8 +1183,8 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
             "\nExamples:\n" +
-            HelpExampleCli("placebet", "\"000\" \"1\" 25\"donation\" \"seans outpost\"") +
-            HelpExampleRpc("placebet", "\"000\", \"1\", 25, \"donation\", \"seans outpost\""));
+            HelpExampleCli("placebet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\" 25 \"Parlay bet\" \"seans outpost\"") +
+            HelpExampleRpc("placebet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\", 25, \"Parlay bet\", \"seans outpost\""));
 
     std::vector<CPeerlessBet> vLegs;
     UniValue legsArr = params[0].get_array();
