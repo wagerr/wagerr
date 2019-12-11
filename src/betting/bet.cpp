@@ -2431,14 +2431,15 @@ bool UndoEventChanges(CBettingsView& bettingsViewCache, const EventKey& eventKey
     return bettingsViewCache.EraseBettingUndo(undoKey);
 }
 
-bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height)
+bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height, const int64_t blockTime)
 {
-
-    LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
-
     // Ensure the event TX has come from Oracle wallet.
     const CTxIn& txin{tx.vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin)};
+
+    LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
+
+    bool parlayBetsAvaible = height > Params().ParlayBetStartHeight();
 
     // First revert OMNO transactions
     if (validOracleTx) {
@@ -2570,6 +2571,28 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     return false;
                 }
                 continue;
+            }
+            std::vector<CPeerlessBet> legs;
+            if (parlayBetsAvaible && CPeerlessBet::ParlayFromOpCode(opCodeHexStr, legs)) {
+                // delete duplicated legs
+                std::sort(legs.begin(), legs.end());
+                legs.erase(std::unique(legs.begin(), legs.end()), legs.end());
+
+                for (auto it = legs.begin(); it != legs.end();) {
+                    CPeerlessBet &bet{*it};
+                    CPeerlessEvent plEvent;
+                    EventKey eventKey{bet.nEventId};
+                    if (!bettingsViewCache.events->Read(eventKey, plEvent) ||
+                            (plEvent.nStartTime > 0 && blockTime > (plEvent.nStartTime - Params().BetPlaceTimeoutBlocks()))) {
+                        legs.erase(it);
+                    }
+                }
+                if (!legs.empty()) {
+                    if (!UndoEventChanges(bettingsViewCache, undoId, height))
+                        return false;
+                    UniversalBetKey key{static_cast<uint32_t>(height), out};
+                    bettingsViewCache.bets->Erase(key);
+                }
             }
         }
     }
