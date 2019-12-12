@@ -615,8 +615,7 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
     auto it = bettingsView->bets->NewIterator();
     UniversalBetKey key{0, COutPoint()};
     auto v = CBettingDB::DbTypeToBytes(key);
-    std::cout << "listbetsdb: BetKey: " << HexStr(v.begin(), v.end()) << std::endl;
-    for(it->Seek(std::vector<char>{}); it->Valid(); it->Next()) {
+    for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
         CUniversalBet uniBet;
         CBettingDB::BytesToDbType(it->Value(), uniBet);
 
@@ -1159,7 +1158,7 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 2 || params.size() > 4)
         throw std::runtime_error(
-            "placebet [{\"eventId\": event_id, \"outcome\": outcome_type}, ...] ( \"comment\" \"comment-to\" )\n"
+            "placeparlaybet [{\"eventId\": event_id, \"outcome\": outcome_type}, ...] ( \"comment\" \"comment-to\" )\n"
             "\nWARNING - Betting closes 20 minutes before event start time.\n"
             "Any bets placed after this time will be invalid and will not be paid out! \n"
             "\nPlace an amount as a bet on an event. The amount is rounded to the nearest 0.00000001\n" +
@@ -1183,8 +1182,8 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
             "\nExamples:\n" +
-            HelpExampleCli("placebet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\" 25 \"Parlay bet\" \"seans outpost\"") +
-            HelpExampleRpc("placebet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\", 25, \"Parlay bet\", \"seans outpost\""));
+            HelpExampleCli("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\" 25 \"Parlay bet\" \"seans outpost\"") +
+            HelpExampleRpc("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\", 25, \"Parlay bet\", \"seans outpost\""));
 
     std::vector<CPeerlessBet> vLegs;
     UniValue legsArr = params[0].get_array();

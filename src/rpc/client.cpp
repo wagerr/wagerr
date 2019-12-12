@@ -187,6 +187,7 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"getfeeinfo", 0},
         {"getchecksumblock", 1},
         {"getchecksumblock", 2},
+        {"getmappingname", 1},
     };
 
 class CRPCConvertTable

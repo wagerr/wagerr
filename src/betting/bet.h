@@ -202,12 +202,12 @@ public:
         nEventId = eventId;
         nOutcome = outcome;
     }
-    bool operator<(const CPeerlessBet& rhs)
+    bool operator<(const CPeerlessBet& rhs) const
     {
         return nEventId == rhs.nEventId ? nOutcome < rhs.nOutcome : nEventId < rhs.nEventId;
     }
 
-    bool operator==(const CPeerlessBet& rhs)
+    bool operator==(const CPeerlessBet& rhs) const
     {
         return nEventId == rhs.nEventId && nOutcome == rhs.nOutcome;
     }
@@ -693,9 +693,9 @@ public:
     template<typename KeyType, typename ValueType>
     bool Read(const KeyType& key, ValueType& value) {
         auto vKey = DbTypeToBytes(key);
-        std::vector<unsigned char> value_v;
-        if (GetDb().Read(vKey, value_v)) {
-            BytesToDbType(value_v, value);
+        std::vector<unsigned char> vValue;
+        if (GetDb().Read(vKey, vValue)) {
+            BytesToDbType(vValue, value);
             return true;
         }
         return false;
@@ -805,7 +805,7 @@ public:
     }
 
     void PruneOlderUndos(const uint32_t height) {
-        CBettingUndo undo;
+        std::vector<CBettingUndo> vUndos;
         BettingUndoKey key;
         std::string str;
         auto it = undos->NewIterator();
@@ -816,8 +816,8 @@ public:
                 continue;
             }
             CBettingDB::BytesToDbType(it->Key(), key);
-            CBettingDB::BytesToDbType(it->Value(), undo);
-            if (undo.height < height) {
+            CBettingDB::BytesToDbType(it->Value(), vUndos);
+            if (vUndos[0].height < height) {
                 undos->Erase(key);
             }
         }
