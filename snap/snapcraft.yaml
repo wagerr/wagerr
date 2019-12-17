@@ -117,7 +117,7 @@ parts:
   wagerr:
     source: https://github.com/wagerr/wagerr
     source-type: git
-    source-tag: v3.1.0
+    source-tag: master
     plugin: nil
     override-build: |
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
