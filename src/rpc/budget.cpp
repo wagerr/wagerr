@@ -734,7 +734,9 @@ UniValue mnbudgetrawvote(const UniValue& params, bool fHelp)
     vote.SetVchSig(vchSig);
 
     if (!vote.CheckSignature(true)) {
-        return "Failure to verify signature.";
+        // try old message version
+        vote.nMessVersion = MessageVersion::MESS_VER_STRMESS;
+        if (!vote.CheckSignature(true)) return "Failure to verify signature.";
     }
 
     std::string strError = "";
