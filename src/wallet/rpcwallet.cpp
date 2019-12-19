@@ -5936,9 +5936,9 @@ UniValue createautomintaddress(const UniValue& params, bool fHelp)
 
 UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() < 4 || params.size() > 6)
+    if (fHelp || params.size() < 4 || params.size() > 7)
         throw std::runtime_error(
-            "spendrawzerocoin \"serialHex\" denom \"randomnessHex\" ( \"address\" \"mintTxId\" fRelay)\n"
+            "spendrawzerocoin \"serialHex\" denom \"randomnessHex\" \"priv key\" ( \"address\" \"mintTxId\" isPublicSpend)\n"
             "\nCreate and broadcast a TX spending the provided zericoin.\n"
 
             "\nArguments:\n"
@@ -5950,6 +5950,8 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
             "                        or empty string, spend to change address.\n"
             "6. \"mintTxId\"         (string, optional) txid of the transaction containing the mint. If not"
             "                        specified, or empty string, the blockchain will be scanned (could take a while)"
+            "7. isPublicSpend        (boolean, optional, default=true) create a public zc spend."
+            "                        If false, instead create spend version 2 (only for regression tests)"
 
             "\nResult:\n"
                 "\"txid\"             (string) The transaction txid in hex\n"
@@ -5957,6 +5959,10 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
             "\nExamples\n" +
             HelpExampleCli("spendrawzerocoin", "\"f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2\" \"a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600\" 100 \"xxx\"") +
             HelpExampleRpc("spendrawzerocoin", "\"f80892e78c30a393ef4ab4d5a9d5a2989de6ebc7b976b241948c7f489ad716a2\", \"a4fd4d7248e6a51f1d877ddd2a4965996154acc6b8de5aa6c83d4775b283b600\", 100, \"xxx\""));
+
+    const bool isPublicSpend = (params.size() > 6 ? params[6].get_bool() : true);
+    if (Params().NetworkID() != CBaseChainParams::REGTEST && !isPublicSpend)
+        throw JSONRPCError(RPC_WALLET_ERROR, "zWGR old spend only available in regtest for tests purposes");
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
@@ -6028,7 +6034,7 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
     }
 
     std::vector<CZerocoinMint> vMintsSelected = {mint};
-    return DoZwgrSpend(mint.GetDenominationAsAmount(), false, true, vMintsSelected, address_str);
+    return DoZwgrSpend(mint.GetDenominationAsAmount(), false, true, vMintsSelected, address_str, isPublicSpend);
 }
 
 UniValue clearspendcache(const UniValue& params, bool fHelp)
