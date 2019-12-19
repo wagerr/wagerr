@@ -1018,7 +1018,7 @@ UniValue createrawzerocoinspend(const UniValue& params, bool fHelp)
 {
     if (fHelp || params.size() < 1 || params.size() > 3)
         throw std::runtime_error(
-            "createrawzerocoinspend mint_input \n"
+            "createrawzerocoinspend mint_input ( \"address\" isPublicSpend )\n"
             "\nCreates raw zWGR public spend.\n" +
             HelpRequiringPassphrase() + "\n"
 
