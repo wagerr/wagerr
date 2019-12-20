@@ -10,27 +10,27 @@
 #include "leveldbwrapper.h"
 #include <boost/optional.hpp>
 
-using MapKV = std::map<std::vector<char>, boost::optional<std::vector<char>>>;
+using MapKV = std::map<std::vector<unsigned char>, boost::optional<std::vector<unsigned char>>>;
 
 // Key-Value storage iterator interface
 class CStorageKVIterator {
 public:
     virtual ~CStorageKVIterator() {};
-    virtual void Seek(const std::vector<char>& key) = 0;
+    virtual void Seek(const std::vector<unsigned char>& key) = 0;
     virtual void Next() = 0;
     virtual bool Valid() = 0;
-    virtual std::vector<char> Key() = 0;
-    virtual std::vector<char> Value() = 0;
+    virtual std::vector<unsigned char> Key() = 0;
+    virtual std::vector<unsigned char> Value() = 0;
 };
 
 // Key-Value storage interface
 class CStorageKV {
 public:
     virtual ~CStorageKV() {};
-    virtual bool Exists(const std::vector<char>& key) = 0;
-    virtual bool Write(const std::vector<char>& key, const std::vector<char>& value) = 0;
-    virtual bool Erase(const std::vector<char>& key) = 0;
-    virtual bool Read(const std::vector<char>& key, std::vector<char>& value) = 0;
+    virtual bool Exists(const std::vector<unsigned char>& key) = 0;
+    virtual bool Write(const std::vector<unsigned char>& key, const std::vector<unsigned char>& value) = 0;
+    virtual bool Erase(const std::vector<unsigned char>& key) = 0;
+    virtual bool Read(const std::vector<unsigned char>& key, std::vector<unsigned char>& value) = 0;
     virtual std::unique_ptr<CStorageKVIterator> NewIterator() = 0;
 };
 
@@ -39,13 +39,13 @@ class CStorageLevelDBIterator : public CStorageKVIterator {
 public:
     explicit CStorageLevelDBIterator(std::unique_ptr<leveldb::Iterator>&& it) : it{std::move(it)} { }
     ~CStorageLevelDBIterator() override { }
-    void Seek(const std::vector<char>& key) override { it->Seek(leveldb::Slice(key.data(), key.size())); }
+    void Seek(const std::vector<unsigned char>& key) override { it->Seek(leveldb::Slice((char *)key.data(), key.size())); }
     void Next() override { it->Next(); }
     bool Valid() override { return it->Valid(); }
-    std::vector<char> Key() override {
+    std::vector<unsigned char> Key() override {
         return ExtractSlice(it->key());
     }
-    std::vector<char> Value() override {
+    std::vector<unsigned char> Value() override {
         return ExtractSlice(it->value());
     }
 private:
@@ -54,8 +54,8 @@ private:
     CStorageLevelDBIterator(const CStorageLevelDBIterator&);
     void operator=(const CStorageLevelDBIterator&);
 
-    std::vector<char> ExtractSlice(const leveldb::Slice& s) {
-        std::vector<char> v;
+    std::vector<unsigned char> ExtractSlice(const leveldb::Slice& s) {
+        std::vector<unsigned char> v;
         CDataStream stream(s.data(), s.data() + s.size(), SER_DISK, CLIENT_VERSION);
         stream >> v;
         return v;
@@ -67,10 +67,10 @@ class CStorageLevelDB : public CStorageKV {
 public:
     explicit CStorageLevelDB(std::string dbName, std::size_t cacheSize, bool fMemory = false, bool fWipe = false) : db{dbName, cacheSize, fMemory, fWipe} {}
     ~CStorageLevelDB() override { }
-    bool Exists(const std::vector<char>& key) override { return db.Exists(key); }
-    bool Write(const std::vector<char>& key, const std::vector<char>& value) override { return db.Write(key, value); }
-    bool Erase(const std::vector<char>& key) override { return db.Erase(key); }
-    bool Read(const std::vector<char>& key, std::vector<char>& value) override { return db.Read(key, value); }
+    bool Exists(const std::vector<unsigned char>& key) override { return db.Exists(key); }
+    bool Write(const std::vector<unsigned char>& key, const std::vector<unsigned char>& value) override { return db.Write(key, value, true); }
+    bool Erase(const std::vector<unsigned char>& key) override { return db.Erase(key, true); }
+    bool Read(const std::vector<unsigned char>& key, std::vector<unsigned char>& value) override { return db.Read(key, value); }
     std::unique_ptr<CStorageKVIterator> NewIterator() override {
         return MakeUnique<CStorageLevelDBIterator>(std::unique_ptr<leveldb::Iterator>(db.NewIterator()));
     }
@@ -90,7 +90,7 @@ public:
     CFlushableStorageKVIterator(const CFlushableStorageKVIterator&) = delete;
     void operator=(const CFlushableStorageKVIterator&) = delete;
     ~CFlushableStorageKVIterator() override { }
-    void Seek(const std::vector<char>& key) override {
+    void Seek(const std::vector<unsigned char>& key) override {
         prevKey.clear();
         pIt->Seek(key);
         parentOk = pIt->Valid();
@@ -144,10 +144,10 @@ public:
     bool Valid() override {
         return !key.empty();
     }
-    std::vector<char> Key() override {
+    std::vector<unsigned char> Key() override {
         return key;
     }
-    std::vector<char> Value() override {
+    std::vector<unsigned char> Value() override {
         return value;
     }
 private:
@@ -157,9 +157,9 @@ private:
     MapKV& map;
     MapKV::iterator mIt;
     bool mapOk;
-    std::vector<char> key;
-    std::vector<char> value;
-    std::vector<char> prevKey;
+    std::vector<unsigned char> key;
+    std::vector<unsigned char> value;
+    std::vector<unsigned char> prevKey;
 };
 
 // Flushable Key-Value Storage
@@ -168,22 +168,22 @@ public:
     explicit CFlushableStorageKV(CStorageKV& db_) : db(db_) { }
     CFlushableStorageKV(const CFlushableStorageKV& db) = delete;
     ~CFlushableStorageKV() override { }
-    bool Exists(const std::vector<char>& key) override {
+    bool Exists(const std::vector<unsigned char>& key) override {
         auto it = changed.find(key);
         if (it != changed.end()) {
             return !!it->second;
         }
         return db.Exists(key);
     }
-    bool Write(const std::vector<char>& key, const std::vector<char>& value) override {
-        changed[key] = boost::optional<std::vector<char>>{value};
+    bool Write(const std::vector<unsigned char>& key, const std::vector<unsigned char>& value) override {
+        changed[key] = boost::optional<std::vector<unsigned char>>{value};
         return true;
     }
-    bool Erase(const std::vector<char>& key) override {
-        changed[key] = boost::optional<std::vector<char>>{};
+    bool Erase(const std::vector<unsigned char>& key) override {
+        changed[key] = boost::optional<std::vector<unsigned char>>{};
         return true;
     }
-    bool Read(const std::vector<char>& key, std::vector<char>& value) override {
+    bool Read(const std::vector<unsigned char>& key, std::vector<unsigned char>& value) override {
         auto it = changed.find(key);
         if (it == changed.end()) {
             return db.Read(key, value);
