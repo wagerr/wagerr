@@ -76,7 +76,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
     }
 
     auto it = bettingsView->events->NewIterator();
-    for (it->Seek(std::vector<char>{}); it->Valid(); it->Next()) {
+    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
         CPeerlessEvent plEvent;
         CMapping mapping;
         CBettingDB::BytesToDbType(it->Value(), plEvent);
@@ -149,6 +149,54 @@ UniValue listevents(const UniValue& params, bool fHelp)
         evt.push_back(Pair("odds", odds));
 
         result.push_back(evt);
+    }
+
+    return result;
+}
+
+UniValue listeventsdebug(const UniValue& params, bool fHelp)
+{
+    if (fHelp || (params.size() > 0))
+        throw std::runtime_error(
+            "listeventsdebug\n"
+            "\nGet all Wagerr events from db.\n"
+
+            "\nResult:\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("listeventsdebug", "") + HelpExampleRpc("listeventsdebug", ""));
+
+    UniValue result{UniValue::VARR};
+
+    auto time = std::time(0);
+
+    auto it = bettingsView->events->NewIterator();
+    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        CPeerlessEvent plEvent;
+        CMapping mapping;
+        CBettingDB::BytesToDbType(it->Value(), plEvent);
+
+        std::stringstream strStream;
+
+        auto started = ((time_t) plEvent.nStartTime < time) ? std::string("true") : std::string("false");
+
+        strStream << "eventId=" << plEvent.nEventId << ", sport: " << plEvent.nSport << ", tournament: " << plEvent.nTournament << ", round: " << plEvent.nStage << ", home: " << plEvent.nHomeTeam << ", away: " << plEvent.nAwayTeam << ", homeOdds:" << plEvent.nHomeOdds << ", awayOdds: " << plEvent.nAwayOdds << ", drawOdds: " << plEvent.nDrawOdds << ", started: " << started << ".";
+
+        if (!bettingsView->mappings->Read(MappingKey{sportMapping, plEvent.nSport}, mapping)) {
+            strStream << " No sport mapping!";
+        }
+        if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+            strStream << " No tournament mapping!";
+        }
+        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+            strStream << " No home team mapping!";
+        }
+        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+            strStream << " No away team mapping!";
+        }
+
+        result.push_back(strStream.str().c_str());
+        strStream.clear();
     }
 
     return result;
@@ -1257,7 +1305,7 @@ UniValue geteventsliability(const UniValue& params, bool fHelp)
 
     CPeerlessEvent plEvent{};
     auto it = bettingsView->events->NewIterator();
-    for (it->Seek(std::vector<char>{}); it->Valid(); it->Next()) {
+    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
         CBettingDB::BytesToDbType(it->Value(), plEvent);
 
         UniValue event(UniValue::VOBJ);

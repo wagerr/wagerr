@@ -1759,6 +1759,8 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
     const CTxIn& txin{tx.vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin)};
 
+    LogPrintf("ParseBettingTx: start\n");
+
     // Search for any new bets
     for (unsigned int i = 0; i < tx.vout.size(); i++) {
         const CTxOut& txout = tx.vout[i];
@@ -1779,6 +1781,7 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 CPeerlessEvent plEvent;
                 EventKey eventKey{plBet.nEventId};
 
+                LogPrintf("CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
                 // Find the event in DB
                 if (bettingsViewCache.events->Read(eventKey, plEvent)) {
                     CAmount payout = 0 * COIN;
@@ -1854,7 +1857,12 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                     }
 
-                    bettingsViewCache.events->Update(eventKey, plEvent);
+                    if (!bettingsViewCache.events->Update(eventKey, plEvent)) {
+                        LogPrintf("Failed to update event!\n");
+                    }
+                }
+                else {
+                    LogPrintf("Failed to find event!\n");
                 }
                 continue;
             }
@@ -1877,22 +1885,36 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 // If mapping found then add it to the relating map index and write the map index to disk.
                 CMapping mapping{};
                 if (CMapping::FromOpCode(opCode, mapping)) {
+                    LogPrintf("CMapping: type: %lu, id: %lu, name: %s\n", mapping.nMType, mapping.nId, mapping.sName);
                     MappingKey mappingKey{mapping.nMType, mapping.nId};
-                    bettingsViewCache.mappings->Write(mappingKey, mapping);
+                    if (!bettingsViewCache.mappings->Write(mappingKey, mapping))
+                        LogPrintf("Failed to write new mapping!\n");
                     continue;
                 }
 
                 // If events found in block add them to the events index.
                 CPeerlessEvent plEvent{};
                 if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
+                    LogPrintf("CPeerlessEvent: id: %lu, sport: %lu, tounament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
+                        plEvent.nEventId,
+                        plEvent.nSport,
+                        plEvent.nTournament,
+                        plEvent.nStage,
+                        plEvent.nHomeTeam,
+                        plEvent.nAwayTeam,
+                        plEvent.nHomeOdds,
+                        plEvent.nAwayOdds,
+                        plEvent.nDrawOdds);
                     EventKey eventKey{plEvent.nEventId};
-                    bettingsViewCache.events->Write(eventKey, plEvent);
+                    if (!bettingsViewCache.events->Write(eventKey, plEvent))
+                        LogPrintf("Failed to write new event!\n");
                     continue;
                 }
 
                 // If event patch found in block apply them to the events.
                 CPeerlessEventPatch plEventPatch{};
                 if (CPeerlessEventPatch::FromOpCode(opCode, plEventPatch)) {
+                    LogPrintf("CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatch.nEventId, plEventPatch.nStartTime);
                     CPeerlessEvent plEvent;
                     EventKey eventKey{plEventPatch.nEventId};
                     // First check a peerless event exists in DB
@@ -1901,7 +1923,12 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         bettingsViewCache.SaveBettingUndo(undoId, CBettingUndo{BettingUndoVariant{plEvent}, (uint32_t)height});
 
                         plEvent.nStartTime = plEventPatch.nStartTime;
-                        bettingsViewCache.events->Update(eventKey, plEvent);
+
+                        if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                            LogPrintf("Failed to update event!\n");
+                    }
+                    else {
+                        LogPrintf("Failed to find event!\n");
                     }
                     continue;
                 }
@@ -1909,14 +1936,17 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 // If results found in block add result to result index.
                 CPeerlessResult plResult{};
                 if (CPeerlessResult::FromOpCode(opCode, plResult)) {
+                    LogPrintf("CPeerlessResult: id: %lu, resultType: %lu, homeScore: %lu, awayScore: %lu\n", plResult.nEventId, plResult.nResultType, plResult.nHomeScore, plResult.nAwayScore);
                     ResultKey resultKey{plResult.nEventId};
-                    bettingsViewCache.results->Write(resultKey, plResult);
+                    if (!bettingsViewCache.results->Write(resultKey, plResult))
+                        LogPrintf("Failed to write result!\n");
                     continue;
                 }
 
                 // If update money line odds TX found in block, update the event index.
                 CPeerlessUpdateOdds puo{};
                 if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
+                    LogPrintf("CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n", puo.nEventId, puo.nHomeOdds, puo.nAwayOdds, puo.nDrawOdds);
                     CPeerlessEvent plEvent;
                     EventKey eventKey{puo.nEventId};
                     // First check a peerless event exists in DB.
@@ -1929,7 +1959,11 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         plEvent.nDrawOdds = puo.nDrawOdds;
 
                         // Update the event in the DB.
-                        bettingsViewCache.events->Update(eventKey, plEvent);
+                        if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                            LogPrintf("Failed to update event!\n");
+                    }
+                    else {
+                        LogPrintf("Failed to find event!\n");
                     }
                     continue;
                 }
@@ -1937,6 +1971,7 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 // If spread odds TX found then update the spread odds for that event object.
                 CPeerlessSpreadsEvent spreadEvent{};
                 if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
+                    LogPrintf("CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n", spreadEvent.nEventId, spreadEvent.nPoints, spreadEvent.nHomeOdds, spreadEvent.nAwayOdds);
                     CPeerlessEvent plEvent;
                     EventKey eventKey{spreadEvent.nEventId};
                     // First check a peerless event exists in the event index.
@@ -1948,7 +1983,11 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         plEvent.nSpreadHomeOdds  = spreadEvent.nHomeOdds;
                         plEvent.nSpreadAwayOdds  = spreadEvent.nAwayOdds;
                         // Update the event in the DB.
-                        bettingsViewCache.events->Update(eventKey, plEvent);
+                        if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                            LogPrintf("Failed to update event!\n");
+                    }
+                    else {
+                        LogPrintf("Failed to find event!\n");
                     }
                     continue;
                 }
@@ -1956,6 +1995,7 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 // If total odds TX found then update the total odds for that event object.
                 CPeerlessTotalsEvent totalsEvent{};
                 if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
+                    LogPrintf("CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n", totalsEvent.nEventId, totalsEvent.nPoints, totalsEvent.nOverOdds, totalsEvent.nUnderOdds);
                     CPeerlessEvent plEvent;
                     EventKey eventKey{totalsEvent.nEventId};
                     // First check a peerless event exists in the event index.
@@ -1968,13 +2008,19 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         plEvent.nTotalUnderOdds = totalsEvent.nUnderOdds;
 
                         // Update the event in the DB.
-                        bettingsViewCache.events->Update(eventKey, plEvent);
+                        if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                            LogPrintf("Failed to update event!\n");
+                    }
+                    else {
+                        LogPrintf("Failed to find event!\n");
                     }
                     continue;
                 }
             }
         }
     }
+
+    LogPrintf("ParseBettingTx: end\n");
 }
 
 int GetActiveChainHeight(const bool lockHeld)
@@ -1996,12 +2042,27 @@ bool RecoveryBettingDB(boost::signals2::signal<void(const std::string&)> & progr
 bool UndoEventChanges(CBettingsView& bettingsViewCache, const EventKey& eventKey, const BettingUndoKey& undoKey, const uint32_t height)
 {
     CBettingUndo undo = bettingsViewCache.GetBettingUndo(undoKey);
-    if (!undo.Inited() || undo.Get().which() != UndoPeerlessEvent || undo.height != height) {
+    // we have no undo for this tx
+    if (!undo.Inited()) {
+        return true;
+    }
+    // undo data is inconsistent
+    if (undo.Get().which() != UndoPeerlessEvent || undo.height != height) {
         return false;
     }
     else {
         CPeerlessEvent event = boost::get<CPeerlessEvent>(undo.Get());
-        assert(event.nEventId == eventKey);
+        assert(event.nEventId == eventKey.eventId);
+        LogPrintf("UndoEventChanges: CPeerlessEvent: id: %lu, sport: %lu, tounament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
+                        event.nEventId,
+                        event.nSport,
+                        event.nTournament,
+                        event.nStage,
+                        event.nHomeTeam,
+                        event.nAwayTeam,
+                        event.nHomeOdds,
+                        event.nAwayOdds,
+                        event.nDrawOdds);
         if (!bettingsViewCache.events->Update(eventKey, event))
             return false;
     }
@@ -2012,9 +2073,119 @@ bool UndoEventChanges(CBettingsView& bettingsViewCache, const EventKey& eventKey
 bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height)
 {
 
+    LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
+
     // Ensure the event TX has come from Oracle wallet.
     const CTxIn& txin{tx.vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin)};
+
+    // First revert OMNO transactions
+    if (validOracleTx) {
+        for (unsigned int i = 0; i < tx.vout.size(); i++) {
+            const CTxOut& txout = tx.vout[i];
+            std::string s = txout.scriptPubKey.ToString();
+
+            COutPoint out(tx.GetHash(), i);
+            const uint256 undoId = SerializeHash(out);
+
+            if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+                std::vector<unsigned char> v = ParseHex(s.substr(9, std::string::npos));
+                std::string opCode(v.begin(), v.end());
+                // If mapping - just remove
+                CMapping mapping{};
+                if (CMapping::FromOpCode(opCode, mapping)) {
+                    LogPrintf("CMapping: type: %lu, id: %lu, name: %s\n", mapping.nMType, mapping.nId, mapping.sName);
+                    MappingKey mappingKey{mapping.nMType, mapping.nId};
+                    if (!bettingsViewCache.mappings->Erase(mappingKey)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                    continue;
+                }
+
+                // If events - just remove
+                CPeerlessEvent plEvent{};
+                if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
+                    LogPrintf("CPeerlessEvent: id: %lu, sport: %lu, tounament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
+                        plEvent.nEventId,
+                        plEvent.nSport,
+                        plEvent.nTournament,
+                        plEvent.nStage,
+                        plEvent.nHomeTeam,
+                        plEvent.nAwayTeam,
+                        plEvent.nHomeOdds,
+                        plEvent.nAwayOdds,
+                        plEvent.nDrawOdds);
+                    EventKey eventKey{plEvent.nEventId};
+                    if (!bettingsViewCache.events->Erase(eventKey)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                    continue;
+                }
+
+                // If event patch - find event undo and revert changes
+                CPeerlessEventPatch plEventPatch{};
+                if (CPeerlessEventPatch::FromOpCode(opCode, plEventPatch)) {
+                    EventKey eventKey{plEventPatch.nEventId};
+                    LogPrintf("CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatch.nEventId, plEventPatch.nStartTime);
+                    if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                    continue;
+                }
+
+                // If results - just remove
+                CPeerlessResult plResult{};
+                if (CPeerlessResult::FromOpCode(opCode, plResult)) {
+                    ResultKey resultKey{plResult.nEventId};
+                    LogPrintf("CPeerlessResult: id: %lu, resultType: %lu, homeScore: %lu, awayScore: %lu\n", plResult.nEventId, plResult.nResultType, plResult.nHomeScore, plResult.nAwayScore);
+                    if (!bettingsViewCache.results->Erase(resultKey)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                    continue;
+                }
+
+                // If update money line odds - find event undo and revert changes
+                CPeerlessUpdateOdds puo{};
+                if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
+                    EventKey eventKey{puo.nEventId};
+                    LogPrintf("CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n", puo.nEventId, puo.nHomeOdds, puo.nAwayOdds, puo.nDrawOdds);
+                    if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                    continue;
+                }
+
+                // If spread odds - find event undo and revert changes
+                CPeerlessSpreadsEvent spreadEvent{};
+                if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
+                    EventKey eventKey{spreadEvent.nEventId};
+                    LogPrintf("CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n", spreadEvent.nEventId, spreadEvent.nPoints, spreadEvent.nHomeOdds, spreadEvent.nAwayOdds);
+                    if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                    continue;
+                }
+
+                // If total odds - find event undo and revert changes
+                CPeerlessTotalsEvent totalsEvent{};
+                if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
+                    EventKey eventKey{totalsEvent.nEventId};
+                    LogPrintf("CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n", totalsEvent.nEventId, totalsEvent.nPoints, totalsEvent.nOverOdds, totalsEvent.nUnderOdds);
+                    if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                    continue;
+                }
+            }
+        }
+    }
 
     // Search for any new bets
     for (unsigned int i = 0; i < tx.vout.size(); i++) {
@@ -2032,83 +2203,15 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             // If bet- find event undo and revert changes
             if (CPeerlessBet::FromOpCode(opCode, plBet)) {
                 EventKey eventKey{plBet.nEventId};
-
-                if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height))
+                LogPrintf("CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
+                if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height)) {
+                    LogPrintf("Revert failed!\n");
                     return false;
+                }
                 continue;
-            }
-
-            // If a valid OMNO transaction.
-            if (validOracleTx) {
-
-                // If mapping - just remove
-                CMapping mapping{};
-                if (CMapping::FromOpCode(opCode, mapping)) {
-                    MappingKey mappingKey{mapping.nMType, mapping.nId};
-                    if (!bettingsViewCache.mappings->Erase(mappingKey))
-                        return false;
-                    continue;
-                }
-
-                // If events - just remove
-                CPeerlessEvent plEvent{};
-                if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
-                    EventKey eventKey{plEvent.nEventId};
-                    if (!bettingsViewCache.events->Erase(eventKey))
-                        return false;
-                    continue;
-                }
-
-                // If event patch - find event undo and revert changes
-                CPeerlessEventPatch plEventPatch{};
-                if (CPeerlessEventPatch::FromOpCode(opCode, plEventPatch)) {
-                    EventKey eventKey{plEventPatch.nEventId};
-
-                    if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height))
-                        return false;
-                    continue;
-                }
-
-                // If results - just remove
-                CPeerlessResult plResult{};
-                if (CPeerlessResult::FromOpCode(opCode, plResult)) {
-                    ResultKey resultKey{plResult.nEventId};
-                    if (!bettingsViewCache.results->Erase(resultKey))
-                        return false;
-                    continue;
-                }
-
-                // If update money line odds - find event undo and revert changes
-                CPeerlessUpdateOdds puo{};
-                if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
-                    EventKey eventKey{puo.nEventId};
-
-                    if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height))
-                        return false;
-                    continue;
-                }
-
-                // If spread odds - find event undo and revert changes
-                CPeerlessSpreadsEvent spreadEvent{};
-                if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
-                    EventKey eventKey{spreadEvent.nEventId};
-
-                    if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height))
-                        return false;
-                    continue;
-                }
-
-                // If total odds - find event undo and revert changes
-                CPeerlessTotalsEvent totalsEvent{};
-                if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
-                    EventKey eventKey{totalsEvent.nEventId};
-
-                    if (!UndoEventChanges(bettingsViewCache, eventKey, undoId, height))
-                        return false;
-                    continue;
-                }
             }
         }
     }
+    LogPrintf("UndoBettingTx: end\n");
     return true;
 }
