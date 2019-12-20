@@ -412,16 +412,44 @@ typedef struct MappingKey {
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
-        READWRITE(nMType);
-        READWRITE(nId);
+        uint32_t be_val;
+        if (ser_action.ForRead()) {
+            READWRITE(be_val);
+            nMType = ntohl(be_val);
+            READWRITE(be_val);
+            nId = ntohl(be_val);
+        }
+        else {
+            be_val = htonl(nMType);
+            READWRITE(be_val);
+            be_val = htonl(nId);
+            READWRITE(be_val);
+        }
     }
 } MappingKey;
 
 // ResultKey
-using ResultKey = uint32_t;
+typedef struct ResultKey {
+    uint32_t eventId;
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint32_t be_val;
+        if (ser_action.ForRead()) {
+            READWRITE(be_val);
+            eventId = ntohl(be_val);
+        }
+        else {
+            be_val = htonl(eventId);
+            READWRITE(be_val);
+        }
+    }
+} ResultKey;
 
 // EventKey
-using EventKey = uint32_t;
+using EventKey = ResultKey;
 
 // UndoKey
 using BettingUndoKey = uint256;
@@ -542,14 +570,20 @@ public:
 
     template<typename KeyType, typename ValueType>
     bool Write(const KeyType& key, const ValueType& value) {
-        if (GetDb().Exists(DbTypeToBytes(key)))
+        auto vKey = DbTypeToBytes(key);
+        auto vValue = DbTypeToBytes(value);
+        if (GetDb().Exists(vKey))
             return false;
-        return GetDb().Write(DbTypeToBytes(key), DbTypeToBytes(value));
+        return GetDb().Write(vKey, vValue);
     }
 
     template<typename KeyType, typename ValueType>
     bool Update(const KeyType& key, const ValueType& value) {
-        return Erase(key) && Write(key, value);
+        auto vKey = DbTypeToBytes(key);
+        auto vValue = DbTypeToBytes(value);
+        if (!GetDb().Exists(vKey))
+            return false;
+        return GetDb().Write(vKey, vValue);
     }
 
     template<typename KeyType>
@@ -561,7 +595,7 @@ public:
 
     template<typename KeyType, typename ValueType>
     bool Read(const KeyType& key, ValueType& value) {
-        std::vector<char> value_v;
+        std::vector<unsigned char> value_v;
         if (GetDb().Read(DbTypeToBytes(key), value_v)) {
             BytesToDbType(value_v, value);
             return true;
@@ -590,14 +624,14 @@ public:
     }
 
     template<typename T>
-    static std::vector<char> DbTypeToBytes(const T& value) {
+    static std::vector<unsigned char> DbTypeToBytes(const T& value) {
         CDataStream stream(SER_DISK, CLIENT_VERSION);
         stream << value;
-        return std::vector<char>(stream.begin(), stream.end());
+        return std::vector<unsigned char>(stream.begin(), stream.end());
     }
 
     template<typename T>
-    static void BytesToDbType(const std::vector<char>& bytes, T& value) {
+    static void BytesToDbType(const std::vector<unsigned char>& bytes, T& value) {
         CDataStream stream(bytes, SER_DISK, CLIENT_VERSION);
         stream >> value;
         assert(stream.size() == 0);
@@ -674,8 +708,8 @@ public:
         BettingUndoKey key;
         std::string str;
         auto it = undos->NewIterator();
-        std::vector<char> lastHeightKey = CBettingDB::DbTypeToBytes(std::string("LastHeight"));
-        for (it->Seek(std::vector<char>{}); it->Valid(); it->Next()) {
+        std::vector<unsigned char> lastHeightKey = CBettingDB::DbTypeToBytes(std::string("LastHeight"));
+        for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
             // check that key is serialized "LastHeight" key and skip if true
             if (it->Key() == lastHeightKey) {
                 continue;

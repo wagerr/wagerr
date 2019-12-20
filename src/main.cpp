@@ -2471,6 +2471,8 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
         LogPrintf("%s : pindex=%s view=%s\n", __func__, pindex->GetBlockHash().GetHex(), view.GetBestBlock().GetHex());
     assert(pindex->GetBlockHash() == view.GetBestBlock());
 
+    LogPrintf("DisconnectBlock(): block height=%lu, hash=%s\n", pindex->nHeight, pindex->GetBlockHash().GetHex());
+
     if (pfClean)
         *pfClean = false;
 
