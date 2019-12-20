@@ -6007,7 +6007,6 @@ UniValue spendrawzerocoin(const UniValue& params, bool fHelp)
         const CBigNum& mintValue = mint.GetValue();
         bool found = false;
         {
-            LOCK2(cs_main, pwalletMain->cs_wallet);
             CBlockIndex* pindex = chainActive.Tip();
             while (!found && pindex && pindex->nHeight >= Params().Zerocoin_StartHeight()) {
                 LogPrintf("%s : Checking block %d...\n", __func__, pindex->nHeight);
