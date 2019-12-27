@@ -1067,9 +1067,17 @@ bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block)
 
             totalStakeAcc += voutValue;
         }
-        if (vExpectedPayouts.size() + numStakingTx > tx.vout.size() - 1) {
-            LogPrintf("%s - Incorrect number of transactions in block %s\n", __func__, block.GetHash().ToString());
-            return false;
+        if (Params().NetworkID() != CBaseChainParams::REGTEST) {
+            if (vExpectedPayouts.size() + numStakingTx > tx.vout.size() - 1) {
+                LogPrintf("%s - Incorrect number of transactions in block %s\n", __func__, block.GetHash().ToString());
+                return false;
+            }
+        }
+        else {
+            if (vExpectedPayouts.size() + numStakingTx > tx.vout.size()) {
+                LogPrintf("%s - Incorrect number of transactions in block %s\n", __func__, block.GetHash().ToString());
+                return false;
+            }
         }
 
         // Validate the payout block against the expected payouts vector. If all payout amounts and payout addresses match then we have a valid payout block.
@@ -1391,13 +1399,14 @@ std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height)
                     // if we found one result for parlay - check win condition for this and each other legs
                     if (leg.nEventId == result.nEventId) {
                         resultFound = true;
+                        break;
                     }
                 }
                 if (resultFound) {
                     // make assumption that parlay is completed and this result is last
                     completedBet = true;
                     // find all results for all legs
-                    bool firstOddMultiply = false;
+                    bool firstOddMultiply = true;
                     for (int idx = 0; idx < uniBet.legs.size(); idx++) {
                         CPeerlessBet &leg = uniBet.legs[idx];
                         CPeerlessEvent &lockedEvent = uniBet.lockedEvents[idx];
@@ -1460,7 +1469,9 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height)
     for (const auto& result : results) {
         // Look back the chain 14 days for any events and bets.
         CBlockIndex *BlocksIndex = NULL;
-        BlocksIndex = chainActive[nCurrentHeight - Params().BetBlocksIndexTimespan()];
+        int startHeight = nCurrentHeight - Params().BetBlocksIndexTimespan();
+        startHeight = startHeight < Params().BetStartHeight() ? Params().BetStartHeight() : startHeight;
+        BlocksIndex = chainActive[startHeight];
 
         uint64_t oddsDivisor  = Params().OddsDivisor();
         uint64_t betXPermille = Params().BetXPermille();
@@ -2039,7 +2050,7 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
     uint64_t oddsDivisor{Params().OddsDivisor()};
     uint64_t betXPermille{Params().BetXPermille()};
 
-    LogPrintf("ParseBettingTx: start\n");
+    LogPrintf("ParseBettingTx: start, tx hash: %s\n", tx.GetHash().GetHex());
 
     bool parlayBetsAvaible = height >= Params().ParlayBetStartHeight();
 
@@ -2063,8 +2074,11 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             CBitcoinAddress address;
             CTxDestination prevAddr;
             // if we cant extract playerAddress - skip vout
-            if (!GetTransaction(tx.vin[0].prevout.hash, txPrev, hashBlock, true) &&
-                !ExtractDestination(txPrev.vout[tx.vin[0].prevout.n].scriptPubKey, prevAddr)) continue;
+            if ((GetTransaction(txin.prevout.hash, txPrev, hashBlock, true),
+                    !ExtractDestination(txPrev.vout[txin.prevout.n].scriptPubKey, prevAddr))) {
+                LogPrintf("Couldn't extract destination!");
+                continue;
+            }
             address = CBitcoinAddress(prevAddr);
 
             std::vector<CPeerlessBet> legs;
