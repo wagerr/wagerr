@@ -73,6 +73,7 @@ BASE_SCRIPTS= [
     #'zerocoin_wrapped_serials.py',
     #'feature_block.py',
     #'rpc_fundrawtransaction.py',
+    'feature_betting.py',
 
     # vv Tests less than 2m vv
     #'feature_uacomment.py', # Not Applicable -uacomment not supported
