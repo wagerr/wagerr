@@ -528,7 +528,7 @@ typedef struct UniversalBetKey {
     COutPoint outPoint;
 
     UniversalBetKey() : blockHeight(0), outPoint(COutPoint()) { }
-    UniversalBetKey(uint32_t height, COutPoint out) : blockHeight(height), outPoint(outPoint) { }
+    UniversalBetKey(uint32_t height, COutPoint out) : blockHeight(height), outPoint(out) { }
 
     ADD_SERIALIZE_METHODS;
 
