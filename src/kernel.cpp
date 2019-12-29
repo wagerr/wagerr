@@ -390,9 +390,10 @@ bool StakeV1(const CBlockIndex* pindexPrev, CStakeInput* stakeInput, const uint3
         minTime = prevBlockTime;
     unsigned int nTryTime = maxTime;
 
-    // check required maturity for stake
-    if (maxTime <= minTime)
-        return error("%s : stake age violation, nTimeBlockFrom = %d, prevBlockTime = %d -- maxTime = %d ", __func__, nTimeBlockFrom, prevBlockTime, maxTime);
+    if (maxTime <= minTime) {
+        // too early to stake
+        return false;
+    }
 
     while (nTryTime > minTime) {
         // store a time stamp of when we last hashed on this block
