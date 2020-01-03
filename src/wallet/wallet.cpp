@@ -51,7 +51,6 @@ bool bSpendZeroConfChange = true;
 bool bdisableSystemnotifications = false; // Those bubbles can be annoying and slow down the UI when you get lots of trx
 bool fSendFreeTransactions = false;
 bool fPayAtLeastCustomFee = true;
-bool fGlobalUnlockSpendCache = false;
 int64_t nStartupTime = GetTime(); //!< Client startup time for use with automint
 
 /**
@@ -2612,33 +2611,6 @@ bool CWallet::CreateCoinStake(
 
             newStakeInput = std::move(stakeInput);
 
-            /*
-            //Masternode payment
-            FillBlockPayee(txNew, nMinFee, true, stakeInput->IsZWGR());
-
-            {
-                TRY_LOCK(zwgrTracker->cs_spendcache, fLocked);
-                if (!fLocked)
-                    continue;
-
-                uint256 hashTxOut = txNew.GetHash();
-                CTxIn in;
-                if (!stakeInput->CreateTxIn(this, in, hashTxOut)) {
-                    LogPrintf("%s : failed to create TxIn\n", __func__);
-                    txNew.vin.clear();
-                    txNew.vout.clear();
-                    continue;
-                }
-                txNew.vin.emplace_back(in);
-            }
-
-            //Mark mints as spent
-            if (stakeInput->IsZWGR()) {
-                CZWgrStake* z = (CZWgrStake*)stakeInput.get();
-                if (!z->MarkSpent(this, txNew.GetHash()))
-                    return error("%s: failed to mark mint as used\n", __func__);
-            }
-            */
             fKernelFound = true;
             break;
         }
@@ -4061,93 +4033,71 @@ bool CWallet::MintsToInputVector(std::map<CBigNum, CZerocoinMint>& mapMintsSelec
     AccumulatorMap mapAccumulators(paramsAccumulator);
     int64_t nTimeStart = GetTimeMicros();
 
-    int nLockAttempts = 0;
-    while (nLockAttempts < 100) {
-        TRY_LOCK(zwgrTracker->cs_spendcache, lockSpendcache);
-        if (!lockSpendcache) {
-            fGlobalUnlockSpendCache = true;
-            MilliSleep(100);
-            ++nLockAttempts;
-            continue;
+    for (auto &it : mapMintsSelected) {
+        CZerocoinMint mint = it.second;
+        CMintMeta meta = zwgrTracker->Get(GetSerialHash(mint.GetSerialNumber()));
+        CoinWitnessData coinWitness = CoinWitnessData(mint);
+        coinWitness.SetHeightMintAdded(mint.GetHeight());
+
+        // Generate the witness for each mint being spent
+        if (!GenerateAccumulatorWitness(&coinWitness, mapAccumulators, pindexCheckpoint)) {
+            receipt.SetStatus(_("Couldn't generate the accumulator witness"),
+                              ZWGR_FAILED_ACCUMULATOR_INITIALIZATION);
+            return error("%s : %s", __func__, receipt.GetStatusMessage());
         }
 
-        for (auto &it : mapMintsSelected) {
-            CZerocoinMint mint = it.second;
-            CMintMeta meta = zwgrTracker->Get(GetSerialHash(mint.GetSerialNumber()));
-            CoinWitnessData *coinWitness = zwgrTracker->GetSpendCache(meta.hashStake);
+        // Construct the CoinSpend object. This acts like a signature on the transaction.
+        int64_t nTime1 = GetTimeMicros();
+        libzerocoin::ZerocoinParams *paramsCoin = Params().Zerocoin_Params(coinWitness.isV1);
+        libzerocoin::PrivateCoin privateCoin(paramsCoin, coinWitness.denom);
+        privateCoin.setPublicCoin(*coinWitness.coin);
+        privateCoin.setRandomness(mint.GetRandomness());
+        privateCoin.setSerialNumber(mint.GetSerialNumber());
+        int64_t nTime2 = GetTimeMicros();
+        LogPrint("bench", "        - CoinSpend constructed in %.2fms\n", 0.001 * (nTime2 - nTime1));
 
-            if (!coinWitness->nHeightAccEnd) {
-                *coinWitness = CoinWitnessData(mint);
-                coinWitness->SetHeightMintAdded(mint.GetHeight());
-            }
+        //Version 2 zerocoins have a privkey associated with them
+        uint8_t nVersion = mint.GetVersion();
+        privateCoin.setVersion(mint.GetVersion());
+        if (nVersion >= libzerocoin::PrivateCoin::PUBKEY_VERSION) {
+            CKey key;
+            if (!mint.GetKeyPair(key))
+                return error("%s: failed to set zWGR privkey mint version=%d", __func__, nVersion);
+            privateCoin.setPrivKey(key.GetPrivKey());
+        }
+        int64_t nTime3 = GetTimeMicros();
+        LogPrint("bench", "        - Signing key set in %.2fms\n", 0.001 * (nTime3 - nTime2));
 
-            // Generate the witness for each mint being spent
-            if (!GenerateAccumulatorWitness(coinWitness, mapAccumulators, pindexCheckpoint)) {
-                receipt.SetStatus(_("Couldn't generate the accumulator witness"),
-                                  ZWGR_FAILED_ACCUMULATOR_INITIALIZATION);
+        libzerocoin::Accumulator accumulator = mapAccumulators.GetAccumulator(coinWitness.denom);
+        uint32_t nChecksum = GetChecksum(accumulator.getValue());
+        CBigNum bnValue;
+        if (!GetAccumulatorValueFromChecksum(nChecksum, false, bnValue) || bnValue == 0)
+            return error("%s: could not find checksum used for spend\n", __func__);
+
+        int64_t nTime4 = GetTimeMicros();
+        LogPrint("bench", "        - Accumulator value fetched in %.2fms\n", 0.001 * (nTime4 - nTime3));
+
+        try {
+            libzerocoin::CoinSpend spend(paramsCoin, paramsAccumulator, privateCoin, accumulator, nChecksum,
+                                         *coinWitness.pWitness, hashTxOut, spendType);
+
+            if (!CheckCoinSpend(spend, accumulator, receipt)) {
+                receipt.SetStatus(_("CoinSpend: failed check"), ZWGR_SPEND_ERROR);
                 return error("%s : %s", __func__, receipt.GetStatusMessage());
             }
 
-            // Construct the CoinSpend object. This acts like a signature on the transaction.
-            int64_t nTime1 = GetTimeMicros();
-            libzerocoin::ZerocoinParams *paramsCoin = Params().Zerocoin_Params(coinWitness->isV1);
-            libzerocoin::PrivateCoin privateCoin(paramsCoin, coinWitness->denom);
-            privateCoin.setPublicCoin(*coinWitness->coin);
-            privateCoin.setRandomness(mint.GetRandomness());
-            privateCoin.setSerialNumber(mint.GetSerialNumber());
-            int64_t nTime2 = GetTimeMicros();
-            LogPrint("bench", "        - CoinSpend constructed in %.2fms\n", 0.001 * (nTime2 - nTime1));
+            vin.emplace_back(CTxIn(spend, coinWitness.denom));
+            CZerocoinSpend zcSpend(spend.getCoinSerialNumber(), 0, mint.GetValue(), mint.GetDenomination(),
+                                   GetChecksum(accumulator.getValue()));
+            zcSpend.SetMintCount(coinWitness.nMintsAdded);
+            receipt.AddSpend(zcSpend);
 
-            //Version 2 zerocoins have a privkey associated with them
-            uint8_t nVersion = mint.GetVersion();
-            privateCoin.setVersion(mint.GetVersion());
-            if (nVersion >= libzerocoin::PrivateCoin::PUBKEY_VERSION) {
-                CKey key;
-                if (!mint.GetKeyPair(key))
-                    return error("%s: failed to set zWGR privkey mint version=%d", __func__, nVersion);
-                privateCoin.setPrivKey(key.GetPrivKey());
-            }
-            int64_t nTime3 = GetTimeMicros();
-            LogPrint("bench", "        - Signing key set in %.2fms\n", 0.001 * (nTime3 - nTime2));
-
-            libzerocoin::Accumulator accumulator = mapAccumulators.GetAccumulator(coinWitness->denom);
-            uint32_t nChecksum = GetChecksum(accumulator.getValue());
-            CBigNum bnValue;
-            if (!GetAccumulatorValueFromChecksum(nChecksum, false, bnValue) || bnValue == 0)
-                return error("%s: could not find checksum used for spend\n", __func__);
-
-            int64_t nTime4 = GetTimeMicros();
-            LogPrint("bench", "        - Accumulator value fetched in %.2fms\n", 0.001 * (nTime4 - nTime3));
-
-            try {
-                libzerocoin::CoinSpend spend(paramsCoin, paramsAccumulator, privateCoin, accumulator, nChecksum,
-                                             *coinWitness->pWitness, hashTxOut, spendType);
-
-                if (!CheckCoinSpend(spend, accumulator, receipt)) {
-                    receipt.SetStatus(_("CoinSpend: failed check"), ZWGR_SPEND_ERROR);
-                    return error("%s : %s", __func__, receipt.GetStatusMessage());
-                }
-
-                vin.emplace_back(CTxIn(spend, coinWitness->denom));
-                CZerocoinSpend zcSpend(spend.getCoinSerialNumber(), 0, mint.GetValue(), mint.GetDenomination(),
-                                       GetChecksum(accumulator.getValue()));
-                zcSpend.SetMintCount(coinWitness->nMintsAdded);
-                receipt.AddSpend(zcSpend);
-
-                int64_t nTime5 = GetTimeMicros();
-                LogPrint("bench", "        - CoinSpend verified in %.2fms\n", 0.001 * (nTime5 - nTime4));
-            } catch (const std::exception&) {
-                receipt.SetStatus(_("CoinSpend: Accumulator witness does not verify"), ZWGR_INVALID_WITNESS);
-                return error("%s : %s", __func__, receipt.GetStatusMessage());
-            }
+            int64_t nTime5 = GetTimeMicros();
+            LogPrint("bench", "        - CoinSpend verified in %.2fms\n", 0.001 * (nTime5 - nTime4));
+        } catch (const std::exception&) {
+            receipt.SetStatus(_("CoinSpend: Accumulator witness does not verify"), ZWGR_INVALID_WITNESS);
+            return error("%s : %s", __func__, receipt.GetStatusMessage());
         }
-        break;
-    }
-
-    if (nLockAttempts == 100) {
-        LogPrintf("%s : could not get lock on cs_spendcache\n", __func__);
-        receipt.SetStatus(_("could not get lock on cs_spendcache"), ZWGR_TXMINT_GENERAL);
-         return false;
      }
 
     int64_t nTimeFinished = GetTimeMicros();
@@ -4175,69 +4125,51 @@ bool CWallet::MintsToInputVectorPublicSpend(std::map<CBigNum, CZerocoinMint>& ma
 
     int spendVersion = CurrentPublicCoinSpendVersion();
 
-    int nLockAttempts = 0;
-    while (nLockAttempts < 100) {
-        TRY_LOCK(zwgrTracker->cs_spendcache, lockSpendcache);
-        if (!lockSpendcache) {
-            fGlobalUnlockSpendCache = true;
-            MilliSleep(100);
-            ++nLockAttempts;
-            continue;
+    for (auto &it : mapMintsSelected) {
+        CZerocoinMint mint = it.second;
+
+        // Create the simple input and the scriptSig -> Serial + Randomness + Private key signature of both.
+        // As the mint doesn't have the output index search it..
+        CTransaction txMint;
+        uint256 hashBlock;
+        if (!GetTransaction(mint.GetTxHash(), txMint, hashBlock)) {
+            receipt.SetStatus(strprintf(_("Unable to find transaction containing mint %s"), mint.GetTxHash().GetHex()), ZWGR_TXMINT_GENERAL);
+            return false;
+        } else if (mapBlockIndex.count(hashBlock) < 1) {
+            // check that this mint made it into the blockchain
+            receipt.SetStatus(_("Mint did not make it into blockchain"), ZWGR_TXMINT_GENERAL);
+            return false;
         }
 
-        for (auto &it : mapMintsSelected) {
-            CZerocoinMint mint = it.second;
+        int outputIndex = -1;
+        for (unsigned long i = 0; i < txMint.vout.size(); ++i) {
+            CTxOut out = txMint.vout[i];
+            if (out.scriptPubKey.IsZerocoinMint()){
+                libzerocoin::PublicCoin pubcoin(Params().Zerocoin_Params(false));
+                CValidationState state;
+                if (!TxOutToPublicCoin(out, pubcoin, state))
+                    return error("%s: extracting pubcoin from txout failed", __func__);
 
-            // Create the simple input and the scriptSig -> Serial + Randomness + Private key signature of both.
-            // As the mint doesn't have the output index search it..
-            CTransaction txMint;
-            uint256 hashBlock;
-            if (!GetTransaction(mint.GetTxHash(), txMint, hashBlock)) {
-                receipt.SetStatus(strprintf(_("Unable to find transaction containing mint %s"), mint.GetTxHash().GetHex()), ZWGR_TXMINT_GENERAL);
-                return false;
-            } else if (mapBlockIndex.count(hashBlock) < 1) {
-                // check that this mint made it into the blockchain
-                receipt.SetStatus(_("Mint did not make it into blockchain"), ZWGR_TXMINT_GENERAL);
-                return false;
-            }
-
-            int outputIndex = -1;
-            for (unsigned long i = 0; i < txMint.vout.size(); ++i) {
-                CTxOut out = txMint.vout[i];
-                if (out.scriptPubKey.IsZerocoinMint()){
-                    libzerocoin::PublicCoin pubcoin(Params().Zerocoin_Params(false));
-                    CValidationState state;
-                    if (!TxOutToPublicCoin(out, pubcoin, state))
-                        return error("%s: extracting pubcoin from txout failed", __func__);
-
-                    if (pubcoin.getValue() == mint.GetValue()){
-                        outputIndex = i;
-                        break;
-                    }
+                if (pubcoin.getValue() == mint.GetValue()){
+                    outputIndex = i;
+                    break;
                 }
             }
-
-            if (outputIndex == -1) {
-                receipt.SetStatus(_("Pubcoin not found in mint tx"), ZWGR_TXMINT_GENERAL);
-                return false;
-            }
-
-            mint.SetOutputIndex(outputIndex);
-            CTxIn in;
-            if(!ZWGRModule::createInput(in, mint, hashTxOut, spendVersion)) {
-                receipt.SetStatus(_("Cannot create public spend input"), ZWGR_TXMINT_GENERAL);
-                return false;
-            }
-            vin.emplace_back(in);
-            receipt.AddSpend(CZerocoinSpend(mint.GetSerialNumber(), 0, mint.GetValue(), mint.GetDenomination(), 0));
         }
-        break;
-    }
 
-    if (nLockAttempts == 100) {
-        LogPrintf("%s : could not get lock on cs_spendcache\n", __func__);
-        receipt.SetStatus(_("could not get lock on cs_spendcache"), ZWGR_TXMINT_GENERAL);
-        return false;
+        if (outputIndex == -1) {
+            receipt.SetStatus(_("Pubcoin not found in mint tx"), ZWGR_TXMINT_GENERAL);
+            return false;
+        }
+
+        mint.SetOutputIndex(outputIndex);
+        CTxIn in;
+        if(!ZWGRModule::createInput(in, mint, hashTxOut, spendVersion)) {
+            receipt.SetStatus(_("Cannot create public spend input"), ZWGR_TXMINT_GENERAL);
+            return false;
+        }
+        vin.emplace_back(in);
+        receipt.AddSpend(CZerocoinSpend(mint.GetSerialNumber(), 0, mint.GetValue(), mint.GetDenomination(), 0));
     }
 
     receipt.SetStatus(_("Spend Valid"), ZWGR_SPEND_OKAY); // Everything okay
