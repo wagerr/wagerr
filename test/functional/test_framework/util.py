@@ -296,7 +296,6 @@ def initialize_datadir(dirname, n):
         f.write("rpcport=" + str(rpc_port(n)) + "\n")
         f.write("listenonion=0\n")
         f.write("enablezeromint=0\n")
-        f.write("precompute=0\n")
         f.write("staking=0\n")
         f.write("spendzeroconfchange=1\n")
     return datadir
