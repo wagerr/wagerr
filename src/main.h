@@ -160,7 +160,6 @@ extern CFeeRate minRelayTxFee;
 extern bool fAlerts;
 extern int64_t nMaxTipAge;
 extern bool fVerifyingBlocks;
-extern bool fClearSpendCache;
 
 extern bool fLargeWorkForkFound;
 extern bool fLargeWorkInvalidChainFound;
