@@ -7,10 +7,6 @@
 #include "zerocoin.h"
 #include "serialize.h"
 
-#define PRECOMPUTE_LRU_CACHE_SIZE 1000
-#define PRECOMPUTE_MAX_DIRTY_CACHE_SIZE 100
-#define PRECOMPUTE_FLUSH_TIME 300 // 5 minutes
-
 class CoinWitnessCacheData;
 
 class CoinWitnessData
