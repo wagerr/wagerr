@@ -203,7 +203,7 @@ public:
     static const int STAKE_SPLIT_THRESHOLD = 2000;
 
     bool MintableCoins();
-    bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, int blockHeight, bool fPrecompute = false);
+    bool SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInputs, CAmount nTargetAmount, int blockHeight);
     bool IsCollateralAmount(CAmount nInputAmount) const;
 
     // Zerocoin additions
