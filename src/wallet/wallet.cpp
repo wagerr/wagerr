@@ -5155,12 +5155,18 @@ void CWalletTx::Init(const CWallet* pwalletIn)
 
 bool CWalletTx::IsTrusted() const
 {
+    bool fConflicted = false;
+    int nDepth = 0;
+    return IsTrusted(nDepth, fConflicted);
+}
+
+bool CWalletTx::IsTrusted(int& nDepth, bool& fConflicted) const
+{
     // Quick answer in most cases
     if (!IsFinalTx(*this))
         return false;
 
-    bool fConflicted;
-    int nDepth = GetDepthAndMempool(fConflicted);
+    nDepth = GetDepthAndMempool(fConflicted);
 
     if (fConflicted) // Don't trust unconfirmed transactions from us unless they are in the mempool.
         return false;
@@ -5175,7 +5181,7 @@ bool CWalletTx::IsTrusted() const
     for (const CTxIn& txin : vin) {
         // Transactions not sent by us: not trusted
         const CWalletTx* parent = pwallet->GetWalletTx(txin.prevout.hash);
-        if (parent == NULL)
+        if (parent == nullptr)
             return false;
         const CTxOut& parentOut = parent->vout[txin.prevout.n];
         if (pwallet->IsMine(parentOut) != ISMINE_SPENDABLE)

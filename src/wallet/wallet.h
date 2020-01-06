@@ -812,6 +812,7 @@ public:
     bool IsEquivalentTo(const CWalletTx& tx) const;
 
     bool IsTrusted() const;
+    bool IsTrusted(int& nDepth, bool& fConflicted) const;
 
     bool WriteToDisk(CWalletDB *pwalletdb);
 
