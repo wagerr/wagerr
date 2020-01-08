@@ -62,6 +62,10 @@ bool WalletModel::isTestnet() const {
     return Params().NetworkID() == CBaseChainParams::TESTNET;
 }
 
+bool WalletModel::isStakingStatusActive() const {
+    return wallet->pStakerStatus->IsActive();
+}
+
 CAmount WalletModel::getBalance(const CCoinControl* coinControl) const
 {
     if (coinControl) {
@@ -140,6 +144,10 @@ void WalletModel::updateStatus()
 bool WalletModel::isWalletUnlocked() const {
     EncryptionStatus status = getEncryptionStatus();
     return status == Unencrypted || status == Unlocked;
+}
+
+bool WalletModel::isWalletLocked() const {
+    return getEncryptionStatus() == Locked;
 }
 
 void WalletModel::pollBalanceChanged()
