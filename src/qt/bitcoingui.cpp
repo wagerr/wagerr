@@ -1229,7 +1229,7 @@ void BitcoinGUI::setStakingStatus()
         if (pwalletMain)
             fMultiSend = pwalletMain->isMultiSendEnabled();
 
-        if (nLastCoinStakeSearchInterval) {
+        if (pwalletMain && pwalletMain->pStakerStatus->IsActive()) {
             labelStakingIcon->show();
             labelStakingIcon->setPixmap(QIcon(":/icons/staking_active").pixmap(STATUSBAR_ICONSIZE, STATUSBAR_ICONSIZE));
             labelStakingIcon->setToolTip(

@@ -162,6 +162,28 @@ public:
     StringMap destdata;
 };
 
+/** Record info about last kernel stake operation (time and chainTip)**/
+class CStakerStatus {
+private:
+    const CBlockIndex* tipLastStakeAttempt = nullptr;
+    int64_t timeLastStakeAttempt;
+public:
+    const CBlockIndex* GetLastTip() const { return tipLastStakeAttempt; }
+    uint256 GetLastHash() const
+    {
+        return (tipLastStakeAttempt == nullptr ? 0 : tipLastStakeAttempt->GetBlockHash());
+    }
+    int64_t GetLastTime() const { return timeLastStakeAttempt; }
+    void SetLastTip(const CBlockIndex* lastTip) { tipLastStakeAttempt = lastTip; }
+    void SetLastTime(const uint64_t lastTime) { timeLastStakeAttempt = lastTime; }
+    void SetNull()
+    {
+        SetLastTip(nullptr);
+        SetLastTime(0);
+    }
+    bool IsActive() { return (timeLastStakeAttempt + 30) >= GetTime(); }
+};
+
 /**
  * A CWallet is an extension of a keystore, which also maintains a set of transactions and balances,
  * and provides the ability to create new transactions.
@@ -293,6 +315,7 @@ public:
     // Stake Settings
     uint64_t nStakeSplitThreshold;
     int nStakeSetUpdateTime;
+    CStakerStatus* pStakerStatus = nullptr;
 
     //MultiSend
     std::vector<std::pair<std::string, int> > vMultiSend;
@@ -448,7 +471,7 @@ public:
     bool CommitTransaction(CWalletTx& wtxNew, CReserveKey& reservekey, std::string strCommand = "tx");
     bool AddAccountingEntry(const CAccountingEntry&, CWalletDB & pwalletdb);
     int GenerateObfuscationOutputs(int nTotalValue, std::vector<CTxOut>& vout);
-    bool CreateCoinStake(const CKeyStore& keystore, const CBlockIndex* pindexPrev, unsigned int nBits, int64_t nSearchInterval, CMutableTransaction& txNew, int64_t& nTxNewTime, std::unique_ptr<CStakeInput>& newStakeInput);
+    bool CreateCoinStake(const CKeyStore& keystore, const CBlockIndex* pindexPrev, unsigned int nBits, CMutableTransaction& txNew, int64_t& nTxNewTime, std::unique_ptr<CStakeInput>& newStakeInput);
     bool FillCoinStake(const CKeyStore& keystore, CMutableTransaction& txNew, CAmount &nFee, std::vector<CTxOut> voutPayouts, std::unique_ptr<CStakeInput>& stakeInput);
     bool MultiSend();
     void AutoCombineDust();

@@ -2486,7 +2486,6 @@ bool CWallet::CreateCoinStake(
         const CKeyStore& keystore,
         const CBlockIndex* pindexPrev,
         unsigned int nBits,
-        int64_t nSearchInterval,
         CMutableTransaction& txNew,
         int64_t& nTxNewTime,
         std::unique_ptr<CStakeInput>& newStakeInput
@@ -2528,60 +2527,67 @@ bool CWallet::CreateCoinStake(
         }
     }
 
-    CAmount nCredit = 0;
+    CAmount nCredit;
     CScript scriptPubKeyKernel;
     bool fKernelFound = false;
     int nAttempts = 0;
 
+    // update staker status (hash)
+    pStakerStatus->SetLastTip(pindexPrev);
+
     for (std::unique_ptr<CStakeInput>& stakeInput : listInputs) {
+        //new block came in, move on
+        if (chainActive.Height() != pindexPrev->nHeight) return false;
+
         // Make sure the wallet is unlocked and shutdown hasn't been requested
-        if (IsLocked() || ShutdownRequested())
-            return false;
+        if (IsLocked() || ShutdownRequested()) return false;
 
+        nCredit = 0;
         uint256 hashProofOfStake = 0;
-
         nAttempts++;
-        //iterates each utxo inside of CheckStakeKernelHash()
-        if (Stake(pindexPrev, stakeInput.get(), nBits, nTxNewTime, hashProofOfStake)) {
+        fKernelFound = Stake(pindexPrev, stakeInput.get(), nBits, nTxNewTime, hashProofOfStake);
 
-            // Found a kernel
-            LogPrintf("CreateCoinStake : kernel found\n");
+        // update staker status (time)
+        pStakerStatus->SetLastTime(nTxNewTime);
 
-            nCredit += stakeInput->GetValue();
+        if (!fKernelFound) continue;
 
-            // Calculate reward
-            CAmount nReward;
-            nReward = GetBlockValue(chainActive.Height() + 1);
-            nCredit += nReward;
+        // Found a kernel
+        LogPrintf("CreateCoinStake : kernel found\n");
+        nCredit += stakeInput->GetValue();
 
-            // Create the output transaction(s)
-            std::vector<CTxOut> vout;
-            if (!stakeInput->CreateTxOuts(this, vout, nCredit)) {
-                LogPrintf("%s : failed to get scriptPubKey\n", __func__);
-                continue;
-            }
-            txNew.vout.insert(txNew.vout.end(), vout.begin(), vout.end());
+        // Calculate reward
+        CAmount nReward;
+        nReward = GetBlockValue(chainActive.Height() + 1);
+        nCredit += nReward;
 
-            CAmount nMinFee = 0;
-            if (!stakeInput->IsZWGR()) {
-                // Set output amount
-                if (txNew.vout.size() == 3) {
-                    txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 / CENT) * CENT;
-                    txNew.vout[2].nValue = nCredit - nMinFee - txNew.vout[1].nValue;
-                } else
-                    txNew.vout[1].nValue = nCredit - nMinFee;
-            }
-
-            // Limit size
-            unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
-            if (nBytes >= DEFAULT_BLOCK_MAX_SIZE * 0.85)
-                return error("CreateCoinStake : exceeded coinstake size limit");
-
-            newStakeInput = std::move(stakeInput);
-
-            fKernelFound = true;
-            break;
+        // Create the output transaction(s)
+        std::vector<CTxOut> vout;
+        if (!stakeInput->CreateTxOuts(this, vout, nCredit)) {
+            LogPrintf("%s : failed to create output\n", __func__);
+            continue;
         }
+        txNew.vout.insert(txNew.vout.end(), vout.begin(), vout.end());
+
+        CAmount nMinFee = 0;
+        if (!stakeInput->IsZWGR()) {
+            // Set output amount
+            if (txNew.vout.size() == 3) {
+                txNew.vout[1].nValue = ((nCredit - nMinFee) / 2 / CENT) * CENT;
+                txNew.vout[2].nValue = nCredit - nMinFee - txNew.vout[1].nValue;
+            } else
+                txNew.vout[1].nValue = nCredit - nMinFee;
+        }
+
+        // Limit size
+        unsigned int nBytes = ::GetSerializeSize(txNew, SER_NETWORK, PROTOCOL_VERSION);
+        if (nBytes >= DEFAULT_BLOCK_MAX_SIZE * 0.85)
+            return error("CreateCoinStake : exceeded coinstake size limit");
+
+        newStakeInput = std::move(stakeInput);
+
+        fKernelFound = true;
+        break;
     }
     LogPrint("staking", "%s: attempted staking %d times\n", __func__, nAttempts);
 
@@ -4879,7 +4885,7 @@ bool CWallet::FillCoinStake(const CKeyStore& keystore, CMutableTransaction& txNe
     if (!txNew.vin[0].scriptSig.IsZerocoinSpend()) {
         for (CTxIn txIn : txNew.vin) {
             const CWalletTx *wtx = GetWalletTx(txIn.prevout.hash);
-            if (!SignSignature(*this, *wtx, txNew, nIn++))
+            if (!SignSignature(*this, *wtx, txNew, nIn++, SIGHASH_ALL))
                 return error("CreateCoinStake : failed to sign coinstake");
         }
     } else {
@@ -4906,7 +4912,9 @@ bool CWallet::FillCoinStake(const CKeyStore& keystore, CMutableTransaction& txNe
     }
 
     return true;
-}CWallet::CWallet()
+}
+
+CWallet::CWallet()
 {
     SetNull();
 }
@@ -4922,6 +4930,7 @@ CWallet::CWallet(std::string strWalletFileIn)
 CWallet::~CWallet()
 {
     delete pwalletdbEncryption;
+    delete pStakerStatus;
 }
 
 void CWallet::SetNull()
@@ -4939,6 +4948,11 @@ void CWallet::SetNull()
     fBackupMints = false;
 
     // Stake Settings
+    if (pStakerStatus) {
+        pStakerStatus->SetNull();
+    } else {
+        pStakerStatus = new CStakerStatus();
+    }
     nStakeSplitThreshold = STAKE_SPLIT_THRESHOLD;
     nStakeSetUpdateTime = 300; // 5 minutes
 
