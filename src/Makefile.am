@@ -200,9 +200,6 @@ BITCOIN_CORE_H = \
   zwgr/zwgrtracker.h \
   zwgr/zwgrwallet.h \
   zwgr/zwgrmodule.h \
-  genwit.h \
-  concurrentqueue.h \
-  lightzwgrthread.h \
   zmq/zmqabstractnotifier.h \
   zmq/zmqconfig.h \
   zmq/zmqnotificationinterface.h \
@@ -304,9 +301,7 @@ libbitcoin_wallet_a_SOURCES = \
   zwgr/zwgrwallet.cpp \
   zwgr/zwgrtracker.cpp \
   stakeinput.cpp \
-  genwit.cpp \
   zwgr/zwgrmodule.cpp \
-  lightzwgrthread.cpp \
   $(BITCOIN_CORE_H)
 
 # crypto primitives library

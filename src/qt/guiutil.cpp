@@ -927,9 +927,6 @@ QString formatServicesStr(quint64 mask)
             case NODE_BLOOM_WITHOUT_MN:
                 strList.append(QObject::tr("BLOOM"));
                 break;
-            case NODE_BLOOM_LIGHT_ZC:
-                strList.append(QObject::tr("ZK_BLOOM"));
-                break;
             default:
                 strList.append(QString("%1[%2]").arg(QObject::tr("UNKNOWN")).arg(check));
             }

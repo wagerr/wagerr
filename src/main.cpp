@@ -106,9 +106,6 @@ std::map<uint256, std::set<uint256> > mapOrphanTransactionsByPrev;
 std::map<uint256, int64_t> mapRejectedBlocks;
 std::map<uint256, int64_t> mapZerocoinspends; //txid, time received
 
-/***/
-CLightWorker lightWorker;
-
 void EraseOrphansFor(NodeId peer);
 
 static void CheckBlockIndex();
@@ -5734,7 +5731,6 @@ bool static AlreadyHave(const CInv& inv)
     }
     case MSG_DSTX:
         return mapObfuscationBroadcastTxes.count(inv.hash);
-    case MSG_PUBCOINS:
     case MSG_BLOCK:
         return mapBlockIndex.count(inv.hash);
     case MSG_TXLOCK_REQUEST:
@@ -5882,48 +5878,6 @@ void static ProcessGetData(CNode* pfrom)
                         ss << tx;
                         pfrom->PushMessage("tx", ss);
                         pushed = true;
-                    }
-                }
-
-                if(nLocalServices & NODE_BLOOM_LIGHT_ZC) {
-                    if (!pushed && inv.type == MSG_PUBCOINS) {
-                        //std::cout << "asking for pubcoins, requested block hash: " << inv.hash.GetHex() << std::endl;
-
-                        bool send = false;
-                        BlockMap::iterator mi = mapBlockIndex.find(inv.hash);
-                        if (mi != mapBlockIndex.end()) {
-                            if (chainActive.Contains(mi->second)) {
-                                send = true;
-                            } else {
-                                // To prevent fingerprinting attacks, only send blocks outside of the active
-                                // chain if they are valid, and no more than a max reorg depth than the best header
-                                // chain we know about.
-                                send = mi->second->IsValid(BLOCK_VALID_SCRIPTS) && (pindexBestHeader != NULL) &&
-                                       (chainActive.Height() - mi->second->nHeight < Params().MaxReorganizationDepth());
-                                if (!send) {
-                                    LogPrintf(
-                                            "ProcessGetData(): ignoring request from peer=%i for old block that isn't in the main chain\n",
-                                            pfrom->GetId());
-                                }
-                            }
-                        }
-                        // Don't send not-validated blocks
-                        if (send && (mi->second->nStatus & BLOCK_HAVE_DATA)) {
-                            try {
-                                std::list<libzerocoin::PublicCoin> pubcoins = GetPubcoinFromBlock((*mi).second);
-                                CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-                                ss.reserve(2000);
-                                ss << inv.hash.Get32();
-                                ss << pubcoins.size();
-                                for (const libzerocoin::PublicCoin &pubcoin : pubcoins) {
-                                    ss << pubcoin.getValue();
-                                }
-                                pfrom->PushMessage("pubcoins", ss);
-                                pushed = true;
-                            } catch (const std::exception &e) {
-                                PrintExceptionContinue(&e, "ProcessMessages()");
-                            }
-                        }
                     }
                 }
 
@@ -6677,60 +6631,6 @@ bool static ProcessMessage(CNode* pfrom, std::string strCommand, CDataStream& vR
                 pfrom->DisconnectOldProtocol(ActiveProtocol(), strCommand);
             } else {
                 LogPrint("net", "%s : Already processed block %s, skipping ProcessNewBlock()\n", __func__, block.GetHash().GetHex());
-            }
-        }
-    }
-
-    else if (strCommand == "accvalue"){
-        if(nLocalServices & NODE_BLOOM_LIGHT_ZC) {
-            try {
-                int height;
-                libzerocoin::CoinDenomination den;
-                vRecv >> height;
-                vRecv >> den;
-                CBigNum bnAccValue = 0;
-                //std::cout << "asking for checkpoint value in height: " << height << ", den: " << den << std::endl;
-                if (!GetAccumulatorValue(height, den, bnAccValue)) {
-                    LogPrint("zwgr", "peer misbehaving for request an invalid acc checkpoint \n", __func__);
-                    Misbehaving(pfrom->GetId(), 50);
-                } else {
-                    //std::cout << "Sending acc value, with checksum: " << GetChecksum(bnAccValue) << " for "
-                    //          << bnAccValue.GetDec() << std::endl;
-                    CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-                    ss << bnAccValue;
-                    ss << height;
-                    pfrom->PushMessage("accvalueresponse", ss);
-                }
-            } catch (const std::exception& e) {
-                // TODO: Response with an error?
-                PrintExceptionContinue(&e, "ProcessMessages()");
-            }
-        }
-    }
-
-    else if (strCommand == "genwit") {
-        if(nLocalServices & NODE_BLOOM_LIGHT_ZC) {
-            try {
-                CGenWit gen;
-                vRecv >> gen;
-                gen.setPfrom(pfrom);
-                if (gen.isValid(chainActive.Height())) {
-                    if (!lightWorker.addWitWork(gen)) {
-                        LogPrint("zwgr", "%s : add genwit request failed \n", __func__);
-                        CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-                        // Invalid request only returns the message without a result.
-                        ss << gen.getRequestNum();
-                        pfrom->PushMessage("pubcoins", ss);
-                    }
-                } else {
-                    CDataStream ss(SER_NETWORK, PROTOCOL_VERSION);
-                    // Invalid request only returns the message without a result.
-                    ss << gen.getRequestNum();
-                    pfrom->PushMessage("pubcoins", ss);
-                }
-            } catch (const std::exception& e) {
-                // TODO: Response with an error?
-                PrintExceptionContinue(&e, "ProcessMessages()");
             }
         }
     }
