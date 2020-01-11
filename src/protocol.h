@@ -80,11 +80,6 @@ enum {
 
     NODE_BLOOM_WITHOUT_MN = (1 << 4),
 
-
-    // NODE_BLOOM_LIGHT_ZC means the node has the same feature as NODE_BLOOM_WITHOUT_MN with the addition of
-    // support for the light zerocoin protocol.
-    NODE_BLOOM_LIGHT_ZC = (1 << 5),
-
     // Bits 24-31 are reserved for temporary experiments. Just pick a bit that
     // isn't getting used, or one not being used much, and notify the
     // bitcoin-development mailing list. Remember that service bits are just
@@ -175,10 +170,7 @@ enum {
     MSG_MASTERNODE_QUORUM,
     MSG_MASTERNODE_ANNOUNCE,
     MSG_MASTERNODE_PING,
-    MSG_DSTX,
-    MSG_PUBCOINS,
-    MSG_GENWIT,
-    MSG_ACC_VALUE
+    MSG_DSTX
 };
 
 #endif // BITCOIN_PROTOCOL_H
