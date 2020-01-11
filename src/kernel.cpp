@@ -16,6 +16,7 @@
 #include "stakeinput.h"
 #include "utilmoneystr.h"
 #include "zwgrchain.h"
+#include "zwgr/accumulators.h"
 
 // v1 modifier interval.
 static const int64_t OLD_MODIFIER_INTERVAL = 2087;
