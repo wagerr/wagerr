@@ -137,24 +137,24 @@ UniValue generate(const UniValue& params, bool fHelp)
     if (!Params().MineBlocksOnDemand())
         throw JSONRPCError(RPC_METHOD_NOT_FOUND, "This method can only be used on regtest");
 
-    int nHeightStart = 0;
+    const int nGenerate = params[0].get_int();
     int nHeightEnd = 0;
     int nHeight = 0;
-    int nGenerate = params[0].get_int();
     CReserveKey reservekey(pwalletMain);
 
     {   // Don't keep cs_main locked
         LOCK(cs_main);
-        nHeightStart = chainActive.Height();
-        nHeight = nHeightStart;
-        nHeightEnd = nHeightStart+nGenerate;
+        nHeight = chainActive.Height();
+        nHeightEnd = nHeight + nGenerate;
     }
     unsigned int nExtraNonce = 0;
     UniValue blockHashes(UniValue::VARR);
-    bool fPoS = nHeight >= Params().LAST_POW_BLOCK();
-    while (nHeight < nHeightEnd)
-    {
 
+    bool fPoS = false;
+    const int last_pow_block = Params().LAST_POW_BLOCK();
+    while (nHeight < nHeightEnd && !ShutdownRequested())
+    {
+        if (!fPoS) fPoS = (nHeight >= last_pow_block);
         std::unique_ptr<CBlockTemplate> pblocktemplate(
                 fPoS ? CreateNewBlock(CScript(), pwalletMain, fPoS) : CreateNewBlockWithKey(reservekey, pwalletMain)
                         );
@@ -162,27 +162,29 @@ UniValue generate(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_INTERNAL_ERROR, "Couldn't create new block");
         CBlock *pblock = &pblocktemplate->block;
 
-        if(!fPoS){
+        if(!fPoS) {
             {
                 LOCK(cs_main);
                 IncrementExtraNonce(pblock, chainActive.Tip(), nExtraNonce);
             }
-        }
-        while (!CheckProofOfWork(pblock->GetHash(), pblock->nBits)) {
-            // Yes, there is a chance every nonce could fail to satisfy the -regtest
-            // target -- 1 in 2^(2^32). That ain't gonna happen.
-            ++pblock->nNonce;
-            if(fPoS){
-                if (!SignBlock(*pblock, *pwalletMain)) {
-                    LogPrintf("%s - Can't sign\n", __func__);
-                }
+            while (pblock->nNonce < std::numeric_limits<uint32_t>::max() &&
+                    !CheckProofOfWork(pblock->GetHash(), pblock->nBits)) {
+                ++pblock->nNonce;
+                 if(fPoS){
+                     if (!SignBlock(*pblock, *pwalletMain)) {
+                         LogPrintf("%s - Can't sign\n", __func__);
+                     }
+                 }
             }
+            if (ShutdownRequested()) break;
+            if (pblock->nNonce == std::numeric_limits<uint32_t>::max()) continue;
         }
+
         CValidationState state;
-        if (!ProcessNewBlock(state, NULL, pblock))
+        if (!ProcessNewBlock(state, nullptr, pblock))
             throw JSONRPCError(RPC_INTERNAL_ERROR, "ProcessNewBlock, block not accepted");
+
         ++nHeight;
-        fPoS = nHeight >= Params().LAST_POW_BLOCK();
         blockHashes.push_back(pblock->GetHash().GetHex());
     }
     return blockHashes;
