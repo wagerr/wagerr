@@ -2006,9 +2006,6 @@ bool CWallet::MintableCoins()
 {
     LOCK(cs_main);
     CAmount nBalance = GetBalance();
-    CAmount nZwgrBalance = GetZerocoinBalance(false);
-
-    int chainHeight = chainActive.Height();
 
     // Regular WGR
     if (nBalance > 0) {
@@ -2020,24 +2017,15 @@ bool CWallet::MintableCoins()
         std::vector<COutput> vCoins;
         AvailableCoins(vCoins, true);
 
-        int64_t time = GetAdjustedTime();
-        for (const COutput& out : vCoins) {
-            CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
-            //check for maturity (min age/depth)
-            if (Params().HasStakeMinAgeOrDepth(chainHeight, time, utxoBlock->nHeight, utxoBlock->nTime))
-                return true;
-        }
-    }
-
-    // zWGR
-    if (nZwgrBalance > 0) {
-        std::set<CMintMeta> setMints = zwgrTracker->ListMints(true, true, true);
-        for (auto mint : setMints) {
-            if (mint.nVersion < CZerocoinMint::STAKABLE_VERSION)
-                continue;
-            if (mint.nHeight > chainHeight - Params().Zerocoin_RequiredStakeDepth())
-                continue;
-           return true;
+        if (vCoins.size() > 0) {
+            // check that we have at least one utxo eligible for staking (min age/depth)
+            const int64_t time = GetAdjustedTime();
+            const int chainHeight = chainActive.Height();
+            for (const COutput& out : vCoins) {
+                CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
+                if (Params().HasStakeMinAgeOrDepth(chainHeight, time, utxoBlock->nHeight, utxoBlock->nTime))
+                    return true;
+            }
         }
     }
 
