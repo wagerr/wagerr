@@ -1807,7 +1807,8 @@ void CWallet::AvailableCoins(
         bool fIncludeZeroValue,
         AvailableCoinsType nCoinType,
         bool fUseIX,
-        int nWatchonlyConfig) const
+        int nWatchonlyConfig,
+        bool fJustOne) const
 {
     vCoins.clear();
     const bool fCoinsSelected = (coinControl != nullptr) && coinControl->HasSelected();
@@ -1868,7 +1869,9 @@ void CWallet::AvailableCoins(
                 if ((mine & ISMINE_MULTISIG) != ISMINE_NO)
                     fIsSpendable = true;
 
+                // found valid coin
                 vCoins.emplace_back(COutput(pcoin, i, nDepth, fIsSpendable));
+                if (fJustOne) return;
             }
         }
     }
@@ -1989,24 +1992,26 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
 
 bool CWallet::MintableCoins()
 {
-    LOCK(cs_main);
     CAmount nBalance = GetBalance();
 
-    // Regular WGR
-    if (nBalance > 0) {
-        if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
-            return error("%s : invalid reserve balance amount", __func__);
-        if (nBalance <= nReserveBalance)
-            return false;
+    if (nBalance == 0) return false;
+    if (mapArgs.count("-reservebalance") && !ParseMoney(mapArgs["-reservebalance"], nReserveBalance))
+        return error("%s : invalid reserve balance amount", __func__);
+    if (nBalance <= nReserveBalance) return false;
 
-        std::vector<COutput> vCoins;
-        AvailableCoins(vCoins, true);
+    std::vector<COutput> vCoins;
+    AvailableCoins(vCoins,
+            true,           // fOnlyConfirmed
+            nullptr,        // coinControl
+            false,          // fIncludeZeroValue
+            STAKABLE_COINS, // nCoinType
+            false,          // fUseIX
+            1,              // nWatchonlyConfig
+            true            // fJustOne
+            );
 
-        // check that we have at least one utxo eligible for staking.
-        return (vCoins.size() > 0);
-    }
-
-    return false;
+    // check that we have at least one utxo eligible for staking.
+    return (vCoins.size() > 0);
 }
 
 bool CWallet::SelectCoinsMinConf(const CAmount& nTargetValue, int nConfMine, int nConfTheirs, std::vector<COutput> vCoins, std::set<std::pair<const CWalletTx*, unsigned int> >& setCoinsRet, CAmount& nValueRet) const
