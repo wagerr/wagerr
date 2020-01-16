@@ -322,37 +322,6 @@ bool InvalidCheckpointRange(int nHeight)
     return nHeight > Params().Zerocoin_Block_LastGoodCheckpoint() && nHeight < Params().Zerocoin_Block_RecalculateAccumulators();
 }
 
-bool ValidateAccumulatorCheckpoint(const CBlock& block, CBlockIndex* pindex, AccumulatorMap& mapAccumulators)
-{
-    //V1 accumulators are completely phased out by the time this code hits the public and begins generating new checkpoints
-    //It is VERY IMPORTANT that when this is being run and height < v2_start, then zWGR need to be disabled at the same time!!
-    if (pindex->nHeight < Params().Zerocoin_Block_V2_Start() || fVerifyingBlocks)
-        return true;
-
-    if (pindex->nHeight > Params().Zerocoin_Block_Last_Checkpoint()) {
-        return true;
-    }
-
-    if (pindex->nHeight % 10 == 0) {
-        uint256 nCheckpointCalculated = 0;
-
-        if (!CalculateAccumulatorCheckpoint(pindex->nHeight, nCheckpointCalculated, mapAccumulators))
-            return error("%s : failed to calculate accumulator checkpoint", __func__);
-
-        if (nCheckpointCalculated != block.nAccumulatorCheckpoint) {
-            LogPrintf("%s: block=%d calculated: %s\n block: %s\n", __func__, pindex->nHeight, nCheckpointCalculated.GetHex(), block.nAccumulatorCheckpoint.GetHex());
-            return error("%s : accumulator does not match calculated value", __func__);
-        }
-
-        return true;
-    }
-
-    if (block.nAccumulatorCheckpoint != pindex->pprev->nAccumulatorCheckpoint)
-        return error("%s : new accumulator checkpoint generated on a block that is not multiple of 10", __func__);
-
-    return true;
-}
-
 
 //########################## Witness
 
