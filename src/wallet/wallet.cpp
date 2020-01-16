@@ -1810,6 +1810,7 @@ void CWallet::AvailableCoins(
         int nWatchonlyConfig) const
 {
     vCoins.clear();
+    const bool fCoinsSelected = (coinControl != nullptr) && coinControl->HasSelected();
 
     {
         LOCK2(cs_main, cs_wallet);
@@ -1817,24 +1818,20 @@ void CWallet::AvailableCoins(
             const uint256& wtxid = it->first;
             const CWalletTx* pcoin = &(*it).second;
 
-            if (!CheckFinalTx(*pcoin))
-                continue;
-
-            if (fOnlyConfirmed && !pcoin->IsTrusted())
-                continue;
-
-            if ((pcoin->IsCoinBase() || pcoin->IsCoinStake()) && pcoin->GetBlocksToMaturity() > 0)
-                continue;
+            if (!CheckFinalTx(*pcoin)) continue;
+            if (fOnlyConfirmed && !pcoin->IsTrusted()) continue;
+            if (pcoin->GetBlocksToMaturity() > 0) continue;
 
             int nDepth = pcoin->GetDepthInMainChain(false);
             // do not use IX for inputs that have less then 6 blockchain confirmations
-            if (fUseIX && nDepth < 6)
-                continue;
+            if (fUseIX && nDepth < 6) continue;
 
             // We should not consider coins which aren't at least in our mempool
             // It's possible for these to be conflicted via ancestors which we may never be able to detect
-            if (nDepth == 0 && !pcoin->InMempool())
-                continue;
+            if (nDepth == 0 && !pcoin->InMempool()) continue;
+
+            // Check min depth requirement for stake inputs
+            if (nCoinType == STAKABLE_COINS && nDepth <= Params().COINSTAKE_MIN_DEPTH()) continue;
 
             for (unsigned int i = 0; i < pcoin->vout.size(); i++) {
                 bool found = false;
@@ -1853,29 +1850,17 @@ void CWallet::AvailableCoins(
                 }
                 if (!found) continue;
 
-                if (nCoinType == STAKABLE_COINS) {
-                    if (pcoin->vout[i].IsZerocoinMint())
-                        continue;
-                }
+                if (nCoinType == STAKABLE_COINS && pcoin->vout[i].IsZerocoinMint()) continue;
+                if (IsSpent(wtxid, i)) continue;
 
                 isminetype mine = IsMine(pcoin->vout[i]);
-                if (IsSpent(wtxid, i))
-                    continue;
-                if (mine == ISMINE_NO)
-                    continue;
-
-                if ((mine == ISMINE_MULTISIG || mine == ISMINE_SPENDABLE) && nWatchonlyConfig == 2)
-                    continue;
-
-                if (mine == ISMINE_WATCH_ONLY && nWatchonlyConfig == 1)
-                    continue;
-
-                if (IsLockedCoin((*it).first, i) && nCoinType != ONLY_25000)
-                    continue;
-                if (pcoin->vout[i].nValue <= 0 && !fIncludeZeroValue)
-                    continue;
-                if (coinControl && coinControl->HasSelected() && !coinControl->fAllowOtherInputs && !coinControl->IsSelected((*it).first, i))
-                    continue;
+                if (  (mine == ISMINE_NO) ||
+                      ((mine == ISMINE_MULTISIG || mine == ISMINE_SPENDABLE) && nWatchonlyConfig == 2) ||
+                      (mine == ISMINE_WATCH_ONLY && nWatchonlyConfig == 1) ||
+                      (IsLockedCoin((*it).first, i) && nCoinType != ONLY_25000) ||
+                      (pcoin->vout[i].nValue <= 0 && !fIncludeZeroValue) ||
+                      (fCoinsSelected && coinControl->HasSelected() && !coinControl->fAllowOtherInputs && !coinControl->IsSelected((*it).first, i))
+                   ) continue;
 
                 bool fIsSpendable = false;
                 if ((mine & ISMINE_SPENDABLE) != ISMINE_NO)
@@ -2017,16 +2002,8 @@ bool CWallet::MintableCoins()
         std::vector<COutput> vCoins;
         AvailableCoins(vCoins, true);
 
-        if (vCoins.size() > 0) {
-            // check that we have at least one utxo eligible for staking (min age/depth)
-            const int64_t time = GetAdjustedTime();
-            const int chainHeight = chainActive.Height();
-            for (const COutput& out : vCoins) {
-                CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
-                if (Params().HasStakeMinAgeOrDepth(chainHeight, time, utxoBlock->nHeight, utxoBlock->nTime))
-                    return true;
-            }
-        }
+        // check that we have at least one utxo eligible for staking.
+        return (vCoins.size() > 0);
     }
 
     return false;
