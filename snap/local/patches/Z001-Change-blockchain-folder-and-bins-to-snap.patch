@@ -1,0 +1,123 @@
+From c6086a849ebedca5ffa1d85c6ae6cf04bdf42ae7 Mon Sep 17 00:00:00 2001
+From: cevap <dev@i2pmail.org>
+Date: Mon, 2 Dec 2019 19:55:07 +0100
+Subject: [PATCH] Change blockchain folder and bins to snap
+
+---
+ src/main/blockchain/blockchain.js |  6 +++---
+ src/main/blockchain/daemon.js     | 10 +++++-----
+ src/main/index.js                 | 17 ++++++++---------
+ 3 files changed, 16 insertions(+), 17 deletions(-)
+
+diff --git a/src/main/blockchain/blockchain.js b/src/main/blockchain/blockchain.js
+index 4641c42..d53c3dd 100755
+--- a/src/main/blockchain/blockchain.js
++++ b/src/main/blockchain/blockchain.js
+@@ -5,8 +5,8 @@ import PropertiesReader from 'properties-reader';
+ let testnet = 0;
+ let rpcUser = uuidv4();
+ let rpcPass = uuidv4();
+-const daemonName = 'wagerrd';
+-const cliName = 'wagerr-cli';
++const daemonName = 'wagerr.daemon';
++const cliName = 'wagerr.cli';
+ const mnoCollateral = 25000;
+ let rpcPort = 55003;
+ const minTxFee = 0.0001;
+@@ -124,7 +124,7 @@ function getWagerrDataPath() {
+       return path.join(environment.ENV.APPDATA, 'wagerr');
+     }
+     case 'linux': {
+-      return path.join(environment.ENV.HOME, '.wagerr');
++      return path.join(environment.ENV.HOME, 'snap/wagerr/common/.wagerr');
+     }
+     default: {
+       console.log('Unsupported platform!');
+diff --git a/src/main/blockchain/daemon.js b/src/main/blockchain/daemon.js
+index c5d0145..99262af 100755
+--- a/src/main/blockchain/daemon.js
++++ b/src/main/blockchain/daemon.js
+@@ -22,7 +22,7 @@ export default class Daemon {
+    */
+   runCommand(cmd) {
+     return new Promise(async resolve => {
+-      const cliPath = this.getExecutablePath('wagerr-cli');
++      const cliPath = this.getExecutablePath('wagerr.cli');
+       console.log(
+         'Confirm the cli params',
+         blockchain.rpcUser,
+@@ -56,7 +56,7 @@ export default class Daemon {
+   }
+ 
+   launch(args) {
+-    const wagerrdPath = this.getExecutablePath('wagerrd');
++    const wagerrdPath = this.getExecutablePath('wagerr.daemon');
+     const wagerrdArgs = this.getWagerrdArgs(args);
+ 
+     console.log(`\x1b[32m Launching daemon: ${wagerrdPath}\x1b[32m`);
+@@ -89,7 +89,7 @@ export default class Daemon {
+   stop() {
+     return new Promise(async resolve => {
+       let running = true;
+-      const cliPath = this.getExecutablePath('wagerr-cli');
++      const cliPath = this.getExecutablePath('wagerr.cli');
+ 
+       // Call wagerr cli to stop the wagerr daemon.
+       const wagerrcliProcess = spawn(cliPath, [
+@@ -118,8 +118,8 @@ export default class Daemon {
+   getExecutablePath(name) {
+     const binPath =
+       process.env.NODE_ENV === 'development'
+-        ? path.join(__dirname, '..', '..', '..', 'bin')
+-        : path.join(process.resourcesPath, 'bin');
++        ? path.join('/snap/bin')
++        : path.join('/snap/bin');
+     const execName = os.platform() !== 'win32' ? name : `${name}.exe`;
+ 
+     return path.join(binPath, execName);
+diff --git a/src/main/index.js b/src/main/index.js
+index 4054b44..759d5f4 100644
+--- a/src/main/index.js
++++ b/src/main/index.js
+@@ -12,7 +12,6 @@ import {
+ import Daemon from './blockchain/daemon';
+ import { spawnLogger } from './logger/logger';
+ import menu from './menu/menu';
+-import { checkForUpdates } from './updater/updater';
+ import { version as appVersion } from '../../package.json';
+ 
+ const logger = spawnLogger();
+@@ -155,8 +154,8 @@ export async function init(args) {
+   daemon = new Daemon();
+ 
+   // Check if the wagerrd binary exists.
+-  const wagerrExe = daemon.getExecutablePath('wagerrd');
+-  const wagerrcliExe = daemon.getExecutablePath('wagerr-cli');
++  const wagerrExe = daemon.getExecutablePath('wagerr.daemon');
++  const wagerrcliExe = daemon.getExecutablePath('wagerr.cli');
+ 
+   if (!fs.existsSync(wagerrExe) || !fs.existsSync(wagerrcliExe)) {
+     logger.error(
+@@ -201,13 +200,13 @@ app.on('ready', async () => {
+   }
+ 
+   // Check for updates only for the packaged app.
+-  if (process.env.NODE_ENV === 'production') {
+-    logger.info('Checking for an update');
+-    checkForUpdates();
+-  } else {
+-    logger.debug('Skipping update check when running in development mode');
++  //if (process.env.NODE_ENV === 'production') {
++  //  logger.info('Checking for an update');
++  //  checkForUpdates();
++  //} else {
++    logger.debug('Skipping update check when running in snap confinement');
+     await init();
+-  }
++  //}
+ });
+ 
+ // Catch the 'window-all-closed' event and (right now) do nothing with it. If
+-- 
+2.17.1
+

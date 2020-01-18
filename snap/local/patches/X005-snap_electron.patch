@@ -1,0 +1,40 @@
+--- a/package.json.orig	2019-11-11 14:11:52.993012349 +0000
++++ b/package.json	2019-11-11 14:12:12.185012349 +0000
+@@ -105,7 +105,6 @@
+     "decompress": "^4.2.0",
+     "electron-progressbar": "Cryptarchist/electron-progressbar#1f49bcb",
+     "electron-store": "^5.0.0",
+-    "electron-updater": "^4.1.2",
+     "element-ui": "^2.12.0",
+     "find-process": "^1.4.2",
+     "materialize-css": "^1.0.0",
+--- a/src/main/index.js.orig	2019-11-11 14:12:32.889012349 +0000
++++ b/src/main/index.js	2019-11-11 14:13:55.497012349 +0000
+@@ -12,7 +12,6 @@
+ import Daemon from './blockchain/daemon';
+ import { spawnLogger } from './logger/logger';
+ import menu from './menu/menu';
+-import { checkForUpdates } from './updater/updater';
+ import { version as appVersion } from '../../package.json';
+
+ const logger = spawnLogger();
+@@ -201,13 +200,13 @@
+   }
+
+   // Check for updates only for the packaged app.
+-  if (process.env.NODE_ENV === 'production') {
+-    logger.info('Checking for an update');
+-    checkForUpdates();
+-  } else {
+-    logger.debug('Skipping update check when running in development mode');
++  //if (process.env.NODE_ENV === 'production') {
++  //  logger.info('Checking for an update');
++  //  checkForUpdates();
++  //} else {
++    logger.debug('Skipping update check when running in snap confinement');
+     await init();
+-  }
++  //}
+ });
+
+ // Catch the 'window-all-closed' event and (right now) do nothing with it. If
