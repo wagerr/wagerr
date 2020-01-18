@@ -396,6 +396,7 @@ parts:
       - libxss1
       - libasound2
       - libglu1-mesa
+      - libgtk2.0-0
 
     build-packages:
       - curl
