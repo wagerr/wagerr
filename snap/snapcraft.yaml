@@ -341,6 +341,11 @@ parts:
       git apply $SNAPCRAFT_STAGE/Z001-Change-blockchain-folder-and-bins-to-snap.patch
       curl -sL https://deb.nodesource.com/setup_10.x | bash -
       apt-get -y install nodejs
+      apt-get -y install npm
+      curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
+      echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
+      sudo apt-get update
+      sudo apt-get install yarn
       if [ $SNAPCRAFT_ARCH_TRIPLET = "i386-linux-gnu" ]; then
         HOST="i686-linux-gnu"
       else
