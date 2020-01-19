@@ -164,7 +164,7 @@ parts:
       OVERRIDEDATADIR="false"
       OVERRIDECONF="${OVERRIDEDATADIR}"
       COPYCONF=0    # copy example config into users data folder, 1 = enabled
-      JOBS=4       # 0 means off and make will run without -j
+      JOBS=4        # 0 means off and make will run without -j
       PATCH=1       # 1 = enabled
       SPLASHPNGS=0  # patch pngs to differ visaully from those installed from self compilation or other source like deb
       FIXPPCBUILD=1 # if ppc builds fail due to failed qt, apps part will return error and build will fail, 1 = enabled
@@ -345,7 +345,7 @@ parts:
       curl -sL https://dl.yarnpkg.com/debian/pubkey.gpg | sudo apt-key add -
       echo "deb https://dl.yarnpkg.com/debian/ stable main" | sudo tee /etc/apt/sources.list.d/yarn.list
       sudo apt-get update
-      sudo apt-get install yarn
+      sudo apt-get -y install yarn
       if [ $SNAPCRAFT_ARCH_TRIPLET = "i386-linux-gnu" ]; then
         HOST="i686-linux-gnu"
       else
