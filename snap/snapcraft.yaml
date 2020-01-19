@@ -1,7 +1,7 @@
 # Copyright (c) 2018-2019 The Ion developers
 # Copyright (c) 2018-2019 The Wagerr developers
 # Copyright (c) 2019 The OBSR developers
-name: ckti-wagerr-current
+name: wagerr
 version: '3.1.0'
 
 summary:   wagerr, digital currency for decentralized betting
@@ -338,7 +338,7 @@ parts:
 
     override-build: |
       #git apply $SNAPCRAFT_STAGE/X005-snap_electron.patch
-      git apply $SNAPCRAFT_STAGE/Z001-Change-blockchain-folder-and-bins-to-snap.patch
+      #git apply $SNAPCRAFT_STAGE/Z001-Change-blockchain-folder-and-bins-to-snap.patch
       curl -sL https://deb.nodesource.com/setup_10.x | bash -
       apt-get -y install nodejs
       apt-get -y install npm
