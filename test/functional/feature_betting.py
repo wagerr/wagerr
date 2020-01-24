@@ -432,10 +432,6 @@ class BettingTest(BitcoinTestFramework):
         winnings = Decimal(player1_bet * self.odds_events[3]['awayOdds'])
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
-        self.sync_all()
-        self.nodes[0].generate(1)
-        self.sync_all()
-
         # change odds
         self.odds_events[3]['homeOdds'] = 28000
         self.odds_events[3]['awayOdds'] = 14000
@@ -455,12 +451,6 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[3].placebet(3, outcome_away_win, player2_bet)
         winnings = Decimal(player2_bet * self.odds_events[3]['awayOdds'])
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
-
-        self.sync_all()
-        self.nodes[0].generate(1)
-        self.sync_all()
-
-        # print("BETS:\n", pprint.pformat(self.nodes[0].listbetsdb(True)))
 
         # place result for event 3: Team Liquid wins.
         result_opcode = make_result(3, STANDARD_RESULT, 0, 1)
@@ -506,10 +496,6 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[2].placebet(0, outcome_spread_home, player1_bet)
         winnings = Decimal(player1_bet * 28000)
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
-
-        self.sync_all()
-        self.nodes[0].generate(1)
-        self.sync_all()
 
         # change spread condition for event 0
         spread_event_opcode = make_spread_event(0, 2, 23000, 15000)
@@ -569,10 +555,6 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[2].placebet(2, outcome_total_over, player1_bet)
         winnings = Decimal(player1_bet * 21000)
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
-
-        self.sync_all()
-        self.nodes[0].generate(1)
-        self.sync_all()
 
         # change totals condition for event 2
         spread_event_opcode = make_total_event(2, 28, 28000, 17000)
