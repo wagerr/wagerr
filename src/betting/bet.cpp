@@ -2096,9 +2096,12 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 std::vector<CBettingUndo> vUndos;
                 for (auto it = legs.begin(); it != legs.end();) {
                     CPeerlessBet &bet = *it;
-                    CPeerlessEvent plEvent;
+                    CPeerlessEvent plEvent, lockedEvent;
                     EventKey eventKey{bet.nEventId};
-                    if (bettingsViewCache.events->Read(eventKey, plEvent) &&
+                    // Find the event in DB
+                    // get locked event from previous block for getting correct odds
+                    if (bettingsView->events->Read(eventKey, lockedEvent) &&
+                            bettingsViewCache.events->Read(eventKey, plEvent) &&
                             !(plEvent.nStartTime > 0 && blockTime > (plEvent.nStartTime - Params().BetPlaceTimeoutBlocks()))) {
                         vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
                         switch (bet.nOutcome) {
@@ -2130,7 +2133,7 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                             default:
                                 std::runtime_error("Unknown bet outcome type!");
                         }
-                        lockedEvents.emplace_back(plEvent);
+                        lockedEvents.emplace_back(lockedEvent);
                         it++;
                         bettingsViewCache.events->Update(eventKey, plEvent);
                     }
@@ -2149,13 +2152,15 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
             CPeerlessBet plBet;
             if (CPeerlessBet::FromOpCode(opCode, plBet)) {
-                CPeerlessEvent plEvent;
+                CPeerlessEvent plEvent, lockedEvent;
                 EventKey eventKey{plBet.nEventId};
 
                 LogPrintf("CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
                 // Find the event in DB
-                if (bettingsViewCache.events->Read(eventKey, plEvent) &&
-                            !(plEvent.nStartTime > 0 && blockTime > plEvent.nStartTime)) {
+                // get locked event from previous block for getting correct odds
+                if (bettingsView->events->Read(eventKey, lockedEvent) &&
+                        bettingsViewCache.events->Read(eventKey, plEvent) &&
+                        !(plEvent.nStartTime > 0 && blockTime > plEvent.nStartTime)) {
                     CAmount payout = 0 * COIN;
                     CAmount burn = 0;
                     CAmount winnings = 0;
@@ -2241,7 +2246,7 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     if (parlayBetsAvaible) {
                         // add single bet into vector
                         legs.emplace_back(plBet.nEventId, plBet.nOutcome);
-                        lockedEvents.emplace_back(plEvent);
+                        lockedEvents.emplace_back(lockedEvent);
                         bettingsViewCache.bets->Write(UniversalBetKey{static_cast<uint32_t>(height), out}, CUniversalBet(betAmount, address, legs, lockedEvents, out, blockTime));
                     }
                 }
