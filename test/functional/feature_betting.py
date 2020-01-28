@@ -711,6 +711,13 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Parlay Bets Success")
 
+    def check_mempool_accept(self):
+        self.log.info("Checking Mempool Accepting")
+        # bets to resulted events shouldn't accepted to memory pool after parlay starting height
+        assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[2].placebet, 3, outcome_away_win, 1000)
+        assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
+        self.log.info("Mempool Accepting Success")
+
     def run_test(self):
         self.check_minting()
         self.check_mapping()
@@ -723,6 +730,7 @@ class BettingTest(BitcoinTestFramework):
         self.check_spreads_bet()
         self.check_totals_bet()
         self.check_parlays_bet()
+        self.check_mempool_accept()
 
 if __name__ == '__main__':
     BettingTest().main()

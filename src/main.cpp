@@ -1401,6 +1401,7 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
     {
         CCoinsView dummy;
         CCoinsViewCache view(&dummy);
+        CBettingsView bettingsViewCache(bettingsView);
 
         CAmount nValueIn = 0;
         if (tx.HasZerocoinSpendInputs()) {
@@ -1611,6 +1612,10 @@ bool AcceptToMemoryPool(CTxMemPool& pool, CValidationState& state, const CTransa
             flags |= SCRIPT_VERIFY_CHECKLOCKTIMEVERIFY;
         if (!CheckInputs(tx, state, view, true, flags, true)) {
             return error("AcceptToMemoryPool: : BUG! PLEASE REPORT THIS! ConnectInputs failed against MANDATORY but not STANDARD flags %s", hash.ToString());
+        }
+
+        if (!CheckBettingTx(bettingsViewCache, tx, chainActive.Height())) {
+            return error("AcceptToMemoryPool: Error when betting TX checking!");
         }
 
         // Store transaction in memory
