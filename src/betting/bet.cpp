@@ -2042,6 +2042,76 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
     return vexpectedCGLottoBetPayouts;
 }
 
+bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
+{
+    // if is not hardfork for parlays - do not check tx
+    if (height < Params().ParlayBetStartHeight()) return true;
+
+    // Search for any new bets
+    for (unsigned int i = 0; i < tx.vout.size(); i++) {
+        const CTxOut& txout = tx.vout[i];
+        std::string s = txout.scriptPubKey.ToString();
+
+        if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+            std::vector<unsigned char> v = ParseHex(s.substr(9, std::string::npos));
+            std::string opCode(v.begin(), v.end());
+            std::string opCodeHexStr = s.substr(10);
+
+            CAmount betAmount{txout.nValue};
+            // Get player address
+            const CTxIn& txin{tx.vin[0]};
+            uint256 hashBlock;
+            CTransaction txPrev;
+            CBitcoinAddress address;
+            CTxDestination prevAddr;
+            // if we cant extract playerAddress - drop tx
+            if ((GetTransaction(txin.prevout.hash, txPrev, hashBlock, true),
+                    !ExtractDestination(txPrev.vout[txin.prevout.n].scriptPubKey, prevAddr))) {
+                return error("CheckBettingTX: Couldn't extract destination!");
+            }
+            address = CBitcoinAddress(prevAddr);
+
+            std::vector<CPeerlessBet> legs;
+            std::vector<CPeerlessEvent> lockedEvents;
+            if (CPeerlessBet::ParlayFromOpCode(opCodeHexStr, legs)) {
+                // delete duplicated legs
+                std::sort(legs.begin(), legs.end());
+                legs.erase(std::unique(legs.begin(), legs.end()), legs.end());
+
+                std::vector<CBettingUndo> vUndos;
+                for (auto it = legs.begin(); it != legs.end(); it++) {
+                    CPeerlessBet &bet = *it;
+                    CPeerlessEvent plEvent;
+                    // Find the event in DB
+                    if (bettingsViewCache.events->Read(EventKey{bet.nEventId}, plEvent)) {
+                        if (bettingsViewCache.results->Exists(ResultKey{bet.nEventId})) {
+                            return error("CheckBettingTX: Bet placed to resulted event %lu!", bet.nEventId);
+                        }
+                    }
+                    else {
+                        return error("CheckBettingTX: Failed to find event %lu!", bet.nEventId);
+                    }
+                }
+            }
+
+            CPeerlessBet plBet;
+            if (CPeerlessBet::FromOpCode(opCode, plBet)) {
+                CPeerlessEvent plEvent;
+                // Find the event in DB
+                if (bettingsViewCache.events->Read(EventKey{plBet.nEventId}, plEvent)) {
+                    if (bettingsViewCache.results->Exists(ResultKey{plBet.nEventId})) {
+                        return error("CheckBettingTX: Bet placed to resulted event %lu!", plBet.nEventId);
+                    }
+                }
+                else {
+                    return error("CheckBettingTX: Failed to find event %lu!", plBet.nEventId);
+                }
+            }
+        }
+    }
+    return true;
+}
+
 void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime)
 {
     // Ensure the event TX has come from Oracle wallet.
@@ -2101,8 +2171,7 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     // Find the event in DB
                     // get locked event from previous block for getting correct odds
                     if (bettingsView->events->Read(eventKey, lockedEvent) &&
-                            bettingsViewCache.events->Read(eventKey, plEvent) &&
-                            !(plEvent.nStartTime > 0 && blockTime > (plEvent.nStartTime - Params().BetPlaceTimeoutBlocks()))) {
+                            bettingsViewCache.events->Read(eventKey, plEvent)) {
                         vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
                         switch (bet.nOutcome) {
                             case moneyLineWin:
@@ -2138,8 +2207,8 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         bettingsViewCache.events->Update(eventKey, plEvent);
                     }
                     else {
-                        // if invalid event or bet placed less than 20 mins before event start or after event start - exclude bet
-                        it = legs.erase(it);
+                        LogPrintf("Failed to find event!\n");
+                        continue;
                     }
                 }
                 if (!legs.empty()) {
@@ -2159,14 +2228,10 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 // Find the event in DB
                 // get locked event from previous block for getting correct odds
                 if (bettingsView->events->Read(eventKey, lockedEvent) &&
-                        bettingsViewCache.events->Read(eventKey, plEvent) &&
-                        !(plEvent.nStartTime > 0 && blockTime > plEvent.nStartTime)) {
+                        bettingsViewCache.events->Read(eventKey, plEvent)) {
                     CAmount payout = 0 * COIN;
                     CAmount burn = 0;
                     CAmount winnings = 0;
-
-                    // if new payout system and bet placed less than 20 mins before event start or after event start - exclude bet
-                    if (parlayBetsAvaible && plEvent.nStartTime > 0 && blockTime > (plEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) continue;
 
                     // save prev event state to undo
                     bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndo{BettingUndoVariant{plEvent}, (uint32_t)height}});
@@ -2240,8 +2305,10 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                             std::runtime_error("Unknown bet outcome type!");
                             break;
                     }
-                    if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                    if (!bettingsViewCache.events->Update(eventKey, plEvent)) {
                         LogPrintf("Failed to update event!\n");
+                        continue;
+                    }
 
                     if (parlayBetsAvaible) {
                         // add single bet into vector

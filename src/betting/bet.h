@@ -854,6 +854,9 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height);
 /** Get the chain games winner and return the payout vector. **/
 std::vector<CBetOut> GetCGLottoBetPayouts(int height);
 
+/** Check Betting Tx when try accept tx to memory pool **/
+bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height);
+
 /** Parse the transaction for betting data **/
 void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime);
 
