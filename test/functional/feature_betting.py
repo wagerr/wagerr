@@ -712,11 +712,70 @@ class BettingTest(BitcoinTestFramework):
         self.log.info("Parlay Bets Success")
 
     def check_mempool_accept(self):
-        self.log.info("Checking Mempool Accepting")
+        self.log.info("Check Mempool Accepting")
         # bets to resulted events shouldn't accepted to memory pool after parlay starting height
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[2].placebet, 3, outcome_away_win, 1000)
+        # bets to nonexistent events shouldn't accepted to memory pool
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
         self.log.info("Mempool Accepting Success")
+
+    def check_timecut_refund(self):
+        self.log.info("Check Timecut Refund...")
+        # add new event with time = 2 mins to go
+        self.start_time = int(time.time() + 60 * 2)
+        # 7: CSGO - PGL Major Krakow - Astralis vs Gambit round3
+        mlevent = make_event(7, # Event ID
+                            self.start_time, # start time = current + 2 mins
+                            sport_names.index("CSGO"), # Sport ID
+                            tournament_names.index("PGL Major Krakow"), # Tournament ID
+                            round_names.index("round3"), # Round ID
+                            team_names.index("Gambit"), # Home Team
+                            team_names.index("Astralis"), # Away Team
+                            34000, # home odds
+                            14000, # away odds
+                            0) # draw odds
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # player 1 bet to Team Gambit with odds 34000 but bet will be refunded
+        player1_bet = 1000
+        self.nodes[2].placebet(7, outcome_home_win, player1_bet)
+        winnings = Decimal(player1_bet * ODDS_DIVISOR)
+        player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # place result for event 7: Gambit wins with score 16:14
+        result_opcode = make_result(7, STANDARD_RESULT, 160, 140)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        player1_balance_before = Decimal(self.nodes[2].getbalance())
+
+        print("player1 balance before: ", player1_balance_before)
+        print("player1 exp win: ", player1_expected_win)
+
+        # generate block with payouts
+        blockhash = self.nodes[0].generate(1)[0]
+        block = self.nodes[0].getblock(blockhash)
+
+        self.sync_all()
+
+        player1_balance_after = Decimal(self.nodes[2].getbalance())
+
+        print("player1 balance: ", player1_balance_after)
+
+        assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
+
+        self.log.info("Timecut Refund Success")
 
     def run_test(self):
         self.check_minting()
@@ -731,6 +790,7 @@ class BettingTest(BitcoinTestFramework):
         self.check_totals_bet()
         self.check_parlays_bet()
         self.check_mempool_accept()
+        self.check_timecut_refund()
 
 if __name__ == '__main__':
     BettingTest().main()
