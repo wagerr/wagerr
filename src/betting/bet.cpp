@@ -1295,7 +1295,6 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
  * Check winning condition for current bet considering locked event and event result.
  *
  * @return Odds, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
- * TODO: make refund if bet placed to zero odds
  */
 uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, const CPeerlessResult &result)
 {
@@ -1307,19 +1306,19 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
         return oddsDivisor;
     switch (bet.nOutcome) {
         case moneyLineWin:
-            if (result.nResultType == ResultType::mlRefund) return oddsDivisor;
+            if (result.nResultType == ResultType::mlRefund || lockedEvent.nHomeOdds == 0) return oddsDivisor;
             if (result.nHomeScore > result.nAwayScore) return lockedEvent.nHomeOdds;
             break;
         case moneyLineLose:
-            if (result.nResultType == ResultType::mlRefund) return oddsDivisor;
+            if (result.nResultType == ResultType::mlRefund || lockedEvent.nAwayOdds == 0) return oddsDivisor;
             if (result.nAwayScore > result.nHomeScore) return lockedEvent.nAwayOdds;
             break;
         case moneyLineDraw:
-            if (result.nResultType == ResultType::mlRefund) return oddsDivisor;
+            if (result.nResultType == ResultType::mlRefund || lockedEvent.nDrawOdds == 0) return oddsDivisor;
             if (result.nHomeScore == result.nAwayScore) return lockedEvent.nDrawOdds;
             break;
         case spreadHome:
-            if (result.nResultType == ResultType::spreadsRefund) return oddsDivisor;
+            if (result.nResultType == ResultType::spreadsRefund || lockedEvent.nSpreadHomeOdds == 0) return oddsDivisor;
             if (spreadDiff == lockedEvent.nSpreadPoints) return oddsDivisor;
             if (homeFavorite) {
                 // mean bet to home will win with spread
@@ -1331,7 +1330,7 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
             }
             break;
         case spreadAway:
-            if (result.nResultType == ResultType::spreadsRefund) return oddsDivisor;
+            if (result.nResultType == ResultType::spreadsRefund || lockedEvent.nSpreadAwayOdds == 0) return oddsDivisor;
             if (spreadDiff == lockedEvent.nSpreadPoints) return oddsDivisor;
             if (homeFavorite) {
                 // mean that bet to away will not lose with spread
@@ -1343,12 +1342,12 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
             }
             break;
         case totalOver:
-            if (result.nResultType == ResultType::totalsRefund) return oddsDivisor;
+            if (result.nResultType == ResultType::totalsRefund || lockedEvent.nTotalOverOdds == 0) return oddsDivisor;
             if (totalPoints == lockedEvent.nTotalPoints) return oddsDivisor;
             if (totalPoints > lockedEvent.nTotalPoints) return lockedEvent.nTotalOverOdds;
             break;
         case totalUnder:
-            if (result.nResultType == ResultType::totalsRefund) return oddsDivisor;
+            if (result.nResultType == ResultType::totalsRefund || lockedEvent.nTotalUnderOdds == 0) return oddsDivisor;
             if (totalPoints == lockedEvent.nTotalPoints) return oddsDivisor;
             if (totalPoints < lockedEvent.nTotalPoints) return lockedEvent.nTotalUnderOdds;
             break;
@@ -1413,7 +1412,14 @@ std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height)
                         // skip this bet if incompleted (can't find one result)
                         CPeerlessResult res;
                         if (bettingsViewCache.results->Read(ResultKey{leg.nEventId}, res)) {
-                            uint32_t betOdds = GetBetOdds(leg, lockedEvent, res);
+                            uint32_t betOdds = 0;
+                            // if bet placed before 2 mins of event started - refund this bet
+                            if (lockedEvent.nStartTime > 0 && uniBet.betTime > (lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                                betOdds = oddsDivisor;
+                            }
+                            else {
+                                betOdds = GetBetOdds(leg, lockedEvent, res);
+                            }
                             odds = firstOddMultiply ? (firstOddMultiply = false, betOdds) : static_cast<uint32_t>(((uint64_t) odds * betOdds) / oddsDivisor);
                         }
                         else {
@@ -1429,7 +1435,13 @@ std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height)
                 CPeerlessEvent &lockedEvent = uniBet.lockedEvents[0];
                 if (singleBet.nEventId == result.nEventId) {
                     completedBet = true;
-                    odds = GetBetOdds(singleBet, lockedEvent, result);
+                    // if bet placed before 2 mins of event started - refund this bet
+                    if (lockedEvent.nStartTime > 0 && uniBet.betTime > (lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                        odds = oddsDivisor;
+                    }
+                    else {
+                        odds = GetBetOdds(singleBet, lockedEvent, result);
+                    }
                 }
             }
 
@@ -1438,7 +1450,7 @@ std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height)
                 CAmount payout = winnings > 0 ? (winnings - ((winnings - uniBet.betAmount * oddsDivisor) / 1000 * betXPermille)) / oddsDivisor : 0;
 
                 if (payout > 0) {
-                    // Add winning bet payout to the bet vector.
+                    // Add winning payout to the payouts vector.
                     vExpectedPayouts.emplace_back(payout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
                 }
                 LogPrintf("\nBet %s is handled!\nPlayer address: %s\nPayout: %ll\n\n", uniBet.betOutPoint.ToStringShort(), uniBet.playerAddress.ToString(), payout);
@@ -2120,7 +2132,7 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
     uint64_t oddsDivisor{Params().OddsDivisor()};
     uint64_t betXPermille{Params().BetXPermille()};
 
-    LogPrintf("ParseBettingTx: start, tx hash: %s\n", tx.GetHash().GetHex());
+    LogPrintf("ParseBettingTx: start, time: %lu, tx hash: %s\n", blockTime, tx.GetHash().GetHex());
 
     bool parlayBetsAvaible = height >= Params().ParlayBetStartHeight();
 
@@ -2664,6 +2676,10 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     LogPrintf("Revert failed!\n");
                     return false;
                 }
+                if (parlayBetsAvaible) {
+                    UniversalBetKey key{static_cast<uint32_t>(height), out};
+                    bettingsViewCache.bets->Erase(key);
+                }
                 continue;
             }
             std::vector<CPeerlessBet> legs;
@@ -2681,8 +2697,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     CPeerlessBet &bet = *it;
                     CPeerlessEvent plEvent;
                     EventKey eventKey{bet.nEventId};
-                    if (!bettingsViewCache.events->Read(eventKey, plEvent) ||
-                            (plEvent.nStartTime > 0 && blockTime > (plEvent.nStartTime - Params().BetPlaceTimeoutBlocks()))) {
+                    if (!bettingsViewCache.events->Read(eventKey, plEvent)) {
                         legs.erase(it);
                     }
                 }
