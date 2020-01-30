@@ -283,6 +283,7 @@ public:
         READWRITE(legs);
         READWRITE(lockedEvents);
         READWRITE(betOutPoint);
+        READWRITE(betTime);
         READWRITE(completed);
     }
 
