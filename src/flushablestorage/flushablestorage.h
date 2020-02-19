@@ -39,7 +39,13 @@ class CStorageLevelDBIterator : public CStorageKVIterator {
 public:
     explicit CStorageLevelDBIterator(std::unique_ptr<leveldb::Iterator>&& it) : it{std::move(it)} { }
     ~CStorageLevelDBIterator() override { }
-    void Seek(const std::vector<unsigned char>& key) override { it->Seek(leveldb::Slice((char *)key.data(), key.size())); }
+    void Seek(const std::vector<unsigned char>& key) override {
+        CDataStream ssKey(SER_DISK, CLIENT_VERSION);
+        ssKey.reserve(ssKey.GetSerializeSize(key));
+        ssKey << key;
+        leveldb::Slice slKey(&ssKey[0], ssKey.size());
+        it->Seek(slKey);
+    }
     void Next() override { it->Next(); }
     bool Valid() override { return it->Valid(); }
     std::vector<unsigned char> Key() override {
