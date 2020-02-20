@@ -1489,6 +1489,9 @@ bool AppInit2()
                 bettingsView->undosStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("undos"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
                 bettingsView->undos = MakeUnique<CBettingDB>(*bettingsView->undosStorage.get());
 
+                bettingsView->payoutsInfoStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("payoutsinfo"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->payoutsInfo = MakeUnique<CBettingDB>(*bettingsView->payoutsInfoStorage.get());
+
                 if (fReindex)
                     pblocktree->WriteReindexing(true);
 

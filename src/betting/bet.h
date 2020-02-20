@@ -644,6 +644,24 @@ private:
     BettingUndoVariant undoVariant;
 };
 
+using PayoutInfoKey = UniversalBetKey;
+
+class CPayoutInfo
+{
+public:
+    UniversalBetKey betKey;
+
+    explicit CPayoutInfo() { }
+    explicit CPayoutInfo(UniversalBetKey &betKey) : betKey(betKey) { }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(betKey);
+    }
+};
+
 class CBettingDB
 {
 public:
@@ -755,6 +773,8 @@ public:
     std::unique_ptr<CStorageKV> betsStorage;
     std::unique_ptr<CBettingDB> undos; // "undos"
     std::unique_ptr<CStorageKV> undosStorage;
+    std::unique_ptr<CBettingDB> payoutsInfo; // "payoutsinfo"
+    std::unique_ptr<CStorageKV> payoutsInfoStorage;
 
     // default constructor
     CBettingsView() { }
@@ -766,10 +786,11 @@ public:
         events = MakeUnique<CBettingDB>(*phr->events.get());
         bets = MakeUnique<CBettingDB>(*phr->bets.get());
         undos = MakeUnique<CBettingDB>(*phr->undos.get());
+        payoutsInfo = MakeUnique<CBettingDB>(*phr->payoutsInfo.get());
     }
 
     bool Flush() {
-        return mappings->Flush() && results->Flush() && events->Flush() && bets->Flush() && undos->Flush();
+        return mappings->Flush() && results->Flush() && events->Flush() && bets->Flush() && undos->Flush() && payoutsInfo->Flush();
     }
 
     void SetLastHeight(uint32_t height) {
@@ -848,7 +869,7 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
 /** Get the peerless winning bets from the block chain and return the payout vector. **/
 std::vector<CBetOut> GetBetPayoutsLegacy(int height);
 /** Using betting database for handle bets **/
-std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height);
+void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo);
 /** Undo bets as marked completed when generating payouts **/
 bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height);
 
