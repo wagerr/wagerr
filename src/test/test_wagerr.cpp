@@ -68,7 +68,10 @@ TestingSetup::TestingSetup()
         bettingsView->bets = MakeUnique<CBettingDB>(*bettingsView->betsStorage.get());
 
         bettingsView->undosStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("test-undos"), CBettingDB::dbWrapperCacheSize(), true);
-        bettingsView->undos = MakeUnique<CBettingDB>(*bettingsView->resultsStorage.get());
+        bettingsView->undos = MakeUnique<CBettingDB>(*bettingsView->undosStorage.get());
+
+        bettingsView->payoutsInfoStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("test-payoutsinfo"), CBettingDB::dbWrapperCacheSize(), true);
+        bettingsView->payoutsInfo = MakeUnique<CBettingDB>(*bettingsView->payoutsInfoStorage.get());
         InitBlockIndex();
 #ifdef ENABLE_WALLET
         bool fFirstRun;
