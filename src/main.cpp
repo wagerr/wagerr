@@ -3237,6 +3237,8 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     std::vector<CBetOut> vExpectedPLPayouts;
     std::vector<CBetOut> vExpectedCGLottoPayouts;
 
+    std::vector<CPayoutInfo> vExpectedPayoutsInfo;
+
     if( pindex->nHeight > Params().BetStartHeight()) {
         std::string strBetNetBlockTxt;
         std::ostringstream BetNetBlockTxt;
@@ -3262,7 +3264,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
         // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
         if (pindex->nHeight >= Params().ParlayBetStartHeight()) {
-            vExpectedPLPayouts = GetBetPayouts(bettingsViewCache, pindex->nHeight - 1);
+            GetBetPayouts(bettingsViewCache, pindex->nHeight - 1, vExpectedPLPayouts, vExpectedPayoutsInfo);
         }
         else {
             vExpectedPLPayouts = GetBetPayoutsLegacy(pindex->nHeight - 1);

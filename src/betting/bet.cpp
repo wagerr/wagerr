@@ -1361,11 +1361,10 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
 /**
  * Creates the bet payout vector for all winning CUniversalBet bets.
  *
- * @return payout vector.
+ * @return payout vector, payouts info vector.
  */
-std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height)
+void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo)
 {
-    std::vector<CBetOut> vExpectedPayouts;
     int nCurrentHeight = chainActive.Height();
     uint64_t oddsDivisor{Params().OddsDivisor()};
     uint64_t betXPermille{Params().BetXPermille()};
@@ -1373,6 +1372,9 @@ std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height)
     std::vector<CPeerlessResult> results = getEventResults(height);
 
     LogPrintf("Start generating payouts...\n");
+
+    vExpectedPayouts.clear();
+    vPayoutsInfo.clear();
 
     for (auto result : results) {
 
@@ -1452,6 +1454,7 @@ std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height)
                 if (payout > 0) {
                     // Add winning payout to the payouts vector.
                     vExpectedPayouts.emplace_back(payout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
+                    vPayoutsInfo.emplace_back(uniBetKey);
                 }
                 LogPrintf("\nBet %s is handled!\nPlayer address: %s\nPayout: %ll\n\n", uniBet.betOutPoint.ToStringShort(), uniBet.playerAddress.ToString(), payout);
                 // if handling bet is completed - mark it
@@ -1460,7 +1463,6 @@ std::vector<CBetOut> GetBetPayouts(CBettingsView &bettingsViewCache, int height)
             }
         }
     }
-    return vExpectedPayouts;
 }
 
 // TODO function will need to be refactored and cleaned up at a later stage as we have had to make rapid and frequent code changes.
