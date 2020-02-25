@@ -790,7 +790,12 @@ public:
     }
 
     bool Flush() {
-        return mappings->Flush() && results->Flush() && events->Flush() && bets->Flush() && undos->Flush() && payoutsInfo->Flush();
+        return mappings->Flush() &&
+                results->Flush() &&
+                events->Flush() &&
+                bets->Flush() &&
+                undos->Flush() &&
+                payoutsInfo->Flush();
     }
 
     void SetLastHeight(uint32_t height) {
