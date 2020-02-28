@@ -1326,26 +1326,50 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
             break;
         case spreadHome:
             if (result.nResultType == ResultType::spreadsRefund || lockedEvent.nSpreadHomeOdds == 0) return oddsDivisor;
-            if (spreadDiff == lockedEvent.nSpreadPoints) return oddsDivisor;
-            if (homeFavorite) {
-                // mean bet to home will win with spread
-                if (spreadDiff > lockedEvent.nSpreadPoints) return lockedEvent.nSpreadHomeOdds;
+            if (lockedEvent.nSpreadVersion == 1) {
+                if (spreadDiff == lockedEvent.nSpreadPoints) return oddsDivisor;
+                if (homeFavorite) {
+                    // mean bet to home will win with spread
+                    if (spreadDiff > lockedEvent.nSpreadPoints) return lockedEvent.nSpreadHomeOdds;
+                }
+                else {
+                    // mean bet to home will not lose with spread
+                    if (spreadDiff < lockedEvent.nSpreadPoints) return lockedEvent.nSpreadHomeOdds;
+                }
             }
-            else {
-                // mean bet to home will not lose with spread
-                if (spreadDiff < lockedEvent.nSpreadPoints) return lockedEvent.nSpreadHomeOdds;
+            else { // lockedEvent.nSpreadVersion == 2
+                int32_t difference = result.nHomeScore - result.nAwayScore;
+                if (lockedEvent.nSpreadPoints < difference) {
+                    return lockedEvent.nSpreadHomeOdds;
+                } else if (lockedEvent.nSpreadPoints > difference) {
+                    return lockedEvent.nSpreadAwayOdds;
+                } else {
+                    return oddsDivisor;
+                }
             }
             break;
         case spreadAway:
             if (result.nResultType == ResultType::spreadsRefund || lockedEvent.nSpreadAwayOdds == 0) return oddsDivisor;
-            if (spreadDiff == lockedEvent.nSpreadPoints) return oddsDivisor;
-            if (homeFavorite) {
-                // mean that bet to away will not lose with spread
-                if (spreadDiff < lockedEvent.nSpreadPoints) return lockedEvent.nSpreadAwayOdds;
+            if (lockedEvent.nSpreadVersion == 1) {
+                if (spreadDiff == lockedEvent.nSpreadPoints) return oddsDivisor;
+                if (homeFavorite) {
+                    // mean that bet to away will not lose with spread
+                    if (spreadDiff < lockedEvent.nSpreadPoints) return lockedEvent.nSpreadAwayOdds;
+                }
+                else {
+                    // mean that bet to away will win with spread
+                    if (spreadDiff > lockedEvent.nSpreadPoints) return lockedEvent.nSpreadAwayOdds;
+                }
             }
-            else {
-                // mean that bet to away will win with spread
-                if (spreadDiff > lockedEvent.nSpreadPoints) return lockedEvent.nSpreadAwayOdds;
+            else { // lockedEvent.nSpreadVersion == 2
+                int32_t difference = result.nHomeScore - result.nAwayScore;
+                if (lockedEvent.nSpreadPoints < difference) {
+                    return lockedEvent.nSpreadHomeOdds;
+                } else if (lockedEvent.nSpreadPoints > difference) {
+                    return lockedEvent.nSpreadAwayOdds;
+                } else {
+                    return oddsDivisor;
+                }
             }
             break;
         case totalOver:
@@ -2471,6 +2495,7 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         // save prev event state to undo
                         bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndo{BettingUndoVariant{plEvent}, (uint32_t)height}});
 
+                        plEvent.nSpreadVersion   = spreadEvent.nVersion;
                         plEvent.nSpreadPoints    = spreadEvent.nPoints;
                         plEvent.nSpreadHomeOdds  = spreadEvent.nHomeOdds;
                         plEvent.nSpreadAwayOdds  = spreadEvent.nAwayOdds;
