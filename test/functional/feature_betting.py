@@ -18,6 +18,7 @@ from decimal import *
 import pprint
 import time
 import os
+import ctypes
 
 WGR_WALLET_ORACLE = { "addr": "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", "key": "TBwvXbNNUiq7tDkR2EXiCbPxEJRTxA1i6euNyAE9Ag753w36c1FZ" }
 WGR_WALLET_EVENT = { "addr": "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", "key": "TCDjD2i4e32kx2Fc87bDJKGBedEyG7oZPaZfp7E1PQG29YnvArQ8" }
@@ -378,7 +379,7 @@ class BettingTest(BitcoinTestFramework):
                 assert_equal(event['odds'][1]['spreadHome'], 0)
                 assert_equal(event['odds'][1]['spreadAway'], 0)
         # make spread for event 0: UEFA Champions League
-        spread_event_opcode = make_spread_event(0, 1, 28000, 14000)
+        spread_event_opcode = make_spread_event(0, 1, 1, 28000, 14000)
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -394,6 +395,66 @@ class BettingTest(BitcoinTestFramework):
                     assert_equal(event['odds'][1]['spreadAway'], 14000)
 
         self.log.info("Spread events Success")
+
+    def check_spread_event_v2(self):
+        self.log.info("Check Spread v2 events...")
+        mlevent = make_event(4, # Event ID
+                             self.start_time, # start time = current + hour
+                             sport_names.index("DOTA2"), # Sport ID
+                             tournament_names.index("EPICENTER Major"), # Tournament ID
+                             round_names.index("round1"), # Round ID
+                             team_names.index("Virtus Pro"), # Home Team
+                             team_names.index("Team Liquid"), # Away Team
+                             10000, # home odds
+                             30000, # away odds
+                             0) # draw odds
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                if event['event_id'] == 4:
+                    assert_equal(event['odds'][1]['spreadPoints'], 0)
+                    assert_equal(event['odds'][1]['spreadHome'], 0)
+                    assert_equal(event['odds'][1]['spreadAway'], 0)
+        # make spread for event 4: DOTA2
+        spread_event_opcode = make_spread_event(4, 2, 1, 25000, 15000)
+        post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                if event['event_id'] == 4:
+                    assert_equal(event['odds'][1]['spreadPoints'], 1)
+                    assert_equal(event['odds'][1]['spreadHome'], 25000)
+                    assert_equal(event['odds'][1]['spreadAway'], 15000)
+
+        # make spread for event 4: DOTA2
+        spread_event_opcode_negative = make_spread_event(4, 2, -1, 27000, 13000)
+        post_opcode(self.nodes[1], spread_event_opcode_negative, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        for node in self.nodes:
+            events = node.listevents()
+            for event in events:
+                if event['event_id'] == 4:
+                    tmp = event['odds'][1]['spreadPoints']
+                    assert_equal(ctypes.c_long(tmp).value, -1)
+                    assert_equal(event['odds'][1]['spreadHome'], 27000)
+                    assert_equal(event['odds'][1]['spreadAway'], 13000)
+
+        self.log.info("Spread v2 events Success")
 
     def check_total_event(self):
         self.log.info("Check Total events...")
@@ -498,7 +559,7 @@ class BettingTest(BitcoinTestFramework):
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
         # change spread condition for event 0
-        spread_event_opcode = make_spread_event(0, 2, 23000, 15000)
+        spread_event_opcode = make_spread_event(0, 1, 2, 23000, 15000)
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -546,6 +607,66 @@ class BettingTest(BitcoinTestFramework):
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
 
         self.log.info("Spreads Bets Success")
+
+    def check_spreads_bet_v2(self):
+        self.log.info("Check Spreads Bets v2...")
+
+        # place spread bet to event 4: EPICENTER Major, expect that event result will be 0:2 for away team
+        # player 1 bet to spread home, mean that home will lose with spread points for away = 2
+        player1_bet = 300
+        self.nodes[2].placebet(4, outcome_spread_home, player1_bet)
+        winnings = Decimal(player1_bet * 13000)
+        player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        # change spread condition for event 2
+        spread_event_opcode = make_spread_event(4, 2, -2, 29000, 12000)
+        post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # player 2 bet to spread home, mean that home will win with spread points for away = 2
+        # for our results it means refund
+        player2_bet = 200
+        self.nodes[3].placebet(4, outcome_spread_home, player2_bet)
+        winnings = Decimal(player2_bet * ODDS_DIVISOR)
+        player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        # place result for event 2:
+        result_opcode = make_result(4, STANDARD_RESULT, 0, 2)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        player1_balance_before = Decimal(self.nodes[2].getbalance())
+        player2_balance_before = Decimal(self.nodes[3].getbalance())
+
+        print("player1 balance before: ", player1_balance_before)
+        print("player1 exp win: ", player1_expected_win)
+        print("player2 balance before: ", player2_balance_before)
+        print("player2 exp win: ", player2_expected_win)
+
+        # generate block with payouts
+        blockhash = self.nodes[0].generate(1)[0]
+        block = self.nodes[0].getblock(blockhash)
+
+        self.sync_all()
+
+        # print(pprint.pformat(block))
+
+        player1_balance_after = Decimal(self.nodes[2].getbalance())
+        player2_balance_after = Decimal(self.nodes[3].getbalance())
+
+        print("player1 balance after: ", player1_balance_after)
+        print("player2 balance after: ", player2_balance_after)
+
+        assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
+        assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
+
+        self.log.info("Spreads Bets v2 Success")
 
     def check_totals_bet(self):
         self.log.info("Check Totals Bets...")
@@ -609,7 +730,7 @@ class BettingTest(BitcoinTestFramework):
         self.log.info("Check Parlay Bets...")
         # add new events
         # 4: CSGO - PGL Major Krakow - Astralis vs Gambit round2
-        mlevent = make_event(4, # Event ID
+        mlevent = make_event(5, # Event ID
                             self.start_time, # start time = current + hour
                             sport_names.index("CSGO"), # Sport ID
                             tournament_names.index("PGL Major Krakow"), # Tournament ID
@@ -623,7 +744,7 @@ class BettingTest(BitcoinTestFramework):
         post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
 
         # 5: CSGO - PGL Major Krakow - Astralis vs Gambit round3
-        mlevent = make_event(5, # Event ID
+        mlevent = make_event(6, # Event ID
                             self.start_time, # start time = current + hour
                             sport_names.index("CSGO"), # Sport ID
                             tournament_names.index("PGL Major Krakow"), # Tournament ID
@@ -637,7 +758,7 @@ class BettingTest(BitcoinTestFramework):
         post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
 
         # 6: Football - UEFA Champions League - Barcelona vs Real Madrid round2
-        mlevent = make_event(6, # Event ID
+        mlevent = make_event(7, # Event ID
                             self.start_time, # start time = current + hour
                             sport_names.index("Football"), # Sport ID
                             tournament_names.index("UEFA Champions League"), # Tournament ID
@@ -658,26 +779,26 @@ class BettingTest(BitcoinTestFramework):
         player1_bet = 200
         winnings = Decimal(player1_bet * 27440)
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
-        self.nodes[2].placeparlaybet([{'eventId': 4, 'outcome': outcome_home_win}, {'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}], player1_bet)
+        self.nodes[2].placeparlaybet([{'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}, {'eventId': 7, 'outcome': outcome_home_win}], player1_bet)
 
         # player 2 make express to events 4, 5, 6 - home win
         player2_bet = 500
         winnings = Decimal(player2_bet * 27440)
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
-        self.nodes[3].placeparlaybet([{'eventId': 4, 'outcome': outcome_home_win}, {'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}], player2_bet)
+        self.nodes[3].placeparlaybet([{'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}, {'eventId': 7, 'outcome': outcome_home_win}], player2_bet)
 
         self.sync_all()
         self.nodes[0].generate(1)
         self.sync_all()
 
         # place result for event 4: Astralis wins with score 16:9
-        result_opcode = make_result(4, STANDARD_RESULT, 16, 9)
+        result_opcode = make_result(5, STANDARD_RESULT, 16, 9)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
         # place result for event 5: Astralis wins with score 16:14
-        result_opcode = make_result(5, STANDARD_RESULT, 16, 14)
+        result_opcode = make_result(6, STANDARD_RESULT, 16, 14)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
         # place result for event 6: Barcelona wins with score 3:2
-        result_opcode = make_result(6, STANDARD_RESULT, 3, 2)
+        result_opcode = make_result(7, STANDARD_RESULT, 3, 2)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -724,7 +845,7 @@ class BettingTest(BitcoinTestFramework):
         # add new event with time = 2 mins to go
         self.start_time = int(time.time() + 60 * 2)
         # 7: CSGO - PGL Major Krakow - Astralis vs Gambit round3
-        mlevent = make_event(7, # Event ID
+        mlevent = make_event(8, # Event ID
                             self.start_time, # start time = current + 2 mins
                             sport_names.index("CSGO"), # Sport ID
                             tournament_names.index("PGL Major Krakow"), # Tournament ID
@@ -742,7 +863,7 @@ class BettingTest(BitcoinTestFramework):
 
         # player 1 bet to Team Gambit with odds 34000 but bet will be refunded
         player1_bet = 1000
-        self.nodes[2].placebet(7, outcome_home_win, player1_bet)
+        self.nodes[2].placebet(8, outcome_home_win, player1_bet)
         winnings = Decimal(player1_bet * ODDS_DIVISOR)
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
@@ -751,7 +872,7 @@ class BettingTest(BitcoinTestFramework):
         self.sync_all()
 
         # place result for event 7: Gambit wins with score 16:14
-        result_opcode = make_result(7, STANDARD_RESULT, 160, 140)
+        result_opcode = make_result(8, STANDARD_RESULT, 160, 140)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -784,9 +905,11 @@ class BettingTest(BitcoinTestFramework):
         self.check_event_patch()
         self.check_update_odds()
         self.check_spread_event()
+        self.check_spread_event_v2()
         self.check_total_event()
         self.check_ml_bet()
         self.check_spreads_bet()
+        self.check_spreads_bet_v2()
         self.check_totals_bet()
         self.check_parlays_bet()
         self.check_mempool_accept()
