@@ -6,7 +6,6 @@ import struct
 import subprocess
 
 OPCODE_PREFIX = 42
-OPCODE_VERSION = 0x01
 
 OPCODE_BTX_MAPPING = 0x01
 OPCODE_BTX_EVENT = 0x02
@@ -43,6 +42,15 @@ def encode_int_little_endian(value: int, size: int):
     else:
         raise RuntimeError("Incorrect byte size was specified for encoding.")
 
+def encode_signed_int_little_endian(value: int, size: int):
+    if size == 1:
+        return struct.pack('<b', int(value)).hex()
+    elif size == 2:
+        return struct.pack('<h', int(value)).hex()
+    elif size == 4:
+        return struct.pack('<i', int(value)).hex()
+    else:
+        raise RuntimeError("Incorrect byte size was specified for encoding.")
 
 # Encode a string in hexadecimal notation. Byte order does not matter for UTF-8 encoded strings, however, I have kept
 # used similar encoding methods as I would to encode in little-endian byte order to keep things consistent with int
@@ -54,9 +62,9 @@ def encode_str_hex(value: str):
     return struct.pack("<%ds" % (len(value)), value).hex()
 
 # Create a common opcode.
-def make_common_header(btx_type):
+def make_common_header(btx_type, version = 1):
     prefix = str(OPCODE_PREFIX)
-    version_hex = encode_int_little_endian(OPCODE_VERSION, 1)
+    version_hex = encode_int_little_endian(version, 1)
     btx_type_hex = encode_int_little_endian(btx_type, 1)
     return prefix + version_hex + btx_type_hex
 
@@ -103,10 +111,10 @@ def make_update_ml_odds(event_id, home_odds, away_odds, draw_odds):
     return result
 
 # Create a spread event
-def make_spread_event(event_id, points, home_odds, away_odds):
-    result = make_common_header(OPCODE_BTX_SPREAD_EVENT)
+def make_spread_event(event_id, version, points, home_odds, away_odds):
+    result = make_common_header(OPCODE_BTX_SPREAD_EVENT, version)
     result = result + encode_int_little_endian(event_id, 4)
-    result = result + encode_int_little_endian(points, 2)
+    result = result + encode_signed_int_little_endian(points, 2)
     result = result + encode_int_little_endian(home_odds, 4)
     result = result + encode_int_little_endian(away_odds, 4)
     return result
