@@ -513,8 +513,13 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                     vAllBetTxOuts.emplace_back(vCGLottoPayout.nValue, vCGLottoPayout.scriptPubKey);
                 }
 
-                vAllPayoutsInfo = vPLPayoutsInfo;
-                vAllPayoutsInfo.emplace(vAllPayoutsInfo.end(), vCGLottoPayoutsInfo.begin(), vCGLottoPayoutsInfo.end());
+                // merge vectors into single payout info vector
+                for (auto&& vPLPayoutInfo : vPLPayoutsInfo) {
+                    vAllPayoutsInfo.emplace_back(vPLPayoutInfo.betKey, vPLPayoutInfo.payoutType);
+                }
+                for (auto&& vCGLottoPayoutInfo : vCGLottoPayoutsInfo) {
+                    vAllPayoutsInfo.emplace_back(vCGLottoPayoutInfo.betKey, vCGLottoPayoutInfo.payoutType);
+                }
             }
 
             assert(vAllBetTxOuts.size() == vAllPayoutsInfo.size());
