@@ -541,8 +541,9 @@ typedef struct UniversalBetKey {
     uint32_t blockHeight;
     COutPoint outPoint;
 
-    UniversalBetKey() : blockHeight(0), outPoint(COutPoint()) { }
-    UniversalBetKey(uint32_t height, COutPoint out) : blockHeight(height), outPoint(out) { }
+    explicit UniversalBetKey() : blockHeight(0), outPoint(COutPoint()) { }
+    explicit UniversalBetKey(uint32_t height, COutPoint out) : blockHeight(height), outPoint(out) { }
+    explicit UniversalBetKey(const UniversalBetKey& betKey) : blockHeight{betKey.blockHeight}, outPoint{betKey.outPoint} { }
 
     ADD_SERIALIZE_METHODS;
 
@@ -666,14 +667,24 @@ public:
     PayoutType payoutType;
 
     explicit CPayoutInfo() { }
-    explicit CPayoutInfo(UniversalBetKey &betKey, PayoutType payoutType) : betKey(betKey), payoutType(payoutType) { }
+    explicit CPayoutInfo(UniversalBetKey &betKey, PayoutType payoutType) : betKey{betKey}, payoutType{payoutType} { }
+    explicit CPayoutInfo(const CPayoutInfo& payoutInfo) : betKey{payoutInfo.betKey}, payoutType{payoutInfo.payoutType} { }
 
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(betKey);
-        READWRITE(payoutType);
+        uint8_t type;
+        if (ser_action.ForRead()) {
+            READWRITE(type);
+            payoutType = (PayoutType) type;
+
+        }
+        else {
+            type = (uint8_t) payoutType;
+            READWRITE(type);
+        }
     }
 };
 
@@ -913,5 +924,7 @@ bool RecoveryBettingDB(boost::signals2::signal<void(const std::string&)> & progr
 
 bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height, const int64_t blockTime);
 
+/* Revert payouts info from DB */
+bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height);
 
 #endif // WAGERR_BET_H

@@ -980,6 +980,7 @@ int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetR
     CAmount profitAcc = 0;
     CAmount nPayout = 0;
     CAmount totalAmountBet = 0;
+    UniversalBetKey zeroKey{0, COutPoint()};
 
     // Set the OMNO and Dev reward addresses
     std::string devPayoutAddr  = Params().DevPayoutAddr();
@@ -1002,9 +1003,9 @@ int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetR
 
         // Add both reward payouts to the payout vector.
         vExpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress(devPayoutAddr).Get()));
-        vPayoutsInfo.emplace_back(UniversalBetKey{0, COutPoint()}, PayoutType::bettingReward);
+        vPayoutsInfo.emplace_back(zeroKey, PayoutType::bettingReward);
         vExpectedPayouts.emplace_back(nOMNOReward, GetScriptForDestination(CBitcoinAddress(OMNOPayoutAddr).Get()));
-        vPayoutsInfo.emplace_back(UniversalBetKey{0, COutPoint()}, PayoutType::bettingReward);
+        vPayoutsInfo.emplace_back(zeroKey, PayoutType::bettingReward);
         nPayout += nDevReward + nOMNOReward;
     }
 
@@ -1037,7 +1038,7 @@ int64_t GetCGBlockPayouts(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& nMN
  * @param nHeight - The current chain height.
  * @return
  */
-bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block)
+bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::vector<CBetOut>& vExpectedPayouts, CBlock block, int nBlockHeight, const std::vector<CPayoutInfo>& vExpectedPayoutsInfo)
 {
     unsigned long size = vExpectedPayouts.size();
 
@@ -1094,7 +1095,8 @@ bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block)
 
             const CTxOut &txout = tx.vout[i];
             CAmount voutValue   = txout.nValue;
-            CAmount vExpected   = vExpectedPayouts[i - numStakingTx].nValue;
+            CAmount vExpected   = vExpectedPayouts[j].nValue;
+            PayoutInfoKey payoutInfoKey{nBlockHeight, COutPoint{tx.GetHash(), static_cast<uint32_t>(i)}};
 
             LogPrintf("Bet Amount %li  - Expected Bet Amount: %li \n", voutValue, vExpected);
 
@@ -1105,7 +1107,7 @@ bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block)
 
             // Get the expected payout address.
             CTxDestination expectedAddr;
-            ExtractDestination(vExpectedPayouts[i - numStakingTx].scriptPubKey, expectedAddr);
+            ExtractDestination(vExpectedPayouts[j].scriptPubKey, expectedAddr);
             std::string expectedAddrS = CBitcoinAddress(expectedAddr).ToString();
 
             LogPrintf("Bet Address %s  - Expected Bet Address: %s \n", betAddrS.c_str(), expectedAddrS.c_str());
@@ -1114,6 +1116,8 @@ bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block)
                 LogPrintf("Validation failed! \n");
                 return false;
             }
+            // write payout info to DB
+            bettingsViewCache.payoutsInfo->Write(payoutInfoKey, vExpectedPayoutsInfo[j]);
         }
     }
 
@@ -1272,7 +1276,6 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
                     // find all results for all legs
                     for (int idx = 0; idx < uniBet.legs.size(); idx++) {
                         CPeerlessBet &leg = uniBet.legs[idx];
-                        CPeerlessEvent &lockedEvent = uniBet.lockedEvents[idx];
                         // skip this bet if incompleted (can't find one result)
                         CPeerlessResult res;
                         if (!bettingsViewCache.results->Read(ResultKey{leg.nEventId}, res)) {
@@ -1284,7 +1287,6 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
             // single bet
             else if (uniBet.legs.size() == 1) {
                 CPeerlessBet &singleBet = uniBet.legs[0];
-                CPeerlessEvent &lockedEvent = uniBet.lockedEvents[0];
                 if (singleBet.nEventId == result.nEventId) {
                     needUndo = true;
                 }
@@ -1936,7 +1938,7 @@ void GetBetPayoutsLegacy(int height, std::vector<CBetOut>& vExpectedPayouts, std
  *
  * @return payout vector.
  */
-void GetCGLottoBetPayouts (int height, std::vector<CBetOut> vexpectedCGLottoBetPayouts, std::vector<CPayoutInfo>& vPayoutsInfo)
+void GetCGLottoBetPayouts (int height, std::vector<CBetOut>& vexpectedCGLottoBetPayouts, std::vector<CPayoutInfo>& vPayoutsInfo)
 {
     int nCurrentHeight = chainActive.Height();
     long long totalValueOfBlock = 0;
@@ -2037,7 +2039,7 @@ void GetCGLottoBetPayouts (int height, std::vector<CBetOut> vexpectedCGLottoBetP
                                     }
 
                                     // Add the payout address of each candidate to array
-                                    candidates.push_back(std::pair{CBitcoinAddress( payoutAddress ).ToString().c_str(), betKey});
+                                    candidates.push_back(std::pair<std::string, UniversalBetKey>{CBitcoinAddress( payoutAddress ).ToString().c_str(), betKey});
                                 }
                             }
                         }
@@ -2102,9 +2104,10 @@ void GetCGLottoBetPayouts (int height, std::vector<CBetOut> vexpectedCGLottoBetP
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
+                UniversalBetKey zeroKey{0, COutPoint()};
                 vPayoutsInfo.emplace_back(candidates[winnerNr].second, PayoutType::chainGamesPayout);
                 vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
-                vPayoutsInfo.emplace_back(UniversalBetKey{0, COutPoint()}, PayoutType::chainGamesPayout);
+                vPayoutsInfo.emplace_back(zeroKey, PayoutType::chainGamesPayout);
                 vexpectedCGLottoBetPayouts.emplace_back(fee, GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get()), entranceFee);
             }
         }
@@ -2652,7 +2655,6 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 // If event patch - find event undo and revert changes
                 CPeerlessEventPatch plEventPatch{};
                 if (CPeerlessEventPatch::FromOpCode(opCode, plEventPatch)) {
-                    EventKey eventKey{plEventPatch.nEventId};
                     LogPrintf("CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatch.nEventId, plEventPatch.nStartTime);
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
@@ -2676,7 +2678,6 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 // If update money line odds - find event undo and revert changes
                 CPeerlessUpdateOdds puo{};
                 if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
-                    EventKey eventKey{puo.nEventId};
                     LogPrintf("CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n", puo.nEventId, puo.nHomeOdds, puo.nAwayOdds, puo.nDrawOdds);
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
@@ -2688,7 +2689,6 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 // If spread odds - find event undo and revert changes
                 CPeerlessSpreadsEvent spreadEvent{};
                 if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
-                    EventKey eventKey{spreadEvent.nEventId};
                     LogPrintf("CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n", spreadEvent.nEventId, spreadEvent.nPoints, spreadEvent.nHomeOdds, spreadEvent.nAwayOdds);
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
@@ -2700,7 +2700,6 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 // If total odds - find event undo and revert changes
                 CPeerlessTotalsEvent totalsEvent{};
                 if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
-                    EventKey eventKey{totalsEvent.nEventId};
                     LogPrintf("CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n", totalsEvent.nEventId, totalsEvent.nPoints, totalsEvent.nOverOdds, totalsEvent.nUnderOdds);
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
@@ -2728,7 +2727,6 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             CPeerlessBet plBet;
             // If bet - try to find event undo and revert changes
             if (CPeerlessBet::FromOpCode(opCode, plBet)) {
-                EventKey eventKey{plBet.nEventId};
                 LogPrintf("CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
                 if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                     LogPrintf("Revert failed!\n");
@@ -2771,5 +2769,30 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
         }
     }
     LogPrintf("UndoBettingTx: end\n");
+    return true;
+}
+
+/* Revert payouts info from DB */
+bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
+{
+    // we should save array of entries to delete because
+    // changing (add/delete) of flushable DB when iterating is not allowed
+    std::vector<PayoutInfoKey> entriesToDelete;
+    auto it = bettingsViewCache.payoutsInfo->NewIterator();
+    for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{static_cast<uint32_t>(height), COutPoint()}));; it->Next()) {
+        PayoutInfoKey key;
+        CBettingDB::BytesToDbType(it->Key(), key);
+        if (key.blockHeight != height)
+            break;
+        else
+            entriesToDelete.emplace_back(key);
+    }
+
+    // delete all entries with height of disconnected block
+    for (auto&& key : entriesToDelete) {
+        if (!bettingsViewCache.payoutsInfo->Erase(key))
+            return false;
+    }
+
     return true;
 }
