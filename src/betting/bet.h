@@ -839,6 +839,7 @@ public:
         BettingUndoKey key;
         std::string str;
         auto it = undos->NewIterator();
+        std::vector<BettingUndoKey> vKeysToDelete;
         std::vector<unsigned char> lastHeightKey = CBettingDB::DbTypeToBytes(std::string("LastHeight"));
         for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
             // check that key is serialized "LastHeight" key and skip if true
@@ -848,8 +849,11 @@ public:
             CBettingDB::BytesToDbType(it->Key(), key);
             CBettingDB::BytesToDbType(it->Value(), vUndos);
             if (vUndos[0].height < height) {
-                undos->Erase(key);
+                vKeysToDelete.push_back(key);
             }
+        }
+        for (auto && key : vKeysToDelete) {
+            undos->Erase(key);
         }
     }
 };
