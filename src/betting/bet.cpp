@@ -2604,7 +2604,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
     LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
 
-    bool parlayBetsAvaible = height > Params().ParlayBetStartHeight();
+    bool parlayBetsAvaible = height >= Params().ParlayBetStartHeight();
 
     // First revert OMNO transactions
     if (validOracleTx) {
