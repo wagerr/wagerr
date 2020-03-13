@@ -614,11 +614,11 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
     }
 
     auto it = bettingsView->bets->NewIterator();
-    UniversalBetKey key{0, COutPoint()};
-    auto v = CBettingDB::DbTypeToBytes(key);
     for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        UniversalBetKey key;
         CUniversalBet uniBet;
         CBettingDB::BytesToDbType(it->Value(), uniBet);
+        CBettingDB::BytesToDbType(it->Key(), key);
 
         if (!includeHandled && uniBet.IsCompleted()) continue;
 
@@ -631,7 +631,9 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
             uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
             uLegs.push_back(uLeg);
         }
-
+        uValue.push_back(Pair("betBlockHeight", (uint64_t) key.blockHeight));
+        uValue.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
+        uValue.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
         uValue.push_back(Pair("legs", uLegs));
         uValue.push_back(Pair("address", uniBet.playerAddress.ToString()));
         uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
