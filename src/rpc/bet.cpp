@@ -10,6 +10,7 @@
 #include "main.h"
 #include "betting/bet.h"
 #include "rpc/server.h"
+#include <boost/assign/list_of.hpp>
 
 #include <univalue.h>
 
@@ -150,4 +151,177 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
     result.push_back(mapping);
 
     return result;
+}
+
+std::string GetPayoutTypeStr(PayoutType type)
+{
+    switch(type) {
+        case PayoutType::bettingPayout:
+            return std::string("Betting Payout");
+        case PayoutType::bettingRefund:
+            return std::string("Betting Refund");
+        case PayoutType::bettingReward:
+            return std::string("Betting Reward");
+        case PayoutType::chainGamesPayout:
+            return std::string("Chain Games Payout");
+        case PayoutType::chainGamesRefund:
+            return std::string("Chain Games Refund");
+        case PayoutType::chainGamesReward:
+            return std::string("Chain Games Reward");
+        default:
+            return std::string("Undefined Payout Type");
+    }
+}
+
+UniValue CreatePayoutInfoResponse(const std::vector<std::pair<bool, CPayoutInfo>> vPayoutsInfo)
+{
+    UniValue responseArr{UniValue::VARR};
+    for (auto info : vPayoutsInfo) {
+        UniValue retObj{UniValue::VOBJ};
+        if (info.first) { // if payout info was found - add info to array
+            CPayoutInfo &payoutInfo = info.second;
+            UniValue infoObj{UniValue::VOBJ};
+
+            infoObj.push_back(Pair("payoutType", GetPayoutTypeStr(payoutInfo.payoutType)));
+            infoObj.push_back(Pair("betBlockHeight", (uint64_t) payoutInfo.betKey.blockHeight));
+            infoObj.push_back(Pair("betTxHash", payoutInfo.betKey.outPoint.hash.GetHex()));
+            infoObj.push_back(Pair("betTxOut", (uint64_t) payoutInfo.betKey.outPoint.n));
+            retObj.push_back(Pair("found", UniValue{true}));
+            retObj.push_back(Pair("payoutInfo", infoObj));
+        }
+        else {
+            retObj.push_back(Pair("found", UniValue{false}));
+            retObj.push_back(Pair("payoutInfo", UniValue{UniValue::VOBJ}));
+        }
+
+        responseArr.push_back(retObj);
+    }
+    return responseArr;
+}
+
+/**
+ * Looks up a given payout tx hash and out number for getting payout info.
+ * If not found return an empty array. If found - return array of info objects.
+ *
+ * @param params The RPC params consisting of an array of objects
+ * @param fHelp  Help text
+ * @return
+ */
+UniValue getpayoutinfo(const UniValue& params, bool fHelp)
+{
+    if (fHelp || (params.size() != 1))
+        throw std::runtime_error(
+                "getpayoutinfo\n"
+                "\nGet an info for given  .\n"
+                "1. Payout params  (array, requied)\n"
+                "[\n"
+                "  {\n"
+                "    \"txHash\": hash (string, requied) The payout transaction hash.\n"
+                "    \"nOut\": nOut (numeric, requied) The payout transaction out number.\n"
+                "  }\n"
+                "]\n"
+                "\nResult:\n"
+                "[\n"
+                "  {\n"
+                "    \"found\": flag (boolean) Indicate that expected payout was found.\n"
+                "    \"payoutInfo\": object (object) Payout info object.\n"
+                "      {\n"
+                "        \"payoutType\": payoutType (string) Payout type: bet or chain game, payout or refund or reward.\n"
+                "        \"betHeight\": height (numeric) Bet block height.\n"
+                "        \"betTxHash\": hash (string) Bet transaction hash.\n"
+                "        \"betOut\": nOut (numeric) Bet transaction out number.\n"
+                "      }\n"
+                "  }\n"
+                "]\n"
+                "\nExamples:\n" +
+                HelpExampleCli("getpayoutinfo", "[{\"txHash\": 08746e1bdb6f4aebd7f1f3da25ac11e1cd3cacaf34cd2ad144e376b2e7f74d49, \"nOut\": 3}, {\"txHash\": 4c1e6b1a26808541e9e43c542adcc0eb1c67f2be41f2334ab1436029bf1791c0, \"nOut\": 4}]") +
+                    HelpExampleRpc("getpayoutinfo", "[{\"txHash\": 08746e1bdb6f4aebd7f1f3da25ac11e1cd3cacaf34cd2ad144e376b2e7f74d49, \"nOut\": 3}, {\"txHash\": 4c1e6b1a26808541e9e43c542adcc0eb1c67f2be41f2334ab1436029bf1791c0, \"nOut\": 4}]"));
+
+    UniValue paramsArr = params[0].get_array();
+    std::vector<std::pair<bool, CPayoutInfo>> vPayoutsInfo;
+
+    // parse payout params
+    for (int i = 0; i < paramsArr.size(); i++) {
+        const UniValue obj = paramsArr[i].get_obj();
+        RPCTypeCheckObj(obj, boost::assign::map_list_of("txHash", UniValue::VSTR)("nOut", UniValue::VNUM));
+        uint256 txHash = uint256(find_value(obj, "txHash").get_str());
+        uint32_t nOut = find_value(obj, "nOut").get_int();
+        uint256 hashBlock;
+        CTransaction tx;
+        if (!GetTransaction(txHash, tx, hashBlock, true)) {
+            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{false, CPayoutInfo{}});
+            continue;
+        }
+        if (hashBlock == 0) { // uncomfirmed tx
+            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{false, CPayoutInfo{}});
+            continue;
+        }
+        uint32_t blockHeight = mapBlockIndex.at(hashBlock)->nHeight;
+
+        CPayoutInfo payoutInfo;
+        // try to find payout info from db
+        if (!bettingsView->payoutsInfo->Read(PayoutInfoKey{blockHeight, COutPoint{txHash, nOut}}, payoutInfo)) {
+            // not found
+            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{false, CPayoutInfo{}});
+            continue;
+        }
+        vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{true, payoutInfo});
+    }
+
+    return CreatePayoutInfoResponse(vPayoutsInfo);
+}
+
+/**
+ * Looks up a given block height for getting payouts info since this block height.
+ * If not found return an empty array. If found - return array of info objects.
+ *
+ * @param params The RPC params consisting of an array of objects
+ * @param fHelp  Help text
+ * @return
+ */
+UniValue getpayoutinfosince(const UniValue& params, bool fHelp)
+{
+    if (fHelp || (params.size() < 1 || params.size() > 2))
+        throw std::runtime_error(
+                "getpayoutinfosince\n"
+                "\nGet an info for given  .\n"
+                "1. Start block height  (numeric, requied) Block number for starting payouts info search.\n"
+                "2. End block height  (numeric, optional) Block number for ending payouts info search.\n"
+                "\nResult:\n"
+                "[\n"
+                "  {\n"
+                "    \"found\": flag (boolean) Indicate that expected payout was found.\n"
+                "    \"payoutInfo\": object (object) Payout info object.\n"
+                "      {\n"
+                "        \"payoutType\": payoutType (string) Payout type: bet or chain game, payout or refund or reward.\n"
+                "        \"betHeight\": height (numeric) Bet block height.\n"
+                "        \"betTxHash\": hash (string) Bet transaction hash.\n"
+                "        \"betOut\": nOut (numeric) Bet transaction out number.\n"
+                "      }\n"
+                "  }\n"
+                "]\n"
+                "\nExamples:\n" +
+                HelpExampleCli("getpayoutinfosince", "600 650") + HelpExampleRpc("getpayoutinfosince", "600 650"));
+
+    uint32_t startBlockHeight = params[0].get_int();
+    uint32_t endBlockHeight = 0;
+    std::vector<std::pair<bool, CPayoutInfo>> vPayoutsInfo;
+    bool endHeight = false;
+    if (params.size() == 2) {
+        endHeight = true;
+        endBlockHeight = params[1].get_int();
+    }
+
+    auto it = bettingsView->payoutsInfo->NewIterator();
+    for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{startBlockHeight, COutPoint()})); it->Valid(); it->Next()) {
+        PayoutInfoKey key;
+        CPayoutInfo payoutInfo;
+        CBettingDB::BytesToDbType(it->Key(), key);
+        CBettingDB::BytesToDbType(it->Value(), payoutInfo);
+        if (endHeight && key.blockHeight > endBlockHeight)
+            break;
+        vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{true, payoutInfo});
+    }
+
+    return CreatePayoutInfoResponse(vPayoutsInfo);
 }
