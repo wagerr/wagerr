@@ -41,6 +41,18 @@ outcome_total_under = 7
 ODDS_DIVISOR = 10000
 BETX_PERMILLE = 60
 
+def check_bet_payouts_info(listbets, listpayoutsinfo):
+    for bet in listbets:
+        info_found = False
+        for info in listpayoutsinfo:
+            info_type = info['payoutInfo']['payoutType']
+            if info_type == 'Betting Payout' or info_type == 'Betting Refund':
+                if info['payoutInfo']['betBlockHeight'] == bet['betBlockHeight']:
+                    if info['payoutInfo']['betTxHash'] == bet['betTxHash']:
+                        if info['payoutInfo']['betTxOut'] == bet['betTxOut']:
+                            info_found = True
+        assert(info_found)
+
 class BettingTest(BitcoinTestFramework):
     def get_cache_dir_name(self, node_index, block_count):
         return ".test-chain-{0}-{1}-.node{2}".format(self.num_nodes, block_count, node_index)
@@ -524,24 +536,21 @@ class BettingTest(BitcoinTestFramework):
         player1_balance_before = Decimal(self.nodes[2].getbalance())
         player2_balance_before = Decimal(self.nodes[3].getbalance())
 
-        print("player1 balance before: ", player1_balance_before)
-        print("player1 exp win: ", player1_expected_win)
-        print("player2 balance before: ", player2_balance_before)
-        print("player2 exp win: ", player2_expected_win)
+        listbets = self.nodes[0].listbetsdb(False)
 
         # generate block with payouts
         blockhash = self.nodes[0].generate(1)[0]
         block = self.nodes[0].getblock(blockhash)
+        height = block['height']
 
         self.sync_all()
 
-        # print(pprint.pformat(block))
+        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
+
+        check_bet_payouts_info(listbets, payoutsInfo)
 
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
-
-        print("player1 balance after: ", player1_balance_after)
-        print("player2 balance after: ", player2_balance_after)
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
@@ -584,24 +593,21 @@ class BettingTest(BitcoinTestFramework):
         player1_balance_before = Decimal(self.nodes[2].getbalance())
         player2_balance_before = Decimal(self.nodes[3].getbalance())
 
-        print("player1 balance before: ", player1_balance_before)
-        print("player1 exp win: ", player1_expected_win)
-        print("player2 balance before: ", player2_balance_before)
-        print("player2 exp win: ", player2_expected_win)
+        listbets = self.nodes[0].listbetsdb(False)
 
         # generate block with payouts
         blockhash = self.nodes[0].generate(1)[0]
         block = self.nodes[0].getblock(blockhash)
+        height = block['height']
 
         self.sync_all()
 
-        # print(pprint.pformat(block))
+        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
+
+        check_bet_payouts_info(listbets, payoutsInfo)
 
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
-
-        print("player1 balance after: ", player1_balance_after)
-        print("player2 balance after: ", player2_balance_after)
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
@@ -702,24 +708,21 @@ class BettingTest(BitcoinTestFramework):
         player1_balance_before = Decimal(self.nodes[2].getbalance())
         player2_balance_before = Decimal(self.nodes[3].getbalance())
 
-        print("player1 balance before: ", player1_balance_before)
-        print("player1 exp win: ", player1_expected_win)
-        print("player2 balance before: ", player2_balance_before)
-        print("player2 exp win: ", player2_expected_win)
+        listbets = self.nodes[0].listbetsdb(False)
 
         # generate block with payouts
         blockhash = self.nodes[0].generate(1)[0]
         block = self.nodes[0].getblock(blockhash)
+        height = block['height']
 
         self.sync_all()
 
-        # print(pprint.pformat(block))
+        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
+
+        check_bet_payouts_info(listbets, payoutsInfo)
 
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
-
-        print("player1 balance: ", player1_balance_after)
-        print("player2 balance: ", player2_balance_after)
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
@@ -808,24 +811,21 @@ class BettingTest(BitcoinTestFramework):
         player1_balance_before = Decimal(self.nodes[2].getbalance())
         player2_balance_before = Decimal(self.nodes[3].getbalance())
 
-        print("player1 balance before: ", player1_balance_before)
-        print("player1 exp win: ", player1_expected_win)
-        print("player2 balance before: ", player2_balance_before)
-        print("player2 exp win: ", player2_expected_win)
+        listbets = self.nodes[0].listbetsdb(False)
 
         # generate block with payouts
         blockhash = self.nodes[0].generate(1)[0]
         block = self.nodes[0].getblock(blockhash)
+        height = block['height']
 
         self.sync_all()
 
-        # print(pprint.pformat(block))
+        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
+
+        check_bet_payouts_info(listbets, payoutsInfo)
 
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
-
-        print("player1 balance: ", player1_balance_after)
-        print("player2 balance: ", player2_balance_after)
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
@@ -881,18 +881,20 @@ class BettingTest(BitcoinTestFramework):
 
         player1_balance_before = Decimal(self.nodes[2].getbalance())
 
-        print("player1 balance before: ", player1_balance_before)
-        print("player1 exp win: ", player1_expected_win)
+        listbets = self.nodes[0].listbetsdb(False)
 
         # generate block with payouts
         blockhash = self.nodes[0].generate(1)[0]
         block = self.nodes[0].getblock(blockhash)
+        height = block['height']
 
         self.sync_all()
 
-        player1_balance_after = Decimal(self.nodes[2].getbalance())
+        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
 
-        print("player1 balance: ", player1_balance_after)
+        check_bet_payouts_info(listbets, payoutsInfo)
+
+        player1_balance_after = Decimal(self.nodes[2].getbalance())
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
 
