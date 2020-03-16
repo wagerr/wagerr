@@ -975,7 +975,7 @@ bool IsValidOracleTx(const CTxIn &txin)
  * @param nMNBetReward  The Oracle masternode reward.
  * @return
  */
-int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward)
+int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward, std::vector<CPayoutInfo>& vPayoutsInfo)
 {
     CAmount profitAcc = 0;
     CAmount nPayout = 0;
@@ -1002,8 +1002,9 @@ int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetR
 
         // Add both reward payouts to the payout vector.
         vExpectedPayouts.emplace_back(nDevReward, GetScriptForDestination(CBitcoinAddress(devPayoutAddr).Get()));
+        vPayoutsInfo.emplace_back(UniversalBetKey{0, COutPoint()}, PayoutType::bettingReward);
         vExpectedPayouts.emplace_back(nOMNOReward, GetScriptForDestination(CBitcoinAddress(OMNOPayoutAddr).Get()));
-
+        vPayoutsInfo.emplace_back(UniversalBetKey{0, COutPoint()}, PayoutType::bettingReward);
         nPayout += nDevReward + nOMNOReward;
     }
 
@@ -1235,8 +1236,8 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
 bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
 {
     int nCurrentHeight = chainActive.Height();
-    // Get all the results posted in the latest block.
-    std::vector<CPeerlessResult> results = getEventResults(height);
+    // Get all the results posted in the previous block.
+    std::vector<CPeerlessResult> results = getEventResults(height - 1);
 
     LogPrintf("Start undo payouts...\n");
 
@@ -1485,7 +1486,7 @@ void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::vector<CBe
                 if (payout > 0) {
                     // Add winning payout to the payouts vector.
                     vExpectedPayouts.emplace_back(payout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
-                    vPayoutsInfo.emplace_back(uniBetKey);
+                    vPayoutsInfo.emplace_back(uniBetKey, odds == oddsDivisor ? PayoutType::bettingRefund : PayoutType::bettingPayout);
                 }
                 LogPrintf("\nBet %s is handled!\nPlayer address: %s\nPayout: %ll\n\n", uniBet.betOutPoint.ToStringShort(), uniBet.playerAddress.ToString(), payout);
                 // if handling bet is completed - mark it
@@ -1502,9 +1503,8 @@ void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::vector<CBe
  *
  * @return payout vector.
  */
-std::vector<CBetOut> GetBetPayoutsLegacy(int height)
+void GetBetPayoutsLegacy(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo)
 {
-    std::vector<CBetOut> vExpectedPayouts;
     int nCurrentHeight = chainActive.Height();
 
     // Get all the results posted in the latest block.
@@ -1566,6 +1566,7 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height)
             CBlock block;
             ReadBlockFromDisk(block, BlocksIndex);
             time_t transactionTime = block.nTime;
+            uint32_t nHeight = BlocksIndex->nHeight;
 
             for (CTransaction &tx : block.vtx) {
                 // Check all TX vouts for an OP RETURN.
@@ -1757,7 +1758,7 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height)
 
                             LogPrintf("Result found ending search \n");
 
-                            return vExpectedPayouts;
+                            return;
                         }
 
                         // Only payout bets that are between 25 - 10000 WRG inclusive (MaxBetPayoutRange).
@@ -1766,6 +1767,8 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height)
                             // Bet OP RETURN transaction.
                             CPeerlessBet pb;
                             if (CPeerlessBet::FromOpCode(opCode, pb)) {
+
+                                UniversalBetKey betKey{nHeight, COutPoint(tx.GetHash(), i)};
 
                                 CAmount payout = 0 * COIN;
 
@@ -1852,6 +1855,8 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height)
                                     // Only add valid payouts to the vector.
                                     if (payout > 0) {
                                         // Add winning bet payout to the bet vector.
+                                        bool refund = (payout == betAmount * oddsDivisor) ? true : false;
+                                        vPayoutsInfo.emplace_back(betKey, refund ? PayoutType::bettingRefund : PayoutType::bettingPayout);
                                         vExpectedPayouts.emplace_back(payout, GetScriptForDestination(CBitcoinAddress(payoutAddress).Get()), betAmount);
                                     }
                                 }
@@ -1923,7 +1928,7 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height)
         }
     }
 
-    return vExpectedPayouts;
+    return;
 }
 
 /**
@@ -1931,9 +1936,8 @@ std::vector<CBetOut> GetBetPayoutsLegacy(int height)
  *
  * @return payout vector.
  */
-std::vector<CBetOut> GetCGLottoBetPayouts (int height)
+void GetCGLottoBetPayouts (int height, std::vector<CBetOut> vexpectedCGLottoBetPayouts, std::vector<CPayoutInfo>& vPayoutsInfo)
 {
-    std::vector<CBetOut> vexpectedCGLottoBetPayouts;
     int nCurrentHeight = chainActive.Height();
     long long totalValueOfBlock = 0;
 
@@ -1951,7 +1955,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
         totalValueOfBlock = stoll(blockSizeArray[0]);
 
         //reset total bet amount and candidate array for this event
-        std::vector<std::string> candidates;
+        std::vector<std::pair<std::string, UniversalBetKey>> candidates;
         CAmount totalBetAmount = 0 * COIN;
 
         // Look back the chain 10 days for any events and bets.
@@ -1977,6 +1981,8 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
                 uint256 hashBlock;
                 CTransaction txPrev;
 
+                uint256 txHash = tx.GetHash();
+
                 bool validTX = IsValidOracleTx(txin);
 
                 // Check all TX vouts for an OP RETURN.
@@ -1985,6 +1991,8 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
                     const CTxOut &txout = tx.vout[i];
                     std::string scriptPubKey = txout.scriptPubKey.ToString();
                     CAmount betAmount = txout.nValue;
+
+                    UniversalBetKey betKey{BlocksIndex->nHeight, COutPoint{txHash, i}};
 
                     if (scriptPubKey.length() > 0 && 0 == strncmp(scriptPubKey.c_str(), "OP_RETURN", 9)) {
                         // Get the OP CODE from the transaction scriptPubKey.
@@ -2029,7 +2037,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
                                     }
 
                                     // Add the payout address of each candidate to array
-                                    candidates.push_back(CBitcoinAddress( payoutAddress ).ToString().c_str());
+                                    candidates.push_back(std::pair{CBitcoinAddress( payoutAddress ).ToString().c_str(), betKey});
                                 }
                             }
                         }
@@ -2052,7 +2060,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
         if (candidates.size() == 1) {
              // Refund the single entrant.
              CAmount noOfBets = candidates.size();
-             std::string winnerAddress = candidates[0];
+             std::string winnerAddress = candidates[0].first;
              CAmount entranceFee = eventFee;
              CAmount winnerPayout = eventFee;
 
@@ -2063,6 +2071,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 
              // Only add valid payouts to the vector.
              if (winnerPayout > 0) {
+                 vPayoutsInfo.emplace_back(candidates[0].second, PayoutType::chainGamesRefund);
                  vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
              }
         }
@@ -2079,7 +2088,7 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
             uint64_t winnerNr = tempVal.Get64();
 
             // Split the pot and calculate winnings.
-            std::string winnerAddress = candidates[winnerNr];
+            std::string winnerAddress = candidates[winnerNr].first;
             CAmount entranceFee = eventFee;
             CAmount totalPot = hashProofOfStake == 0 ? 0 : (noOfBets*entranceFee);
             CAmount winnerPayout = totalPot / 10 * 8;
@@ -2093,13 +2102,13 @@ std::vector<CBetOut> GetCGLottoBetPayouts (int height)
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
+                vPayoutsInfo.emplace_back(candidates[winnerNr].second, PayoutType::chainGamesPayout);
                 vexpectedCGLottoBetPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
+                vPayoutsInfo.emplace_back(UniversalBetKey{0, COutPoint()}, PayoutType::chainGamesPayout);
                 vexpectedCGLottoBetPayouts.emplace_back(fee, GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get()), entranceFee);
             }
         }
     }
-
-    return vexpectedCGLottoBetPayouts;
 }
 
 bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)

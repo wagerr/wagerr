@@ -65,6 +65,16 @@ typedef enum MappingTypes {
     tournamentMapping = 0x04
 } MappingTypes;
 
+//
+typedef enum PayoutType {
+    bettingPayout    = 0x01,
+    bettingRefund    = 0x02,
+    bettingReward    = 0x03,
+    chainGamesPayout = 0x04,
+    chainGamesRefund = 0x05,
+    chainGamesReward = 0x06
+} PayoutType;
+
 // Class derived from CTxOut
 // nBetValue is NOT serialized, nor is it included in the hash.
 class CBetOut : public CTxOut {
@@ -653,15 +663,17 @@ class CPayoutInfo
 {
 public:
     UniversalBetKey betKey;
+    PayoutType payoutType;
 
     explicit CPayoutInfo() { }
-    explicit CPayoutInfo(UniversalBetKey &betKey) : betKey(betKey) { }
+    explicit CPayoutInfo(UniversalBetKey &betKey, PayoutType payoutType) : betKey(betKey), payoutType(payoutType) { }
 
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(betKey);
+        READWRITE(payoutType);
     }
 };
 
@@ -864,13 +876,13 @@ extern CBettingsView *bettingsView;
 bool IsValidOracleTx(const CTxIn &txin);
 
 /** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
-int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward);
+int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward, std::vector<CPayoutInfo>& vPayoutsInfo);
 
 /** Aggregates the amount of WGR to be minted to pay out all CG Lotto winners as well as OMNO rewards. **/
 int64_t GetCGBlockPayouts(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& nMNBetReward);
 
 /** Validating the payout block using the payout vector. **/
-bool IsBlockPayoutsValid(std::vector<CBetOut> vExpectedPayouts, CBlock block);
+bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::vector<CBetOut>& vExpectedPayouts, CBlock block, int nBlockHeight, const std::vector<CPayoutInfo>& vExpectedPayoutsInfo);
 
 /** Find peerless events. **/
 std::vector<CPeerlessResult> getEventResults(int height);
@@ -879,14 +891,14 @@ std::vector<CPeerlessResult> getEventResults(int height);
 std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEventResults(int height);
 
 /** Get the peerless winning bets from the block chain and return the payout vector. **/
-std::vector<CBetOut> GetBetPayoutsLegacy(int height);
+void GetBetPayoutsLegacy(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo);
 /** Using betting database for handle bets **/
 void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo);
 /** Undo bets as marked completed when generating payouts **/
 bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height);
 
 /** Get the chain games winner and return the payout vector. **/
-std::vector<CBetOut> GetCGLottoBetPayouts(int height);
+void GetCGLottoBetPayouts(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo);
 
 /** Check Betting Tx when try accept tx to memory pool **/
 bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height);
