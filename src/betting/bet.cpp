@@ -1096,7 +1096,7 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::vector<CBe
             const CTxOut &txout = tx.vout[i];
             CAmount voutValue   = txout.nValue;
             CAmount vExpected   = vExpectedPayouts[j].nValue;
-            PayoutInfoKey payoutInfoKey{nBlockHeight, COutPoint{tx.GetHash(), static_cast<uint32_t>(i)}};
+            PayoutInfoKey payoutInfoKey{static_cast<uint32_t>(nBlockHeight), COutPoint{tx.GetHash(), static_cast<uint32_t>(i)}};
 
             LogPrintf("Bet Amount %li  - Expected Bet Amount: %li \n", voutValue, vExpected);
 
@@ -1994,7 +1994,7 @@ void GetCGLottoBetPayouts (int height, std::vector<CBetOut>& vexpectedCGLottoBet
                     std::string scriptPubKey = txout.scriptPubKey.ToString();
                     CAmount betAmount = txout.nValue;
 
-                    UniversalBetKey betKey{BlocksIndex->nHeight, COutPoint{txHash, i}};
+                    UniversalBetKey betKey{static_cast<uint32_t>(BlocksIndex->nHeight), COutPoint{txHash, static_cast<uint32_t>(i)}};
 
                     if (scriptPubKey.length() > 0 && 0 == strncmp(scriptPubKey.c_str(), "OP_RETURN", 9)) {
                         // Get the OP CODE from the transaction scriptPubKey.
