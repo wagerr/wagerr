@@ -2749,14 +2749,6 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 std::sort(legs.begin(), legs.end());
                 legs.erase(std::unique(legs.begin(), legs.end()), legs.end());
 
-                for (auto it = legs.begin(); it != legs.end();) {
-                    CPeerlessBet &bet = *it;
-                    CPeerlessEvent plEvent;
-                    EventKey eventKey{bet.nEventId};
-                    if (!bettingsViewCache.events->Read(eventKey, plEvent)) {
-                        legs.erase(it);
-                    }
-                }
                 if (!legs.empty()) {
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
