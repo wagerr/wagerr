@@ -2771,7 +2771,7 @@ bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
     // changing (add/delete) of flushable DB when iterating is not allowed
     std::vector<PayoutInfoKey> entriesToDelete;
     auto it = bettingsViewCache.payoutsInfo->NewIterator();
-    for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{static_cast<uint32_t>(height), COutPoint()}));; it->Next()) {
+    for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{static_cast<uint32_t>(height), COutPoint()})); it->Valid(); it->Next()) {
         PayoutInfoKey key;
         CBettingDB::BytesToDbType(it->Key(), key);
         if (key.blockHeight != height)
