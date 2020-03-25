@@ -71,31 +71,9 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
                 mappingFound = true;
             }
         }
-        // Find the first available free key in the sorted map
-        if (!FirstIndexFreeFound){
-            if (key.nId != nFirstIndexFree) {
-                FirstIndexFreeFound = true;
-            } else {
-                nFirstIndexFree++;
-            }
-        }
     }
-
-    // If no mapping found then create a new one and add to the given map index.
-    if (!mappingFound) {
-        CMapping m{};
-        m.nMType   = type;
-        m.nId      = nFirstIndexFree;
-        m.sName    = name;
-
-        if (bettingsView->mappings->Write(MappingKey{m.nMType, m.nId}, m)) {
-            mappings.push_back(Pair("mapping-id",  (uint64_t) nFirstIndexFree));
-            mappings.push_back(Pair("exists", false));
-            mappings.push_back(Pair("mapping-index", mIndex));
-        }
-    }
-
-    result.push_back(mappings);
+    if (mappingFound)
+        result.push_back(mappings);
 
     return result;
 }
