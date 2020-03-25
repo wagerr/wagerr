@@ -1165,7 +1165,7 @@ std::vector<CPeerlessResult> getEventResults( int height )
                         continue;
                     }
 
-                    LogPrintf("Results found...\n");
+                    LogPrintf("Result for event %lu was found...\n", plResult.nEventId);
 
                     // Store the result if its a valid result OP CODE.
                     results.push_back(plResult);

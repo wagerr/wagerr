@@ -1127,7 +1127,7 @@ UniValue placebet(const UniValue& params, bool fHelp)
     EnsureEnoughWagerr(nAmount);
 
     CBitcoinAddress address("");
-    int eventId = params[0].get_int();
+    uint32_t eventId = static_cast<uint32_t>(params[0].get_int64());
     int outcome = params[1].get_int();
     CPeerlessBet plBet(eventId, (OutcomeType) outcome);
 
@@ -1195,7 +1195,7 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
 
         RPCTypeCheckObj(obj, boost::assign::map_list_of("eventId", UniValue::VNUM)("outcome", UniValue::VNUM));
 
-        uint32_t eventId = find_value(obj, "eventId").get_int();
+        uint32_t eventId = static_cast<uint32_t>(find_value(obj, "eventId").get_int64());
         OutcomeType outcomeType = (OutcomeType) find_value(obj, "outcome").get_int();
         vLegs.emplace_back(eventId, outcomeType);
     }
