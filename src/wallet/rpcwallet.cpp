@@ -591,7 +591,19 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
             "      [\n"
             "        {\n"
             "          \"event-id\": id,\n"
-            "          \"outcome\": type\n"
+            "          \"outcome\": type,\n"
+            "          \"lockedEvent\": {\n"
+            "            \"homeOdds\": homeOdds\n"
+            "            \"awayOdds\": awayOdds\n"
+            "            \"drawOdds\": drawOdds\n"
+            "            \"spreadVersion\": spreadVersion\n"
+            "            \"spreadPoints\": spreadPoints\n"
+            "            \"spreadHomeOdds\": spreadHomeOdds\n"
+            "            \"spreadAwayOdds\": spreadAwayOdds\n"
+            "            \"totalPoints\": totalPoints\n"
+            "            \"totalOverOdds\": totalOverOdds\n"
+            "            \"totalUnderOdds\": totalUnderOdds\n"
+            "          }\n"
             "        },\n"
             "        ...\n"
             "      ],                          (list) The list of legs.\n"
@@ -625,10 +637,24 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
         UniValue uValue(UniValue::VOBJ);
         UniValue uLegs(UniValue::VARR);
 
-        for (auto leg : uniBet.legs) {
+        for (int i = 0; i < uniBet.legs.size(); i++) {
+            auto &leg = uniBet.legs[i];
+            auto &lockedEvent = uniBet.lockedEvents[i];
             UniValue uLeg(UniValue::VOBJ);
+            UniValue uLockedEvent(UniValue::VOBJ);
             uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
             uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+            uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
+            uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
+            uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
+            uLockedEvent.push_back(Pair("spreadVersion", (uint64_t) lockedEvent.nSpreadVersion));
+            uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
+            uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
+            uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
+            uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
+            uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
+            uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
+            uLeg.push_back(Pair("lockedEvent", uLockedEvent));
             uLegs.push_back(uLeg);
         }
         uValue.push_back(Pair("betBlockHeight", (uint64_t) key.blockHeight));
