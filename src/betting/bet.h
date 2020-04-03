@@ -75,6 +75,10 @@ typedef enum PayoutType {
     chainGamesReward = 0x06
 } PayoutType;
 
+typedef enum QuickGamesType {
+    qgDice = 0x01,
+} QuickGamesType;
+
 // Class derived from CTxOut
 // nBetValue is NOT serialized, nor is it included in the hash.
 class CBetOut : public CTxOut {
@@ -244,63 +248,6 @@ public:
             READWRITE(outcome);
         }
     }
-};
-
-// class for serializing bets on DB
-class CUniversalBet
-{
-public:
-    CAmount betAmount;
-    CBitcoinAddress playerAddress;
-    // one elem means single bet, else it is parlay bet, max size = 5
-    std::vector<CPeerlessBet> legs;
-    // vector for member event condition
-    std::vector<CPeerlessEvent> lockedEvents;
-    COutPoint betOutPoint;
-    int64_t betTime;
-
-    explicit CUniversalBet() { }
-    explicit CUniversalBet(const CAmount amount, const CBitcoinAddress address, const std::vector<CPeerlessBet> vLegs, const std::vector<CPeerlessEvent> vEvents, const COutPoint outPoint, const int64_t time) :
-        betAmount(amount), playerAddress(address), legs(vLegs), lockedEvents(vEvents), betOutPoint(outPoint), betTime(time) { }
-    explicit CUniversalBet(const CUniversalBet& bet)
-    {
-        betAmount = bet.betAmount;
-        playerAddress = bet.playerAddress;
-        legs = bet.legs;
-        lockedEvents = bet.lockedEvents;
-        betOutPoint = bet.betOutPoint;
-        betTime = bet.betTime;
-        completed = bet.completed;
-    }
-
-    bool IsCompleted() { return completed; }
-    void SetCompleted() { completed = true; }
-    // for undo
-    void SetUncompleted() { completed = false; }
-
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
-        std::string addrStr;
-        READWRITE(betAmount);
-        if (ser_action.ForRead()) {
-            READWRITE(addrStr);
-            playerAddress.SetString(addrStr);
-        }
-        else {
-            addrStr = playerAddress.ToString();
-            READWRITE(addrStr);
-        }
-        READWRITE(legs);
-        READWRITE(lockedEvents);
-        READWRITE(betOutPoint);
-        READWRITE(betTime);
-        READWRITE(completed);
-    }
-
-private:
-    bool completed = false;
 };
 
 class CPeerlessResult
@@ -562,6 +509,63 @@ typedef struct UniversalBetKey {
     }
 } UniversalBetKey;
 
+// class for serializing bets on DB
+class CUniversalBet
+{
+public:
+    CAmount betAmount;
+    CBitcoinAddress playerAddress;
+    // one elem means single bet, else it is parlay bet, max size = 5
+    std::vector<CPeerlessBet> legs;
+    // vector for member event condition
+    std::vector<CPeerlessEvent> lockedEvents;
+    COutPoint betOutPoint;
+    int64_t betTime;
+
+    explicit CUniversalBet() { }
+    explicit CUniversalBet(const CAmount amount, const CBitcoinAddress address, const std::vector<CPeerlessBet> vLegs, const std::vector<CPeerlessEvent> vEvents, const COutPoint outPoint, const int64_t time) :
+        betAmount(amount), playerAddress(address), legs(vLegs), lockedEvents(vEvents), betOutPoint(outPoint), betTime(time) { }
+    explicit CUniversalBet(const CUniversalBet& bet)
+    {
+        betAmount = bet.betAmount;
+        playerAddress = bet.playerAddress;
+        legs = bet.legs;
+        lockedEvents = bet.lockedEvents;
+        betOutPoint = bet.betOutPoint;
+        betTime = bet.betTime;
+        completed = bet.completed;
+    }
+
+    bool IsCompleted() { return completed; }
+    void SetCompleted() { completed = true; }
+    // for undo
+    void SetUncompleted() { completed = false; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        std::string addrStr;
+        READWRITE(betAmount);
+        if (ser_action.ForRead()) {
+            READWRITE(addrStr);
+            playerAddress.SetString(addrStr);
+        }
+        else {
+            addrStr = playerAddress.ToString();
+            READWRITE(addrStr);
+        }
+        READWRITE(legs);
+        READWRITE(lockedEvents);
+        READWRITE(betOutPoint);
+        READWRITE(betTime);
+        READWRITE(completed);
+    }
+
+private:
+    bool completed = false;
+};
+
 // UndoKey
 using BettingUndoKey = uint256;
 
@@ -688,6 +692,53 @@ public:
     }
 };
 
+using QuickGamesBetKey = UniversalBetKey;
+
+class CQuickGamesBet
+{
+    QuickGamesType gameType;
+    std::vector<unsigned char> vBetInfo;
+    CAmount betAmount;
+    CBitcoinAddress playerAddress;
+    COutPoint betOutPoint;
+    int64_t betTime;
+
+    explicit CQuickGamesBet() { }
+    explicit CQuickGamesBet(const QuickGamesType gameType, const std::vector<unsigned char>& vBetInfo, const CAmount betAmount, const CBitcoinAddress& playerAddress, const COutPoint& betOutPoint, const int64_t betTime) :
+        gameType(gameType), vBetInfo(vBetInfo), betAmount(betAmount), playerAddress(playerAddress), betOutPoint(betOutPoint), betTime(betTime) { }
+    explicit CQuickGamesBet(const CQuickGamesBet& cgBet) :
+        gameType(cgBet.gameType), vBetInfo(cgBet.vBetInfo), betAmount(cgBet.betAmount), playerAddress(cgBet.playerAddress), betOutPoint(cgBet.betOutPoint), betTime(cgBet.betTime) { }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t type;
+        std::string addrStr;
+        if (ser_action.ForRead()) {
+            READWRITE(type);
+            gameType = (QuickGamesType) type;
+
+        }
+        else {
+            type = (uint8_t) gameType;
+            READWRITE(type);
+        }
+        READWRITE(vBetInfo);
+        READWRITE(betAmount);
+        if (ser_action.ForRead()) {
+            READWRITE(addrStr);
+            playerAddress.SetString(addrStr);
+        }
+        else {
+            addrStr = playerAddress.ToString();
+            READWRITE(addrStr);
+        }
+        READWRITE(betOutPoint);
+        READWRITE(betTime);
+    }
+};
+
 class CBettingDB
 {
 public:
@@ -801,6 +852,8 @@ public:
     std::unique_ptr<CStorageKV> undosStorage;
     std::unique_ptr<CBettingDB> payoutsInfo; // "payoutsinfo"
     std::unique_ptr<CStorageKV> payoutsInfoStorage;
+    std::unique_ptr<CBettingDB> quickGamesBets; // "quickgamesbets"
+    std::unique_ptr<CStorageKV> quickGamesBetsStorage;
 
     // default constructor
     CBettingsView() { }
@@ -813,6 +866,7 @@ public:
         bets = MakeUnique<CBettingDB>(*phr->bets.get());
         undos = MakeUnique<CBettingDB>(*phr->undos.get());
         payoutsInfo = MakeUnique<CBettingDB>(*phr->payoutsInfo.get());
+        quickGamesBets = MakeUnique<CBettingDB>(*phr->quickGamesBets.get());
     }
 
     bool Flush() {
@@ -821,7 +875,8 @@ public:
                 events->Flush() &&
                 bets->Flush() &&
                 undos->Flush() &&
-                payoutsInfo->Flush();
+                payoutsInfo->Flush() &&
+                quickGamesBets->Flush();
     }
 
     void SetLastHeight(uint32_t height) {
