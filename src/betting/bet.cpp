@@ -1251,6 +1251,7 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
         uint32_t startHeight = nCurrentHeight >= Params().BetBlocksIndexTimespan() ? nCurrentHeight - Params().BetBlocksIndexTimespan() : 0;
 
         auto it = bettingsViewCache.bets->NewIterator();
+        std::vector<std::pair<UniversalBetKey, CUniversalBet>> vEntriesToUpdate;
         for (it->Seek(CBettingDB::DbTypeToBytes(UniversalBetKey{startHeight, COutPoint()})); it->Valid(); it->Next()) {
             UniversalBetKey uniBetKey;
             CUniversalBet uniBet;
@@ -1294,8 +1295,11 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
 
             if (needUndo) {
                 uniBet.SetUncompleted();
-                bettingsViewCache.bets->Update(uniBetKey, uniBet);
+                vEntriesToUpdate.emplace_back(std::pair<UniversalBetKey, CUniversalBet>{uniBetKey, uniBet});
             }
+        }
+        for (auto pair : vEntriesToUpdate) {
+            bettingsViewCache.bets->Update(pair.first, pair.second);
         }
     }
     return true;
@@ -1416,6 +1420,7 @@ void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::vector<CBe
         uint32_t startHeight = nCurrentHeight >= Params().BetBlocksIndexTimespan() ? nCurrentHeight - Params().BetBlocksIndexTimespan() : 0;
 
         auto it = bettingsViewCache.bets->NewIterator();
+        std::vector<std::pair<UniversalBetKey, CUniversalBet>> vEntriesToUpdate;
         for (it->Seek(CBettingDB::DbTypeToBytes(UniversalBetKey{static_cast<uint32_t>(startHeight), COutPoint()})); it->Valid(); it->Next()) {
             UniversalBetKey uniBetKey;
             CUniversalBet uniBet;
@@ -1493,8 +1498,11 @@ void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::vector<CBe
                 LogPrintf("\nBet %s is handled!\nPlayer address: %s\nPayout: %ll\n\n", uniBet.betOutPoint.ToStringShort(), uniBet.playerAddress.ToString(), payout);
                 // if handling bet is completed - mark it
                 uniBet.SetCompleted();
-                bettingsViewCache.bets->Update(uniBetKey, uniBet);
+                vEntriesToUpdate.emplace_back(std::pair<UniversalBetKey, CUniversalBet>{uniBetKey, uniBet});
             }
+        }
+        for (auto pair : vEntriesToUpdate) {
+            bettingsViewCache.bets->Update(pair.first, pair.second);
         }
     }
 }
