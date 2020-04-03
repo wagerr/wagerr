@@ -54,7 +54,8 @@ typedef enum BetTxTypes{
     plSpreadsEventTxType = 0x09,  // Spread odds transaction type identifier.
     plTotalsEventTxType  = 0x0a,  // Totals odds transaction type identifier.
     plEventPatchTxType   = 0x0b,  // Peerless event patch transaction type identifier.
-    plParlayBetTxType    = 0x0c   // Peerless Parlay Bet transaction type identifier.
+    plParlayBetTxType    = 0x0c,  // Peerless Parlay Bet transaction type identifier.
+    qgBetTxType          = 0x0d,  // Quick Games Bet transaction type identifier.
 } BetTxTypes;
 
 // The supported mapping TX types.
@@ -430,6 +431,33 @@ public:
         READWRITE(nMType);
         READWRITE(nId);
         READWRITE(sName);
+    }
+};
+
+// OPCODE serialization class
+class CQuickGamesTxBet
+{
+    QuickGamesType gameType;
+    std::vector<unsigned char> vBetInfo;
+
+    static bool ToOpCode(CQuickGamesTxBet& bet, std::string &opCode);
+    static bool FromOpCode(std::string opCode, CQuickGamesTxBet &bet);
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t type;
+        if (ser_action.ForRead()) {
+            READWRITE(type);
+            gameType = (QuickGamesType) type;
+
+        }
+        else {
+            type = (uint8_t) gameType;
+            READWRITE(type);
+        }
+        READWRITE(vBetInfo);
     }
 };
 
