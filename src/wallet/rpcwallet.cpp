@@ -376,11 +376,11 @@ UniValue listbets(const UniValue& params, bool fHelp)
                         if (bettingsView->results->Read(ResultKey{plBet.nEventId}, plResult)) {
 
                             switch (plBet.nOutcome) {
-                                case OutcomeType::moneyLineWin:
+                                case OutcomeType::moneyLineHomeWin:
                                     betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
 
                                     break;
-                                case OutcomeType::moneyLineLose:
+                                case OutcomeType::moneyLineAwayWin:
                                     betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
 
                                     break;
@@ -538,11 +538,11 @@ UniValue getbet(const UniValue& params, bool fHelp)
                 if (bettingsView->results->Read(ResultKey{plBet.nEventId}, plResult)) {
 
                     switch (plBet.nOutcome) {
-                    case OutcomeType::moneyLineWin:
+                    case OutcomeType::moneyLineHomeWin:
                         betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
 
                         break;
-                    case OutcomeType::moneyLineLose:
+                    case OutcomeType::moneyLineAwayWin:
                         betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
 
                         break;
@@ -672,7 +672,240 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
     }
 
     return ret;
+}
 
+std::string BetResultTypeToStr(BetResultType resType)
+{
+    switch (resType) {
+        case betResultUnknown: return std::string("pending");
+        case betResultWin: return std::string("win");
+        case betResultLose: return std::string("lose");
+        case betResultRefund: return std::string("refund");
+        default: return std::string("error");
+    }
+}
+
+std::string EventResultTypeToStr(ResultType resType)
+{
+    switch (resType) {
+        case standardResult: return std::string("standard");
+        case eventRefund: return std::string("event refund");
+        case mlRefund: return std::string("ml refund");
+        case spreadsRefund: return std::string("spreads refund");
+        case totalsRefund: return std::string("totals refund");
+        default: return std::string("error");
+    }
+}
+
+UniValue GetBets(uint32_t limit, CWallet *pwalletMain = NULL) {
+    UniValue ret(UniValue::VARR);
+
+    auto it = bettingsView->bets->NewIterator();
+
+    for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        UniversalBetKey key;
+        CUniversalBet uniBet;
+        CBettingDB::BytesToDbType(it->Value(), uniBet);
+        CBettingDB::BytesToDbType(it->Key(), key);
+
+        // check bet is mine if needed
+        if (pwalletMain && IsMine(*pwalletMain, uniBet.playerAddress.Get()) == ISMINE_NO)
+            continue;
+
+        UniValue uValue(UniValue::VOBJ);
+        UniValue uLegs(UniValue::VARR);
+
+        for (uint32_t i = 0; i < uniBet.legs.size(); i++) {
+            auto &leg = uniBet.legs[i];
+            auto &lockedEvent = uniBet.lockedEvents[i];
+            UniValue uLeg(UniValue::VOBJ);
+            UniValue uLockedEvent(UniValue::VOBJ);
+            uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
+            uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+
+            uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
+            uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
+            uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
+            uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
+            uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
+            uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
+            uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
+            uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
+            uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
+
+            // Retrieve the event details
+            CPeerlessEvent plEvent;
+            if (bettingsView->events->Read(EventKey{leg.nEventId}, plEvent)) {
+                uLockedEvent.push_back(Pair("starting", plEvent.nStartTime));
+                CMapping mapping;
+                if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+                    uLockedEvent.push_back(Pair("home", mapping.sName));
+                }
+                if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+                    uLockedEvent.push_back(Pair("away", mapping.sName));
+                }
+                if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+                    uLockedEvent.push_back(Pair("tournament", mapping.sName));
+                }
+            }
+            CPeerlessResult plResult;
+            uint32_t legOdds = 0;
+            if (bettingsView->results->Read(EventKey{leg.nEventId}, plResult)) {
+                uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) plResult.nResultType)));
+                uLockedEvent.push_back(Pair("homeScore", (uint64_t) plResult.nHomeScore));
+                uLockedEvent.push_back(Pair("awayScore", (uint64_t) plResult.nAwayScore));
+                if (lockedEvent.nStartTime > 0 && uniBet.betTime > (lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                    uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
+                }
+                else {
+                    legOdds = GetBetOdds(leg, lockedEvent, plResult, key.blockHeight >= Params().WagerrProtocolV3StartHeight());
+                    uLeg.push_back(Pair("legResultType", legOdds == 0 ? "lose" : legOdds == BET_ODDSDIVISOR ? "refund" : "win"));
+                }
+            }
+            else {
+                uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
+                uLockedEvent.push_back(Pair("homeScore", "undefined"));
+                uLockedEvent.push_back(Pair("awayScore", "undefined"));
+                uLeg.push_back(Pair("legResultType", "pending"));
+            }
+            uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+            uLegs.push_back(uLeg);
+        }
+        uValue.push_back(Pair("betBlockHeight", (uint64_t) key.blockHeight));
+        uValue.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
+        uValue.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
+        uValue.push_back(Pair("legs", uLegs));
+        uValue.push_back(Pair("address", uniBet.playerAddress.ToString()));
+        uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
+        uValue.push_back(Pair("time", (uint64_t) uniBet.betTime));
+        uValue.push_back(Pair("completed", uniBet.IsCompleted() ? "yes" : "no"));
+        uValue.push_back(Pair("betResultType", BetResultTypeToStr(uniBet.resultType)));
+        uValue.push_back(Pair("payout", uniBet.IsCompleted() ? ValueFromAmount(uniBet.payout) : "pending"));
+
+        ret.push_back(uValue);
+    }
+
+    if (limit != 0 && ret.size() > limit) {
+        UniValue retLimit{UniValue::VARR};
+        for (int i = ret.size() - limit; i < ret.size(); i++) {
+            retLimit.push_back(ret[i]);
+        }
+        return retLimit;
+    }
+    else {
+        return ret;
+    }
+}
+
+UniValue getallbets(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw std::runtime_error(
+                "getallbets\n"
+                "\nGet bets info for all wallets\n"
+
+                "\nArguments:\n"
+                "1. Last bets limit (numeric, optional) Limit response to last bets number.\n"
+                "\nResult:\n"
+                "[\n"
+                "  {\n"
+                "    \"legs\":\n"
+                "      [\n"
+                "        {\n"
+                "          \"event-id\": id,\n"
+                "          \"outcome\": type,\n"
+                "          \"lockedEvent\": {\n"
+                "            \"homeOdds\": homeOdds\n"
+                "            \"awayOdds\": awayOdds\n"
+                "            \"drawOdds\": drawOdds\n"
+                "            \"spreadVersion\": spreadVersion\n"
+                "            \"spreadPoints\": spreadPoints\n"
+                "            \"spreadHomeOdds\": spreadHomeOdds\n"
+                "            \"spreadAwayOdds\": spreadAwayOdds\n"
+                "            \"totalPoints\": totalPoints\n"
+                "            \"totalOverOdds\": totalOverOdds\n"
+                "            \"totalUnderOdds\": totalUnderOdds\n"
+                "            \"starting\": starting\n"
+                "            \"home\": home command\n"
+                "            \"away\": away command\n"
+                "            \"tournament\": tournament\n"
+                "          }\n"
+                "        },\n"
+                "        ...\n"
+                "      ],                          (list) The list of legs.\n"
+                "    \"address\": playerAddress    (string) The player address.\n"
+                "    \"amount\": x.xxx,            (numeric) The amount bet in WGR.\n"
+                "    \"time\": \"betting time\",    (string) The betting time.\n"
+                "    \"result\": lose/win/refund/pending\n"
+                "  },\n"
+                "  ...\n"
+                "]\n"
+
+                "\nExamples:\n" +
+                HelpExampleCli("getallbets", ""));
+
+    uint32_t limit = 0;
+    if (params.size()  == 1)
+        limit = params[0].get_int();
+
+    return GetBets(limit);
+}
+
+
+UniValue getmybets(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw std::runtime_error(
+                "getmybets\n"
+                "\nGet bets info for my wallets.\n"
+
+                "\nArguments:\n"
+                "1. Last bets limit (numeric, optional) Limit response to last bets number.\n"
+                "\nResult:\n"
+                "[\n"
+                "  {\n"
+                "    \"legs\":\n"
+                "      [\n"
+                "        {\n"
+                "          \"event-id\": id,\n"
+                "          \"outcome\": type,\n"
+                "          \"lockedEvent\": {\n"
+                "            \"homeOdds\": homeOdds\n"
+                "            \"awayOdds\": awayOdds\n"
+                "            \"drawOdds\": drawOdds\n"
+                "            \"spreadVersion\": spreadVersion\n"
+                "            \"spreadPoints\": spreadPoints\n"
+                "            \"spreadHomeOdds\": spreadHomeOdds\n"
+                "            \"spreadAwayOdds\": spreadAwayOdds\n"
+                "            \"totalPoints\": totalPoints\n"
+                "            \"totalOverOdds\": totalOverOdds\n"
+                "            \"totalUnderOdds\": totalUnderOdds\n"
+                "            \"starting\": starting\n"
+                "            \"home\": home command\n"
+                "            \"away\": away command\n"
+                "            \"tournament\": tournament\n"
+                "          }\n"
+                "        },\n"
+                "        ...\n"
+                "      ],                          (list) The list of legs.\n"
+                "    \"address\": playerAddress    (string) The player address.\n"
+                "    \"amount\": x.xxx,            (numeric) The amount bet in WGR.\n"
+                "    \"time\": \"betting time\",    (string) The betting time.\n"
+                "    \"result\": lose/win/refund/pending\n"
+                "  },\n"
+                "  ...\n"
+                "]\n"
+
+                "\nExamples:\n" +
+                HelpExampleCli("getmybets", ""));
+
+    uint32_t limit = 0;
+    if (params.size() == 1)
+        limit = params[0].get_int();
+
+    EnsureWalletIsUnlocked();
+
+    return GetBets(limit, pwalletMain);
 }
 
 UniValue listchaingamesbets(const UniValue& params, bool fHelp)
@@ -923,7 +1156,7 @@ UniValue getaccountaddress(const UniValue& params, bool fHelp)
             "\nReturns the current WAGERR address for receiving payments to this account.\n"
 
             "\nArguments:\n"
-            "1. \"account\"       (string, required) The account name for the address. It can also be set to the empty string \"\" to represent the default account. The account does not need to exist, it will be created and a new address created  if there is no account by the given name.\n"
+
 
             "\nResult:\n"
             "\"wagerraddress\"   (string) The account wagerr address\n"

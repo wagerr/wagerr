@@ -118,11 +118,11 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
     if (result.nResultType == ResultType::eventRefund)
         return refundOdds;
     switch (bet.nOutcome) {
-        case moneyLineWin:
+        case moneyLineHomeWin:
             if (result.nResultType == ResultType::mlRefund || (lockedEvent.nHomeOdds == 0 && fWagerrProtocolV3)) return refundOdds;
             if (result.nHomeScore > result.nAwayScore) return lockedEvent.nHomeOdds;
             break;
-        case moneyLineLose:
+        case moneyLineAwayWin:
             if (result.nResultType == ResultType::mlRefund || (lockedEvent.nAwayOdds == 0 && fWagerrProtocolV3)) return refundOdds;
             if (result.nAwayScore > result.nHomeScore) return lockedEvent.nAwayOdds;
             break;

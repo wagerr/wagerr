@@ -10,6 +10,9 @@
 class CBetOut;
 class CBettingsView;
 class CPayoutInfo;
+class CPeerlessBet;
+class CPeerlessEvent;
+class CPeerlessResult;
 
 /** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
 int64_t GetBlockPayouts(std::multimap<CPayoutInfo, CBetOut>& mExpectedPayouts, CAmount& nMNBetReward, uint32_t nBlockHeight);
@@ -22,5 +25,7 @@ void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::multimap<C
 
 /** Get the chain games winner and return the payout vector. **/
 void GetCGLottoBetPayouts(int height, std::multimap<CPayoutInfo, CBetOut>& mExpectedPayouts);
+
+uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, const CPeerlessResult &result, const bool fWagerrProtocolV3);
 
 #endif // WAGERR_V2_BET_H

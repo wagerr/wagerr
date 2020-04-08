@@ -257,12 +257,11 @@ UniValue getpayoutinfo(const UniValue& params, bool fHelp)
  */
 UniValue getpayoutinfosince(const UniValue& params, bool fHelp)
 {
-    if (fHelp || (params.size() < 1 || params.size() > 2))
+    if (fHelp || (params.size() > 1))
         throw std::runtime_error(
                 "getpayoutinfosince\n"
                 "\nGet an info for given  .\n"
-                "1. Start block height  (numeric, requied) Block number for starting payouts info search.\n"
-                "2. End block height  (numeric, optional) Block number for ending payouts info search.\n"
+                "1. Last blocks (numeric, optional) default = 10.\n"
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
@@ -277,16 +276,19 @@ UniValue getpayoutinfosince(const UniValue& params, bool fHelp)
                 "  }\n"
                 "]\n"
                 "\nExamples:\n" +
-                HelpExampleCli("getpayoutinfosince", "600 650") + HelpExampleRpc("getpayoutinfosince", "600 650"));
+                HelpExampleCli("getpayoutinfosince", "15") + HelpExampleRpc("getpayoutinfosince", "15"));
 
-    uint32_t startBlockHeight = params[0].get_int();
-    uint32_t endBlockHeight = 0;
     std::vector<std::pair<bool, CPayoutInfo>> vPayoutsInfo;
-    bool endHeight = false;
-    if (params.size() == 2) {
-        endHeight = true;
-        endBlockHeight = params[1].get_int();
+    uint32_t nLastBlocks = 10;
+    if (params.size() == 1) {
+        nLastBlocks = params[0].get_int();
+        if (nLastBlocks < 1)
+            throw std::runtime_error("Invalid number of last blocks.");
     }
+
+    int nCurrentHeight = chainActive.Height();
+
+    uint32_t startBlockHeight = static_cast<uint32_t>(nCurrentHeight) - nLastBlocks + 1;
 
     auto it = bettingsView->payoutsInfo->NewIterator();
     for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{startBlockHeight, COutPoint()})); it->Valid(); it->Next()) {
@@ -294,8 +296,6 @@ UniValue getpayoutinfosince(const UniValue& params, bool fHelp)
         CPayoutInfo payoutInfo;
         CBettingDB::BytesToDbType(it->Key(), key);
         CBettingDB::BytesToDbType(it->Value(), payoutInfo);
-        if (endHeight && key.blockHeight > endBlockHeight)
-            break;
         vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{true, payoutInfo});
     }
 
