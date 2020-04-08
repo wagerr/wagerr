@@ -119,10 +119,10 @@ void GetBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::ve
 
         // Find MoneyLine outcome (result).
         if (result.nHomeScore > result.nAwayScore) {
-            nMoneylineResult = moneyLineWin;
+            nMoneylineResult = moneyLineHomeWin;
         }
         else if (result.nHomeScore < result.nAwayScore) {
-            nMoneylineResult = moneyLineLose;
+            nMoneylineResult = moneyLineAwayWin;
         }
         else if (result.nHomeScore == result.nAwayScore) {
             nMoneylineResult = moneyLineDraw;
@@ -167,10 +167,10 @@ void GetBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::ve
                                 tempEventStartTime = pe.nStartTime;
 
                                 // Set the temp moneyline odds.
-                                if (nMoneylineResult == moneyLineWin) {
+                                if (nMoneylineResult == moneyLineHomeWin) {
                                     nTempMoneylineOdds = pe.nHomeOdds;
                                 }
-                                else if (nMoneylineResult == moneyLineLose) {
+                                else if (nMoneylineResult == moneyLineAwayWin) {
                                     nTempMoneylineOdds = pe.nAwayOdds;
                                 }
                                 else if (nMoneylineResult == moneyLineDraw) {
@@ -209,10 +209,10 @@ void GetBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::ve
                             UpdateMoneyLine = true;
 
                             // If current event ID matches result ID set the odds.
-                            if (nMoneylineResult == moneyLineWin) {
+                            if (nMoneylineResult == moneyLineHomeWin) {
                                 nTempMoneylineOdds = puo.nHomeOdds;
                             }
-                            else if (nMoneylineResult == moneyLineLose) {
+                            else if (nMoneylineResult == moneyLineAwayWin) {
                                 nTempMoneylineOdds = puo.nAwayOdds;
                             }
                             else if (nMoneylineResult == moneyLineDraw) {
@@ -376,8 +376,8 @@ void GetBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::ve
                                     } else if (result.nResultType == ResultType::mlRefund){
                                         // Calculate winnings.
                                         if (pb.nOutcome == OutcomeType::moneyLineDraw ||
-                                                pb.nOutcome == OutcomeType::moneyLineLose ||
-                                                pb.nOutcome == OutcomeType::moneyLineWin) {
+                                                pb.nOutcome == OutcomeType::moneyLineAwayWin ||
+                                                pb.nOutcome == OutcomeType::moneyLineHomeWin) {
                                             payout = betAmount;
                                         }
                                         else if (spreadsFound && (pb.nOutcome == vSpreadsResult.at(0) || pb.nOutcome == vSpreadsResult.at(1))) {

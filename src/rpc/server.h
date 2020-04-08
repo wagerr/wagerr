@@ -290,6 +290,8 @@ extern UniValue getmappingid(const UniValue& params, bool fHelp);
 extern UniValue getmappingname(const UniValue& params, bool fHelp);
 extern UniValue getbet(const UniValue& params, bool fHelp);
 extern UniValue listbetsdb(const UniValue& params, bool fHelp);
+extern UniValue getallbets(const UniValue& params, bool fHelp);
+extern UniValue getmybets(const UniValue& params, bool fHelp);
 extern UniValue getpayoutinfo(const UniValue& params, bool fHelp);
 extern UniValue getpayoutinfosince(const UniValue& params, bool fHelp);
 

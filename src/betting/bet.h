@@ -21,8 +21,8 @@
 
 // The supported bet outcome types.
 typedef enum OutcomeType {
-    moneyLineWin  = 0x01,
-    moneyLineLose = 0x02,
+    moneyLineHomeWin  = 0x01,
+    moneyLineAwayWin = 0x02,
     moneyLineDraw = 0x03,
     spreadHome    = 0x04,
     spreadAway    = 0x05,
@@ -79,6 +79,13 @@ typedef enum PayoutType {
     chainGamesRefund = 0x05,
     chainGamesReward = 0x06
 } PayoutType;
+
+typedef enum BetResultType {
+    betResultUnknown = 0x00,
+    betResultWin = 0x01,
+    betResultLose = 0x02,
+    betResultRefund = 0x03,
+} BetResultType;
 
 // Class derived from CTxOut
 // nBetValue is NOT serialized, nor is it included in the hash or in comparison functions
@@ -297,63 +304,6 @@ public:
             READWRITE(outcome);
         }
     }
-};
-
-// class for serializing bets on DB
-class CUniversalBet
-{
-public:
-    CAmount betAmount;
-    CBitcoinAddress playerAddress;
-    // one elem means single bet, else it is parlay bet, max size = 5
-    std::vector<CPeerlessBet> legs;
-    // vector for member event condition
-    std::vector<CPeerlessEvent> lockedEvents;
-    COutPoint betOutPoint;
-    int64_t betTime;
-
-    explicit CUniversalBet() { }
-    explicit CUniversalBet(const CAmount amount, const CBitcoinAddress address, const std::vector<CPeerlessBet> vLegs, const std::vector<CPeerlessEvent> vEvents, const COutPoint outPoint, const int64_t time) :
-        betAmount(amount), playerAddress(address), legs(vLegs), lockedEvents(vEvents), betOutPoint(outPoint), betTime(time) { }
-    explicit CUniversalBet(const CUniversalBet& bet)
-    {
-        betAmount = bet.betAmount;
-        playerAddress = bet.playerAddress;
-        legs = bet.legs;
-        lockedEvents = bet.lockedEvents;
-        betOutPoint = bet.betOutPoint;
-        betTime = bet.betTime;
-        completed = bet.completed;
-    }
-
-    bool IsCompleted() { return completed; }
-    void SetCompleted() { completed = true; }
-    // for undo
-    void SetUncompleted() { completed = false; }
-
-    ADD_SERIALIZE_METHODS;
-
-    template <typename Stream, typename Operation>
-    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
-        std::string addrStr;
-        READWRITE(betAmount);
-        if (ser_action.ForRead()) {
-            READWRITE(addrStr);
-            playerAddress.SetString(addrStr);
-        }
-        else {
-            addrStr = playerAddress.ToString();
-            READWRITE(addrStr);
-        }
-        READWRITE(legs);
-        READWRITE(lockedEvents);
-        READWRITE(betOutPoint);
-        READWRITE(betTime);
-        READWRITE(completed);
-    }
-
-private:
-    bool completed = false;
 };
 
 class CPeerlessResult
@@ -615,7 +565,79 @@ typedef struct UniversalBetKey {
     }
 } UniversalBetKey;
 
-// UndoKey
+// class for serializing bets on DB
+class CUniversalBet
+{
+public:
+    CAmount betAmount;
+    CBitcoinAddress playerAddress;
+    // one elem means single bet, else it is parlay bet, max size = 5
+    std::vector<CPeerlessBet> legs;
+    // vector for member event condition
+    std::vector<CPeerlessEvent> lockedEvents;
+    COutPoint betOutPoint;
+    int64_t betTime;
+    BetResultType resultType = BetResultType::betResultUnknown;
+    CAmount payout = 0;
+
+    explicit CUniversalBet() { }
+    explicit CUniversalBet(const CAmount amount, const CBitcoinAddress address, const std::vector<CPeerlessBet> vLegs, const std::vector<CPeerlessEvent> vEvents, const COutPoint outPoint, const int64_t time) :
+        betAmount(amount), playerAddress(address), legs(vLegs), lockedEvents(vEvents), betOutPoint(outPoint), betTime(time) { }
+    explicit CUniversalBet(const CUniversalBet& bet)
+    {
+        betAmount = bet.betAmount;
+        playerAddress = bet.playerAddress;
+        legs = bet.legs;
+        lockedEvents = bet.lockedEvents;
+        betOutPoint = bet.betOutPoint;
+        betTime = bet.betTime;
+        completed = bet.completed;
+        resultType = bet.resultType;
+        payout = bet.payout;
+    }
+
+    bool IsCompleted() { return completed; }
+    void SetCompleted() { completed = true; }
+    // for undo
+    void SetUncompleted() { completed = false; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        std::string addrStr;
+        READWRITE(betAmount);
+        if (ser_action.ForRead()) {
+            READWRITE(addrStr);
+            playerAddress.SetString(addrStr);
+        }
+        else {
+            addrStr = playerAddress.ToString();
+            READWRITE(addrStr);
+        }
+        READWRITE(legs);
+        READWRITE(lockedEvents);
+        READWRITE(betOutPoint);
+        READWRITE(betTime);
+        READWRITE(completed);
+        uint8_t resType;
+        if (ser_action.ForRead()) {
+            READWRITE(resType);
+            resultType = (BetResultType) resType;
+        }
+        else {
+            resType = (uint8_t) resultType;
+            READWRITE(resType);
+        }
+        READWRITE(payout);
+    }
+
+private:
+    bool completed = false;
+};
+
+// Betting Undo
+
 using BettingUndoKey = uint256;
 
 using BettingUndoVariant = boost::variant<CMapping, CPeerlessEvent, CPeerlessResult>;
@@ -710,6 +732,8 @@ public:
 private:
     BettingUndoVariant undoVariant;
 };
+
+// Payout Info
 
 using PayoutInfoKey = UniversalBetKey;
 

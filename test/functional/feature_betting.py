@@ -545,7 +545,7 @@ class BettingTest(BitcoinTestFramework):
 
         self.sync_all()
 
-        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
+        payoutsInfo = self.nodes[0].getpayoutinfosince(1)
 
         check_bet_payouts_info(listbets, payoutsInfo)
 
@@ -602,7 +602,7 @@ class BettingTest(BitcoinTestFramework):
 
         self.sync_all()
 
-        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
+        payoutsInfo = self.nodes[0].getpayoutinfosince(1)
 
         check_bet_payouts_info(listbets, payoutsInfo)
 
@@ -717,7 +717,7 @@ class BettingTest(BitcoinTestFramework):
 
         self.sync_all()
 
-        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
+        payoutsInfo = self.nodes[0].getpayoutinfosince(1)
 
         check_bet_payouts_info(listbets, payoutsInfo)
 
@@ -820,7 +820,7 @@ class BettingTest(BitcoinTestFramework):
 
         self.sync_all()
 
-        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
+        payoutsInfo = self.nodes[0].getpayoutinfosince(1)
 
         check_bet_payouts_info(listbets, payoutsInfo)
 
@@ -890,7 +890,7 @@ class BettingTest(BitcoinTestFramework):
 
         self.sync_all()
 
-        payoutsInfo = self.nodes[0].getpayoutinfosince(height, height)
+        payoutsInfo = self.nodes[0].getpayoutinfosince(1)
 
         check_bet_payouts_info(listbets, payoutsInfo)
 

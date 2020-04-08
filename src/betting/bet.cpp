@@ -326,7 +326,6 @@ bool CPeerlessBet::ParlayFromOpCode(const std::string& opCode, std::vector<CPeer
 {
     if (opCode.size() < PPB_OP_STRMINLEN) return false;
     CDataStream ss(ParseHex(opCode), SER_NETWORK, CLIENT_VERSION);
-    std::vector<CPeerlessBet> vBets;
     uint8_t byte;
     legs.clear();
     // get BTX prefix
@@ -1193,7 +1192,7 @@ std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEve
 
 /**
  * Undo only bet payout mark as completed in DB.
- * But coin tx outs were undid early.
+ * But coin tx outs were undid early in native bitcoin core.
  * @return
  */
 bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
@@ -1254,6 +1253,8 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
 
             if (needUndo) {
                 uniBet.SetUncompleted();
+                uniBet.resultType = BetResultType::betResultUnknown;
+                uniBet.payout = 0;
                 vEntriesToUpdate.emplace_back(std::pair<UniversalBetKey, CUniversalBet>{uniBetKey, uniBet});
             }
         }
@@ -1393,10 +1394,10 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                             bettingsViewCache.events->Read(eventKey, plEvent)) {
                         vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
                         switch (bet.nOutcome) {
-                            case moneyLineWin:
+                            case moneyLineHomeWin:
                                 plEvent.nMoneyLineHomeBets += 1;
                                 break;
-                            case moneyLineLose:
+                            case moneyLineAwayWin:
                                 plEvent.nMoneyLineAwayBets += 1;
                                 break;
                             case moneyLineDraw:
@@ -1455,13 +1456,13 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndo{BettingUndoVariant{plEvent}, (uint32_t)height}});
                     // Check which outcome the bet was placed on and add to accumulators
                     switch (plBet.nOutcome) {
-                        case moneyLineWin:
+                        case moneyLineHomeWin:
                             CalculatePayoutBurnAmounts(betAmount, plEvent.nHomeOdds, payout, burn);
 
                             plEvent.nMoneyLineHomePotentialLiability += payout / COIN ;
                             plEvent.nMoneyLineHomeBets += 1;
                             break;
-                        case moneyLineLose:
+                        case moneyLineAwayWin:
                             CalculatePayoutBurnAmounts(betAmount, plEvent.nAwayOdds, payout, burn);
 
                             plEvent.nMoneyLineAwayPotentialLiability += payout / COIN ;
