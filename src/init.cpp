@@ -192,66 +192,6 @@ void PrepareShutdown()
     if (!lockShutdown)
         return;
 
-    // TODO - We are assuming that the use of locks will not be required when
-    // writing a map index to a .dat file because all writing to a
-    // .dat should happen on the same thread. If this is not the case
-    // then a lock mechanism will have to be implemented to ensure we don't
-    // corrupt any .dat when we want the write to it.
-    // Get the latest block hash.
-    CBlockIndex *blockIndex = chainActive[chainActive.Height()];
-
-    CBlock block;
-    ReadBlockFromDisk(block, blockIndex);
-    uint256 lastBlockHash = block.GetHash();
-
-    // Write the events index to disk.
-    eventIndex_t eventIndex;
-    CEventDB::GetEvents(eventIndex);
-    CEventDB edb;
-
-    if (!edb.Write(eventIndex, lastBlockHash))
-        LogPrintf("Failed to write to the events.dat\n");
-
-    // Write the sports mapping index to sports.dat.
-    mappingIndex_t sportsIndex;
-    CMappingDB msdb("sports.dat");
-    msdb.GetSports(sportsIndex);
-
-    if (!msdb.Write(sportsIndex, lastBlockHash))
-        LogPrintf("Failed to write to the sports.dat\n");
-
-    // Write the rounds mapping index to rounds.dat.
-    mappingIndex_t roundsIndex;
-    CMappingDB mrdb("rounds.dat");
-    mrdb.GetRounds(roundsIndex);
-
-    if (!mrdb.Write(roundsIndex, lastBlockHash))
-        LogPrintf("Failed to write to the rounds.dat\n");
-
-    // Write the teams mapping index to teams.dat.
-    mappingIndex_t teamsIndex;
-    CMappingDB mtdb("teams.dat");
-    mtdb.GetTeams(teamsIndex);
-
-    if (!mtdb.Write(teamsIndex, lastBlockHash))
-        LogPrintf("Failed to write to the teams.dat\n");
-
-    // Write the tournaments mapping index to tournaments.dat.
-    mappingIndex_t tournamentsIndex;
-    CMappingDB mtodb("tournaments.dat");
-    mtodb.GetTournaments(tournamentsIndex);
-
-    if (!mtodb.Write(tournamentsIndex, lastBlockHash))
-        LogPrintf("Failed to write to the tournaments.dat\n");
-
-    // Write the results index to results.dat.
-    CResultDB rdb;
-    resultsIndex_t resultsIndex;
-    rdb.GetResults(resultsIndex);
-
-    if (!rdb.Write(resultsIndex, lastBlockHash))
-        LogPrintf("Failed to write to the results.dat\n");
-
     /// Note: Shutdown() must be able to handle cases in which AppInit2() failed part of the way,
     /// for example if the data directory was found to be locked.
     /// Be sure that anything that writes files or flushes caches only does this if the respective
@@ -308,6 +248,8 @@ void PrepareShutdown()
         zerocoinDB = NULL;
         delete pSporkDB;
         pSporkDB = NULL;
+        delete bettingsView;
+        bettingsView = NULL;
     }
 #ifdef ENABLE_WALLET
     if (pwalletMain)
@@ -1510,6 +1452,7 @@ bool AppInit2()
                 delete pblocktree;
                 delete zerocoinDB;
                 delete pSporkDB;
+                delete bettingsView;
 
                 //WAGERR specific: zerocoin and spork DB's
                 zerocoinDB = new CZerocoinDB(0, false, fReindex);
@@ -1520,65 +1463,34 @@ bool AppInit2()
                 pcoinscatcher = new CCoinsViewErrorCatcher(pcoinsdbview);
                 pcoinsTip = new CCoinsViewCache(pcoinscatcher);
 
-                // TODO - When reading from the events.dat we also return the
-                // last block hash. The idea was to use this to cycle the block chain
-                // from that block and update the event index with any missing data.
-                // AcceptBlock() already does this, but if this is not good enough
-                // then we may have to implement the solution outlined above.
-                // Load up the events from the events.dat.
-                eventIndex_t eventIndex;
-                uint256 lastBlockHash;
-                CEventDB edb;
+                // Flushable database model has the following structure:
+                // globalDB: --(r, w, del, exist)--> { CacheDB_glob_map -> { LevelDB } }.
+                // If we need make cache from global DB, for example,
+                // in those places where it is made in the original BitcoinCore,
+                // we should make CBettingsView cacheDb(globalDb) and the structure will be:
+                // cacheDB: --(r, w, del, exist)--> { CacheDB_loc_map -> { CacheDB_glob_map -> { LevelDB } } }.
+                // The Flush() operation at cacheDB will copy data from CacheDB_loc_map to CacheDB_glob_map
+                // and the Flush() at globalDB will write data from CacheDB_glob_map to LevelDB (persistent storage).
+                bettingsView = new CBettingsView();
+                // create Level DB storage for global betting database
+                bettingsView->mappingsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("mappings"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                // create cacheble betting DB with LevelDB storage as main storage
+                bettingsView->mappings = MakeUnique<CBettingDB>(*bettingsView->mappingsStorage.get());
 
-                if (!edb.Read(eventIndex, lastBlockHash))
-                    LogPrintf("Invalid or missing events.dat; recreating\n");
+                bettingsView->eventsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("events"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->events = MakeUnique<CBettingDB>(*bettingsView->eventsStorage.get());
 
-                CEventDB::SetEvents(eventIndex);
+                bettingsView->resultsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("results"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->results = MakeUnique<CBettingDB>(*bettingsView->resultsStorage.get());
 
-                // Load up the sports from the sports.dat.
-                CMappingDB cmSportsDb("sports.dat");
-                mappingIndex_t sportsIndex;
-                uint256 sportsLastBlockHash;
-                if (!cmSportsDb.Read(sportsIndex, sportsLastBlockHash))
-                    LogPrintf("Invalid or missing sports.dat; recreating\n");
+                bettingsView->betsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("bets"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->bets = MakeUnique<CBettingDB>(*bettingsView->betsStorage.get());
 
-                cmSportsDb.SetSports(sportsIndex);
+                bettingsView->undosStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("undos"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->undos = MakeUnique<CBettingDB>(*bettingsView->undosStorage.get());
 
-                // Load up the rounds from the rounds.dat.
-                CMappingDB cmRoundsDb("rounds.dat");
-                mappingIndex_t roundsIndex;
-                uint256 roundsLastBlockHash;
-                if (!cmRoundsDb.Read(roundsIndex, roundsLastBlockHash))
-                    LogPrintf("Invalid or missing rounds.dat; recreating\n");
-
-                cmRoundsDb.SetRounds(roundsIndex);
-
-                // Load up the teams from the teams.dat.
-                CMappingDB cmTeamsDb("teams.dat");
-                mappingIndex_t teamsIndex;
-                uint256 teamsLastBlockHash;
-                if (!cmTeamsDb.Read(teamsIndex, teamsLastBlockHash))
-                    LogPrintf("Invalid or missing teams.dat; recreating\n");
-
-                cmTeamsDb.SetTeams(teamsIndex);
-
-                // Load up the tournaments from the tournaments.dat.
-                CMappingDB cmTournamentsDb("tournaments.dat");
-                mappingIndex_t tournamentsIndex;
-                uint256 tournamentsLastBlockHash;
-                if (!cmTournamentsDb.Read(tournamentsIndex, tournamentsLastBlockHash))
-                    LogPrintf("Invalid or missing tournaments.dat; recreating\n");
-
-                cmTournamentsDb.SetTournaments(tournamentsIndex);
-
-                // Load up the results from the results.dat.
-                CResultDB rdb;
-                resultsIndex_t resultsIndex;
-                uint256 resultsLastBlockHash;
-                if (!rdb.Read(resultsIndex, resultsLastBlockHash))
-                    LogPrintf("Invalid or missing results.dat; recreating\n");
-
-                rdb.SetResults(resultsIndex);
+                bettingsView->payoutsInfoStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("payoutsinfo"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->payoutsInfo = MakeUnique<CBettingDB>(*bettingsView->payoutsInfoStorage.get());
 
                 if (fReindex)
                     pblocktree->WriteReindexing(true);
@@ -1718,6 +1630,9 @@ bool AppInit2()
                         fVerifyingBlocks = false;
                         break;
                     }
+
+                    if (!RecoveryBettingDB(uiInterface.InitMessage))
+                        return InitError(_("Failed to recovery betting database, please start with -reindex"));
                 }
             } catch (std::exception& e) {
                 if (fDebug) LogPrintf("%s\n", e.what());

@@ -67,116 +67,140 @@ UniValue listevents(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("listevents", "") + HelpExampleRpc("listevents", ""));
 
-    CEventDB edb;
-    eventIndex_t eventsIndex;
-    edb.GetEvents(eventsIndex);
-
-    mappingIndex_t sportsIndex;
-    CMappingDB msdb("sports.dat");
-    msdb.GetSports(sportsIndex);
-
-    mappingIndex_t roundsIndex;
-    CMappingDB mrdb("rounds.dat");
-    mrdb.GetRounds(roundsIndex);
-
-    mappingIndex_t teamsIndex;
-    CMappingDB mtdb("teams.dat");
-    mtdb.GetTeams(teamsIndex);
-
-    mappingIndex_t tournamentsIndex;
-    CMappingDB mtodb("tournaments.dat");
-    mtodb.GetTournaments(tournamentsIndex);
+    UniValue result{UniValue::VARR};
 
     std::string sportFilter = "";
 
-    if (params.size() >= 1) {
+    if (params.size() > 0) {
         sportFilter = params[0].get_str();
     }
 
-    // Check the events index actually has events,
-    if (eventsIndex.size() < 1) {
-        throw std::runtime_error("Currently no events to list.");
+    auto it = bettingsView->events->NewIterator();
+    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        CPeerlessEvent plEvent;
+        CMapping mapping;
+        CBettingDB::BytesToDbType(it->Value(), plEvent);
+
+        if (!bettingsView->mappings->Read(MappingKey{sportMapping, plEvent.nSport}, mapping))
+            continue;
+
+        std::string sport = mapping.sName;
+
+        // if event filter is set the don't list event if it doesn't match the filter.
+        if (params.size() > 0 && sportFilter != sport) {
+            continue;
+        }
+
+        // Only list active events.
+        if ((time_t) plEvent.nStartTime < std::time(0)) {
+            continue;
+        }
+
+        //std::string round    = roundsIndex.find(plEvent.nStage)->second.sName;
+        if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping))
+            continue;
+        std::string tournament = mapping.sName;
+        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping))
+            continue;
+        std::string homeTeam = mapping.sName;
+        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping))
+            continue;
+        std::string awayTeam = mapping.sName;
+
+        UniValue evt(UniValue::VOBJ);
+
+        evt.push_back(Pair("event_id", (uint64_t) plEvent.nEventId));
+        evt.push_back(Pair("sport", sport));
+        evt.push_back(Pair("tournament", tournament));
+        //evt.push_back(Pair("round", ""));
+
+        evt.push_back(Pair("starting", (uint64_t) plEvent.nStartTime));
+        evt.push_back(Pair("tester", (uint64_t) plEvent.nAwayTeam));
+
+        UniValue teams(UniValue::VOBJ);
+
+        teams.push_back(Pair("home", homeTeam));
+        teams.push_back(Pair("away", awayTeam));
+
+        evt.push_back(Pair("teams", teams));
+
+        UniValue odds(UniValue::VARR);
+
+        UniValue mlOdds(UniValue::VOBJ);
+        UniValue spreadOdds(UniValue::VOBJ);
+        UniValue totalsOdds(UniValue::VOBJ);
+
+        mlOdds.push_back(Pair("mlHome", (uint64_t) plEvent.nHomeOdds));
+        mlOdds.push_back(Pair("mlAway", (uint64_t) plEvent.nAwayOdds));
+        mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
+
+        spreadOdds.push_back(Pair("spreadVersion", (uint64_t) plEvent.nSpreadVersion));
+        spreadOdds.push_back(Pair("spreadPoints", (uint64_t) plEvent.nSpreadPoints));
+        spreadOdds.push_back(Pair("spreadHome", (uint64_t) plEvent.nSpreadHomeOdds));
+        spreadOdds.push_back(Pair("spreadAway", (uint64_t) plEvent.nSpreadAwayOdds));
+
+        totalsOdds.push_back(Pair("totalsPoints", (uint64_t) plEvent.nTotalPoints));
+        totalsOdds.push_back(Pair("totalsOver", (uint64_t) plEvent.nTotalOverOdds));
+        totalsOdds.push_back(Pair("totalsUnder", (uint64_t) plEvent.nTotalUnderOdds));
+
+        odds.push_back(mlOdds);
+        odds.push_back(spreadOdds);
+        odds.push_back(totalsOdds);
+
+        evt.push_back(Pair("odds", odds));
+
+        result.push_back(evt);
     }
 
-    UniValue ret(UniValue::VARR);
+    return result;
+}
 
-    std::map<uint32_t, CPeerlessEvent>::iterator it;
-    for (it = eventsIndex.begin(); it != eventsIndex.end(); it++) {
+UniValue listeventsdebug(const UniValue& params, bool fHelp)
+{
+    if (fHelp || (params.size() > 0))
+        throw std::runtime_error(
+            "listeventsdebug\n"
+            "\nGet all Wagerr events from db.\n"
 
-        try {
-            CPeerlessEvent plEvent = it->second;
+            "\nResult:\n"
 
-            // Ensure all the mapping indexes for this event are set. Discard the event is any mappings are not set.
-            if (!sportsIndex.count(plEvent.nSport) || !tournamentsIndex.count(plEvent.nTournament) || !teamsIndex.count(plEvent.nHomeTeam) || !teamsIndex.count(plEvent.nAwayTeam)) {
-                continue;
-            }
+            "\nExamples:\n" +
+            HelpExampleCli("listeventsdebug", "") + HelpExampleRpc("listeventsdebug", ""));
 
-            std::string sport = sportsIndex.find(plEvent.nSport)->second.sName;
+    UniValue result{UniValue::VARR};
 
-            // if event filter is set the don't list event if it doesn't match the filter.
-            if (params.size() > 0 && sportFilter != sport) {
-                continue;
-            }
+    auto time = std::time(0);
 
-            // Only list active events.
-            if ((time_t) plEvent.nStartTime < std::time(0)) {
-                continue;
-            }
+    auto it = bettingsView->events->NewIterator();
+    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        CPeerlessEvent plEvent;
+        CMapping mapping;
+        CBettingDB::BytesToDbType(it->Value(), plEvent);
 
-            //std::string round    = roundsIndex.find(plEvent.nStage)->second.sName;
-            std::string tournament = tournamentsIndex.find(plEvent.nTournament)->second.sName;
-            std::string homeTeam   = teamsIndex.find(plEvent.nHomeTeam)->second.sName;
-            std::string awayTeam   = teamsIndex.find(plEvent.nAwayTeam)->second.sName;
+        std::stringstream strStream;
 
-            UniValue evt(UniValue::VOBJ);
+        auto started = ((time_t) plEvent.nStartTime < time) ? std::string("true") : std::string("false");
 
-            evt.push_back(Pair("event_id", (uint64_t) plEvent.nEventId));
-            evt.push_back(Pair("sport", sport));
-            evt.push_back(Pair("tournament", tournament));
-            //evt.push_back(Pair("round", ""));
+        strStream << "eventId=" << plEvent.nEventId << ", sport: " << plEvent.nSport << ", tournament: " << plEvent.nTournament << ", round: " << plEvent.nStage << ", home: " << plEvent.nHomeTeam << ", away: " << plEvent.nAwayTeam << ", homeOdds:" << plEvent.nHomeOdds << ", awayOdds: " << plEvent.nAwayOdds << ", drawOdds: " << plEvent.nDrawOdds << ", started: " << started << ".";
 
-            evt.push_back(Pair("starting", (uint64_t) plEvent.nStartTime));
-            evt.push_back(Pair("tester", (uint64_t) plEvent.nAwayTeam));
-
-            UniValue teams(UniValue::VOBJ);
-
-            teams.push_back(Pair("home", homeTeam));
-            teams.push_back(Pair("away", awayTeam));
-
-            evt.push_back(Pair("teams", teams));
-
-            UniValue odds(UniValue::VARR);
-
-            UniValue mlOdds(UniValue::VOBJ);
-            UniValue spreadOdds(UniValue::VOBJ);
-            UniValue totalsOdds(UniValue::VOBJ);
-
-            mlOdds.push_back(Pair("mlHome", (uint64_t) plEvent.nHomeOdds));
-            mlOdds.push_back(Pair("mlAway", (uint64_t) plEvent.nAwayOdds));
-            mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
-
-            spreadOdds.push_back(Pair("spreadPoints", (uint64_t) plEvent.nSpreadPoints));
-            spreadOdds.push_back(Pair("spreadHome", (uint64_t) plEvent.nSpreadHomeOdds));
-            spreadOdds.push_back(Pair("spreadAway", (uint64_t) plEvent.nSpreadAwayOdds));
-
-            totalsOdds.push_back(Pair("totalsPoints", (uint64_t) plEvent.nTotalPoints));
-            totalsOdds.push_back(Pair("totalsOver", (uint64_t) plEvent.nTotalOverOdds));
-            totalsOdds.push_back(Pair("totalsUnder", (uint64_t) plEvent.nTotalUnderOdds));
-
-            odds.push_back(mlOdds);
-            odds.push_back(spreadOdds);
-            odds.push_back(totalsOdds);
-
-            evt.push_back(Pair("odds", odds));
-
-            ret.push_back(evt);
+        if (!bettingsView->mappings->Read(MappingKey{sportMapping, plEvent.nSport}, mapping)) {
+            strStream << " No sport mapping!";
         }
-        catch (std::exception& e) {
-            LogPrintf("ListEvents() failed to pull event data from .dats ");
+        if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+            strStream << " No tournament mapping!";
         }
+        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+            strStream << " No home team mapping!";
+        }
+        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+            strStream << " No away team mapping!";
+        }
+
+        result.push_back(strStream.str().c_str());
+        strStream.clear();
     }
 
-    return ret;
+    return result;
 }
 
 UniValue listchaingamesevents(const UniValue& params, bool fHelp)
@@ -296,21 +320,9 @@ UniValue listbets(const UniValue& params, bool fHelp)
     if (nFrom < 0)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative from");
 
-    UniValue ret(UniValue::VARR);
+    UniValue result{UniValue::VARR};
 
-    const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
-
-    CEventDB edb;
-    eventIndex_t eventIndex;
-    edb.GetEvents(eventIndex);
-
-    mappingIndex_t teamsIndex;
-    CMappingDB mtdb("teams.dat");
-    mtdb.GetTeams(teamsIndex);
-
-    mappingIndex_t tournamentsIndex;
-    CMappingDB mtodb("tournaments.dat");
-    mtodb.GetTournaments(tournamentsIndex);
+    const CWallet::TxItems & txOrdered{pwalletMain->wtxOrdered};
 
     // iterate backwards until we have nCount items to return:
     for (CWallet::TxItems::const_reverse_iterator it = txOrdered.rbegin(); it != txOrdered.rend(); ++it) {
@@ -335,88 +347,81 @@ UniValue listbets(const UniValue& params, bool fHelp)
                         entry.push_back(Pair("event-id", (uint64_t) plBet.nEventId));
 
                         // Retrieve the event details
-                        if (eventIndex.count(plBet.nEventId)){
-                            CPeerlessEvent plEvent = eventIndex.find(plBet.nEventId)->second;
+                        CPeerlessEvent plEvent;
+                        if (bettingsView->events->Read(EventKey{plBet.nEventId}, plEvent)) {
 
                             entry.push_back(Pair("starting", plEvent.nStartTime));
-                            if (teamsIndex.count(plEvent.nHomeTeam)) {
-                                entry.push_back(Pair("home", teamsIndex.find(plEvent.nHomeTeam)->second.sName));
+                            CMapping mapping;
+                            if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+                                entry.push_back(Pair("home", mapping.sName));
                             }
-                            if (teamsIndex.count(plEvent.nAwayTeam)) {
-                                entry.push_back(Pair("away", teamsIndex.find(plEvent.nAwayTeam)->second.sName));
+                            if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+                                entry.push_back(Pair("away", mapping.sName));
                             }
-                            if (tournamentsIndex.count(plEvent.nTournament)) {
-                                entry.push_back(Pair("tournament", tournamentsIndex.find(plEvent.nTournament)->second.sName));
+                            if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+                                entry.push_back(Pair("tournament", mapping.sName));
                             }
                         }
 
                         entry.push_back(Pair("team-to-win", (uint64_t) plBet.nOutcome));
                         entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
 
-                        // Check if the users bet has a result posted, if so check to see it its a winning or losing bet.
-                        CResultDB rdb;
-                        resultsIndex_t resultsIndex;
-                        rdb.GetResults(resultsIndex);
+                        std::string betResult = "pending";
+                        CPeerlessResult plResult;
+                        if (bettingsView->results->Read(ResultKey{plBet.nEventId}, plResult)) {
 
-                        if (resultsIndex.size() > 0) {
-                            std::string betResult = "pending";
+                            switch (plBet.nOutcome) {
+                                case OutcomeType::moneyLineWin:
+                                    betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
 
-                            if (resultsIndex.count(plBet.nEventId)) {
-                                CPeerlessResult plResult = resultsIndex.find(plBet.nEventId)->second;
+                                    break;
+                                case OutcomeType::moneyLineLose:
+                                    betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
 
-                                switch (plBet.nOutcome) {
-                                    case OutcomeType::moneyLineWin:
-                                        betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
+                                    break;
+                                case OutcomeType::moneyLineDraw :
+                                    betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
 
-                                        break;
-                                    case OutcomeType::moneyLineLose:
-                                        betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
+                                    break;
+                                case OutcomeType::spreadHome:
+                                    betResult = "Check block explorer for result.";
 
-                                        break;
-                                    case OutcomeType::moneyLineDraw :
-                                        betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
+                                    break;
+                                case OutcomeType::spreadAway:
+                                    betResult = "Check block explorer for result.";
 
-                                        break;
-                                    case OutcomeType::spreadHome:
-                                        betResult = "Check block explorer for result.";
+                                    break;
+                                case OutcomeType::totalOver:
+                                    betResult = "Check block explorer for result.";
 
-                                        break;
-                                    case OutcomeType::spreadAway:
-                                        betResult = "Check block explorer for result.";
+                                    break;
+                                case OutcomeType::totalUnder:
+                                    betResult = "Check block explorer for result.";
 
-                                        break;
-                                    case OutcomeType::totalOver:
-                                        betResult = "Check block explorer for result.";
-
-                                        break;
-                                    case OutcomeType::totalUnder:
-                                        betResult = "Check block explorer for result.";
-
-                                        break;
-                                    default :
-                                        LogPrintf("Invalid bet outcome");
-                                }
+                                    break;
+                                default :
+                                    LogPrintf("Invalid bet outcome");
                             }
-
-                            entry.push_back(Pair("result", betResult));
                         }
 
-                        ret.push_back(entry);
+                        entry.push_back(Pair("result", betResult));
+
+                        result.push_back(entry);
                     }
                 }
             }
         }
 
-        if ((int)ret.size() >= (nCount + nFrom)) break;
+        if ((int)result.size() >= (nCount + nFrom)) break;
     }
     // ret is newest to oldest
 
-    if (nFrom > (int)ret.size())
-        nFrom = ret.size();
-    if ((nFrom + nCount) > (int)ret.size())
-        nCount = ret.size() - nFrom;
+    if (nFrom > (int)result.size())
+        nFrom = result.size();
+    if ((nFrom + nCount) > (int)result.size())
+        nCount = result.size() - nFrom;
 
-    std::vector<UniValue> arrTmp = ret.getValues();
+    std::vector<UniValue> arrTmp = result.getValues();
 
     std::vector<UniValue>::iterator first = arrTmp.begin();
     std::advance(first, nFrom);
@@ -428,11 +433,11 @@ UniValue listbets(const UniValue& params, bool fHelp)
 
     std::reverse(arrTmp.begin(), arrTmp.end()); // Return oldest to newest
 
-    ret.clear();
-    ret.setArray();
-    ret.push_backV(arrTmp);
+    result.clear();
+    result.setArray();
+    result.push_backV(arrTmp);
 
-    return ret;
+    return result;
 }
 
 UniValue getbet(const UniValue& params, bool fHelp)
@@ -489,18 +494,6 @@ UniValue getbet(const UniValue& params, bool fHelp)
 
     UniValue ret(UniValue::VOBJ);
 
-    CEventDB edb;
-    eventIndex_t eventIndex;
-    edb.GetEvents(eventIndex);
-
-    mappingIndex_t teamsIndex;
-    CMappingDB mtdb("teams.dat");
-    mtdb.GetTeams(teamsIndex);
-
-    mappingIndex_t tournamentsIndex;
-    CMappingDB mtodb("tournaments.dat");
-    mtodb.GetTournaments(tournamentsIndex);
-
     for (unsigned int i = 0; i < tx.vout.size(); i++) {
         const CTxOut& txout = tx.vout[i];
         std::string scriptPubKey = txout.scriptPubKey.ToString();
@@ -516,77 +509,166 @@ UniValue getbet(const UniValue& params, bool fHelp)
                 ret.push_back(Pair("event-id", (uint64_t)plBet.nEventId));
 
                 // Retrieve the event details
-                if (eventIndex.count(plBet.nEventId)) {
-                    CPeerlessEvent plEvent = eventIndex.find(plBet.nEventId)->second;
+                CPeerlessEvent plEvent;
+                if (bettingsView->events->Read(EventKey{plBet.nEventId}, plEvent)) {
 
                     ret.push_back(Pair("starting", plEvent.nStartTime));
-                    if (teamsIndex.count(plEvent.nHomeTeam)) {
-                        ret.push_back(Pair("home", teamsIndex.find(plEvent.nHomeTeam)->second.sName));
+                    CMapping mapping;
+                    if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+                        ret.push_back(Pair("home", mapping.sName));
                     }
-                    if (teamsIndex.count(plEvent.nAwayTeam)) {
-                        ret.push_back(Pair("away", teamsIndex.find(plEvent.nAwayTeam)->second.sName));
+                    if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+                        ret.push_back(Pair("away", mapping.sName));
                     }
-                    if (tournamentsIndex.count(plEvent.nTournament)) {
-                        ret.push_back(Pair("tournament", tournamentsIndex.find(plEvent.nTournament)->second.sName));
+                    if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+                        ret.push_back(Pair("tournament", mapping.sName));
                     }
                 }
 
                 ret.push_back(Pair("team-to-win", (uint64_t)plBet.nOutcome));
                 ret.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
 
-                // Check if the users bet has a result posted, if so check to see it its a winning or losing bet.
-                CResultDB rdb;
-                resultsIndex_t resultsIndex;
-                rdb.GetResults(resultsIndex);
+                std::string betResult = "pending";
+                CPeerlessResult plResult;
+                if (bettingsView->results->Read(ResultKey{plBet.nEventId}, plResult)) {
 
-                if (resultsIndex.size() > 0) {
-                    std::string betResult = "pending";
+                    switch (plBet.nOutcome) {
+                    case OutcomeType::moneyLineWin:
+                        betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
 
-                    if (resultsIndex.count(plBet.nEventId)) {
-                        CPeerlessResult plResult = resultsIndex.find(plBet.nEventId)->second;
+                        break;
+                    case OutcomeType::moneyLineLose:
+                        betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
 
-                        switch (plBet.nOutcome) {
-                        case OutcomeType::moneyLineWin:
-                            betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
+                        break;
+                    case OutcomeType::moneyLineDraw:
+                        betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
 
-                            break;
-                        case OutcomeType::moneyLineLose:
-                            betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
+                        break;
+                    case OutcomeType::spreadHome:
+                        betResult = "Check block explorer for result.";
 
-                            break;
-                        case OutcomeType::moneyLineDraw:
-                            betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
+                        break;
+                    case OutcomeType::spreadAway:
+                        betResult = "Check block explorer for result.";
 
-                            break;
-                        case OutcomeType::spreadHome:
-                            betResult = "Check block explorer for result.";
+                        break;
+                    case OutcomeType::totalOver:
+                        betResult = "Check block explorer for result.";
 
-                            break;
-                        case OutcomeType::spreadAway:
-                            betResult = "Check block explorer for result.";
+                        break;
+                    case OutcomeType::totalUnder:
+                        betResult = "Check block explorer for result.";
 
-                            break;
-                        case OutcomeType::totalOver:
-                            betResult = "Check block explorer for result.";
-
-                            break;
-                        case OutcomeType::totalUnder:
-                            betResult = "Check block explorer for result.";
-
-                            break;
-                        default:
-                            LogPrintf("Invalid bet outcome");
-                        }
+                        break;
+                    default:
+                        LogPrintf("Invalid bet outcome");
                     }
-
-                    ret.push_back(Pair("result", betResult));
                 }
+                ret.push_back(Pair("result", betResult));
             }
             break;
         }
     }
 
     return ret;
+}
+
+UniValue listbetsdb(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 1 || params.size() > 2)
+        throw std::runtime_error(
+            "listbetsdb\n"
+            "\nGet bets form bets DB.\n"
+
+            "\nArguments:\n"
+            "1. \"includeHandled\"   (bool, optional) Include bets which already handled, default - false.\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"legs\":\n"
+            "      [\n"
+            "        {\n"
+            "          \"event-id\": id,\n"
+            "          \"outcome\": type,\n"
+            "          \"lockedEvent\": {\n"
+            "            \"homeOdds\": homeOdds\n"
+            "            \"awayOdds\": awayOdds\n"
+            "            \"drawOdds\": drawOdds\n"
+            "            \"spreadVersion\": spreadVersion\n"
+            "            \"spreadPoints\": spreadPoints\n"
+            "            \"spreadHomeOdds\": spreadHomeOdds\n"
+            "            \"spreadAwayOdds\": spreadAwayOdds\n"
+            "            \"totalPoints\": totalPoints\n"
+            "            \"totalOverOdds\": totalOverOdds\n"
+            "            \"totalUnderOdds\": totalUnderOdds\n"
+            "          }\n"
+            "        },\n"
+            "        ...\n"
+            "      ],                          (list) The list of legs.\n"
+            "    \"address\": playerAddress    (string) The player address.\n"
+            "    \"amount\": x.xxx,            (numeric) The amount bet in WGR.\n"
+            "    \"time\":\"betting time\",    (string) The betting time.\n"
+            "  },\n"
+            "  ...\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("listbetsdb", "true"));
+
+    UniValue ret(UniValue::VARR);
+
+    bool includeHandled = false;
+
+    if (params.size() > 0) {
+        includeHandled = params[0].get_bool();
+    }
+
+    auto it = bettingsView->bets->NewIterator();
+    for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        UniversalBetKey key;
+        CUniversalBet uniBet;
+        CBettingDB::BytesToDbType(it->Value(), uniBet);
+        CBettingDB::BytesToDbType(it->Key(), key);
+
+        if (!includeHandled && uniBet.IsCompleted()) continue;
+
+        UniValue uValue(UniValue::VOBJ);
+        UniValue uLegs(UniValue::VARR);
+
+        for (int i = 0; i < uniBet.legs.size(); i++) {
+            auto &leg = uniBet.legs[i];
+            auto &lockedEvent = uniBet.lockedEvents[i];
+            UniValue uLeg(UniValue::VOBJ);
+            UniValue uLockedEvent(UniValue::VOBJ);
+            uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
+            uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+            uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
+            uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
+            uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
+            uLockedEvent.push_back(Pair("spreadVersion", (uint64_t) lockedEvent.nSpreadVersion));
+            uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
+            uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
+            uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
+            uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
+            uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
+            uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
+            uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+            uLegs.push_back(uLeg);
+        }
+        uValue.push_back(Pair("betBlockHeight", (uint64_t) key.blockHeight));
+        uValue.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
+        uValue.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
+        uValue.push_back(Pair("legs", uLegs));
+        uValue.push_back(Pair("address", uniBet.playerAddress.ToString()));
+        uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
+        uValue.push_back(Pair("time", (uint64_t) uniBet.betTime));
+        ret.push_back(uValue);
+    }
+
+    return ret;
+
 }
 
 UniValue listchaingamesbets(const UniValue& params, bool fHelp)
@@ -1041,10 +1123,10 @@ UniValue placebet(const UniValue& params, bool fHelp)
             "2. outcome         (numeric, required) 1 means home team win,\n"
             "                                       2 means away team win,\n"
             "                                       3 means a draw."
-            "3. amount          (numeric, required) The amount in wgr to send. eg 10\n"
-            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
+            "3. amount          (numeric, required) The amount in wgr to send.\n"
+            "4. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
             "                             This is not part of the transaction, just kept in your wallet.\n"
-            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
+            "5. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
             "                             to which you're sending the transaction. This is not part of the \n"
             "                             transaction, just kept in your wallet.\n"
             "\nResult:\n"
@@ -1071,7 +1153,7 @@ UniValue placebet(const UniValue& params, bool fHelp)
     EnsureEnoughWagerr(nAmount);
 
     CBitcoinAddress address("");
-    int eventId = params[0].get_int();
+    uint32_t eventId = static_cast<uint32_t>(params[0].get_int64());
     int outcome = params[1].get_int();
     CPeerlessBet plBet(eventId, (OutcomeType) outcome);
 
@@ -1089,6 +1171,82 @@ UniValue placebet(const UniValue& params, bool fHelp)
     // ideally be investigated and corrected/justified when time allows.
     std::string opCode;
     CPeerlessBet::ToOpCode(plBet, opCode);
+
+    // Unhex the validated bet opcode
+    std::vector<unsigned char> vectorValue;
+    std::string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
+UniValue placeparlaybet(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 2 || params.size() > 4)
+        throw std::runtime_error(
+            "placeparlaybet [{\"eventId\": event_id, \"outcome\": outcome_type}, ...] ( \"comment\" \"comment-to\" )\n"
+            "\nWARNING - Betting closes 20 minutes before event start time.\n"
+            "Any bets placed after this time will be invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on an event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. Legs array     (array of json objects, required) The list of bets.\n"
+            "  [\n"
+            "    {\n"
+            "      \"eventId\": id      (numeric, required) The event to bet on.\n"
+            "      \"outcome\": type    (numeric, required) 1 - home win, 2 - away win, 3 - draw,\n"
+            "                                               4 - spread home, 5 - spread away,\n"
+            "                                               6 - total over, 7 - total under\n"
+            "    }\n"
+            "  ]\n"
+            "2. amount          (numeric, required) The amount in wgr to send. Min: 25, max: 4000.\n"
+            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for.\n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization\n"
+            "                             to which you're sending the transaction. This is not part of the\n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\" 25 \"Parlay bet\" \"seans outpost\"") +
+            HelpExampleRpc("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\", 25, \"Parlay bet\", \"seans outpost\""));
+
+    std::vector<CPeerlessBet> vLegs;
+    UniValue legsArr = params[0].get_array();
+    for (int i = 0; i < legsArr.size(); i++) {
+        const UniValue obj = legsArr[i].get_obj();
+
+        RPCTypeCheckObj(obj, boost::assign::map_list_of("eventId", UniValue::VNUM)("outcome", UniValue::VNUM));
+
+        uint32_t eventId = static_cast<uint32_t>(find_value(obj, "eventId").get_int64());
+        OutcomeType outcomeType = (OutcomeType) find_value(obj, "outcome").get_int();
+        vLegs.emplace_back(eventId, outcomeType);
+    }
+
+    std::string opCode;
+    CPeerlessBet::ParlayToOpCode(vLegs, opCode);
+
+    CAmount nAmount = AmountFromValue(params[1]);
+
+    // Validate parlay bet amount so its between 25 - 4000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxParlayBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 4000 WGR inclusive.");
+    }
+
+    // Wallet comments
+    CWalletTx wtx;
+    if (params.size() > 2 && !params[2].isNull() && !params[2].get_str().empty())
+        wtx.mapValue["comment"] = params[2].get_str();
+    if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
+        wtx.mapValue["to"] = params[3].get_str();
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    CBitcoinAddress address("");
 
     // Unhex the validated bet opcode
     std::vector<unsigned char> vectorValue;
@@ -1248,7 +1406,9 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     }
 
     if (resultHeight > Params().BetStartHeight() && fShowWinner) {
-        std::vector<CBetOut> betOuts = GetCGLottoBetPayouts(resultHeight);
+        std::vector<CPayoutInfo> vExpectedPayoutsInfo;
+        std::vector<CBetOut> betOuts;
+        GetCGLottoBetPayouts(resultHeight, betOuts, vExpectedPayoutsInfo);
         for (auto betOut : betOuts) {
             if (!winningBetFound && betOut.nEventId == eventID) {
                 winningBetOut = betOut;
@@ -1313,24 +1473,16 @@ UniValue geteventsliability(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("geteventtotals", "") + HelpExampleRpc("geteventtotals", ""));
 
-    CEventDB edb;
-    eventIndex_t eventsIndex;
-    edb.GetEvents(eventsIndex);
-
-    // Check the events index actually has events,
-    if (eventsIndex.size() < 1) {
-        throw std::runtime_error("Currently no events to list.");
-    }
-
     int payoutThreshold = params[0].get_int();
     int betThreshold = params[1].get_int();
 
     UniValue ret(UniValue::VARR);
 
-    std::map<uint32_t, CPeerlessEvent>::iterator it;
-    for (it = eventsIndex.begin(); it != eventsIndex.end(); it++) {
 
-        CPeerlessEvent plEvent = it->second;
+    CPeerlessEvent plEvent{};
+    auto it = bettingsView->events->NewIterator();
+    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        CBettingDB::BytesToDbType(it->Value(), plEvent);
 
         UniValue event(UniValue::VOBJ);
         event.push_back(Pair("event-id", (int) plEvent.nEventId));

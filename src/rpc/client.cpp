@@ -39,10 +39,13 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"placebet", 0},
         {"placebet", 1},
         {"placebet", 2},
+        {"placeparlaybet", 0},
+        {"placeparlaybet", 1},
         {"listbets", 1},
         {"listbets", 2},
         {"listbets", 3},
         {"getbet", 1},
+        {"listbetsdb", 0},
         {"placechaingamesbet", 0},
         {"placechaingamesbet", 1},
         {"placechaingamesbet", 2},
@@ -184,6 +187,10 @@ static const CRPCConvertParam vRPCConvertParams[] =
         {"getfeeinfo", 0},
         {"getchecksumblock", 1},
         {"getchecksumblock", 2},
+        {"getmappingname", 1},
+        {"getpayoutinfo", 0},
+        {"getpayoutinfosince", 0},
+        {"getpayoutinfosince", 1},
     };
 
 class CRPCConvertTable

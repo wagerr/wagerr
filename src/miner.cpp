@@ -210,6 +210,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
         CBlockIndex* pindexPrev = chainActive.Tip();
         const int nHeight = pindexPrev->nHeight + 1;
         CCoinsViewCache view(pcoinsTip);
+        CBettingsView bettingsViewCache(bettingsView);
 
         // Priority order to process transactions
         std::list<COrphan> vOrphan; // list memory doesn't move
@@ -486,15 +487,22 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             std::vector<CTxOut> vAllBetTxOuts;
             std::vector<CBetOut> vPLPayouts;
             std::vector<CBetOut> vCGLottoPayouts;
+            std::vector<CPayoutInfo> vPLPayoutsInfo;
+            std::vector<CPayoutInfo> vCGLottoPayoutsInfo;
+            std::vector<CPayoutInfo> vAllPayoutsInfo;
             CAmount nMNBetReward = 0;
 
-            if( nHeight > Params().BetStartHeight()) {
+            if (nHeight > Params().BetStartHeight()) {
                 // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
-                vPLPayouts = GetBetPayouts(nHeight - 1);
-                vCGLottoPayouts = GetCGLottoBetPayouts(nHeight - 1);
+                if (nHeight > Params().ParlayBetStartHeight()) {
+                    GetBetPayouts(bettingsViewCache, nHeight - 1, vPLPayouts, vPLPayoutsInfo);
+                }
+                else {
+                    GetBetPayoutsLegacy(nHeight - 1, vPLPayouts, vPLPayoutsInfo);
+                }
+                GetCGLottoBetPayouts(nHeight - 1, vCGLottoPayouts, vCGLottoPayoutsInfo);
 
-                // Get the total amount of WGR that needs to be minted to payout all winning bets.
-                GetBlockPayouts(vPLPayouts, nMNBetReward);
+                GetBlockPayouts(vPLPayouts, nMNBetReward, vPLPayoutsInfo);
                 GetCGBlockPayouts(vCGLottoPayouts, nMNBetReward);
 
                 // Merge vectors into single payout vector.
@@ -504,8 +512,17 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 for (auto vCGLottoPayout : vCGLottoPayouts) {
                     vAllBetTxOuts.emplace_back(vCGLottoPayout.nValue, vCGLottoPayout.scriptPubKey);
                 }
+
+                // merge vectors into single payout info vector
+                for (auto&& vPLPayoutInfo : vPLPayoutsInfo) {
+                    vAllPayoutsInfo.emplace_back(vPLPayoutInfo.betKey, vPLPayoutInfo.payoutType);
+                }
+                for (auto&& vCGLottoPayoutInfo : vCGLottoPayoutsInfo) {
+                    vAllPayoutsInfo.emplace_back(vCGLottoPayoutInfo.betKey, vCGLottoPayoutInfo.payoutType);
+                }
             }
 
+            assert(vAllBetTxOuts.size() == vAllPayoutsInfo.size());
             // Fill coin stake transaction.
             if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, vAllBetTxOuts, stakeInput)) {
                 LogPrintf("%s: filled coin stake tx [%s]\n", __func__, txCoinStake.ToString());

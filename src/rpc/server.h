@@ -277,16 +277,21 @@ extern UniValue createautomintaddress(const UniValue& params, bool fHelp);
 
 /** Betting related RPC methods **/
 extern UniValue listevents(const UniValue& params, bool fHelp);
+extern UniValue listeventsdebug(const UniValue& params, bool fHelp);
 extern UniValue listchaingamesevents(const UniValue& params, bool fHelp);
 extern UniValue listchaingamesbets(const UniValue& params, bool fHelp);
 extern UniValue getchaingamesinfo(const UniValue& params, bool fHelp);
 extern UniValue placechaingamesbet(const UniValue& params, bool fHelp);
 extern UniValue geteventsliability(const UniValue& params, bool fHelp);
 extern UniValue placebet(const UniValue& params, bool fHelp);
+extern UniValue placeparlaybet(const UniValue& params, bool fHelp);
 extern UniValue listbets(const UniValue& params, bool fHelp);
 extern UniValue getmappingid(const UniValue& params, bool fHelp);
 extern UniValue getmappingname(const UniValue& params, bool fHelp);
 extern UniValue getbet(const UniValue& params, bool fHelp);
+extern UniValue listbetsdb(const UniValue& params, bool fHelp);
+extern UniValue getpayoutinfo(const UniValue& params, bool fHelp);
+extern UniValue getpayoutinfosince(const UniValue& params, bool fHelp);
 
 extern UniValue getrawtransaction(const UniValue& params, bool fHelp); // in rpc/rawtransaction.cpp
 extern UniValue listunspent(const UniValue& params, bool fHelp);

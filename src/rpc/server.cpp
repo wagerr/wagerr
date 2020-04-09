@@ -391,6 +391,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "spork", &spork, true, true, false},
         {"wagerr", "getpoolinfo", &getpoolinfo, true, true, false},
         {"wagerr", "listevents", &listevents, false, false, false},
+        {"wagerr", "listeventsdebug", &listeventsdebug, false, false, false},
         {"wagerr", "listchaingamesevents", &listchaingamesevents, false, false, false},
         {"wagerr", "listchaingamesbets", &listchaingamesbets, false, false, false},
         {"wagerr", "getchaingamesinfo", &getchaingamesinfo, false, false, false},
@@ -398,6 +399,9 @@ static const CRPCCommand vRPCCommands[] =
         {"wagerr", "geteventsliability", &geteventsliability, false, false, true},
         {"wagerr", "getmappingid", &getmappingid, false, false, true},
         {"wagerr", "getmappingname", &getmappingname, false, false, true},
+        {"wallet", "listbetsdb", &listbetsdb, false, false, false},
+        {"wagerr", "getpayoutinfo", &getpayoutinfo, false, false, false},
+        {"wagerr", "getpayoutinfosince", &getpayoutinfosince, false, false, false},
 
 
 #ifdef ENABLE_WALLET
@@ -445,6 +449,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "move", &movecmd, false, false, true},
         {"wallet", "multisend", &multisend, false, false, true},
         {"wallet", "placebet", &placebet, false, false, true},
+        {"wallet", "placeparlaybet", &placeparlaybet, false, false, true},
         {"wallet", "sendfrom", &sendfrom, false, false, true},
         {"wallet", "sendmany", &sendmany, false, false, true},
         {"wallet", "sendtoaddress", &sendtoaddress, false, false, true},
