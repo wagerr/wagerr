@@ -21,6 +21,7 @@
 #define PSE_OP_STRLEN    34
 #define PTE_OP_STRLEN    34
 #define PEP_OP_STRLEN    22
+#define CGB_OP_STRMINLEN 12
 
 CBettingsView* bettingsView = nullptr;
 
@@ -323,7 +324,6 @@ bool CPeerlessBet::ParlayFromOpCode(const std::string& opCode, std::vector<CPeer
 {
     if (opCode.size() < PPB_OP_STRMINLEN) return false;
     CDataStream ss(ParseHex(opCode), SER_NETWORK, CLIENT_VERSION);
-    std::vector<CPeerlessBet> vBets;
     uint8_t byte;
     legs.clear();
     // get BTX prefix
@@ -929,6 +929,35 @@ bool CMapping::FromOpCode(std::string opCode, CMapping &cm)
     }
 
     cm.sName = name;
+
+    return true;
+}
+
+bool CQuickGamesTxBet::ToOpCode(CQuickGamesTxBet& bet, std::string &opCode)
+{
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << 'B' << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) qgBetTxType << bet;
+    opCode = HexStr(ss.begin(), ss.end());
+
+    return true;
+}
+
+bool CQuickGamesTxBet::FromOpCode(std::string opCode, CQuickGamesTxBet &bet)
+{
+    if (opCode.size() < CGB_OP_STRMINLEN) return false;
+    CDataStream ss(ParseHex(opCode), SER_NETWORK, CLIENT_VERSION);
+    uint8_t byte;
+    // get BTX prefix
+    ss >> byte;
+    if (byte != 'B') return false;
+    // get BTX format version
+    ss >> byte;
+    if (byte != (uint8_t) BTX_FORMAT_VERSION) return false;
+    // get parlay bet tx type
+    ss >> byte;
+    if (byte != (uint8_t) qgBetTxType) return false;
+    // get bet data
+    ss >> bet;
 
     return true;
 }
