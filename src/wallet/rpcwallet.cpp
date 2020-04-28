@@ -140,7 +140,7 @@ UniValue listevents(const UniValue& params, bool fHelp)
         } else {
             spreadOdds.push_back(Pair("favorite", plEvent.nHomeOdds <= plEvent.nAwayOdds ? "home" : "away"));
         }
-        spreadOdds.push_back(Pair("spreadPoints", (uint64_t) plEvent.nSpreadPoints));
+        spreadOdds.push_back(Pair("spreadPoints", (int64_t) plEvent.nSpreadPoints));
         spreadOdds.push_back(Pair("spreadHome", (uint64_t) plEvent.nSpreadHomeOdds));
         spreadOdds.push_back(Pair("spreadAway", (uint64_t) plEvent.nSpreadAwayOdds));
 
