@@ -146,6 +146,7 @@ public:
         bnProofOfWorkLimit = ~uint256(0) >> 20; // Wagerr starting difficulty is 1 / 2^12
         nSubsidyHalvingInterval = 210000;
         nMaxReorganizationDepth = 100;
+        nMaxBettingUndoDepth = 200;
         nEnforceBlockUpgradeMajority = 8100; // 75%
         nRejectBlockOutdatedMajority = 10260; // 95%
         nToCheckBlockUpgradeMajority = 10800; // Approximate expected amount of blocks in 7 days (1440*7.5)
@@ -185,7 +186,7 @@ public:
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
         /** Bet related parameters **/
-        nBetStartHeight = 298386;                                       // The block that betting protocols become active.
+        nBetStartHeight = 763350;                                       // The block that betting protocols become active.
         vOracleWalletAddrs = {"WcsijutAF46tSLTcojk9mR9zV9wqwUUYpC",     // Oracle Masternode Event & Result Posting Wallet Addresses.
                               "Weqz3PFBq3SniYF5HS8kuj72q9FABKzDrP"};
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
@@ -193,15 +194,13 @@ public:
         strOMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";       // OMNO fund payout address.
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
-        nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
-        nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
         nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
         nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
         nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nParlayBetStartHeight = 1000000;                                // TODO: pick block height for enabling parlay betting and new payout system
+        nWagerrProtocolV3StartHeight = 1500000;                         // TODO: pick block height for enabling parlay betting and new payout system
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = 556623;
@@ -351,15 +350,13 @@ public:
         strOMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";       // OMNO fund payout address (Testnet).
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
-        nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
-        nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
         nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
         nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
         nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nParlayBetStartHeight = 100900;                                // TODO: pick block height for enabling parlay betting and new payout system
+        nWagerrProtocolV3StartHeight = 100900;                          // TODO: pick block height for enabling parlay betting and new payout system
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;
@@ -469,15 +466,13 @@ public:
         strOMNOPayoutAddr = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";       // OMNO fund payout address (Regtest).
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
-        nOddsDivisor = 10000;                                           // Odds divisor, Facilitates calculations with floating integers.
-        nBetXPermille = 60;                                             // 6% fee subtracted from bet profit.
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
         nMinBetPayoutRange = 25;                                        // Spam filter to prevent malicious actors congesting the chain (Only payout bets that are between 25 - 10000 WRG inclusive).
         nMaxBetPayoutRange = 10000;                                     // Minimizes maximum payout size to avoid unnecessary large numbers (Only payout bets that are between 25 - 10000 WRG inclusive).
         nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nParlayBetStartHeight = nBetStartHeight;                        // TODO: pick block height for enabling parlay betting and new payout system
+        nWagerrProtocolV3StartHeight = nBetStartHeight;                 // TODO: pick block height for enabling parlay betting and new payout system
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;

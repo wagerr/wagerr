@@ -1,4 +1,4 @@
-// Copyright (c) 2018 The Wagerr developers
+// Copyright (c) 2018-2020 The Wagerr developers
 // Distributed under the MIT/X11 software license, see the accompanying
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
@@ -9,11 +9,16 @@
 #include "chainparams.h"
 #include "leveldbwrapper.h"
 #include "base58.h"
+
 #include <flushablestorage/flushablestorage.h>
 #include <boost/variant.hpp>
 #include <boost/filesystem.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/exception/to_string.hpp>
+
+#define BET_ODDSDIVISOR 10000   // Odds divisor, Facilitates calculations with floating integers.
+#define BET_BURNXPERMILLE 60    // Burn promillage
+
 // The supported bet outcome types.
 typedef enum OutcomeType {
     moneyLineWin  = 0x01,
@@ -76,8 +81,18 @@ typedef enum PayoutType {
 } PayoutType;
 
 // Class derived from CTxOut
-// nBetValue is NOT serialized, nor is it included in the hash.
+// nBetValue is NOT serialized, nor is it included in the hash or in comparison functions
 class CBetOut : public CTxOut {
+    private:
+
+    void Set(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn = 0, uint32_t nEventIdIn = 0)
+    {
+        nValue = nValueIn;
+        scriptPubKey = scriptPubKeyIn;
+        nBetValue = nBetValueIn;
+        nEventId = nEventIdIn;
+    }
+
     public:
 
     CAmount nBetValue;
@@ -87,13 +102,20 @@ class CBetOut : public CTxOut {
         SetNull();
     }
 
-    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn) : CTxOut(nValueIn, scriptPubKeyIn), nBetValue(0), nEventId(0) {};
+    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn)
+    {
+        Set(nValueIn,scriptPubKeyIn);
+    };
 
-    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn) :
-            CTxOut(nValueIn, scriptPubKeyIn), nBetValue(nBetValueIn), nEventId(0) {};
+    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn)
+    {
+        Set(nValueIn,scriptPubKeyIn, nBetValueIn);
+    };
 
-    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn, uint32_t nEventIdIn) :
-            CTxOut(nValueIn, scriptPubKeyIn), nBetValue(nBetValueIn), nEventId(nEventIdIn) {};
+    CBetOut(const CAmount& nValueIn, CScript scriptPubKeyIn, const CAmount& nBetValueIn, uint32_t nEventIdIn)
+    {
+        Set(nValueIn,scriptPubKeyIn, nBetValueIn, nEventIdIn);
+    };
 
     void SetNull() {
         CTxOut::SetNull();
@@ -108,8 +130,32 @@ class CBetOut : public CTxOut {
     }
 
     bool IsEmpty() const {
-        return CTxOut::IsEmpty() && nBetValue == 0 && nEventId == 0;
+        return CTxOut::IsEmpty() && nEventId == 0;
     }
+
+    inline int CompareTo(const CBetOut& rhs) const
+    {
+        if (nValue < rhs.nValue)
+            return -1;
+        if (nValue > rhs.nValue)
+            return 1;
+        if (scriptPubKey < rhs.scriptPubKey)
+            return -1;
+        if (scriptPubKey > rhs.scriptPubKey)
+            return 1;
+        if (nEventId < rhs.nEventId)
+            return -1;
+        if (nEventId > rhs.nEventId)
+            return 1;
+        return 0;
+    }
+
+    inline bool operator==(const CBetOut& rhs) const { return CompareTo(rhs) == 0; }
+    inline bool operator!=(const CBetOut& rhs) const { return CompareTo(rhs) != 0; }
+    inline bool operator<=(const CBetOut& rhs) const { return CompareTo(rhs) <= 0; }
+    inline bool operator>=(const CBetOut& rhs) const { return CompareTo(rhs) >= 0; }
+    inline bool operator<(const CBetOut& rhs) const { return CompareTo(rhs) < 0; }
+    inline bool operator>(const CBetOut& rhs) const { return CompareTo(rhs) > 0; }
 };
 
 class CPeerlessEvent
@@ -125,7 +171,6 @@ public:
     uint32_t nHomeOdds = 0;
     uint32_t nAwayOdds = 0;
     uint32_t nDrawOdds = 0;
-    uint8_t  nSpreadVersion = 0;
     int32_t  nSpreadPoints = 0;  // Should be int16_t
     uint32_t nSpreadHomeOdds = 0;
     uint32_t nSpreadAwayOdds = 0;
@@ -151,6 +196,10 @@ public:
     uint32_t nTotalUnderBets = 0;
     uint32_t nTotalPushBets = 0;
 
+    // Used in version 1 events
+    int nEventCreationHeight = 0;
+    bool fLegacyInitialHomeFavorite = true;
+
     // Default Constructor.
     CPeerlessEvent() {}
 
@@ -171,7 +220,6 @@ public:
         READWRITE(nHomeOdds);
         READWRITE(nAwayOdds);
         READWRITE(nDrawOdds);
-        READWRITE(nSpreadVersion);
         READWRITE(nSpreadPoints);
         READWRITE(nSpreadHomeOdds);
         READWRITE(nSpreadAwayOdds);
@@ -196,6 +244,11 @@ public:
         READWRITE(nTotalOverBets);
         READWRITE(nTotalUnderBets);
         READWRITE(nTotalPushBets);
+
+        READWRITE(nEventCreationHeight);
+        if (nEventCreationHeight < Params().WagerrProtocolV3StartHeight()) {
+            READWRITE(fLegacyInitialHomeFavorite);
+        }
     }
 };
 
@@ -686,6 +739,30 @@ public:
             READWRITE(type);
         }
     }
+
+    inline int CompareTo(const CPayoutInfo& rhs) const
+    {
+        if (betKey.blockHeight < rhs.betKey.blockHeight)
+            return -1;
+        if (betKey.blockHeight > rhs.betKey.blockHeight)
+            return 1;
+        if (betKey.outPoint < rhs.betKey.outPoint)
+            return -1;
+        if (betKey.outPoint != rhs.betKey.outPoint) // !(betKey.outPoint < rhs.betKey.outPoint) is demonstrated above
+            return 1;
+        if ((uint8_t)payoutType < (uint8_t)rhs.payoutType)
+            return -1;
+        if ((uint8_t)payoutType > (uint8_t)rhs.payoutType)
+            return 1;
+        return 0;
+    }
+
+    inline bool operator==(const CPayoutInfo& rhs) const { return CompareTo(rhs) == 0; }
+    inline bool operator!=(const CPayoutInfo& rhs) const { return CompareTo(rhs) != 0; }
+    inline bool operator<=(const CPayoutInfo& rhs) const { return CompareTo(rhs) <= 0; }
+    inline bool operator>=(const CPayoutInfo& rhs) const { return CompareTo(rhs) >= 0; }
+    inline bool operator<(const CPayoutInfo& rhs) const { return CompareTo(rhs) < 0; }
+    inline bool operator>(const CPayoutInfo& rhs) const { return CompareTo(rhs) > 0; }
 };
 
 class CBettingDB
@@ -886,14 +963,11 @@ extern CBettingsView *bettingsView;
 /** Ensures a TX has come from an OMNO wallet. **/
 bool IsValidOracleTx(const CTxIn &txin);
 
-/** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
-int64_t GetBlockPayouts(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward, std::vector<CPayoutInfo>& vPayoutsInfo);
-
-/** Aggregates the amount of WGR to be minted to pay out all CG Lotto winners as well as OMNO rewards. **/
-int64_t GetCGBlockPayouts(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& nMNBetReward);
+//* Calculates the amount of coins paid out to bettors and the amount of coins to burn, based on bet amount and odds **/
+bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CAmount& nPayout, CAmount& nBurn);
 
 /** Validating the payout block using the payout vector. **/
-bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::vector<CBetOut>& vExpectedPayouts, CBlock block, int nBlockHeight, const std::vector<CPayoutInfo>& vExpectedPayoutsInfo);
+bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayoutInfo, CBetOut> mExpectedPayouts, const CBlock& block, int nBlockHeight, const CAmount& nExpectedMint);
 
 /** Find peerless events. **/
 std::vector<CPeerlessResult> getEventResults(int height);
@@ -901,21 +975,14 @@ std::vector<CPeerlessResult> getEventResults(int height);
 /** Find chain games lotto result. **/
 std::pair<std::vector<CChainGamesResult>,std::vector<std::string>> getCGLottoEventResults(int height);
 
-/** Get the peerless winning bets from the block chain and return the payout vector. **/
-void GetBetPayoutsLegacy(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo);
-/** Using betting database for handle bets **/
-void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo);
 /** Undo bets as marked completed when generating payouts **/
 bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height);
-
-/** Get the chain games winner and return the payout vector. **/
-void GetCGLottoBetPayouts(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo);
 
 /** Check Betting Tx when try accept tx to memory pool **/
 bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height);
 
 /** Parse the transaction for betting data **/
-void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime);
+void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime, const bool ParseBettingTx);
 
 /** Get the chain height **/
 int GetActiveChainHeight(const bool lockHeld = false);

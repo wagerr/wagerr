@@ -83,6 +83,8 @@ BITCOIN_CORE_H = \
   amount.h \
   base58.h \
   betting/bet.h \
+  betting/bet_v2.h \
+  betting/bet_v3.h \
   bip38.h \
   bloom.h \
   blocksignature.h \
@@ -210,6 +212,8 @@ libbitcoin_server_a_SOURCES = \
   addrman.cpp \
   alert.cpp \
   betting/bet.cpp \
+  betting/bet_v2.cpp \
+  betting/bet_v3.cpp \
   bloom.cpp \
   blocksignature.cpp \
   chain.cpp \

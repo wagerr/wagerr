@@ -58,6 +58,10 @@ public:
     int ToCheckBlockUpgradeMajority() const { return nToCheckBlockUpgradeMajority; }
     int MaxReorganizationDepth() const { return nMaxReorganizationDepth; }
 
+    /** Betting undo data is used to check blocks during init      **/
+    /** Hence, the max undo depth is also the max for -checkblocks **/
+    int MaxBettingUndoDepth() const { return nMaxBettingUndoDepth; }
+
     /** Used if GenerateBitcoins is called with a negative number of threads */
     int DefaultMinerThreads() const { return nMinerThreads; }
     const CBlock& GenesisBlock() const { return genesis; }
@@ -160,15 +164,13 @@ public:
     std::string OMNOPayoutAddr() const { return strOMNOPayoutAddr; }
     uint64_t OMNORewardPermille() const { return nOMNORewardPermille; }
     uint64_t DevRewardPermille() const { return nDevRewardPermille; }
-    uint64_t OddsDivisor() const { return nOddsDivisor; }
-    uint64_t BetXPermille() const { return nBetXPermille; }
     int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; } // Currently not used
     int64_t MaxBetPayoutRange() const { return nMaxBetPayoutRange; }
     int64_t MinBetPayoutRange() const { return nMinBetPayoutRange; }
     int64_t MaxParlayBetPayoutRange() const { return nMaxBetPayoutRange; }
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
-    int MaxParlayLegs() const { return nMaxParlayLegs; }
-    int ParlayBetStartHeight() const { return nParlayBetStartHeight; }
+    uint32_t MaxParlayLegs() const { return nMaxParlayLegs; }
+    int WagerrProtocolV3StartHeight() const { return nWagerrProtocolV3StartHeight; }
 
     /** temp worarounds **/
     int ZerocoinCheckTX() const { return nZerocoinCheckTX; }
@@ -184,6 +186,7 @@ protected:
     int nDefaultPort;
     uint256 bnProofOfWorkLimit;
     int nMaxReorganizationDepth;
+    int nMaxBettingUndoDepth;
     int nSubsidyHalvingInterval;
     int nEnforceBlockUpgradeMajority;
     int nRejectBlockOutdatedMajority;
@@ -260,15 +263,13 @@ protected:
     std::string strOMNOPayoutAddr;
     uint64_t nOMNORewardPermille;
     uint64_t nDevRewardPermille;
-    uint64_t nOddsDivisor;
-    uint64_t nBetXPermille;
     uint64_t nBetBlockPayoutAmount;
     int64_t nMinBetPayoutRange;
     int64_t nMaxBetPayoutRange;
     int64_t nMaxParlayBetPayoutRange;
     int nBetPlaceTimeoutBlocks;
-    int nMaxParlayLegs;
-    int nParlayBetStartHeight;
+    uint32_t nMaxParlayLegs;
+    int nWagerrProtocolV3StartHeight;
 
     // workarounds
     int nZerocoinCheckTX;

@@ -19,7 +19,6 @@
 #include "coins.h"
 #include "net.h"
 #include "pow.h"
-#include "betting/bet.h"
 #include "primitives/block.h"
 #include "primitives/transaction.h"
 #include "zwgr/zerocoin.h"
@@ -47,6 +46,7 @@
 
 #include <boost/unordered_map.hpp>
 
+class CBettingsView;
 class CBlockIndex;
 class CBlockTreeDB;
 class CZerocoinDB;

@@ -127,7 +127,7 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
 
     // If home odds are set to zero show 'N/A' on the home odds btn. Otherwise show to home odds.
     if( std::stod(fields[8]) > 0 ){
-        winOddsString = std::to_string(std::stod(fields[8]) / Params().OddsDivisor());
+        winOddsString = std::to_string(std::stod(fields[8]) / 10000);
         winOddsString = winOddsString.substr(0, winOddsString.size() -4);
     }
     else{
@@ -136,7 +136,7 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
 
     // If away odds are set to zero show 'N/A' on the away odds btn. Otherwise show to away odds.
     if( std::stod(fields[9]) > 0 ){
-        loseOddsString = std::to_string(std::stod(fields[9]) / Params().OddsDivisor());
+        loseOddsString = std::to_string(std::stod(fields[9]) / 10000);
         loseOddsString = loseOddsString.substr(0, loseOddsString.size() -4);
     }
     else{
@@ -145,7 +145,7 @@ CEvent* CEvent::ParseEvent(const std::string& descr)
 
     // If draw odds are set to zero show 'N/A' on the draw odds btn. Otherwise show to draw odds/
     if( std::stod(fields[10]) > 0 ){
-        drawOddsString = std::to_string(std::stod(fields[10]) / Params().OddsDivisor());
+        drawOddsString = std::to_string(std::stod(fields[10]) / 10000);
         drawOddsString =  drawOddsString.substr(0, drawOddsString.size() -4);
     }
     else{
