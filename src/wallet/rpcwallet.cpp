@@ -8,6 +8,7 @@
 
 #include "amount.h"
 #include "base58.h"
+#include "betting/bet_v3.h"
 #include "core_io.h"
 #include "init.h"
 #include "net.h"
@@ -134,7 +135,11 @@ UniValue listevents(const UniValue& params, bool fHelp)
         mlOdds.push_back(Pair("mlAway", (uint64_t) plEvent.nAwayOdds));
         mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
 
-        spreadOdds.push_back(Pair("spreadVersion", (uint64_t) plEvent.nSpreadVersion));
+        if (plEvent.nEventCreationHeight < Params().WagerrProtocolV3StartHeight()) {
+            spreadOdds.push_back(Pair("favorite", plEvent.fLegacyInitialHomeFavorite ? "home" : "away"));
+        } else {
+            spreadOdds.push_back(Pair("favorite", plEvent.nHomeOdds <= plEvent.nAwayOdds ? "home" : "away"));
+        }
         spreadOdds.push_back(Pair("spreadPoints", (uint64_t) plEvent.nSpreadPoints));
         spreadOdds.push_back(Pair("spreadHome", (uint64_t) plEvent.nSpreadHomeOdds));
         spreadOdds.push_back(Pair("spreadAway", (uint64_t) plEvent.nSpreadAwayOdds));
@@ -637,7 +642,7 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
         UniValue uValue(UniValue::VOBJ);
         UniValue uLegs(UniValue::VARR);
 
-        for (int i = 0; i < uniBet.legs.size(); i++) {
+        for (uint32_t i = 0; i < uniBet.legs.size(); i++) {
             auto &leg = uniBet.legs[i];
             auto &lockedEvent = uniBet.lockedEvents[i];
             UniValue uLeg(UniValue::VOBJ);
@@ -647,7 +652,6 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
             uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
             uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
             uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
-            uLockedEvent.push_back(Pair("spreadVersion", (uint64_t) lockedEvent.nSpreadVersion));
             uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
             uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
             uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
@@ -1216,7 +1220,7 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
 
     std::vector<CPeerlessBet> vLegs;
     UniValue legsArr = params[0].get_array();
-    for (int i = 0; i < legsArr.size(); i++) {
+    for (uint32_t i = 0; i < legsArr.size(); i++) {
         const UniValue obj = legsArr[i].get_obj();
 
         RPCTypeCheckObj(obj, boost::assign::map_list_of("eventId", UniValue::VNUM)("outcome", UniValue::VNUM));
@@ -1406,12 +1410,11 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     }
 
     if (resultHeight > Params().BetStartHeight() && fShowWinner) {
-        std::vector<CPayoutInfo> vExpectedPayoutsInfo;
-        std::vector<CBetOut> betOuts;
-        GetCGLottoBetPayouts(resultHeight, betOuts, vExpectedPayoutsInfo);
-        for (auto betOut : betOuts) {
-            if (!winningBetFound && betOut.nEventId == eventID) {
-                winningBetOut = betOut;
+        std::multimap<CPayoutInfo, CBetOut> mExpectedCGLottoPayouts;
+        GetCGLottoBetPayouts(resultHeight, mExpectedCGLottoPayouts);
+        for (auto lottoPayouts : mExpectedCGLottoPayouts) {
+            if (!winningBetFound && lottoPayouts.second.nEventId == eventID) {
+                winningBetOut = lottoPayouts.second;
                 winningBetFound = true;
             }
         }

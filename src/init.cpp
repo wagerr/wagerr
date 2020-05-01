@@ -917,6 +917,10 @@ bool AppInit2()
     if (mapArgs.count("-checklevel"))
         return InitError(_("Error: Unsupported argument -checklevel found. Checklevel must be level 4."));
 
+    // Maximum number of blocks is limited by the depth of the betting undo information
+    if (GetArg("-checkblocks", 100) > Params().MaxBettingUndoDepth())
+        return InitError(strprintf(_("InError: Maximum number of blocks to check is %d"), Params().MaxBettingUndoDepth()));
+
     if (GetBoolArg("-benchmark", false))
         InitWarning(_("Warning: Unsupported argument -benchmark ignored, use -debug=bench."));
 

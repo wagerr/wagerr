@@ -12,6 +12,8 @@
 #include "zwgr/accumulatormap.h"
 #include "addrman.h"
 #include "alert.h"
+#include "betting/bet.h"
+#include "betting/bet_v3.h"
 #include "blocksignature.h"
 #include "chainparams.h"
 #include "checkpoints.h"
@@ -2607,11 +2609,9 @@ bool DisconnectBlock(CBlock& block, CValidationState& state, CBlockIndex* pindex
         // Revert betting dats
         if (pindex->nHeight > Params().BetStartHeight()) {
             // revert complete bet payouts marker
-            if (pindex->nHeight > Params().ParlayBetStartHeight()) {
-                if (!UndoBetPayouts(bettingsViewCache, pindex->nHeight)) {
-                    error("DisconnectBlock(): undo payout data is inconsistent");
-                    return false;
-                }
+            if (!UndoBetPayouts(bettingsViewCache, pindex->nHeight)) {
+                error("DisconnectBlock(): undo payout data is inconsistent");
+                return false;
             }
             if (!UndoPayoutsInfo(bettingsViewCache, pindex->nHeight)) {
                 error("DisconnectBlock(): undo payouts info failed");
@@ -3237,13 +3237,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         nExpectedMint += nFees;
 
     // Calculate the expected bet payouts.
-    std::vector<CBetOut> vExpectedAllPayouts;
-    std::vector<CBetOut> vExpectedPLPayouts;
-    std::vector<CBetOut> vExpectedCGLottoPayouts;
+    std::multimap<CPayoutInfo, CBetOut> mExpectedAllPayouts;
+    std::multimap<CPayoutInfo, CBetOut> mExpectedPLPayouts;
+    std::multimap<CPayoutInfo, CBetOut> mExpectedCGLottoPayouts;
+    mExpectedAllPayouts.clear();
+    mExpectedPLPayouts.clear();
+    mExpectedCGLottoPayouts.clear();
 
-    std::vector<CPayoutInfo> vExpectedPLPayoutsInfo;
-    std::vector<CPayoutInfo> vExpectedCGLottoPayoutsInfo;
-    std::vector<CPayoutInfo> vExpectedAllPayoutsInfo;
+    CAmount nExpectedBetMint = 0;
 
     if( pindex->nHeight > Params().BetStartHeight()) {
         std::string strBetNetBlockTxt;
@@ -3269,59 +3270,35 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         //const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
 
         // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
-        if (pindex->nHeight >= Params().ParlayBetStartHeight()) {
-            GetBetPayouts(bettingsViewCache, pindex->nHeight - 1, vExpectedPLPayouts, vExpectedPLPayoutsInfo);
-        }
-        else {
-            GetBetPayoutsLegacy(pindex->nHeight - 1, vExpectedPLPayouts, vExpectedPLPayoutsInfo);
-        }
-        GetCGLottoBetPayouts(pindex->nHeight - 1, vExpectedCGLottoPayouts, vExpectedCGLottoPayoutsInfo);
+        GetBetPayouts(bettingsViewCache, pindex->nHeight - 1, mExpectedPLPayouts, pindex->nHeight >= Params().WagerrProtocolV3StartHeight());
+        GetCGLottoBetPayouts(pindex->nHeight - 1, mExpectedCGLottoPayouts);
 
         // Get the total amount of WGR that needs to be minted to payout all winning bets.
-        nExpectedMint += GetBlockPayouts(vExpectedPLPayouts, nMNBetReward, vExpectedPLPayoutsInfo);
-        nExpectedMint += GetCGBlockPayouts(vExpectedCGLottoPayouts, nMNBetReward);
+        nExpectedBetMint = GetBlockPayouts(mExpectedPLPayouts, nMNBetReward, pindex->nHeight);
+        nExpectedBetMint += GetCGBlockPayoutsValue(mExpectedCGLottoPayouts);
 
-        nExpectedMint += nMNBetReward;
+        nExpectedBetMint += nMNBetReward;
 
         // Merge vectors into single payout vector.
-        vExpectedAllPayouts = vExpectedPLPayouts;
-        vExpectedAllPayouts.insert(vExpectedAllPayouts.end(), vExpectedCGLottoPayouts.begin(), vExpectedCGLottoPayouts.end());
-        vExpectedAllPayoutsInfo = vExpectedPLPayoutsInfo;
-        vExpectedAllPayoutsInfo.insert(vExpectedAllPayoutsInfo.end(), vExpectedCGLottoPayoutsInfo.begin(), vExpectedCGLottoPayoutsInfo.end());
+        mExpectedAllPayouts = mExpectedPLPayouts;
+        mExpectedAllPayouts.insert(mExpectedCGLottoPayouts.begin(), mExpectedCGLottoPayouts.end());
+
+        if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedAllPayouts, block, pindex->nHeight, nExpectedMint)) {
+            if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().ZerocoinCheckTXexclude() && pindex->nHeight <= Params().ZerocoinCheckTX())) {
+                LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : Bet payout TX's don't match up with block payout TX's at block %i\n", pindex->nHeight);
+            } else  {
+                return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
+            }
+        }
+        nExpectedMint += nExpectedBetMint;
     }
 
-    // Validate bet payouts nExpectedMint against the block pindex->nMint to ensure reward wont pay to much.
-    /*  **TODO**
-        *
-        * Kokary: there are some oddities with fee calculation:
-        * - Coinstake transactions do have fees, resulting in rougly 4400 satoshi less mints
-        * - When there are no masternodes to pay, those MN rewards are not paid, resulting in 1*COIN less than expected mints
-        * - Testnet is polluted with test coinstake payouts between block 15195 and 15220
-        * A 'safe' check that also checks for underminting coins would be something like this:
-        *     if ((pindex->nHeight < 15195 || pindex->nHeight > 15220) && (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint )) )
-        *         return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
-        * Though if we keep this check for minimum mint, it should be moved to IsBlockValueValid().
-     */
-    /*
-    if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().ZerocoinCheckTXexclude() || pindex->nHeight <= Params().ZerocoinCheckTX())) {
-        LogPrintf("Skipping validation of mint size on testnet subset");
-    } else if (pindex->nMint > nExpectedMint || pindex->nMint < (nExpectedMint - 2*COIN) || !IsBlockValueValid( block, nExpectedMint, pindex->nMint)) {
-        return state.DoS(100, error("ConnectBlock() : reward pays wrong amount (actual=%s vs limit=%s)", FormatMoney(pindex->nMint), FormatMoney(nExpectedMint)), REJECT_INVALID, "bad-cb-amount");
-    }
-    */
-    assert(vExpectedAllPayouts.size() == vExpectedAllPayoutsInfo.size());
-    if (!IsBlockPayoutsValid(bettingsViewCache, vExpectedAllPayouts, block, pindex->nHeight, vExpectedAllPayoutsInfo)) {
-        if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().ZerocoinCheckTXexclude() && pindex->nHeight <= Params().ZerocoinCheckTX())) {
-            LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : Bet payout TX's don't match up with block payout TX's at block %i\n", pindex->nHeight);
-        } else  {
-            return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
-        }
-    }
+//    assert(vExpectedAllPayouts.size() == vExpectedAllPayoutsInfo.size());
 
     // Clear all the payout vectors.
-    vExpectedAllPayouts.clear();
-    vExpectedPLPayouts.clear();
-    vExpectedCGLottoPayouts.clear();
+    mExpectedAllPayouts.clear();
+    mExpectedPLPayouts.clear();
+    mExpectedCGLottoPayouts.clear();
 
     // Ensure that accumulator checkpoints are valid and in the same state as this instance of the chain
     AccumulatorMap mapAccumulators(Params().Zerocoin_Params(pindex->nHeight < Params().Zerocoin_Block_V2_Start()));
@@ -3433,7 +3410,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     if (!fJustCheck) {
         if (pindex->nHeight > Params().BetStartHeight()) {
             for (const CTransaction& tx : block.vtx) {
-                ParseBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime());
+                ParseBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= Params().WagerrProtocolV3StartHeight());
             }
             if (!(pindex->nHeight % 100)) {
                 int heightLimit = pindex->nHeight - Params().MaxReorganizationDepth();

@@ -53,10 +53,8 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
     }
 
     bool mappingFound{false};
-    unsigned int nFirstIndexFree{0};
 
     // Check the map for the string name.
-    bool FirstIndexFreeFound = false;
     auto it = bettingsView->mappings->NewIterator();
     MappingKey key{};
     for (it->Seek(CBettingDB::DbTypeToBytes(MappingKey{type, 0})); it->Valid() && (CBettingDB::BytesToDbType(it->Key(), key), key.nMType == type); it->Next()) {
