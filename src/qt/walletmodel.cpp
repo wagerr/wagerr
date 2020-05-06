@@ -496,7 +496,7 @@ WalletModel::SendCoinsReturn WalletModel::placeBet(WalletModelTransaction& trans
 
 bool WalletModel::createZwgrSpend(
         CWalletTx &wtxNew,
-        vector<CZerocoinMint> &vMintsSelected,
+        std::vector<CZerocoinMint> &vMintsSelected,
         bool fMintChange,
         bool fMinimizeChange,
         CZerocoinSpendReceipt &receipt,
@@ -519,7 +519,7 @@ bool WalletModel::createZwgrSpend(
     }
 
     CReserveKey reserveKey(wallet);
-    vector<CDeterministicMint> vNewMints;
+    std::vector<CDeterministicMint> vNewMints;
     if (!wallet->CreateZerocoinSpendTransaction(
             value,
             100,
@@ -542,7 +542,7 @@ bool WalletModel::createZwgrSpend(
 }
 
 bool WalletModel::sendZwgr(
-        vector<CZerocoinMint> &vMintsSelected,
+        std::vector<CZerocoinMint> &vMintsSelected,
         bool fMintChange,
         bool fMinimizeChange,
         CZerocoinSpendReceipt &receipt,
@@ -573,7 +573,7 @@ bool WalletModel::sendZwgr(
 
 bool WalletModel::convertBackZwgr(
         CAmount value,
-        vector<CZerocoinMint> &vMintsSelected,
+        std::vector<CZerocoinMint> &vMintsSelected,
         bool fMintChange,
         bool fMinimizeChange,
         CZerocoinSpendReceipt &receipt,
