@@ -174,7 +174,7 @@ public:
 
     bool createZwgrSpend(
             CWalletTx &wtxNew,
-            vector<CZerocoinMint> &vMintsSelected,
+            std::vector<CZerocoinMint> &vMintsSelected,
             bool fMintChange,
             bool fMinimizeChange,
             CZerocoinSpendReceipt &receipt,
@@ -183,7 +183,7 @@ public:
     );
 
     bool sendZwgr(
-            vector<CZerocoinMint> &vMintsSelected,
+            std::vector<CZerocoinMint> &vMintsSelected,
             bool fMintChange,
             bool fMinimizeChange,
             CZerocoinSpendReceipt &receipt,
@@ -193,7 +193,7 @@ public:
 
     bool convertBackZwgr(
             CAmount value,
-            vector<CZerocoinMint> &vMintsSelected,
+            std::vector<CZerocoinMint> &vMintsSelected,
             bool fMintChange,
             bool fMinimizeChange,
             CZerocoinSpendReceipt &receipt,
