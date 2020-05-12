@@ -221,7 +221,19 @@ public:
     std::unique_ptr<CStorageKVIterator> NewIterator() override {
         return MakeUnique<CFlushableStorageKVIterator>(db.NewIterator(), changed);
     }
-
+    unsigned int GetCacheSize() {
+        return changed.size();
+    }
+    unsigned int GetCacheSizeBytesToWrite() {
+        unsigned int sum = 0;
+        for (auto it = changed.begin(); it != changed.end(); it++) {
+            // if entry for writting
+            if (it->second) {
+                sum += 1 + it->first.size() + 1 + it->second.get().size();
+            }
+        }
+        return sum;
+    }
 private:
     CStorageKV& db;
     MapKV changed;
