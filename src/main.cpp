@@ -77,6 +77,7 @@ bool fIsBareMultisigStd = true;
 bool fCheckBlockIndex = false;
 bool fVerifyingBlocks = false;
 unsigned int nCoinCacheSize = 5000;
+unsigned int nBettingCacheSize = 5000;
 bool fAlerts = DEFAULT_ALERTS;
 bool fClearSpendCache = false;
 
@@ -3438,19 +3439,23 @@ bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
 {
     LOCK(cs_main);
     static int64_t nLastWrite = 0;
+    LogPrintf("FlushStateToDisk: started");
     try {
         if ((mode == FLUSH_STATE_ALWAYS) ||
             ((mode == FLUSH_STATE_PERIODIC || mode == FLUSH_STATE_IF_NEEDED) && pcoinsTip->GetCacheSize() > nCoinCacheSize) ||
+            ((mode == FLUSH_STATE_PERIODIC || mode == FLUSH_STATE_IF_NEEDED) && bettingsView->GetCacheSize() > nBettingCacheSize) ||
             (mode == FLUSH_STATE_PERIODIC && GetTimeMicros() > nLastWrite + DATABASE_WRITE_INTERVAL * 1000000)) {
             // Typical CCoins structures on disk are around 100 bytes in size.
             // Pushing a new one to the database can cause it to be written
             // twice (once in the log, and once in the tables). This is already
             // an overestimation, as most will delete an existing entry or
             // overwrite one. Still, use a conservative safety factor of 2.
-            if (!CheckDiskSpace(100 * 2 * 2 * pcoinsTip->GetCacheSize()))
+            if (!CheckDiskSpace(100 * 2 * 2 * pcoinsTip->GetCacheSize() + 2 * bettingsView->GetCacheSizeBytesToWrite()))
                 return state.Error("out of disk space");
             // First make sure all block and undo data is flushed to disk.
+            int64_t debugTime = GetTimeMicros();
             FlushBlockFile();
+            LogPrintf("FlushBlockFile: %lu ms\n", GetTimeMicros() - debugTime);
             // Then update all block file information (which may refer to block and undo files).
             {
                 std::vector<std::pair<int, const CBlockFileInfo*> > vFiles;
@@ -3470,11 +3475,17 @@ bool static FlushStateToDisk(CValidationState& state, FlushStateMode mode)
                 }
             }
             // Finally flush the chainstate (which may refer to block index entries).
+            debugTime = GetTimeMicros();
+            LogPrintf("pcoinsTip->Flush(), %lu entries\n", pcoinsTip->GetCacheSize());
             if (!pcoinsTip->Flush())
                 return state.Abort("Failed to write to coin database");
+            LogPrintf("pcoinsTip->Flush(): %lu ms\n", GetTimeMicros() - debugTime);
             // Flush global betting database to persistent storage (LevelDB)
+            debugTime = GetTimeMicros();
+            LogPrintf("bettingsView->Flush(), %lu entries\n", bettingsView->GetCacheSize());
             if (!bettingsView->Flush())
                 return state.Abort("Failed to write to betting database");
+            LogPrintf("bettingsView->Flush(): %lu ms\n", GetTimeMicros() - debugTime);
             // Update best block in wallet (so we can detect restored wallets).
             if (mode != FLUSH_STATE_IF_NEEDED) {
                 GetMainSignals().SetBestChain(chainActive.GetLocator());

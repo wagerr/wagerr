@@ -847,6 +847,14 @@ public:
         return false;
     }
 
+    unsigned int GetCacheSize() {
+        return GetDb().GetCacheSize();
+    }
+
+    unsigned int GetCacheSizeBytesToWrite() {
+        return GetDb().GetCacheSizeBytesToWrite();
+    }
+
     static std::size_t dbWrapperCacheSize() { return 10 << 20; }
 
     static std::string MakeDbPath(const char* name) {
@@ -923,6 +931,24 @@ public:
                 bets->Flush() &&
                 undos->Flush() &&
                 payoutsInfo->Flush();
+    }
+
+    unsigned int GetCacheSize() {
+        return mappings->GetCacheSize() +
+                results->GetCacheSize() +
+                events->GetCacheSize() +
+                bets->GetCacheSize() +
+                undos->GetCacheSize() +
+                payoutsInfo->GetCacheSize();
+    }
+
+    unsigned int GetCacheSizeBytesToWrite() {
+        return mappings->GetCacheSizeBytesToWrite() +
+                results->GetCacheSizeBytesToWrite() +
+                events->GetCacheSizeBytesToWrite() +
+                bets->GetCacheSizeBytesToWrite() +
+                undos->GetCacheSizeBytesToWrite() +
+                payoutsInfo->GetCacheSizeBytesToWrite();
     }
 
     void SetLastHeight(uint32_t height) {
