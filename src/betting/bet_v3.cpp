@@ -145,12 +145,10 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
             }
             else { // lockedEvent.nSpreadVersion == 2
                 int32_t difference = result.nHomeScore - result.nAwayScore;
-                if (lockedEvent.nSpreadPoints < difference) {
-                    return lockedEvent.nSpreadHomeOdds;
-                } else if (lockedEvent.nSpreadPoints > difference) {
-                    return lockedEvent.nSpreadAwayOdds;
-                } else {
+                if (lockedEvent.nSpreadPoints == difference) {
                     return refundOdds;
+                } else if (lockedEvent.nSpreadPoints < difference) {
+                    return lockedEvent.nSpreadHomeOdds;
                 }
             }
             break;
@@ -169,12 +167,10 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
             }
             else { // lockedEvent.nSpreadVersion == 2
                 int32_t difference = result.nHomeScore - result.nAwayScore;
-                if (lockedEvent.nSpreadPoints < difference) {
-                    return lockedEvent.nSpreadHomeOdds;
+                if (lockedEvent.nSpreadPoints == difference) {
+                    return refundOdds;
                 } else if (lockedEvent.nSpreadPoints > difference) {
                     return lockedEvent.nSpreadAwayOdds;
-                } else {
-                    return refundOdds;
                 }
             }
             break;
