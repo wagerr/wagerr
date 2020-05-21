@@ -1825,7 +1825,8 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 // If event patch - find event undo and revert changes
                 CPeerlessEventPatch plEventPatch{};
-                if (CPeerlessEventPatch::FromOpCode(opCode, plEventPatch)) {
+                if (CPeerlessEventPatch::FromOpCode(opCode, plEventPatch) &&
+                        bettingsViewCache.events->Exists(EventKey{plEventPatch.nEventId})) {
                     LogPrintf("CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatch.nEventId, plEventPatch.nStartTime);
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
@@ -1848,7 +1849,8 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 // If update money line odds - find event undo and revert changes
                 CPeerlessUpdateOdds puo{};
-                if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
+                if (CPeerlessUpdateOdds::FromOpCode(opCode, puo) &&
+                        bettingsViewCache.events->Exists(EventKey{puo.nEventId})) {
                     LogPrintf("CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n", puo.nEventId, puo.nHomeOdds, puo.nAwayOdds, puo.nDrawOdds);
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
@@ -1859,7 +1861,8 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 // If spread odds - find event undo and revert changes
                 CPeerlessSpreadsEvent spreadEvent{};
-                if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
+                if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent) &&
+                        bettingsViewCache.events->Exists(EventKey{spreadEvent.nEventId})) {
                     LogPrintf("CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n", spreadEvent.nEventId, spreadEvent.nPoints, spreadEvent.nHomeOdds, spreadEvent.nAwayOdds);
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
@@ -1870,7 +1873,8 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 // If total odds - find event undo and revert changes
                 CPeerlessTotalsEvent totalsEvent{};
-                if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
+                if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent) &&
+                        bettingsViewCache.events->Exists(EventKey{totalsEvent.nEventId})) {
                     LogPrintf("CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n", totalsEvent.nEventId, totalsEvent.nPoints, totalsEvent.nOverOdds, totalsEvent.nUnderOdds);
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
@@ -1897,7 +1901,8 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
             CPeerlessBet plBet;
             // If bet - try to find event undo and revert changes
-            if (CPeerlessBet::FromOpCode(opCode, plBet)) {
+            if (CPeerlessBet::FromOpCode(opCode, plBet) &&
+                    bettingsViewCache.events->Exists(EventKey{plBet.nEventId})) {
                 LogPrintf("CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
                 if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                     LogPrintf("Revert failed!\n");
@@ -1918,7 +1923,14 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 std::sort(legs.begin(), legs.end());
                 legs.erase(std::unique(legs.begin(), legs.end()), legs.end());
 
-                if (!legs.empty()) {
+                bool allEventsExist = true;
+
+                for (auto leg : legs) {
+                    if (!bettingsViewCache.events->Exists(EventKey{leg.nEventId}))
+                        allEventsExist = false;
+                }
+
+                if (!legs.empty() && allEventsExist) {
                     if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;
@@ -1926,6 +1938,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     UniversalBetKey key{static_cast<uint32_t>(height), out};
                     bettingsViewCache.bets->Erase(key);
                 }
+                continue;
             }
         }
     }
