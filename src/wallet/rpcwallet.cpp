@@ -23,6 +23,7 @@
 
 #include "transactionrecord.h"
 #include "betting/bet.h"
+#include "betting/quickgames/dice.h"
 
 #include <cstdlib>
 #include <stdint.h>
@@ -908,6 +909,141 @@ UniValue getmybets(const UniValue& params, bool fHelp)
     return GetBets(limit, pwalletMain);
 }
 
+UniValue GetQuickGamesBets(uint32_t limit, CWallet *pwalletMain = NULL) {
+    UniValue ret(UniValue::VARR);
+
+    auto it = bettingsView->quickGamesBets->NewIterator();
+    for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        QuickGamesBetKey key;
+        CQuickGamesBet qgBet;
+        uint256 hash;
+        CBettingDB::BytesToDbType(it->Value(), qgBet);
+        CBettingDB::BytesToDbType(it->Key(), key);
+
+        // check bet is mine if needed
+        if (pwalletMain && IsMine(*pwalletMain, qgBet.playerAddress.Get()) == ISMINE_NO)
+            continue;
+
+        CBlockIndex *blockIndex = chainActive[(int) key.blockHeight];
+        if (blockIndex)
+            hash = blockIndex->hashProofOfStake;
+
+        UniValue bet{UniValue::VOBJ};
+
+        auto &gameView = Params().QuickGamesArr()[qgBet.gameType];
+
+        bet.push_back(Pair("blockHeight", (uint64_t) key.blockHeight));
+        bet.push_back(Pair("resultBlockHash", hash.ToString().c_str()));
+        bet.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
+        bet.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
+        bet.push_back(Pair("address", qgBet.playerAddress.ToString()));
+        bet.push_back(Pair("amount", ValueFromAmount(qgBet.betAmount)));
+        bet.push_back(Pair("time", (uint64_t) qgBet.betTime));
+        bet.push_back(Pair("gameName", gameView.name));
+        UniValue betInfo{UniValue::VOBJ};
+        for (auto val : gameView.betInfoParser(qgBet.vBetInfo, hash)) {
+            betInfo.push_back(Pair(val.first, val.second));
+        }
+        bet.push_back(Pair("betInfo", betInfo));
+        bet.push_back(Pair("completed", qgBet.IsCompleted() ? "yes" : "no"));
+        bet.push_back(Pair("betResultType", BetResultTypeToStr(qgBet.resultType)));
+        bet.push_back(Pair("payout", qgBet.IsCompleted() ? ValueFromAmount(qgBet.payout) : "pending"));
+
+        ret.push_back(bet);
+    }
+
+    if (limit != 0 && ret.size() > limit) {
+        UniValue retLimit{UniValue::VARR};
+        for (int i = ret.size() - limit; i < ret.size(); i++) {
+            retLimit.push_back(ret[i]);
+        }
+        return retLimit;
+    }
+    else {
+        return ret;
+    }
+}
+
+UniValue getallqgbets(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw std::runtime_error(
+                "getallqgbets\n"
+                "\nGet quick games bets info for all wallets\n"
+
+                "\nArguments:\n"
+                "1. Last bets limit (numeric, optional) The limit response to last bets bumber.\n"
+                "\nResult:\n"
+                "[\n"
+                "  {\n"
+                "    \"blockHeight\": height, (numeric) The block height where bet was placed.\n"
+                "    \"resultBlockHash\": posHash, (string) The block hash where bet was placed. Also using for calc win number.\n"
+                "    \"betTxHash\": hash, (string) The transaction hash where bet was placed.\n"
+                "    \"betTxOut\": outPoint, (numeric) The transaction outpoint where bet was placed.\n"
+                "    \"address\": playerAddress, (string) The player address.\n"
+                "    \"amount\": x.xxx, (numeric) The amount bet in WGR.\n"
+                "    \"time\": betTime, (string) The time of bet.\n"
+                "    \"gameName\": name, (string) The game name on which bet has been placed.\n"
+                "    \"betInfo\": info, (object) The bet info which collect specific infos about currect game params."
+                "    \"completed\": yes/no, (string).\n"
+                "    \"betResultType\": lose/win/refund/pending, (string).\n"
+                "    \"payout\": x.xxx/pending, (numeric/string) The winning value.\n"
+                "  },\n"
+                "  ...\n"
+                "]\n"
+
+                "\nExamples:\n" +
+                HelpExampleCli("getallqgbets", "15"));
+
+    uint32_t limit = 0;
+    if (params.size()  == 1)
+        limit = params[0].get_int();
+
+    return GetQuickGamesBets(limit);
+}
+
+
+UniValue getmyqgbets(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw std::runtime_error(
+                "getmyqgbets\n"
+                "\nGet quick games bets info for my wallets.\n"
+
+                                "\nArguments:\n"
+                "1. Last bets limit (numeric, optional) The limit response to last bets bumber.\n"
+                "\nResult:\n"
+                "[\n"
+                "  {\n"
+                "    \"blockHeight\": height, (numeric) The block height where bet was placed.\n"
+                "    \"resultBlockHash\": posHash, (string) The block hash where bet was placed. Also using for calc win number.\n"
+                "    \"betTxHash\": hash, (string) The transaction hash where bet was placed.\n"
+                "    \"betTxOut\": outPoint, (numeric) The transaction outpoint where bet was placed.\n"
+                "    \"address\": playerAddress, (string) The player address.\n"
+                "    \"amount\": x.xxx, (numeric) The amount bet in WGR.\n"
+                "    \"time\": betTime, (string) The time of bet.\n"
+                "    \"gameName\": name, (string) The game name on which bet has been placed.\n"
+                "    \"betInfo\": info, (object) The bet info which collect specific infos about currect game params."
+                "    \"completed\": yes/no, (string).\n"
+                "    \"betResultType\": lose/win/refund/pending, (string).\n"
+                "    \"payout\": x.xxx/pending, (numeric/string) The winning value.\n"
+                "  },\n"
+                "  ...\n"
+                "]\n"
+
+                "\nExamples:\n" +
+                HelpExampleCli("getmyqgbets", "15"));
+
+    uint32_t limit = 0;
+    if (params.size() == 1)
+        limit = params[0].get_int();
+
+    EnsureWalletIsUnlocked();
+
+    return GetQuickGamesBets(limit, pwalletMain);
+}
+
+
 UniValue listchaingamesbets(const UniValue& params, bool fHelp)
 {
     // TODO The command-line parameters for this command aren't handled as.
@@ -1548,6 +1684,77 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
     std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
 
     // Process transaction
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
+
+
+UniValue placeqgdicebet(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() < 2 || params.size() > 3)
+        throw std::runtime_error(
+            "\nPlace an amount as a bet on a quick game dice. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. Amount          (numeric, required) The amount in wgr to send. Min: 25, max: 4000.\n"
+            "2. Dice game type  (string, required) The dice game type. One type of:\n"
+            "                                      equal, not equal, total over,\n"
+            "                                      total under, even, odd.\n"
+            "3. Bet number      (numeric, optional) The bet number required for all games type,\n"
+            "                                       except even and odd. Min: 2, Max: 12.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placeqgdicebet", "1000 \"total over\" 6") +
+            HelpExampleRpc("placeqgdicebet", "1000 \"even\""));
+
+    CAmount nAmount = AmountFromValue(params[0]);
+
+    // Validate parlay bet amount so its between 25 - 4000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxParlayBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 4000 WGR inclusive.");
+    }
+
+    quickgames::DiceBetInfo betInfo;
+
+    auto betType = quickgames::StrToDiceGameType(params[1].get_str());
+    if (betType == quickgames::qgDiceUndefined)
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet type for dice game!");
+
+    uint32_t betNumber = 0;
+    if (betType != quickgames::qgDiceEven && betType != quickgames::qgDiceOdd) {
+        betNumber = params[2].get_int();
+        if (betNumber < 2 || betNumber > 12)
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet number for dice game! It must be between 2 and 12.");
+    }
+    betInfo.betType = betType;
+    betInfo.betNumber = betNumber;
+
+    CDataStream ss{SER_NETWORK, CLIENT_VERSION};
+    ss << betInfo;
+
+    CQuickGamesTxBet txBet;
+    txBet.gameType = QuickGamesType::qgDice;
+    txBet.vBetInfo = std::vector<unsigned char>{ss.begin(), ss.end()};
+
+    std::string opCode;
+    CQuickGamesTxBet::ToOpCode(txBet, opCode);
+
+    CWalletTx wtx;
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    CBitcoinAddress address("");
+
+    // Unhex the validated bet opcode
+    std::vector<unsigned char> vectorValue;
+    std::string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
     SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
 
     return wtx.GetHash().GetHex();

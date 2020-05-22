@@ -285,6 +285,7 @@ extern UniValue placechaingamesbet(const UniValue& params, bool fHelp);
 extern UniValue geteventsliability(const UniValue& params, bool fHelp);
 extern UniValue placebet(const UniValue& params, bool fHelp);
 extern UniValue placeparlaybet(const UniValue& params, bool fHelp);
+extern UniValue placeqgdicebet(const UniValue& params, bool fHelp);
 extern UniValue listbets(const UniValue& params, bool fHelp);
 extern UniValue getmappingid(const UniValue& params, bool fHelp);
 extern UniValue getmappingname(const UniValue& params, bool fHelp);
@@ -292,6 +293,8 @@ extern UniValue getbet(const UniValue& params, bool fHelp);
 extern UniValue listbetsdb(const UniValue& params, bool fHelp);
 extern UniValue getallbets(const UniValue& params, bool fHelp);
 extern UniValue getmybets(const UniValue& params, bool fHelp);
+extern UniValue getallqgbets(const UniValue& params, bool fHelp);
+extern UniValue getmyqgbets(const UniValue& params, bool fHelp);
 extern UniValue getpayoutinfo(const UniValue& params, bool fHelp);
 extern UniValue getpayoutinfosince(const UniValue& params, bool fHelp);
 

@@ -120,9 +120,6 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
         mapping.push_back(Pair("exists", true));
         mapping.push_back(Pair("mapping-index", static_cast<uint64_t>(map.nMType)));
     }
-    else {
-        throw std::runtime_error("Currently no mapping name exists for the mapping name you provided.");
-    }
 
     result.push_back(mapping);
 
@@ -217,7 +214,7 @@ UniValue getpayoutinfo(const UniValue& params, bool fHelp)
     std::vector<std::pair<bool, CPayoutInfo>> vPayoutsInfo;
 
     // parse payout params
-    for (int i = 0; i < paramsArr.size(); i++) {
+    for (uint32_t i = 0; i < paramsArr.size(); i++) {
         const UniValue obj = paramsArr[i].get_obj();
         RPCTypeCheckObj(obj, boost::assign::map_list_of("txHash", UniValue::VSTR)("nOut", UniValue::VNUM));
         uint256 txHash = uint256(find_value(obj, "txHash").get_str());
