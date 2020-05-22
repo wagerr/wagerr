@@ -402,6 +402,9 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "listbetsdb", &listbetsdb, false, false, false},
         {"wallet", "getallbets", &getallbets, false, false, false},
         {"wallet", "getmybets", &getmybets, false, false, true},
+        {"wallet", "placeqgdicebet", &placeqgdicebet, false, false, true},
+        {"wallet", "getallqgbets", &getallqgbets,false, false, false},
+        {"wallet", "getmyqgbets", &getmyqgbets,false, false, true},
         {"wagerr", "getpayoutinfo", &getpayoutinfo, false, false, false},
         {"wagerr", "getpayoutinfosince", &getpayoutinfosince, false, false, false},
 
