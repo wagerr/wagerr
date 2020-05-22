@@ -28,4 +28,9 @@ void GetCGLottoBetPayouts(int height, std::multimap<CPayoutInfo, CBetOut>& mExpe
 
 uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, const CPeerlessResult &result, const bool fWagerrProtocolV3);
 
+/* Creates the bet payout vector for all winning Quick Games bets */
+uint32_t GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int height,  std::multimap<CPayoutInfo, CBetOut>& mExpectedQGPayouts);
+
+bool UndoQuickGamesBetPayouts(CBettingsView &bettingsViewCache, int height);
+
 #endif // WAGERR_V2_BET_H

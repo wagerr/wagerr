@@ -495,9 +495,12 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                 if (nHeight >= Params().WagerrProtocolV3StartHeight()) {
                     std::multimap<CPayoutInfo, CBetOut> mPLPayouts;
                     std::multimap<CPayoutInfo, CBetOut> mCGLottoPayouts;
+                    std::multimap<CPayoutInfo, CBetOut> mQGPayouts;
 
                     GetBetPayouts(bettingsViewCache, nHeight - 1, mPLPayouts, true);
                     GetCGLottoBetPayouts(nHeight - 1, mCGLottoPayouts);
+
+                    GetQuickGamesBetPayouts(bettingsViewCache, nHeight - 1, mQGPayouts);
 
                     GetBlockPayouts(mPLPayouts, nMNBetReward, nHeight);
                     GetCGBlockPayoutsValue(mCGLottoPayouts);
@@ -508,6 +511,9 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
                     }
                     for (auto vCGLottoPayout : mCGLottoPayouts) {
                         vAllBetTxOuts.emplace_back(vCGLottoPayout.second.nValue, vCGLottoPayout.second.scriptPubKey);
+                    }
+                    for (auto mQGPayout : mQGPayouts) {
+                        vAllBetTxOuts.emplace_back(mQGPayout.second.nValue, mQGPayout.second.scriptPubKey);
                     }
                 }
                 else {
