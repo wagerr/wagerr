@@ -59,7 +59,8 @@ typedef enum BetTxTypes{
     plSpreadsEventTxType = 0x09,  // Spread odds transaction type identifier.
     plTotalsEventTxType  = 0x0a,  // Totals odds transaction type identifier.
     plEventPatchTxType   = 0x0b,  // Peerless event patch transaction type identifier.
-    plParlayBetTxType    = 0x0c   // Peerless Parlay Bet transaction type identifier.
+    plParlayBetTxType    = 0x0c,  // Peerless Parlay Bet transaction type identifier.
+    qgBetTxType          = 0x0d,  // Quick Games Bet transaction type identifier.
 } BetTxTypes;
 
 // The supported mapping TX types.
@@ -77,7 +78,10 @@ typedef enum PayoutType {
     bettingReward    = 0x03,
     chainGamesPayout = 0x04,
     chainGamesRefund = 0x05,
-    chainGamesReward = 0x06
+    chainGamesReward = 0x06,
+    quickGamesPayout = 0x07,
+    quickGamesRefund = 0x08,
+    quickGamesReward = 0x09
 } PayoutType;
 
 typedef enum BetResultType {
@@ -489,6 +493,34 @@ public:
     }
 };
 
+// OPCODE serialization class
+class CQuickGamesTxBet
+{
+public:
+    QuickGamesType gameType;
+    std::vector<unsigned char> vBetInfo;
+
+    static bool ToOpCode(CQuickGamesTxBet& bet, std::string &opCode);
+    static bool FromOpCode(std::string opCode, CQuickGamesTxBet &bet);
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t type;
+        if (ser_action.ForRead()) {
+            READWRITE(type);
+            gameType = (QuickGamesType) type;
+
+        }
+        else {
+            type = (uint8_t) gameType;
+            READWRITE(type);
+        }
+        READWRITE(vBetInfo);
+    }
+};
+
 // DataBase Code
 
 // MappingKey
@@ -516,9 +548,13 @@ typedef struct MappingKey {
     }
 } MappingKey;
 
-// ResultKey
-typedef struct ResultKey {
+// EventKey
+typedef struct EventKey {
     uint32_t eventId;
+
+    explicit EventKey(uint32_t id) : eventId(id) { }
+    explicit EventKey(const EventKey& key) : eventId(key.eventId) { }
+    explicit EventKey(EventKey&& key) : eventId(key.eventId) { }
 
     ADD_SERIALIZE_METHODS;
 
@@ -534,10 +570,10 @@ typedef struct ResultKey {
             READWRITE(be_val);
         }
     }
-} ResultKey;
+} EventKey;
 
-// EventKey
-using EventKey = ResultKey;
+// ResultKey
+using ResultKey = EventKey;
 
 // UniversalBetKey
 typedef struct UniversalBetKey {
@@ -789,6 +825,76 @@ public:
     inline bool operator>(const CPayoutInfo& rhs) const { return CompareTo(rhs) > 0; }
 };
 
+// Quick Games
+
+using QuickGamesBetKey = UniversalBetKey;
+
+class CQuickGamesBet
+{
+public:
+    QuickGamesType gameType;
+    std::vector<unsigned char> vBetInfo;
+    CAmount betAmount;
+    CBitcoinAddress playerAddress;
+    int64_t betTime;
+    BetResultType resultType = BetResultType::betResultUnknown;
+    CAmount payout = 0;
+
+    explicit CQuickGamesBet() { }
+    explicit CQuickGamesBet(const QuickGamesType gameType, const std::vector<unsigned char>& vBetInfo, const CAmount betAmount, const CBitcoinAddress& playerAddress, const int64_t betTime) :
+        gameType(gameType), vBetInfo(vBetInfo), betAmount(betAmount), playerAddress(playerAddress), betTime(betTime) { }
+    explicit CQuickGamesBet(const CQuickGamesBet& cgBet) :
+        gameType(cgBet.gameType), vBetInfo(cgBet.vBetInfo), betAmount(cgBet.betAmount), playerAddress(cgBet.playerAddress), betTime(cgBet.betTime), resultType(cgBet.resultType), payout(cgBet.payout), completed(cgBet.completed) { }
+
+    bool IsCompleted() { return completed; }
+    void SetCompleted() { completed = true; }
+    // for undo
+    void SetUncompleted() { completed = false; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t type;
+        std::string addrStr;
+        if (ser_action.ForRead()) {
+            READWRITE(type);
+            gameType = (QuickGamesType) type;
+
+        }
+        else {
+            type = (uint8_t) gameType;
+            READWRITE(type);
+        }
+        READWRITE(vBetInfo);
+        READWRITE(betAmount);
+        if (ser_action.ForRead()) {
+            READWRITE(addrStr);
+            playerAddress.SetString(addrStr);
+        }
+        else {
+            addrStr = playerAddress.ToString();
+            READWRITE(addrStr);
+        }
+        READWRITE(betTime);
+        uint8_t resType;
+        if (ser_action.ForRead()) {
+            READWRITE(resType);
+            resultType = (BetResultType) resType;
+        }
+        else {
+            resType = (uint8_t) resultType;
+            READWRITE(resType);
+        }
+        READWRITE(payout);
+        READWRITE(completed);
+    }
+private:
+    bool completed = false;
+};
+
+// Betting Data Base
+
 class CBettingDB
 {
 public:
@@ -910,6 +1016,8 @@ public:
     std::unique_ptr<CStorageKV> undosStorage;
     std::unique_ptr<CBettingDB> payoutsInfo; // "payoutsinfo"
     std::unique_ptr<CStorageKV> payoutsInfoStorage;
+    std::unique_ptr<CBettingDB> quickGamesBets; // "quickgamesbets"
+    std::unique_ptr<CStorageKV> quickGamesBetsStorage;
 
     // default constructor
     CBettingsView() { }
@@ -922,6 +1030,7 @@ public:
         bets = MakeUnique<CBettingDB>(*phr->bets.get());
         undos = MakeUnique<CBettingDB>(*phr->undos.get());
         payoutsInfo = MakeUnique<CBettingDB>(*phr->payoutsInfo.get());
+        quickGamesBets = MakeUnique<CBettingDB>(*phr->quickGamesBets.get());
     }
 
     bool Flush() {
@@ -930,7 +1039,8 @@ public:
                 events->Flush() &&
                 bets->Flush() &&
                 undos->Flush() &&
-                payoutsInfo->Flush();
+                payoutsInfo->Flush() &&
+                quickGamesBets->Flush();
     }
 
     unsigned int GetCacheSize() {
@@ -939,7 +1049,8 @@ public:
                 events->GetCacheSize() +
                 bets->GetCacheSize() +
                 undos->GetCacheSize() +
-                payoutsInfo->GetCacheSize();
+                payoutsInfo->GetCacheSize() +
+                quickGamesBets->GetCacheSize();
     }
 
     unsigned int GetCacheSizeBytesToWrite() {
@@ -948,7 +1059,8 @@ public:
                 events->GetCacheSizeBytesToWrite() +
                 bets->GetCacheSizeBytesToWrite() +
                 undos->GetCacheSizeBytesToWrite() +
-                payoutsInfo->GetCacheSizeBytesToWrite();
+                payoutsInfo->GetCacheSizeBytesToWrite() +
+                quickGamesBets->GetCacheSizeBytesToWrite();
     }
 
     void SetLastHeight(uint32_t height) {

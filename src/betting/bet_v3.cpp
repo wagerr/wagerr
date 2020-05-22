@@ -514,3 +514,113 @@ void GetCGLottoBetPayouts(int height, std::multimap<CPayoutInfo, CBetOut>& mExpe
         }
     }
 }
+
+/**
+ * Undo only quick games bet payout mark as completed in DB.
+ * But coin tx outs were undid early in native bitcoin core.
+ * @return
+ */
+bool UndoQuickGamesBetPayouts(CBettingsView &bettingsViewCache, int height)
+{
+    uint32_t blockHeight = static_cast<uint32_t>(height);
+
+    LogPrintf("Start undo quick games payouts...\n");
+
+    auto it = bettingsViewCache.quickGamesBets->NewIterator();
+    std::vector<std::pair<QuickGamesBetKey, CQuickGamesBet>> vEntriesToUpdate;
+    for (it->Seek(CBettingDB::DbTypeToBytes(QuickGamesBetKey{blockHeight, COutPoint()})); it->Valid(); it->Next()) {
+        QuickGamesBetKey qgBetKey;
+        CQuickGamesBet qgBet;
+        CBettingDB::BytesToDbType(it->Key(), qgBetKey);
+        CBettingDB::BytesToDbType(it->Value(), qgBet);
+        // skip if bet is uncompleted
+        if (!qgBet.IsCompleted()) continue;
+
+        qgBet.SetUncompleted();
+        qgBet.resultType = BetResultType::betResultUnknown;
+        qgBet.payout = 0;
+        vEntriesToUpdate.emplace_back(std::pair<QuickGamesBetKey, CQuickGamesBet>{qgBetKey, qgBet});
+    }
+    for (auto pair : vEntriesToUpdate) {
+        bettingsViewCache.quickGamesBets->Update(pair.first, pair.second);
+    }
+    return true;
+}
+
+/**
+ * Creates the bet payout vector for all winning Quick Games bets.
+ *
+ * @return payout vector.
+ */
+uint32_t GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int height,  std::multimap<CPayoutInfo, CBetOut>& mExpectedQGPayouts)
+{
+    UniversalBetKey zeroKey{0, COutPoint()};
+    uint32_t expectedMint = 0;
+
+    LogPrintf("Start generating quick games bets payouts...\n");
+
+    CBlockIndex *blockIndex = chainActive[height];
+    uint32_t blockHeight = static_cast<uint32_t>(height);
+    auto it = bettingsViewCache.quickGamesBets->NewIterator();
+    std::vector<std::pair<QuickGamesBetKey, CQuickGamesBet>> vEntriesToUpdate;
+    for (it->Seek(CBettingDB::DbTypeToBytes(QuickGamesBetKey{blockHeight, COutPoint()})); it->Valid(); it->Next()) {
+        QuickGamesBetKey qgKey;
+        CQuickGamesBet qgBet;
+
+        CBettingDB::BytesToDbType(it->Key(), qgKey);
+
+        if (qgKey.blockHeight != blockHeight)
+            break;
+
+        CBettingDB::BytesToDbType(it->Value(), qgBet);
+        // skip if already handled
+        if (qgBet.IsCompleted())
+            continue;
+
+        // invalid game index
+        if (qgBet.gameType >= Params().QuickGamesArr().size())
+            continue;
+
+        // handle bet by specific game handler from quick games framework
+        const CQuickGamesView& gameView = Params().QuickGamesArr()[qgBet.gameType];
+        // if odds == 0 - bet lose, if odds > OddsDivisor - bet win, if odds == BET_ODDSDIVISOR - bet refunded
+        uint32_t odds = gameView.handler(qgBet.vBetInfo, blockIndex->hashProofOfStake);
+        CAmount winningsPermille = qgBet.betAmount * odds;
+        CAmount feePermille = winningsPermille > 0 ? (qgBet.betAmount * (odds - BET_ODDSDIVISOR) / 1000 * gameView.nFeePermille) : 0;
+        CAmount payout = winningsPermille > 0 ? (winningsPermille - feePermille) / BET_ODDSDIVISOR : 0;
+
+        if (payout > 0) {
+            qgBet.resultType = odds == BET_ODDSDIVISOR ? BetResultType::betResultRefund : BetResultType::betResultWin;
+            // Add winning payout to the payouts vector.
+            CPayoutInfo payoutInfo(qgKey, odds == BET_ODDSDIVISOR ? PayoutType::quickGamesRefund : PayoutType::quickGamesPayout);
+            CBetOut betOut(payout, GetScriptForDestination(qgBet.playerAddress.Get()), qgBet.betAmount);
+            mExpectedQGPayouts.insert(std::pair<CPayoutInfo, CBetOut>(payoutInfo, betOut));
+            expectedMint += payout;
+           // Dev reward
+            CAmount devReward = (CAmount)(feePermille / 1000 * gameView.nDevRewardPermille / BET_ODDSDIVISOR);
+            expectedMint += devReward;
+            CPayoutInfo devRewardInfo(zeroKey, PayoutType::quickGamesReward);
+            CBetOut devRewardOut(devReward, GetScriptForDestination(CBitcoinAddress(gameView.specialAddress).Get()), qgBet.betAmount);
+            mExpectedQGPayouts.insert(std::pair<CPayoutInfo, CBetOut>(devRewardInfo, devRewardOut));
+            // OMNO reward
+            std::string OMNOPayoutAddr = Params().OMNOPayoutAddr();
+            CAmount nOMNOReward = (CAmount)(feePermille / 1000 * gameView.nOMNORewardPermille / BET_ODDSDIVISOR);
+            expectedMint += nOMNOReward;
+            CPayoutInfo omnoRewardInfo(zeroKey, PayoutType::quickGamesReward);
+            CBetOut omnoRewardOut(nOMNOReward, GetScriptForDestination(CBitcoinAddress(OMNOPayoutAddr).Get()), qgBet.betAmount);
+            mExpectedQGPayouts.insert(std::pair<CPayoutInfo, CBetOut>(omnoRewardInfo, omnoRewardOut));
+        }
+        else {
+            qgBet.resultType = BetResultType::betResultLose;
+        }
+        LogPrintf("\nQuick game: %s, bet %s is handled!\nPlayer address: %s\nPayout: %ll\n\n", gameView.name, qgKey.outPoint.ToStringShort(), qgBet.playerAddress.ToString(), payout);
+        // if handling bet is completed - mark it
+        qgBet.SetCompleted();
+        qgBet.payout = payout;
+        vEntriesToUpdate.emplace_back(std::pair<QuickGamesBetKey, CQuickGamesBet>{qgKey, qgBet});
+    }
+    for (auto pair : vEntriesToUpdate) {
+        bettingsViewCache.quickGamesBets->Update(pair.first, pair.second);
+    }
+    return expectedMint;
+}

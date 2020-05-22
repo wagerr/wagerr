@@ -22,6 +22,7 @@
 #define PSE_OP_STRLEN    34
 #define PTE_OP_STRLEN    34
 #define PEP_OP_STRLEN    22
+#define CGB_OP_STRMINLEN 10
 
 CBettingsView* bettingsView = nullptr;
 
@@ -935,6 +936,35 @@ bool CMapping::FromOpCode(std::string opCode, CMapping &cm)
     return true;
 }
 
+bool CQuickGamesTxBet::ToOpCode(CQuickGamesTxBet& bet, std::string &opCode)
+{
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << 'B' << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) qgBetTxType << bet;
+    opCode = HexStr(ss.begin(), ss.end());
+
+    return true;
+}
+
+bool CQuickGamesTxBet::FromOpCode(std::string opCode, CQuickGamesTxBet &bet)
+{
+    if (opCode.size() < CGB_OP_STRMINLEN) return false;
+    CDataStream ss(ParseHex(opCode), SER_NETWORK, CLIENT_VERSION);
+    uint8_t byte;
+    // get BTX prefix
+    ss >> byte;
+    if (byte != 'B') return false;
+    // get BTX format version
+    ss >> byte;
+    if (byte != (uint8_t) BTX_FORMAT_VERSION) return false;
+    // get quick games bet tx type
+    ss >> byte;
+    if (byte != (uint8_t) qgBetTxType) return false;
+    // get bet data
+    ss >> bet;
+
+    return true;
+}
+
 /**
  * Validate the transaction to ensure it has been posted by an oracle node.
  *
@@ -1338,6 +1368,14 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     return error("CheckBettingTX: Failed to find event %lu!", plBet.nEventId);
                 }
             }
+
+            CQuickGamesTxBet qgTxBet;
+            if (CQuickGamesTxBet::FromOpCode(opCodeHexStr, qgTxBet)) {
+                // Validate quick game bet amount so its between 25 - 10000 WGR inclusive.
+                if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                    return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
+                }
+            }
         }
     }
     return true;
@@ -1532,6 +1570,15 @@ void ParseBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 else {
                     LogPrintf("Failed to find event!\n");
                 }
+                continue;
+            }
+
+            CQuickGamesTxBet qgTxBet;
+            if (CQuickGamesTxBet::FromOpCode(opCodeHexStr, qgTxBet)) {
+                LogPrintf("CQuickGamesTxBet: gameType: %d, betInfo: %s", qgTxBet.gameType, std::string(qgTxBet.vBetInfo.begin(), qgTxBet.vBetInfo.end()));
+                bettingsViewCache.quickGamesBets->Write(
+                    QuickGamesBetKey{static_cast<uint32_t>(height), out},
+                    CQuickGamesBet{qgTxBet.gameType, qgTxBet.vBetInfo, betAmount, address, blockTime});
                 continue;
             }
         }
@@ -1937,6 +1984,15 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     }
                     UniversalBetKey key{static_cast<uint32_t>(height), out};
                     bettingsViewCache.bets->Erase(key);
+                }
+                continue;
+            }
+            CQuickGamesTxBet qgTxBet;
+            if (CQuickGamesTxBet::FromOpCode(opCodeHexStr, qgTxBet)) {
+                LogPrintf("CQuickGamesTxBet: gameType: %d, betInfo: %s", qgTxBet.gameType, std::string(qgTxBet.vBetInfo.begin(), qgTxBet.vBetInfo.end()));
+                if (!bettingsViewCache.quickGamesBets->Erase(QuickGamesBetKey{static_cast<uint32_t>(height), out})) {
+                    LogPrintf("Revert failed!\n");
+                    return false;
                 }
                 continue;
             }
