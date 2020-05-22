@@ -7,6 +7,8 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "libzerocoin/Params.h"
+#include "betting/quickgames/dice.h"
+#include "betting/quickgames/qgview.h"
 #include "chainparams.h"
 #include "random.h"
 #include "util.h"
@@ -16,6 +18,7 @@
 
 #include <boost/assign/list_of.hpp>
 
+#include <clientversion.h>
 
 struct SeedSpec6 {
     uint8_t addr[16];
@@ -202,6 +205,15 @@ public:
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV3StartHeight = 1500000;                         // TODO: pick block height for enabling parlay betting and new payout system
 
+        quickGamesArr.emplace_back(
+            std::string("Dice"), // Game name
+            QuickGamesType::qgDice, // game type
+            &quickgames::DiceHandler, // game bet handler
+            &quickgames::DiceBetInfoParser, // bet info parser
+            std::string("Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe"), // Dev address
+            400, // OMNO reward permille (40%)
+            100); // Dev reward permille (10%)
+
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = 556623;
         nSupplyBeforeFakeSerial = 3703597*COIN;   // zerocoin supply at block nFakeSerialBlockheightEnd
@@ -358,6 +370,15 @@ public:
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV3StartHeight = 100900;                          // TODO: pick block height for enabling parlay betting and new payout system
 
+        quickGamesArr.emplace_back(
+            std::string("Dice"), // Game name
+            QuickGamesType::qgDice, // game type
+            &quickgames::DiceHandler, // game bet handler
+            &quickgames::DiceBetInfoParser, // bet info parser
+            std::string("TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY"), // Dev address
+            400, // OMNO reward permille (40%)
+            100); // Dev reward permille (10%)
+
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;
         nSupplyBeforeFakeSerial = 0;
@@ -473,6 +494,15 @@ public:
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV3StartHeight = nBetStartHeight;                 // TODO: pick block height for enabling parlay betting and new payout system
+
+        quickGamesArr.emplace_back(
+            std::string("Dice"), // Game name
+            QuickGamesType::qgDice, // game type
+            &quickgames::DiceHandler, // game bet handler
+            &quickgames::DiceBetInfoParser, // bet info parser
+            std::string("TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs"), // Dev address
+            400, // OMNO reward permille (40%)
+            100); // Dev reward permille (10%)
 
         // Fake Serial Attack
         nFakeSerialBlockheightEnd = -1;

@@ -9,6 +9,7 @@
 #ifndef BITCOIN_CHAINPARAMS_H
 #define BITCOIN_CHAINPARAMS_H
 
+#include "betting/quickgames/qgview.h"
 #include "chainparamsbase.h"
 #include "checkpoints.h"
 #include "primitives/block.h"
@@ -171,6 +172,7 @@ public:
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
     uint32_t MaxParlayLegs() const { return nMaxParlayLegs; }
     int WagerrProtocolV3StartHeight() const { return nWagerrProtocolV3StartHeight; }
+    const std::vector<CQuickGamesView>& QuickGamesArr() const { return quickGamesArr; }
 
     /** temp worarounds **/
     int ZerocoinCheckTX() const { return nZerocoinCheckTX; }
@@ -270,6 +272,8 @@ protected:
     int nBetPlaceTimeoutBlocks;
     uint32_t nMaxParlayLegs;
     int nWagerrProtocolV3StartHeight;
+
+    std::vector<CQuickGamesView> quickGamesArr;
 
     // workarounds
     int nZerocoinCheckTX;
