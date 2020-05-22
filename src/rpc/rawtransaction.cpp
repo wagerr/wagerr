@@ -419,6 +419,12 @@ UniValue createrawtransaction(const UniValue& params, bool fHelp)
 
             CTxOut out(0, CScript() << OP_RETURN << data);
             rawTx.vout.push_back(out);
+        } else if (name_ == "ctxout") {
+            std::vector<unsigned char> data = ParseHexV(sendTo[name_].getValStr(),"CTxOut");
+            CDataStream ss(data, SER_NETWORK, PROTOCOL_VERSION);
+            CTxOut out;
+            ss >> out;
+            rawTx.vout.push_back(out);
         } else {
             CBitcoinAddress address(name_);
             if (!address.IsValid())
