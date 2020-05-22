@@ -4,6 +4,8 @@
 import os
 import struct
 import subprocess
+from test_framework.util import bytes_to_hex_str
+from test_framework.mininode import COIN
 
 OPCODE_PREFIX = 42
 
@@ -16,6 +18,9 @@ OPCODE_BTX_SPREAD_EVENT = 0x09
 OPCODE_BTX_TOTALS_EVENT = 0x0a
 OPCODE_BTX_EVENT_PATCH = 0x0b
 OPCODE_BTX_PARLAY_BET = 0x0c
+OPCODE_BTX_QG_BET = 0x0d
+
+OPCODE_QG_DICE = 0x00
 
 SPORT_MAPPING      = 0x01
 ROUND_MAPPING      = 0x02
@@ -29,6 +34,13 @@ SPREADS_REFUND  = 0x04
 TOTALS_REFUND   = 0x05
 
 WGR_TX_FEE = 0.001
+
+QG_DICE_EQUAL = 0x00
+QG_DICE_NOT_EQUAL = 0x01
+QG_DICE_TOTAL_OVER = 0x02
+QG_DICE_TOTAL_UNDER = 0x03
+QG_DICE_EVEN = 0x04
+QG_DICE_ODD = 0x05
 
 # Encode an unsigned int in hexadecimal and little endian byte order. The function expects the value and the size in
 # bytes as parameters.
@@ -164,3 +176,32 @@ def post_opcode(node, opcode, address):
     # Sign the raw transaction.
     trx = node.signrawtransaction(trx)
     return node.sendrawtransaction(trx['hex'])
+
+def post_raw_opcode(node, ctxout, address):
+    # Get unspent outputs to use as inputs (spend).
+    inputs, spend = get_utxo_list(node, address)
+    # Calculate the change by subtracting the transaction fee from the UTXO's value.
+    change = float(spend - ctxout.nValue / COIN)
+
+    # Create the output JSON
+    outputs = {address: change, 'ctxout': bytes_to_hex_str(ctxout.serialize())}
+
+    # Create the raw transaction.
+    trx = node.createrawtransaction(inputs, outputs)
+
+    # Sign the raw transaction.
+    trx = node.signrawtransaction(trx)
+    return node.sendrawtransaction(trx['hex'])
+
+# Create dice game bet.
+def make_dice_bet(dice_type, number = 1):
+    result = make_common_header(OPCODE_BTX_QG_BET)
+    result = result + encode_int_little_endian(OPCODE_QG_DICE, 1)
+    if dice_type != QG_DICE_EVEN and dice_type != QG_DICE_ODD:
+        result = result + encode_int_little_endian(5, 1) # vector size
+        result = result + encode_int_little_endian(dice_type, 1)
+        result = result + encode_int_little_endian(number, 4)
+    else:
+        result = result + encode_int_little_endian(1, 1) # vector size
+        result = result + encode_int_little_endian(dice_type, 1)
+    return result
