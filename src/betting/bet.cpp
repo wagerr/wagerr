@@ -999,7 +999,7 @@ bool IsValidOracleTx(const CTxIn &txin)
     return false;
 }
 
-bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uint32_t& nPayoutOffset, uint32_t& nWinnerPayments, const CAmount& nExpectedMint)
+bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uint32_t& nPayoutOffset, uint32_t& nWinnerPayments, const CAmount& nExpectedMint, const CAmount& nMasternodeReward)
 {
     const CTransaction &tx = block.vtx[1];
 
@@ -1027,8 +1027,8 @@ bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uin
 
     // Count the coinbase and staking vouts in the current block TX.
     CAmount totalStakeAcc = 0;
-    CAmount mnValue = 0;
-    for (unsigned int i = 0; i < tx.vout.size() - 1; i++) {
+    CAmount mnValue = tx.vout[tx.vout.size() - 1].nValue == nMasternodeReward ? nMasternodeReward : 0;
+    for (unsigned int i = 0; i < tx.vout.size(); i++) {
         const CTxOut &txout = tx.vout[i];
         CAmount voutValue   = txout.nValue;
         CScript voutScript = txout.scriptPubKey;
@@ -1041,7 +1041,6 @@ bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uin
             nPayoutOffset++;
             totalStakeAcc += voutValue;
 
-            CAmount mnValue = tx.vout[tx.vout.size() - 1].nValue;
             // Needs some slack?
             if (totalStakeAcc + mnValue == stakeAmount) {
                 fStakesFound = true;
@@ -1051,7 +1050,7 @@ bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uin
     return fStakesFound || (nWinnerPayments == 0 && totalStakeAcc + mnValue < stakeAmount);
 }
 
-bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayoutInfo, CBetOut> mExpectedPayouts, const CBlock& block, const int nBlockHeight, const CAmount& nExpectedMint)
+bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayoutInfo, CBetOut> mExpectedPayouts, const CBlock& block, const int nBlockHeight, const CAmount& nExpectedMint, const CAmount& nMasternodeReward)
 {
     const CTransaction &tx = block.vtx[1];
 
@@ -1063,7 +1062,7 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayout
     uint32_t nWinnerPayments = 0; // unused
 
     // If we have payouts to validate. Note: bets can only happen in blocks with MN payments.
-    if (!ExtractPayouts(block, vFoundPayouts, nPayoutOffset, nWinnerPayments, nExpectedMint)) {
+    if (!ExtractPayouts(block, vFoundPayouts, nPayoutOffset, nWinnerPayments, nExpectedMint, nMasternodeReward)) {
         LogPrintf("%s - Not all payouts found - %s\n", __func__, block.GetHash().ToString());
         return false;
     }

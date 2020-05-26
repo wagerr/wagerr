@@ -2001,14 +2001,14 @@ double ConvertBitsToDouble(unsigned int nBits)
 
 int64_t GetBlockValue(int nHeight)
 {
-   
+
     if (Params().NetworkID() == CBaseChainParams::REGTEST || Params().NetworkID() == CBaseChainParams::TESTNET) {
         if (nHeight == 0) {
             // Genesis block
             return 0 * COIN;
         } else if (nHeight == 1) {
             /* PREMINE: Current available wagerr on DEX marketc 198360471 wagerr
-            Info abobut premine: 
+            Info abobut premine:
             Full premine size is 198360471. First 100 blocks mine 250000 wagerr per block - 198360471 - (100 * 250000) = 173360471
             */
             // 87.4 % of premine
@@ -2017,7 +2017,7 @@ int64_t GetBlockValue(int nHeight)
             return 250000 * COIN;
         } else if (nHeight >= 200 && nHeight <= Params().LAST_POW_BLOCK()) {
             return 100000 * COIN;
-        } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight <= Params().Zerocoin_Block_V2_Start()) { 
+        } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight <= Params().Zerocoin_Block_V2_Start()) {
             return 3.8 / 90 * 100 * COIN;
         } else if (nHeight > Params().Zerocoin_Block_V2_Start()) {
             return 3.8 * COIN;
@@ -2026,7 +2026,7 @@ int64_t GetBlockValue(int nHeight)
         }
     }
 
-    
+
     // MAIN
     int64_t nSubsidy = 0;
     if (nHeight == 0) {
@@ -2034,7 +2034,7 @@ int64_t GetBlockValue(int nHeight)
         nSubsidy = 0 * COIN;
     } else if (nHeight == 1) {
         /* PREMINE: Current available wagerr on DEX marketc 198360471 wagerr
-        Info abobut premine: 
+        Info abobut premine:
         Full premine size is 198360471. First 100 blocks mine 250000 wagerr per block - 198360471 - (100 * 250000) = 173360471
         */
         // 87.4 % of premine
@@ -2799,7 +2799,7 @@ bool RecalculateWGRSupply(int nHeightStart)
 
     CBlockIndex* pindex = chainActive[nHeightStart];
     CAmount nSupplyPrev = pindex->pprev->nMoneySupply;
- 
+
     uiInterface.ShowProgress(_("Recalculating WGR supply..."), 0);
     while (true) {
         if (pindex->nHeight % 1000 == 0) {
@@ -3293,7 +3293,10 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         mExpectedAllPayouts.insert(mExpectedCGLottoPayouts.begin(), mExpectedCGLottoPayouts.end());
         mExpectedAllPayouts.insert(mExpectedQGPayouts.begin(), mExpectedQGPayouts.end());
 
-        if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedAllPayouts, block, pindex->nHeight, nExpectedMint)) {
+        CAmount nMasternodeReward = GetMasternodePayment(pindex->nHeight, nExpectedMint, 0, block.vtx.size() > 1 && block.vtx[1].HasZerocoinMintOutputs());
+        if (nMasternodeReward > 0) nMasternodeReward += nFees;
+
+        if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedAllPayouts, block, pindex->nHeight, nExpectedMint, nMasternodeReward)) {
             if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().ZerocoinCheckTXexclude() && pindex->nHeight <= Params().ZerocoinCheckTX())) {
                 LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : Bet payout TX's don't match up with block payout TX's at block %i\n", pindex->nHeight);
             } else  {
