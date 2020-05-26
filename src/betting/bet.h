@@ -1129,7 +1129,7 @@ bool IsValidOracleTx(const CTxIn &txin);
 bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CAmount& nPayout, CAmount& nBurn);
 
 /** Validating the payout block using the payout vector. **/
-bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayoutInfo, CBetOut> mExpectedPayouts, const CBlock& block, int nBlockHeight, const CAmount& nExpectedMint);
+bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayoutInfo, CBetOut> mExpectedPayouts, const CBlock& block, int nBlockHeight, const CAmount& nExpectedMint, const CAmount& nMasternodeReward);
 
 /** Find peerless events. **/
 std::vector<CPeerlessResult> getEventResults(int height);
