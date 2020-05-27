@@ -81,14 +81,15 @@ static const Checkpoints::CCheckpointData data = {
 static Checkpoints::MapCheckpoints mapCheckpointsTestnet =
     boost::assign::map_list_of
     (       0, uint256("00000fdc268f54ff1368703792dc046b1356e60914c2b5b6348032144bcb2de5"))
-    (       1, uint256("00000ee56853cd05cda3148653fe2815075d2251299a23c84de189e70c5d9757"))     // 1567576895   2
-    (     450, uint256("defe8866695382de16183afd0321d651e91cafe9d7080ed6cc7ab9e17fc1074d"))     // 1567615777   635
-    (     469, uint256("c4751ac19dedcce9b51243f9d333d33018099ba0757c23842780d814e84aeef1"))    // 1567623780   673
-    (   99998, uint256("1faea452edad951076459a113ed57c0844111e75d00dfb9f3c8971bdf142039e"));
+    (       1, uint256("0000098cc93ece2804776d2e9eda2d01e2ff830d80bab22500821361259f8aa3"))
+    (     450, uint256("3cec3911fdf321a22b8109ca95ca28913e6b51f0d80cc6d2b2e30e1f2a6115c0"))
+    (     469, uint256("d69d843cd63d333cfa3ff4dc0675fa320d6ef8cab7ab1a73bf8a1482210f93ce"))
+    (    1100, uint256("fa462709a1f3cf81d699ffbd45440204aa4d38de84c2da1fc8b3ff15c3c7a95f"))  // 1588780440
+    (    2000, uint256("a5aab45e4e2345715adf79774d661a5bb9b2a2efd001c339df5678418fb51409")); // 1588834261
 static const Checkpoints::CCheckpointData dataTestnet = {
     &mapCheckpointsTestnet,
-    1567615777,
-    673,
+    1588834261,
+    3724,
     1000};
 
 static Checkpoints::MapCheckpoints mapCheckpointsRegtest =
@@ -354,7 +355,7 @@ public:
         nPublicZCSpends = 600;
 
         /** Bet related parameters **/
-        nBetStartHeight = 600;                                        // The block that betting protocols become active (Testnet).
+        nBetStartHeight = 1100;                                         // The block that betting protocols become active (Testnet).
         vOracleWalletAddrs = {"TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2",     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
                               "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc" };
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
@@ -368,7 +369,7 @@ public:
         nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nWagerrProtocolV3StartHeight = 100900;                          // TODO: pick block height for enabling parlay betting and new payout system
+        nWagerrProtocolV3StartHeight = 2000;                          // TODO: pick block height for enabling parlay betting and new payout system
 
         quickGamesArr.emplace_back(
             std::string("Dice"), // Game name
