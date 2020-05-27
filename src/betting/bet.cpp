@@ -999,15 +999,13 @@ bool IsValidOracleTx(const CTxIn &txin)
     return false;
 }
 
-bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uint32_t& nPayoutOffset, uint32_t& nWinnerPayments, const CAmount& nExpectedMint, const CAmount& nMasternodeReward)
+bool ExtractPayouts(const CTransaction& tx, std::vector<CTxOut>& vFoundPayouts, uint32_t& nPayoutOffset, uint32_t& nWinnerPayments, const CAmount& nExpectedMint, const CAmount& nMasternodeReward)
 {
-    const CTransaction &tx = block.vtx[1];
-
     // Get the vin staking value so we can use it to find out how many staking TX in the vouts.
-    COutPoint prevout         = tx.vin[0].prevout;
-    CAmount stakeAmount       = 0;
-    bool fStakesFound         = false;
-
+    const COutPoint prevout = tx.vin[0].prevout;
+    unsigned int voutLoopSize = tx.vout.size();
+    CAmount stakeAmount = 0;
+    bool fStakesFound = false;
     nPayoutOffset = 0;
     nWinnerPayments = 0;
 
@@ -1015,7 +1013,7 @@ bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uin
     CTransaction txPrev;
 
     if (GetTransaction(prevout.hash, txPrev, hashBlock, true)) {
-        const CTxOut &prevTxOut = txPrev.vout[prevout.n];
+        const CTxOut prevTxOut = txPrev.vout[prevout.n];
         stakeAmount = prevTxOut.nValue + nExpectedMint;
     } else {
         return false;
@@ -1027,9 +1025,13 @@ bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uin
 
     // Count the coinbase and staking vouts in the current block TX.
     CAmount totalStakeAcc = 0;
-    CAmount mnValue = tx.vout[tx.vout.size() - 1].nValue == nMasternodeReward ? nMasternodeReward : 0;
-    for (unsigned int i = 0; i < tx.vout.size(); i++) {
-        const CTxOut &txout = tx.vout[i];
+    CAmount mnValue = 0;
+    if (voutLoopSize > 0 && nMasternodeReward > 0 && tx.vout[voutLoopSize - 1].nValue == nMasternodeReward) {
+        mnValue = nMasternodeReward;
+        voutLoopSize--;
+    }
+    for (unsigned int i = 0; i < voutLoopSize; i++) {
+        const CTxOut txout = tx.vout[i];
         CAmount voutValue   = txout.nValue;
         CScript voutScript = txout.scriptPubKey;
         if (fStakesFound) {
@@ -1050,9 +1052,9 @@ bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uin
     return fStakesFound || (nWinnerPayments == 0 && totalStakeAcc + mnValue < stakeAmount);
 }
 
-bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayoutInfo, CBetOut> mExpectedPayouts, const CBlock& block, const int nBlockHeight, const CAmount& nExpectedMint, const CAmount& nMasternodeReward)
+bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<CPayoutInfo, CBetOut>& mExpectedPayoutsIn, const CTransaction &tx, const int nBlockHeight, const CAmount& nExpectedMint, const CAmount& nMasternodeReward)
 {
-    const CTransaction &tx = block.vtx[1];
+    std::multimap<CPayoutInfo, CBetOut> mExpectedPayouts = mExpectedPayoutsIn;
 
     std::vector<CTxOut> vFoundPayouts;
     std::multiset<CTxOut> setFoundPayouts;
@@ -1062,8 +1064,8 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayout
     uint32_t nWinnerPayments = 0; // unused
 
     // If we have payouts to validate. Note: bets can only happen in blocks with MN payments.
-    if (!ExtractPayouts(block, vFoundPayouts, nPayoutOffset, nWinnerPayments, nExpectedMint, nMasternodeReward)) {
-        LogPrintf("%s - Not all payouts found - %s\n", __func__, block.GetHash().ToString());
+    if (!ExtractPayouts(tx, vFoundPayouts, nPayoutOffset, nWinnerPayments, nExpectedMint, nMasternodeReward)) {
+        LogPrintf("%s - Not all payouts found - %s\n", __func__, tx.GetHash().ToString());
         return false;
     }
     setFoundPayouts = std::multiset<CTxOut>(vFoundPayouts.begin(), vFoundPayouts.end());
@@ -1082,7 +1084,7 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayout
         for (auto foundPayouts : setFoundPayouts) {
             LogPrintf("%s %d %d\n", foundPayouts.nRounds, foundPayouts.nValue, foundPayouts.scriptPubKey.ToString());
         }
-        LogPrintf("%s - Not all payouts validate - %s\n", __func__, block.GetHash().ToString());
+        LogPrintf("%s - Not all payouts validate - %s\n", __func__, tx.GetHash().ToString());
         return false;
     }
 
@@ -1100,7 +1102,7 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, std::multimap<CPayout
             mExpectedPayouts.erase(expectedPayout);
         } else {
             // Redundant: should not happen after previous test 'setExpectedPayouts != setFoundPayouts'
-            LogPrintf("%s - Could not find expected payout - %s\n", __func__, block.GetHash().ToString());
+            LogPrintf("%s - Could not find expected payout - %s\n", __func__, tx.GetHash().ToString());
             return false;
         }
     }
