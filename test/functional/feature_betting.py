@@ -618,9 +618,9 @@ class BettingTest(BitcoinTestFramework):
         self.log.info("Check Spreads Bets v2...")
 
         # place spread bet to event 4: EPICENTER Major, expect that event result will be 0:2 for away team
-        # player 1 bet to spread home, mean that home will lose with spread points for away = 2
+        # player 1 bet to spread away
         player1_bet = 300
-        self.nodes[2].placebet(4, outcome_spread_home, player1_bet)
+        self.nodes[2].placebet(4, outcome_spread_away, player1_bet)
         winnings = Decimal(player1_bet * 13000)
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
