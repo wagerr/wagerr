@@ -81,12 +81,13 @@ int64_t GetCGBlockPayoutsValue(const std::multimap<CPayoutInfo, CBetOut>& mExpec
 }
 
 bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CAmount& nPayout, CAmount& nBurn) {
-    if (odds < BET_ODDSDIVISOR) {
+    if (odds == 0) {
         nPayout = 0;
         nBurn = 0;
         return false;
-    } else if (odds == BET_ODDSDIVISOR) {
-        nPayout = betAmount;
+    }
+    else if (odds > 0 && odds <= BET_ODDSDIVISOR) {
+        nPayout = betAmount * odds / BET_ODDSDIVISOR;
         nBurn = 0;
         return true;
     }
@@ -102,6 +103,38 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
     nBurn = bBurn.getuint256().Get64();
     LogPrintf("bWinnings: %d bBurn: %d bPayout: %d\n", bWinningsT.getuint256().Get64(), nPayout, nBurn);
     return true;
+}
+
+uint32_t CalculateAsianSpreadOdds(const CPeerlessEvent &lockedEvent, const int32_t difference, bool spreadHomeOutcome)
+{
+    // calculate asian handicap spread points
+    int32_t sign = lockedEvent.nSpreadPoints < 0 ? -1 : 1;
+    int32_t sp1 = abs(lockedEvent.nSpreadPoints / 50) * 50 * sign;
+    int32_t sp2 = (abs(lockedEvent.nSpreadPoints / 50) + 1) * 50 * sign;
+    // if outcome is spread away - change sign for spread points
+    if (!spreadHomeOutcome) {
+        sp1 = -sp1;
+        sp2 = -sp2;
+    }
+    uint32_t odd1, odd2 = odd1 = 0;
+    // calculate spread odds for 2 conditions of game and return summ of odds
+    if (sp1 + difference == 0) {
+        odd1 = BET_ODDSDIVISOR;
+    } else if (sp1 + difference > 0) {
+        odd1 = spreadHomeOutcome ? lockedEvent.nSpreadHomeOdds : lockedEvent.nSpreadAwayOdds;
+    }
+    else {
+        odd1 = 0;
+    }
+    if (sp2 + difference == 0) {
+        odd2 =  BET_ODDSDIVISOR;
+    } else if (sp2 + difference > 0) {
+        odd2 = spreadHomeOutcome ? lockedEvent.nSpreadHomeOdds : lockedEvent.nSpreadAwayOdds;
+    }
+    else {
+        odd2 = 0;
+    }
+    return ((BET_ODDSDIVISOR / 2) * odd1) / BET_ODDSDIVISOR + ((BET_ODDSDIVISOR / 2) * odd2) / BET_ODDSDIVISOR;
 }
 
 /**
@@ -145,10 +178,17 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
             }
             else { // lockedEvent.nSpreadVersion == 2
                 int32_t difference = result.nHomeScore - result.nAwayScore;
-                if (lockedEvent.nSpreadPoints == difference) {
-                    return refundOdds;
-                } else if (lockedEvent.nSpreadPoints < difference) {
-                    return lockedEvent.nSpreadHomeOdds;
+                // if its 0 or 0.5 like handicap
+                if (lockedEvent.nSpreadPoints % 50 == 0) {
+                    if (lockedEvent.nSpreadPoints + difference == 0) {
+                        return refundOdds;
+                    } else if (lockedEvent.nSpreadPoints + difference > 0 ) {
+                        return lockedEvent.nSpreadHomeOdds;
+                    }
+                }
+                // if its 0.25 or 0.75 like handicap
+                else if (lockedEvent.nSpreadPoints % 25 == 0) {
+                    return CalculateAsianSpreadOdds(lockedEvent, difference, true);
                 }
             }
             break;
@@ -166,11 +206,18 @@ uint32_t GetBetOdds(const CPeerlessBet &bet, const CPeerlessEvent &lockedEvent, 
                 }
             }
             else { // lockedEvent.nSpreadVersion == 2
-                int32_t difference = result.nHomeScore - result.nAwayScore;
-                if (lockedEvent.nSpreadPoints == difference) {
-                    return refundOdds;
-                } else if (lockedEvent.nSpreadPoints > difference) {
-                    return lockedEvent.nSpreadAwayOdds;
+                int32_t difference = result.nAwayScore - result.nHomeScore;
+                // if its 0.5 like handicap
+                if (lockedEvent.nSpreadPoints % 50 == 0) {
+                    if ((lockedEvent.nSpreadPoints * (-1)) + difference == 0) {
+                        return refundOdds;
+                    } else if ((lockedEvent.nSpreadPoints * (-1)) + difference > 0) {
+                        return lockedEvent.nSpreadAwayOdds;
+                    }
+                }
+                // if its 0.25 or 0.75 handicap
+                else if (lockedEvent.nSpreadPoints % 25 == 0) {
+                    return CalculateAsianSpreadOdds(lockedEvent, difference, false);
                 }
             }
             break;

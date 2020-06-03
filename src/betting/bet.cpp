@@ -1305,6 +1305,7 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
 
 bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
 {
+    const bool validOracleTx{IsValidOracleTx(tx.vin[0])};
     // if is not hardfork for parlays - do not check tx
     if (height < Params().BetStartHeight()) return true;
 
@@ -1382,6 +1383,59 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 // Validate quick game bet amount so its between 25 - 10000 WGR inclusive.
                 if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
                     return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
+                }
+            }
+        }
+    }
+    // If a valid OMNO transaction.
+    // TODO: add new check conditions for oracle txs in the future if needed
+    // for example: check asian spreads points to mod 25 == 0 and etc.
+    if (validOracleTx) {
+
+        for (unsigned int i = 0; i < tx.vout.size(); i++) {
+            const CTxOut& txout = tx.vout[i];
+            std::string s = txout.scriptPubKey.ToString();
+
+            COutPoint out(tx.GetHash(), i);
+            const uint256 undoId = SerializeHash(out);
+
+            if (0 == strncmp(s.c_str(), "OP_RETURN", 9)) {
+                std::vector<unsigned char> v = ParseHex(s.substr(9, std::string::npos));
+                std::string opCode(v.begin(), v.end());
+
+                CMapping mapping{};
+                if (CMapping::FromOpCode(opCode, mapping)) {
+                    continue;
+                }
+
+                CPeerlessEvent plEvent{};
+                if (CPeerlessEvent::FromOpCode(opCode, plEvent)) {
+                    continue;
+                }
+
+                CPeerlessEventPatch plEventPatch{};
+                if (CPeerlessEventPatch::FromOpCode(opCode, plEventPatch)) {
+                    continue;
+                }
+
+                CPeerlessResult plResult{};
+                if (CPeerlessResult::FromOpCode(opCode, plResult)) {
+                    continue;
+                }
+
+                CPeerlessUpdateOdds puo{};
+                if (CPeerlessUpdateOdds::FromOpCode(opCode, puo)) {
+                    continue;
+                }
+
+                CPeerlessSpreadsEvent spreadEvent{};
+                if (CPeerlessSpreadsEvent::FromOpCode(opCode, spreadEvent)) {
+                    continue;
+                }
+
+                CPeerlessTotalsEvent totalsEvent{};
+                if (CPeerlessTotalsEvent::FromOpCode(opCode, totalsEvent)) {
+                    continue;
                 }
             }
         }
