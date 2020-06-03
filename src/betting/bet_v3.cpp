@@ -45,16 +45,16 @@ int64_t GetBlockPayouts(std::multimap<CPayoutInfo, CBetOut>& mExpectedPayouts, C
     CAmount nDevReward  = (CAmount)(profitAcc * Params().DevRewardPermille() / (1000.0 - BET_BURNXPERMILLE));
     if (nDevReward > 0) {
         // Add both reward payouts to the payout vector.
-        CBetOut betOutDev(nDevReward, payoutScriptDev, profitAcc);
-        CPayoutInfo payoutInfoDev(zeroKey, PayoutType::bettingReward);
-        mExpectedPayouts.insert(std::pair<CPayoutInfo, CBetOut>(payoutInfoDev, betOutDev));
+        const CBetOut betOutDev(nDevReward, payoutScriptDev, profitAcc);
+        const CPayoutInfo payoutInfoDev(zeroKey, PayoutType::bettingReward);
+        mExpectedPayouts.insert(std::pair<const CPayoutInfo, CBetOut>{payoutInfoDev, betOutDev});
 
         nPayout += nDevReward;
     }
     if (nOMNOReward > 0) {
-        CBetOut betOutOMNO(nOMNOReward, payoutScriptOMNO, profitAcc);
-        CPayoutInfo payoutInfoOMNO(zeroKey, PayoutType::bettingReward);
-        mExpectedPayouts.insert(std::pair<CPayoutInfo, CBetOut>(payoutInfoOMNO, betOutOMNO));
+        const CBetOut betOutOMNO(nOMNOReward, payoutScriptOMNO, profitAcc);
+        const CPayoutInfo payoutInfoOMNO(zeroKey, PayoutType::bettingReward);
+        mExpectedPayouts.insert(std::pair<const CPayoutInfo, CBetOut>(payoutInfoOMNO, betOutOMNO));
 
         nPayout += nOMNOReward;
     }
@@ -298,9 +298,9 @@ void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::multimap<C
 
                 if (payout > 0) {
                     // Add winning payout to the payouts vector.
-                    CPayoutInfo payoutInfo(uniBetKey, odds == refundOdds ? PayoutType::bettingRefund : PayoutType::bettingPayout);
-                    CBetOut betOut(payout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
-                    mExpectedPayouts.insert(std::pair<CPayoutInfo, CBetOut>(payoutInfo, betOut));
+                    const CPayoutInfo payoutInfo(uniBetKey, odds == refundOdds ? PayoutType::bettingRefund : PayoutType::bettingPayout);
+                    const CBetOut betOut(payout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
+                    mExpectedPayouts.insert(std::pair<const CPayoutInfo, CBetOut>(payoutInfo, betOut));
                 }
                 LogPrintf("\nBet %s is handled!\nPlayer address: %s\nPayout: %ll\n\n", uniBet.betOutPoint.ToStringShort(), uniBet.playerAddress.ToString(), payout);
                 // if handling bet is completed - mark it
@@ -458,9 +458,9 @@ void GetCGLottoBetPayouts(int height, std::multimap<CPayoutInfo, CBetOut>& mExpe
 
              // Only add valid payouts to the vector.
              if (winnerPayout > 0) {
-                CPayoutInfo payoutInfo(candidates[0].second, PayoutType::chainGamesRefund);
-                CBetOut betOut(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
-                mExpectedPayouts.insert(std::pair<CPayoutInfo, CBetOut>(payoutInfo, betOut));
+                const CPayoutInfo payoutInfo(candidates[0].second, PayoutType::chainGamesRefund);
+                const CBetOut betOut(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
+                mExpectedPayouts.insert(std::pair<const CPayoutInfo, CBetOut>(payoutInfo, betOut));
              }
         }
         else if (candidates.size() >= 2) {
@@ -501,15 +501,15 @@ void GetCGLottoBetPayouts(int height, std::multimap<CPayoutInfo, CBetOut>& mExpe
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
-                CPayoutInfo payoutInfoWinner(candidates[winnerNr].second, PayoutType::chainGamesPayout);
-                CBetOut betOutWinner(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
-                mExpectedPayouts.insert(std::pair<CPayoutInfo, CBetOut>(payoutInfoWinner, betOutWinner));
+                const CPayoutInfo payoutInfoWinner(candidates[winnerNr].second, PayoutType::chainGamesPayout);
+                const CBetOut betOutWinner(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
+                mExpectedPayouts.insert(std::pair<const CPayoutInfo, CBetOut>(payoutInfoWinner, betOutWinner));
             }
             if (fee > 0) {
                 UniversalBetKey zeroKey{static_cast<uint32_t>(nCurrentHeight), COutPoint()};
-                CPayoutInfo payoutInfoFee(zeroKey, PayoutType::chainGamesPayout);
-                CBetOut betOutFee(fee, GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get()), entranceFee);
-                mExpectedPayouts.insert(std::pair<CPayoutInfo, CBetOut>(payoutInfoFee, betOutFee));
+                const CPayoutInfo payoutInfoFee(zeroKey, PayoutType::chainGamesPayout);
+                const CBetOut betOutFee(fee, GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get()), entranceFee);
+                mExpectedPayouts.insert(std::pair<const CPayoutInfo, CBetOut>(payoutInfoFee, betOutFee));
             }
         }
     }
