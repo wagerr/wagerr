@@ -345,10 +345,16 @@ void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::multimap<C
 
                 if (payout > 0) {
                     // Add winning payout to the payouts vector.
-                    const CPayoutInfo payoutInfo(uniBetKey, odds == refundOdds ? PayoutType::bettingRefund : PayoutType::bettingPayout);
+                    const CPayoutInfo payoutInfo(uniBetKey, odds <= refundOdds ? PayoutType::bettingRefund : PayoutType::bettingPayout);
                     const CBetOut betOut(payout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
                     mExpectedPayouts.insert(std::pair<const CPayoutInfo, CBetOut>(payoutInfo, betOut));
+
+                    uniBet.resultType = odds <= refundOdds ? BetResultType::betResultRefund : BetResultType::betResultWin;
                 }
+                else {
+                    uniBet.resultType = BetResultType::betResultLose;
+                }
+                uniBet.payout = payout;
                 LogPrintf("\nBet %s is handled!\nPlayer address: %s\nPayout: %ll\n\n", uniBet.betOutPoint.ToStringShort(), uniBet.playerAddress.ToString(), payout);
                 // if handling bet is completed - mark it
                 uniBet.SetCompleted();
