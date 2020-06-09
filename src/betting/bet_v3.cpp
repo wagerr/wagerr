@@ -92,8 +92,8 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
         return true;
     }
     // Events with odds > 92 can cause an overflow with winnings calculations when using uint64_t
-    CBigNum bBetAmount(betAmount);
-    CBigNum bOdds(odds);
+    const CBigNum bBetAmount = CBigNum(uint256(betAmount));
+    const CBigNum bOdds = CBigNum(uint256(odds));
 
     CBigNum bWinningsT = bBetAmount * bOdds;
     CBigNum bPayout = (bWinningsT - (((bWinningsT - bBetAmount * BET_ODDSDIVISOR) / 1000) * 60)) / BET_ODDSDIVISOR;
@@ -101,7 +101,7 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
 
     nPayout = bPayout.getuint256().Get64();
     nBurn = bBurn.getuint256().Get64();
-    LogPrintf("bWinnings: %d bBurn: %d bPayout: %d\n", bWinningsT.getuint256().Get64(), nPayout, nBurn);
+    LogPrintf("bWinnings: %d bPayout: %d bBurn: %d\n", bWinningsT.getuint256().Get64(), nPayout, nBurn);
     return true;
 }
 
