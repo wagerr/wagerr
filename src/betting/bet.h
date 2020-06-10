@@ -632,7 +632,7 @@ public:
         payout = bet.payout;
     }
 
-    bool IsCompleted() { return completed; }
+    bool IsCompleted() const { return completed; }
     void SetCompleted() { completed = true; }
     // for undo
     void SetUncompleted() { completed = false; }
