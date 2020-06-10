@@ -297,6 +297,7 @@ extern UniValue getallqgbets(const UniValue& params, bool fHelp);
 extern UniValue getmyqgbets(const UniValue& params, bool fHelp);
 extern UniValue getpayoutinfo(const UniValue& params, bool fHelp);
 extern UniValue getpayoutinfosince(const UniValue& params, bool fHelp);
+extern UniValue getbetbytxid(const UniValue& params, bool fHelp);
 
 extern UniValue getrawtransaction(const UniValue& params, bool fHelp); // in rpc/rawtransaction.cpp
 extern UniValue listunspent(const UniValue& params, bool fHelp);

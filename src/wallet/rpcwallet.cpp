@@ -698,6 +698,86 @@ std::string EventResultTypeToStr(ResultType resType)
     }
 }
 
+void CollectBetData(UniValue& uValue, const UniversalBetKey& key, const CUniversalBet& uniBet) {
+    UniValue uLegs(UniValue::VARR);
+
+    for (uint32_t i = 0; i < uniBet.legs.size(); i++) {
+        auto &leg = uniBet.legs[i];
+        auto &lockedEvent = uniBet.lockedEvents[i];
+        UniValue uLeg(UniValue::VOBJ);
+        UniValue uLockedEvent(UniValue::VOBJ);
+        uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
+        uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+
+        uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
+        uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
+        uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
+        uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
+        uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
+        uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
+        uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
+        uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
+        uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
+
+        // Retrieve the event details
+        CPeerlessEvent plEvent;
+        if (bettingsView->events->Read(EventKey{leg.nEventId}, plEvent)) {
+            uLockedEvent.push_back(Pair("starting", plEvent.nStartTime));
+            CMapping mapping;
+            if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+                uLockedEvent.push_back(Pair("home", mapping.sName));
+            }
+            else {
+                uLockedEvent.push_back(Pair("home", "undefined"));
+            }
+            if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+                uLockedEvent.push_back(Pair("away", mapping.sName));
+            }
+            else {
+                uLockedEvent.push_back(Pair("away", "undefined"));
+            }
+            if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+                uLockedEvent.push_back(Pair("tournament", mapping.sName));
+            }
+            else {
+                uLockedEvent.push_back(Pair("tournament", "undefined"));
+            }
+        }
+        CPeerlessResult plResult;
+        uint32_t legOdds = 0;
+        if (bettingsView->results->Read(EventKey{leg.nEventId}, plResult)) {
+            uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) plResult.nResultType)));
+            uLockedEvent.push_back(Pair("homeScore", (uint64_t) plResult.nHomeScore));
+            uLockedEvent.push_back(Pair("awayScore", (uint64_t) plResult.nAwayScore));
+            if (lockedEvent.nStartTime > 0 && uniBet.betTime > (lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
+            }
+            else {
+                legOdds = GetBetOdds(leg, lockedEvent, plResult, key.blockHeight >= Params().WagerrProtocolV3StartHeight());
+                uLeg.push_back(Pair("legResultType", legOdds == 0 ? "lose" : legOdds == BET_ODDSDIVISOR ? "refund" : "win"));
+            }
+        }
+        else {
+            uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
+            uLockedEvent.push_back(Pair("homeScore", "undefined"));
+            uLockedEvent.push_back(Pair("awayScore", "undefined"));
+            uLeg.push_back(Pair("legResultType", "pending"));
+        }
+        uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+        uLegs.push_back(uLeg);
+    }
+    uValue.push_back(Pair("betBlockHeight", (uint64_t) key.blockHeight));
+    uValue.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
+    uValue.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
+    uValue.push_back(Pair("legs", uLegs));
+    uValue.push_back(Pair("address", uniBet.playerAddress.ToString()));
+    uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
+    uValue.push_back(Pair("time", (uint64_t) uniBet.betTime));
+    uValue.push_back(Pair("completed", uniBet.IsCompleted() ? "yes" : "no"));
+    uValue.push_back(Pair("betResultType", BetResultTypeToStr(uniBet.resultType)));
+    uValue.push_back(Pair("payout", uniBet.IsCompleted() ? ValueFromAmount(uniBet.payout) : "pending"));
+}
+
 UniValue GetBets(uint32_t limit, CWallet *pwalletMain = NULL) {
     UniValue ret(UniValue::VARR);
 
@@ -714,74 +794,8 @@ UniValue GetBets(uint32_t limit, CWallet *pwalletMain = NULL) {
             continue;
 
         UniValue uValue(UniValue::VOBJ);
-        UniValue uLegs(UniValue::VARR);
 
-        for (uint32_t i = 0; i < uniBet.legs.size(); i++) {
-            auto &leg = uniBet.legs[i];
-            auto &lockedEvent = uniBet.lockedEvents[i];
-            UniValue uLeg(UniValue::VOBJ);
-            UniValue uLockedEvent(UniValue::VOBJ);
-            uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
-            uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
-
-            uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
-            uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
-            uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
-            uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
-            uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
-            uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
-            uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
-            uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
-            uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
-
-            // Retrieve the event details
-            CPeerlessEvent plEvent;
-            if (bettingsView->events->Read(EventKey{leg.nEventId}, plEvent)) {
-                uLockedEvent.push_back(Pair("starting", plEvent.nStartTime));
-                CMapping mapping;
-                if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
-                    uLockedEvent.push_back(Pair("home", mapping.sName));
-                }
-                if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
-                    uLockedEvent.push_back(Pair("away", mapping.sName));
-                }
-                if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
-                    uLockedEvent.push_back(Pair("tournament", mapping.sName));
-                }
-            }
-            CPeerlessResult plResult;
-            uint32_t legOdds = 0;
-            if (bettingsView->results->Read(EventKey{leg.nEventId}, plResult)) {
-                uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) plResult.nResultType)));
-                uLockedEvent.push_back(Pair("homeScore", (uint64_t) plResult.nHomeScore));
-                uLockedEvent.push_back(Pair("awayScore", (uint64_t) plResult.nAwayScore));
-                if (lockedEvent.nStartTime > 0 && uniBet.betTime > (lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
-                    uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
-                }
-                else {
-                    legOdds = GetBetOdds(leg, lockedEvent, plResult, key.blockHeight >= Params().WagerrProtocolV3StartHeight());
-                    uLeg.push_back(Pair("legResultType", legOdds == 0 ? "lose" : legOdds == BET_ODDSDIVISOR ? "refund" : "win"));
-                }
-            }
-            else {
-                uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
-                uLockedEvent.push_back(Pair("homeScore", "undefined"));
-                uLockedEvent.push_back(Pair("awayScore", "undefined"));
-                uLeg.push_back(Pair("legResultType", "pending"));
-            }
-            uLeg.push_back(Pair("lockedEvent", uLockedEvent));
-            uLegs.push_back(uLeg);
-        }
-        uValue.push_back(Pair("betBlockHeight", (uint64_t) key.blockHeight));
-        uValue.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
-        uValue.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
-        uValue.push_back(Pair("legs", uLegs));
-        uValue.push_back(Pair("address", uniBet.playerAddress.ToString()));
-        uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
-        uValue.push_back(Pair("time", (uint64_t) uniBet.betTime));
-        uValue.push_back(Pair("completed", uniBet.IsCompleted() ? "yes" : "no"));
-        uValue.push_back(Pair("betResultType", BetResultTypeToStr(uniBet.resultType)));
-        uValue.push_back(Pair("payout", uniBet.IsCompleted() ? ValueFromAmount(uniBet.payout) : "pending"));
+        CollectBetData(uValue, key, uniBet);
 
         ret.push_back(uValue);
     }
@@ -810,34 +824,42 @@ UniValue getallbets(const UniValue& params, bool fHelp)
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
-                "    \"legs\":\n"
+                "    \"betBlockHeight\": height, (string) The hash of block wich store tx with bet opcode.\n"
+                "    \"betTxHash\": txHash, (string) The hash of transaction wich store bet opcode.\n"
+                "    \"betTxOut\": nOut, (numeric) The out number of transaction wich store bet opcode.\n"
+                "    \"legs\": (array of objects)\n"
                 "      [\n"
                 "        {\n"
-                "          \"event-id\": id,\n"
-                "          \"outcome\": type,\n"
-                "          \"lockedEvent\": {\n"
-                "            \"homeOdds\": homeOdds\n"
-                "            \"awayOdds\": awayOdds\n"
-                "            \"drawOdds\": drawOdds\n"
-                "            \"spreadVersion\": spreadVersion\n"
-                "            \"spreadPoints\": spreadPoints\n"
-                "            \"spreadHomeOdds\": spreadHomeOdds\n"
-                "            \"spreadAwayOdds\": spreadAwayOdds\n"
-                "            \"totalPoints\": totalPoints\n"
-                "            \"totalOverOdds\": totalOverOdds\n"
-                "            \"totalUnderOdds\": totalUnderOdds\n"
-                "            \"starting\": starting\n"
-                "            \"home\": home command\n"
-                "            \"away\": away command\n"
-                "            \"tournament\": tournament\n"
+                "          \"event-id\": id, (numeric) The event id.\n"
+                "          \"outcome\": typeId, (numeric) The outcome type id.\n"
+                "          \"legResultType\": typeStr, (string) The string with leg result info.\n"
+                "          \"lockedEvent\": (object) {\n"
+                "            \"homeOdds\": homeOdds, (numeric) The moneyline odds to home team winning.\n"
+                "            \"awayOdds\": awayOdds, (numeric) The moneyline odds to away team winning.\n"
+                "            \"drawOdds\": drawOdds, (numeric) The moneyline odds to draw.\n"
+                "            \"spreadPoints\": spreadPoints, (numeric) The spread points.\n"
+                "            \"spreadHomeOdds\": spreadHomeOdds, (numeric) The spread odds to home team.\n"
+                "            \"spreadAwayOdds\": spreadAwayOdds, (numeric) The spread odds to away team.\n"
+                "            \"totalPoints\": totalPoints, (numeric) The total points.\n"
+                "            \"totalOverOdds\": totalOverOdds, (numeric) The total odds to over.\n"
+                "            \"totalUnderOdds\": totalUnderOdds, (numeric) The total odds to under.\n"
+                "            \"starting\": starting, (numeric) The event start time in ms of Unix Timestamp.\n"
+                "            \"home\": home command, (string) The home team name.\n"
+                "            \"away\": away command, (string) The away team name.\n"
+                "            \"tournament\": tournament, (string) The tournament name.\n"
+                "            \"eventResultType\": type, (standard, event refund, ml refund, spreads refund, totals refund) The result type of finished event.\n"
+                "            \"homeScore\": score, (numeric) The scores number of home team.\n"
+                "            \"awayScore\": score, (numeric) The scores number of away team.\n"
                 "          }\n"
                 "        },\n"
                 "        ...\n"
-                "      ],                          (list) The list of legs.\n"
-                "    \"address\": playerAddress    (string) The player address.\n"
-                "    \"amount\": x.xxx,            (numeric) The amount bet in WGR.\n"
+                "      ],                           (list) The list of legs.\n"
+                "    \"address\": playerAddress,    (string) The player address.\n"
+                "    \"amount\": x.xxx,             (numeric) The amount bet in WGR.\n"
                 "    \"time\": \"betting time\",    (string) The betting time.\n"
-                "    \"result\": lose/win/refund/pending\n"
+                "    \"completed\": betIsCompleted, (bool), The bet status in chain.\n"
+                "    \"betResultType\": type,       (lose/win/refund/pending), The info about bet result.\n"
+                "    \"payout\": x.xxx,            (numeric) The bet payout.\n"
                 "  },\n"
                 "  ...\n"
                 "]\n"
@@ -865,34 +887,42 @@ UniValue getmybets(const UniValue& params, bool fHelp)
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
-                "    \"legs\":\n"
+                "    \"betBlockHeight\": height, (string) The hash of block wich store tx with bet opcode.\n"
+                "    \"betTxHash\": txHash, (string) The hash of transaction wich store bet opcode.\n"
+                "    \"betTxOut\": nOut, (numeric) The out number of transaction wich store bet opcode.\n"
+                "    \"legs\": (array of objects)\n"
                 "      [\n"
                 "        {\n"
-                "          \"event-id\": id,\n"
-                "          \"outcome\": type,\n"
-                "          \"lockedEvent\": {\n"
-                "            \"homeOdds\": homeOdds\n"
-                "            \"awayOdds\": awayOdds\n"
-                "            \"drawOdds\": drawOdds\n"
-                "            \"spreadVersion\": spreadVersion\n"
-                "            \"spreadPoints\": spreadPoints\n"
-                "            \"spreadHomeOdds\": spreadHomeOdds\n"
-                "            \"spreadAwayOdds\": spreadAwayOdds\n"
-                "            \"totalPoints\": totalPoints\n"
-                "            \"totalOverOdds\": totalOverOdds\n"
-                "            \"totalUnderOdds\": totalUnderOdds\n"
-                "            \"starting\": starting\n"
-                "            \"home\": home command\n"
-                "            \"away\": away command\n"
-                "            \"tournament\": tournament\n"
+                "          \"event-id\": id, (numeric) The event id.\n"
+                "          \"outcome\": typeId, (numeric) The outcome type id.\n"
+                "          \"legResultType\": typeStr, (string) The string with leg result info.\n"
+                "          \"lockedEvent\": (object) {\n"
+                "            \"homeOdds\": homeOdds, (numeric) The moneyline odds to home team winning.\n"
+                "            \"awayOdds\": awayOdds, (numeric) The moneyline odds to away team winning.\n"
+                "            \"drawOdds\": drawOdds, (numeric) The moneyline odds to draw.\n"
+                "            \"spreadPoints\": spreadPoints, (numeric) The spread points.\n"
+                "            \"spreadHomeOdds\": spreadHomeOdds, (numeric) The spread odds to home team.\n"
+                "            \"spreadAwayOdds\": spreadAwayOdds, (numeric) The spread odds to away team.\n"
+                "            \"totalPoints\": totalPoints, (numeric) The total points.\n"
+                "            \"totalOverOdds\": totalOverOdds, (numeric) The total odds to over.\n"
+                "            \"totalUnderOdds\": totalUnderOdds, (numeric) The total odds to under.\n"
+                "            \"starting\": starting, (numeric) The event start time in ms of Unix Timestamp.\n"
+                "            \"home\": home command, (string) The home team name.\n"
+                "            \"away\": away command, (string) The away team name.\n"
+                "            \"tournament\": tournament, (string) The tournament name.\n"
+                "            \"eventResultType\": type, (standard, event refund, ml refund, spreads refund, totals refund) The result type of finished event.\n"
+                "            \"homeScore\": score, (numeric) The scores number of home team.\n"
+                "            \"awayScore\": score, (numeric) The scores number of away team.\n"
                 "          }\n"
                 "        },\n"
                 "        ...\n"
-                "      ],                          (list) The list of legs.\n"
-                "    \"address\": playerAddress    (string) The player address.\n"
-                "    \"amount\": x.xxx,            (numeric) The amount bet in WGR.\n"
+                "      ],                           (list) The list of legs.\n"
+                "    \"address\": playerAddress,    (string) The player address.\n"
+                "    \"amount\": x.xxx,             (numeric) The amount bet in WGR.\n"
                 "    \"time\": \"betting time\",    (string) The betting time.\n"
-                "    \"result\": lose/win/refund/pending\n"
+                "    \"completed\": betIsCompleted, (bool), The bet status in chain.\n"
+                "    \"betResultType\": type,       (lose/win/refund/pending), The info about bet result.\n"
+                "    \"payout\": x.xxx,            (numeric) The bet payout.\n"
                 "  },\n"
                 "  ...\n"
                 "]\n"
@@ -1043,6 +1073,96 @@ UniValue getmyqgbets(const UniValue& params, bool fHelp)
     return GetQuickGamesBets(limit, pwalletMain);
 }
 
+UniValue getbetbytxid(const UniValue& params, bool fHelp)
+{
+    if (fHelp || params.size() > 1)
+        throw std::runtime_error(
+                "getbetbytxid\n"
+                "\nGet bet info by bet's txid.\n"
+
+                "\nArguments:\n"
+                "1. \"txid\" (string, required) Transaction ID wich has bet opcode in blockchain.\n"
+                "\nResult: (array of objects)\n"
+                "[\n"
+                "  {\n"
+                "    \"betBlockHeight\": height, (string) The hash of block wich store tx with bet opcode.\n"
+                "    \"betTxHash\": txHash, (string) The hash of transaction wich store bet opcode.\n"
+                "    \"betTxOut\": nOut, (numeric) The out number of transaction wich store bet opcode.\n"
+                "    \"legs\": (array of objects)\n"
+                "      [\n"
+                "        {\n"
+                "          \"event-id\": id, (numeric) The event id.\n"
+                "          \"outcome\": typeId, (numeric) The outcome type id.\n"
+                "          \"legResultType\": typeStr, (string) The string with leg result info.\n"
+                "          \"lockedEvent\": (object) {\n"
+                "            \"homeOdds\": homeOdds, (numeric) The moneyline odds to home team winning.\n"
+                "            \"awayOdds\": awayOdds, (numeric) The moneyline odds to away team winning.\n"
+                "            \"drawOdds\": drawOdds, (numeric) The moneyline odds to draw.\n"
+                "            \"spreadPoints\": spreadPoints, (numeric) The spread points.\n"
+                "            \"spreadHomeOdds\": spreadHomeOdds, (numeric) The spread odds to home team.\n"
+                "            \"spreadAwayOdds\": spreadAwayOdds, (numeric) The spread odds to away team.\n"
+                "            \"totalPoints\": totalPoints, (numeric) The total points.\n"
+                "            \"totalOverOdds\": totalOverOdds, (numeric) The total odds to over.\n"
+                "            \"totalUnderOdds\": totalUnderOdds, (numeric) The total odds to under.\n"
+                "            \"starting\": starting, (numeric) The event start time in ms of Unix Timestamp.\n"
+                "            \"home\": home command, (string) The home team name.\n"
+                "            \"away\": away command, (string) The away team name.\n"
+                "            \"tournament\": tournament, (string) The tournament name.\n"
+                "            \"eventResultType\": type, (standard, event refund, ml refund, spreads refund, totals refund) The result type of finished event.\n"
+                "            \"homeScore\": score, (numeric) The scores number of home team.\n"
+                "            \"awayScore\": score, (numeric) The scores number of away team.\n"
+                "          }\n"
+                "        },\n"
+                "        ...\n"
+                "      ],                           (list) The list of legs.\n"
+                "    \"address\": playerAddress,    (string) The player address.\n"
+                "    \"amount\": x.xxx,             (numeric) The amount bet in WGR.\n"
+                "    \"time\": \"betting time\",    (string) The betting time.\n"
+                "    \"completed\": betIsCompleted, (bool), The bet status in chain.\n"
+                "    \"betResultType\": type,       (lose/win/refund/pending), The info about bet result.\n"
+                "    \"payout\": x.xxx,            (numeric) The bet payout.\n"
+                "  },\n"
+                "  ...\n"
+                "]\n"
+
+                "\nExamples:\n" +
+                HelpExampleCli("getbetbytxid", "1075db55d416d3ca199f55b6084e2115b9345e16c5cf302fc80e9d5fbf5d48d"));
+
+    uint256 txHash;
+    txHash.SetHex(params[0].get_str());
+
+    CTransaction tx;
+    uint256 hashBlock;
+    if (!GetTransaction(txHash, tx, hashBlock, true)) {
+        throw std::runtime_error("Invalid bet's transaction id");
+    }
+
+    CBlockIndex* blockindex = mapBlockIndex[hashBlock];
+
+    if (!blockindex) {
+        throw std::runtime_error("Invalid block index");
+    }
+
+    UniValue ret{UniValue::VARR};
+
+    auto it = bettingsView->bets->NewIterator();
+    for (it->Seek(CBettingDB::DbTypeToBytes(UniversalBetKey{static_cast<uint32_t>(blockindex->nHeight), COutPoint{txHash, 0}})); it->Valid(); it->Next()) {
+        UniversalBetKey key;
+        CUniversalBet uniBet;
+        CBettingDB::BytesToDbType(it->Value(), uniBet);
+        CBettingDB::BytesToDbType(it->Key(), key);
+
+        if (key.outPoint.hash != txHash) break;
+
+        UniValue uValue(UniValue::VOBJ);
+
+        CollectBetData(uValue, key, uniBet);
+
+        ret.push_back(uValue);
+    }
+
+    return ret;
+}
 
 UniValue listchaingamesbets(const UniValue& params, bool fHelp)
 {
