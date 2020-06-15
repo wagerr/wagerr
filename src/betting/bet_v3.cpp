@@ -350,6 +350,8 @@ void GetBetPayouts(CBettingsView &bettingsViewCache, int height, std::multimap<C
                     mExpectedPayouts.insert(std::pair<const CPayoutInfo, CBetOut>(payoutInfo, betOut));
 
                     uniBet.resultType = odds <= refundOdds ? BetResultType::betResultRefund : BetResultType::betResultWin;
+                    // write payout height: result height + 1
+                    uniBet.payoutHeight = static_cast<uint32_t>(height) + 1;
                 }
                 else {
                     uniBet.resultType = BetResultType::betResultLose;
