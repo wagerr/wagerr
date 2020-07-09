@@ -671,7 +671,7 @@ CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, int height, std::mul
     }
     else {
 
-        GetBetPayoutsV2(height, vExpectedPayouts, vPayoutsInfo);
+        GetPLBetPayoutsV3(bettingsViewCache, height, vExpectedPayouts, vPayoutsInfo);
 
         GetCGLottoBetPayoutsV2(height, vExpectedPayouts, vPayoutsInfo);
     }
