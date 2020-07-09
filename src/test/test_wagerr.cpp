@@ -9,6 +9,7 @@
 #include "test_wagerr.h"
 
 #include "betting/bet.h"
+#include "betting/bet_db.h"
 #include "main.h"
 #include "random.h"
 #include "txdb.h"

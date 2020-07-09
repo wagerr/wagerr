@@ -186,20 +186,27 @@ class BettingTest(BitcoinTestFramework):
         for id in range(len(sport_names)):
             mapping_opcode = make_mapping(SPORT_MAPPING, id, sport_names[id])
             post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
+
+        # generate block for unlocking used Oracle's UTXO
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
         # add rounds to mapping
         for id in range(len(round_names)):
             mapping_opcode = make_mapping(ROUND_MAPPING, id, round_names[id])
             post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
 
-        # generate block for unlocking used UTXO
-        self.sync_all()
-        self.nodes[0].generate(1)
-        self.sync_all()
-
         # add teams to mapping
         for id in range(len(team_names)):
             mapping_opcode = make_mapping(TEAM_MAPPING, id, team_names[id])
             post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
+
+        # generate block for unlocking used Oracle's UTXO
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
         # add tournaments to mapping
         for id in range(len(tournament_names)):
             mapping_opcode = make_mapping(TOURNAMENT_MAPPING, id, tournament_names[id])
@@ -215,28 +222,32 @@ class BettingTest(BitcoinTestFramework):
                 mapping = node.getmappingname("sports", id)[0]
                 assert_equal(mapping['exists'], True)
                 assert_equal(mapping['mapping-name'], sport_names[id])
-                assert_equal(mapping['mapping-index'], SPORT_MAPPING)
+                assert_equal(mapping['mapping-type'], "sports")
+                assert_equal(mapping['mapping-index'], id)
 
             # Check rounds mapping
             for id in range(len(round_names)):
                 mapping = node.getmappingname("rounds", id)[0]
                 assert_equal(mapping['exists'], True)
                 assert_equal(mapping['mapping-name'], round_names[id])
-                assert_equal(mapping['mapping-index'], ROUND_MAPPING)
+                assert_equal(mapping['mapping-type'], "rounds")
+                assert_equal(mapping['mapping-index'], id)
 
             # Check teams mapping
             for id in range(len(team_names)):
                 mapping = node.getmappingname("teamnames", id)[0]
                 assert_equal(mapping['exists'], True)
                 assert_equal(mapping['mapping-name'], team_names[id])
-                assert_equal(mapping['mapping-index'], TEAM_MAPPING)
+                assert_equal(mapping['mapping-type'], "teamnames")
+                assert_equal(mapping['mapping-index'], id)
 
             # Check tournaments mapping
             for id in range(len(tournament_names)):
                 mapping = node.getmappingname("tournaments", id)[0]
                 assert_equal(mapping['exists'], True)
                 assert_equal(mapping['mapping-name'], tournament_names[id])
-                assert_equal(mapping['mapping-index'], TOURNAMENT_MAPPING)
+                assert_equal(mapping['mapping-type'], "tournaments")
+                assert_equal(mapping['mapping-index'], id)
 
         self.log.info("Mapping Success")
 
@@ -396,7 +407,7 @@ class BettingTest(BitcoinTestFramework):
                 assert_equal(event['odds'][1]['spreadHome'], 0)
                 assert_equal(event['odds'][1]['spreadAway'], 0)
         # make spread for event 0: UEFA Champions League
-        spread_event_opcode = make_spread_event(0, 1, 1, 28000, 14000)
+        spread_event_opcode = make_spread_event(0, 1, 28000, 14000)
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -439,7 +450,7 @@ class BettingTest(BitcoinTestFramework):
                     assert_equal(event['odds'][1]['spreadHome'], 0)
                     assert_equal(event['odds'][1]['spreadAway'], 0)
         # make spread for event 4: DOTA2
-        spread_event_opcode = make_spread_event(4, 2, 150, 25000, 15000)
+        spread_event_opcode = make_spread_event(4, 150, 25000, 15000)
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -455,7 +466,7 @@ class BettingTest(BitcoinTestFramework):
                     assert_equal(event['odds'][1]['spreadAway'], 15000)
 
         # make spread for event 4: DOTA2
-        spread_event_opcode_negative = make_spread_event(4, 2, -250, 27000, 13000)
+        spread_event_opcode_negative = make_spread_event(4, -250, 27000, 13000)
         post_opcode(self.nodes[1], spread_event_opcode_negative, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -573,7 +584,7 @@ class BettingTest(BitcoinTestFramework):
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
         # change spread condition for event 0
-        spread_event_opcode = make_spread_event(0, 1, 2, 23000, 15000)
+        spread_event_opcode = make_spread_event(0, 2, 23000, 15000)
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -631,7 +642,7 @@ class BettingTest(BitcoinTestFramework):
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
         # change spread condition for event 2
-        spread_event_opcode = make_spread_event(4, 2, -200, 29000, 12000)
+        spread_event_opcode = make_spread_event(4, -200, 29000, 12000)
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -931,7 +942,7 @@ class BettingTest(BitcoinTestFramework):
         self.sync_all()
 
         # create asian spread event
-        spread_event_opcode = make_spread_event(9, 2, -125, 14000, 26000)
+        spread_event_opcode = make_spread_event(9, -125, 14000, 26000)
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -946,7 +957,7 @@ class BettingTest(BitcoinTestFramework):
         player1_expected_win = winnings / ODDS_DIVISOR
 
         # change spread condition for event
-        spread_event_opcode = make_spread_event(9, 2, -75, 13000, 27000)
+        spread_event_opcode = make_spread_event(9, -75, 13000, 27000)
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()

@@ -4,6 +4,8 @@
 #include "streams.h"
 #include "betting/bet.h"
 
+#define BET_ODDSDIVISOR 10000   // Odds divisor, Facilitates calculations with floating integers.
+
 uint64_t Dice_NumberOfWinCases(uint64_t sum) {              //    sum: 2, 3, 4, 5, 6, 7, 8, 9, 10  11, 12
     return (sum <= 7) * (sum - 1) + (sum > 7) * (13 - sum); // result: 1, 2, 3, 4, 5, 6, 5, 4,  3,  2,  1
 }

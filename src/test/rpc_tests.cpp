@@ -13,6 +13,7 @@
 
 #include "test/test_wagerr.h"
 #include "betting/bet.h"
+#include "betting/bet_db.h"
 
 #include <boost/algorithm/string.hpp>
 #include <boost/test/unit_test.hpp>

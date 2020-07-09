@@ -30,8 +30,7 @@
 #include "invalid.h"
 #include "zwgrchain.h"
 #include "betting/bet.h"
-#include "betting/bet_v2.h"
-#include "betting/bet_v3.h"
+#include "betting/bet_db.h"
 
 #include <boost/thread.hpp>
 #include <boost/tuple/tuple.hpp>
@@ -158,7 +157,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
     CMutableTransaction txCoinStake;
     std::unique_ptr<CStakeInput> stakeInput;
-    
+
     if (fProofOfStake) {
         boost::this_thread::interruption_point();
         pblock->nTime = GetAdjustedTime();
@@ -486,68 +485,19 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
         if (fProofOfStake) {
             // Calculate the bet payouts.
-            std::vector<CTxOut> vAllBetTxOuts;
+            std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
+            std::vector<CTxOut> vExpectedTxOuts;
 
             CAmount nMNBetReward = 0;
 
-            if (nHeight >= Params().BetStartHeight()) {
-                // Get the PL and CG bet payout TX's so we can calculate the winning bet vector which is used to mint coins and payout bets.
-                if (nHeight >= Params().WagerrProtocolV3StartHeight()) {
-                    std::multimap<CPayoutInfo, CBetOut> mPLPayouts;
-                    std::multimap<CPayoutInfo, CBetOut> mCGLottoPayouts;
-                    std::multimap<CPayoutInfo, CBetOut> mQGPayouts;
+            nMNBetReward += GetBettingPayouts(bettingsViewCache, nHeight, mExpectedPayouts);
 
-                    GetBetPayouts(bettingsViewCache, nHeight - 1, mPLPayouts, true);
-                    GetCGLottoBetPayouts(nHeight - 1, mCGLottoPayouts);
-
-                    GetQuickGamesBetPayouts(bettingsViewCache, nHeight - 1, mQGPayouts);
-
-                    GetBlockPayouts(mPLPayouts, nMNBetReward, nHeight);
-                    GetCGBlockPayoutsValue(mCGLottoPayouts);
-
-                    // Merge vectors into single payout vector.
-                    for (auto vPLPayout : mPLPayouts) {
-                        vAllBetTxOuts.emplace_back(vPLPayout.second.nValue, vPLPayout.second.scriptPubKey);
-                    }
-                    for (auto vCGLottoPayout : mCGLottoPayouts) {
-                        vAllBetTxOuts.emplace_back(vCGLottoPayout.second.nValue, vCGLottoPayout.second.scriptPubKey);
-                    }
-                    for (auto mQGPayout : mQGPayouts) {
-                        vAllBetTxOuts.emplace_back(mQGPayout.second.nValue, mQGPayout.second.scriptPubKey);
-                    }
-                }
-                else {
-                    std::vector<CBetOut> vPLPayouts;
-                    std::vector<CBetOut> vCGLottoPayouts;
-                    std::vector<CPayoutInfo> vPLPayoutsInfo;
-                    std::vector<CPayoutInfo> vCGLottoPayoutsInfo;
-                    std::vector<CPayoutInfo> vAllPayoutsInfo;
-                    GetBetPayoutsV2(nHeight - 1, vPLPayouts, vPLPayoutsInfo);
-                    GetCGLottoBetPayoutsV2(nHeight - 1, vCGLottoPayouts, vCGLottoPayoutsInfo);
-
-                    GetBlockPayoutsV2(vPLPayouts, nMNBetReward, vPLPayoutsInfo);
-                    GetCGBlockPayoutsV2(vCGLottoPayouts, nMNBetReward);
-
-                    // Merge vectors into single payout vector.
-                    for (auto vPLPayout : vPLPayouts) {
-                        vAllBetTxOuts.emplace_back(vPLPayout.nValue, vPLPayout.scriptPubKey);
-                    }
-                    for (auto vCGLottoPayout : vCGLottoPayouts) {
-                        vAllBetTxOuts.emplace_back(vCGLottoPayout.nValue, vCGLottoPayout.scriptPubKey);
-                    }
-
-                    // merge vectors into single payout info vector
-                    for (auto&& vPLPayoutInfo : vPLPayoutsInfo) {
-                        vAllPayoutsInfo.emplace_back(vPLPayoutInfo.betKey, vPLPayoutInfo.payoutType);
-                    }
-                    for (auto&& vCGLottoPayoutInfo : vCGLottoPayoutsInfo) {
-                        vAllPayoutsInfo.emplace_back(vCGLottoPayoutInfo.betKey, vCGLottoPayoutInfo.payoutType);
-                    }
-                }
+            for (auto payout : mExpectedPayouts) {
+                vExpectedTxOuts.emplace_back(payout.second.nValue, payout.second.scriptPubKey);
             }
 
             // Fill coin stake transaction.
-            if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, vAllBetTxOuts, stakeInput)) {
+            if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, vExpectedTxOuts, stakeInput)) {
                 LogPrintf("%s: filled coin stake tx [%s]\n", __func__, txCoinStake.ToString());
             }
             else {

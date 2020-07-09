@@ -88,7 +88,6 @@ def make_mapping(namespace_id, mapping_id, mapping_name):
     result = result + encode_int_little_endian(mapping_id, mapping_id_size)
     for sym in mapping_name:
         result = result + encode_int_little_endian(ord(sym), 1)
-    result = result + encode_int_little_endian(0, 1)
     return result
 
 # Create a moneyline patch opcode.
@@ -123,8 +122,8 @@ def make_update_ml_odds(event_id, home_odds, away_odds, draw_odds):
     return result
 
 # Create a spread event
-def make_spread_event(event_id, version, points, home_odds, away_odds):
-    result = make_common_header(OPCODE_BTX_SPREAD_EVENT, version)
+def make_spread_event(event_id, points, home_odds, away_odds):
+    result = make_common_header(OPCODE_BTX_SPREAD_EVENT)
     result = result + encode_int_little_endian(event_id, 4)
     result = result + encode_signed_int_little_endian(points, 2)
     result = result + encode_int_little_endian(home_odds, 4)
