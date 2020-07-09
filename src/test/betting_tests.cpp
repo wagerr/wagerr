@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include "betting/bet.h"
+#include "betting/bet_db.h"
 #include "random.h"
 #include "uint256.h"
 #include "test/test_wagerr.h"
@@ -24,25 +25,20 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_test)
     auto &db = *bettingsView->mappings.get();
     CBettingDB dbCache{db};
     // for writing
-    CMapping mapping{};
+    CMappingDB mapping{};
     // for reading
-    CMapping mapping_r{};
-    MappingKey key{};
+    CMappingDB mapping_r{};
+    MappingKey key{teamMapping, 1};
 
-    mapping.nId = 1;
-    mapping.nMType = teamMapping;
     mapping.sName = "Team1";
-    key = {mapping.nMType, mapping.nId};
 
     BOOST_CHECK(dbCache.Write(key, mapping));
     BOOST_CHECK(dbCache.Read(key, mapping_r));
 
     BOOST_CHECK_EQUAL(mapping_r.sName, mapping.sName);
 
-    mapping.nId = 2;
-    mapping.nMType = sportMapping;
     mapping.sName = "Sport1";
-    key = {mapping.nMType, mapping.nId};
+    key = {sportMapping, 2};
 
     BOOST_CHECK(dbCache.Write(key, mapping));
     BOOST_CHECK(dbCache.Read(key, mapping_r));
@@ -65,8 +61,6 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_test)
 
     // check rewriting
     key = {teamMapping, 1};
-    mapping.nId = 1;
-    mapping.nMType = teamMapping;
     mapping.sName = "Team1-2";
     BOOST_CHECK(!dbCache.Write(key, mapping));
 
@@ -94,14 +88,12 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_iterator_test)
     std::string nameBases[] = {"Sport", "Round", "Team", "Tournament"};
     // for writing
     MappingKey key{};
-    CMapping mapping{};
+    CMappingDB mapping{};
 
     for (uint32_t mapType = tournamentMapping; mapType > 0; mapType--) {
         for (uint32_t mapId = 4097; mapId > 0; mapId--) {
-            mapping.nMType = mapType;
-            mapping.nId = mapId;
             mapping.sName = nameBases[mapType - 1] + std::to_string(mapId);
-            key = {mapping.nMType, mapping.nId};
+            key = {(MappingType) mapType, mapId};
             db.Write(key, mapping);
         }
     }
@@ -115,8 +107,9 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_iterator_test)
         for (uint32_t mapId = 1; mapId <= 4097; mapId++, it->Next()) {
             BOOST_CHECK(it->Valid());
             CBettingDB::BytesToDbType(it->Value(), mapping);
-            BOOST_CHECK_EQUAL(mapping.nMType, mapType);
-            BOOST_CHECK_EQUAL(mapping.nId, mapId);
+            CBettingDB::BytesToDbType(it->Key(), key);
+            BOOST_CHECK_EQUAL(key.nMType, mapType);
+            BOOST_CHECK_EQUAL(key.nId, mapId);
             BOOST_CHECK_EQUAL(mapping.sName, nameBases[mapType - 1] + std::to_string(mapId));
         }
     }
@@ -144,8 +137,9 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_iterator_test)
         for (uint32_t mapId = 1; mapId <= 4097; mapId++, it->Next()) {
             BOOST_CHECK(it->Valid());
             CBettingDB::BytesToDbType(it->Value(), mapping);
-            BOOST_CHECK_EQUAL(mapping.nMType, mapType);
-            BOOST_CHECK_EQUAL(mapping.nId, mapId);
+            CBettingDB::BytesToDbType(it->Key(), key);
+            BOOST_CHECK_EQUAL(key.nMType, mapType);
+            BOOST_CHECK_EQUAL(key.nId, mapId);
             BOOST_CHECK_EQUAL(mapping.sName, nameBases[mapType - 1] + std::to_string(mapId));
         }
     }
@@ -160,27 +154,6 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_iterator_test)
     BOOST_CHECK(!it->Valid());
 
     std::cout << "Testing of flushable DB iterator passed" << std::endl;
-}
-
-BOOST_AUTO_TEST_CASE(betting_serialization_test)
-{
-    std::vector<CPeerlessBet> vLegs;
-    for (uint32_t i = 0; i < Params().MaxParlayLegs(); i++) {
-        vLegs.emplace_back(i + 1024, (OutcomeType) i);
-    }
-
-    std::string opCode;
-    BOOST_CHECK(CPeerlessBet::ParlayToOpCode(vLegs, opCode));
-
-    std::vector<CPeerlessBet> vLegsOut;
-    BOOST_CHECK(CPeerlessBet::ParlayFromOpCode(opCode, vLegsOut));
-
-    for (uint32_t i = 0; i < vLegsOut.size(); i++) {
-        BOOST_CHECK_EQUAL(vLegs[i].nEventId, vLegsOut[i].nEventId);
-        BOOST_CHECK_EQUAL(vLegs[i].nOutcome, vLegsOut[i].nOutcome);
-    }
-
-    std::cout << "Testing of parlay bet serialization passed" << std::endl;
 }
 
 BOOST_AUTO_TEST_SUITE_END()

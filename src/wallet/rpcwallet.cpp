@@ -8,7 +8,6 @@
 
 #include "amount.h"
 #include "base58.h"
-#include "betting/bet_v3.h"
 #include "core_io.h"
 #include "init.h"
 #include "net.h"
@@ -23,6 +22,10 @@
 
 #include "transactionrecord.h"
 #include "betting/bet.h"
+#include "betting/bet_db.h"
+#include "betting/bet_tx.h"
+#include "betting/bet_common.h"
+#include "betting/bet_v2.h"
 #include "betting/quickgames/dice.h"
 
 #include <cstdlib>
@@ -79,8 +82,8 @@ UniValue listevents(const UniValue& params, bool fHelp)
 
     auto it = bettingsView->events->NewIterator();
     for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
-        CPeerlessEvent plEvent;
-        CMapping mapping;
+        CPeerlessExtendedEventDB plEvent;
+        CMappingDB mapping;
         CBettingDB::BytesToDbType(it->Value(), plEvent);
 
         if (!bettingsView->mappings->Read(MappingKey{sportMapping, plEvent.nSport}, mapping))
@@ -179,8 +182,8 @@ UniValue listeventsdebug(const UniValue& params, bool fHelp)
 
     auto it = bettingsView->events->NewIterator();
     for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
-        CPeerlessEvent plEvent;
-        CMapping mapping;
+        CPeerlessExtendedEventDB plEvent;
+        CMappingDB mapping;
         CBettingDB::BytesToDbType(it->Value(), plEvent);
 
         std::stringstream strStream;
@@ -251,23 +254,19 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
             // Check each TX out for values
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
                 const CTxOut &txout = tx.vout[i];
-                std::string scriptPubKey = txout.scriptPubKey.ToString();
 
-                // Find OP_RETURN transactions
-                if(scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                auto cgBettingTx = ParseBettingTx(txout);
 
-                    std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, std::string::npos));
-                    std::string OpCode(vOpCode.begin(), vOpCode.end());
+                if (cgBettingTx == nullptr) continue;
 
-                    // Find any CChainGameEvents matching the specified id
-                    CChainGamesEvent cgEvent;
-                    if (validTx && CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
-                        UniValue evt(UniValue::VOBJ);
-                        evt.push_back(Pair("tx-id", txHash.ToString().c_str()));
-                        evt.push_back(Pair("event-id", (uint64_t) cgEvent.nEventId));
-                        evt.push_back(Pair("entry-fee", (uint64_t) cgEvent.nEntryFee));
-                        ret.push_back(evt);
-                    }
+                // Find any CChainGameEvents matching the specified id
+                if (validTx && cgBettingTx->GetTxType() == cgEventTxType) {
+                    CChainGamesEventTx* cgEvent = (CChainGamesEventTx*) cgBettingTx.get();
+                    UniValue evt(UniValue::VOBJ);
+                    evt.push_back(Pair("tx-id", txHash.ToString().c_str()));
+                    evt.push_back(Pair("event-id", (uint64_t) cgEvent->nEventId));
+                    evt.push_back(Pair("entry-fee", (uint64_t) cgEvent->nEntryFee));
+                    ret.push_back(evt);
                 }
             }
         }
@@ -339,81 +338,79 @@ UniValue listbets(const UniValue& params, bool fHelp)
 
             for (unsigned int i = 0; i < (*pwtx).vout.size(); i++) {
                 const CTxOut& txout = (*pwtx).vout[i];
-                std::string scriptPubKey = txout.scriptPubKey.ToString();
+                auto bettingTx = ParseBettingTx(txout);
 
-                // TODO Remove hard-coded values from this block.
-                if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
-                    std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, std::string::npos));
-                    std::string opCode(vOpCode.begin(), vOpCode.end());
+                if (bettingTx == nullptr) continue;
 
-                    CPeerlessBet plBet;
-                    if (CPeerlessBet::FromOpCode(opCode, plBet)) {
-                        UniValue entry(UniValue::VOBJ);
-                        entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
-                        entry.push_back(Pair("event-id", (uint64_t) plBet.nEventId));
+                auto txType = bettingTx->GetTxType();
 
-                        // Retrieve the event details
-                        CPeerlessEvent plEvent;
-                        if (bettingsView->events->Read(EventKey{plBet.nEventId}, plEvent)) {
+                if (txType == plBetTxType) {
+                    CPeerlessBetTx* plBet = (CPeerlessBetTx*) bettingTx.get();
+                    UniValue entry(UniValue::VOBJ);
+                    entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
+                    entry.push_back(Pair("event-id", (uint64_t) plBet->nEventId));
 
-                            entry.push_back(Pair("starting", plEvent.nStartTime));
-                            CMapping mapping;
-                            if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
-                                entry.push_back(Pair("home", mapping.sName));
-                            }
-                            if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
-                                entry.push_back(Pair("away", mapping.sName));
-                            }
-                            if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
-                                entry.push_back(Pair("tournament", mapping.sName));
-                            }
+                    // Retrieve the event details
+                    CPeerlessExtendedEventDB plEvent;
+                    if (bettingsView->events->Read(EventKey{plBet->nEventId}, plEvent)) {
+
+                        entry.push_back(Pair("starting", plEvent.nStartTime));
+                        CMappingDB mapping;
+                        if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+                            entry.push_back(Pair("home", mapping.sName));
                         }
-
-                        entry.push_back(Pair("team-to-win", (uint64_t) plBet.nOutcome));
-                        entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
-
-                        std::string betResult = "pending";
-                        CPeerlessResult plResult;
-                        if (bettingsView->results->Read(ResultKey{plBet.nEventId}, plResult)) {
-
-                            switch (plBet.nOutcome) {
-                                case OutcomeType::moneyLineHomeWin:
-                                    betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
-
-                                    break;
-                                case OutcomeType::moneyLineAwayWin:
-                                    betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
-
-                                    break;
-                                case OutcomeType::moneyLineDraw :
-                                    betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
-
-                                    break;
-                                case OutcomeType::spreadHome:
-                                    betResult = "Check block explorer for result.";
-
-                                    break;
-                                case OutcomeType::spreadAway:
-                                    betResult = "Check block explorer for result.";
-
-                                    break;
-                                case OutcomeType::totalOver:
-                                    betResult = "Check block explorer for result.";
-
-                                    break;
-                                case OutcomeType::totalUnder:
-                                    betResult = "Check block explorer for result.";
-
-                                    break;
-                                default :
-                                    LogPrintf("Invalid bet outcome");
-                            }
+                        if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+                            entry.push_back(Pair("away", mapping.sName));
                         }
-
-                        entry.push_back(Pair("result", betResult));
-
-                        result.push_back(entry);
+                        if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+                            entry.push_back(Pair("tournament", mapping.sName));
+                        }
                     }
+
+                    entry.push_back(Pair("team-to-win", (uint64_t) plBet->nOutcome));
+                    entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+
+                    std::string betResult = "pending";
+                    CPeerlessResultDB plResult;
+                    if (bettingsView->results->Read(ResultKey{plBet->nEventId}, plResult)) {
+
+                        switch (plBet->nOutcome) {
+                            case OutcomeType::moneyLineHomeWin:
+                                betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
+
+                                break;
+                            case OutcomeType::moneyLineAwayWin:
+                                betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
+
+                                break;
+                            case OutcomeType::moneyLineDraw :
+                                betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
+
+                                break;
+                            case OutcomeType::spreadHome:
+                                betResult = "Check block explorer for result.";
+
+                                break;
+                            case OutcomeType::spreadAway:
+                                betResult = "Check block explorer for result.";
+
+                                break;
+                            case OutcomeType::totalOver:
+                                betResult = "Check block explorer for result.";
+
+                                break;
+                            case OutcomeType::totalUnder:
+                                betResult = "Check block explorer for result.";
+
+                                break;
+                            default :
+                                LogPrintf("Invalid bet outcome");
+                        }
+                    }
+
+                    entry.push_back(Pair("result", betResult));
+
+                    result.push_back(entry);
                 }
             }
         }
@@ -502,79 +499,77 @@ UniValue getbet(const UniValue& params, bool fHelp)
 
     for (unsigned int i = 0; i < tx.vout.size(); i++) {
         const CTxOut& txout = tx.vout[i];
-        std::string scriptPubKey = txout.scriptPubKey.ToString();
 
-        // TODO Remove hard-coded values from this block.
-        if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
-            std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, std::string::npos));
-            std::string opCode(vOpCode.begin(), vOpCode.end());
+        auto bettingTx = ParseBettingTx(txout);
 
-            CPeerlessBet plBet;
-            if (CPeerlessBet::FromOpCode(opCode, plBet)) {
-                ret.push_back(Pair("tx-id", txHash.ToString().c_str()));
-                ret.push_back(Pair("event-id", (uint64_t)plBet.nEventId));
+        if (bettingTx == nullptr) continue;
 
-                // Retrieve the event details
-                CPeerlessEvent plEvent;
-                if (bettingsView->events->Read(EventKey{plBet.nEventId}, plEvent)) {
+        if (bettingTx->GetTxType() == plBetTxType) {
+            CPeerlessBetTx* plBet = (CPeerlessBetTx*) bettingTx.get();
 
-                    ret.push_back(Pair("starting", plEvent.nStartTime));
-                    CMapping mapping;
-                    if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
-                        ret.push_back(Pair("home", mapping.sName));
-                    }
-                    if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
-                        ret.push_back(Pair("away", mapping.sName));
-                    }
-                    if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
-                        ret.push_back(Pair("tournament", mapping.sName));
-                    }
+            ret.push_back(Pair("tx-id", txHash.ToString().c_str()));
+            ret.push_back(Pair("event-id", (uint64_t)plBet->nEventId));
+
+            // Retrieve the event details
+            CPeerlessExtendedEventDB plEvent;
+            if (bettingsView->events->Read(EventKey{plBet->nEventId}, plEvent)) {
+
+                ret.push_back(Pair("starting", plEvent.nStartTime));
+                CMappingDB mapping;
+                if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+                    ret.push_back(Pair("home", mapping.sName));
                 }
-
-                ret.push_back(Pair("team-to-win", (uint64_t)plBet.nOutcome));
-                ret.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
-
-                std::string betResult = "pending";
-                CPeerlessResult plResult;
-                if (bettingsView->results->Read(ResultKey{plBet.nEventId}, plResult)) {
-
-                    switch (plBet.nOutcome) {
-                    case OutcomeType::moneyLineHomeWin:
-                        betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
-
-                        break;
-                    case OutcomeType::moneyLineAwayWin:
-                        betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
-
-                        break;
-                    case OutcomeType::moneyLineDraw:
-                        betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
-
-                        break;
-                    case OutcomeType::spreadHome:
-                        betResult = "Check block explorer for result.";
-
-                        break;
-                    case OutcomeType::spreadAway:
-                        betResult = "Check block explorer for result.";
-
-                        break;
-                    case OutcomeType::totalOver:
-                        betResult = "Check block explorer for result.";
-
-                        break;
-                    case OutcomeType::totalUnder:
-                        betResult = "Check block explorer for result.";
-
-                        break;
-                    default:
-                        LogPrintf("Invalid bet outcome");
-                    }
+                if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+                    ret.push_back(Pair("away", mapping.sName));
                 }
-                ret.push_back(Pair("result", betResult));
+                if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+                    ret.push_back(Pair("tournament", mapping.sName));
+                }
             }
-            break;
+
+            ret.push_back(Pair("team-to-win", (uint64_t)plBet->nOutcome));
+            ret.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+
+            std::string betResult = "pending";
+            CPeerlessResultDB plResult;
+            if (bettingsView->results->Read(ResultKey{plBet->nEventId}, plResult)) {
+
+                switch (plBet->nOutcome) {
+                case OutcomeType::moneyLineHomeWin:
+                    betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
+
+                    break;
+                case OutcomeType::moneyLineAwayWin:
+                    betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
+
+                    break;
+                case OutcomeType::moneyLineDraw:
+                    betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
+
+                    break;
+                case OutcomeType::spreadHome:
+                    betResult = "Check block explorer for result.";
+
+                    break;
+                case OutcomeType::spreadAway:
+                    betResult = "Check block explorer for result.";
+
+                    break;
+                case OutcomeType::totalOver:
+                    betResult = "Check block explorer for result.";
+
+                    break;
+                case OutcomeType::totalUnder:
+                    betResult = "Check block explorer for result.";
+
+                    break;
+                default:
+                    LogPrintf("Invalid bet outcome");
+                }
+            }
+            ret.push_back(Pair("result", betResult));
         }
+        break;
     }
 
     return ret;
@@ -633,8 +628,8 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
 
     auto it = bettingsView->bets->NewIterator();
     for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
-        UniversalBetKey key;
-        CUniversalBet uniBet;
+        PeerlessBetKey key;
+        CPeerlessBetDB uniBet;
         CBettingDB::BytesToDbType(it->Value(), uniBet);
         CBettingDB::BytesToDbType(it->Key(), key);
 
@@ -698,7 +693,7 @@ std::string EventResultTypeToStr(ResultType resType)
     }
 }
 
-void CollectBetData(UniValue& uValue, const UniversalBetKey& betKey, const CUniversalBet& uniBet, bool requiredPayoutInfo = false) {
+void CollectBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPeerlessBetDB& uniBet, bool requiredPayoutInfo = false) {
     UniValue uLegs(UniValue::VARR);
 
     for (uint32_t i = 0; i < uniBet.legs.size(); i++) {
@@ -720,10 +715,10 @@ void CollectBetData(UniValue& uValue, const UniversalBetKey& betKey, const CUniv
         uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
 
         // Retrieve the event details
-        CPeerlessEvent plEvent;
+        CPeerlessExtendedEventDB plEvent;
         if (bettingsView->events->Read(EventKey{leg.nEventId}, plEvent)) {
             uLockedEvent.push_back(Pair("starting", plEvent.nStartTime));
-            CMapping mapping;
+            CMappingDB mapping;
             if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
                 uLockedEvent.push_back(Pair("home", mapping.sName));
             }
@@ -743,7 +738,7 @@ void CollectBetData(UniValue& uValue, const UniversalBetKey& betKey, const CUniv
                 uLockedEvent.push_back(Pair("tournament", "undefined"));
             }
         }
-        CPeerlessResult plResult;
+        CPeerlessResultDB plResult;
         uint32_t legOdds = 0;
         if (bettingsView->results->Read(EventKey{leg.nEventId}, plResult)) {
             uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) plResult.nResultType)));
@@ -783,7 +778,7 @@ void CollectBetData(UniValue& uValue, const UniversalBetKey& betKey, const CUniv
                 auto it = bettingsView->payoutsInfo->NewIterator();
                 for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{uniBet.payoutHeight, COutPoint{}})); it->Valid(); it->Next()) {
                     PayoutInfoKey payoutKey;
-                    CPayoutInfo payoutInfo;
+                    CPayoutInfoDB payoutInfo;
                     CBettingDB::BytesToDbType(it->Key(), payoutKey);
                     CBettingDB::BytesToDbType(it->Value(), payoutInfo);
                     if (uniBet.payoutHeight != payoutKey.blockHeight) break;
@@ -812,8 +807,8 @@ UniValue GetBets(uint32_t limit, CWallet *pwalletMain = NULL) {
     auto it = bettingsView->bets->NewIterator();
 
     for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
-        UniversalBetKey key;
-        CUniversalBet uniBet;
+        PeerlessBetKey key;
+        CPeerlessBetDB uniBet;
         CBettingDB::BytesToDbType(it->Value(), uniBet);
         CBettingDB::BytesToDbType(it->Key(), key);
 
@@ -977,7 +972,7 @@ UniValue GetQuickGamesBets(uint32_t limit, CWallet *pwalletMain = NULL) {
     auto it = bettingsView->quickGamesBets->NewIterator();
     for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
         QuickGamesBetKey key;
-        CQuickGamesBet qgBet;
+        CQuickGamesBetDB qgBet;
         uint256 hash;
         CBettingDB::BytesToDbType(it->Value(), qgBet);
         CBettingDB::BytesToDbType(it->Key(), key);
@@ -1180,9 +1175,9 @@ UniValue getbetbytxid(const UniValue& params, bool fHelp)
     UniValue ret{UniValue::VARR};
 
     auto it = bettingsView->bets->NewIterator();
-    for (it->Seek(CBettingDB::DbTypeToBytes(UniversalBetKey{static_cast<uint32_t>(blockindex->nHeight), COutPoint{txHash, 0}})); it->Valid(); it->Next()) {
-        UniversalBetKey key;
-        CUniversalBet uniBet;
+    for (it->Seek(CBettingDB::DbTypeToBytes(PeerlessBetKey{static_cast<uint32_t>(blockindex->nHeight), COutPoint{txHash, 0}})); it->Valid(); it->Next()) {
+        PeerlessBetKey key;
+        CPeerlessBetDB uniBet;
         CBettingDB::BytesToDbType(it->Value(), uniBet);
         CBettingDB::BytesToDbType(it->Key(), key);
 
@@ -1259,21 +1254,18 @@ UniValue listchaingamesbets(const UniValue& params, bool fHelp)
 
             for (unsigned int i = 0; i < (*pwtx).vout.size(); i++) {
                 const CTxOut& txout = (*pwtx).vout[i];
-                std::string scriptPubKey = txout.scriptPubKey.ToString();
 
-                // TODO Remove hard-coded values from this block.
-                if (scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
-                    std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, std::string::npos));
-                    std::string opCode(vOpCode.begin(), vOpCode.end());
+                auto cgBettingTx = ParseBettingTx(txout);
 
-                    CChainGamesBet cgBet;
-                    if (CChainGamesBet::FromOpCode(opCode, cgBet)) {
-                        UniValue entry(UniValue::VOBJ);
-                        entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
-                        entry.push_back(Pair("event-id", (uint64_t) cgBet.nEventId));
-                        entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
-                        ret.push_back(entry);
-                    }
+                if (cgBettingTx == nullptr) continue;
+
+                if (cgBettingTx->GetTxType() == cgBetTxType) {
+                    CChainGamesBetTx* cgBet = (CChainGamesBetTx*) cgBettingTx.get();
+                    UniValue entry(UniValue::VOBJ);
+                    entry.push_back(Pair("tx-id", txHash.ToString().c_str()));
+                    entry.push_back(Pair("event-id", (uint64_t) cgBet->nEventId));
+                    entry.push_back(Pair("amount", ValueFromAmount(txout.nValue)));
+                    ret.push_back(entry);
                 }
             }
         }
@@ -1681,8 +1673,12 @@ UniValue placebet(const UniValue& params, bool fHelp)
 
     CBitcoinAddress address("");
     uint32_t eventId = static_cast<uint32_t>(params[0].get_int64());
-    int outcome = params[1].get_int();
-    CPeerlessBet plBet(eventId, (OutcomeType) outcome);
+    uint8_t outcome = (uint8_t) params[1].get_int();
+
+    if (outcome < moneyLineHomeWin || outcome > totalUnder)
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
+
+    CPeerlessBetTx plBet(eventId, outcome);
 
     // TODO Retrieve the `CPeerlessEvent` currently associated with `eventId`
     // and confirm that the submitted `team` is available; `throw` an
@@ -1696,8 +1692,10 @@ UniValue placebet(const UniValue& params, bool fHelp)
     // Note that, during testing, the `opReturn` value is added to the
     // blockchain incorrectly if its length is less than 5. This behaviour would
     // ideally be investigated and corrected/justified when time allows.
-    std::string opCode;
-    CPeerlessBet::ToOpCode(plBet, opCode);
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) plBetTxType << plBet;
+    std::string opCode = HexStr(ss.begin(), ss.end());
+
 
     // Unhex the validated bet opcode
     std::vector<unsigned char> vectorValue;
@@ -1741,7 +1739,7 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
             HelpExampleCli("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\" 25 \"Parlay bet\" \"seans outpost\"") +
             HelpExampleRpc("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\", 25, \"Parlay bet\", \"seans outpost\""));
 
-    std::vector<CPeerlessBet> vLegs;
+    CPeerlessParlayBetTx parlayBetTx;
     UniValue legsArr = params[0].get_array();
     for (uint32_t i = 0; i < legsArr.size(); i++) {
         const UniValue obj = legsArr[i].get_obj();
@@ -1749,12 +1747,17 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
         RPCTypeCheckObj(obj, boost::assign::map_list_of("eventId", UniValue::VNUM)("outcome", UniValue::VNUM));
 
         uint32_t eventId = static_cast<uint32_t>(find_value(obj, "eventId").get_int64());
-        OutcomeType outcomeType = (OutcomeType) find_value(obj, "outcome").get_int();
-        vLegs.emplace_back(eventId, outcomeType);
+        uint8_t outcomeType = (uint8_t) find_value(obj, "outcome").get_int();
+
+        if (outcomeType < moneyLineHomeWin || outcomeType > totalUnder)
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
+
+        parlayBetTx.legs.emplace_back(eventId, outcomeType);
     }
 
-    std::string opCode;
-    CPeerlessBet::ParlayToOpCode(vLegs, opCode);
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) plParlayBetTxType << parlayBetTx;
+    std::string opCode = HexStr(ss.begin(), ss.end());
 
     CAmount nAmount = AmountFromValue(params[1]);
 
@@ -1827,10 +1830,12 @@ UniValue placechaingamesbet(const UniValue& params, bool fHelp)
     //TODO Respond if amount not correct
     CBitcoinAddress address("");
     int eventId = params[0].get_int();
-    CChainGamesBet cgBet(eventId);
 
-    std::string opCode;
-    CChainGamesBet::ToOpCode(cgBet, opCode);
+    CChainGamesBetTx cgBet(eventId);
+
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) cgBetTxType << cgBet;
+    std::string opCode = HexStr(ss.begin(), ss.end());
 
     // Unhex the validated bet opcode
     std::vector<unsigned char> vectorValue;
@@ -1886,15 +1891,19 @@ UniValue placeqgdicebet(const UniValue& params, bool fHelp)
     betInfo.betType = betType;
     betInfo.betNumber = betNumber;
 
-    CDataStream ss{SER_NETWORK, CLIENT_VERSION};
-    ss << betInfo;
+    CQuickGamesBetTx qgBetTx;
 
-    CQuickGamesTxBet txBet;
-    txBet.gameType = QuickGamesType::qgDice;
-    txBet.vBetInfo = std::vector<unsigned char>{ss.begin(), ss.end()};
+    {
+        CDataStream sBetInfo{SER_NETWORK, CLIENT_VERSION};
+        sBetInfo << betInfo;
 
-    std::string opCode;
-    CQuickGamesTxBet::ToOpCode(txBet, opCode);
+        qgBetTx.gameType = QuickGamesType::qgDice;
+        qgBetTx.vBetInfo.insert(qgBetTx.vBetInfo.begin(), sBetInfo.begin(), sBetInfo.end());
+    }
+
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) qgBetTxType << qgBetTx;
+    std::string opCode = HexStr(ss.begin(), ss.end());
 
     CWalletTx wtx;
 
@@ -1966,35 +1975,33 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
             // Check each TX out for values
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
                 const CTxOut &txout = tx.vout[i];
-                std::string scriptPubKey = txout.scriptPubKey.ToString();
 
-                // Find OP_RETURN transactions
-                if(scriptPubKey.length() > 0 && strncmp(scriptPubKey.c_str(), "OP_RETURN", 9) == 0) {
+                auto cgBettingTx = ParseBettingTx(txout);
 
-                    std::vector<unsigned char> vOpCode = ParseHex(scriptPubKey.substr(9, std::string::npos));
-                    std::string OpCode(vOpCode.begin(), vOpCode.end());
+                if(cgBettingTx == nullptr) continue;
 
-                    // Find any CChainGameEvents matching the specified id
-                    CChainGamesEvent cgEvent;
-                    if (validTx && CChainGamesEvent::FromOpCode(OpCode, cgEvent)) {
-                        if (((unsigned int)cgEvent.nEventId) == eventID){
-                            entryFee = cgEvent.nEntryFee;
-                            gameStartTime = block.GetBlockTime();
-                            gameStartBlock = BlocksIndex -> nHeight;
-                        }
+                auto txType = cgBettingTx->GetTxType();
+
+                // Find any CChainGameEvents matching the specified id
+                if (validTx && txType == cgEventTxType) {
+                    CChainGamesEventTx* cgEvent = (CChainGamesEventTx*) cgBettingTx.get();
+                    if (((unsigned int)cgEvent->nEventId) == eventID){
+                        entryFee = cgEvent->nEntryFee;
+                        gameStartTime = block.GetBlockTime();
+                        gameStartBlock = BlocksIndex -> nHeight;
                     }
-                    // Find a matching result transaction
-                    CChainGamesResult cgResult;
-                    if (validTx && resultHeight == -1 && cgResult.FromScript(txout.scriptPubKey)) {
-                        if (cgResult.nEventId == (uint16_t)eventID) {
-                            resultHeight = BlocksIndex->nHeight;
-                        }
+                }
+                // Find a matching result transaction
+                if (validTx && resultHeight == -1 && txType == cgResultTxType) {
+                    CChainGamesResultTx* cgResult = (CChainGamesResultTx*) cgBettingTx.get();
+                    if (cgResult->nEventId == (uint16_t)eventID) {
+                        resultHeight = BlocksIndex->nHeight;
                     }
-                    CChainGamesBet cgBet;
-                    if (CChainGamesBet::FromOpCode(OpCode, cgBet)) {
-                        if (((unsigned int)cgBet.nEventId) == eventID){
-                            totalFoundCGBets = totalFoundCGBets + 1;
-                        }
+                }
+                if (txType == cgBetTxType) {
+                    CChainGamesBetTx* cgBet = (CChainGamesBetTx*) cgBettingTx.get();
+                    if (((unsigned int)cgBet->nEventId) == eventID){
+                        totalFoundCGBets = totalFoundCGBets + 1;
                     }
                 }
             }
@@ -2004,11 +2011,12 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
     }
 
     if (resultHeight > Params().BetStartHeight() && fShowWinner) {
-        std::multimap<CPayoutInfo, CBetOut> mExpectedCGLottoPayouts;
-        GetCGLottoBetPayouts(resultHeight, mExpectedCGLottoPayouts);
-        for (auto lottoPayouts : mExpectedCGLottoPayouts) {
-            if (!winningBetFound && lottoPayouts.second.nEventId == eventID) {
-                winningBetOut = lottoPayouts.second;
+        std::vector<CBetOut> vExpectedCGLottoPayouts;
+        std::vector<CPayoutInfoDB> vPayoutsInfo;
+        GetCGLottoBetPayoutsV2(resultHeight, vExpectedCGLottoPayouts, vPayoutsInfo);
+        for (auto lottoPayouts : vExpectedCGLottoPayouts) {
+            if (!winningBetFound && lottoPayouts.nEventId == eventID) {
+                winningBetOut = lottoPayouts;
                 winningBetFound = true;
             }
         }
@@ -2076,7 +2084,7 @@ UniValue geteventsliability(const UniValue& params, bool fHelp)
     UniValue ret(UniValue::VARR);
 
 
-    CPeerlessEvent plEvent{};
+    CPeerlessExtendedEventDB plEvent{};
     auto it = bettingsView->events->NewIterator();
     for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
         CBettingDB::BytesToDbType(it->Value(), plEvent);

@@ -43,6 +43,7 @@
 #include "validationinterface.h"
 #include "zwgr/accumulatorcheckpoints.h"
 #include "zwgrchain.h"
+#include <betting/bet_db.h>
 
 #ifdef ENABLE_WALLET
 #include "wallet/db.h"
@@ -1638,8 +1639,6 @@ bool AppInit2()
                         break;
                     }
 
-                    if (!RecoveryBettingDB(uiInterface.InitMessage))
-                        return InitError(_("Failed to recovery betting database, please start with -reindex"));
                 }
             } catch (std::exception& e) {
                 if (fDebug) LogPrintf("%s\n", e.what());

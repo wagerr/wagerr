@@ -9,6 +9,7 @@
 #include "net.h"
 #include "main.h"
 #include "betting/bet.h"
+#include "betting/bet_db.h"
 #include "rpc/server.h"
 #include <boost/assign/list_of.hpp>
 
@@ -44,11 +45,11 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
 
     const std::string name{params[1].get_str()};
     const std::string mIndex{params[0].get_str()};
-    const MappingTypes type{CMapping::FromTypeName(mIndex)};
+    const MappingType type{CMappingDB::FromTypeName(mIndex)};
     UniValue result{UniValue::VARR};
     UniValue mappings{UniValue::VOBJ};
 
-    if (static_cast<int>(type) < 0 || CMapping::ToTypeName(type) != mIndex) {
+    if (static_cast<int>(type) < 0 || CMappingDB::ToTypeName(type) != mIndex) {
         throw std::runtime_error("No mapping exist for the mapping index you provided.");
     }
 
@@ -56,14 +57,14 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
 
     // Check the map for the string name.
     auto it = bettingsView->mappings->NewIterator();
-    MappingKey key{};
+    MappingKey key;
     for (it->Seek(CBettingDB::DbTypeToBytes(MappingKey{type, 0})); it->Valid() && (CBettingDB::BytesToDbType(it->Key(), key), key.nMType == type); it->Next()) {
-        CMapping mapping{};
+        CMappingDB mapping{};
         CBettingDB::BytesToDbType(it->Value(), mapping);
-        LogPrintf("%s - mapping - it=[%d,%d] nId=[%d] nMType=[%d] [%s]\n", __func__, key.nMType, key.nId, mapping.nId, mapping.nMType, mapping.sName);
+        LogPrintf("%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
         if (!mappingFound) {
             if (mapping.sName == name) {
-                mappings.push_back(Pair("mapping-id", (uint64_t) mapping.nId));
+                mappings.push_back(Pair("mapping-id", (uint64_t) key.nId));
                 mappings.push_back(Pair("exists", true));
                 mappings.push_back(Pair("mapping-index", mIndex));
                 mappingFound = true;
@@ -95,7 +96,8 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
-                "    \"mapping name\": \"xxx\",  (string) The mapping name.\n"
+                "    \"mapping-type\": \"xxx\",  (string) The mapping type.\n"
+                "    \"mapping-name\": \"xxx\",  (string) The mapping name.\n"
                 "    \"exists\": \"xxx\", (boolean) mapping transaction created or not\n"
                 "    \"mapping-index\": \"xxx\" (string) The index that was searched.\n"
                 "  }\n"
@@ -106,19 +108,20 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
 
     const std::string mIndex{params[0].get_str()};
     const uint32_t id{static_cast<uint32_t>(params[1].get_int())};
-    const MappingTypes type{CMapping::FromTypeName(mIndex)};
+    const MappingType type{CMappingDB::FromTypeName(mIndex)};
     UniValue result{UniValue::VARR};
     UniValue mapping{UniValue::VOBJ};
 
-    if (CMapping::ToTypeName(type) != mIndex) {
+    if (CMappingDB::ToTypeName(type) != mIndex) {
         throw std::runtime_error("No mapping exist for the mapping index you provided.");
     }
 
-    CMapping map{};
+    CMappingDB map{};
     if (bettingsView->mappings->Read(MappingKey{type, id}, map)) {
+        mapping.push_back(Pair("mapping-type", CMappingDB::ToTypeName(type)));
         mapping.push_back(Pair("mapping-name", map.sName));
         mapping.push_back(Pair("exists", true));
-        mapping.push_back(Pair("mapping-index", static_cast<uint64_t>(map.nMType)));
+        mapping.push_back(Pair("mapping-index", static_cast<uint64_t>(id)));
     }
 
     result.push_back(mapping);
@@ -146,13 +149,13 @@ std::string GetPayoutTypeStr(PayoutType type)
     }
 }
 
-UniValue CreatePayoutInfoResponse(const std::vector<std::pair<bool, CPayoutInfo>> vPayoutsInfo)
+UniValue CreatePayoutInfoResponse(const std::vector<std::pair<bool, CPayoutInfoDB>> vPayoutsInfo)
 {
     UniValue responseArr{UniValue::VARR};
     for (auto info : vPayoutsInfo) {
         UniValue retObj{UniValue::VOBJ};
         if (info.first) { // if payout info was found - add info to array
-            CPayoutInfo &payoutInfo = info.second;
+            CPayoutInfoDB &payoutInfo = info.second;
             UniValue infoObj{UniValue::VOBJ};
 
             infoObj.push_back(Pair("payoutType", GetPayoutTypeStr(payoutInfo.payoutType)));
@@ -211,7 +214,7 @@ UniValue getpayoutinfo(const UniValue& params, bool fHelp)
                     HelpExampleRpc("getpayoutinfo", "[{\"txHash\": 08746e1bdb6f4aebd7f1f3da25ac11e1cd3cacaf34cd2ad144e376b2e7f74d49, \"nOut\": 3}, {\"txHash\": 4c1e6b1a26808541e9e43c542adcc0eb1c67f2be41f2334ab1436029bf1791c0, \"nOut\": 4}]"));
 
     UniValue paramsArr = params[0].get_array();
-    std::vector<std::pair<bool, CPayoutInfo>> vPayoutsInfo;
+    std::vector<std::pair<bool, CPayoutInfoDB>> vPayoutsInfo;
 
     // parse payout params
     for (uint32_t i = 0; i < paramsArr.size(); i++) {
@@ -222,23 +225,23 @@ UniValue getpayoutinfo(const UniValue& params, bool fHelp)
         uint256 hashBlock;
         CTransaction tx;
         if (!GetTransaction(txHash, tx, hashBlock, true)) {
-            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{false, CPayoutInfo{}});
+            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{false, CPayoutInfoDB{}});
             continue;
         }
         if (hashBlock == 0) { // uncomfirmed tx
-            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{false, CPayoutInfo{}});
+            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{false, CPayoutInfoDB{}});
             continue;
         }
         uint32_t blockHeight = mapBlockIndex.at(hashBlock)->nHeight;
 
-        CPayoutInfo payoutInfo;
+        CPayoutInfoDB payoutInfo;
         // try to find payout info from db
         if (!bettingsView->payoutsInfo->Read(PayoutInfoKey{blockHeight, COutPoint{txHash, nOut}}, payoutInfo)) {
             // not found
-            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{false, CPayoutInfo{}});
+            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{false, CPayoutInfoDB{}});
             continue;
         }
-        vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{true, payoutInfo});
+        vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{true, payoutInfo});
     }
 
     return CreatePayoutInfoResponse(vPayoutsInfo);
@@ -275,7 +278,7 @@ UniValue getpayoutinfosince(const UniValue& params, bool fHelp)
                 "\nExamples:\n" +
                 HelpExampleCli("getpayoutinfosince", "15") + HelpExampleRpc("getpayoutinfosince", "15"));
 
-    std::vector<std::pair<bool, CPayoutInfo>> vPayoutsInfo;
+    std::vector<std::pair<bool, CPayoutInfoDB>> vPayoutsInfo;
     uint32_t nLastBlocks = 10;
     if (params.size() == 1) {
         nLastBlocks = params[0].get_int();
@@ -290,10 +293,10 @@ UniValue getpayoutinfosince(const UniValue& params, bool fHelp)
     auto it = bettingsView->payoutsInfo->NewIterator();
     for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{startBlockHeight, COutPoint()})); it->Valid(); it->Next()) {
         PayoutInfoKey key;
-        CPayoutInfo payoutInfo;
+        CPayoutInfoDB payoutInfo;
         CBettingDB::BytesToDbType(it->Key(), key);
         CBettingDB::BytesToDbType(it->Value(), payoutInfo);
-        vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfo>{true, payoutInfo});
+        vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{true, payoutInfo});
     }
 
     return CreatePayoutInfoResponse(vPayoutsInfo);

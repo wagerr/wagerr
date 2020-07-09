@@ -83,6 +83,9 @@ BITCOIN_CORE_H = \
   amount.h \
   base58.h \
   betting/bet.h \
+  betting/bet_common.h \
+  betting/bet_tx.h \
+  betting/bet_db.h \
   betting/bet_v2.h \
   betting/bet_v3.h \
   betting/quickgames/dice.h \
@@ -213,6 +216,9 @@ libbitcoin_server_a_CXXFLAGS = $(AM_CXXFLAGS) $(PIE_FLAGS)
 libbitcoin_server_a_SOURCES = \
   addrman.cpp \
   alert.cpp \
+  betting/bet_common.cpp \
+  betting/bet_tx.cpp \
+  betting/bet_db.cpp \
   betting/bet.cpp \
   betting/bet_v2.cpp \
   betting/bet_v3.cpp \

@@ -5039,7 +5039,7 @@ bool CWallet::FillCoinStake(const CKeyStore& keystore, CMutableTransaction& txNe
 
         for (const CTxOut& out : voutPayouts)
             txNew.vout.push_back(out);
-        
+
         //Masternode payment
         FillBlockPayee(txNew, nFee, true, stakeInput->IsZWGR());
 

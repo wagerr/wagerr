@@ -13,7 +13,7 @@
 #include "wallet/wallet.h"
 #include "zwgrchain.h"
 #include "main.h"
-#include "betting/bet.h"
+#include "betting/bet_tx.h"
 
 #include <iostream>
 #include <stdint.h>
@@ -426,14 +426,12 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
                     bool isBettingEntry = false;
                     bool isChainGameEntry = false;
                     if (txout.scriptPubKey.IsUnspendable()) {
-                        std::vector<unsigned char> vOpCode = ParseHex(txout.scriptPubKey.ToString().substr(9, std::string::npos));
-                        std::string opCode(vOpCode.begin(), vOpCode.end());
 
-                        CPeerlessBet plBet;
-                        CChainGamesBet cgBet;
-                        if (CPeerlessBet::FromOpCode(opCode, plBet)) {
+                        auto bettingTx = ParseBettingTx(txout);
+
+                        if (bettingTx && bettingTx->GetTxType() == plBetTxType) {
                             isBettingEntry = true;
-                        } else if (CChainGamesBet::FromOpCode(opCode, cgBet)) {
+                        } else if (bettingTx && bettingTx->GetTxType() == cgBetTxType) {
                             isChainGameEntry = true;
                         }
                     }

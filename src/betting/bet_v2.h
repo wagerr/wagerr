@@ -5,20 +5,15 @@
 #ifndef WAGERR_V2_BET_H
 #define WAGERR_V2_BET_H
 
-#include "amount.h"
+#include <util.h>
+#include <amount.h>
 
 class CBetOut;
-class CPayoutInfo;
-
-/** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
-int64_t GetBlockPayoutsV2(std::vector<CBetOut>& vExpectedPayouts, CAmount& nMNBetReward, std::vector<CPayoutInfo>& vPayoutsInfo);
-
-/** Aggregates the amount of WGR to be minted to pay out all CG Lotto winners as well as OMNO rewards. **/
-int64_t GetCGBlockPayoutsV2(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& nMNBetReward);
+class CPayoutInfoDB;
 
 /** Get the peerless winning bets from the block chain and return the payout vector. **/
-void GetBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo);
+void GetBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 /** Get the chain games winner and return the payout vector. **/
-void GetCGLottoBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfo>& vPayoutsInfo);
+void GetCGLottoBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 
 #endif // WAGERR_V2_BET_H

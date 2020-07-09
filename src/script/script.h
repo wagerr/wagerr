@@ -505,11 +505,11 @@ public:
         if (end() - pc < 1)
             return false;
         unsigned int opcode = *pc++;
+        unsigned int nSize = 0;
 
         // Immediate operand
         if (opcode <= OP_PUSHDATA4)
         {
-            unsigned int nSize = 0;
             if (opcode < OP_PUSHDATA1)
             {
                 nSize = opcode;
@@ -540,6 +540,14 @@ public:
             if (pvchRet)
                 pvchRet->assign(pc, pc + nSize);
             pc += nSize;
+        }
+        else if (opcode == OP_RETURN) {
+            if (end() - pc < 1)
+                return false;
+            nSize = *pc++;
+            if (pvchRet)
+                pvchRet->assign(pc, pc + nSize);
+            pc = end();
         }
 
         opcodeRet = (opcodetype)opcode;
