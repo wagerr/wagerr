@@ -682,7 +682,7 @@ CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, int height, std::mul
 
     for (int i = 0; i < vExpectedPayouts.size(); i++) {
         expectedMint += vExpectedPayouts[i].nValue;
-        mExpectedPayouts.insert(std::pair<CPayoutInfoDB, CBetOut>(vPayoutsInfo[i], vExpectedPayouts[i]));
+        mExpectedPayouts.insert(std::pair<const CPayoutInfoDB, CBetOut>(vPayoutsInfo[i], vExpectedPayouts[i]));
     }
 
     return expectedMint;
