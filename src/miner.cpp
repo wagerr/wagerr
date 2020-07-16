@@ -488,16 +488,17 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
             std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
             std::vector<CTxOut> vExpectedTxOuts;
 
-            CAmount nMNBetReward = 0;
+            CAmount nBetPayout = 0;
 
-            nMNBetReward += GetBettingPayouts(bettingsViewCache, nHeight, mExpectedPayouts);
+            nBetPayout += GetBettingPayouts(bettingsViewCache, nHeight, mExpectedPayouts);
 
             for (auto payout : mExpectedPayouts) {
                 vExpectedTxOuts.emplace_back(payout.second.nValue, payout.second.scriptPubKey);
             }
 
+            CAmount nMNFee = 0;
             // Fill coin stake transaction.
-            if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNBetReward, vExpectedTxOuts, stakeInput)) {
+            if (pwallet->FillCoinStake(*pwallet, txCoinStake, nMNFee, vExpectedTxOuts, stakeInput)) {
                 LogPrintf("%s: filled coin stake tx [%s]\n", __func__, txCoinStake.ToString());
             }
             else {
