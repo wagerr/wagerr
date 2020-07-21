@@ -14,14 +14,16 @@
  *
  * @return payout vector, payouts info vector.
  */
-void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
-    int nCurrentHeight = chainActive.Height();
-    uint64_t refundOdds{BET_ODDSDIVISOR};
-    // Get all the results posted in the prev block.
-    std::vector<CPeerlessResultDB> results = GetEventResults(height - 1);
+    const int nLastBlockHeight = nNewBlockHeight - 1;
 
-    bool fWagerrProtocolV3 = height >= Params().WagerrProtocolV3StartHeight();
+    uint64_t refundOdds{BET_ODDSDIVISOR};
+
+    // Get all the results posted in the prev block.
+    std::vector<CPeerlessResultDB> results = GetEventResults(nLastBlockHeight);
+
+    bool fWagerrProtocolV3 = nLastBlockHeight >= Params().WagerrProtocolV3StartHeight();
 
     LogPrintf("Start generating payouts...\n");
 
@@ -30,7 +32,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, int height, std::vector
         LogPrintf("Looking for bets of eventId: %lu\n", result.nEventId);
 
         // look bets at last 14 days
-        uint32_t startHeight = nCurrentHeight >= Params().BetBlocksIndexTimespan() ? nCurrentHeight - Params().BetBlocksIndexTimespan() : 0;
+        uint32_t startHeight = nLastBlockHeight >= Params().BetBlocksIndexTimespan() ? nLastBlockHeight - Params().BetBlocksIndexTimespan() : 0;
 
         auto it = bettingsViewCache.bets->NewIterator();
         std::vector<std::pair<PeerlessBetKey, CPeerlessBetDB>> vEntriesToUpdate;
@@ -98,7 +100,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, int height, std::vector
                         } else {
                             odds = 0;
                         }
-                    } else if ((!fWagerrProtocolV3) && height - lockedEvent.nEventCreationHeight > Params().BetBlocksIndexTimespan()) {
+                    } else if ((!fWagerrProtocolV3) && nLastBlockHeight - lockedEvent.nEventCreationHeight > Params().BetBlocksIndexTimespan()) {
                         odds = 0;
                     }
                     else {
@@ -124,7 +126,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, int height, std::vector
 
                     uniBet.resultType = odds <= refundOdds ? BetResultType::betResultRefund : BetResultType::betResultWin;
                     // write payout height: result height + 1
-                    uniBet.payoutHeight = static_cast<uint32_t>(height) + 1;
+                    uniBet.payoutHeight = static_cast<uint32_t>(nNewBlockHeight) + 1;
                 }
                 else {
                     uniBet.resultType = BetResultType::betResultLose;
@@ -146,7 +148,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, int height, std::vector
         }
     }
 
-    GetPLRewardPayouts(height, vExpectedPayouts, vPayoutsInfo);
+    GetPLRewardPayouts(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
 
     LogPrintf("Finished generating payouts...\n");
 
@@ -157,14 +159,16 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, int height, std::vector
  *
  * @return payout vector.
  */
-void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
+    const int nLastBlockHeight = nNewBlockHeight - 1;
+
     PeerlessBetKey zeroKey{0, COutPoint()};
 
     LogPrintf("Start generating quick games bets payouts...\n");
 
-    CBlockIndex *blockIndex = chainActive[height];
-    uint32_t blockHeight = static_cast<uint32_t>(height);
+    CBlockIndex *blockIndex = chainActive[nLastBlockHeight];
+    uint32_t blockHeight = static_cast<uint32_t>(nLastBlockHeight);
     auto it = bettingsViewCache.quickGamesBets->NewIterator();
     std::vector<std::pair<QuickGamesBetKey, CQuickGamesBetDB>> vEntriesToUpdate;
     for (it->Seek(CBettingDB::DbTypeToBytes(QuickGamesBetKey{blockHeight, COutPoint()})); it->Valid(); it->Next()) {

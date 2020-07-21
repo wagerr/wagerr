@@ -71,15 +71,15 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
  *
  * @return results vector.
  */
-std::vector<CPeerlessResultDB> GetEventResults(int height)
+std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight)
 {
     std::vector<CPeerlessResultDB> results;
 
-    bool fMultipleResultsAllowed = (height >= Params().WagerrProtocolV3StartHeight());
+    bool fMultipleResultsAllowed = (nLastBlockHeight >= Params().WagerrProtocolV3StartHeight());
 
     // Get the current block so we can look for any results in it.
     CBlockIndex *resultsBocksIndex = NULL;
-    resultsBocksIndex = chainActive[height];
+    resultsBocksIndex = chainActive[nLastBlockHeight];
 
     CBlock block;
     ReadBlockFromDisk(block, resultsBocksIndex);
@@ -117,19 +117,15 @@ std::vector<CPeerlessResultDB> GetEventResults(int height)
  * @param height The block we want to check for the result.
  * @return results array.
  */
-std::pair<std::vector<CChainGamesResultDB>, std::vector<std::string>> GetCGLottoEventResults(int height)
+bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults)
 {
-    std::vector<CChainGamesResultDB> chainGameResults;
-    std::vector<std::string> blockTotalValues;
-    CAmount totalBlockValue = 0;
+    chainGameResults.clear();
 
     // Get the current block so we can look for any results in it.
-    CBlockIndex *resultsBocksIndex = chainActive[height];
+    CBlockIndex *resultsBocksIndex = chainActive[nLastBlockHeight];
 
     CBlock block;
     ReadBlockFromDisk(block, resultsBocksIndex);
-
-    int blockTime = block.GetBlockTime();
 
     for (CTransaction& tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet by looking at the TX vins.
@@ -154,18 +150,7 @@ std::pair<std::vector<CChainGamesResultDB>, std::vector<std::string>> GetCGLotto
         }
     }
 
-    unsigned long long LGTotal = blockTime + totalBlockValue;
-    char strTotal[256];
-    sprintf(strTotal, "%lld", LGTotal);
-
-    // If a CGLotto result is found, append total block value to each result
-    if (chainGameResults.size() != 0) {
-        for (unsigned int i = 0; i < chainGameResults.size(); i++) {
-            blockTotalValues.emplace_back(strTotal);
-        }
-    }
-
-    return std::make_pair(chainGameResults,blockTotalValues);
+    return (chainGameResults.size() > 0);
 }
 
 /**
@@ -176,11 +161,11 @@ std::pair<std::vector<CChainGamesResultDB>, std::vector<std::string>> GetCGLotto
  * @param nMNBetReward  The Oracle masternode reward.
  * @return
  */
-void GetPLRewardPayouts(uint32_t nBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetPLRewardPayouts(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
     CAmount profitAcc = 0;
     CAmount totalAmountBet = 0;
-    PeerlessBetKey zeroKey{nBlockHeight, COutPoint()};
+    PeerlessBetKey zeroKey{nNewBlockHeight, COutPoint()};
 
     // Set the OMNO and Dev reward addresses
     CScript payoutScriptDev = GetScriptForDestination(CBitcoinAddress(Params().DevPayoutAddr()).Get());

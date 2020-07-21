@@ -16,9 +16,9 @@ class CPeerlessResultDB;
 
 
 /** Using betting database for handle bets **/
-void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
+void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 
 /* Creates the bet payout vector for all winning Quick Games bets */
-uint32_t GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
+uint32_t GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 
 #endif // WAGERR_V3_BET_H

@@ -160,13 +160,13 @@ bool IsValidOracleTx(const CTxIn &txin);
 bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CAmount& nPayout, CAmount& nBurn);
 
 /** Find peerless events. **/
-std::vector<CPeerlessResultDB> GetEventResults(int height);
+std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight);
 
 /** Find chain games lotto result. **/
-std::pair<std::vector<CChainGamesResultDB>,std::vector<std::string>> GetCGLottoEventResults(int height);
+bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults);
 
 /** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
-void GetPLRewardPayouts(uint32_t nBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
+void GetPLRewardPayouts(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 
 /**
  * Check winning condition for current bet considering locked event and event result.

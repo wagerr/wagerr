@@ -25,7 +25,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 /** Parse the transaction for betting data **/
 void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime, const bool wagerrProtocolV3);
 
-CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, int height, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts);
+CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts);
 
 bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector<CTransaction>& vtx);
 
