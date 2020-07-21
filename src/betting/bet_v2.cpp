@@ -34,18 +34,18 @@ int64_t GetCGBlockPayoutsV2(std::vector<CBetOut>& vexpectedCGPayouts, CAmount& n
  *
  * @return payout vector.
  */
-void GetBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
-    int nCurrentHeight = chainActive.Height();
+    int nLastBlockHeight = chainActive.Height();
 
     // Get all the results posted in the latest block.
-    std::vector<CPeerlessResultDB> results = GetEventResults(height - 1);
+    std::vector<CPeerlessResultDB> results = GetEventResults(nNewBlockHeight - 1);
 
     // Traverse the blockchain for an event to match a result and all the bets on a result.
     for (const auto& result : results) {
         // Look back the chain 14 days for any events and bets.
         CBlockIndex *BlocksIndex = NULL;
-        int startHeight = nCurrentHeight - Params().BetBlocksIndexTimespan();
+        int startHeight = nLastBlockHeight - Params().BetBlocksIndexTimespan();
         startHeight = startHeight < Params().BetStartHeight() ? Params().BetStartHeight() : startHeight;
         BlocksIndex = chainActive[startHeight];
 
@@ -439,7 +439,7 @@ void GetBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::ve
         }
     }
 
-    GetPLRewardPayouts(height, vExpectedPayouts, vPayoutsInfo);
+    GetPLRewardPayouts(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
 
     return;
 }
@@ -449,24 +449,20 @@ void GetBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::ve
  *
  * @return payout vector.
  */
-void GetCGLottoBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
-    int nCurrentHeight = chainActive.Height();
-    long long totalValueOfBlock = 0;
+    const int nLastBlockHeight = nNewBlockHeight - 1;
 
     // get results from prev block
-    std::pair<std::vector<CChainGamesResultDB>,std::vector<std::string>> resultArray = GetCGLottoEventResults(height - 1);
-    std::vector<CChainGamesResultDB> allChainGames = resultArray.first;
-    std::vector<std::string> blockSizeArray = resultArray.second;
+    std::vector<CChainGamesResultDB> allChainGames;
+    bool fHasLottoResults = GetCGLottoEventResults(nLastBlockHeight, allChainGames);
 
     // Find payout for each CGLotto game
-    for (unsigned int currResult = 0; currResult < resultArray.second.size(); currResult++) {
+    for (unsigned int currResult = 0; currResult < allChainGames.size(); currResult++) {
 
         CChainGamesResultDB currentChainGame = allChainGames[currResult];
         uint32_t currentEventID = currentChainGame.nEventId;
         CAmount eventFee = 0;
-
-        totalValueOfBlock = stoll(blockSizeArray[0]);
 
         //reset total bet amount and candidate array for this event
         std::vector<std::pair<std::string, PeerlessBetKey>> candidates;
@@ -474,7 +470,7 @@ void GetCGLottoBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, 
 
         // Look back the chain 10 days for any events and bets.
         CBlockIndex *BlocksIndex = NULL;
-        BlocksIndex = chainActive[nCurrentHeight - 14400];
+        BlocksIndex = chainActive[nLastBlockHeight - 14400];
 
         time_t eventStart = 0;
         bool eventStartedFlag = false;
@@ -593,7 +589,7 @@ void GetCGLottoBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, 
             // Use random number to choose winner.
             auto noOfBets    = candidates.size();
 
-            CBlockIndex *winBlockIndex = chainActive[height];
+            CBlockIndex *winBlockIndex = chainActive[nLastBlockHeight];
             uint256 hashProofOfStake = winBlockIndex->hashProofOfStake;
             if (hashProofOfStake == 0) hashProofOfStake = winBlockIndex->GetBlockHash();
             uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
@@ -611,7 +607,6 @@ void GetCGLottoBetPayoutsV2(int height, std::vector<CBetOut>& vExpectedPayouts, 
             LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
             LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
             LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerNr);
-            LogPrintf("Total Value of Block: %u \n", totalValueOfBlock);
             LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
 
             // Only add valid payouts to the vector.
