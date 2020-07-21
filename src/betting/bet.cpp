@@ -489,6 +489,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 if (!wagerrProtocolV3) {
                     plEvent.nEventCreationHeight = height;
+                    plEvent.fLegacyInitialHomeFavorite =  plEventTx->nHomeOdds < plEventTx->nAwayOdds ? true : false;
                 }
 
                 EventKey eventKey{plEvent.nEventId};
