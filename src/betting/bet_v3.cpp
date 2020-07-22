@@ -126,7 +126,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
 
                     uniBet.resultType = odds <= refundOdds ? BetResultType::betResultRefund : BetResultType::betResultWin;
                     // write payout height: result height + 1
-                    uniBet.payoutHeight = static_cast<uint32_t>(nNewBlockHeight) + 1;
+                    uniBet.payoutHeight = static_cast<uint32_t>(nNewBlockHeight);
                 }
                 else {
                     uniBet.resultType = BetResultType::betResultLose;
