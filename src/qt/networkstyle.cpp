@@ -19,7 +19,7 @@ static const struct {
 } network_styles[] = {
     {"main", QAPP_APP_NAME_DEFAULT, ":/icons/wagerr", "", ":/images/splash"},
     {"test", QAPP_APP_NAME_TESTNET, ":/icons/wagerr_testnet", QT_TRANSLATE_NOOP("SplashScreen", "[testnet]"), ":/images/splash_testnet"},
-    {"regtest", QAPP_APP_NAME_REGTEST, ":/icons/wagerr_testnet", "[regtest]", ":/images/splash_regtest"}};
+    {"regtest", QAPP_APP_NAME_REGTEST, ":/icons/wagerr_regtest", "[regtest]", ":/images/splash_regtest"}};
 static const unsigned network_styles_count = sizeof(network_styles) / sizeof(*network_styles);
 
 // titleAddText needs to be const char* for tr()
