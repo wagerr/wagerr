@@ -219,6 +219,7 @@ RES_ICONS = \
   qt/res/icons/wagerr.png \
   qt/res/icons/wagerr_testnet.ico \
   qt/res/icons/wagerr_testnet.png \
+  qt/res/icons/wagerr_regtest.ico \
   qt/res/icons/wagerr_regtest.png \
   qt/res/icons/browse.png \
   qt/res/icons/clock1.png \
