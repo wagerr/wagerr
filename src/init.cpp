@@ -875,6 +875,12 @@ bool AppInit2()
             LogPrintf("AppInit2 : parameter interaction: -zapwallettxes=<mode> -> setting -rescan=1\n");
     }
 
+    // -resync implies zapping wallet transactions
+    if (GetBoolArg("-resync", false) && !mapArgs.count("-zapwallettxes")) {
+        if (SoftSetArg("-zapwallettxes", std::string("1")))
+            LogPrintf("AppInit2 : parameter interaction: -resync=true -> default of -zapwallettxes=1 unless explicitly specified otherwise\n");
+    }
+
     if (!GetBoolArg("-enableswifttx", fEnableSwiftTX)) {
         if (SoftSetArg("-swifttxdepth", "0"))
             LogPrintf("AppInit2 : parameter interaction: -enableswifttx=false -> setting -nSwiftTXDepth=0\n");
