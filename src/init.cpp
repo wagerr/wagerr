@@ -1181,12 +1181,7 @@ bool AppInit2()
             boost::filesystem::path chainstateDir = GetDataDir() / "chainstate";
             boost::filesystem::path sporksDir = GetDataDir() / "sporks";
             boost::filesystem::path zerocoinDir = GetDataDir() / "zerocoin";
-            boost::filesystem::path eventsDat = GetDataDir() / "events.dat";
-            boost::filesystem::path sportsDat = GetDataDir() / "sports.dat";
-            boost::filesystem::path roundsDat = GetDataDir() / "rounds.dat";
-            boost::filesystem::path teamsDat = GetDataDir() / "teams.dat";
-            boost::filesystem::path tournamentsDat = GetDataDir() / "tournaments.dat";
-            boost::filesystem::path resultsDat = GetDataDir() / "results.dat";
+            boost::filesystem::path bettingDir = GetDataDir() / "betting";
 
             LogPrintf("Deleting blockchain folders blocks, chainstate, sporks and zerocoin\n");
             // We delete in 4 individual steps in case one of the folder is missing already
@@ -1211,37 +1206,10 @@ bool AppInit2()
                     LogPrintf("-resync: folder deleted: %s\n", zerocoinDir.string().c_str());
                 }
 
-                // Remove betting .dat files on resync.
-                if (boost::filesystem::exists(eventsDat)) {
-                    boost::filesystem::remove(eventsDat);
-                    LogPrintf("-resync: file deleted: %s\n", eventsDat.string().c_str());
+                if (boost::filesystem::exists(bettingDir)){
+                    boost::filesystem::remove_all(bettingDir);
+                    LogPrintf("-resync: folder deleted: %s\n", bettingDir.string().c_str());
                 }
-
-                if (boost::filesystem::exists(sportsDat)) {
-                    boost::filesystem::remove(sportsDat);
-                    LogPrintf("-resync: file deleted: %s\n", sportsDat.string().c_str());
-                }
-
-                if (boost::filesystem::exists(roundsDat)) {
-                    boost::filesystem::remove(roundsDat);
-                    LogPrintf("-resync: file deleted: %s\n", roundsDat.string().c_str());
-                }
-
-                if (boost::filesystem::exists(teamsDat)) {
-                    boost::filesystem::remove(teamsDat);
-                    LogPrintf("-resync: file deleted: %s\n", teamsDat.string().c_str());
-                }
-
-                if (boost::filesystem::exists(tournamentsDat)) {
-                    boost::filesystem::remove(tournamentsDat);
-                    LogPrintf("-resync: file deleted: %s\n", tournamentsDat.string().c_str());
-                }
-
-                if (boost::filesystem::exists(resultsDat)) {
-                    boost::filesystem::remove(resultsDat);
-                    LogPrintf("-resync: file deleted: %s\n", resultsDat.string().c_str());
-                }
-
             } catch (boost::filesystem::filesystem_error& error) {
                 LogPrintf("Failed to delete blockchain folders %s\n", error.what());
             }
