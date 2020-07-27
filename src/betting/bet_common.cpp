@@ -172,7 +172,7 @@ void GetPLRewardPayouts(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vE
     CScript payoutScriptOMNO = GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get());
 
     // Loop over the payout vector and aggregate values.
-    for (int i = 0; i < vExpectedPayouts.size(); i++)
+    for (size_t i = 0; i < vExpectedPayouts.size(); i++)
     {
         if (vPayoutsInfo[i].payoutType == PayoutType::bettingPayout) {
             CAmount betValue = vExpectedPayouts[i].nBetValue;

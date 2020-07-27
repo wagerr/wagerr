@@ -43,17 +43,16 @@ bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uin
 
     // Count the coinbase and staking vouts in the current block TX.
     CAmount totalStakeAcc = 0;
-    CAmount mnValue = 0;
-    const int txVoutSize = tx.vout.size();
+    const size_t txVoutSize = tx.vout.size();
 
-    int nMaxVoutI = txVoutSize;
+    size_t nMaxVoutI = txVoutSize;
     CAmount nMNReward = 0;
     if (txVoutSize > 2 && tx.vout[txVoutSize - 1].nValue == nExpectedMNReward) {
         nMaxVoutI--;
         nMNReward = nExpectedMNReward;
     }
 
-    for (unsigned int i = 0; i < nMaxVoutI; i++) {
+    for (size_t i = 0; i < nMaxVoutI; i++) {
         const CTxOut &txout = tx.vout[i];
         CAmount voutValue   = txout.nValue;
         CScript voutScript = txout.scriptPubKey;
@@ -227,6 +226,9 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             case qgBetTxType:
             {
                 CQuickGamesBetTx* qgBetTx = (CQuickGamesBetTx*) bettingTx.get();
+                if (!(qgBetTx->gameType == QuickGamesType::qgDice)) {
+                    return error("CheckBettingTX: Invalid game type (%d)", qgBetTx->gameType);
+                }
                 // Validate quick game bet amount so its between 25 - 10000 WGR inclusive.
                 if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
                     return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
@@ -272,7 +274,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
     }
     address = CBitcoinAddress(prevAddr);
 
-    for (int i = 0; i < tx.vout.size(); i++) {
+    for (size_t i = 0; i < tx.vout.size(); i++) {
         const CTxOut &txOut = tx.vout[i];
         // parse betting TX
         auto bettingTx = ParseBettingTx(txOut);
@@ -681,7 +683,7 @@ CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockH
 
     mExpectedPayouts.clear();
 
-    for (int i = 0; i < vExpectedPayouts.size(); i++) {
+    for (unsigned int i = 0; i < vExpectedPayouts.size(); i++) {
         expectedMint += vExpectedPayouts[i].nValue;
         mExpectedPayouts.insert(std::pair<const CPayoutInfoDB, CBetOut>(vPayoutsInfo[i], vExpectedPayouts[i]));
     }
@@ -732,7 +734,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
     LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
 
-    bool wagerrProtocolV3 = height >= Params().WagerrProtocolV3StartHeight();
+    bool wagerrProtocolV3 = height >= (uint32_t)Params().WagerrProtocolV3StartHeight();
 
     // undo changes in back order
     for (int i = tx.vout.size() - 1; i >= 0 ; i--) {
@@ -742,7 +744,6 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
         if (bettingTx == nullptr) continue;
 
-        CAmount betAmount{txOut.nValue};
         COutPoint outPoint{tx.GetHash(), (uint32_t) i};
         uint256 undoId = SerializeHash(outPoint);
 
@@ -1062,7 +1063,7 @@ bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
     for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{static_cast<uint32_t>(height), COutPoint()})); it->Valid(); it->Next()) {
         PayoutInfoKey key;
         CBettingDB::BytesToDbType(it->Key(), key);
-        if (key.blockHeight != height)
+        if ((int64_t)key.blockHeight != height)
             break;
         else
             entriesToDelete.emplace_back(key);

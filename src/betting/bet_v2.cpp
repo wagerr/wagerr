@@ -455,7 +455,7 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
 
     // get results from prev block
     std::vector<CChainGamesResultDB> allChainGames;
-    bool fHasLottoResults = GetCGLottoEventResults(nLastBlockHeight, allChainGames);
+    GetCGLottoEventResults(nLastBlockHeight, allChainGames);
 
     // Find payout for each CGLotto game
     for (unsigned int currResult = 0; currResult < allChainGames.size(); currResult++) {
