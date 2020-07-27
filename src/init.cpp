@@ -1608,7 +1608,7 @@ bool AppInit2()
 
                     // Zerocoin must check at level 4
                     if (!CVerifyDB().VerifyDB(pcoinsdbview, 4, GetArg("-checkblocks", 100))) {
-                        strLoadError = _("Corrupted block database detected");
+                        strLoadError = _("Inconsistent block database detected. This might be the result of an upgrade or of a database corruption");
                         fVerifyingBlocks = false;
                         break;
                     }

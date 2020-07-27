@@ -763,7 +763,6 @@ public:
     {
         CDataStream stream(bytes, SER_DISK, CLIENT_VERSION);
         stream >> value;
-        assert(stream.size() == 0);
     }
 };
 
