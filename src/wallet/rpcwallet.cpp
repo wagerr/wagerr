@@ -744,11 +744,11 @@ void CollectBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPeerl
             uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) plResult.nResultType)));
             uLockedEvent.push_back(Pair("homeScore", (uint64_t) plResult.nHomeScore));
             uLockedEvent.push_back(Pair("awayScore", (uint64_t) plResult.nAwayScore));
-            if (lockedEvent.nStartTime > 0 && uniBet.betTime > (lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+            if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
                 uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
             }
             else {
-                legOdds = GetBetOdds(leg, lockedEvent, plResult, betKey.blockHeight >= Params().WagerrProtocolV3StartHeight());
+                legOdds = GetBetOdds(leg, lockedEvent, plResult, (int64_t)betKey.blockHeight >= Params().WagerrProtocolV3StartHeight());
                 uLeg.push_back(Pair("legResultType", legOdds == 0 ? "lose" : legOdds == BET_ODDSDIVISOR ? "refund" : "win"));
             }
         }
@@ -825,7 +825,7 @@ UniValue GetBets(uint32_t limit, CWallet *pwalletMain = NULL) {
 
     if (limit != 0 && ret.size() > limit) {
         UniValue retLimit{UniValue::VARR};
-        for (int i = ret.size() - limit; i < ret.size(); i++) {
+        for (size_t i = ret.size() - limit; i < ret.size(); i++) {
             retLimit.push_back(ret[i]);
         }
         return retLimit;
@@ -1011,7 +1011,7 @@ UniValue GetQuickGamesBets(uint32_t limit, CWallet *pwalletMain = NULL) {
 
     if (limit != 0 && ret.size() > limit) {
         UniValue retLimit{UniValue::VARR};
-        for (int i = ret.size() - limit; i < ret.size(); i++) {
+        for (size_t i = ret.size() - limit; i < ret.size(); i++) {
             retLimit.push_back(ret[i]);
         }
         return retLimit;

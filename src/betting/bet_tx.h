@@ -63,7 +63,7 @@ public:
     uint32_t nId;
     std::string sName;
 
-    CMappingTx() {}
+    CMappingTx(): nMType(0), nId(0) {}
 
     BetTxTypes GetTxType() const override { return mappingTxType; }
 
@@ -105,7 +105,7 @@ public:
             }
         }
         else {
-            for (int i = 0; i < sName.size(); i++) {
+            for (size_t i = 0; i < sName.size(); i++) {
                 ch = (uint8_t) sName[i];
                 READWRITE(ch);
             }

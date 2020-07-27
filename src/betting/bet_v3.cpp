@@ -70,7 +70,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                         if (bettingsViewCache.results->Read(ResultKey{leg.nEventId}, res)) {
                             uint32_t betOdds = 0;
                             // if bet placed before 2 mins of event started - refund this bet
-                            if (lockedEvent.nStartTime > 0 && uniBet.betTime > (lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                            if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
                                 betOdds = fWagerrProtocolV3 ? refundOdds : 0;
                             }
                             else {
@@ -94,7 +94,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                     completedBet = true;
 
                     // if bet placed before 2 mins of event started - refund this bet
-                    if (lockedEvent.nStartTime > 0 && uniBet.betTime > (lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                    if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
                         if (fWagerrProtocolV3) {
                             odds = refundOdds;
                         } else {
