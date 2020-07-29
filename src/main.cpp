@@ -3376,6 +3376,9 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             for (const CTransaction& tx : block.vtx) {
                 ProcessBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= Params().WagerrProtocolV3StartHeight());
             }
+            for (const CTransaction& tx : block.vtx) {
+                ProcessOracleTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= Params().WagerrProtocolV3StartHeight());
+            }
             if (!(pindex->nHeight % Params().MaxReorganizationDepth())) {
                 int heightLimit = pindex->nHeight - Params().MaxReorganizationDepth();
                 bettingsViewCache.PruneOlderUndos((uint32_t)heightLimit);
