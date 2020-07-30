@@ -476,7 +476,6 @@ void ProcessOracleTx(CBettingsView& bettingsViewCache, const CTransaction& tx, c
 
         if (bettingTx == nullptr) continue;
 
-        CAmount betAmount{txOut.nValue};
         COutPoint outPoint{tx.GetHash(), (uint32_t) i};
         uint256 undoId = SerializeHash(outPoint);
 
@@ -753,10 +752,6 @@ bool UndoEventChanges(CBettingsView& bettingsViewCache, const BettingUndoKey& un
 
 bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height)
 {
-    // Ensure the event TX has come from Oracle wallet.
-    const CTxIn& txin{tx.vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin)};
-
     LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
 
     bool wagerrProtocolV3 = height >= (uint32_t)Params().WagerrProtocolV3StartHeight();
@@ -848,6 +843,36 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 }
                 break;
             }
+
+            default:
+                break;
+        }
+    }
+
+    LogPrintf("UndoBettingTx: end\n");
+    return true;
+}
+
+bool UndoOracleTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const uint32_t height)
+{
+    // Ensure the event TX has come from Oracle wallet.
+    const CTxIn& txin{tx.vin[0]};
+    const bool validOracleTx{IsValidOracleTx(txin)};
+
+    LogPrintf("UndoOracleTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
+
+    // undo changes in back order
+    for (int i = tx.vout.size() - 1; i >= 0 ; i--) {
+        const CTxOut &txOut = tx.vout[i];
+        // parse betting TX
+        auto bettingTx = ParseBettingTx(txOut);
+
+        if (bettingTx == nullptr) continue;
+
+        COutPoint outPoint{tx.GetHash(), (uint32_t) i};
+        uint256 undoId = SerializeHash(outPoint);
+
+        switch(bettingTx->GetTxType()) {
 
             /* Oracle's tx types */
 
@@ -999,7 +1024,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
         }
     }
 
-    LogPrintf("UndoBettingTx: end\n");
+    LogPrintf("UndoOracleTx: end\n");
     return true;
 }
 
@@ -1153,6 +1178,12 @@ bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector
             return false;
         }
 
+        for (auto tx : vtx) {
+            if (!UndoOracleTx(bettingsViewCache, tx, height)) {
+                error("DisconnectBlock(): custom transaction and undo data inconsistent");
+                return false;
+            }
+        }
         for (auto tx : vtx) {
             if (!UndoBettingTx(bettingsViewCache, tx, height)) {
                 error("DisconnectBlock(): custom transaction and undo data inconsistent");
