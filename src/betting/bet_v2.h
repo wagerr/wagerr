@@ -11,6 +11,26 @@
 class CBetOut;
 class CPayoutInfoDB;
 
+class LegacyPayout
+{
+public:
+    uint16_t payoutType;
+    uint32_t blockHeight;
+    int vtxNr;
+    CTxOut txOut;
+
+    LegacyPayout(uint16_t payoutTypeIn, uint32_t blockHeightIn, int vtxNrIn, CTxOut txOutIn) :
+        payoutType(payoutTypeIn), blockHeight(blockHeightIn), vtxNr(vtxNrIn), txOut(txOutIn) {};
+
+    bool operator<(const LegacyPayout& rhs) {
+        if (payoutType != rhs.payoutType) return payoutType < rhs.payoutType;
+
+        if (blockHeight != rhs.blockHeight) return blockHeight < rhs.blockHeight;
+
+        return vtxNr < rhs.vtxNr;
+    }
+};
+
 /** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
 void GetPLRewardPayoutsV2(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 

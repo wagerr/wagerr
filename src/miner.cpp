@@ -30,6 +30,7 @@
 #include "invalid.h"
 #include "zwgrchain.h"
 #include "betting/bet.h"
+#include "betting/bet_v2.h"
 #include "betting/bet_db.h"
 
 #include <boost/thread.hpp>
@@ -492,8 +493,39 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
 
             nBetPayout += GetBettingPayouts(bettingsViewCache, nHeight, mExpectedPayouts);
 
-            for (auto payout : mExpectedPayouts) {
-                vExpectedTxOuts.emplace_back(payout.second.nValue, payout.second.scriptPubKey);
+            if (nHeight >= Params().WagerrProtocolV3StartHeight()) {
+                for (auto payout : mExpectedPayouts) {
+                    vExpectedTxOuts.emplace_back(payout.second.nValue, payout.second.scriptPubKey);
+                }
+            } else {
+                /*
+                    In V3, payouts are ordered by 1) blockheight, 2) outpoint (tx hash, output nr), 3) payout type.
+                    Before V3, payouts were ordered by 1) bet type (first betting then chain games), 2) blockheight, 3) tx index nr
+                */
+                std::vector<LegacyPayout> vExpectedLegacyPayouts;
+                for (auto payout : mExpectedPayouts) {
+
+                    int nHeight = payout.first.betKey.blockHeight;
+
+                    CBlock block;
+                    int vtxNr = -1;
+                    if (payout.first.payoutType != PayoutType::bettingReward && ReadBlockFromDisk(block, chainActive[nHeight])) {
+                        for (size_t i = 0; i < block.vtx.size(); i++) {
+                            const CTransaction& tx = block.vtx[i];
+                            if (tx.GetHash() == payout.first.betKey.outPoint.hash) {
+                                vtxNr = i;
+                                break;
+                            }
+                        }
+                    } else {
+                        LogPrintf("%s: failed locate bet\n", __func__);
+                    }
+                    vExpectedLegacyPayouts.emplace_back((uint16_t)payout.first.payoutType, payout.first.betKey.blockHeight, vtxNr, payout.second);
+                }
+                std::sort(vExpectedLegacyPayouts.begin(), vExpectedLegacyPayouts.end());
+                for (auto payout : vExpectedLegacyPayouts) {
+                    vExpectedTxOuts.emplace_back(payout.txOut.nValue, payout.txOut.scriptPubKey);
+                }
             }
 
             CAmount nMNFee = 0;
