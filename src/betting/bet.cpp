@@ -258,7 +258,9 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 {
     LogPrintf("ProcessBettingTx: start, time: %lu, tx hash: %s\n", blockTime, tx.GetHash().GetHex());
 
+    // Ensure the event TX has come from Oracle wallet.
     const CTxIn& txin{tx.vin[0]};
+    const bool validOracleTx{IsValidOracleTx(txin)};
     // Get player address
     uint256 hashBlock;
     CTransaction txPrev;
@@ -454,33 +456,6 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 break;
             }
 
-            default:
-                break;
-        }
-    }
-    LogPrintf("ProcessBettingTx: end\n");
-}
-
-void ProcessOracleTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime, const bool wagerrProtocolV3)
-{
-    LogPrintf("ProcessOracleTx: start, time: %lu, tx hash: %s\n", blockTime, tx.GetHash().GetHex());
-
-    // Ensure the event TX has come from Oracle wallet.
-    const CTxIn& txin{tx.vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin)};
-
-    for (size_t i = 0; i < tx.vout.size(); i++) {
-        const CTxOut &txOut = tx.vout[i];
-        // parse betting TX
-        auto bettingTx = ParseBettingTx(txOut);
-
-        if (bettingTx == nullptr) continue;
-
-        CAmount betAmount{txOut.nValue};
-        COutPoint outPoint{tx.GetHash(), (uint32_t) i};
-        uint256 undoId = SerializeHash(outPoint);
-
-        switch(bettingTx->GetTxType()) {
             /* Oracle's tx types */
 
             case mappingTxType:
@@ -677,7 +652,7 @@ void ProcessOracleTx(CBettingsView& bettingsViewCache, const CTransaction& tx, c
                 break;
         }
     }
-    LogPrintf("ProcessOracleTx: end\n");
+    LogPrintf("ProcessBettingTx: end\n");
 }
 
 CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts)
