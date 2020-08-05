@@ -45,7 +45,8 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
             if (fWagerrProtocolV3 && uniBet.IsCompleted()) continue;
 
             bool completedBet = false;
-            uint32_t odds = 0;
+            // {onchainOdds, effectiveOdds}
+            std::pair<uint32_t, uint32_t> finalOdds{0, 0};
 
             // parlay bet
             if (uniBet.legs.size() > 1) {
@@ -68,15 +69,24 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                         // skip this bet if incompleted (can't find one result)
                         CPeerlessResultDB res;
                         if (bettingsViewCache.results->Read(ResultKey{leg.nEventId}, res)) {
-                            uint32_t betOdds = 0;
+                            // {onchainOdds, effectiveOdds}
+                            std::pair<uint32_t, uint32_t> betOdds;
                             // if bet placed before 2 mins of event started - refund this bet
                             if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
-                                betOdds = fWagerrProtocolV3 ? refundOdds : 0;
+                                betOdds = fWagerrProtocolV3 ? std::pair<uint32_t, uint32_t>{refundOdds, refundOdds} : std::pair<uint32_t, uint32_t>{0, 0};
                             }
                             else {
                                 betOdds = GetBetOdds(leg, lockedEvent, res, fWagerrProtocolV3);
                             }
-                            odds = firstOddMultiply ? (firstOddMultiply = false, betOdds) : static_cast<uint32_t>(((uint64_t) odds * betOdds) / BET_ODDSDIVISOR);
+                            if (firstOddMultiply) {
+                                finalOdds.first = betOdds.first;
+                                finalOdds.second = betOdds.second ;
+                                firstOddMultiply = false;
+                            }
+                            else {
+                                finalOdds.first = static_cast<uint32_t>(((uint64_t) finalOdds.first * betOdds.first) / BET_ODDSDIVISOR);
+                                finalOdds.second = static_cast<uint32_t>(((uint64_t) finalOdds.second * betOdds.second) / BET_ODDSDIVISOR);
+                            }
                         }
                         else {
                             completedBet = false;
@@ -96,43 +106,44 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                     // if bet placed before 2 mins of event started - refund this bet
                     if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
                         if (fWagerrProtocolV3) {
-                            odds = refundOdds;
+                            finalOdds = std::pair<uint32_t, uint32_t>{refundOdds, refundOdds};
                         } else {
-                            odds = 0;
+                            finalOdds = std::pair<uint32_t, uint32_t>{0, 0};
                         }
                     } else if ((!fWagerrProtocolV3) && nLastBlockHeight - lockedEvent.nEventCreationHeight > Params().BetBlocksIndexTimespan()) {
-                        odds = 0;
+                        finalOdds = std::pair<uint32_t, uint32_t>{0, 0};
                     }
                     else {
-                        odds = GetBetOdds(singleBet, lockedEvent, result, fWagerrProtocolV3);
+                        finalOdds = GetBetOdds(singleBet, lockedEvent, result, fWagerrProtocolV3);
                     }
                 }
             }
 
             if (completedBet) {
-                CAmount burn;
-                CAmount payout;
-
                 if (uniBet.betAmount < (Params().MinBetPayoutRange() * COIN) || uniBet.betAmount > (Params().MaxBetPayoutRange() * COIN)) {
-                    odds = fWagerrProtocolV3 ? refundOdds : 0;
+                    finalOdds = fWagerrProtocolV3 ? std::pair<uint32_t, uint32_t>{refundOdds, refundOdds} : std::pair<uint32_t, uint32_t>{0, 0};
                 }
-                CalculatePayoutBurnAmounts(uniBet.betAmount, odds, payout, burn);
 
-                if (payout > 0) {
+                // CalculatePayoutBurnAmounts(uniBet.betAmount, potentialOdds, payout, burn);
+
+                CAmount effectivePayout = uniBet.betAmount * finalOdds.second / BET_ODDSDIVISOR;
+
+                if (effectivePayout > 0) {
                     // Add winning payout to the payouts vector.
-                    CPayoutInfoDB payoutInfo(uniBetKey, odds <= refundOdds ? PayoutType::bettingRefund : PayoutType::bettingPayout);
-                    vExpectedPayouts.emplace_back(payout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
+                    CPayoutInfoDB payoutInfo(uniBetKey, finalOdds.second <= refundOdds ? PayoutType::bettingRefund : PayoutType::bettingPayout);
+                    vExpectedPayouts.emplace_back(effectivePayout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
                     vPayoutsInfo.emplace_back(payoutInfo);
 
-                    uniBet.resultType = odds <= refundOdds ? BetResultType::betResultRefund : BetResultType::betResultWin;
+                    uniBet.resultType = finalOdds.second <= refundOdds ? BetResultType::betResultRefund : BetResultType::betResultWin;
                     // write payout height: result height + 1
                     uniBet.payoutHeight = static_cast<uint32_t>(nNewBlockHeight);
                 }
                 else {
                     uniBet.resultType = BetResultType::betResultLose;
                 }
-                uniBet.payout = payout;
-                LogPrintf("\nBet %s is handled!\nPlayer address: %s\nPayout: %lu\n", uniBetKey.outPoint.ToStringShort(), uniBet.playerAddress.ToString(), payout);
+                uniBet.payout = effectivePayout;
+                LogPrintf("\nBet %s is handled!\nPlayer address: %s\nFinal onchain odds: %lu, effective odds: %lu\nPayout: %lu\n",
+                    uniBetKey.outPoint.ToStringShort(), uniBet.playerAddress.ToString(), finalOdds.first, finalOdds.second, effectivePayout);
                 LogPrintf("Legs:");
                 for (auto leg : uniBet.legs) {
                     LogPrintf(" (eventId: %lu, outcome: %lu) ", leg.nEventId, leg.nOutcome);
