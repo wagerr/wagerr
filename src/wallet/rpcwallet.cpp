@@ -748,8 +748,8 @@ void CollectBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPeerl
                 uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
             }
             else {
-                legOdds = GetBetOdds(leg, lockedEvent, plResult, (int64_t)betKey.blockHeight >= Params().WagerrProtocolV3StartHeight());
-                uLeg.push_back(Pair("legResultType", legOdds == 0 ? "lose" : legOdds == BET_ODDSDIVISOR ? "refund" : "win"));
+                legOdds = GetBetOdds(leg, lockedEvent, plResult, (int64_t)betKey.blockHeight >= Params().WagerrProtocolV3StartHeight()).first;
+                uLeg.push_back(Pair("legResultType", legOdds == 0 ? "lose" : legOdds <= BET_ODDSDIVISOR ? "refund" : "win"));
             }
         }
         else {

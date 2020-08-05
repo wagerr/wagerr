@@ -201,7 +201,11 @@ void GetPLRewardPayouts(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vE
     }
 }
 
-uint32_t CalculateAsianSpreadOdds(const CPeerlessBaseEventDB &lockedEvent, const int32_t difference, bool spreadHomeOutcome)
+uint32_t CalculateEffectiveOdds(uint32_t onChainOdds) {
+    return static_cast<uint32_t>(((static_cast<uint64_t>(onChainOdds) - BET_ODDSDIVISOR) * 9400) / BET_ODDSDIVISOR + BET_ODDSDIVISOR);
+}
+
+std::pair<uint32_t, uint32_t> CalculateAsianSpreadOdds(const CPeerlessBaseEventDB &lockedEvent, const int32_t difference, bool spreadHomeOutcome)
 {
     // calculate asian handicap spread points
     int32_t sign = lockedEvent.nSpreadPoints < 0 ? -1 : 1;
@@ -212,64 +216,68 @@ uint32_t CalculateAsianSpreadOdds(const CPeerlessBaseEventDB &lockedEvent, const
         sp1 = -sp1;
         sp2 = -sp2;
     }
-    uint32_t odd1, odd2 = odd1 = 0;
+    uint32_t oc_odd1, oc_odd2 = oc_odd1 = 0;
+    uint32_t eff_odd1, eff_odd2 = eff_odd1 = 0;
     // calculate spread odds for 2 conditions of game and return summ of odds
     if (sp1 + difference == 0) {
-        odd1 = BET_ODDSDIVISOR;
+        eff_odd1 = oc_odd1 = BET_ODDSDIVISOR;
     } else if (sp1 + difference > 0) {
-        odd1 = spreadHomeOutcome ? lockedEvent.nSpreadHomeOdds : lockedEvent.nSpreadAwayOdds;
+        oc_odd1 = spreadHomeOutcome ? lockedEvent.nSpreadHomeOdds : lockedEvent.nSpreadAwayOdds;
+        eff_odd1 = CalculateEffectiveOdds(oc_odd1);
     }
     else {
-        odd1 = 0;
+        eff_odd1 = oc_odd1 = 0;
     }
     if (sp2 + difference == 0) {
-        odd2 =  BET_ODDSDIVISOR;
+        eff_odd2 = oc_odd2 =  BET_ODDSDIVISOR;
     } else if (sp2 + difference > 0) {
-        odd2 = spreadHomeOutcome ? lockedEvent.nSpreadHomeOdds : lockedEvent.nSpreadAwayOdds;
+        oc_odd2 = spreadHomeOutcome ? lockedEvent.nSpreadHomeOdds : lockedEvent.nSpreadAwayOdds;
+        eff_odd2 = CalculateEffectiveOdds(oc_odd2);
     }
     else {
-        odd2 = 0;
+        eff_odd2 = oc_odd2 = 0;
     }
-    return ((BET_ODDSDIVISOR / 2) * odd1) / BET_ODDSDIVISOR + ((BET_ODDSDIVISOR / 2) * odd2) / BET_ODDSDIVISOR;
+    return {((BET_ODDSDIVISOR / 2) * oc_odd1) / BET_ODDSDIVISOR + ((BET_ODDSDIVISOR / 2) * oc_odd2) / BET_ODDSDIVISOR,
+            ((BET_ODDSDIVISOR / 2) * eff_odd1) / BET_ODDSDIVISOR + ((BET_ODDSDIVISOR / 2) * eff_odd2) / BET_ODDSDIVISOR};
 }
 
 /**
  * Check winning condition for current bet considering locked event and event result.
  *
- * @return Odds, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
+ * @return pair of {on_chain_odds, effective_odds}, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
  */
-uint32_t GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent, const CPeerlessResultDB &result, const bool fWagerrProtocolV3)
+std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent, const CPeerlessResultDB &result, const bool fWagerrProtocolV3)
 {
     bool fLegacyInitialHomeFavorite = lockedEvent.fLegacyInitialHomeFavorite;
     uint32_t refundOdds{BET_ODDSDIVISOR};
     int32_t legacySpreadDiff = fLegacyInitialHomeFavorite ? result.nHomeScore - result.nAwayScore : result.nAwayScore - result.nHomeScore;
     uint32_t totalPoints = result.nHomeScore + result.nAwayScore;
     if (result.nResultType == ResultType::eventRefund)
-        return refundOdds;
+        return {refundOdds, refundOdds};
     switch (bet.nOutcome) {
         case moneyLineHomeWin:
-            if (result.nResultType == ResultType::mlRefund || (lockedEvent.nHomeOdds == 0 && fWagerrProtocolV3)) return refundOdds;
-            if (result.nHomeScore > result.nAwayScore) return lockedEvent.nHomeOdds;
+            if (result.nResultType == ResultType::mlRefund || (lockedEvent.nHomeOdds == 0 && fWagerrProtocolV3)) return {refundOdds, refundOdds};
+            if (result.nHomeScore > result.nAwayScore) return {lockedEvent.nHomeOdds, CalculateEffectiveOdds(lockedEvent.nHomeOdds)};
             break;
         case moneyLineAwayWin:
-            if (result.nResultType == ResultType::mlRefund || (lockedEvent.nAwayOdds == 0 && fWagerrProtocolV3)) return refundOdds;
-            if (result.nAwayScore > result.nHomeScore) return lockedEvent.nAwayOdds;
+            if (result.nResultType == ResultType::mlRefund || (lockedEvent.nAwayOdds == 0 && fWagerrProtocolV3)) return {refundOdds, refundOdds};
+            if (result.nAwayScore > result.nHomeScore) return {lockedEvent.nAwayOdds, CalculateEffectiveOdds(lockedEvent.nAwayOdds)};
             break;
         case moneyLineDraw:
-            if (result.nResultType == ResultType::mlRefund || (lockedEvent.nDrawOdds == 0 && fWagerrProtocolV3)) return refundOdds;
-            if (result.nHomeScore == result.nAwayScore) return lockedEvent.nDrawOdds;
+            if (result.nResultType == ResultType::mlRefund || (lockedEvent.nDrawOdds == 0 && fWagerrProtocolV3)) return {refundOdds, refundOdds};
+            if (result.nHomeScore == result.nAwayScore) return {lockedEvent.nDrawOdds, CalculateEffectiveOdds(lockedEvent.nDrawOdds)};
             break;
         case spreadHome:
-            if (result.nResultType == ResultType::spreadsRefund || (lockedEvent.nSpreadHomeOdds == 0 && fWagerrProtocolV3)) return refundOdds;
+            if (result.nResultType == ResultType::spreadsRefund || (lockedEvent.nSpreadHomeOdds == 0 && fWagerrProtocolV3)) return {refundOdds, refundOdds};
             if (!fWagerrProtocolV3) {
-                if (legacySpreadDiff == lockedEvent.nSpreadPoints) return refundOdds;
+                if (legacySpreadDiff == lockedEvent.nSpreadPoints) return {refundOdds, refundOdds};
                 if (fLegacyInitialHomeFavorite) {
                     // mean bet to home will win with spread
-                    if (legacySpreadDiff > lockedEvent.nSpreadPoints) return lockedEvent.nSpreadHomeOdds;
+                    if (legacySpreadDiff > lockedEvent.nSpreadPoints) return {lockedEvent.nSpreadHomeOdds, CalculateEffectiveOdds(lockedEvent.nSpreadHomeOdds)};
                 }
                 else {
                     // mean bet to home will not lose with spread
-                    if (legacySpreadDiff < lockedEvent.nSpreadPoints) return lockedEvent.nSpreadHomeOdds;
+                    if (legacySpreadDiff < lockedEvent.nSpreadPoints) return {lockedEvent.nSpreadHomeOdds, CalculateEffectiveOdds(lockedEvent.nSpreadHomeOdds)};
                 }
             }
             else { // lockedEvent.nSpreadVersion == 2
@@ -277,9 +285,9 @@ uint32_t GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &locke
                 // if its 0 or 0.5 like handicap
                 if (lockedEvent.nSpreadPoints % 50 == 0) {
                     if (lockedEvent.nSpreadPoints + difference == 0) {
-                        return refundOdds;
+                        return {refundOdds, refundOdds};
                     } else if (lockedEvent.nSpreadPoints + difference > 0 ) {
-                        return lockedEvent.nSpreadHomeOdds;
+                        return {lockedEvent.nSpreadHomeOdds, CalculateEffectiveOdds(lockedEvent.nSpreadHomeOdds)};
                     }
                 }
                 // if its 0.25 or 0.75 like handicap
@@ -289,16 +297,16 @@ uint32_t GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &locke
             }
             break;
         case spreadAway:
-            if (result.nResultType == ResultType::spreadsRefund || (lockedEvent.nSpreadAwayOdds == 0 && fWagerrProtocolV3)) return refundOdds;
+            if (result.nResultType == ResultType::spreadsRefund || (lockedEvent.nSpreadAwayOdds == 0 && fWagerrProtocolV3)) return {refundOdds, refundOdds};
             if (!fWagerrProtocolV3) {
-                if (legacySpreadDiff == lockedEvent.nSpreadPoints) return refundOdds;
+                if (legacySpreadDiff == lockedEvent.nSpreadPoints) return {refundOdds, refundOdds};
                 if (fLegacyInitialHomeFavorite) {
                     // mean that bet to away will not lose with spread
-                    if (legacySpreadDiff < lockedEvent.nSpreadPoints) return lockedEvent.nSpreadAwayOdds;
+                    if (legacySpreadDiff < lockedEvent.nSpreadPoints) return {lockedEvent.nSpreadAwayOdds, CalculateEffectiveOdds(lockedEvent.nSpreadAwayOdds)};
                 }
                 else {
                     // mean that bet to away will win with spread
-                    if (legacySpreadDiff > lockedEvent.nSpreadPoints) return lockedEvent.nSpreadAwayOdds;
+                    if (legacySpreadDiff > lockedEvent.nSpreadPoints) return {lockedEvent.nSpreadAwayOdds, CalculateEffectiveOdds(lockedEvent.nSpreadAwayOdds)};
                 }
             }
             else { // lockedEvent.nSpreadVersion == 2
@@ -306,9 +314,9 @@ uint32_t GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &locke
                 // if its 0.5 like handicap
                 if (lockedEvent.nSpreadPoints % 50 == 0) {
                     if ((lockedEvent.nSpreadPoints * (-1)) + difference == 0) {
-                        return refundOdds;
+                        return {refundOdds, refundOdds};
                     } else if ((lockedEvent.nSpreadPoints * (-1)) + difference > 0) {
-                        return lockedEvent.nSpreadAwayOdds;
+                        return {lockedEvent.nSpreadAwayOdds, CalculateEffectiveOdds(lockedEvent.nSpreadAwayOdds)};
                     }
                 }
                 // if its 0.25 or 0.75 handicap
@@ -318,18 +326,18 @@ uint32_t GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &locke
             }
             break;
         case totalOver:
-            if (result.nResultType == ResultType::totalsRefund || (lockedEvent.nTotalOverOdds == 0 && fWagerrProtocolV3)) return refundOdds;
-            if (totalPoints == lockedEvent.nTotalPoints) return refundOdds;
-            if (totalPoints > lockedEvent.nTotalPoints) return lockedEvent.nTotalOverOdds;
+            if (result.nResultType == ResultType::totalsRefund || (lockedEvent.nTotalOverOdds == 0 && fWagerrProtocolV3)) return {refundOdds, refundOdds};
+            if (totalPoints == lockedEvent.nTotalPoints) return {refundOdds, refundOdds};
+            if (totalPoints > lockedEvent.nTotalPoints) return {lockedEvent.nTotalOverOdds, CalculateEffectiveOdds(lockedEvent.nTotalOverOdds)};
             break;
         case totalUnder:
-            if (result.nResultType == ResultType::totalsRefund || (lockedEvent.nTotalUnderOdds == 0 && fWagerrProtocolV3)) return refundOdds;
-            if (totalPoints == lockedEvent.nTotalPoints) return refundOdds;
-            if (totalPoints < lockedEvent.nTotalPoints) return lockedEvent.nTotalUnderOdds;
+            if (result.nResultType == ResultType::totalsRefund || (lockedEvent.nTotalUnderOdds == 0 && fWagerrProtocolV3)) return {refundOdds, refundOdds};
+            if (totalPoints == lockedEvent.nTotalPoints) return {refundOdds, refundOdds};
+            if (totalPoints < lockedEvent.nTotalPoints) return {lockedEvent.nTotalUnderOdds, CalculateEffectiveOdds(lockedEvent.nTotalUnderOdds)};
             break;
         default:
             std::runtime_error("Unknown bet outcome type!");
     }
     // bet lose
-    return 0;
+    return {0, 0};
 }

@@ -797,14 +797,14 @@ class BettingTest(BitcoinTestFramework):
 
         # player 1 make express to events 4, 5, 6 - home win
         player1_bet = 200
-        winnings = Decimal(player1_bet * 27440)
-        player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+        # 26051 - it is early calculated effective odds for this parlay bet
+        player1_expected_win = Decimal(player1_bet * 26051) / ODDS_DIVISOR
         self.nodes[2].placeparlaybet([{'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}, {'eventId': 7, 'outcome': outcome_home_win}], player1_bet)
 
         # player 2 make express to events 4, 5, 6 - home win
         player2_bet = 500
-        winnings = Decimal(player2_bet * 27440)
-        player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+        # 26051 - it is early calculated effective odds for this parlay bet
+        player2_expected_win = Decimal(player2_bet * 26051) / ODDS_DIVISOR
         self.nodes[3].placeparlaybet([{'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}, {'eventId': 7, 'outcome': outcome_home_win}], player2_bet)
 
         self.sync_all()

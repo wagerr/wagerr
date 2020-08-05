@@ -173,6 +173,6 @@ void GetPLRewardPayouts(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vE
  *
  * @return Odds, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
  */
-uint32_t GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent, const CPeerlessResultDB &result, const bool fWagerrProtocolV3);
+std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent, const CPeerlessResultDB &result, const bool fWagerrProtocolV3);
 
 #endif
