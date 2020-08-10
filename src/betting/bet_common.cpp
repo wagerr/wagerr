@@ -341,3 +341,26 @@ std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerl
     // bet lose
     return {0, 0};
 }
+
+uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent)
+{
+    switch(bet.nOutcome) {
+        case moneyLineHomeWin:
+            return lockedEvent.nHomeOdds;
+        case moneyLineAwayWin:
+            return lockedEvent.nAwayOdds;
+        case moneyLineDraw:
+            return lockedEvent.nDrawOdds;
+        case spreadHome:
+            return lockedEvent.nSpreadHomeOdds;
+        case spreadAway:
+            return lockedEvent.nSpreadAwayOdds;
+        case totalOver:
+            return lockedEvent.nTotalOverOdds;
+        case totalUnder:
+            return lockedEvent.nTotalUnderOdds;
+        default:
+            std::runtime_error("Unknown bet outcome type!");
+    }
+    return 0;
+}
