@@ -677,6 +677,8 @@ std::string BetResultTypeToStr(BetResultType resType)
         case betResultWin: return std::string("win");
         case betResultLose: return std::string("lose");
         case betResultRefund: return std::string("refund");
+        case betResultPartialWin: return std::string("partial-win");
+        case betResultPartialLose: return std::string("partial-lose");
         default: return std::string("error");
     }
 }
@@ -749,7 +751,23 @@ void CollectBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPeerl
             }
             else {
                 legOdds = GetBetOdds(leg, lockedEvent, plResult, (int64_t)betKey.blockHeight >= Params().WagerrProtocolV3StartHeight()).first;
-                uLeg.push_back(Pair("legResultType", legOdds == 0 ? "lose" : legOdds <= BET_ODDSDIVISOR ? "refund" : "win"));
+                std::string legResultTypeStr;
+                if (legOdds == 0) {
+                    legResultTypeStr = std::string("lose");
+                }
+                else if (legOdds == BET_ODDSDIVISOR / 2) {
+                    legResultTypeStr = std::string("half-lose");
+                }
+                else if (legOdds == BET_ODDSDIVISOR) {
+                    legResultTypeStr = std::string("refund");
+                }
+                else if (legOdds < GetBetPotentialOdds(leg, lockedEvent)) {
+                    legResultTypeStr = std::string("half-win");
+                }
+                else {
+                    legResultTypeStr = std::string("win");
+                }
+                uLeg.push_back(Pair("legResultType", legResultTypeStr));
             }
         }
         else {

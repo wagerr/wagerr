@@ -33,7 +33,9 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
 
         // look bets at last 14 days
         uint32_t startHeight = nLastBlockHeight >= Params().BetBlocksIndexTimespan() ? nLastBlockHeight - Params().BetBlocksIndexTimespan() : 0;
-
+        bool legHalfLose = false;
+        bool legHalfWin = false;
+        bool legRefund = false;
         auto it = bettingsViewCache.bets->NewIterator();
         std::vector<std::pair<PeerlessBetKey, CPeerlessBetDB>> vEntriesToUpdate;
         for (it->Seek(CBettingDB::DbTypeToBytes(PeerlessBetKey{static_cast<uint32_t>(startHeight), COutPoint()})); it->Valid(); it->Next()) {
@@ -78,6 +80,18 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                             else {
                                 betOdds = GetBetOdds(leg, lockedEvent, res, fWagerrProtocolV3);
                             }
+
+                            if (betOdds.first == 0) { }
+                            else if (betOdds.first == refundOdds) {
+                                legRefund = true;
+                            }
+                            else if (betOdds.first == refundOdds / 2) {
+                                legHalfLose = true;
+                            }
+                            else if (betOdds.first < GetBetPotentialOdds(leg, lockedEvent)) {
+                                legHalfWin = true;
+                            }
+                            // multiply odds
                             if (firstOddMultiply) {
                                 finalOdds.first = betOdds.first;
                                 finalOdds.second = betOdds.second ;
@@ -116,6 +130,17 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                     else {
                         finalOdds = GetBetOdds(singleBet, lockedEvent, result, fWagerrProtocolV3);
                     }
+
+                    if (finalOdds.first == 0) { }
+                    else if (finalOdds.first == refundOdds) {
+                        legRefund = true;
+                    }
+                    else if (finalOdds.first == refundOdds / 2) {
+                        legHalfLose = true;
+                    }
+                    else if (finalOdds.first < GetBetPotentialOdds(singleBet, lockedEvent)) {
+                        legHalfWin = true;
+                    }
                 }
             }
 
@@ -134,7 +159,19 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                     vExpectedPayouts.emplace_back(effectivePayout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
                     vPayoutsInfo.emplace_back(payoutInfo);
 
-                    uniBet.resultType = finalOdds.second <= refundOdds ? BetResultType::betResultRefund : BetResultType::betResultWin;
+                    if (effectivePayout < uniBet.betAmount) {
+                        uniBet.resultType = BetResultType::betResultPartialLose;
+                    }
+                    else if (finalOdds.first == refundOdds) {
+                        uniBet.resultType = BetResultType::betResultRefund;
+                    }
+                    else if ((uniBet.legs.size() == 1 && legHalfWin) ||
+                            (uniBet.legs.size() > 1 && (legHalfWin || legHalfLose || legRefund))) {
+                        uniBet.resultType = BetResultType::betResultPartialWin;
+                    }
+                    else {
+                        uniBet.resultType = BetResultType::betResultWin;
+                    }
                     // write payout height: result height + 1
                     uniBet.payoutHeight = (uint32_t) nNewBlockHeight;
                 }

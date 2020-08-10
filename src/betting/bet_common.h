@@ -72,6 +72,8 @@ typedef enum BetResultType {
     betResultWin = 0x01,
     betResultLose = 0x02,
     betResultRefund = 0x03,
+    betResultPartialWin = 0x04,
+    betResultPartialLose = 0x05
 } BetResultType;
 
 // Class derived from CTxOut
@@ -174,5 +176,7 @@ void GetPLRewardPayouts(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vE
  * @return Odds, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
  */
 std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent, const CPeerlessResultDB &result, const bool fWagerrProtocolV3);
+
+uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent);
 
 #endif
