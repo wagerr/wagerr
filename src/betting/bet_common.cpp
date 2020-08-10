@@ -202,6 +202,11 @@ void GetPLRewardPayouts(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vE
 }
 
 uint32_t CalculateEffectiveOdds(uint32_t onChainOdds) {
+    if (onChainOdds == 0 ||
+            onChainOdds == BET_ODDSDIVISOR / 2 ||
+            onChainOdds == BET_ODDSDIVISOR) {
+        return onChainOdds;
+    }
     return static_cast<uint32_t>(((static_cast<uint64_t>(onChainOdds) - BET_ODDSDIVISOR) * 9400) / BET_ODDSDIVISOR + BET_ODDSDIVISOR);
 }
 
