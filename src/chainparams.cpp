@@ -118,6 +118,10 @@ libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params(bool useModulusV1) co
     return &ZCParamsDec;
 }
 
+int CChainParams::COINBASE_MATURITY(const int contextHeight) const {
+    return contextHeight < nWagerrProtocolV3StartHeight ? nMaturityV1 : nMaturityV2;
+}
+
 bool CChainParams::HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
         const int utxoFromBlockHeight, const uint32_t utxoFromBlockTime) const
 {
@@ -156,7 +160,8 @@ public:
         nToCheckBlockUpgradeMajority = 10800; // Approximate expected amount of blocks in 7 days (1440*7.5)
         nMinerThreads = 0;
         nTargetSpacing = 1 * 60;        // 1 minute
-        nMaturity = 100;
+        nMaturityV1 = 100;
+        nMaturityV2 = 60;
         nStakeMinDepth = 600;
         nFutureTimeDriftPoW = 7200;
         nFutureTimeDriftPoS = 180;
@@ -330,7 +335,8 @@ public:
         nMinerThreads = 0;
         nTargetSpacing = 1 * 60;  // WAGERR: 1 minute
         nLastPOWBlock = 300;
-        nMaturity = 15;
+        nMaturityV1 = 15;
+        nMaturityV2 = 10;
         nStakeMinDepth = 100;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 1; //approx Mon, 17 Apr 2017 04:00:00 GMT
@@ -461,7 +467,8 @@ public:
         nTargetSpacing = 1 * 60;        // WAGERR: 1 minutes
         bnProofOfWorkLimit = ~uint256(0) >> 1;
         nLastPOWBlock = 250;
-        nMaturity = 100;
+        nMaturityV1 = 100;
+        nMaturityV2 = 60;
         nStakeMinDepth = 0;
         nMasternodeCountDrift = 4;
         nModifierUpdateBlock = 0; //approx Mon, 17 Apr 2017 04:00:00 GMT
