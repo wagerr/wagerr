@@ -291,41 +291,49 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             {
                 CPeerlessBetTx* betTx = (CPeerlessBetTx*) bettingTx.get();
                 CPeerlessLegDB plBet{betTx->nEventId, (OutcomeType) betTx->nOutcome};
-                CPeerlessExtendedEventDB plEvent, lockedEvent;
+                CPeerlessExtendedEventDB plEvent, plCachedEvent;
+                CPeerlessBaseEventDB lockedEvent;
 
                 LogPrintf("CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
                 // Find the event in DB
                 EventKey eventKey{plBet.nEventId};
                 // get locked event from upper level cache for getting correct odds
-                if (bettingsView->events->Read(eventKey, lockedEvent) &&
+                if (bettingsView->events->Read(eventKey, plCachedEvent) &&
                         bettingsViewCache.events->Read(eventKey, plEvent)) {
                     CAmount payout = 0 * COIN;
                     CAmount burn = 0;
+
+                    LogPrintf("plCachedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
+                        plCachedEvent.nHomeOdds, plCachedEvent.nAwayOdds, plCachedEvent.nDrawOdds, plCachedEvent.nSpreadHomeOdds, plCachedEvent.nSpreadAwayOdds, plCachedEvent.nTotalOverOdds, plCachedEvent.nTotalUnderOdds);
+
+                    lockedEvent = CPeerlessBaseEventDB{plCachedEvent};
+                    LogPrintf("lockedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
+                        lockedEvent.nHomeOdds, lockedEvent.nAwayOdds, lockedEvent.nDrawOdds, lockedEvent.nSpreadHomeOdds, lockedEvent.nSpreadAwayOdds, lockedEvent.nTotalOverOdds, lockedEvent.nTotalUnderOdds);
 
                     // save prev event state to undo
                     bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
                     // Check which outcome the bet was placed on and add to accumulators
                     switch (plBet.nOutcome) {
                         case moneyLineHomeWin:
-                            CalculatePayoutBurnAmounts(betAmount, plEvent.nHomeOdds, payout, burn);
+                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nHomeOdds, payout, burn);
 
                             plEvent.nMoneyLineHomePotentialLiability += payout / COIN ;
                             plEvent.nMoneyLineHomeBets += 1;
                             break;
                         case moneyLineAwayWin:
-                            CalculatePayoutBurnAmounts(betAmount, plEvent.nAwayOdds, payout, burn);
+                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nAwayOdds, payout, burn);
 
                             plEvent.nMoneyLineAwayPotentialLiability += payout / COIN ;
                             plEvent.nMoneyLineAwayBets += 1;
                             break;
                         case moneyLineDraw:
-                            CalculatePayoutBurnAmounts(betAmount, plEvent.nDrawOdds, payout, burn);
+                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nDrawOdds, payout, burn);
 
                             plEvent.nMoneyLineDrawPotentialLiability += payout / COIN ;
                             plEvent.nMoneyLineDrawBets += 1;
                             break;
                         case spreadHome:
-                            CalculatePayoutBurnAmounts(betAmount, plEvent.nSpreadHomeOdds, payout, burn);
+                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nSpreadHomeOdds, payout, burn);
 
                             plEvent.nSpreadHomePotentialLiability += payout / COIN ;
                             plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
@@ -333,7 +341,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                             plEvent.nSpreadPushBets += 1;
                             break;
                         case spreadAway:
-                            CalculatePayoutBurnAmounts(betAmount, plEvent.nSpreadAwayOdds, payout, burn);
+                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nSpreadAwayOdds, payout, burn);
 
                             plEvent.nSpreadAwayPotentialLiability += payout / COIN ;
                             plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
@@ -341,7 +349,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                             plEvent.nSpreadPushBets += 1;
                             break;
                         case totalOver:
-                            CalculatePayoutBurnAmounts(betAmount, plEvent.nTotalOverOdds, payout, burn);
+                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nTotalOverOdds, payout, burn);
 
                             plEvent.nTotalOverPotentialLiability += payout / COIN ;
                             plEvent.nTotalPushPotentialLiability += betAmount / COIN;
@@ -349,7 +357,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                             plEvent.nTotalPushBets += 1;
                             break;
                         case totalUnder:
-                            CalculatePayoutBurnAmounts(betAmount, plEvent.nTotalUnderOdds, payout, burn);
+                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nTotalUnderOdds, payout, burn);
 
                             plEvent.nTotalUnderPotentialLiability += payout / COIN;
                             plEvent.nTotalPushPotentialLiability += betAmount / COIN;
@@ -364,6 +372,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                         LogPrintf("Failed to update event!\n");
                         continue;
                     }
+
                     bettingsViewCache.bets->Write(PeerlessBetKey{static_cast<uint32_t>(height), outPoint}, CPeerlessBetDB(betAmount, address, {plBet}, {lockedEvent}, blockTime));
                 }
                 else {
@@ -388,12 +397,21 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 std::vector<CBettingUndoDB> vUndos;
                 for (const CPeerlessLegDB& leg : legs) {
-                    CPeerlessExtendedEventDB plEvent, lockedEvent;
+                    CPeerlessExtendedEventDB plEvent, plCachedEvent;
+                    CPeerlessBaseEventDB lockedEvent;
                     EventKey eventKey{leg.nEventId};
                     // Find the event in DB
                     // get locked event from upper level cache of betting view for getting correct odds
-                    if (bettingsView->events->Read(eventKey, lockedEvent) &&
+                    if (bettingsView->events->Read(eventKey, plCachedEvent) &&
                             bettingsViewCache.events->Read(eventKey, plEvent)) {
+
+                        LogPrintf("plCachedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
+                            plCachedEvent.nHomeOdds, plCachedEvent.nAwayOdds, plCachedEvent.nDrawOdds, plCachedEvent.nSpreadHomeOdds, plCachedEvent.nSpreadAwayOdds, plCachedEvent.nTotalOverOdds, plCachedEvent.nTotalUnderOdds);
+
+                        lockedEvent = CPeerlessBaseEventDB{plCachedEvent};
+                        LogPrintf("lockedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
+                            lockedEvent.nHomeOdds, lockedEvent.nAwayOdds, lockedEvent.nDrawOdds, lockedEvent.nSpreadHomeOdds, lockedEvent.nSpreadAwayOdds, lockedEvent.nTotalOverOdds, lockedEvent.nTotalUnderOdds);
+
                         vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
                         switch (leg.nOutcome) {
                             case moneyLineHomeWin:
@@ -424,6 +442,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                             default:
                                 std::runtime_error("Unknown bet outcome type!");
                         }
+
                         lockedEvents.emplace_back(lockedEvent);
                         bettingsViewCache.events->Update(eventKey, plEvent);
                     }

@@ -182,10 +182,15 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                 LogPrintf("\nBet %s is handled!\nPlayer address: %s\nFinal onchain odds: %lu, effective odds: %lu\nPayout: %lu\n",
                     uniBetKey.outPoint.ToStringShort(), uniBet.playerAddress.ToString(), finalOdds.first, finalOdds.second, effectivePayout);
                 LogPrintf("Legs:");
-                for (auto leg : uniBet.legs) {
+                for (auto &leg : uniBet.legs) {
                     LogPrintf(" (eventId: %lu, outcome: %lu) ", leg.nEventId, leg.nOutcome);
                 }
                 LogPrintf("\n");
+                LogPrintf("LockedEvents:\n");
+                for (auto &lockedEvent : uniBet.lockedEvents) {
+                    LogPrintf("\t\thomeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
+                        lockedEvent.nHomeOdds, lockedEvent.nAwayOdds, lockedEvent.nDrawOdds, lockedEvent.nSpreadHomeOdds, lockedEvent.nSpreadAwayOdds, lockedEvent.nTotalOverOdds, lockedEvent.nTotalUnderOdds);
+                }
                 // if handling bet is completed - mark it
                 uniBet.SetCompleted();
                 vEntriesToUpdate.emplace_back(std::pair<PeerlessBetKey, CPeerlessBetDB>{uniBetKey, uniBet});
