@@ -149,9 +149,14 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                     finalOdds = fWagerrProtocolV3 ? std::pair<uint32_t, uint32_t>{refundOdds, refundOdds} : std::pair<uint32_t, uint32_t>{0, 0};
                 }
 
-                // CalculatePayoutBurnAmounts(uniBet.betAmount, potentialOdds, payout, burn);
+                CAmount effectivePayout, burn;
 
-                CAmount effectivePayout = uniBet.betAmount * finalOdds.second / BET_ODDSDIVISOR;
+                if (!fWagerrProtocolV3) {
+                    CalculatePayoutBurnAmounts(uniBet.betAmount, finalOdds.first, effectivePayout, burn);
+                }
+                else {
+                    effectivePayout = uniBet.betAmount * finalOdds.second / BET_ODDSDIVISOR;
+                }
 
                 if (effectivePayout > 0) {
                     // Add winning payout to the payouts vector.
