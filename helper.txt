@@ -1,0 +1,26 @@
+./configure CXXFLAGS="-O0" BDB_LIBS="-l:libdb_cxx-4.8.a" --enable-gui --enable-debug --enable-cxx  --disable-zmq --enable-tests --prefix ~/work/wagerr/depends/x86_64-pc-linux-gnu
+
+##### REGTEST #####
+WGR_WALLET_ORACLE_ADDRESS = "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1" privkey TBwvXbNNUiq7tDkR2EXiCbPxEJRTxA1i6euNyAE9Ag753w36c1FZ
+WGR_WALLET_EVENT_ADDRESS = "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu" privkey TCDjD2i4e32kx2Fc87bDJKGBedEyG7oZPaZfp7E1PQG29YnvArQ8
+WGR_WALLET_DEV_ADDRESS = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs" privkey TFCrxaUt3EjHzMGKXeBqA7sfy3iaeihg5yZPSrf9KEyy4PHUMWVe
+WGR_WALLET_OMNO_ADDRESS = "THofaueWReDjeZQZEECiySqV9GP4byP3qr" privkey TDJnwRkSk8JiopQrB484Ny9gMcL1x7bQUUFFFNwJZmmWA7U79uRk
+
+##### TESTNET #####
+WGR_WALLET_ORACLE_ADDRESS = "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc" privkey TBfX8U2F9kgf8rvfYDbJnoctsEDEsj1juX83UQjM2bcKi9DuK9nn
+MY_ADDRESS = "TEfnm8CAof5dNJwPrTDzKRcacnf66fk4i4" privkey TFqeimKaregtV5yXQcyUSQoFntxuiHLyEUP45LmyiSV5eu6HVXsD
+
+
+TESTNET
+addnode='88.198.155.66:55004'
+addnode='95.216.223.11:55004'
+addnode='95.216.147.239:55004'
+addnode='78.47.143.87:55004'
+addnode='95.216.171.6:55004'
+
+
+Test Sport id: 65535
+Test Tournament id: 65535
+Test Round id: 65535
+Test Team1 id: 4294967294
+Test Team2 id: 4294967295
