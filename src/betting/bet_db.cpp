@@ -167,6 +167,10 @@ std::vector<CBettingUndoDB> CBettingsView::GetBettingUndo(const BettingUndoKey& 
         return std::vector<CBettingUndoDB>{};
 }
 
+bool CBettingsView::ExistsBettingUndo(const BettingUndoKey& key) {
+    return undos->Exists(key);
+}
+
 void CBettingsView::PruneOlderUndos(const uint32_t height) {
     static std::vector<unsigned char> lastHeightKey = CBettingDB::DbTypeToBytes(std::string("LastHeight"));
     std::vector<CBettingUndoDB> vUndos;
