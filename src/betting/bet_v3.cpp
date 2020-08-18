@@ -3,11 +3,41 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <betting/bet_common.h>
+#include <betting/bet_v2.h>
 #include <betting/bet_db.h>
 #include <main.h>
 #include <util.h>
 #include <base58.h>
 #include <kernel.h>
+
+void GetPLRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+{
+    PeerlessBetKey zeroKey{nNewBlockHeight, COutPoint()};
+
+    // Set the OMNO and Dev reward addresses
+    CScript payoutScriptDev = GetScriptForDestination(CBitcoinAddress(Params().DevPayoutAddr()).Get());
+    CScript payoutScriptOMNO = GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get());
+
+    // Calculate the OMNO reward and the Dev reward.
+    // 40% of total fee
+    CAmount nOMNOReward = (fee * 4000) / BET_ODDSDIVISOR;
+    // 10% of total fee
+    CAmount nDevReward  = (fee * 1000) / BET_ODDSDIVISOR;
+
+    if (nDevReward > 0) {
+        // Add both reward payouts to the payout vector.
+        CBetOut betOutDev(nDevReward, payoutScriptDev, 0);
+        CPayoutInfoDB payoutInfoDev(zeroKey, PayoutType::bettingReward);
+        vExpectedPayouts.emplace_back(betOutDev);
+        vPayoutsInfo.emplace_back(payoutInfoDev);
+    }
+    if (nOMNOReward > 0) {
+        CBetOut betOutOMNO(nOMNOReward, payoutScriptOMNO, 0);
+        CPayoutInfoDB payoutInfoOMNO(zeroKey, PayoutType::bettingReward);
+        vExpectedPayouts.emplace_back(betOutOMNO);
+        vPayoutsInfo.emplace_back(payoutInfoOMNO);
+    }
+}
 
 /**
  * Creates the bet payout vector for all winning CUniversalBet bets.
@@ -24,6 +54,8 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
     std::vector<CPeerlessResultDB> results = GetEventResults(nLastBlockHeight);
 
     bool fWagerrProtocolV3 = nLastBlockHeight >= Params().WagerrProtocolV3StartHeight();
+
+    CAmount effectivePayoutsSum, grossPayoutsSum = effectivePayoutsSum = 0;
 
     LogPrintf("Start generating payouts...\n");
 
@@ -149,13 +181,16 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                     finalOdds = fWagerrProtocolV3 ? std::pair<uint32_t, uint32_t>{refundOdds, refundOdds} : std::pair<uint32_t, uint32_t>{0, 0};
                 }
 
-                CAmount effectivePayout, burn;
+                CAmount effectivePayout, grossPayout, burn;
 
                 if (!fWagerrProtocolV3) {
                     CalculatePayoutBurnAmounts(uniBet.betAmount, finalOdds.first, effectivePayout, burn);
                 }
                 else {
                     effectivePayout = uniBet.betAmount * finalOdds.second / BET_ODDSDIVISOR;
+                    grossPayout = uniBet.betAmount * finalOdds.first / BET_ODDSDIVISOR;
+                    effectivePayoutsSum += effectivePayout;
+                    grossPayoutsSum += grossPayout;
                 }
 
                 if (effectivePayout > 0) {
@@ -190,12 +225,6 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                 for (auto &leg : uniBet.legs) {
                     LogPrintf(" (eventId: %lu, outcome: %lu) ", leg.nEventId, leg.nOutcome);
                 }
-                LogPrintf("\n");
-                LogPrintf("LockedEvents:\n");
-                for (auto &lockedEvent : uniBet.lockedEvents) {
-                    LogPrintf("\t\thomeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
-                        lockedEvent.nHomeOdds, lockedEvent.nAwayOdds, lockedEvent.nDrawOdds, lockedEvent.nSpreadHomeOdds, lockedEvent.nSpreadAwayOdds, lockedEvent.nTotalOverOdds, lockedEvent.nTotalUnderOdds);
-                }
                 // if handling bet is completed - mark it
                 uniBet.SetCompleted();
                 vEntriesToUpdate.emplace_back(std::pair<PeerlessBetKey, CPeerlessBetDB>{uniBetKey, uniBet});
@@ -206,7 +235,12 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
         }
     }
 
-    GetPLRewardPayouts(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+    if (!fWagerrProtocolV3) {
+        GetPLRewardPayoutsV2(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+    }
+    else {
+        GetPLRewardPayoutsV3(nNewBlockHeight, grossPayoutsSum - effectivePayoutsSum, vExpectedPayouts, vPayoutsInfo);
+    }
 
     LogPrintf("Finished generating payouts...\n");
 

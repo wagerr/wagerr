@@ -167,9 +167,6 @@ std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight);
 /** Find chain games lotto result. **/
 bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults);
 
-/** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
-void GetPLRewardPayouts(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
-
 /**
  * Check winning condition for current bet considering locked event and event result.
  *

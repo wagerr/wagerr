@@ -10,6 +10,54 @@
 #include <main.h>
 
 /**
+ * Takes a payout vector and aggregates the total WGR that is required to pay out all bets.
+ * We also calculate and add the OMNO and dev fund rewards.
+ *
+ * @param vExpectedPayouts  A vector containing all the winning bets that need to be paid out.
+ * @param nMNBetReward  The Oracle masternode reward.
+ * @return
+ */
+void GetPLRewardPayoutsV2(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+{
+    CAmount profitAcc = 0;
+    CAmount totalAmountBet = 0;
+    PeerlessBetKey zeroKey{nNewBlockHeight, COutPoint()};
+
+    // Set the OMNO and Dev reward addresses
+    CScript payoutScriptDev = GetScriptForDestination(CBitcoinAddress(Params().DevPayoutAddr()).Get());
+    CScript payoutScriptOMNO = GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get());
+
+    // Loop over the payout vector and aggregate values.
+    for (size_t i = 0; i < vExpectedPayouts.size(); i++)
+    {
+        if (vPayoutsInfo[i].payoutType == PayoutType::bettingPayout) {
+            CAmount betValue = vExpectedPayouts[i].nBetValue;
+            CAmount payValue = vExpectedPayouts[i].nValue;
+
+            totalAmountBet += betValue;
+            profitAcc += payValue - betValue;
+        }
+    }
+
+    // Calculate the OMNO reward and the Dev reward.
+    CAmount nOMNOReward = (CAmount)(profitAcc * Params().OMNORewardPermille() / (1000.0 - BET_BURNXPERMILLE));
+    CAmount nDevReward  = (CAmount)(profitAcc * Params().DevRewardPermille() / (1000.0 - BET_BURNXPERMILLE));
+    if (nDevReward > 0) {
+        // Add both reward payouts to the payout vector.
+        CBetOut betOutDev(nDevReward, payoutScriptDev, profitAcc);
+        CPayoutInfoDB payoutInfoDev(zeroKey, PayoutType::bettingReward);
+        vExpectedPayouts.emplace_back(betOutDev);
+        vPayoutsInfo.emplace_back(payoutInfoDev);
+    }
+    if (nOMNOReward > 0) {
+        CBetOut betOutOMNO(nOMNOReward, payoutScriptOMNO, profitAcc);
+        CPayoutInfoDB payoutInfoOMNO(zeroKey, PayoutType::bettingReward);
+        vExpectedPayouts.emplace_back(betOutOMNO);
+        vPayoutsInfo.emplace_back(payoutInfoOMNO);
+    }
+}
+
+/**
  * Takes a payout vector and aggregates the total WGR that is required to pay out all CGLotto bets.
  *
  * @param vexpectedCGPayouts  A vector containing all the winning bets that need to be paid out.
@@ -439,7 +487,7 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
         }
     }
 
-    GetPLRewardPayouts(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+    GetPLRewardPayoutsV2(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
 
     return;
 }

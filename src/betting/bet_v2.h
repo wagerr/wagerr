@@ -11,6 +11,9 @@
 class CBetOut;
 class CPayoutInfoDB;
 
+/** Aggregates the amount of WGR to be minted to pay out all bets as well as dev and OMNO rewards. **/
+void GetPLRewardPayoutsV2(const uint32_t nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
+
 /** Get the peerless winning bets from the block chain and return the payout vector. **/
 void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 /** Get the chain games winner and return the payout vector. **/
