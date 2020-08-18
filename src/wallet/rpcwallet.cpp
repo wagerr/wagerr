@@ -1267,7 +1267,7 @@ UniValue getbetbytxid(const UniValue& params, bool fHelp)
 
             UniValue uValue(UniValue::VOBJ);
 
-            CollectQGBetData(uValue, key, qgBet, hash);
+            CollectQGBetData(uValue, key, qgBet, hash, true);
 
             ret.push_back(uValue);
         }
