@@ -809,6 +809,8 @@ public:
 
     std::vector<CBettingUndoDB> GetBettingUndo(const BettingUndoKey& key);
 
+    bool ExistsBettingUndo(const BettingUndoKey& key);
+
     void PruneOlderUndos(const uint32_t height);
 };
 
