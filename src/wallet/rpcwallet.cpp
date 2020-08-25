@@ -823,12 +823,12 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
     }
 }
 
-UniValue GetBets(uint32_t limit, CWallet *pwalletMain = NULL) {
+UniValue GetBets(uint32_t count, uint32_t from, CWallet *pwalletMain = NULL) {
     UniValue ret(UniValue::VARR);
 
     auto it = bettingsView->bets->NewIterator();
-
-    for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+    uint32_t skippedEntities = 0;
+    for(it->SeekToLast(); it->Valid(); it->Prev()) {
         PeerlessBetKey key;
         CPeerlessBetDB uniBet;
         CBettingDB::BytesToDbType(it->Value(), uniBet);
@@ -842,30 +842,30 @@ UniValue GetBets(uint32_t limit, CWallet *pwalletMain = NULL) {
 
         CollectPLBetData(uValue, key, uniBet, true);
 
-        ret.push_back(uValue);
+        if (skippedEntities == from) {
+            ret.push_back(uValue);
+        } else {
+            skippedEntities++;
+        }
+
+        if (count != 0 && ret.size() == count) {
+            break;
+        }
     }
 
-    if (limit != 0 && ret.size() > limit) {
-        UniValue retLimit{UniValue::VARR};
-        for (size_t i = ret.size() - limit; i < ret.size(); i++) {
-            retLimit.push_back(ret[i]);
-        }
-        return retLimit;
-    }
-    else {
-        return ret;
-    }
+    return ret;
 }
 
 UniValue getallbets(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() > 1)
+    if (fHelp || params.size() > 2)
         throw std::runtime_error(
                 "getallbets\n"
                 "\nGet bets info for all wallets\n"
 
                 "\nArguments:\n"
-                "1. Last bets limit (numeric, optional) Limit response to last bets number.\n"
+                "1. count (numeric, optional, default=10) Limit response to last bets number.\n"
+                "2. from (numeric, optional, default=0) The number of bets to skip (from the last)\n"
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
@@ -914,23 +914,28 @@ UniValue getallbets(const UniValue& params, bool fHelp)
                 "\nExamples:\n" +
                 HelpExampleCli("getallbets", ""));
 
-    uint32_t limit = 0;
-    if (params.size()  == 1)
-        limit = params[0].get_int();
+    uint32_t count = 10;
+    if (params.size() >= 1)
+        count = params[0].get_int();
 
-    return GetBets(limit);
+    uint32_t from = 0;
+    if (params.size() == 2)
+        from = params[1].get_int();
+
+    return GetBets(count, from);
 }
 
 
 UniValue getmybets(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() > 1)
+    if (fHelp || params.size() > 2)
         throw std::runtime_error(
                 "getmybets\n"
                 "\nGet bets info for my wallets.\n"
 
                 "\nArguments:\n"
-                "1. Last bets limit (numeric, optional) Limit response to last bets number.\n"
+                "1. count (numeric, optional, default=10) Limit response to last bets number.\n"
+                "2. from (numeric, optional, default=0) The number of bets to skip (from the last)\n"
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
@@ -979,13 +984,17 @@ UniValue getmybets(const UniValue& params, bool fHelp)
                 "\nExamples:\n" +
                 HelpExampleCli("getmybets", ""));
 
-    uint32_t limit = 0;
-    if (params.size() == 1)
-        limit = params[0].get_int();
+    uint32_t count = 10;
+    if (params.size()  >= 1)
+        count = params[0].get_int();
+
+    uint32_t from = 0;
+    if (params.size()  == 2)
+        from = params[1].get_int();
 
     EnsureWalletIsUnlocked();
 
-    return GetBets(limit, pwalletMain);
+    return GetBets(count, from, pwalletMain);
 }
 
 void CollectQGBetData(UniValue &uValue, QuickGamesBetKey &key, CQuickGamesBetDB &qgBet, uint256 hash, bool requiredPayoutInfo = false) {
@@ -1039,11 +1048,12 @@ void CollectQGBetData(UniValue &uValue, QuickGamesBetKey &key, CQuickGamesBetDB 
     }
 }
 
-UniValue GetQuickGamesBets(uint32_t limit, CWallet *pwalletMain = NULL) {
+UniValue GetQuickGamesBets(uint32_t count, uint32_t from, CWallet *pwalletMain = NULL) {
     UniValue ret(UniValue::VARR);
 
     auto it = bettingsView->quickGamesBets->NewIterator();
-    for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+    uint32_t skippedEntities = 0;
+    for(it->SeekToLast(); it->Valid(); it->Prev()) {
         QuickGamesBetKey key;
         CQuickGamesBetDB qgBet;
         uint256 hash;
@@ -1064,30 +1074,30 @@ UniValue GetQuickGamesBets(uint32_t limit, CWallet *pwalletMain = NULL) {
 
         CollectQGBetData(bet, key, qgBet, hash, true);
 
-        ret.push_back(bet);
+        if (skippedEntities == from) {
+            ret.push_back(bet);
+        } else {
+            skippedEntities++;
+        }
+
+        if (count != 0 && ret.size() == count) {
+            break;
+        }
     }
 
-    if (limit != 0 && ret.size() > limit) {
-        UniValue retLimit{UniValue::VARR};
-        for (size_t i = ret.size() - limit; i < ret.size(); i++) {
-            retLimit.push_back(ret[i]);
-        }
-        return retLimit;
-    }
-    else {
-        return ret;
-    }
+    return ret;
 }
 
 UniValue getallqgbets(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() > 1)
+    if (fHelp || params.size() > 2)
         throw std::runtime_error(
                 "getallqgbets\n"
                 "\nGet quick games bets info for all wallets\n"
 
                 "\nArguments:\n"
-                "1. Last bets limit (numeric, optional) The limit response to last bets bumber.\n"
+                "1. count (numeric, optional, default=10) Limit response to last bets number.\n"
+                "2. from (numeric, optional, default=0) The number of bets to skip (from the last)\n"
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
@@ -1110,23 +1120,28 @@ UniValue getallqgbets(const UniValue& params, bool fHelp)
                 "\nExamples:\n" +
                 HelpExampleCli("getallqgbets", "15"));
 
-    uint32_t limit = 0;
-    if (params.size()  == 1)
-        limit = params[0].get_int();
+    uint32_t count = 10;
+    if (params.size()  >= 1)
+        count = params[0].get_int();
 
-    return GetQuickGamesBets(limit);
+    uint32_t from = 0;
+    if (params.size()  == 2)
+        from = params[1].get_int();
+
+    return GetQuickGamesBets(count, from);
 }
 
 
 UniValue getmyqgbets(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() > 1)
+    if (fHelp || params.size() > 2)
         throw std::runtime_error(
                 "getmyqgbets\n"
                 "\nGet quick games bets info for my wallets.\n"
 
                                 "\nArguments:\n"
-                "1. Last bets limit (numeric, optional) The limit response to last bets bumber.\n"
+                "1. count (numeric, optional, default=10) Limit response to last bets number.\n"
+                "2. from (numeric, optional, default=0) The number of bets to skip (from the last)\n"
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
@@ -1149,13 +1164,17 @@ UniValue getmyqgbets(const UniValue& params, bool fHelp)
                 "\nExamples:\n" +
                 HelpExampleCli("getmyqgbets", "15"));
 
-    uint32_t limit = 0;
-    if (params.size() == 1)
-        limit = params[0].get_int();
+    uint32_t count = 10;
+    if (params.size()  >= 1)
+        count = params[0].get_int();
+
+    uint32_t from = 0;
+    if (params.size()  == 2)
+        from = params[1].get_int();
 
     EnsureWalletIsUnlocked();
 
-    return GetQuickGamesBets(limit, pwalletMain);
+    return GetQuickGamesBets(count, from, pwalletMain);
 }
 
 UniValue getbetbytxid(const UniValue& params, bool fHelp)

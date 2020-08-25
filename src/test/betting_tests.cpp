@@ -156,4 +156,78 @@ BOOST_AUTO_TEST_CASE(betting_flushable_db_iterator_test)
     std::cout << "Testing of flushable DB iterator passed" << std::endl;
 }
 
+BOOST_AUTO_TEST_CASE(betting_flushable_reverse_db_iterator_test)
+{
+    auto &db = *bettingsView->mappings.get();
+    std::string nameBases[] = {"Sport", "Round", "Team", "Tournament"};
+    // for writing
+    MappingKey key{};
+    CMappingDB mapping{};
+
+    for (uint32_t mapType = tournamentMapping; mapType > 0; mapType--) {
+        for (uint32_t mapId = 4097; mapId > 0; mapId--) {
+            mapping.sName = nameBases[mapType - 1] + std::to_string(mapId);
+            key = {(MappingType) mapType, mapId};
+            db.Write(key, mapping);
+        }
+    }
+    db.Flush();
+
+    // check iterator walkthrough
+    auto it = db.NewIterator();
+    // seek to last record
+    it->SeekToLast();
+    for (uint32_t mapType = tournamentMapping; mapType > 0; mapType--) {
+        for (uint32_t mapId = 4097; mapId > 0; mapId--, it->Prev()) {
+            BOOST_CHECK(it->Valid());
+            CBettingDB::BytesToDbType(it->Value(), mapping);
+            CBettingDB::BytesToDbType(it->Key(), key);
+            BOOST_CHECK_EQUAL(key.nMType, mapType);
+            BOOST_CHECK_EQUAL(key.nId, mapId);
+            BOOST_CHECK_EQUAL(mapping.sName, nameBases[mapType - 1] + std::to_string(mapId));
+        }
+    }
+
+    CBettingDB dbCache{db};
+
+    // erase
+    for (it->SeekToLast(); it->Valid(); it->Prev()) {
+        CBettingDB::BytesToDbType(it->Key(), key);
+        dbCache.Erase(key);
+    }
+
+    // check cached DB is empty
+    it = dbCache.NewIterator();
+    // seek to first record
+    it->Seek(std::vector<unsigned char>{});
+    // check that iterator of empty table is invalid
+    BOOST_CHECK(!it->Valid());
+
+    // iterator from main db must be still valid
+    it = db.NewIterator();
+    // seek to last record
+    it->SeekToLast();
+    for (uint32_t mapType = tournamentMapping; mapType > 0; mapType--) {
+        for (uint32_t mapId = 4097; mapId > 0; mapId--, it->Prev()) {
+            BOOST_CHECK(it->Valid());
+            CBettingDB::BytesToDbType(it->Value(), mapping);
+            CBettingDB::BytesToDbType(it->Key(), key);
+            BOOST_CHECK_EQUAL(key.nMType, mapType);
+            BOOST_CHECK_EQUAL(key.nId, mapId);
+            BOOST_CHECK_EQUAL(mapping.sName, nameBases[mapType - 1] + std::to_string(mapId));
+        }
+    }
+
+    BOOST_CHECK(dbCache.Flush());
+
+    // check main DB is empty
+    it = db.NewIterator();
+    // seek to first record
+    it->Seek(std::vector<unsigned char>{});
+    // check that iterator of empty table is invalid
+    BOOST_CHECK(!it->Valid());
+
+    std::cout << "Testing of flushable reverse DB iterator passed" << std::endl;
+}
+
 BOOST_AUTO_TEST_SUITE_END()

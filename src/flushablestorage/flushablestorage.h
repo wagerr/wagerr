@@ -17,6 +17,9 @@ class CStorageKVIterator {
 public:
     virtual ~CStorageKVIterator() {};
     virtual void Seek(const std::vector<unsigned char>& key) = 0;
+    virtual void SeekToFirst() = 0;
+    virtual void SeekToLast() = 0;
+    virtual void Prev() = 0;
     virtual void Next() = 0;
     virtual bool Valid() = 0;
     virtual std::vector<unsigned char> Key() = 0;
@@ -46,6 +49,9 @@ public:
         leveldb::Slice slKey(&ssKey[0], ssKey.size());
         it->Seek(slKey);
     }
+    void SeekToFirst() override { it->SeekToFirst(); }
+    void SeekToLast() override { it->SeekToLast(); }
+    void Prev() override { it->Prev(); }
     void Next() override { it->Next(); }
     bool Valid() override { return it->Valid(); }
     std::vector<unsigned char> Key() override {
@@ -90,7 +96,7 @@ private:
 class CFlushableStorageKVIterator : public CStorageKVIterator {
 public:
     explicit CFlushableStorageKVIterator(std::unique_ptr<CStorageKVIterator>&& pIt_, MapKV& map_) : pIt{std::move(pIt_)}, map(map_) {
-        inited = parentOk = mapOk = false;
+        inited = parentOk = mapOk = reverseOk = false;
     }
          // No copying allowed
     CFlushableStorageKVIterator(const CFlushableStorageKVIterator&) = delete;
@@ -102,8 +108,77 @@ public:
         parentOk = pIt->Valid();
         mIt = map.lower_bound(key);
         mapOk = mIt != map.end();
+        rIt = MapKV::reverse_iterator(map.upper_bound(key));
+        reverseOk = rIt != map.rend();
         inited = true;
         Next();
+    }
+    void SeekToFirst() override {
+        prevKey.clear();
+        pIt->SeekToFirst();
+        parentOk = pIt->Valid();
+        mIt = map.begin();
+        mapOk = mIt != map.end();
+        rIt = map.rbegin();
+        reverseOk = rIt != map.rend();
+        inited = true;
+        Next();
+    }
+    void SeekToLast() override {
+        prevKey.clear();
+        pIt->SeekToLast();
+        parentOk = pIt->Valid();
+        if (!map.empty()){
+            mIt = (--map.end());
+            mapOk = mIt != map.end();
+        } else {
+            mapOk = false;
+        }
+        rIt = map.rbegin();
+        reverseOk = rIt != map.rend();
+        inited = true;
+        Prev();
+    }
+    void Prev() override {
+        if (!inited) throw std::runtime_error("Iterator wasn't inited.");
+        key.clear();
+        value.clear();
+
+        while (reverseOk || parentOk) {
+            if (reverseOk) {
+                while (reverseOk && (!parentOk || rIt->first >= pIt->Key())) {
+                    bool ok = false;
+
+                    if (rIt->second) {
+                        ok = prevKey.empty() || rIt->first < prevKey;
+                    } else {
+                        prevKey = rIt->first;
+                    }
+                    if (ok) {
+                        key = rIt->first, value = *rIt->second;
+                        prevKey = rIt->first;
+                    }
+                    if (reverseOk) {
+                        --rIt;
+                        reverseOk = rIt != map.rend();
+                    }
+                    if (ok) return;
+                }
+            }
+            if (parentOk) {
+                bool ok = prevKey.empty() || pIt->Key() < prevKey;
+                if (ok) {
+                    key = pIt->Key();
+                    value = pIt->Value();
+                    prevKey = key;
+                }
+                if (parentOk) {
+                    pIt->Prev();
+                    parentOk = pIt->Valid();
+                }
+                if (ok) return;
+            }
+        }
     }
     void Next() override {
         if (!inited) throw std::runtime_error("Iterator wasn't inited.");
@@ -162,7 +237,9 @@ private:
     bool parentOk;
     MapKV& map;
     MapKV::iterator mIt;
+    MapKV::reverse_iterator rIt;
     bool mapOk;
+    bool reverseOk;
     std::vector<unsigned char> key;
     std::vector<unsigned char> value;
     std::vector<unsigned char> prevKey;
