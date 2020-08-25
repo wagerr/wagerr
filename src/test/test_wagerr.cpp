@@ -78,6 +78,15 @@ TestingSetup::TestingSetup()
         bettingsView->quickGamesBetsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("test-quickgamesbets"), CBettingDB::dbWrapperCacheSize(), true);
         bettingsView->quickGamesBets = MakeUnique<CBettingDB>(*bettingsView->quickGamesBetsStorage.get());
 
+        bettingsView->chainGamesLottoEventsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("cglottoevents"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+        bettingsView->chainGamesLottoEvents = MakeUnique<CBettingDB>(*bettingsView->chainGamesLottoEventsStorage.get());
+
+        bettingsView->chainGamesLottoBetsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("cglottobets"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+        bettingsView->chainGamesLottoBets = MakeUnique<CBettingDB>(*bettingsView->chainGamesLottoBetsStorage.get());
+
+        bettingsView->chainGamesLottoResultsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("cglottoresults"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+        bettingsView->chainGamesLottoResults = MakeUnique<CBettingDB>(*bettingsView->chainGamesLottoResultsStorage.get());
+
         InitBlockIndex();
 #ifdef ENABLE_WALLET
         bool fFirstRun;

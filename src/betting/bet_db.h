@@ -418,6 +418,7 @@ private:
 
 class CChainGamesEventDB
 {
+public:
     uint32_t nEventId;
     uint32_t nEntryFee;
 
@@ -434,26 +435,53 @@ class CChainGamesEventDB
     }
 };
 
+using ChainGamesBetKey = PeerlessBetKey;
+
 class CChainGamesBetDB
 {
 public:
     uint32_t nEventId;
+    CAmount betAmount;
+    CBitcoinAddress playerAddress;
+    int64_t betTime;
+    CAmount payout = 0;
+    uint32_t payoutHeight = 0;
 
     // Default Constructor.
     explicit CChainGamesBetDB() {}
 
     // Parametrized Constructor.
-    explicit CChainGamesBetDB(int eventId) {
-        nEventId = eventId;
-    }
+    explicit CChainGamesBetDB(uint32_t eventId, CAmount amount, CBitcoinAddress address, int64_t time) :
+        nEventId(eventId), betAmount(amount), playerAddress(address), betTime(time) { }
 
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nEventId);
+        READWRITE(completed);
+        READWRITE(betAmount);
+        std::string addrStr;
+        if (ser_action.ForRead()) {
+            READWRITE(addrStr);
+            playerAddress.SetString(addrStr);
+        }
+        else {
+            addrStr = playerAddress.ToString();
+            READWRITE(addrStr);
+        }
+        READWRITE(betTime);
+        READWRITE(payout);
+        READWRITE(payoutHeight);
     }
 
+    bool IsCompleted() const { return completed; }
+    void SetCompleted() { completed = true; }
+    // for undo
+    void SetUncompleted() { completed = false; }
+
+private:
+    bool completed = false;
 };
 
 class CChainGamesResultDB
@@ -786,6 +814,12 @@ public:
     std::unique_ptr<CStorageKV> payoutsInfoStorage;
     std::unique_ptr<CBettingDB> quickGamesBets; // "quickgamesbets"
     std::unique_ptr<CStorageKV> quickGamesBetsStorage;
+    std::unique_ptr<CBettingDB> chainGamesLottoEvents; // "cglottoevents"
+    std::unique_ptr<CStorageKV> chainGamesLottoEventsStorage;
+    std::unique_ptr<CBettingDB> chainGamesLottoBets; // "cglottobets"
+    std::unique_ptr<CStorageKV> chainGamesLottoBetsStorage;
+    std::unique_ptr<CBettingDB> chainGamesLottoResults; // "cglottoresults"
+    std::unique_ptr<CStorageKV> chainGamesLottoResultsStorage;
 
     // default constructor
     explicit CBettingsView() { }

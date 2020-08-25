@@ -102,6 +102,9 @@ CBettingsView::CBettingsView(CBettingsView* phr) {
     undos = MakeUnique<CBettingDB>(*phr->undos.get());
     payoutsInfo = MakeUnique<CBettingDB>(*phr->payoutsInfo.get());
     quickGamesBets = MakeUnique<CBettingDB>(*phr->quickGamesBets.get());
+    chainGamesLottoEvents = MakeUnique<CBettingDB>(*phr->chainGamesLottoEvents.get());
+    chainGamesLottoBets = MakeUnique<CBettingDB>(*phr->chainGamesLottoBets.get());
+    chainGamesLottoResults = MakeUnique<CBettingDB>(*phr->chainGamesLottoResults.get());
 }
 
 bool CBettingsView::Flush() {
@@ -111,7 +114,10 @@ bool CBettingsView::Flush() {
             bets->Flush() &&
             undos->Flush() &&
             payoutsInfo->Flush() &&
-            quickGamesBets->Flush();
+            quickGamesBets->Flush() &&
+            chainGamesLottoEvents->Flush() &&
+            chainGamesLottoBets->Flush() &&
+            chainGamesLottoResults->Flush();
 }
 
 unsigned int CBettingsView::GetCacheSize() {
@@ -121,7 +127,10 @@ unsigned int CBettingsView::GetCacheSize() {
             bets->GetCacheSize() +
             undos->GetCacheSize() +
             payoutsInfo->GetCacheSize() +
-            quickGamesBets->GetCacheSize();
+            quickGamesBets->GetCacheSize() +
+            chainGamesLottoEvents->GetCacheSize() +
+            chainGamesLottoBets->GetCacheSize() +
+            chainGamesLottoResults->GetCacheSize();
 }
 
 unsigned int CBettingsView::GetCacheSizeBytesToWrite() {
@@ -131,7 +140,10 @@ unsigned int CBettingsView::GetCacheSizeBytesToWrite() {
             bets->GetCacheSizeBytesToWrite() +
             undos->GetCacheSizeBytesToWrite() +
             payoutsInfo->GetCacheSizeBytesToWrite() +
-            quickGamesBets->GetCacheSizeBytesToWrite();
+            quickGamesBets->GetCacheSizeBytesToWrite() +
+            chainGamesLottoEvents->GetCacheSizeBytesToWrite() +
+            chainGamesLottoBets->GetCacheSizeBytesToWrite() +
+            chainGamesLottoResults->GetCacheSizeBytesToWrite();
 }
 
 void CBettingsView::SetLastHeight(uint32_t height) {
