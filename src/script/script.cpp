@@ -308,7 +308,8 @@ std::string CScript::ToString() const
         }
         if (0 <= opcode && opcode <= OP_PUSHDATA4) {
             str += ValueString(vch);
-        } else {
+        }
+        else {
             str += GetOpName(opcode);
             if (opcode == OP_ZEROCOINSPEND) {
                 //Zerocoinspend has no further op codes.
