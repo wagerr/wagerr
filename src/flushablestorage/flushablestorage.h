@@ -159,7 +159,7 @@ public:
                         prevKey = rIt->first;
                     }
                     if (reverseOk) {
-                        --rIt;
+                        ++rIt;
                         reverseOk = rIt != map.rend();
                     }
                     if (ok) return;
