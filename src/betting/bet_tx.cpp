@@ -26,8 +26,16 @@ std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut)
     std::vector<unsigned char> opcodeData;
     opcodetype opcode;
 
-    if (!script.GetOp(pc, opcode, opcodeData) || opcode != OP_RETURN)
+    if (!script.GetOp(pc, opcode) || opcode != OP_RETURN)
         return nullptr;
+
+    if (!script.GetOp(pc, opcode, opcodeData) ||
+            (opcode > OP_PUSHDATA1 &&
+             opcode != OP_PUSHDATA2 &&
+             opcode != OP_PUSHDATA4))
+    {
+        return nullptr;
+    }
 
     CDataStream ss(opcodeData, SER_NETWORK, PROTOCOL_VERSION);
     // deserialize betting tx header

@@ -30,6 +30,7 @@
 
 #include <cstdlib>
 #include <stdint.h>
+#include <math.h>
 
 #include "libzerocoin/Coin.h"
 #include "spork.h"
@@ -1949,7 +1950,7 @@ UniValue placeqgdicebet(const UniValue& params, bool fHelp)
             "\nResult:\n"
             "\"transactionid\"  (string) The transaction id.\n"
             "\nExamples:\n" +
-            HelpExampleCli("placeqgdicebet", "1000 \"total over\" 6") +
+            HelpExampleCli("placeqgdicebet", "1000 \"total over\" 6.5") +
             HelpExampleRpc("placeqgdicebet", "1000 \"even\""));
 
     CAmount nAmount = AmountFromValue(params[0]);
@@ -1967,9 +1968,26 @@ UniValue placeqgdicebet(const UniValue& params, bool fHelp)
 
     uint32_t betNumber = 0;
     if (betType != quickgames::qgDiceEven && betType != quickgames::qgDiceOdd) {
-        betNumber = params[2].get_int();
-        if (betNumber < 2 || betNumber > 12)
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet number for dice game! It must be between 2 and 12.");
+        double realBetNumber = params[2].get_real();
+        double intpart;
+        double fractpart = modf (realBetNumber , &intpart);
+        betNumber = uint32_t(intpart);
+        if (betType == quickgames::qgDiceEqual ||
+            betType == quickgames::qgDiceNotEqual ||
+            betType == quickgames::qgDiceEven ||
+            betType == quickgames::qgDiceOdd) {
+            if (fabs(fractpart) > 1.0e-10) {
+                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet number for dice game! For \"equal\", \"not equal\", \"even\" and \"odd\" bet types available only integer value");
+            }
+            if (betNumber < 2 || betNumber > 12)
+                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet number for dice game! It must be between 2 and 12");
+        } else { // qgDiceTotalOver or qgDiceTotalUnder
+            if (fabs(fractpart - 0.5) > 1.0e-10) {
+                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet number for dice game! For \"total over\" or \"total under\" bet types available only .5 value");
+            }
+            if (betNumber < 2 || betNumber > 11)
+                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet number for dice game! It must be between 2.5 and 11.5");
+        }
     }
     betInfo.betType = betType;
     betInfo.betNumber = betNumber;
@@ -2133,109 +2151,82 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
  * @param fHelp  Help text
  * @return
  */
-UniValue geteventsliability(const UniValue& params, bool fHelp)
+UniValue geteventliability(const UniValue& params, bool fHelp)
 {
-  if (fHelp || (params.size() <= 1))
+  if (fHelp || (params.size() != 1))
         throw std::runtime_error(
-            "geteventsliability\n"
+            "geteventliability\n"
             "Return the payout of each event.\n"
+            "\nArguments:\n"
+            "1. Event id (numeric, required) The event id required for get liability.\n"
 
             "\nResult:\n"
             "[\n"
             "  {\n"
-            "    \"name\": \"xxx\",         (string) The event ID\n"
-            "    \"event-id\": \"xxx\",       (string) The name of the event\n"
-            "    \"moneyline-home-payout\": \"xxx\",\n"
-            "    \"moneyline-away-payout\": n,\n"
-            "    \"moneyline-draw-payout\": n,\n"
-            "    \"spread-over-payout\": n,\n"
-            "    \"spread-under-payout\": n,\n"
-            "    \"spread-push-payout\": n,\n"
-            "    \"totals-over-payout\": n,\n"
-            "    \"totals-under-payout\": n,\n"
-            "    \"totals-push-payout\": n,\n"
+            "    \"event-id\": \"xxx\", (numeric) The id of the event.\n"
+            "    \"event-status\": \"status\", (string) The status of the event (running | resulted).\n"
+            "    \"moneyline-home-bets\": \"xxx\", (numeric) The number of bets to moneyline home (parlays included).\n"
+            "    \"moneyline-home-liability\": \"xxx\", (numeric) The moneyline home potentional liability (without parlays).\n"
+            "    \"moneyline-away-bets\": \"xxx\", (numeric) The number of bets to moneyline away (parlays included).\n"
+            "    \"moneyline-away-liability\": \"xxx\", (numeric) The moneyline away potentional liability (without parlays).\n"
+            "    \"moneyline-draw-bets\": \"xxx\", (numeric) The number of bets to moneyline draw (parlays included).\n"
+            "    \"moneyline-draw-liability\": \"xxx\", (numeric) The moneyline draw potentional liability (without parlays).\n"
+            "    \"spread-home-bets\": \"xxx\", (numeric) The number of bets to spread home (parlays included).\n"
+            "    \"spread-home-liability\": \"xxx\", (numeric) The spreads home potentional liability (without parlays).\n"
+            "    \"spread-away-bets\": \"xxx\", (numeric) The number of bets to spread away (parlays included).\n"
+            "    \"spread-away-liability\": \"xxx\", (numeric) The spread away potentional liability (without parlays).\n"
+            "    \"spread-push-bets\": \"xxx\", (numeric) The number of bets to spread push (parlays included).\n"
+            "    \"spread-push-liability\": \"xxx\", (numeric) The spread push potentional liability (without parlays).\n"
+            "    \"total-over-bets\": \"xxx\", (numeric) The number of bets to total over (parlays included).\n"
+            "    \"total-over-liability\": \"xxx\", (numeric) The total over potentional liability (without parlays).\n"
+            "    \"total-under-bets\": \"xxx\", (numeric) The number of bets to total under (parlays included).\n"
+            "    \"total-under-liability\": \"xxx\", (numeric) The total under potentional liability (without parlays).\n"
+            "    \"total-push-bets\": \"xxx\", (numeric) The number of bets to total push (parlays included).\n"
+            "    \"total-push-liability\": \"xxx\", (numeric) The total push potentional liability (without parlays).\n"
             "    ]\n"
             "  }\n"
             "]\n"
 
             "\nExamples:\n" +
-            HelpExampleCli("geteventtotals", "") + HelpExampleRpc("geteventtotals", ""));
+            HelpExampleCli("geteventliability", "10") + HelpExampleRpc("geteventliability", "10"));
 
-    int payoutThreshold = params[0].get_int();
-    int betThreshold = params[1].get_int();
+    uint32_t eventId = static_cast<uint32_t>(params[0].get_int());
 
-    UniValue ret(UniValue::VARR);
+    UniValue event(UniValue::VOBJ);
 
+    CPeerlessExtendedEventDB plEvent;
+    if (bettingsView->events->Read(EventKey{eventId}, plEvent)) {
 
-    CPeerlessExtendedEventDB plEvent{};
-    auto it = bettingsView->events->NewIterator();
-    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
-        CBettingDB::BytesToDbType(it->Value(), plEvent);
-
-        UniValue event(UniValue::VOBJ);
-        event.push_back(Pair("event-id", (int) plEvent.nEventId));
-
-        // Return potential moneyline payouts if each outcome is still open for betting
-        if (plEvent.nHomeOdds != 0 && (int) plEvent.nMoneyLineHomePotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("moneyline-home-liability", (int) plEvent.nMoneyLineHomePotentialLiability ));
+        event.push_back(Pair("event-id", (uint64_t) plEvent.nEventId));
+        if (!bettingsView->results->Exists(ResultKey{eventId})) {
+            event.push_back(Pair("event-status", "running"));
+            event.push_back(Pair("moneyline-home-bets", (uint64_t) plEvent.nMoneyLineHomeBets));
+            event.push_back(Pair("moneyline-home-liability", (uint64_t) plEvent.nMoneyLineHomePotentialLiability));
+            event.push_back(Pair("moneyline-away-bets", (uint64_t) plEvent.nMoneyLineAwayBets));
+            event.push_back(Pair("moneyline-away-liability", (uint64_t) plEvent.nMoneyLineAwayPotentialLiability));
+            event.push_back(Pair("moneyline-draw-bets", (uint64_t) plEvent.nMoneyLineDrawBets));
+            event.push_back(Pair("moneyline-draw-liability", (uint64_t) plEvent.nMoneyLineDrawPotentialLiability));
+            event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
+            event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
+            event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
+            event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
+            event.push_back(Pair("spread-away-bets", (uint64_t) plEvent.nSpreadAwayBets));
+            event.push_back(Pair("spread-away-liability", (uint64_t) plEvent.nSpreadAwayPotentialLiability));
+            event.push_back(Pair("spread-push-bets", (uint64_t) plEvent.nSpreadPushBets));
+            event.push_back(Pair("spread-push-liability", (uint64_t) plEvent.nSpreadPushPotentialLiability));
+            event.push_back(Pair("total-over-bets", (uint64_t) plEvent.nTotalOverBets));
+            event.push_back(Pair("total-over-liability", (uint64_t) plEvent.nTotalOverPotentialLiability));
+            event.push_back(Pair("total-under-bets", (uint64_t) plEvent.nTotalUnderBets));
+            event.push_back(Pair("total-under-liability", (uint64_t) plEvent.nTotalUnderPotentialLiability));
+            event.push_back(Pair("total-push-bets", (uint64_t) plEvent.nTotalPushBets));
+            event.push_back(Pair("total-push-liability", (uint64_t) plEvent.nTotalPushPotentialLiability));
         }
-
-        if (plEvent.nAwayOdds != 0 && (int) plEvent.nMoneyLineAwayPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("moneyline-away-liability", (int) plEvent.nMoneyLineAwayPotentialLiability));
+        else {
+            event.push_back(Pair("event-status", "resulted"));
         }
-
-        if (plEvent.nDrawOdds != 0 && (int) plEvent.nMoneyLineDrawPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("moneyline-draw-liability", (int) plEvent.nMoneyLineDrawPotentialLiability));
-        }
-
-        // Return potential spread payouts if each outcome is still open for betting
-        if (plEvent.nSpreadHomeOdds != 0 && (int) plEvent.nSpreadHomePotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("spreads-home-liability", (int) plEvent.nSpreadHomePotentialLiability));
-        }
-
-        if (plEvent.nSpreadAwayOdds != 0 && (int) plEvent.nSpreadAwayPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("spreads-away-liability", (int) plEvent.nSpreadAwayPotentialLiability));
-        }
-
-        if ( (int) plEvent.nSpreadPushPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("spreads-push-liability", (int) plEvent.nSpreadPushPotentialLiability));
-        }
-
-        // Return potential totals payouts if each outcome is still open for betting
-        if (plEvent.nTotalOverOdds != 0 && (int) plEvent.nTotalOverPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("total-over-liability", (int) plEvent.nTotalOverPotentialLiability));
-        }
-
-        if (plEvent.nTotalUnderOdds != 0 && (int) plEvent.nTotalUnderPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("total-under-liability", (int) plEvent.nTotalUnderPotentialLiability));
-        }
-
-        if ( (int) plEvent.nTotalPushPotentialLiability >= payoutThreshold ){
-            event.push_back(Pair("total-push-liability", (int) plEvent.nTotalPushPotentialLiability));
-        }
-
-        // Find the moneyline event with the most amount of bets and add it to total push bets to find total number potential bets to be payed out
-        int moneylineTotalBets[] = {(int) plEvent.nMoneyLineHomeBets , (int) plEvent.nMoneyLineAwayBets, (int) plEvent.nMoneyLineDrawBets};
-        int highestMoneyLine = 0;
-
-        for (int n=0; n<3; n++ )
-        {
-            if (moneylineTotalBets[n] > highestMoneyLine){
-                highestMoneyLine = moneylineTotalBets[n];
-            }
-        }
-
-        int betCount = highestMoneyLine + (int) plEvent.nSpreadPushBets + (int) plEvent.nTotalPushBets;
-
-        event.push_back(Pair("event-bet-count", betCount));
-
-        if (event.size() > 2 || betCount >= betThreshold) {
-            ret.push_back(event);
-        }
-
     }
 
-    return ret;
+    return event;
 }
 
 UniValue sendtoaddress(const UniValue& params, bool fHelp)

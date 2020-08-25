@@ -255,11 +255,10 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
 {
     const int nLastBlockHeight = nNewBlockHeight - 1;
 
-    PeerlessBetKey zeroKey{0, COutPoint()};
-
     LogPrintf("Start generating quick games bets payouts...\n");
 
     CBlockIndex *blockIndex = chainActive[nLastBlockHeight];
+    std::map<std::string, CAmount> mExpectedRewards;
     uint32_t blockHeight = static_cast<uint32_t>(nLastBlockHeight);
     auto it = bettingsViewCache.quickGamesBets->NewIterator();
     std::vector<std::pair<QuickGamesBetKey, CQuickGamesBetDB>> vEntriesToUpdate;
@@ -299,19 +298,18 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
 
             // Dev reward
             CAmount devReward = (CAmount)(feePermille / 1000 * gameView.nDevRewardPermille / BET_ODDSDIVISOR);
-            CPayoutInfoDB devRewardInfo(zeroKey, PayoutType::quickGamesReward);
-            CBetOut devRewardOut(devReward, GetScriptForDestination(CBitcoinAddress(gameView.specialAddress).Get()), qgBet.betAmount);
-            vExpectedPayouts.emplace_back(devRewardOut);
-            vPayoutsInfo.emplace_back(devRewardInfo);
+            if (mExpectedRewards.find(gameView.specialAddress) == mExpectedRewards.end())
+                mExpectedRewards[gameView.specialAddress] = devReward;
+            else
+                mExpectedRewards[gameView.specialAddress] += devReward;
 
             // OMNO reward
             std::string OMNOPayoutAddr = Params().OMNOPayoutAddr();
             CAmount nOMNOReward = (CAmount)(feePermille / 1000 * gameView.nOMNORewardPermille / BET_ODDSDIVISOR);
-
-            CPayoutInfoDB omnoRewardInfo(zeroKey, PayoutType::quickGamesReward);
-            CBetOut omnoRewardOut(nOMNOReward, GetScriptForDestination(CBitcoinAddress(OMNOPayoutAddr).Get()), qgBet.betAmount);
-            vExpectedPayouts.emplace_back(devRewardOut);
-            vPayoutsInfo.emplace_back(devRewardInfo);
+            if (mExpectedRewards.find(OMNOPayoutAddr) == mExpectedRewards.end())
+                mExpectedRewards[OMNOPayoutAddr] = nOMNOReward;
+            else
+                mExpectedRewards[OMNOPayoutAddr] += nOMNOReward;
         }
         else {
             qgBet.resultType = BetResultType::betResultLose;
@@ -321,6 +319,16 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
         qgBet.SetCompleted();
         qgBet.payout = payout;
         vEntriesToUpdate.emplace_back(std::pair<QuickGamesBetKey, CQuickGamesBetDB>{qgKey, qgBet});
+    }
+    // fill reward outputs
+    PayoutInfoKey zeroKey{(uint32_t) nNewBlockHeight, COutPoint()};
+    CPayoutInfoDB rewardInfo(zeroKey, PayoutType::quickGamesReward);
+    LogPrintf("Quick game rewards:\n");
+    for (auto& reward : mExpectedRewards) {
+        LogPrintf("address: %s, reward: %ll\n", reward.first, reward.second);
+        CBetOut rewardOut(reward.second, GetScriptForDestination(CBitcoinAddress(reward.first).Get()), 0);
+        vExpectedPayouts.emplace_back(rewardOut);
+        vPayoutsInfo.emplace_back(rewardInfo);
     }
     for (auto pair : vEntriesToUpdate) {
         bettingsViewCache.quickGamesBets->Update(pair.first, pair.second);

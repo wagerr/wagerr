@@ -206,6 +206,7 @@ public:
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV3StartHeight = 1500000;                         // TODO: pick block height for enabling parlay betting and new payout system
 
+        quickGamesArr.clear();
         quickGamesArr.emplace_back(
             std::string("Dice"), // Game name
             QuickGamesType::qgDice, // game type
@@ -371,6 +372,7 @@ public:
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV3StartHeight = 2000;                          // TODO: pick block height for enabling parlay betting and new payout system
 
+        quickGamesArr.clear();
         quickGamesArr.emplace_back(
             std::string("Dice"), // Game name
             QuickGamesType::qgDice, // game type
@@ -496,6 +498,7 @@ public:
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV3StartHeight = nBetStartHeight;                 // TODO: pick block height for enabling parlay betting and new payout system
 
+        quickGamesArr.clear();
         quickGamesArr.emplace_back(
             std::string("Dice"), // Game name
             QuickGamesType::qgDice, // game type
