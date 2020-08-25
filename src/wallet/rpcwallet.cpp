@@ -823,7 +823,7 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
     }
 }
 
-UniValue GetBets(uint32_t count, uint32_t from, CWallet *pwalletMain, bool includeWatchonly) {
+UniValue GetBets(uint32_t count, uint32_t from, CWallet *_pwalletMain, boost::optional<std::string> accountName, bool includeWatchonly) {
     UniValue ret(UniValue::VARR);
 
     auto it = bettingsView->bets->NewIterator();
@@ -834,12 +834,16 @@ UniValue GetBets(uint32_t count, uint32_t from, CWallet *pwalletMain, bool inclu
         CBettingDB::BytesToDbType(it->Value(), uniBet);
         CBettingDB::BytesToDbType(it->Key(), key);
 
-        isminetype scriptType = IsMine(*pwalletMain, uniBet.playerAddress.Get());
-        if (pwalletMain) {
+        if (_pwalletMain) {
+            CTxDestination dest = uniBet.playerAddress.Get();
+            isminetype scriptType = IsMine(*_pwalletMain, dest);
             if (scriptType == ISMINE_NO)
                 continue;
             if (!(scriptType == ISMINE_WATCH_ONLY && includeWatchonly))
                 continue;
+            if (accountName && _pwalletMain->mapAddressBook.count(dest))
+                if (_pwalletMain->mapAddressBook[dest].name != *accountName)
+                    continue;
         }
 
         UniValue uValue(UniValue::VOBJ);
@@ -926,21 +930,22 @@ UniValue getallbets(const UniValue& params, bool fHelp)
     if (params.size() == 2)
         from = params[1].get_int();
 
-    return GetBets(count, from, NULL, false);
+    return GetBets(count, from, NULL, boost::optional<std::string>{}, false);
 }
 
 
 UniValue getmybets(const UniValue& params, bool fHelp)
 {
-    if (fHelp || params.size() > 3)
+    if (fHelp || params.size() > 4)
         throw std::runtime_error(
                 "getmybets\n"
                 "\nGet bets info for my wallets.\n"
 
                 "\nArguments:\n"
-                "1. count (numeric, optional, default=10) Limit response to last bets number.\n"
-                "2. from (numeric, optional, default=0) The number of bets to skip (from the last)\n"
-                "3. includeWatchonly (bool, optional, default=false) Include bets to watchonly addresses\n"
+                "1. account (string, optional) The account name. If not included, it will list all bets for all accounts. If \"\" is set, it will list transactions for the default account\n"
+                "2. count (numeric, optional, default=10) Limit response to last bets number.\n"
+                "3. from (numeric, optional, default=0) The number of bets to skip (from the last)\n"
+                "4. includeWatchonly (bool, optional, default=false) Include bets to watchonly addresses\n"
                 "\nResult:\n"
                 "[\n"
                 "  {\n"
@@ -989,21 +994,27 @@ UniValue getmybets(const UniValue& params, bool fHelp)
                 "\nExamples:\n" +
                 HelpExampleCli("getmybets", ""));
 
+
+    boost::optional<std::string> accountName = {};
+    if (params.size() >= 1)
+        accountName = params[0].get_str();
+
     uint32_t count = 10;
-    if (params.size()  >= 1)
-        count = params[0].get_int();
+    if (params.size() >= 2)
+        count = params[1].get_int();
 
     uint32_t from = 0;
-    if (params.size() >= 2)
-        from = params[1].get_int();
+    if (params.size() >= 3)
+        from = params[2].get_int();
 
     bool includeWatchonly = false;
-    if (params.size() == 3)
-        includeWatchonly = params[2].get_bool();
+    if (params.size() == 4)
+        includeWatchonly = params[3].get_bool();
+
 
     EnsureWalletIsUnlocked();
 
-    return GetBets(count, from, pwalletMain, includeWatchonly);
+    return GetBets(count, from, pwalletMain, accountName, includeWatchonly);
 }
 
 void CollectQGBetData(UniValue &uValue, QuickGamesBetKey &key, CQuickGamesBetDB &qgBet, uint256 hash, bool requiredPayoutInfo = false) {
