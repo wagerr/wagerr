@@ -14,6 +14,9 @@ OPCODE_BTX_EVENT = 0x02
 OPCODE_BTX_BET = 0x03
 OPCODE_BTX_RESULT = 0x04
 OPCODE_BTX_UPDATE_ODDS = 0x05
+OPCODE_BTX_CG_EVENT = 0x06
+OPCODE_BTX_CG_BET = 0x07
+OPCODE_BTX_CG_RESULT = 0x08
 OPCODE_BTX_SPREAD_EVENT = 0x09
 OPCODE_BTX_TOTALS_EVENT = 0x0a
 OPCODE_BTX_EVENT_PATCH = 0x0b
@@ -145,6 +148,17 @@ def make_result(event_id, result_type, home_score, away_score):
     result = result + encode_int_little_endian(result_type, 1)
     result = result + encode_int_little_endian(home_score, 2)
     result = result + encode_int_little_endian(away_score, 2)
+    return result
+
+def make_chain_games_event(event_id, fee):
+    result = make_common_header(OPCODE_BTX_CG_EVENT)
+    result = result + encode_int_little_endian(event_id, 2)
+    result = result + encode_int_little_endian(fee, 2)
+    return result
+
+def make_chain_games_result(event_id):
+    result = make_common_header(OPCODE_BTX_CG_RESULT)
+    result = result + encode_int_little_endian(event_id, 2)
     return result
 
 def get_utxo_list(node, address, min_amount=WGR_TX_FEE):

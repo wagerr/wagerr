@@ -1006,6 +1006,67 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Asian Spreads Bets Success")
 
+    def check_chain_games(self):
+        self.log.info("Check Chain Games Bets...")
+
+        cg_fee = 100
+        cgevent = make_chain_games_event(1, cg_fee)
+        post_opcode(self.nodes[1], cgevent, WGR_WALLET_EVENT['addr'])
+
+        # check that bet will be rejected due event isn't created in latest blocks (event will be created in same block)
+        assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[2].placechaingamesbet, 1, cg_fee)
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        self.nodes[2].placechaingamesbet(1, cg_fee)
+        self.nodes[3].placechaingamesbet(1, cg_fee)
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        expected_win = Decimal(cg_fee * 2 / 10 * 8)
+
+        cgresult = make_chain_games_result(1)
+        post_opcode(self.nodes[1], cgresult, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        player1_balance_before = Decimal(self.nodes[2].getbalance())
+        player2_balance_before = Decimal(self.nodes[3].getbalance())
+
+        # print("player1 balance before: ", player1_balance_before)
+        # print("player2 balance before: ", player2_balance_before)
+        # print("Expected win: ", expected_win)
+
+        # generate payout block
+        blockhash = self.nodes[0].generate(1)[0]
+        block = self.nodes[0].getblock(blockhash)
+
+        # pprint.pprint(block)
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        payoutsInfo = self.nodes[0].getpayoutinfosince(2)
+
+        # pprint.pprint(payoutsInfo)
+
+        player1_balance_after = Decimal(self.nodes[2].getbalance())
+        player2_balance_after = Decimal(self.nodes[3].getbalance())
+
+        # print("player1 balance after: ", player1_balance_after)
+        # print("player2 balance after: ", player2_balance_after)
+
+        assert_equal(player1_balance_before + player2_balance_before + expected_win, player1_balance_after + player2_balance_after)
+
+        self.log.info("Chain Games Bets Success")
+
     def run_test(self):
         self.check_minting()
         self.check_mapping()
@@ -1026,6 +1087,7 @@ class BettingTest(BitcoinTestFramework):
         self.check_mempool_accept()
         self.check_timecut_refund()
         self.check_asian_spreads_bet()
+        self.check_chain_games()
 
 if __name__ == '__main__':
     BettingTest().main()

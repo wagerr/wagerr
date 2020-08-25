@@ -220,7 +220,21 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case cgBetTxType:
             {
-                // TODO: add new check condition for chain games lotto bet
+                CChainGamesBetTx* cgBetTx = (CChainGamesBetTx*) bettingTx.get();
+
+                CChainGamesEventDB cgEvent;
+                EventKey eventKey{cgBetTx->nEventId};
+                if (!bettingsViewCache.chainGamesLottoEvents->Read(eventKey, cgEvent)) {
+                    return error("CheckBettingTX: Failed to find event %lu!", cgBetTx->nEventId);
+                }
+                // Check event result
+                if (bettingsViewCache.chainGamesLottoResults->Exists(eventKey)) {
+                    return error("CheckBettingTX: Bet placed to resulted event %lu!", cgBetTx->nEventId);
+                }
+                // Validate chain game bet amount
+                if (betAmount != cgEvent.nEntryFee * COIN) {
+                    return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
+                }
                 break;
             }
             case qgBetTxType:
@@ -488,6 +502,22 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case cgBetTxType:
             {
+                if (!wagerrProtocolV3) break;
+
+                CChainGamesBetTx* cgBetTx = (CChainGamesBetTx*) bettingTx.get();
+
+                LogPrintf("CChainGamesBetTx: nEventId: %lu,", cgBetTx->nEventId);
+                if (!bettingsView->chainGamesLottoEvents->Exists(EventKey{cgBetTx->nEventId})) {
+                    LogPrintf("Failed to find event!\n");
+                    continue;
+                }
+
+                if (!bettingsViewCache.chainGamesLottoBets->Write(
+                        ChainGamesBetKey{static_cast<uint32_t>(height), outPoint},
+                        CChainGamesBetDB{cgBetTx->nEventId, betAmount, address, blockTime})) {
+                    LogPrintf("Failed to write bet!\n");
+                    continue;
+                }
                 break;
             }
             case qgBetTxType:
@@ -497,9 +527,11 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 CQuickGamesBetTx* qgBetTx = (CQuickGamesBetTx*) bettingTx.get();
 
                 LogPrintf("CQuickGamesBetTx: gameType: %d, betInfo: %s", qgBetTx->gameType, std::string(qgBetTx->vBetInfo.begin(), qgBetTx->vBetInfo.end()));
-                bettingsViewCache.quickGamesBets->Write(
-                    QuickGamesBetKey{static_cast<uint32_t>(height), outPoint},
-                    CQuickGamesBetDB{ (QuickGamesType) qgBetTx->gameType, qgBetTx->vBetInfo, betAmount, address, blockTime});
+                if (!bettingsViewCache.quickGamesBets->Write(
+                        QuickGamesBetKey{static_cast<uint32_t>(height), outPoint},
+                        CQuickGamesBetDB{ (QuickGamesType) qgBetTx->gameType, qgBetTx->vBetInfo, betAmount, address, blockTime})) {
+                    LogPrintf("Failed to write bet!\n");
+                }
                 break;
             }
 
@@ -613,10 +645,39 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case cgEventTxType:
             {
+                if (!wagerrProtocolV3) break;
+
+                CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
+
+                LogPrintf("CChainGamesEventTx: nEventId: %d, nEntryFee: %d", cgEventTx->nEventId, cgEventTx->nEntryFee);
+
+                EventKey eventKey{cgEventTx->nEventId};
+                if (!bettingsViewCache.chainGamesLottoEvents->Write(
+                        eventKey,
+                        CChainGamesEventDB{ cgEventTx->nEventId, cgEventTx->nEntryFee })) {
+                    LogPrintf("Failed to write new event!\n");
+                    continue;
+                }
                 break;
             }
             case cgResultTxType:
             {
+                if (!wagerrProtocolV3) break;
+
+                CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
+
+                LogPrintf("CChainGamesResultTx: nEventId: %d", cgResultTx->nEventId);
+
+                if (!bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgResultTx->nEventId})) {
+                    LogPrintf("Failed to find event!\n");
+                    continue;
+                }
+                if (!bettingsViewCache.chainGamesLottoResults->Write(
+                        ResultKey{cgResultTx->nEventId},
+                        CChainGamesResultDB{ cgResultTx->nEventId })) {
+                    LogPrintf("Failed to write result!\n");
+                    continue;
+                }
                 break;
             }
             case plSpreadsEventTxType:
@@ -715,7 +776,7 @@ CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockH
 
         GetPLBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
 
-        GetCGLottoBetPayoutsV2(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+        GetCGLottoBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
 
         GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
     }
@@ -855,6 +916,21 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case cgBetTxType:
             {
+                if (!wagerrProtocolV3) break;
+
+                CChainGamesBetTx* cgBetTx = (CChainGamesBetTx*) bettingTx.get();
+
+                LogPrintf("CChainGamesBetTx: nEventId: %d", cgBetTx->nEventId);
+
+                if (!bettingsView->chainGamesLottoEvents->Exists(EventKey{cgBetTx->nEventId})) {
+                    LogPrintf("Failed to find event!\n");
+                    continue;
+                }
+
+                if (!bettingsViewCache.chainGamesLottoBets->Erase(ChainGamesBetKey{static_cast<uint32_t>(height), outPoint})) {
+                    LogPrintf("Revert failed!\n");
+                    return false;
+                }
                 break;
             }
             case qgBetTxType:
@@ -976,11 +1052,33 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             case cgEventTxType:
             {
                 if (!validOracleTx) break;
+
+                if (!wagerrProtocolV3) break;
+
+                CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
+
+                LogPrintf("CChainGamesEventTx: nEventId: %d, nEntryFee: %d", cgEventTx->nEventId, cgEventTx->nEntryFee);
+
+                if (!bettingsViewCache.chainGamesLottoEvents->Erase(EventKey{cgEventTx->nEventId})) {
+                    LogPrintf("Revert failed!\n");
+                    return false;
+                }
                 break;
             }
             case cgResultTxType:
             {
                 if (!validOracleTx) break;
+
+                if (!wagerrProtocolV3) break;
+
+                CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
+
+                LogPrintf("CChainGamesEventTx: nEventId: %d", cgResultTx->nEventId);
+
+                if (!bettingsViewCache.chainGamesLottoResults->Erase(ResultKey{cgResultTx->nEventId})) {
+                    LogPrintf("Revert failed!\n");
+                    return false;
+                }
                 break;
             }
             case plSpreadsEventTxType:

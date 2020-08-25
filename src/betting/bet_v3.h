@@ -13,6 +13,9 @@ class CBettingsView;
 class CPeerlessLegDB;
 class CPeerlessBaseEventDB;
 class CPeerlessResultDB;
+class CChainGamesEventDB;
+class CChainGamesBetDB;
+class CChainGamesResultDB;
 
 
 void GetPLRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
@@ -22,5 +25,8 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
 
 /* Creates the bet payout vector for all winning Quick Games bets */
 uint32_t GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
+
+/** Get the chain games winner and return the payout vector. **/
+void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 
 #endif // WAGERR_V3_BET_H

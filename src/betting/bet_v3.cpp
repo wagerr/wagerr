@@ -57,7 +57,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
 
     CAmount effectivePayoutsSum, grossPayoutsSum = effectivePayoutsSum = 0;
 
-    LogPrintf("Start generating payouts...\n");
+    LogPrintf("Start generating peerless bets payouts...\n");
 
     for (auto result : results) {
 
@@ -333,4 +333,119 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
     for (auto pair : vEntriesToUpdate) {
         bettingsViewCache.quickGamesBets->Update(pair.first, pair.second);
     }
+
+    LogPrintf("Finished generating payouts...\n");
+}
+
+void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+{
+    const int nLastBlockHeight = nNewBlockHeight - 1;
+
+    // Get all the results posted in the prev block.
+    std::vector<CChainGamesResultDB> results;
+
+    GetCGLottoEventResults(nLastBlockHeight, results);
+
+    bool fWagerrProtocolV3 = nLastBlockHeight >= Params().WagerrProtocolV3StartHeight();
+
+    std::vector<std::pair<ChainGamesBetKey, CChainGamesBetDB>> vEntriesToUpdate;
+
+    PeerlessBetKey zeroKey{(uint32_t) nNewBlockHeight, COutPoint()};
+
+    LogPrintf("Start generating chain games bets payouts...\n");
+
+    for (auto result : results) {
+
+        LogPrintf("Looking for bets of eventId: %lu\n", result.nEventId);
+
+        CChainGamesEventDB cgEvent;
+        if (!bettingsViewCache.chainGamesLottoEvents->Read(EventKey{result.nEventId}, cgEvent)) {
+            LogPrintf("\n!!! Failed to find event %lu for result !!!\n", result.nEventId);
+            continue;
+        }
+
+        CAmount entranceFee = static_cast<CAmount>(cgEvent.nEntryFee) * COIN;
+
+        //reset candidate array for this event
+        std::vector<std::pair<ChainGamesBetKey, CChainGamesBetDB>> candidates;
+
+        // look bets at last 14 days
+        uint32_t startHeight = nLastBlockHeight >= Params().BetBlocksIndexTimespan() ? nLastBlockHeight - Params().BetBlocksIndexTimespan() : 0;
+
+        auto it = bettingsViewCache.chainGamesLottoBets->NewIterator();
+        for (it->Seek(CBettingDB::DbTypeToBytes(ChainGamesBetKey{static_cast<uint32_t>(startHeight), COutPoint()})); it->Valid(); it->Next()) {
+            ChainGamesBetKey cgBetKey;
+            CChainGamesBetDB cgBet;
+            CBettingDB::BytesToDbType(it->Key(), cgBetKey);
+            CBettingDB::BytesToDbType(it->Value(), cgBet);
+
+            if (cgBet.IsCompleted() ||
+                    cgBet.nEventId != result.nEventId ||
+                    cgBet.betAmount != entranceFee) {
+                continue;
+            }
+
+            cgBet.SetCompleted();
+            // Add a bet of each candidate to array
+            LogPrintf("Candidate found, address: %s\n", cgBet.playerAddress.ToString().c_str());
+            candidates.push_back(std::pair<ChainGamesBetKey, CChainGamesBetDB>{cgBetKey, cgBet});
+        }
+
+        // Choose winner from candidates who entered the lotto and payout their winnings.
+        if (candidates.size() == 1) {
+            // Refund the single entrant.
+            CAmount noOfBets = candidates.size();
+            CBitcoinAddress winnerAddress = candidates[0].second.playerAddress;
+            CAmount winnerPayout = entranceFee;
+
+            LogPrintf("Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+            LogPrintf("Winner Address: %s \n", winnerAddress.ToString().c_str());
+            LogPrintf(" This Lotto was refunded as only one person bought a ticket.\n" );
+
+            // Only add valid payouts to the vector.
+            if (winnerPayout > 0) {
+                vPayoutsInfo.emplace_back(candidates[0].first, PayoutType::chainGamesRefund);
+                vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(winnerAddress.Get()), entranceFee, result.nEventId);
+            }
+        }
+        else if (candidates.size() >= 2) {
+            // Use random number to choose winner.
+            auto noOfBets    = candidates.size();
+
+            CBlockIndex *winBlockIndex = chainActive[nLastBlockHeight];
+            uint256 hashProofOfStake = winBlockIndex->hashProofOfStake;
+            if (hashProofOfStake == 0) hashProofOfStake = winBlockIndex->GetBlockHash();
+            uint256 tempVal = hashProofOfStake / noOfBets;  // quotient
+            tempVal = tempVal * noOfBets;
+            tempVal = hashProofOfStake - tempVal;           // remainder
+            uint64_t winnerNr = tempVal.Get64();
+
+            // Split the pot and calculate winnings.
+            CBitcoinAddress winnerAddress = candidates[winnerNr].second.playerAddress;
+            CAmount totalPot = hashProofOfStake == 0 ? 0 : (noOfBets * entranceFee);
+            CAmount winnerPayout = totalPot / 10 * 8;
+            candidates[winnerNr].second.payout = winnerPayout;
+            CAmount fee = totalPot / 50;
+
+            LogPrintf("Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+            LogPrintf("Winner Address: %s (index no %u) \n", winnerAddress.ToString().c_str(), winnerNr);
+            LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
+
+            // Only add valid payouts to the vector.
+            if (winnerPayout > 0) {
+                vPayoutsInfo.emplace_back(candidates[winnerNr].first, PayoutType::chainGamesPayout);
+                vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, result.nEventId);
+                LogPrintf("Reward address: %s, reward: %ll\n", Params().OMNOPayoutAddr(), fee);
+                vPayoutsInfo.emplace_back(zeroKey, PayoutType::chainGamesReward);
+                vExpectedPayouts.emplace_back(fee, GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get()), 0);
+            }
+            vEntriesToUpdate.insert(vEntriesToUpdate.end(), candidates.begin(), candidates.end());
+        }
+    }
+
+    for (auto pair : vEntriesToUpdate) {
+        bettingsViewCache.chainGamesLottoBets->Update(pair.first, pair.second);
+    }
+
+    LogPrintf("Finished generating payouts...\n");
 }
