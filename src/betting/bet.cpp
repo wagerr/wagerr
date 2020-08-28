@@ -262,41 +262,147 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             case plEventTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CPeerlessEventTx* plEventTx = (CPeerlessEventTx*) bettingTx.get();
+
+                if (bettingsViewCache.events->Exists(EventKey{plEventTx->nEventId}))
+                    return error("CheckBettingTX: trying to create existed event id %lu!", plEventTx->nEventId);
+
+                if (!bettingsViewCache.mappings->Exists(MappingKey{sportMapping, (uint32_t) plEventTx->nSport}))
+                    return error("CheckBettingTX: trying to create event with unknown sport id %lu!", plEventTx->nSport);
+
+                if (!bettingsViewCache.mappings->Exists(MappingKey{tournamentMapping, (uint32_t) plEventTx->nTournament}))
+                    return error("CheckBettingTX: trying to create event with unknown tournament id %lu!", plEventTx->nTournament);
+
+                if (!bettingsViewCache.mappings->Exists(MappingKey{roundMapping, (uint32_t) plEventTx->nStage}))
+                    return error("CheckBettingTX: trying to create event with unknown round id %lu!", plEventTx->nStage);
+
+                if (!bettingsViewCache.mappings->Exists(MappingKey{teamMapping, plEventTx->nHomeTeam}))
+                    return error("CheckBettingTX: trying to create event with unknown home team id %lu!", plEventTx->nHomeTeam);
+
+                if (!bettingsViewCache.mappings->Exists(MappingKey{teamMapping, plEventTx->nAwayTeam}))
+                    return error("CheckBettingTX: trying to create event with unknown away team id %lu!", plEventTx->nAwayTeam);
+
+                /*
+                if (!CHECK_ODDS(plEventTx->nHomeOdds))
+                    return error("CheckBettingTX: invalid home odds %lu!", plEventTx->nHomeOdds);
+
+                if (!CHECK_ODDS(plEventTx->nAwayOdds))
+                    return error("CheckBettingTX: invalid away odds %lu!", plEventTx->nAwayOdds);
+
+                if (!CHECK_ODDS(plEventTx->nDrawOdds))
+                    return error("CheckBettingTX: invalid draw odds %lu!", plEventTx->nDrawOdds);
+                */
+
                 break;
             }
             case plResultTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CPeerlessResultTx* plResultTx = (CPeerlessResultTx*) bettingTx.get();
+
+                if (!bettingsViewCache.events->Exists(EventKey{plResultTx->nEventId}))
+                    return error("CheckBettingTX: trying to result not existed event id %lu!", plResultTx->nEventId);
+
+                if (bettingsViewCache.results->Exists(ResultKey{plResultTx->nEventId}))
+                    return error("CheckBettingTX: trying to result already resulted event id %lu!", plResultTx->nEventId);
                 break;
             }
             case plUpdateOddsTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CPeerlessUpdateOddsTx* plUpdateOddsTx = (CPeerlessUpdateOddsTx*) bettingTx.get();
+
+                if (!bettingsViewCache.events->Exists(EventKey{plUpdateOddsTx->nEventId}))
+                    return error("CheckBettingTX: trying to update not existed event id %lu!", plUpdateOddsTx->nEventId);
+
+                /*
+                if (!CHECK_ODDS(plUpdateOddsTx->nHomeOdds))
+                    return error("CheckBettingTX: invalid home odds %lu!", plUpdateOddsTx->nHomeOdds);
+
+                if (!CHECK_ODDS(plUpdateOddsTx->nAwayOdds))
+                    return error("CheckBettingTX: invalid away odds %lu!", plUpdateOddsTx->nAwayOdds);
+
+                if (!CHECK_ODDS(plUpdateOddsTx->nDrawOdds))
+                    return error("CheckBettingTX: invalid draw odds %lu!", plUpdateOddsTx->nDrawOdds);
+                */
+
                 break;
             }
             case cgEventTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
+
+                if (bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgEventTx->nEventId}))
+                    return error("CheckBettingTX: trying to create existed chain games event id %lu!", cgEventTx->nEventId);
+
                 break;
             }
             case cgResultTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
+
+                if (!bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgResultTx->nEventId}))
+                    return error("CheckBettingTX: trying to result not existed chain games event id %lu!", cgResultTx->nEventId);
+
+                if (bettingsViewCache.chainGamesLottoResults->Exists(ResultKey{cgResultTx->nEventId}))
+                    return error("CheckBettingTX: trying to result already resulted chain games event id %lu!", cgResultTx->nEventId);
+
                 break;
             }
             case plSpreadsEventTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CPeerlessSpreadsEventTx* plSpreadsEventTx = (CPeerlessSpreadsEventTx*) bettingTx.get();
+
+                if (!bettingsViewCache.events->Exists(EventKey{plSpreadsEventTx->nEventId}))
+                    return error("CheckBettingTX: trying to create spreads at not existed event id %lu!", plSpreadsEventTx->nEventId);
+
+                /*
+                if (!CHECK_ODDS(plSpreadsEventTx->nHomeOdds))
+                    return error("CheckBettingTX: invalid spreads home odds %lu!", plSpreadsEventTx->nHomeOdds);
+
+                if (!CHECK_ODDS(plSpreadsEventTx->nAwayOdds))
+                    return error("CheckBettingTX: invalid spreads away odds %lu!", plSpreadsEventTx->nAwayOdds);
+                */
+
                 break;
             }
             case plTotalsEventTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CPeerlessTotalsEventTx* plTotalsEventTx = (CPeerlessTotalsEventTx*) bettingTx.get();
+
+                if (!bettingsViewCache.events->Exists(EventKey{plTotalsEventTx->nEventId}))
+                    return error("CheckBettingTX: trying to create totals at not existed event id %lu!", plTotalsEventTx->nEventId);
+
+                /*
+                if (!CHECK_ODDS(plTotalsEventTx->nOverOdds))
+                    return error("CheckBettingTX: invalid totals over odds %lu!", plTotalsEventTx->nOverOdds);
+
+                if (!CHECK_ODDS(plTotalsEventTx->nUnderOdds))
+                    return error("CheckBettingTX: invalid totals under odds %lu!", plTotalsEventTx->nUnderOdds);
+                */
+
                 break;
             }
             case plEventPatchTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CPeerlessEventPatchTx* plEventPatchTx = (CPeerlessEventPatchTx*) bettingTx.get();
+
+                if (!bettingsViewCache.events->Exists(EventKey{plEventPatchTx->nEventId}))
+                    return error("CheckBettingTX: trying to patch not existed event id %lu!", plEventPatchTx->nEventId);
+
                 break;
             }
             default:

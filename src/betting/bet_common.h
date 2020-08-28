@@ -18,6 +18,9 @@ class CPayoutInfoDB;
 
 #define BET_ODDSDIVISOR 10000   // Odds divisor, Facilitates calculations with floating integers.
 #define BET_BURNXPERMILLE 60    // Burn promillage
+#define BET_MAXODDS (99 * BET_ODDSDIVISOR)
+#define BET_MINODDS BET_ODDSDIVISOR
+#define CHECK_ODDS(odds) (odds > BET_MINODDS && odds <= BET_MAXODDS)
 
 // The supported bet outcome types.
 typedef enum OutcomeType {
