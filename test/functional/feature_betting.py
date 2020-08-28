@@ -345,8 +345,8 @@ class BettingTest(BitcoinTestFramework):
 
         self.start_time = int(time.time() + 60 * 20) # new time - curr + 20mins
 
-        for id in range(len(tournament_names)):
-            event_patch = make_event_patch(id, self.start_time)
+        for event in events:
+            event_patch = make_event_patch(event['event_id'], self.start_time)
             post_opcode(self.nodes[1], event_patch, WGR_WALLET_EVENT['addr'])
 
         self.sync_all()
@@ -855,6 +855,32 @@ class BettingTest(BitcoinTestFramework):
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[2].placebet, 3, outcome_away_win, 1000)
         # bets to nonexistent events shouldn't accepted to memory pool
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
+
+        # creating existed mapping
+        mapping_opcode = make_mapping(TEAM_MAPPING, 0, "anotherTeamName")
+        assert_raises_rpc_error(-25, "", post_opcode, self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
+
+        # creating exited event shouldn't accepted to memory pool
+        test_event = make_event(0, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("Football"), # Sport ID
+                            tournament_names.index("UEFA Champions League"), # Tournament ID
+                            round_names.index("round2"), # Round ID
+                            team_names.index("Barcelona"), # Home Team
+                            team_names.index("Real Madrid"), # Away Team
+                            14000, # home odds
+                            33000, # away odds
+                            0) # draw odds
+        assert_raises_rpc_error(-25, "", post_opcode, self.nodes[1], test_event, WGR_WALLET_EVENT['addr'])
+
+        # creating result for resulted event shouldn't accepted to memory pool
+        result_opcode = make_result(4, STANDARD_RESULT, 1, 1)
+        assert_raises_rpc_error(-25, "", post_opcode, self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+
+        # creating totals for not existed event shouldn't accepted to memory pool
+        totals_event_opcode = make_total_event(1000, 26, 21000, 23000)
+        assert_raises_rpc_error(-25, "", post_opcode, self.nodes[1], totals_event_opcode, WGR_WALLET_EVENT['addr'])
+
         self.log.info("Mempool Accepting Success")
 
     def check_timecut_refund(self):
