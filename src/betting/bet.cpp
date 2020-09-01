@@ -441,7 +441,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
         CAmount betAmount{txOut.nValue};
         COutPoint outPoint{tx.GetHash(), (uint32_t) i};
-        uint256 undoId = SerializeHash(outPoint);
+        uint256 bettingTxId = SerializeHash(outPoint);
 
         switch(bettingTx->GetTxType()) {
             /* Player's tx types */
@@ -464,7 +464,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                         plCachedEvent.nHomeOdds, plCachedEvent.nAwayOdds, plCachedEvent.nDrawOdds, plCachedEvent.nSpreadHomeOdds, plCachedEvent.nSpreadAwayOdds, plCachedEvent.nTotalOverOdds, plCachedEvent.nTotalUnderOdds);
 
                     // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
                     // Check which outcome the bet was placed on and add to accumulators
                     switch (plBet.nOutcome) {
                         case moneyLineHomeWin:
@@ -522,6 +522,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                             break;
                     }
                     if (!bettingsViewCache.events->Update(eventKey, plEvent)) {
+                        // should not happen ever
                         LogPrintf("Failed to update event!\n");
                         continue;
                     }
@@ -601,7 +602,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 }
                 if (!legs.empty()) {
                     // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(undoId, vUndos);
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
                     bettingsViewCache.bets->Write(PeerlessBetKey{static_cast<uint32_t>(height), outPoint}, CPeerlessBetDB(betAmount, address, legs, lockedEvents, blockTime));
                 }
                 break;
@@ -650,8 +651,13 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
 
                 LogPrintf("CMapping: type: %lu, id: %lu, name: %s\n", mapTx->nMType, mapTx->nId, mapTx->sName);
-                if (!bettingsViewCache.mappings->Write(MappingKey{MappingType(mapTx->nMType), mapTx->nId}, CMappingDB{mapTx->sName}))
+                if (!bettingsViewCache.mappings->Write(MappingKey{MappingType(mapTx->nMType), mapTx->nId}, CMappingDB{mapTx->sName})) {
+                    if (!wagerrProtocolV3) {
+                        // save failed tx to db, for avoiding undo issues
+                        bettingsViewCache.SaveFailedTx(bettingTxId);
+                    }
                     LogPrintf("Failed to write new mapping!\n");
+                }
                 break;
             }
             case plEventTxType:
@@ -687,7 +693,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                             bettingsViewCache.events->Read(eventKey, plEventToPatch)) {
                         LogPrintf("CPeerlessEvent - Legacy - try to patch with new event data: id: %lu, time: %lu\n", plEvent.nEventId, plEvent.nStartTime);
                         // save prev event state to undo
-                        bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndoDB{BettingUndoVariant{plEventToPatch}, (uint32_t)height}});
+                        bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEventToPatch}, (uint32_t)height}});
 
                         plEventToPatch.nStartTime = plEvent.nStartTime;
                         plEventToPatch.nSport = plEvent.nSport;
@@ -700,9 +706,14 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                         plEventToPatch.nDrawOdds = plEvent.nDrawOdds;
 
                         if (!bettingsViewCache.events->Update(eventKey, plEventToPatch)) {
+                            // should not happen ever
                             LogPrintf("Failed to update event!\n");
                         }
                     } else {
+                        if (!wagerrProtocolV3) {
+                            // save failed tx to db, for avoiding undo issues
+                            bettingsViewCache.SaveFailedTx(bettingTxId);
+                        }
                         LogPrintf("Failed to write new event!\n");
                     }
                 }
@@ -719,8 +730,23 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 CPeerlessResultDB plResult{plResultTx->nEventId, plResultTx->nResultType, plResultTx->nHomeScore, plResultTx->nAwayScore};
 
-                if (!bettingsViewCache.results->Write(ResultKey{plResult.nEventId}, plResult))
+                if (!bettingsViewCache.events->Exists(EventKey{plResult.nEventId})) {
+                    if (!wagerrProtocolV3) {
+                        // save failed tx to db, for avoiding undo issues
+                        bettingsViewCache.SaveFailedTx(bettingTxId);
+                    }
+                    LogPrintf("Failed to find event!\n");
+                    break;
+                }
+
+                if (!bettingsViewCache.results->Write(ResultKey{plResult.nEventId}, plResult)) {
+                    if (!wagerrProtocolV3) {
+                        // save failed tx to db, for avoiding undo issues
+                        bettingsViewCache.SaveFailedTx(bettingTxId);
+                    }
                     LogPrintf("Failed to write result!\n");
+                    break;
+                }
                 break;
             }
             case plUpdateOddsTxType:
@@ -736,7 +762,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 // First check a peerless event exists in DB.
                 if (bettingsViewCache.events->Read(eventKey, plEvent)) {
                     // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
 
                     plEvent.ExtractDataFromTx(*plUpdateOddsTx);
 
@@ -745,6 +771,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                         LogPrintf("Failed to update event!\n");
                 }
                 else {
+                    if (!wagerrProtocolV3) {
+                        // save failed tx to db, for avoiding undo issues
+                        bettingsViewCache.SaveFailedTx(bettingTxId);
+                    }
                     LogPrintf("Failed to find event!\n");
                 }
                 break;
@@ -762,7 +792,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                         eventKey,
                         CChainGamesEventDB{ cgEventTx->nEventId, cgEventTx->nEntryFee })) {
                     LogPrintf("Failed to write new event!\n");
-                    continue;
+                    break;
                 }
                 break;
             }
@@ -776,13 +806,13 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 if (!bettingsViewCache.chainGamesLottoEvents->Exists(EventKey{cgResultTx->nEventId})) {
                     LogPrintf("Failed to find event!\n");
-                    continue;
+                    break;
                 }
                 if (!bettingsViewCache.chainGamesLottoResults->Write(
                         ResultKey{cgResultTx->nEventId},
                         CChainGamesResultDB{ cgResultTx->nEventId })) {
                     LogPrintf("Failed to write result!\n");
-                    continue;
+                    break;
                 }
                 break;
             }
@@ -800,7 +830,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 // First check a peerless event exists in the event index.
                 if (bettingsViewCache.events->Read(eventKey, plEvent)) {
                     // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
 
                     plEvent.ExtractDataFromTx(*plSpreadsEventTx);
                     // Update the event in the DB.
@@ -808,6 +838,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                         LogPrintf("Failed to update event!\n");
                 }
                 else {
+                    if (!wagerrProtocolV3) {
+                        // save failed tx to db, for avoiding undo issues
+                        bettingsViewCache.SaveFailedTx(bettingTxId);
+                    }
                     LogPrintf("Failed to find event!\n");
                 }
                 break;
@@ -826,7 +860,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 // First check a peerless event exists in the event index.
                 if (bettingsViewCache.events->Read(eventKey, plEvent)) {
                     // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
 
                     plEvent.ExtractDataFromTx(*plTotalsEventTx);
 
@@ -835,6 +869,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                         LogPrintf("Failed to update event!\n");
                 }
                 else {
+                    if (!wagerrProtocolV3) {
+                        // save failed tx to db, for avoiding undo issues
+                        bettingsViewCache.SaveFailedTx(bettingTxId);
+                    }
                     LogPrintf("Failed to find event!\n");
                 }
                 break;
@@ -850,7 +888,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 // First check a peerless event exists in DB
                 if (bettingsViewCache.events->Read(eventKey, plEvent)) {
                     // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(undoId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
 
                     plEvent.ExtractDataFromTx(*plEventPatchTx);
 
@@ -858,6 +896,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                         LogPrintf("Failed to update event!\n");
                 }
                 else {
+                    if (!wagerrProtocolV3) {
+                        // save failed tx to db, for avoiding undo issues
+                        bettingsViewCache.SaveFailedTx(bettingTxId);
+                    }
                     LogPrintf("Failed to find event!\n");
                 }
                 break;
@@ -960,7 +1002,13 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
         if (bettingTx == nullptr) continue;
 
         COutPoint outPoint{tx.GetHash(), (uint32_t) i};
-        uint256 undoId = SerializeHash(outPoint);
+        uint256 bettingTxId = SerializeHash(outPoint);
+
+        if (!wagerrProtocolV3 && bettingsViewCache.ExistFailedTx(bettingTxId)) {
+            // failed tx, just skip it
+            bettingsViewCache.EraseFailedTx(bettingTxId);
+            continue;
+        }
 
         switch(bettingTx->GetTxType()) {
             /* Player's tx types */
@@ -973,10 +1021,11 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 LogPrintf("CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
 
                 if (bettingsViewCache.events->Exists(EventKey{plBet.nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;
                     }
+                    // erase bet from db
                     PeerlessBetKey key{static_cast<uint32_t>(height), outPoint};
                     bettingsViewCache.bets->Erase(key);
                 }
@@ -1010,10 +1059,11 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 }
 
                 if (!legs.empty() && allEventsExist) {
-                    if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;
                     }
+                    // erase bet from db
                     PeerlessBetKey key{static_cast<uint32_t>(height), outPoint};
                     bettingsViewCache.bets->Erase(key);
                 }
@@ -1093,8 +1143,8 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 if (bettingsViewCache.events->Exists(EventKey{plEventTx->nEventId})) {
                     // try to undo legacy event patch
-                    if (!wagerrProtocolV3 && bettingsViewCache.ExistsBettingUndo(undoId)) {
-                        if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
+                    if (!wagerrProtocolV3 && bettingsViewCache.ExistsBettingUndo(bettingTxId)) {
+                        if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                             LogPrintf("Revert failed!\n");
                             return false;
                         }
@@ -1139,13 +1189,15 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 LogPrintf("CPeerlessUpdateOdds: id: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu\n",
                     plUpdateOddsTx->nEventId, plUpdateOddsTx->nHomeOdds, plUpdateOddsTx->nAwayOdds, plUpdateOddsTx->nDrawOdds);
 
-                if (!bettingsViewCache.ExistsBettingUndo(undoId)) {
+                /*
+                if (!bettingsViewCache.ExistsBettingUndo(bettingTxId)) {
                     LogPrintf("Failed to find undo entry, probably this tx didn't affect the chain!\n");
                     break;
                 }
+                */
 
                 if (bettingsViewCache.events->Exists(EventKey{plUpdateOddsTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;
                     }
@@ -1196,13 +1248,15 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 LogPrintf("CPeerlessSpreadsEvent: id: %lu, spreadPoints: %lu, homeOdds: %lu, awayOdds: %lu\n",
                     plSpreadsEventTx->nEventId, plSpreadsEventTx->nPoints, plSpreadsEventTx->nHomeOdds, plSpreadsEventTx->nAwayOdds);
 
-                if (!bettingsViewCache.ExistsBettingUndo(undoId)) {
+                /*
+                if (!bettingsViewCache.ExistsBettingUndo(bettingTxId)) {
                     LogPrintf("Failed to find undo entry, probably this tx didn't affect the chain!\n");
                     break;
                 }
+                */
 
                 if (bettingsViewCache.events->Exists(EventKey{plSpreadsEventTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;
                     }
@@ -1221,13 +1275,15 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 LogPrintf("CPeerlessTotalsEvent: id: %lu, totalPoints: %lu, overOdds: %lu, underOdds: %lu\n",
                     plTotalsEventTx->nEventId, plTotalsEventTx->nPoints, plTotalsEventTx->nOverOdds, plTotalsEventTx->nUnderOdds);
 
-                if (!bettingsViewCache.ExistsBettingUndo(undoId)) {
+                /*
+                if (!bettingsViewCache.ExistsBettingUndo(bettingTxId)) {
                     LogPrintf("Failed to find undo entry, probably this tx didn't affect the chain!\n");
                     break;
                 }
+                */
 
                 if (bettingsViewCache.events->Exists(EventKey{plTotalsEventTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;
                     }
@@ -1245,13 +1301,15 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 CPeerlessEventPatchTx* plEventPatchTx = (CPeerlessEventPatchTx*) bettingTx.get();
                 LogPrintf("CPeerlessEventPatch: id: %lu, time: %lu\n", plEventPatchTx->nEventId, plEventPatchTx->nStartTime);
 
-                if (!bettingsViewCache.ExistsBettingUndo(undoId)) {
+                /*
+                if (!bettingsViewCache.ExistsBettingUndo(bettingTxId)) {
                     LogPrintf("Failed to find undo entry, probably this tx didn't affect the chain!\n");
                     break;
                 }
+                */
 
                 if (bettingsViewCache.events->Exists(EventKey{plEventPatchTx->nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, undoId, height)) {
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;
                     }
@@ -1420,7 +1478,7 @@ bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector
             return false;
         }
 
-        // undo in back order
+        // undo betting txs in back order
         for (auto it = vtx.crbegin(); it != vtx.crend(); it++) {
             if (!UndoBettingTx(bettingsViewCache, *it, height)) {
                 error("DisconnectBlock(): custom transaction and undo data inconsistent");

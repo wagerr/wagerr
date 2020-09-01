@@ -118,6 +118,7 @@ bool CBettingsView::Flush() {
             chainGamesLottoEvents->Flush() &&
             chainGamesLottoBets->Flush() &&
             chainGamesLottoResults->Flush();
+            failedBettingTxs->Flush();
 }
 
 unsigned int CBettingsView::GetCacheSize() {
@@ -130,7 +131,8 @@ unsigned int CBettingsView::GetCacheSize() {
             quickGamesBets->GetCacheSize() +
             chainGamesLottoEvents->GetCacheSize() +
             chainGamesLottoBets->GetCacheSize() +
-            chainGamesLottoResults->GetCacheSize();
+            chainGamesLottoResults->GetCacheSize() +
+            failedBettingTxs->GetCacheSize();
 }
 
 unsigned int CBettingsView::GetCacheSizeBytesToWrite() {
@@ -143,7 +145,8 @@ unsigned int CBettingsView::GetCacheSizeBytesToWrite() {
             quickGamesBets->GetCacheSizeBytesToWrite() +
             chainGamesLottoEvents->GetCacheSizeBytesToWrite() +
             chainGamesLottoBets->GetCacheSizeBytesToWrite() +
-            chainGamesLottoResults->GetCacheSizeBytesToWrite();
+            chainGamesLottoResults->GetCacheSizeBytesToWrite() +
+            failedBettingTxs->GetCacheSizeBytesToWrite();
 }
 
 void CBettingsView::SetLastHeight(uint32_t height) {
@@ -204,4 +207,17 @@ void CBettingsView::PruneOlderUndos(const uint32_t height) {
     for (auto && key : vKeysToDelete) {
         undos->Erase(key);
     }
+}
+
+bool CBettingsView::SaveFailedTx(const FailedTxKey& key) {
+    assert(!failedBettingTxs->Exists(key));
+    return failedBettingTxs->Write(key, 0);
+}
+
+bool CBettingsView::ExistFailedTx(const FailedTxKey& key) {
+    return failedBettingTxs->Exists(key);
+}
+
+bool CBettingsView::EraseFailedTx(const FailedTxKey& key) {
+    return failedBettingTxs->Erase(key);
 }
