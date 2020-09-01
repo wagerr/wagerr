@@ -1483,6 +1483,9 @@ bool AppInit2()
                 bettingsView->chainGamesLottoResultsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("cglottoresults"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
                 bettingsView->chainGamesLottoResults = MakeUnique<CBettingDB>(*bettingsView->chainGamesLottoResultsStorage.get());
 
+                bettingsView->failedBettingTxsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("failedtxs"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->failedBettingTxs = MakeUnique<CBettingDB>(*bettingsView->failedBettingTxsStorage.get());
+
                 if (fReindex)
                     pblocktree->WriteReindexing(true);
 

@@ -795,6 +795,8 @@ public:
     }
 };
 
+using FailedTxKey = BettingUndoKey;
+
 /** Container for several db objects */
 class CBettingsView
 {
@@ -820,6 +822,10 @@ public:
     std::unique_ptr<CStorageKV> chainGamesLottoBetsStorage;
     std::unique_ptr<CBettingDB> chainGamesLottoResults; // "cglottoresults"
     std::unique_ptr<CStorageKV> chainGamesLottoResultsStorage;
+    // save failed tx ids which contain in chain, but not affect on
+    // it needed to avoid undo issues, when we try undo not affected tx
+    std::unique_ptr<CBettingDB> failedBettingTxs; // "failedtxs"
+    std::unique_ptr<CStorageKV> failedBettingTxsStorage;
 
     // default constructor
     explicit CBettingsView() { }
@@ -846,6 +852,12 @@ public:
     bool ExistsBettingUndo(const BettingUndoKey& key);
 
     void PruneOlderUndos(const uint32_t height);
+
+    bool SaveFailedTx(const FailedTxKey& key);
+
+    bool ExistFailedTx(const FailedTxKey& key);
+
+    bool EraseFailedTx(const FailedTxKey& key);
 };
 
 #endif
