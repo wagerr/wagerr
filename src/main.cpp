@@ -1988,61 +1988,20 @@ double ConvertBitsToDouble(unsigned int nBits)
 
 int64_t GetBlockValue(int nHeight)
 {
-
     if (Params().NetworkID() == CBaseChainParams::REGTEST || Params().NetworkID() == CBaseChainParams::TESTNET) {
-        if (nHeight == 0) {
-            // Genesis block
-            return 0 * COIN;
-        } else if (nHeight == 1) {
-            /* PREMINE: Current available wagerr on DEX marketc 198360471 wagerr
-            Info abobut premine:
-            Full premine size is 198360471. First 100 blocks mine 250000 wagerr per block - 198360471 - (100 * 250000) = 173360471
-            */
-            // 87.4 % of premine
-            return 173360471 * COIN;
-        } else if (nHeight < 200 && nHeight > 1) {
-            return 250000 * COIN;
-        } else if (nHeight >= 200 && nHeight <= Params().LAST_POW_BLOCK()) {
-            return 100000 * COIN;
-        } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight <= Params().Zerocoin_Block_V2_Start()) {
-            return 3.8 / 90 * 100 * COIN;
-        } else if (nHeight > Params().Zerocoin_Block_V2_Start()) {
-            return 3.8 * COIN;
-        } else {
-            return 0 * COIN;
-        }
+        if (nHeight > Params().Zerocoin_Block_V2_Start() + 1) return 3.8 * COIN;
+        if (nHeight > Params().LAST_POW_BLOCK() + 1) return 3.8 / 90 * 100 * COIN;
+        if (nHeight > 201) 100000 * COIN;
+        if (nHeight > 2) return 250000 * COIN;
+        if (nHeight == 2) return 173360471 * COIN;
+        return 0 * COIN;
     }
 
-
-    // MAIN
-    int64_t nSubsidy = 0;
-    if (nHeight == 0) {
-        // Genesis block
-        nSubsidy = 0 * COIN;
-    } else if (nHeight == 1) {
-        /* PREMINE: Current available wagerr on DEX marketc 198360471 wagerr
-        Info abobut premine:
-        Full premine size is 198360471. First 100 blocks mine 250000 wagerr per block - 198360471 - (100 * 250000) = 173360471
-        */
-        // 87.4 % of premine
-        nSubsidy = 173360471 * COIN;
-    } else if (nHeight > 1 && nHeight <= 101 && nHeight <= Params().LAST_POW_BLOCK()) { // check for last PoW block is not required, it does not harm to leave it *** TODO ***
-        // PoW Phase 1 does produce 12.6 % of full premine (25000000 WGR)
-        nSubsidy = 250000 * COIN;
-    } else if (nHeight > 1 && nHeight > 101 && nHeight <= Params().LAST_POW_BLOCK()) {
-        // PoW Phase does not produce any coins
-        nSubsidy = 0 * COIN;
-    } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight <= 10000) {
-        // PoS - Phase 1 lasts until block 1110)
-        nSubsidy = 0 * COIN;
-    } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight > 10000) {
-        // PoS - Phase 2 lasts until - undefined)
-        nSubsidy = 3.8 * COIN;
-    } else {
-        nSubsidy = 0 * COIN;
-    }
-
-    return nSubsidy;
+    if (nHeight > 10001) return 3.8 * COIN;
+    if (nHeight > 102) return 0 * COIN;
+    if (nHeight > 2) return 250000;
+    if (nHeight == 2) return 173360471 * COIN;
+    return 0 * COIN;
 }
 
 CAmount GetSeeSaw(const CAmount& blockValue, int nMasternodeCount, int nHeight)
@@ -3205,7 +3164,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     LogPrint("bench", "      - Connect %u transactions: %.2fms (%.3fms/tx, %.3fms/txin) [%.2fs]\n", (unsigned)block.vtx.size(), 0.001 * (nTime1 - nTimeStart), 0.001 * (nTime1 - nTimeStart) / block.vtx.size(), nInputs <= 1 ? 0 : 0.001 * (nTime1 - nTimeStart) / (nInputs - 1), nTimeConnect * 0.000001);
 
     //PoW phase redistributed fees to miner. PoS stage destroys fees.
-    CAmount nExpectedMint = GetBlockValue(pindex->pprev->nHeight);
+    CAmount nExpectedMint = GetBlockValue(pindex->nHeight);
     const CAmount nMNExpectedRewardValue = block.IsProofOfStake() ? GetMasternodePayment(pindex->nHeight, nExpectedMint, 1, block.vtx[1].HasZerocoinMintOutputs()) : 0;
 
     if (block.IsProofOfWork())

@@ -46,7 +46,7 @@ bool DecomposeBettingCoinstake(const CWallet* wallet, const CWalletTx& wtx, cons
     if (nStakeDepth <= 0) return false;
 
     const int nStakeHeight = pindexWtx->nHeight;
-    const CAmount nStakeValue = GetBlockValue(nStakeHeight - 1);
+    const CAmount nStakeValue = GetBlockValue(nStakeHeight);
 
     // ** TODO ** refactoring check
     //const CAmount nMNExpectedRewardValue = GetMasternodePayment(nStakeHeight, nStakeValue, 1, wtx.IsZerocoinSpend());

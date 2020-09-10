@@ -20,28 +20,28 @@ BOOST_AUTO_TEST_CASE(subsidy_limit_test)
     CAmount nSum = 0;
     for (int nHeight = 0; nHeight < 1; nHeight += 1) {
         /* premine in block 1 173,360,471 WGR) */
-        CAmount nSubsidy = GetBlockValue(nHeight);
+        CAmount nSubsidy = GetBlockValue(nHeight+1);
         BOOST_CHECK(nSubsidy <= 0 * COIN);
         nSum += nSubsidy;
     }
 
     for (int nHeight = 1; nHeight < 2; nHeight += 1) {
         /* PoW Phase One */
-        CAmount nSubsidy = GetBlockValue(nHeight);
+        CAmount nSubsidy = GetBlockValue(nHeight+1);
         BOOST_CHECK(nSubsidy <= 173360471 * COIN);
         nSum += nSubsidy;
     }
 
     for (int nHeight = 2; nHeight < 102; nHeight += 1) {
         /* PoW Phase Two */
-        CAmount nSubsidy = GetBlockValue(nHeight);
+        CAmount nSubsidy = GetBlockValue(nHeight+1);
         BOOST_CHECK(nSubsidy <= 250000 * COIN);
         nSum += nSubsidy;
     }
 
     for (int nHeight = 102; nHeight < 1001; nHeight += 1) {
         /* PoW Phase Two */
-        CAmount nSubsidy = GetBlockValue(nHeight);
+        CAmount nSubsidy = GetBlockValue(nHeight+1);
         BOOST_CHECK(nSubsidy <= 0 * COIN);
         BOOST_CHECK(MoneyRange(nSubsidy));
         nSum += nSubsidy;
