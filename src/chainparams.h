@@ -273,6 +273,7 @@ protected:
     int nBetPlaceTimeoutBlocks;
     uint32_t nMaxParlayLegs;
     int nWagerrProtocolV3StartHeight;
+    int nMaturityV2StartHeight;
 
     std::vector<CQuickGamesView> quickGamesArr;
 

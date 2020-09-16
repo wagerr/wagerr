@@ -119,7 +119,7 @@ libzerocoin::ZerocoinParams* CChainParams::Zerocoin_Params(bool useModulusV1) co
 }
 
 int CChainParams::COINBASE_MATURITY(const int contextHeight) const {
-    return contextHeight < nWagerrProtocolV3StartHeight ? nMaturityV1 : nMaturityV2;
+    return contextHeight < nMaturityV2StartHeight ? nMaturityV1 : nMaturityV2;
 }
 
 bool CChainParams::HasStakeMinAgeOrDepth(const int contextHeight, const uint32_t contextTime,
@@ -210,6 +210,7 @@ public:
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV3StartHeight = 1500000;                         // TODO: pick block height for enabling parlay betting and new payout system
+        nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
@@ -377,6 +378,7 @@ public:
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV3StartHeight = 2000;                          // TODO: pick block height for enabling parlay betting and new payout system
+        nMaturityV2StartHeight = 38000;                                 // Reduced block maturity required for spending coinstakes and betting payouts
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
@@ -504,6 +506,7 @@ public:
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV3StartHeight = nBetStartHeight;                 // TODO: pick block height for enabling parlay betting and new payout system
+        nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
