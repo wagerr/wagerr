@@ -22,7 +22,7 @@ public:
     LegacyPayout(uint16_t payoutTypeIn, uint32_t blockHeightIn, int vtxNrIn, CTxOut txOutIn) :
         payoutType(payoutTypeIn), blockHeight(blockHeightIn), vtxNr(vtxNrIn), txOut(txOutIn) {};
 
-    bool operator<(const LegacyPayout& rhs) {
+    bool operator<(const LegacyPayout& rhs) const {
         if (payoutType != rhs.payoutType) return payoutType < rhs.payoutType;
 
         if (blockHeight != rhs.blockHeight) return blockHeight < rhs.blockHeight;
