@@ -1786,7 +1786,7 @@ bool CWallet::SelectStakeCoins(std::list<std::unique_ptr<CStakeInput> >& listInp
             if (nAmountSelected + out.tx->vout[out.i].nValue > nTargetAmount)
                 continue;
 
-            if (out.tx->vin[0].IsZerocoinSpend() && !out.tx->IsInMainChain())
+            if (!out.tx->IsInMainChain())
                 continue;
 
             CBlockIndex* utxoBlock = mapBlockIndex.at(out.tx->hashBlock);
