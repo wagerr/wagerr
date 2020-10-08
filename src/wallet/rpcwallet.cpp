@@ -843,7 +843,7 @@ UniValue GetBets(uint32_t count, uint32_t from, CWallet *_pwalletMain, boost::op
             isminetype scriptType = IsMine(*_pwalletMain, dest);
             if (scriptType == ISMINE_NO)
                 continue;
-            if (!(scriptType == ISMINE_WATCH_ONLY && includeWatchonly))
+            if (scriptType == ISMINE_WATCH_ONLY && !includeWatchonly)
                 continue;
             if (accountName && _pwalletMain->mapAddressBook.count(dest))
                 if (_pwalletMain->mapAddressBook[dest].name != *accountName)
