@@ -41,7 +41,7 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
                 "]\n"
 
                 "\nExamples:\n" +
-                HelpExampleCli("getmappingid", "") + HelpExampleRpc("getmappingid", ""));
+                HelpExampleCli("getmappingid", "\"sport\" \"Football\"") + HelpExampleRpc("getmappingid", "\"sport\" \"Football\""));
 
     const std::string name{params[1].get_str()};
     const std::string mIndex{params[0].get_str()};
@@ -104,7 +104,7 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
                 "]\n"
 
                 "\nExamples:\n" +
-                HelpExampleCli("getmappingname", "") + HelpExampleRpc("getmappingname", ""));
+                HelpExampleCli("getmappingname", "\"sport\" 0") + HelpExampleRpc("getmappingname", "\"sport\" 0"));
 
     const std::string mIndex{params[0].get_str()};
     const uint32_t id{static_cast<uint32_t>(params[1].get_int())};
