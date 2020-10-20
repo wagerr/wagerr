@@ -588,7 +588,7 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
             "\nGet bets form bets DB.\n"
 
             "\nArguments:\n"
-            "1. \"includeHandled\"   (bool, optional) Include bets which already handled, default - false.\n"
+            "1. \"includeHandled\"   (bool, optional) Include bets that are already handled (default: false).\n"
 
             "\nResult:\n"
             "[\n"

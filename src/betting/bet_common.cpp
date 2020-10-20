@@ -62,7 +62,7 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
 
     nPayout = bPayout.getuint256().Get64();
     nBurn = bBurn.getuint256().Get64();
-    LogPrintf("bWinnings: %d bPayout: %d bBurn: %d\n", bWinningsT.getuint256().Get64(), nPayout, nBurn);
+    LogPrint("wagerr", "Winnings: %d Payout: %d Burn: %d\n", bWinningsT.getuint256().Get64(), nPayout, nBurn);
     return true;
 }
 
@@ -99,7 +99,7 @@ std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight)
 
                 CPeerlessResultTx* resultTx = (CPeerlessResultTx *)bettingTx.get();
 
-                LogPrintf("Result for event %lu was found...\n", resultTx->nEventId);
+                LogPrint("wagerr", "Result for event %lu was found...\n", resultTx->nEventId);
 
                 // Store the result if its a valid result OP CODE.
                 results.emplace_back(resultTx->nEventId, resultTx->nResultType, resultTx->nHomeScore, resultTx->nAwayScore);
