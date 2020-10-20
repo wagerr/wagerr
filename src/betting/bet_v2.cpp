@@ -408,9 +408,9 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
                                     ExtractDestination( txPrev.vout[prevout.n].scriptPubKey, payoutAddress );
                                 }
 
-                                LogPrintf("MoneyLine Refund - PAYOUT\n");
-                                LogPrintf("AMOUNT: %li \n", payout);
-                                LogPrintf("ADDRESS: %s \n", CBitcoinAddress( payoutAddress ).ToString().c_str());
+                                LogPrint("wagerr", "MoneyLine Refund - PAYOUT\n");
+                                LogPrint("wagerr", "AMOUNT: %li \n", payout);
+                                LogPrint("wagerr", "ADDRESS: %s \n", CBitcoinAddress( payoutAddress ).ToString().c_str());
 
                                 // Only add valid payouts to the vector.
                                 if (payout > 0) {
@@ -622,10 +622,10 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
              CAmount entranceFee = eventFee;
              CAmount winnerPayout = eventFee;
 
-	         LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
-	         LogPrintf("Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-	         LogPrintf("Winner Address: %u \n", winnerAddress);
-	         LogPrintf(" This Lotto was refunded as only one person bought a ticket.\n" );
+             LogPrint("wagerr", "\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
+             LogPrint("wagerr", "Total number of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+             LogPrint("wagerr", "Winner Address: %u \n", winnerAddress);
+             LogPrint("wagerr", " This Lotto was refunded as only one person bought a ticket.\n" );
 
              // Only add valid payouts to the vector.
              if (winnerPayout > 0) {
@@ -652,10 +652,10 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
             CAmount winnerPayout = totalPot / 10 * 8;
             CAmount fee = totalPot / 50;
 
-            LogPrintf("\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
-            LogPrintf("Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
-            LogPrintf("Winner Address: %u (index no %u) \n", winnerAddress, winnerNr);
-            LogPrintf("Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
+            LogPrint("wagerr", "\nCHAIN GAMES PAYOUT. ID: %i \n", allChainGames[currResult].nEventId);
+            LogPrint("wagerr", "Total number Of bettors: %u , Entrance Fee: %u \n", noOfBets, entranceFee);
+            LogPrint("wagerr", "Winner Address: %u (index no %u) \n", winnerAddress, winnerNr);
+            LogPrint("wagerr", "Total Pot: %u, Winnings: %u, Fee: %u \n", totalPot, winnerPayout, fee);
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
