@@ -1015,9 +1015,6 @@ UniValue getmybets(const UniValue& params, bool fHelp)
     if (params.size() == 4)
         includeWatchonly = params[3].get_bool();
 
-
-    EnsureWalletIsUnlocked();
-
     return GetBets(count, from, pwalletMain, accountName, includeWatchonly);
 }
 
@@ -1195,8 +1192,6 @@ UniValue getmyqgbets(const UniValue& params, bool fHelp)
     uint32_t from = 0;
     if (params.size()  == 2)
         from = params[1].get_int();
-
-    EnsureWalletIsUnlocked();
 
     return GetQuickGamesBets(count, from, pwalletMain);
 }
