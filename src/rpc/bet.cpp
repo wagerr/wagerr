@@ -61,7 +61,7 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
     for (it->Seek(CBettingDB::DbTypeToBytes(MappingKey{type, 0})); it->Valid() && (CBettingDB::BytesToDbType(it->Key(), key), key.nMType == type); it->Next()) {
         CMappingDB mapping{};
         CBettingDB::BytesToDbType(it->Value(), mapping);
-        LogPrintf("%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
+        LogPrintf("wagerr", "%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
         if (!mappingFound) {
             if (mapping.sName == name) {
                 mappings.push_back(Pair("mapping-id", (uint64_t) key.nId));
@@ -260,7 +260,7 @@ UniValue getpayoutinfosince(const UniValue& params, bool fHelp)
     if (fHelp || (params.size() > 1))
         throw std::runtime_error(
                 "getpayoutinfosince\n"
-                "\nGet an info for given  .\n"
+                "\nGet info for payouts in the specified block range.\n"
                 "1. Last blocks (numeric, optional) default = 10.\n"
                 "\nResult:\n"
                 "[\n"
