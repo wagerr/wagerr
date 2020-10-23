@@ -43,18 +43,18 @@ Check out the source code in the following directory hierarchy.
 
 Write release notes. git shortlog helps a lot, for example:
 
-    git shortlog --no-merges v(current version, e.g. 1.3.99)..v(new version, e.g. 1.4.34)
+    git shortlog --no-merges --format="* [\`%h\`](https://github.com/wagerr/wagerr/commit/%h) %s" v(current version, e.g. 3.1.0)..(new version, e.g. v4.0.0rc2)
 
 (or ping @wumpus on IRC, he has specific tooling to generate the list of merged pulls
 and sort them into categories based on labels)
 
 Generate list of authors:
 
-    git log --format='%aN' "$*" | sort -ui | sed -e 's/^/- /'
+    git log  --format='- %aN <%aE>' v(current version, e.g. 3.1.0)..(new version, e.g. v4.0.0rc2) | sort -fiu
 
 Tag version (or release candidate) in git
 
-    git tag -s v(new version, e.g. 1.4.34)
+    git tag -s v(new version, e.g. 4.0.0)
 
 ### Setup and perform Gitian builds
 
