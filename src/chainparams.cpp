@@ -209,7 +209,7 @@ public:
         nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nWagerrProtocolV3StartHeight = 1500000;                         // TODO: pick block height for enabling parlay betting and new payout system
+        nWagerrProtocolV3StartHeight = std::numeric_limits<int>::max(); // TODO: pick block height for enabling parlay betting and new payout system
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
 
         quickGamesArr.clear();
