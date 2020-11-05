@@ -830,6 +830,11 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
 UniValue GetBets(uint32_t count, uint32_t from, CWallet *_pwalletMain, boost::optional<std::string> accountName, bool includeWatchonly) {
     UniValue ret(UniValue::VARR);
 
+    bool fAllAccounts = true;
+    if (accountName && *accountName != "*") {
+        fAllAccounts = false;
+    }
+
     auto it = bettingsView->bets->NewIterator();
     uint32_t skippedEntities = 0;
     for(it->SeekToLast(); it->Valid(); it->Prev()) {
@@ -845,7 +850,7 @@ UniValue GetBets(uint32_t count, uint32_t from, CWallet *_pwalletMain, boost::op
                 continue;
             if (scriptType == ISMINE_WATCH_ONLY && !includeWatchonly)
                 continue;
-            if (accountName && _pwalletMain->mapAddressBook.count(dest))
+            if (!fAllAccounts && accountName && _pwalletMain->mapAddressBook.count(dest))
                 if (_pwalletMain->mapAddressBook[dest].name != *accountName)
                     continue;
         }
@@ -864,6 +869,10 @@ UniValue GetBets(uint32_t count, uint32_t from, CWallet *_pwalletMain, boost::op
             break;
         }
     }
+    std::vector<UniValue> arrTmp = ret.getValues();
+    std::reverse(arrTmp.begin(), arrTmp.end()); // Return oldest to newest
+    ret.setArray();
+    ret.push_backV(arrTmp);
 
     return ret;
 }
