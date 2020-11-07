@@ -214,6 +214,8 @@ public:
         nEnforceNewSporkKey = 1536868800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
         nRejectOldSporkKey = 1537128000;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
 
+        /** Block height at which BIP34 becomes active */
+        nBIP34Height = 1;
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 751858;
 
@@ -388,6 +390,8 @@ public:
         nEnforceNewSporkKey = 1536019200; //!> Sporks signed after Tuesday September 4, 2018 12:00:00 AM GMT must use the new spork key
         nRejectOldSporkKey = 1538611200; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
 
+        /** Block height at which BIP34 becomes active */
+        nBIP34Height = 3963;
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 600;
 
@@ -522,6 +526,8 @@ public:
         nBlockFirstFraudulent = 999999999; //First block that bad serials emerged
         nBlockLastGoodCheckpoint = 999999999; //Last valid accumulator checkpoint
 
+        /** Block height at which BIP34 becomes active */
+        nBIP34Height = 1;
         // Start enforcing CHECKLOCKTIMEVERIFY (BIP65) rule
         nBIP65Height = 1;
 
