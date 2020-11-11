@@ -149,7 +149,7 @@ CBlockTemplate* CreateNewBlock(const CScript& scriptPubKeyIn, CWallet* pwallet, 
     bool fZerocoinActive = nHeight >= Params().Zerocoin_StartHeight();
     if (Params().MineBlocksOnDemand()) {
         if (fZerocoinActive)
-            pblock->nVersion = 5;
+            pblock->nVersion = 7;
         else
             pblock->nVersion = 3;
 
