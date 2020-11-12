@@ -229,7 +229,7 @@ public:
         nBlockEnforceNewMessageSignatures = nBlockTimeProtocolV2;
 
         // Blocks v7
-        nBlockLastAccumulatorCheckpoint = 1686240;
+        nBlockLastAccumulatorCheckpoint = 556830; // 861f19fc18b7b4f136117582f4b0ef5d855de652228417fa246992c0fa613ea3
         nBlockV7StartHeight = nBlockTimeProtocolV2;
 
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
