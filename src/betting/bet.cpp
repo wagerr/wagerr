@@ -163,6 +163,10 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
         if (bettingTx == nullptr) continue;
 
+        if (height >= sporkManager.GetSporkValue(SPORK_19_BETTING_MAINTENANCE_MODE)) {
+            return error("CheckBettingTX : Betting transactions are temporarily disabled for maintenance");
+        }
+
         CAmount betAmount{txOut.nValue};
 
         switch(bettingTx->GetTxType()) {
@@ -225,6 +229,10 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case cgBetTxType:
             {
+                if (height >= sporkManager.GetSporkValue(SPORK_20_QUICKGAMES_MAINTENANCE_MODE)) {
+                    return error("CheckBettingTX : Quick games transactions are temporarily disabled for maintenance");
+                }
+
                 CChainGamesBetTx* cgBetTx = (CChainGamesBetTx*) bettingTx.get();
 
                 CChainGamesEventDB cgEvent;
