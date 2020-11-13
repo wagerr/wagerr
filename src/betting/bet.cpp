@@ -912,7 +912,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
 CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::multimap<CPayoutInfoDB, CBetOut>& mExpectedPayouts)
 {
-    if (nNewBlockHeight < Params().BetStartHeight()) return 0;
+    if (nNewBlockHeight < Params().WagerrProtocolV2StartHeight()) return 0;
 
     CAmount expectedMint = 0;
     std::vector<CBetOut> vExpectedPayouts;
@@ -1434,7 +1434,7 @@ bool UndoQuickGamesBetPayouts(CBettingsView &bettingsViewCache, int height)
 bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector<CTransaction>& vtx)
 {
         // Revert betting dats
-    if (height > Params().BetStartHeight()) {
+    if (height > Params().WagerrProtocolV2StartHeight()) {
         // revert complete bet payouts marker
         if (!UndoBetPayouts(bettingsViewCache, height)) {
             error("DisconnectBlock(): undo payout data is inconsistent");

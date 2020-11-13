@@ -240,7 +240,6 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
 
     UniValue ret(UniValue::VARR);
 
-    //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     CBlockIndex *BlocksIndex = NULL;
 
     int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
@@ -2128,7 +2127,6 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
         fShowWinner = params[1].get_bool();
     }
 
-    //CBlockIndex* pindex = chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
     CBlockIndex *BlocksIndex = NULL;
     int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 14400;
     BlocksIndex = chainActive[height];
@@ -2180,7 +2178,7 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
         BlocksIndex = chainActive.Next(BlocksIndex);
     }
 
-    if (resultHeight > Params().BetStartHeight() && fShowWinner) {
+    if (resultHeight > Params().WagerrProtocolV2StartHeight() && fShowWinner) {
         std::vector<CBetOut> vExpectedCGLottoPayouts;
         std::vector<CPayoutInfoDB> vPayoutsInfo;
         GetCGLottoBetPayoutsV2(resultHeight, vExpectedCGLottoPayouts, vPayoutsInfo);

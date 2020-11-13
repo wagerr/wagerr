@@ -170,7 +170,6 @@ public:
     /** Betting on blockchain **/
     std::vector<std::string> OracleWalletAddrs() const { return vOracleWalletAddrs; }
     int BetBlocksIndexTimespan() const { return nBetBlocksIndexTimespan; }
-    int BetStartHeight() const { return nBetStartHeight; }
     std::string DevPayoutAddr() const { return strDevPayoutAddr; }
     std::string OMNOPayoutAddr() const { return strOMNOPayoutAddr; }
     uint64_t OMNORewardPermille() const { return nOMNORewardPermille; }
@@ -181,6 +180,8 @@ public:
     int64_t MaxParlayBetPayoutRange() const { return nMaxBetPayoutRange; }
     int BetPlaceTimeoutBlocks() const { return nBetPlaceTimeoutBlocks; }
     uint32_t MaxParlayLegs() const { return nMaxParlayLegs; }
+    int WagerrProtocolV1StartHeight() const { return nWagerrProtocolV1StartHeight; }
+    int WagerrProtocolV2StartHeight() const { return nWagerrProtocolV2StartHeight; }
     int WagerrProtocolV3StartHeight() const { return nWagerrProtocolV3StartHeight; }
     const std::vector<CQuickGamesView>& QuickGamesArr() const { return quickGamesArr; }
 
@@ -282,7 +283,6 @@ protected:
 
     std::vector<std::string> vOracleWalletAddrs;
     int nBetBlocksIndexTimespan;
-    int nBetStartHeight;
     std::string strDevPayoutAddr;
     std::string strOMNOPayoutAddr;
     uint64_t nOMNORewardPermille;
@@ -293,6 +293,8 @@ protected:
     int64_t nMaxParlayBetPayoutRange;
     int nBetPlaceTimeoutBlocks;
     uint32_t nMaxParlayLegs;
+    int nWagerrProtocolV1StartHeight;
+    int nWagerrProtocolV2StartHeight;
     int nWagerrProtocolV3StartHeight;
     int nMaturityV2StartHeight;
 
