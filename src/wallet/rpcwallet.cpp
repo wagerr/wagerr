@@ -254,7 +254,7 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
             uint256 txHash = tx.GetHash();
 
             const CTxIn &txin = tx.vin[0];
-            bool validTx = IsValidOracleTx(txin);
+            bool validTx = IsValidOracleTx(txin, height);
 
             // Check each TX out for values
             for (unsigned int i = 0; i < tx.vout.size(); i++) {
@@ -2138,7 +2138,7 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
         for (CTransaction& tx : block.vtx) {
 
             const CTxIn &txin = tx.vin[0];
-            bool validTx = IsValidOracleTx(txin);
+            bool validTx = IsValidOracleTx(txin, height);
 
             // Check each TX out for values
             for (unsigned int i = 0; i < tx.vout.size(); i++) {

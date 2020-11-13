@@ -24,8 +24,12 @@ void GetPLRewardPayoutsV2(const uint32_t nNewBlockHeight, std::vector<CBetOut>& 
     PeerlessBetKey zeroKey{nNewBlockHeight, COutPoint()};
 
     // Set the OMNO and Dev reward addresses
-    CScript payoutScriptDev = GetScriptForDestination(CBitcoinAddress(Params().DevPayoutAddr()).Get());
-    CScript payoutScriptOMNO = GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get());
+    CScript payoutScriptDev;
+    CScript payoutScriptOMNO;
+    if (!GetFeePayoutScripts(nNewBlockHeight, payoutScriptDev, payoutScriptOMNO)) {
+        LogPrintf("Unable to find oracle, skipping payouts\n");
+        return;
+    }
 
     // Loop over the payout vector and aggregate values.
     for (size_t i = 0; i < vExpectedPayouts.size(); i++)
@@ -147,7 +151,7 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
             for (CTransaction &tx : block.vtx) {
                 // Ensure TX has it been posted by Oracle wallet.
                 const CTxIn &txin = tx.vin[0];
-                bool validOracleTx = IsValidOracleTx(txin);
+                bool validOracleTx = IsValidOracleTx(txin, nHeight);
                 // Check all TX vouts for an OP RETURN.
                 for (unsigned int i = 0; i < tx.vout.size(); i++) {
 
@@ -541,7 +545,7 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
 
                 uint256 txHash = tx.GetHash();
 
-                bool validTX = IsValidOracleTx(txin);
+                bool validTX = IsValidOracleTx(txin, BlocksIndex->nHeight);
 
                 // Check all TX vouts for an OP RETURN.
                 for (unsigned int i = 0; i < tx.vout.size(); i++) {
@@ -659,11 +663,17 @@ void GetCGLottoBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vEx
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
+                CScript payoutScriptDev;
+                CScript payoutScriptOMNO;
+                if (!GetFeePayoutScripts(nNewBlockHeight, payoutScriptDev, payoutScriptOMNO)) {
+                    LogPrintf("Unable to find oracle, skipping payouts\n");
+                    continue;
+                }
                 PeerlessBetKey zeroKey{0, COutPoint()};
                 vPayoutsInfo.emplace_back(candidates[winnerNr].second, PayoutType::chainGamesPayout);
                 vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, allChainGames[currResult].nEventId);
                 vPayoutsInfo.emplace_back(zeroKey, PayoutType::chainGamesPayout);
-                vExpectedPayouts.emplace_back(fee, GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get()), entranceFee);
+                vExpectedPayouts.emplace_back(fee, payoutScriptOMNO, entranceFee);
             }
         }
     }

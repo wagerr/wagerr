@@ -235,11 +235,11 @@ public:
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
         /** Bet related parameters **/
-        vOracleWalletAddrs = {"WcsijutAF46tSLTcojk9mR9zV9wqwUUYpC",     // Oracle Masternode Event & Result Posting Wallet Addresses.
-                              "Weqz3PFBq3SniYF5HS8kuj72q9FABKzDrP"};
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
-        strDevPayoutAddr = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";        // Development fund payout address.
-        strOMNOPayoutAddr = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";       // OMNO fund payout address.
+        strDevPayoutAddrOld = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";     // Development fund payout address.
+        strDevPayoutAddrNew = "WiaoheNeRz61imSWY3QVQVvqZA9HH8sgHZ";     // Development fund payout address.
+        strOMNOPayoutAddrOld = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";    // OMNO fund payout address.
+        strOMNOPayoutAddrNew = "WfoyvkPVDrnyJREKeNbJWNu97d27EzPinX";    // OMNO fund payout address.
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
@@ -252,6 +252,14 @@ public:
         nWagerrProtocolV2StartHeight = 763350;                          // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = std::numeric_limits<int>::max(); // Betting protocol v3 activation block
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
+        nKeysRotateHeight = std::numeric_limits<int>::max();            // Rotate spork key, oracle keys and fee payout keys
+
+        vOracles = {
+            { "WcsijutAF46tSLTcojk9mR9zV9wqwUUYpC", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "Weqz3PFBq3SniYF5HS8kuj72q9FABKzDrP", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "WdrS2crxxZf4dpxMRUGa3PTRBaMjU2DcF2", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "WcAQ1GrqwPBRPPEgLgoHnobZGXqKFH2Ai1", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+        };
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
@@ -392,8 +400,8 @@ public:
         nBlockEnforceInvalidUTXO = 350; //Start enforcing the invalid UTXO's
         nInvalidAmountFiltered = 0; //Amount of invalid coins filtered through exchanges, that should be considered valid
         nBlockZerocoinV2 = 600; //The block that zerocoin v2 becomes active
-        nEnforceNewSporkKey = 1536019200; //!> Sporks signed after Tuesday September 4, 2018 12:00:00 AM GMT must use the new spork key
-        nRejectOldSporkKey = 1538611200; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
+        nEnforceNewSporkKey = 1603800000; //!> Sporks signed after Tuesday September 4, 2018 12:00:00 AM GMT must use the new spork key
+        nRejectOldSporkKey = 1605009600; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
 
         /** Block height at which BIP34 becomes active */
         nBIP34Height = 3963;
@@ -415,11 +423,11 @@ public:
         nBlockV7StartHeight = nBlockTimeProtocolV2;
 
         /** Bet related parameters **/
-        vOracleWalletAddrs = {"TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2",     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
-                              "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc" };
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
-        strDevPayoutAddr = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";        // Development fund payout address (Testnet).
-        strOMNOPayoutAddr = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";       // OMNO fund payout address (Testnet).
+        strDevPayoutAddrOld = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
+        strDevPayoutAddrNew = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
+        strOMNOPayoutAddrOld = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
+        strOMNOPayoutAddrNew = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
@@ -432,6 +440,14 @@ public:
         nWagerrProtocolV2StartHeight = 1100;                            // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = 2000;                            // Betting protocol v3 activation block
         nMaturityV2StartHeight = 38000;                                 // Reduced block maturity required for spending coinstakes and betting payouts
+        nKeysRotateHeight = 72000;                                      // Rotate spork key, oracle keys and fee payout keys
+
+        vOracles = {
+            { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", "THD9dP7JxeZVXCyKjwvZLnizmtjHpVZHXZ", "TBFJnQqscUyA6Gpv6zqxASRnHpCpgv79GH", nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", "THD9dP7JxeZVXCyKjwvZLnizmtjHpVZHXZ", "TBFJnQqscUyA6Gpv6zqxASRnHpCpgv79GH", nKeysRotateHeight, std::numeric_limits<int>::max() },
+        };
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(
@@ -448,8 +464,8 @@ public:
         nSupplyBeforeFakeSerial = 0;
 
         // workarond fixes
-        nZerocoinCheckTXexclude = -1;
-        nZerocoinCheckTX = -1;
+        nSkipBetValidationStart = 5577;
+        nSkipBetValidationEnd = 35619;
 
         //! Modify the testnet genesis block so the timestamp is valid for a later start.
         genesis.nTime = 1518696182;
@@ -484,8 +500,8 @@ public:
 
         nPoolMaxTransactions = 2;
         nBudgetCycleBlocks = 144; //!< Ten cycles per day on testnet
-        strSporkPubKey = "0466223434350e5754c7379008e82954820a4bcc17335c42b915a0223c486e8bbbf87ba6281777d19ec73dc0b43416b33df432e3f4685770e56f9688afec7c2e3c";
-        strSporkPubKeyOld = "04b2d1b19607edcca2fbf1d3238a0200a434900593f7e5e38102e7681465e5785ddcf1a105ee595c51ef3be1bfc8ea9dc14c8c30b2e0edaa5f5d3f57b77f272046";
+        strSporkPubKey = "04817a91328092a4bd44fa50e9c019bc7705a7eb26840a5763445efc7ddcbd29b6899bf53245b4ddb6fb4068a8ac034a1645ee80a198ded40b6ae49452a7bca5a5";
+        strSporkPubKeyOld = "0466223434350e5754c7379008e82954820a4bcc17335c42b915a0223c486e8bbbf87ba6281777d19ec73dc0b43416b33df432e3f4685770e56f9688afec7c2e3c";
         strObfuscationPoolDummyAddress = "TMPUBzcsHZawA32XYYDF9FHQp6icv492CV";
         nStartMasternodePayments = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
         nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
@@ -558,11 +574,11 @@ public:
         nBlockEnforceNewMessageSignatures = 1;
 
         /** Bet related parameters **/
-        vOracleWalletAddrs = {"TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1",     // Oracle Masternode Event & Result Posting Wallet Address (Regtest).
-                              "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu" };
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
-        strDevPayoutAddr = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";        // Development fund payout address (Regtest).
-        strOMNOPayoutAddr = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";       // OMNO fund payout address (Regtest).
+        strDevPayoutAddrOld = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        strDevPayoutAddrNew = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        strOMNOPayoutAddrOld = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        strOMNOPayoutAddrNew = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
@@ -575,6 +591,14 @@ public:
         nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
+        nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
+
+        vOracles = {
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
+            { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+        };
 
         quickGamesArr.clear();
         quickGamesArr.emplace_back(

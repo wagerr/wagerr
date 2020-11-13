@@ -8,6 +8,7 @@
 #include <betting/bet_v2.h>
 #include <betting/bet_v3.h>
 
+#include "spork.h"
 #include "uint256.h"
 #include "wallet/wallet.h"
 #include <boost/filesystem.hpp>
@@ -16,7 +17,7 @@
 
 CBettingsView* bettingsView = nullptr;
 
-bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uint32_t& nPayoutOffset, uint32_t& nWinnerPayments, const CAmount& nExpectedMint, const CAmount& nExpectedMNReward)
+bool ExtractPayouts(const CBlock& block, const int& nBlockHeight, std::vector<CTxOut>& vFoundPayouts, uint32_t& nPayoutOffset, uint32_t& nWinnerPayments, const CAmount& nExpectedMint, const CAmount& nExpectedMNReward)
 {
     const CTransaction &tx = block.vtx[1];
 
@@ -38,8 +39,12 @@ bool ExtractPayouts(const CBlock& block, std::vector<CTxOut>& vFoundPayouts, uin
     }
 
     // Set the OMNO and Dev reward addresses
-    CScript devPayoutScript = GetScriptForDestination(CBitcoinAddress(Params().DevPayoutAddr()).Get());
-    CScript OMNOPayoutScript = GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get());
+    CScript devPayoutScript;
+    CScript OMNOPayoutScript;
+    if (!GetFeePayoutScripts(nBlockHeight, devPayoutScript, OMNOPayoutScript)) {
+        LogPrintf("Unable to find oracle, skipping payouts\n");
+        return false;
+    }
 
     // Count the coinbase and staking vouts in the current block TX.
     CAmount totalStakeAcc = 0;
@@ -87,7 +92,7 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<C
     uint32_t nWinnerPayments = 0; // unused
 
     // If we have payouts to validate. Note: bets can only happen in blocks with MN payments.
-    if (!ExtractPayouts(block, vFoundPayouts, nPayoutOffset, nWinnerPayments, nExpectedMint, nExpectedMNReward)) {
+    if (!ExtractPayouts(block, nBlockHeight, vFoundPayouts, nPayoutOffset, nWinnerPayments, nExpectedMint, nExpectedMNReward)) {
         LogPrintf("%s - Not all payouts found - %s\n", __func__, block.GetHash().ToString());
         return false;
     }
@@ -135,17 +140,17 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<C
 
 bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
 {
-    // if is not hardfork for wagerr v3 - do not check tx
+    // if is not wagerr v3 - do not check tx
     if (height < Params().WagerrProtocolV3StartHeight()) return true;
 
     // Get player address
     const CTxIn& txin{tx.vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin)};
+    const bool validOracleTx{IsValidOracleTx(txin, height)};
     uint256 hashBlock;
     CTransaction txPrev;
     CBitcoinAddress address;
     CTxDestination prevAddr;
-    // if we cant extract playerAddress - drop tx
+    // if we cant extract playerAddress - reject tx
     if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true) ||
             !ExtractDestination(txPrev.vout[txin.prevout.n].scriptPubKey, prevAddr)) {
         return false;
@@ -418,7 +423,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
     // Ensure the event TX has come from Oracle wallet.
     const CTxIn& txin{tx.vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin)};
+    const bool validOracleTx{IsValidOracleTx(txin, height)};
     // Get player address
     uint256 hashBlock;
     CTransaction txPrev;
@@ -986,7 +991,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 {
     // Ensure the event TX has come from Oracle wallet.
     const CTxIn& txin{tx.vin[0]};
-    const bool validOracleTx{IsValidOracleTx(txin)};
+    const bool validOracleTx{IsValidOracleTx(txin, height)};
 
     LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
 

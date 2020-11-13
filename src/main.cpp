@@ -3087,6 +3087,14 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                 return false;
             control.Add(vChecks);
         }
+        if (!CheckBettingTx(bettingsViewCache, tx, pindex->nHeight)) {
+            if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().SkipBetValidationStart() && pindex->nHeight < Params().SkipBetValidationEnd())) {
+                LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : error when betting TX checking at block %i\n", pindex->nHeight);
+            } else  {
+                return state.DoS(100, error("ConnectBlock() : error when betting TX checking"), REJECT_INVALID, "bad-tx-bet");
+            }
+        }
+
         tx.AddVoutValues(nValueOut, nValueBurned);
 
         CTxUndo undoDummy;
@@ -3245,18 +3253,16 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     }
 
     // Look through the block for any events, results or mapping TX.
-    if (!fJustCheck) {
-        if (pindex->nHeight > Params().WagerrProtocolV2StartHeight()) {
-            for (const CTransaction& tx : block.vtx) {
-                ProcessBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= Params().WagerrProtocolV3StartHeight());
-            }
-            if (!(pindex->nHeight % Params().MaxReorganizationDepth())) {
-                int heightLimit = pindex->nHeight - Params().MaxReorganizationDepth();
-                bettingsViewCache.PruneOlderUndos((uint32_t)heightLimit);
-            }
+    if (pindex->nHeight > Params().WagerrProtocolV2StartHeight()) {
+        for (const CTransaction& tx : block.vtx) {
+            ProcessBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= Params().WagerrProtocolV3StartHeight());
         }
-        bettingsViewCache.SetLastHeight(pindex->nHeight);
+        if (!(pindex->nHeight % Params().MaxReorganizationDepth())) {
+            int heightLimit = pindex->nHeight - Params().MaxReorganizationDepth();
+            bettingsViewCache.PruneOlderUndos((uint32_t)heightLimit);
+        }
     }
+    bettingsViewCache.SetLastHeight(pindex->nHeight);
 
     return true;
 }
