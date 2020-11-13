@@ -5,6 +5,7 @@
 #include <betting/bet_common.h>
 #include <betting/bet_tx.h>
 #include <betting/bet_db.h>
+#include <betting/oracles.h>
 #include <main.h>
 
 /**
@@ -13,10 +14,10 @@
  * @param txin  TX vin input hash.
  * @return      Bool
  */
-bool IsValidOracleTx(const CTxIn &txin)
+bool IsValidOracleTx(const CTxIn &txin, int nHeight)
 {
     COutPoint prevout = txin.prevout;
-    std::vector<std::string> oracleAddrs = Params().OracleWalletAddrs();
+    std::vector<COracle> oracles = Params().Oracles();
 
     uint256 hashBlock;
     CTransaction txPrev;
@@ -31,7 +32,10 @@ bool IsValidOracleTx(const CTxIn &txin)
 
         if (ExtractDestinations(prevTxOut.scriptPubKey, type, prevAddrs, nRequired)) {
             for (const CTxDestination &prevAddr : prevAddrs) {
-                if (std::find(oracleAddrs.begin(), oracleAddrs.end(), CBitcoinAddress(prevAddr).ToString()) != oracleAddrs.end()) {
+                const std::string strPrevAddr = CBitcoinAddress(prevAddr).ToString();
+                if (std::find_if(oracles.begin(), oracles.end(), [strPrevAddr, nHeight](COracle oracle){
+                    return oracle.IsMyOracleTx(strPrevAddr, nHeight);
+                }) != oracles.end()) {
                     return true;
                 }
             }
@@ -87,7 +91,7 @@ std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight)
     for (CTransaction& tx : block.vtx) {
         // Ensure the result TX has been posted by Oracle wallet.
         const CTxIn &txin  = tx.vin[0];
-        bool validResultTx = IsValidOracleTx(txin);
+        bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
 
         if (validResultTx) {
             // Look for result OP RETURN code in the tx vouts.
@@ -133,7 +137,7 @@ bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesR
         uint256 hashBlock;
         CTransaction txPrev;
 
-        bool validResultTx = IsValidOracleTx(txin);
+        bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
 
         if (validResultTx) {
             // Look for result OP RETURN code in the tx vouts.

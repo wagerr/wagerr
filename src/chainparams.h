@@ -10,6 +10,7 @@
 #define BITCOIN_CHAINPARAMS_H
 
 #include "betting/quickgames/qgview.h"
+#include "betting/oracles.h"
 #include "chainparamsbase.h"
 #include "checkpoints.h"
 #include "primitives/block.h"
@@ -168,10 +169,8 @@ public:
     int Zerocoin_AccumulationStartHeight() const { return nZerocoinAccumulationStartHeight; }
 
     /** Betting on blockchain **/
-    std::vector<std::string> OracleWalletAddrs() const { return vOracleWalletAddrs; }
+    std::vector<COracle> Oracles() const { return vOracles; }
     int BetBlocksIndexTimespan() const { return nBetBlocksIndexTimespan; }
-    std::string DevPayoutAddr() const { return strDevPayoutAddr; }
-    std::string OMNOPayoutAddr() const { return strOMNOPayoutAddr; }
     uint64_t OMNORewardPermille() const { return nOMNORewardPermille; }
     uint64_t DevRewardPermille() const { return nDevRewardPermille; }
     int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; } // Currently not used
@@ -186,8 +185,8 @@ public:
     const std::vector<CQuickGamesView>& QuickGamesArr() const { return quickGamesArr; }
 
     /** temp worarounds **/
-    int ZerocoinCheckTX() const { return nZerocoinCheckTX; }
-    int ZerocoinCheckTXexclude() const { return nZerocoinCheckTXexclude; }
+    int SkipBetValidationStart() const { return nSkipBetValidationStart; }
+    int SkipBetValidationEnd() const { return nSkipBetValidationEnd; }
 
 protected:
     CChainParams() {}
@@ -281,10 +280,13 @@ protected:
 
     int nZerocoinAccumulationStartHeight;
 
-    std::vector<std::string> vOracleWalletAddrs;
+    std::vector<COracle> vOracles;
+
     int nBetBlocksIndexTimespan;
-    std::string strDevPayoutAddr;
-    std::string strOMNOPayoutAddr;
+    std::string strDevPayoutAddrOld;
+    std::string strDevPayoutAddrNew;
+    std::string strOMNOPayoutAddrOld;
+    std::string strOMNOPayoutAddrNew;
     uint64_t nOMNORewardPermille;
     uint64_t nDevRewardPermille;
     uint64_t nBetBlockPayoutAmount;
@@ -297,12 +299,13 @@ protected:
     int nWagerrProtocolV2StartHeight;
     int nWagerrProtocolV3StartHeight;
     int nMaturityV2StartHeight;
+    int nKeysRotateHeight;
 
     std::vector<CQuickGamesView> quickGamesArr;
 
     // workarounds
-    int nZerocoinCheckTX;
-    int nZerocoinCheckTXexclude;
+    int nSkipBetValidationEnd;
+    int nSkipBetValidationStart;
 };
 
 /**

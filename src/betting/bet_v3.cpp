@@ -5,6 +5,7 @@
 #include <betting/bet_common.h>
 #include <betting/bet_v2.h>
 #include <betting/bet_db.h>
+#include <betting/oracles.h>
 #include <main.h>
 #include <util.h>
 #include <base58.h>
@@ -15,8 +16,12 @@ void GetPLRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std
     PeerlessBetKey zeroKey{nNewBlockHeight, COutPoint()};
 
     // Set the OMNO and Dev reward addresses
-    CScript payoutScriptDev = GetScriptForDestination(CBitcoinAddress(Params().DevPayoutAddr()).Get());
-    CScript payoutScriptOMNO = GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get());
+    CScript payoutScriptDev;
+    CScript payoutScriptOMNO;
+    if (!GetFeePayoutScripts(nNewBlockHeight, payoutScriptDev, payoutScriptOMNO)) {
+        LogPrintf("Unable to find oracle, skipping payouts\n");
+        return;
+    }
 
     // Calculate the OMNO reward and the Dev reward.
     // 40% of total fee
@@ -289,6 +294,12 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
         CAmount payout = winningsPermille > 0 ? (winningsPermille - feePermille) / BET_ODDSDIVISOR : 0;
 
         if (payout > 0) {
+            std::string DevPayoutAddr;
+            std::string OMNOPayoutAddr;
+            if (!GetFeePayoutAddresses(nNewBlockHeight, DevPayoutAddr, OMNOPayoutAddr)) {
+                LogPrintf("Unable to find oracle, skipping payouts\n");
+                continue;
+            }
             qgBet.resultType = odds == BET_ODDSDIVISOR ? BetResultType::betResultRefund : BetResultType::betResultWin;
             // Add winning payout to the payouts vector.
             CPayoutInfoDB payoutInfo(qgKey, odds == BET_ODDSDIVISOR ? PayoutType::quickGamesRefund : PayoutType::quickGamesPayout);
@@ -304,7 +315,6 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
                 mExpectedRewards[gameView.specialAddress] += devReward;
 
             // OMNO reward
-            std::string OMNOPayoutAddr = Params().OMNOPayoutAddr();
             CAmount nOMNOReward = (CAmount)(feePermille / 1000 * gameView.nOMNORewardPermille / BET_ODDSDIVISOR);
             if (mExpectedRewards.find(OMNOPayoutAddr) == mExpectedRewards.end())
                 mExpectedRewards[OMNOPayoutAddr] = nOMNOReward;
@@ -431,11 +441,17 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
 
             // Only add valid payouts to the vector.
             if (winnerPayout > 0) {
+                CScript payoutScriptDev;
+                CScript payoutScriptOMNO;
+                if (!GetFeePayoutScripts(nNewBlockHeight, payoutScriptDev, payoutScriptOMNO)) {
+                    LogPrintf("Unable to find oracle, skipping payouts\n");
+                    continue;
+                }
                 vPayoutsInfo.emplace_back(candidates[winnerNr].first, PayoutType::chainGamesPayout);
                 vExpectedPayouts.emplace_back(winnerPayout, GetScriptForDestination(CBitcoinAddress(winnerAddress).Get()), entranceFee, result.nEventId);
-                LogPrint("wagerr", "Reward address: %s, reward: %ll\n", Params().OMNOPayoutAddr(), fee);
+                LogPrint("wagerr", "Reward address: %s, reward: %ll\n", payoutScriptOMNO.ToString(), fee);
                 vPayoutsInfo.emplace_back(zeroKey, PayoutType::chainGamesReward);
-                vExpectedPayouts.emplace_back(fee, GetScriptForDestination(CBitcoinAddress(Params().OMNOPayoutAddr()).Get()), 0);
+                vExpectedPayouts.emplace_back(fee, payoutScriptOMNO, 0);
             }
             vEntriesToUpdate.insert(vEntriesToUpdate.end(), candidates.begin(), candidates.end());
         }
