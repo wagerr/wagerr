@@ -1999,65 +1999,22 @@ int64_t GetBlockValue(int nHeight)
 
     if (nHeight > 10001) return 3.8 * COIN;
     if (nHeight > 102) return 0 * COIN;
-    if (nHeight > 2) return 250000;
+    if (nHeight > 2) return 250000 * COIN;
     if (nHeight == 2) return 173360471 * COIN;
     return 0 * COIN;
 }
 
-CAmount GetSeeSaw(const CAmount& blockValue, int nMasternodeCount, int nHeight)
-{
-    //if a mn count is inserted into the function we are looking for a specific result for a masternode count
-    if (nMasternodeCount < 1){
-        if (sporkManager.IsSporkActive(SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT))
-            nMasternodeCount = mnodeman.stable_size();
-        else
-            nMasternodeCount = mnodeman.size();
-    }
-
-    int64_t nMoneySupply = chainActive.Tip()->nMoneySupply;
-    int64_t mNodeCoins = nMasternodeCount * 25000 * COIN;
-
-    // Use this log to compare the masternode count for different clients
-    //LogPrintf("Adjusting seesaw at height %d with %d masternodes (without drift: %d) at %ld\n", nHeight, nMasternodeCount, nMasternodeCount - Params().MasternodeCountDrift(), GetTime());
-
-    if (fDebug)
-        LogPrintf("GetMasternodePayment(): moneysupply=%s, nodecoins=%s \n", FormatMoney(nMoneySupply).c_str(),
-                  FormatMoney(mNodeCoins).c_str());
-
-    CAmount ret = 0;
-    if (mNodeCoins == 0) {
-        ret = 0;
-    } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight < GetZerocoinStartHeight()) {
-        ret = blockValue * .75;
-    } else if (nHeight >= GetZerocoinStartHeight()) {
-        ret = blockValue * .75;
-    }
-    return ret;
-}
-
 int64_t GetMasternodePayment(int nHeight, int64_t blockValue, int nMasternodeCount, bool isZWGRStake)
 {
-    int64_t ret = 0;
-
     if (Params().NetworkID() == CBaseChainParams::TESTNET) {
-        if (nHeight < 200)
-            return 0;
+        if (nHeight < 200) return 0;
     }
 
-    if (nHeight >= 0 && nHeight <= Params().LAST_POW_BLOCK()) {
-        ret = 0 * COIN;
-    } else if (nHeight > Params().LAST_POW_BLOCK() && nHeight < GetZerocoinStartHeight()) {
-        ret = blockValue * .75;
-    } else if (nHeight < Params().Zerocoin_Block_V2_Start()) {
-        return GetSeeSaw(blockValue, nMasternodeCount, nHeight);
-    } else {
-        //When zWGR is staked, masternode only gets 2 WGR
-        ret = blockValue * 0.75;
-        if (isZWGRStake)
-            ret = blockValue - (1 * COIN); // 3.8 zWGR - 1 zWGR = 2.8 zWGR for MNs instead of 2.85 zWGR for MNs
-    }
+    if (nHeight <= Params().LAST_POW_BLOCK()) return 0 * COIN;
+    if (nHeight < Params().Zerocoin_Block_V2_Start()) return blockValue * .75;
 
-    return ret;
+    if (isZWGRStake) return blockValue - (1 * COIN); // 3.8 zWGR - 1 zWGR = 2.8 zWGR for MNs instead of 2.85 zWGR for MNs
+    return blockValue * 0.75;
 }
 
 bool IsInitialBlockDownload()
@@ -3155,6 +3112,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
                                     block.GetHash().GetHex(), pindex->nHeight), REJECT_INVALID);
 
     // track money supply and mint amount info
+    const int64_t nMint = (nValueOut - nValueIn) + nFees;
     CAmount nMoneySupplyPrev = pindex->pprev ? pindex->pprev->nMoneySupply : 0;
     pindex->nMoneySupply = nMoneySupplyPrev + nValueOut - nValueIn - nValueBurned;
     pindex->nMint = pindex->nMoneySupply - nMoneySupplyPrev + nFees;
@@ -3170,41 +3128,25 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
     if (block.IsProofOfWork())
         nExpectedMint += nFees;
 
-    if( pindex->nHeight > Params().BetStartHeight()) {
-        std::string strBetNetBlockTxt;
-        std::ostringstream BetNetBlockTxt;
-        std::ostringstream BetNetExpectedTxt;
-
-        if (Params().NetworkID() == CBaseChainParams::MAIN) {
-            strBetNetBlockTxt = "MAIN";
-        } else if(Params().NetworkID() == CBaseChainParams::TESTNET) {
-            strBetNetBlockTxt = "TESTNET";
-        } else if(Params().NetworkID() == CBaseChainParams::REGTEST) {
-            strBetNetBlockTxt = "REGTEST";
-        } else if(Params().NetworkID() == CBaseChainParams::UNITTEST) {
-            strBetNetBlockTxt = "UNITTEST";
-        }
-
-        // build text **TODO** (has to be edited)
-        BetNetBlockTxt << "\n" << strBetNetBlockTxt << " BLOCK: %i \n";
-        BetNetExpectedTxt << strBetNetBlockTxt << " EXPECTED: %s \n";
-        std::string strBetNetBlockTmp = BetNetBlockTxt.str();
-        std::string strBetNetExpectedTxt = BetNetExpectedTxt.str();
-        //const char * BetNetBlockTxtConst = strBetNetBlockTmp.c_str();
-        //const char * BetNetExpectedTxtConst = strBetNetExpectedTxt.c_str();
+    if (pindex->nHeight >= Params().WagerrProtocolV2StartHeight()) {
+        // Validation of V2 and V3 betting mints
 
         std::multimap<CPayoutInfoDB, CBetOut> mExpectedPayouts;
-
         CAmount nExpectedBetMint = GetBettingPayouts(bettingsViewCache, pindex->nHeight, mExpectedPayouts);
 
         if (!IsBlockPayoutsValid(bettingsViewCache, mExpectedPayouts, block, pindex->nHeight, nExpectedMint, nMNExpectedRewardValue)) {
-            if (Params().NetworkID() == CBaseChainParams::TESTNET && (pindex->nHeight >= Params().ZerocoinCheckTXexclude() && pindex->nHeight <= Params().ZerocoinCheckTX())) {
-                LogPrintf("ConnectBlock() - Skipping validation of bet payouts on testnet subset : Bet payout TX's don't match up with block payout TX's at block %i\n", pindex->nHeight);
-            } else  {
-                return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
-            }
+            return state.DoS(100, error("ConnectBlock() : Bet payout TX's don't match up with block payout TX's %i ", pindex->nHeight), REJECT_INVALID, "bad-cb-payout");
         }
         nExpectedMint += nExpectedBetMint;
+    }
+    if (pindex->nHeight >= Params().WagerrProtocolV1StartHeight()) {
+        // Protocol V1 has been retired 
+    } else {
+        if (!IsBlockValueValid(block, nExpectedMint, nMint)) {
+            return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",
+                                        FormatMoney(nMint), FormatMoney(nExpectedMint)),
+                            REJECT_INVALID, "bad-cb-amount");
+        }
     }
 
     if (!control.Wait())
@@ -3304,7 +3246,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
 
     // Look through the block for any events, results or mapping TX.
     if (!fJustCheck) {
-        if (pindex->nHeight > Params().BetStartHeight()) {
+        if (pindex->nHeight > Params().WagerrProtocolV2StartHeight()) {
             for (const CTransaction& tx : block.vtx) {
                 ProcessBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= Params().WagerrProtocolV3StartHeight());
             }

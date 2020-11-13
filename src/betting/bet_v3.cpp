@@ -346,8 +346,6 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
 
     GetCGLottoEventResults(nLastBlockHeight, results);
 
-    bool fWagerrProtocolV3 = nLastBlockHeight >= Params().WagerrProtocolV3StartHeight();
-
     std::vector<std::pair<ChainGamesBetKey, CChainGamesBetDB>> vEntriesToUpdate;
 
     PeerlessBetKey zeroKey{(uint32_t) nNewBlockHeight, COutPoint()};

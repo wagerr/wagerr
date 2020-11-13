@@ -94,7 +94,7 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
         // Look back the chain 14 days for any events and bets.
         CBlockIndex *BlocksIndex = NULL;
         int startHeight = nLastBlockHeight - Params().BetBlocksIndexTimespan();
-        startHeight = startHeight < Params().BetStartHeight() ? Params().BetStartHeight() : startHeight;
+        startHeight = startHeight < Params().WagerrProtocolV2StartHeight() ? Params().WagerrProtocolV2StartHeight() : startHeight;
         BlocksIndex = chainActive[startHeight];
 
         OutcomeType nMoneylineResult = (OutcomeType) 0;
