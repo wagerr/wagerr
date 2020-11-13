@@ -235,7 +235,6 @@ public:
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
         /** Bet related parameters **/
-        nBetStartHeight = 763350;                                       // The block that betting protocols become active.
         vOracleWalletAddrs = {"WcsijutAF46tSLTcojk9mR9zV9wqwUUYpC",     // Oracle Masternode Event & Result Posting Wallet Addresses.
                               "Weqz3PFBq3SniYF5HS8kuj72q9FABKzDrP"};
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
@@ -249,7 +248,9 @@ public:
         nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nWagerrProtocolV3StartHeight = std::numeric_limits<int>::max(); // TODO: pick block height for enabling parlay betting and new payout system
+        nWagerrProtocolV1StartHeight = 298386;                          // Betting protocol v1 activation block
+        nWagerrProtocolV2StartHeight = 763350;                          // Betting protocol v2 activation block
+        nWagerrProtocolV3StartHeight = std::numeric_limits<int>::max(); // Betting protocol v3 activation block
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
 
         quickGamesArr.clear();
@@ -414,7 +415,6 @@ public:
         nBlockV7StartHeight = nBlockTimeProtocolV2;
 
         /** Bet related parameters **/
-        nBetStartHeight = 1100;                                         // The block that betting protocols become active (Testnet).
         vOracleWalletAddrs = {"TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2",     // Oracle Masternode Event & Result Posting Wallet Address (Testnet).
                               "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc" };
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
@@ -428,7 +428,9 @@ public:
         nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nWagerrProtocolV3StartHeight = 2000;                          // TODO: pick block height for enabling parlay betting and new payout system
+        nWagerrProtocolV1StartHeight = 1100;                            // Betting protocol v1 activation block
+        nWagerrProtocolV2StartHeight = 1100;                            // Betting protocol v2 activation block
+        nWagerrProtocolV3StartHeight = 2000;                            // Betting protocol v3 activation block
         nMaturityV2StartHeight = 38000;                                 // Reduced block maturity required for spending coinstakes and betting payouts
 
         quickGamesArr.clear();
@@ -556,7 +558,6 @@ public:
         nBlockEnforceNewMessageSignatures = 1;
 
         /** Bet related parameters **/
-        nBetStartHeight = 251;                                          // The block that betting protocols become active (Regtest).
         vOracleWalletAddrs = {"TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1",     // Oracle Masternode Event & Result Posting Wallet Address (Regtest).
                               "TFvZVYGdrxxNunQLzSnRSC58BSRA7si6zu" };
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
@@ -570,7 +571,9 @@ public:
         nMaxParlayBetPayoutRange = 4000;                                // Minimizes maximum parlay payout size to avoid unnecessary large numbers (Only payout parlay bets that are between 25 - 4000 WRG inclusive).
         nBetPlaceTimeoutBlocks = 120;                                   // Discard bets placed less than 120 seconds (approx. 2 mins) before event start time,
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
-        nWagerrProtocolV3StartHeight = nBetStartHeight;                 // TODO: pick block height for enabling parlay betting and new payout system
+        nWagerrProtocolV1StartHeight = 251;                             // Betting protocol v1 activation block
+        nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
+        nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
 
         quickGamesArr.clear();

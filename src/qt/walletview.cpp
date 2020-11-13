@@ -369,7 +369,7 @@ void WalletView::gotoPlaceBetPage(QString addr)
     std::vector<CEvent *> eventsVector;
 
     // Look back to the betting start block for events to list on the wallet QT.
-    CBlockIndex* pindex =  chainActive.Height() > Params().BetStartHeight() ? chainActive[Params().BetStartHeight()] : NULL;
+    CBlockIndex* pindex =  chainActive.Height() > Params().WagerrProtocolV2StartHeight() ? chainActive[Params().WagerrProtocolV2StartHeight()] : NULL;
 
     while (pindex) {
 
