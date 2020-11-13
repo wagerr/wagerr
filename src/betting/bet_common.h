@@ -157,9 +157,8 @@ class CBetOut : public CTxOut {
     inline bool operator>(const CBetOut& rhs) const { return CompareTo(rhs) > 0; }
 };
 
-
 /** Ensures a TX has come from an OMNO wallet. **/
-bool IsValidOracleTx(const CTxIn &txin);
+bool IsValidOracleTx(const CTxIn &txin, int nHeight);
 
 //* Calculates the amount of coins paid out to bettors and the amount of coins to burn, based on bet amount and odds **/
 bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CAmount& nPayout, CAmount& nBurn);
