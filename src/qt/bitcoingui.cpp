@@ -411,8 +411,6 @@ void BitcoinGUI::createActions(const NetworkStyle* networkStyle)
     connect(overviewAction, SIGNAL(triggered()), this, SLOT(gotoOverviewPage()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(sendCoinsAction, SIGNAL(triggered()), this, SLOT(gotoSendCoinsPage()));
-    //connect(placeBetAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
-    //connect(placeBetAction, SIGNAL(triggered()), this, SLOT(gotoPlaceBetPage()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
     connect(receiveCoinsAction, SIGNAL(triggered()), this, SLOT(gotoReceiveCoinsPage()));
     connect(privacyAction, SIGNAL(triggered()), this, SLOT(showNormalIfMinimized()));
@@ -881,12 +879,6 @@ void BitcoinGUI::gotoSendCoinsPage(QString addr)
 {
     sendCoinsAction->setChecked(true);
     if (walletFrame) walletFrame->gotoSendCoinsPage(addr);
-}
-
-void BitcoinGUI::gotoPlaceBetPage(QString addr)
-{
-//    placeBetAction->setChecked(true);
-//    if (walletFrame) walletFrame->gotoPlaceBetPage(addr);
 }
 
 void BitcoinGUI::gotoSignMessageTab(QString addr)
