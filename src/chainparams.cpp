@@ -210,8 +210,6 @@ public:
         nInvalidAmountFiltered = 0*COIN;        //Amount of invalid coins filtered through exchanges, that should be considered valid
         nBlockZerocoinV2 = 298386;              //The block that zerocoin v2 becomes active (estimated at unix time 1536868800 -  (GMT): Thursday, September 13, 2018 6:00:00 PM
         nBlockDoubleAccumulated = 99999999;
-        nEnforceNewSporkKey = 1536868800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
-        nRejectOldSporkKey = 1537128000;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
 
         /** Block height at which BIP34 becomes active */
         nBIP34Height = 1;
@@ -236,10 +234,6 @@ public:
 
         /** Bet related parameters **/
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
-        strDevPayoutAddrOld = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";     // Development fund payout address.
-        strDevPayoutAddrNew = "WiaoheNeRz61imSWY3QVQVvqZA9HH8sgHZ";     // Development fund payout address.
-        strOMNOPayoutAddrOld = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";    // OMNO fund payout address.
-        strOMNOPayoutAddrNew = "WfoyvkPVDrnyJREKeNbJWNu97d27EzPinX";    // OMNO fund payout address.
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
@@ -252,13 +246,24 @@ public:
         nWagerrProtocolV2StartHeight = 763350;                          // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = std::numeric_limits<int>::max(); // Betting protocol v3 activation block
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
+
         nKeysRotateHeight = std::numeric_limits<int>::max();            // Rotate spork key, oracle keys and fee payout keys
+        nEnforceNewSporkKey = 1536868800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
+        nRejectOldSporkKey = 1537128000;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
+
+        strSporkPubKey = "043cb569d89fb78fc61df67617012e6c33c1ba306f4620bbb89424279a4931adf4a9e238db60aa7f78cd10ef780f21f1fd3b881f014fd0f656db4b6a6a98f0cff2";
+        strSporkPubKeyOld = "040f00b37452d6e7ac00b4a2e2699bab35b5ed3c8d3e1ecaf63317900fd7b52324f4243d11cc70c40dde54bdbc1e9a732ee63b1eec60ca45e6d529ad2b43d4d614";
+
+        strDevPayoutAddrOld = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";     // Development fund payout address (old).
+        strDevPayoutAddrNew = "Shqrs3mz3i65BiTEKPgnxoqJqMw5b726m5";     // Development fund payout address (new).
+        strOMNOPayoutAddrOld = "WRBs8QD22urVNeGGYeAMP765ncxtUA1Rv2";    // OMNO fund payout address (old).
+        strOMNOPayoutAddrNew = "SNCNYcDyXPCLHpG9AyyhnPcLNpxCpGZ2X6";    // OMNO fund payout address (new).
 
         vOracles = {
             { "WcsijutAF46tSLTcojk9mR9zV9wqwUUYpC", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
             { "Weqz3PFBq3SniYF5HS8kuj72q9FABKzDrP", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "WdrS2crxxZf4dpxMRUGa3PTRBaMjU2DcF2", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
-            { "WcAQ1GrqwPBRPPEgLgoHnobZGXqKFH2Ai1", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "WdAo2Xk8r1MVx7ZmxARpJJkgzaFeumDcCS", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "WhW3dmThz2hWEfpagfbdBQ7hMfqf6MkfHR", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
         };
 
         quickGamesArr.clear();
@@ -330,8 +335,6 @@ public:
 
         nPoolMaxTransactions = 3;
         nBudgetCycleBlocks = 43200; //!< Amount of blocks in a months period of time (using 1 minutes per) = (60*24*30)
-        strSporkPubKey = "043cb569d89fb78fc61df67617012e6c33c1ba306f4620bbb89424279a4931adf4a9e238db60aa7f78cd10ef780f21f1fd3b881f014fd0f656db4b6a6a98f0cff2";
-        strSporkPubKeyOld = "040f00b37452d6e7ac00b4a2e2699bab35b5ed3c8d3e1ecaf63317900fd7b52324f4243d11cc70c40dde54bdbc1e9a732ee63b1eec60ca45e6d529ad2b43d4d614";
         strObfuscationPoolDummyAddress = "WWqou25edpCatoZgSxhd3dpNbhn3dxh21D";
         nStartMasternodePayments = 1518696182; // GMT: Thursday, 15. February 2018 12:03:02
 
@@ -400,8 +403,6 @@ public:
         nBlockEnforceInvalidUTXO = 350; //Start enforcing the invalid UTXO's
         nInvalidAmountFiltered = 0; //Amount of invalid coins filtered through exchanges, that should be considered valid
         nBlockZerocoinV2 = 600; //The block that zerocoin v2 becomes active
-        nEnforceNewSporkKey = 1603800000; //!> Sporks signed after Tuesday September 4, 2018 12:00:00 AM GMT must use the new spork key
-        nRejectOldSporkKey = 1605009600; //!> Reject old spork key after October 4, 2018 12:00:00 AM GMT
 
         /** Block height at which BIP34 becomes active */
         nBIP34Height = 3963;
@@ -424,10 +425,6 @@ public:
 
         /** Bet related parameters **/
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
-        strDevPayoutAddrOld = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
-        strDevPayoutAddrNew = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
-        strOMNOPayoutAddrOld = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
-        strOMNOPayoutAddrNew = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
@@ -440,13 +437,24 @@ public:
         nWagerrProtocolV2StartHeight = 1100;                            // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = 2000;                            // Betting protocol v3 activation block
         nMaturityV2StartHeight = 38000;                                 // Reduced block maturity required for spending coinstakes and betting payouts
-        nKeysRotateHeight = 72000;                                      // Rotate spork key, oracle keys and fee payout keys
+
+        nKeysRotateHeight = 95700;                                      // Rotate spork key, oracle keys and fee payout keys
+        nEnforceNewSporkKey = 1605618000; //!> Sporks signed after Tuesday, 17-Nov-20 13:00:00 UTC must use the new spork key
+        nRejectOldSporkKey = 1605790800; //!> Reject old spork key after Thursday, 19-Nov-20 13:00:00 UTC
+
+        strSporkPubKey = "04817a91328092a4bd44fa50e9c019bc7705a7eb26840a5763445efc7ddcbd29b6899bf53245b4ddb6fb4068a8ac034a1645ee80a198ded40b6ae49452a7bca5a5";
+        strSporkPubKeyOld = "0466223434350e5754c7379008e82954820a4bcc17335c42b915a0223c486e8bbbf87ba6281777d19ec73dc0b43416b33df432e3f4685770e56f9688afec7c2e3c";
+
+        strDevPayoutAddrOld = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
+        strDevPayoutAddrNew = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
+        strOMNOPayoutAddrOld = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
+        strOMNOPayoutAddrNew = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
 
         vOracles = {
             { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
             { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", "THD9dP7JxeZVXCyKjwvZLnizmtjHpVZHXZ", "TBFJnQqscUyA6Gpv6zqxASRnHpCpgv79GH", nKeysRotateHeight, std::numeric_limits<int>::max() },
-            { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", "THD9dP7JxeZVXCyKjwvZLnizmtjHpVZHXZ", "TBFJnQqscUyA6Gpv6zqxASRnHpCpgv79GH", nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
         };
 
         quickGamesArr.clear();
@@ -500,8 +508,6 @@ public:
 
         nPoolMaxTransactions = 2;
         nBudgetCycleBlocks = 144; //!< Ten cycles per day on testnet
-        strSporkPubKey = "04817a91328092a4bd44fa50e9c019bc7705a7eb26840a5763445efc7ddcbd29b6899bf53245b4ddb6fb4068a8ac034a1645ee80a198ded40b6ae49452a7bca5a5";
-        strSporkPubKeyOld = "0466223434350e5754c7379008e82954820a4bcc17335c42b915a0223c486e8bbbf87ba6281777d19ec73dc0b43416b33df432e3f4685770e56f9688afec7c2e3c";
         strObfuscationPoolDummyAddress = "TMPUBzcsHZawA32XYYDF9FHQp6icv492CV";
         nStartMasternodePayments = 1518696183; // GMT: Thursday, 15. February 2018 12:03:03
         nBudget_Fee_Confirmations = 3; // Number of confirmations for the finalization fee. We have to make this very short
@@ -575,10 +581,6 @@ public:
 
         /** Bet related parameters **/
         nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
-        strDevPayoutAddrOld = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
-        strDevPayoutAddrNew = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
-        strOMNOPayoutAddrOld = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
-        strOMNOPayoutAddrNew = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
@@ -591,7 +593,20 @@ public:
         nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
+
         nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
+
+        /* Spork Key for RegTest:
+        WIF private key: 6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH
+        private key hex: a792662ff7b4cca1603fb9b67a4bce9e8ffb9718887977a5a0b2a522e3eab97e
+        */
+        strSporkPubKey = "04fb58d71ffcf7d5385d85020045f108637a5296d1552f56ce561a29f78834101519c306be7d9c328a82b77726038b0eab01b8f3187c76656f9996257bf616e77f";
+        strSporkPubKeyOld = "04fb58d71ffcf7d5385d85020045f108637a5296d1552f56ce561a29f78834101519c306be7d9c328a82b77726038b0eab01b8f3187c76656f9996257bf616e77f";
+
+        strDevPayoutAddrOld = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        strDevPayoutAddrNew = "TLuTVND9QbZURHmtuqD5ESECrGuB9jLZTs";     // Development fund payout address (Regtest).
+        strOMNOPayoutAddrOld = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
+        strOMNOPayoutAddrNew = "THofaueWReDjeZQZEECiySqV9GP4byP3qr";    // OMNO fund payout address (Regtest).
 
         vOracles = {
             { "TXuoB9DNEuZx1RCfKw3Hsv7jNUHTt4sVG1", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
@@ -632,12 +647,6 @@ public:
         fSkipProofOfWorkCheck = true;
         fTestnetToBeDeprecatedFieldRPC = false;
 
-        /* Spork Key for RegTest:
-        WIF private key: 6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH
-        private key hex: a792662ff7b4cca1603fb9b67a4bce9e8ffb9718887977a5a0b2a522e3eab97e
-        */
-        strSporkPubKey = "04fb58d71ffcf7d5385d85020045f108637a5296d1552f56ce561a29f78834101519c306be7d9c328a82b77726038b0eab01b8f3187c76656f9996257bf616e77f";
-        strSporkPubKeyOld = "04fb58d71ffcf7d5385d85020045f108637a5296d1552f56ce561a29f78834101519c306be7d9c328a82b77726038b0eab01b8f3187c76656f9996257bf616e77f";
     }
     const Checkpoints::CCheckpointData& Checkpoints() const
     {
