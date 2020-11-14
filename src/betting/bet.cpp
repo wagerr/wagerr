@@ -150,10 +150,10 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
     CTransaction txPrev;
     CBitcoinAddress address;
     CTxDestination prevAddr;
-    // if we cant extract playerAddress - reject tx
+    // if we cant extract playerAddress - skip tx
     if (!GetTransaction(txin.prevout.hash, txPrev, hashBlock, true) ||
             !ExtractDestination(txPrev.vout[txin.prevout.n].scriptPubKey, prevAddr)) {
-        return false;
+        return true;
     }
     address = CBitcoinAddress(prevAddr);
 
@@ -163,7 +163,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
         if (bettingTx == nullptr) continue;
 
-        if (height >= sporkManager.GetSporkValue(SPORK_19_BETTING_MAINTENANCE_MODE)) {
+        if (height >= sporkManager.GetSporkValue(SPORK_20_BETTING_MAINTENANCE_MODE)) {
             return error("CheckBettingTX : Betting transactions are temporarily disabled for maintenance");
         }
 
@@ -229,7 +229,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case cgBetTxType:
             {
-                if (height >= sporkManager.GetSporkValue(SPORK_20_QUICKGAMES_MAINTENANCE_MODE)) {
+                if (height >= sporkManager.GetSporkValue(SPORK_21_QUICKGAMES_MAINTENANCE_MODE)) {
                     return error("CheckBettingTX : Quick games transactions are temporarily disabled for maintenance");
                 }
 
