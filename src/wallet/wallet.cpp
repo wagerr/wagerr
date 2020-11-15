@@ -1340,7 +1340,7 @@ void CWalletTx::GetAmounts(std::list<COutputEntry>& listReceived,
         if (txout.IsZerocoinMint()) {
             address = CNoDestination();
         } else if (!ExtractDestination(txout.scriptPubKey, address)) {
-            if (!IsCoinStake() && !IsCoinBase()) {
+            if (!IsCoinStake() && !IsCoinBase() && !txout.scriptPubKey.IsUnspendable()) {
                 LogPrintf("CWalletTx::GetAmounts: Unknown transaction type found, txid %s\n", this->GetHash().ToString());
             }
             address = CNoDestination();
