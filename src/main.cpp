@@ -81,7 +81,7 @@ bool fIsBareMultisigStd = true;
 bool fCheckBlockIndex = false;
 bool fVerifyingBlocks = false;
 unsigned int nCoinCacheSize = 5000;
-unsigned int nBettingCacheSize = 5000;
+unsigned int nBettingCacheSize = 1000;
 bool fAlerts = DEFAULT_ALERTS;
 
 /* If the tip is older than this (in seconds), the node is considered to be in initial block download. */
