@@ -170,7 +170,8 @@ public:
 
     /** Betting on blockchain **/
     std::vector<COracle> Oracles() const { return vOracles; }
-    int BetBlocksIndexTimespan() const { return nBetBlocksIndexTimespan; }
+    int BetBlocksIndexTimespanV2() const { return nBetBlocksIndexTimespanV2; }
+    int BetBlocksIndexTimespanV3() const { return nBetBlocksIndexTimespanV3; }
     uint64_t OMNORewardPermille() const { return nOMNORewardPermille; }
     uint64_t DevRewardPermille() const { return nDevRewardPermille; }
     int BetBlockPayoutAmount() const { return nBetBlockPayoutAmount; } // Currently not used
@@ -282,7 +283,8 @@ protected:
 
     std::vector<COracle> vOracles;
 
-    int nBetBlocksIndexTimespan;
+    int nBetBlocksIndexTimespanV2;
+    int nBetBlocksIndexTimespanV3;
     std::string strDevPayoutAddrOld;
     std::string strDevPayoutAddrNew;
     std::string strOMNOPayoutAddrOld;

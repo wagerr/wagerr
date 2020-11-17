@@ -234,7 +234,8 @@ public:
         nZerocoinStartHeight = 700;            // Start accumulation coins here - first zerocoin mint occurs at block
 
         /** Bet related parameters **/
-        nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        nBetBlocksIndexTimespanV2 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        nBetBlocksIndexTimespanV3 = 90050;                              // Checking back 2 months for events and bets for each result.  (With approx. 2 days buffer).
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
@@ -425,7 +426,8 @@ public:
         nBlockV7StartHeight = nBlockTimeProtocolV2;
 
         /** Bet related parameters **/
-        nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
+        nBetBlocksIndexTimespanV2 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
+        nBetBlocksIndexTimespanV3 = 90050;                              // Checking back 2 months for events and bets for each result.  (With approx. 2 days buffer).
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.
@@ -581,7 +583,8 @@ public:
         nBlockEnforceNewMessageSignatures = 1;
 
         /** Bet related parameters **/
-        nBetBlocksIndexTimespan = 23040;                                // Currently checking back 2 weeks for events and bets for each result. (With approx. 2 days buffer).
+        nBetBlocksIndexTimespanV2 = 2880;                               // Checking back 2 days for events and bets for each result.
+        nBetBlocksIndexTimespanV3 = 23040;                              // Checking back 2 weeks for events and bets for each result.  (With approx. 2 days buffer).
         nOMNORewardPermille = 24;                                       // profitAcc / (100-6) * 100 * 0.024 (nMNBetReward = Total Profit * 0.024).
         nDevRewardPermille = 6;                                         // profitAcc / (100-6) * 100 * 0.006 (nDevReward = Total Profit * 0.006).
         nBetBlockPayoutAmount = 1440;                                   // Set the number of blocks we want to look back for results already paid out.

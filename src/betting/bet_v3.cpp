@@ -4,6 +4,7 @@
 
 #include <betting/bet_common.h>
 #include <betting/bet_v2.h>
+#include <betting/bet_v3.h>
 #include <betting/bet_db.h>
 #include <betting/oracles.h>
 #include <main.h>
@@ -44,6 +45,14 @@ void GetPLRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std
     }
 }
 
+uint32_t GetBetSearchStartHeight(int nHeight) {
+    if (nHeight >= Params().WagerrProtocolV3StartHeight()) {
+        return nHeight >= Params().BetBlocksIndexTimespanV3() ? nHeight - Params().BetBlocksIndexTimespanV3() : Params().WagerrProtocolV3StartHeight();
+    } else {
+        return nHeight >= Params().BetBlocksIndexTimespanV2() ? nHeight - Params().BetBlocksIndexTimespanV2() : 0;
+    }
+}
+
 /**
  * Creates the bet payout vector for all winning CUniversalBet bets.
  *
@@ -68,8 +77,8 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
 
         LogPrint("wagerr", "Looking for bets of eventId: %lu\n", result.nEventId);
 
-        // look bets at last 14 days
-        uint32_t startHeight = nLastBlockHeight >= Params().BetBlocksIndexTimespan() ? nLastBlockHeight - Params().BetBlocksIndexTimespan() : 0;
+        // look bets during the bet interval
+        uint32_t startHeight = GetBetSearchStartHeight(nLastBlockHeight);
         bool legHalfLose = false;
         bool legHalfWin = false;
         bool legRefund = false;
@@ -161,7 +170,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
                         } else {
                             finalOdds = std::pair<uint32_t, uint32_t>{0, 0};
                         }
-                    } else if ((!fWagerrProtocolV3) && nLastBlockHeight - lockedEvent.nEventCreationHeight > Params().BetBlocksIndexTimespan()) {
+                    } else if ((!fWagerrProtocolV3) && nLastBlockHeight - lockedEvent.nEventCreationHeight > Params().BetBlocksIndexTimespanV2()) {
                         finalOdds = std::pair<uint32_t, uint32_t>{0, 0};
                     }
                     else {
@@ -378,7 +387,7 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
         std::vector<std::pair<ChainGamesBetKey, CChainGamesBetDB>> candidates;
 
         // look bets at last 14 days
-        uint32_t startHeight = nLastBlockHeight >= Params().BetBlocksIndexTimespan() ? nLastBlockHeight - Params().BetBlocksIndexTimespan() : 0;
+        uint32_t startHeight = GetBetSearchStartHeight(nLastBlockHeight);
 
         auto it = bettingsViewCache.chainGamesLottoBets->NewIterator();
         for (it->Seek(CBettingDB::DbTypeToBytes(ChainGamesBetKey{static_cast<uint32_t>(startHeight), COutPoint()})); it->Valid(); it->Next()) {
