@@ -2218,6 +2218,99 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
  * @param fHelp  Help text
  * @return
  */
+UniValue getalleventliabilities(const UniValue& params, bool fHelp)
+{
+  if (fHelp || (params.size() != 0))
+        throw std::runtime_error(
+            "geteventliability\n"
+            "Return the payout liabilities for all events.\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"event-id\": \"xxx\", (numeric) The id of the event.\n"
+            "    \"event-status\": \"status\", (string) The status of the event (running | resulted).\n"
+            "    \"moneyline-home-bets\": \"xxx\", (numeric) The number of bets to moneyline home (parlays included).\n"
+            "    \"moneyline-home-liability\": \"xxx\", (numeric) The moneyline home potentional liability (without parlays).\n"
+            "    \"moneyline-away-bets\": \"xxx\", (numeric) The number of bets to moneyline away (parlays included).\n"
+            "    \"moneyline-away-liability\": \"xxx\", (numeric) The moneyline away potentional liability (without parlays).\n"
+            "    \"moneyline-draw-bets\": \"xxx\", (numeric) The number of bets to moneyline draw (parlays included).\n"
+            "    \"moneyline-draw-liability\": \"xxx\", (numeric) The moneyline draw potentional liability (without parlays).\n"
+            "    \"spread-home-bets\": \"xxx\", (numeric) The number of bets to spread home (parlays included).\n"
+            "    \"spread-home-liability\": \"xxx\", (numeric) The spreads home potentional liability (without parlays).\n"
+            "    \"spread-away-bets\": \"xxx\", (numeric) The number of bets to spread away (parlays included).\n"
+            "    \"spread-away-liability\": \"xxx\", (numeric) The spread away potentional liability (without parlays).\n"
+            "    \"spread-push-bets\": \"xxx\", (numeric) The number of bets to spread push (parlays included).\n"
+            "    \"spread-push-liability\": \"xxx\", (numeric) The spread push potentional liability (without parlays).\n"
+            "    \"total-over-bets\": \"xxx\", (numeric) The number of bets to total over (parlays included).\n"
+            "    \"total-over-liability\": \"xxx\", (numeric) The total over potentional liability (without parlays).\n"
+            "    \"total-under-bets\": \"xxx\", (numeric) The number of bets to total under (parlays included).\n"
+            "    \"total-under-liability\": \"xxx\", (numeric) The total under potentional liability (without parlays).\n"
+            "    \"total-push-bets\": \"xxx\", (numeric) The number of bets to total push (parlays included).\n"
+            "    \"total-push-liability\": \"xxx\", (numeric) The total push potentional liability (without parlays).\n"
+            "    ]\n"
+            "  }\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getalleventliabilities", "") + HelpExampleRpc("getalleventliabilities", ""));
+
+    UniValue result{UniValue::VARR};
+
+    auto it = bettingsView->events->NewIterator();
+    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        CPeerlessExtendedEventDB plEvent;
+        CBettingDB::BytesToDbType(it->Value(), plEvent);
+
+        // Only list active events.
+        /*
+        if (plEvent.nEventCreationHeight < chainActive.Height() - Params().BetBlocksIndexTimespan()) {
+            continue;
+        }
+        */
+        // Only list active events.
+        if ((time_t) plEvent.nStartTime < std::time(0)) {
+            continue;
+        }
+
+        UniValue event(UniValue::VOBJ);
+
+        event.push_back(Pair("event-id", (uint64_t) plEvent.nEventId));
+        event.push_back(Pair("event-status", "running"));
+        event.push_back(Pair("moneyline-home-bets", (uint64_t) plEvent.nMoneyLineHomeBets));
+        event.push_back(Pair("moneyline-home-liability", (uint64_t) plEvent.nMoneyLineHomePotentialLiability));
+        event.push_back(Pair("moneyline-away-bets", (uint64_t) plEvent.nMoneyLineAwayBets));
+        event.push_back(Pair("moneyline-away-liability", (uint64_t) plEvent.nMoneyLineAwayPotentialLiability));
+        event.push_back(Pair("moneyline-draw-bets", (uint64_t) plEvent.nMoneyLineDrawBets));
+        event.push_back(Pair("moneyline-draw-liability", (uint64_t) plEvent.nMoneyLineDrawPotentialLiability));
+        event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
+        event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
+        event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
+        event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
+        event.push_back(Pair("spread-away-bets", (uint64_t) plEvent.nSpreadAwayBets));
+        event.push_back(Pair("spread-away-liability", (uint64_t) plEvent.nSpreadAwayPotentialLiability));
+        event.push_back(Pair("spread-push-bets", (uint64_t) plEvent.nSpreadPushBets));
+        event.push_back(Pair("spread-push-liability", (uint64_t) plEvent.nSpreadPushPotentialLiability));
+        event.push_back(Pair("total-over-bets", (uint64_t) plEvent.nTotalOverBets));
+        event.push_back(Pair("total-over-liability", (uint64_t) plEvent.nTotalOverPotentialLiability));
+        event.push_back(Pair("total-under-bets", (uint64_t) plEvent.nTotalUnderBets));
+        event.push_back(Pair("total-under-liability", (uint64_t) plEvent.nTotalUnderPotentialLiability));
+        event.push_back(Pair("total-push-bets", (uint64_t) plEvent.nTotalPushBets));
+        event.push_back(Pair("total-push-liability", (uint64_t) plEvent.nTotalPushPotentialLiability));
+
+        result.push_back(event);
+    }
+
+    return result;
+}
+
+/**
+ * Get total liability for each event that is currently active.
+ *
+ * @param params The RPC params consisting of the event id.
+ * @param fHelp  Help text
+ * @return
+ */
 UniValue geteventliability(const UniValue& params, bool fHelp)
 {
   if (fHelp || (params.size() != 1))
