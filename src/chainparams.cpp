@@ -249,11 +249,11 @@ public:
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
 
         nKeysRotateHeight = std::numeric_limits<int>::max();            // Rotate spork key, oracle keys and fee payout keys
-        nEnforceNewSporkKey = 1536868800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
-        nRejectOldSporkKey = 1537128000;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
+        nEnforceNewSporkKey = 4070908800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
+        nRejectOldSporkKey = 4070908800;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
 
-        strSporkPubKey = "043cb569d89fb78fc61df67617012e6c33c1ba306f4620bbb89424279a4931adf4a9e238db60aa7f78cd10ef780f21f1fd3b881f014fd0f656db4b6a6a98f0cff2";
-        strSporkPubKeyOld = "040f00b37452d6e7ac00b4a2e2699bab35b5ed3c8d3e1ecaf63317900fd7b52324f4243d11cc70c40dde54bdbc1e9a732ee63b1eec60ca45e6d529ad2b43d4d614";
+        strSporkPubKey = "04a2f260ba521255f30cdd92dc5e3f53b753f2fcd04fb5510c4b7529843a535d05fabf9029bdfa40c5e0bed030f5f9c00766d6c510391ceb537016728cc44ddaef";
+        strSporkPubKeyOld = "043cb569d89fb78fc61df67617012e6c33c1ba306f4620bbb89424279a4931adf4a9e238db60aa7f78cd10ef780f21f1fd3b881f014fd0f656db4b6a6a98f0cff2";
 
         strDevPayoutAddrOld = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";     // Development fund payout address (old).
         strDevPayoutAddrNew = "Shqrs3mz3i65BiTEKPgnxoqJqMw5b726m5";     // Development fund payout address (new).
@@ -439,23 +439,23 @@ public:
         nWagerrProtocolV3StartHeight = 2000;                            // Betting protocol v3 activation block
         nMaturityV2StartHeight = 38000;                                 // Reduced block maturity required for spending coinstakes and betting payouts
 
-        nKeysRotateHeight = 95700;                                      // Rotate spork key, oracle keys and fee payout keys
-        nEnforceNewSporkKey = 1605618000; //!> Sporks signed after Tuesday, 17-Nov-20 13:00:00 UTC must use the new spork key
-        nRejectOldSporkKey = 1605790800; //!> Reject old spork key after Thursday, 19-Nov-20 13:00:00 UTC
+        nKeysRotateHeight = 102000;                                     // Rotate spork key, oracle keys and fee payout keys
+        nEnforceNewSporkKey = 1605790800; //!> Sporks signed after Thursday, 19-Nov-20 13:00:00 UTC
+        nRejectOldSporkKey = 1605963600; //!> Reject old spork key after Saturday, 21-Nov-20 13:00:00 UTC
 
-        strSporkPubKey = "04817a91328092a4bd44fa50e9c019bc7705a7eb26840a5763445efc7ddcbd29b6899bf53245b4ddb6fb4068a8ac034a1645ee80a198ded40b6ae49452a7bca5a5";
+        strSporkPubKey = "04d23d4179050244bfeff9f03ab4117e79a8835a9c0aba21b6df8d9e31042cc3b76bcb323a6e3a0e87b801ba2beef2c1db3a2a93d62bdb2e10192d8807f27e6f33";
         strSporkPubKeyOld = "0466223434350e5754c7379008e82954820a4bcc17335c42b915a0223c486e8bbbf87ba6281777d19ec73dc0b43416b33df432e3f4685770e56f9688afec7c2e3c";
 
         strDevPayoutAddrOld = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
-        strDevPayoutAddrNew = "TLceyDrdPLBu8DK6UZjKu4vCDUQBGPybcY";     // Development fund payout address (Testnet).
+        strDevPayoutAddrNew = "sUihJctn8P4wDVRU3SgSYbJkG8ajV68kmx";     // Development fund payout address (Testnet).
         strOMNOPayoutAddrOld = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
-        strOMNOPayoutAddrNew = "TDunmyDASGDjYwhTF3SeDLsnDweyEBpfnP";    // OMNO fund payout address (Testnet).
+        strOMNOPayoutAddrNew = "sMF9ejP1QMcoQnzURrSenRrFMznCfQfWgd";    // OMNO fund payout address (Testnet).
 
         vOracles = {
             { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
             { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", strDevPayoutAddrOld, strOMNOPayoutAddrOld, nWagerrProtocolV2StartHeight, nKeysRotateHeight },
-            { "TGFKr64W3tTMLZrKBhMAou9wnQmdNMrSG2", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
-            { "TWM5BQzfjDkBLGbcDtydfuNcuPfzPVSEhc", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TRNjH67Qfpfuhn3TFonqm2DNqDwwUsJ24T", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
+            { "TYijVoyFnJ8dt1SGHtMtn2wa34CEs8EVZq", strDevPayoutAddrNew, strOMNOPayoutAddrNew, nKeysRotateHeight, std::numeric_limits<int>::max() },
         };
 
         quickGamesArr.clear();
