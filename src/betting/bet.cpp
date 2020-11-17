@@ -1328,7 +1328,7 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
     for (auto result : results) {
 
         // look bets at last 14 days
-        uint32_t startHeight = nCurrentHeight >= Params().BetBlocksIndexTimespan() ? nCurrentHeight - Params().BetBlocksIndexTimespan() : 0;
+        uint32_t startHeight = GetBetSearchStartHeight(nCurrentHeight);
 
         auto it = bettingsViewCache.bets->NewIterator();
         std::vector<std::pair<PeerlessBetKey, CPeerlessBetDB>> vEntriesToUpdate;
