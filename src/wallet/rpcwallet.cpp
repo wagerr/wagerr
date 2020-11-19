@@ -82,85 +82,89 @@ UniValue listevents(const UniValue& params, bool fHelp)
         sportFilter = params[0].get_str();
     }
 
-    auto it = bettingsView->events->NewIterator();
-    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
-        CPeerlessExtendedEventDB plEvent;
-        CMappingDB mapping;
-        CBettingDB::BytesToDbType(it->Value(), plEvent);
+    {
+        LOCK(cs_bettingdb);
 
-        if (!bettingsView->mappings->Read(MappingKey{sportMapping, plEvent.nSport}, mapping))
-            continue;
+        auto it = bettingsView->events->NewIterator();
+        for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+            CPeerlessExtendedEventDB plEvent;
+            CMappingDB mapping;
+            CBettingDB::BytesToDbType(it->Value(), plEvent);
 
-        std::string sport = mapping.sName;
+            if (!bettingsView->mappings->Read(MappingKey{sportMapping, plEvent.nSport}, mapping))
+                continue;
 
-        // if event filter is set the don't list event if it doesn't match the filter.
-        if (params.size() > 0 && sportFilter != sport) {
-            continue;
+            std::string sport = mapping.sName;
+
+            // if event filter is set the don't list event if it doesn't match the filter.
+            if (params.size() > 0 && sportFilter != sport) {
+                continue;
+            }
+
+            // Only list active events.
+            if ((time_t) plEvent.nStartTime < std::time(0)) {
+                continue;
+            }
+
+            //std::string round    = roundsIndex.find(plEvent.nStage)->second.sName;
+            if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping))
+                continue;
+            std::string tournament = mapping.sName;
+            if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping))
+                continue;
+            std::string homeTeam = mapping.sName;
+            if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping))
+                continue;
+            std::string awayTeam = mapping.sName;
+
+            UniValue evt(UniValue::VOBJ);
+
+            evt.push_back(Pair("event_id", (uint64_t) plEvent.nEventId));
+            evt.push_back(Pair("sport", sport));
+            evt.push_back(Pair("tournament", tournament));
+            //evt.push_back(Pair("round", ""));
+
+            evt.push_back(Pair("starting", (uint64_t) plEvent.nStartTime));
+            evt.push_back(Pair("tester", (uint64_t) plEvent.nAwayTeam));
+
+            UniValue teams(UniValue::VOBJ);
+
+            teams.push_back(Pair("home", homeTeam));
+            teams.push_back(Pair("away", awayTeam));
+
+            evt.push_back(Pair("teams", teams));
+
+            UniValue odds(UniValue::VARR);
+
+            UniValue mlOdds(UniValue::VOBJ);
+            UniValue spreadOdds(UniValue::VOBJ);
+            UniValue totalsOdds(UniValue::VOBJ);
+
+            mlOdds.push_back(Pair("mlHome", (uint64_t) plEvent.nHomeOdds));
+            mlOdds.push_back(Pair("mlAway", (uint64_t) plEvent.nAwayOdds));
+            mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
+
+            if (plEvent.nEventCreationHeight < Params().WagerrProtocolV3StartHeight()) {
+                spreadOdds.push_back(Pair("favorite", plEvent.fLegacyInitialHomeFavorite ? "home" : "away"));
+            } else {
+                spreadOdds.push_back(Pair("favorite", plEvent.nHomeOdds <= plEvent.nAwayOdds ? "home" : "away"));
+            }
+            spreadOdds.push_back(Pair("spreadPoints", (int64_t) plEvent.nSpreadPoints));
+            spreadOdds.push_back(Pair("spreadHome", (uint64_t) plEvent.nSpreadHomeOdds));
+            spreadOdds.push_back(Pair("spreadAway", (uint64_t) plEvent.nSpreadAwayOdds));
+
+            totalsOdds.push_back(Pair("totalsPoints", (uint64_t) plEvent.nTotalPoints));
+            totalsOdds.push_back(Pair("totalsOver", (uint64_t) plEvent.nTotalOverOdds));
+            totalsOdds.push_back(Pair("totalsUnder", (uint64_t) plEvent.nTotalUnderOdds));
+
+            odds.push_back(mlOdds);
+            odds.push_back(spreadOdds);
+            odds.push_back(totalsOdds);
+
+            evt.push_back(Pair("odds", odds));
+
+            result.push_back(evt);
         }
-
-        // Only list active events.
-        if ((time_t) plEvent.nStartTime < std::time(0)) {
-            continue;
-        }
-
-        //std::string round    = roundsIndex.find(plEvent.nStage)->second.sName;
-        if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping))
-            continue;
-        std::string tournament = mapping.sName;
-        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping))
-            continue;
-        std::string homeTeam = mapping.sName;
-        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping))
-            continue;
-        std::string awayTeam = mapping.sName;
-
-        UniValue evt(UniValue::VOBJ);
-
-        evt.push_back(Pair("event_id", (uint64_t) plEvent.nEventId));
-        evt.push_back(Pair("sport", sport));
-        evt.push_back(Pair("tournament", tournament));
-        //evt.push_back(Pair("round", ""));
-
-        evt.push_back(Pair("starting", (uint64_t) plEvent.nStartTime));
-        evt.push_back(Pair("tester", (uint64_t) plEvent.nAwayTeam));
-
-        UniValue teams(UniValue::VOBJ);
-
-        teams.push_back(Pair("home", homeTeam));
-        teams.push_back(Pair("away", awayTeam));
-
-        evt.push_back(Pair("teams", teams));
-
-        UniValue odds(UniValue::VARR);
-
-        UniValue mlOdds(UniValue::VOBJ);
-        UniValue spreadOdds(UniValue::VOBJ);
-        UniValue totalsOdds(UniValue::VOBJ);
-
-        mlOdds.push_back(Pair("mlHome", (uint64_t) plEvent.nHomeOdds));
-        mlOdds.push_back(Pair("mlAway", (uint64_t) plEvent.nAwayOdds));
-        mlOdds.push_back(Pair("mlDraw", (uint64_t) plEvent.nDrawOdds));
-
-        if (plEvent.nEventCreationHeight < Params().WagerrProtocolV3StartHeight()) {
-            spreadOdds.push_back(Pair("favorite", plEvent.fLegacyInitialHomeFavorite ? "home" : "away"));
-        } else {
-            spreadOdds.push_back(Pair("favorite", plEvent.nHomeOdds <= plEvent.nAwayOdds ? "home" : "away"));
-        }
-        spreadOdds.push_back(Pair("spreadPoints", (int64_t) plEvent.nSpreadPoints));
-        spreadOdds.push_back(Pair("spreadHome", (uint64_t) plEvent.nSpreadHomeOdds));
-        spreadOdds.push_back(Pair("spreadAway", (uint64_t) plEvent.nSpreadAwayOdds));
-
-        totalsOdds.push_back(Pair("totalsPoints", (uint64_t) plEvent.nTotalPoints));
-        totalsOdds.push_back(Pair("totalsOver", (uint64_t) plEvent.nTotalOverOdds));
-        totalsOdds.push_back(Pair("totalsUnder", (uint64_t) plEvent.nTotalUnderOdds));
-
-        odds.push_back(mlOdds);
-        odds.push_back(spreadOdds);
-        odds.push_back(totalsOdds);
-
-        evt.push_back(Pair("odds", odds));
-
-        result.push_back(evt);
     }
 
     return result;
@@ -182,37 +186,41 @@ UniValue listeventsdebug(const UniValue& params, bool fHelp)
 
     auto time = std::time(0);
 
-    auto it = bettingsView->events->NewIterator();
-    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
-        CPeerlessExtendedEventDB plEvent;
-        CMappingDB mapping;
-        CBettingDB::BytesToDbType(it->Value(), plEvent);
+    {
+        LOCK(cs_bettingdb);
 
-        std::stringstream strStream;
+        auto it = bettingsView->events->NewIterator();
+        for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+            CPeerlessExtendedEventDB plEvent;
+            CMappingDB mapping;
+            CBettingDB::BytesToDbType(it->Value(), plEvent);
 
-        auto started = ((time_t) plEvent.nStartTime < time) ? std::string("true") : std::string("false");
+            std::stringstream strStream;
 
-        strStream << "eventId = " << plEvent.nEventId << ", sport: " << plEvent.nSport << ", tournament: " << plEvent.nTournament << ", round: " << plEvent.nStage << ", home: " << plEvent.nHomeTeam << ", away: " << plEvent.nAwayTeam
-            << ", homeOdds: " << plEvent.nHomeOdds << ", awayOdds: " << plEvent.nAwayOdds << ", drawOdds: " << plEvent.nDrawOdds
-            << ", spreadPoints: " << plEvent.nSpreadPoints << ", spreadHomeOdds: " << plEvent.nSpreadHomeOdds << ", spreadAwayOdds: " << plEvent.nSpreadAwayOdds
-            << ", totalPoints: " << plEvent.nTotalPoints << ", totalOverOdds: " << plEvent.nTotalOverOdds << ", totalUnderOdds: " << plEvent.nTotalUnderOdds
-            << ", started: " << started << ".";
+            auto started = ((time_t) plEvent.nStartTime < time) ? std::string("true") : std::string("false");
 
-        if (!bettingsView->mappings->Read(MappingKey{sportMapping, plEvent.nSport}, mapping)) {
-            strStream << " No sport mapping!";
+            strStream << "eventId = " << plEvent.nEventId << ", sport: " << plEvent.nSport << ", tournament: " << plEvent.nTournament << ", round: " << plEvent.nStage << ", home: " << plEvent.nHomeTeam << ", away: " << plEvent.nAwayTeam
+                << ", homeOdds: " << plEvent.nHomeOdds << ", awayOdds: " << plEvent.nAwayOdds << ", drawOdds: " << plEvent.nDrawOdds
+                << ", spreadPoints: " << plEvent.nSpreadPoints << ", spreadHomeOdds: " << plEvent.nSpreadHomeOdds << ", spreadAwayOdds: " << plEvent.nSpreadAwayOdds
+                << ", totalPoints: " << plEvent.nTotalPoints << ", totalOverOdds: " << plEvent.nTotalOverOdds << ", totalUnderOdds: " << plEvent.nTotalUnderOdds
+                << ", started: " << started << ".";
+
+            if (!bettingsView->mappings->Read(MappingKey{sportMapping, plEvent.nSport}, mapping)) {
+                strStream << " No sport mapping!";
+            }
+            if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+                strStream << " No tournament mapping!";
+            }
+            if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+                strStream << " No home team mapping!";
+            }
+            if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+                strStream << " No away team mapping!";
+            }
+
+            result.push_back(strStream.str().c_str());
+            strStream.clear();
         }
-        if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
-            strStream << " No tournament mapping!";
-        }
-        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
-            strStream << " No home team mapping!";
-        }
-        if (!bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
-            strStream << " No away team mapping!";
-        }
-
-        result.push_back(strStream.str().c_str());
-        strStream.clear();
     }
 
     return result;
@@ -631,45 +639,49 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
         includeHandled = params[0].get_bool();
     }
 
-    auto it = bettingsView->bets->NewIterator();
-    for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
-        PeerlessBetKey key;
-        CPeerlessBetDB uniBet;
-        CBettingDB::BytesToDbType(it->Value(), uniBet);
-        CBettingDB::BytesToDbType(it->Key(), key);
+    {
+        LOCK(cs_bettingdb);
 
-        if (!includeHandled && uniBet.IsCompleted()) continue;
+        auto it = bettingsView->bets->NewIterator();
+        for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+            PeerlessBetKey key;
+            CPeerlessBetDB uniBet;
+            CBettingDB::BytesToDbType(it->Value(), uniBet);
+            CBettingDB::BytesToDbType(it->Key(), key);
 
-        UniValue uValue(UniValue::VOBJ);
-        UniValue uLegs(UniValue::VARR);
+            if (!includeHandled && uniBet.IsCompleted()) continue;
 
-        for (uint32_t i = 0; i < uniBet.legs.size(); i++) {
-            auto &leg = uniBet.legs[i];
-            auto &lockedEvent = uniBet.lockedEvents[i];
-            UniValue uLeg(UniValue::VOBJ);
-            UniValue uLockedEvent(UniValue::VOBJ);
-            uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
-            uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
-            uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
-            uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
-            uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
-            uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
-            uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
-            uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
-            uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
-            uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
-            uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
-            uLeg.push_back(Pair("lockedEvent", uLockedEvent));
-            uLegs.push_back(uLeg);
+            UniValue uValue(UniValue::VOBJ);
+            UniValue uLegs(UniValue::VARR);
+
+            for (uint32_t i = 0; i < uniBet.legs.size(); i++) {
+                auto &leg = uniBet.legs[i];
+                auto &lockedEvent = uniBet.lockedEvents[i];
+                UniValue uLeg(UniValue::VOBJ);
+                UniValue uLockedEvent(UniValue::VOBJ);
+                uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
+                uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+                uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
+                uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
+                uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
+                uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
+                uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
+                uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
+                uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
+                uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
+                uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
+                uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+                uLegs.push_back(uLeg);
+            }
+            uValue.push_back(Pair("betBlockHeight", (uint64_t) key.blockHeight));
+            uValue.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
+            uValue.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
+            uValue.push_back(Pair("legs", uLegs));
+            uValue.push_back(Pair("address", uniBet.playerAddress.ToString()));
+            uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
+            uValue.push_back(Pair("time", (uint64_t) uniBet.betTime));
+            ret.push_back(uValue);
         }
-        uValue.push_back(Pair("betBlockHeight", (uint64_t) key.blockHeight));
-        uValue.push_back(Pair("betTxHash", key.outPoint.hash.GetHex()));
-        uValue.push_back(Pair("betTxOut", (uint64_t) key.outPoint.n));
-        uValue.push_back(Pair("legs", uLegs));
-        uValue.push_back(Pair("address", uniBet.playerAddress.ToString()));
-        uValue.push_back(Pair("amount", ValueFromAmount(uniBet.betAmount)));
-        uValue.push_back(Pair("time", (uint64_t) uniBet.betTime));
-        ret.push_back(uValue);
     }
 
     return ret;
@@ -801,6 +813,8 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
     if (requiredPayoutInfo) {
         if (uniBet.IsCompleted()) {
             if (uniBet.payoutHeight > 0) {
+                LOCK(cs_bettingdb);
+
                 auto it = bettingsView->payoutsInfo->NewIterator();
                 for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{uniBet.payoutHeight, COutPoint{}})); it->Valid(); it->Next()) {
                     PayoutInfoKey payoutKey;
@@ -834,6 +848,8 @@ UniValue GetBets(uint32_t count, uint32_t from, CWallet *_pwalletMain, boost::op
     if (accountName && *accountName != "*") {
         fAllAccounts = false;
     }
+
+    LOCK(cs_bettingdb);
 
     auto it = bettingsView->bets->NewIterator();
     uint32_t skippedEntities = 0;
@@ -1052,6 +1068,8 @@ void CollectQGBetData(UniValue &uValue, QuickGamesBetKey &key, CQuickGamesBetDB 
 
     if (requiredPayoutInfo) {
         if (qgBet.IsCompleted()) {
+            LOCK(cs_bettingdb);
+
             auto it = bettingsView->payoutsInfo->NewIterator();
             // payoutHeight is next block height after block which contain bet
             uint32_t payoutHeight = key.blockHeight + 1;
@@ -1080,6 +1098,8 @@ void CollectQGBetData(UniValue &uValue, QuickGamesBetKey &key, CQuickGamesBetDB 
 
 UniValue GetQuickGamesBets(uint32_t count, uint32_t from, CWallet *_pwalletMain, boost::optional<std::string> accountName, bool includeWatchonly) {
     UniValue ret(UniValue::VARR);
+
+    LOCK(cs_bettingdb);
 
     auto it = bettingsView->quickGamesBets->NewIterator();
     uint32_t skippedEntities = 0;
@@ -1299,6 +1319,8 @@ UniValue getbetbytxid(const UniValue& params, bool fHelp)
     UniValue ret{UniValue::VARR};
 
     {
+        LOCK(cs_bettingdb);
+
         auto it = bettingsView->bets->NewIterator();
         for (it->Seek(CBettingDB::DbTypeToBytes(PeerlessBetKey{static_cast<uint32_t>(blockindex->nHeight), COutPoint{txHash, 0}})); it->Valid(); it->Next()) {
             PeerlessBetKey key;
@@ -1316,6 +1338,8 @@ UniValue getbetbytxid(const UniValue& params, bool fHelp)
         }
     }
     {
+        LOCK(cs_bettingdb);
+
         auto it = bettingsView->quickGamesBets->NewIterator();
         for (it->Seek(CBettingDB::DbTypeToBytes(PeerlessBetKey{static_cast<uint32_t>(blockindex->nHeight), COutPoint{txHash, 0}})); it->Valid(); it->Next()) {
             QuickGamesBetKey key;
@@ -2257,48 +2281,52 @@ UniValue getalleventliabilities(const UniValue& params, bool fHelp)
 
     UniValue result{UniValue::VARR};
 
-    auto it = bettingsView->events->NewIterator();
-    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
-        CPeerlessExtendedEventDB plEvent;
-        CBettingDB::BytesToDbType(it->Value(), plEvent);
+    {
+        LOCK(cs_bettingdb);
 
-        // Only list active events.
-        /*
-        if (plEvent.nEventCreationHeight < chainActive.Height() - Params().BetBlocksIndexTimespan()) {
-            continue;
+        auto it = bettingsView->events->NewIterator();
+        for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+            CPeerlessExtendedEventDB plEvent;
+            CBettingDB::BytesToDbType(it->Value(), plEvent);
+
+            // Only list active events.
+            /*
+            if (plEvent.nEventCreationHeight < chainActive.Height() - Params().BetBlocksIndexTimespan()) {
+                continue;
+            }
+            */
+            // Only list active events.
+            if ((time_t) plEvent.nStartTime < std::time(0)) {
+                continue;
+            }
+
+            UniValue event(UniValue::VOBJ);
+
+            event.push_back(Pair("event-id", (uint64_t) plEvent.nEventId));
+            event.push_back(Pair("event-status", "running"));
+            event.push_back(Pair("moneyline-home-bets", (uint64_t) plEvent.nMoneyLineHomeBets));
+            event.push_back(Pair("moneyline-home-liability", (uint64_t) plEvent.nMoneyLineHomePotentialLiability));
+            event.push_back(Pair("moneyline-away-bets", (uint64_t) plEvent.nMoneyLineAwayBets));
+            event.push_back(Pair("moneyline-away-liability", (uint64_t) plEvent.nMoneyLineAwayPotentialLiability));
+            event.push_back(Pair("moneyline-draw-bets", (uint64_t) plEvent.nMoneyLineDrawBets));
+            event.push_back(Pair("moneyline-draw-liability", (uint64_t) plEvent.nMoneyLineDrawPotentialLiability));
+            event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
+            event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
+            event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
+            event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
+            event.push_back(Pair("spread-away-bets", (uint64_t) plEvent.nSpreadAwayBets));
+            event.push_back(Pair("spread-away-liability", (uint64_t) plEvent.nSpreadAwayPotentialLiability));
+            event.push_back(Pair("spread-push-bets", (uint64_t) plEvent.nSpreadPushBets));
+            event.push_back(Pair("spread-push-liability", (uint64_t) plEvent.nSpreadPushPotentialLiability));
+            event.push_back(Pair("total-over-bets", (uint64_t) plEvent.nTotalOverBets));
+            event.push_back(Pair("total-over-liability", (uint64_t) plEvent.nTotalOverPotentialLiability));
+            event.push_back(Pair("total-under-bets", (uint64_t) plEvent.nTotalUnderBets));
+            event.push_back(Pair("total-under-liability", (uint64_t) plEvent.nTotalUnderPotentialLiability));
+            event.push_back(Pair("total-push-bets", (uint64_t) plEvent.nTotalPushBets));
+            event.push_back(Pair("total-push-liability", (uint64_t) plEvent.nTotalPushPotentialLiability));
+
+            result.push_back(event);
         }
-        */
-        // Only list active events.
-        if ((time_t) plEvent.nStartTime < std::time(0)) {
-            continue;
-        }
-
-        UniValue event(UniValue::VOBJ);
-
-        event.push_back(Pair("event-id", (uint64_t) plEvent.nEventId));
-        event.push_back(Pair("event-status", "running"));
-        event.push_back(Pair("moneyline-home-bets", (uint64_t) plEvent.nMoneyLineHomeBets));
-        event.push_back(Pair("moneyline-home-liability", (uint64_t) plEvent.nMoneyLineHomePotentialLiability));
-        event.push_back(Pair("moneyline-away-bets", (uint64_t) plEvent.nMoneyLineAwayBets));
-        event.push_back(Pair("moneyline-away-liability", (uint64_t) plEvent.nMoneyLineAwayPotentialLiability));
-        event.push_back(Pair("moneyline-draw-bets", (uint64_t) plEvent.nMoneyLineDrawBets));
-        event.push_back(Pair("moneyline-draw-liability", (uint64_t) plEvent.nMoneyLineDrawPotentialLiability));
-        event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
-        event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
-        event.push_back(Pair("spread-home-bets", (uint64_t) plEvent.nSpreadHomeBets));
-        event.push_back(Pair("spread-home-liability", (uint64_t) plEvent.nSpreadHomePotentialLiability));
-        event.push_back(Pair("spread-away-bets", (uint64_t) plEvent.nSpreadAwayBets));
-        event.push_back(Pair("spread-away-liability", (uint64_t) plEvent.nSpreadAwayPotentialLiability));
-        event.push_back(Pair("spread-push-bets", (uint64_t) plEvent.nSpreadPushBets));
-        event.push_back(Pair("spread-push-liability", (uint64_t) plEvent.nSpreadPushPotentialLiability));
-        event.push_back(Pair("total-over-bets", (uint64_t) plEvent.nTotalOverBets));
-        event.push_back(Pair("total-over-liability", (uint64_t) plEvent.nTotalOverPotentialLiability));
-        event.push_back(Pair("total-under-bets", (uint64_t) plEvent.nTotalUnderBets));
-        event.push_back(Pair("total-under-liability", (uint64_t) plEvent.nTotalUnderPotentialLiability));
-        event.push_back(Pair("total-push-bets", (uint64_t) plEvent.nTotalPushBets));
-        event.push_back(Pair("total-push-liability", (uint64_t) plEvent.nTotalPushPotentialLiability));
-
-        result.push_back(event);
     }
 
     return result;
