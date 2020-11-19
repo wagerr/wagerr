@@ -1326,6 +1326,7 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
     LogPrintf("Start undo payouts...\n");
 
     for (auto result : results) {
+        LOCK(cs_bettingdb);
 
         // look bets at last 14 days
         uint32_t startHeight = GetBetSearchStartHeight(nCurrentHeight);
@@ -1390,6 +1391,8 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
 /* Revert payouts info from DB */
 bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
 {
+    LOCK(cs_bettingdb);
+
     // we should save array of entries to delete because
     // changing (add/delete) of flushable DB when iterating is not allowed
     std::vector<PayoutInfoKey> entriesToDelete;
@@ -1419,6 +1422,8 @@ bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
  */
 bool UndoQuickGamesBetPayouts(CBettingsView &bettingsViewCache, int height)
 {
+    LOCK(cs_bettingdb);
+
     uint32_t blockHeight = static_cast<uint32_t>(height);
 
     LogPrintf("Start undo quick games payouts...\n");

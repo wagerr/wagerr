@@ -74,6 +74,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
     LogPrint("wagerr", "Start generating peerless bets payouts...\n");
 
     for (auto result : results) {
+        LOCK(cs_bettingdb);
 
         LogPrint("wagerr", "Looking for bets of eventId: %lu\n", result.nEventId);
 
@@ -267,6 +268,8 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
  */
 void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
+    LOCK(cs_bettingdb);
+
     const int nLastBlockHeight = nNewBlockHeight - 1;
 
     LogPrint("wagerr", "Start generating quick games bets payouts...\n");
@@ -372,6 +375,7 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
     LogPrint("wagerr", "Start generating chain games bets payouts...\n");
 
     for (auto result : results) {
+        LOCK(cs_bettingdb);
 
         LogPrint("wagerr", "Looking for bets of eventId: %lu\n", result.nEventId);
 
