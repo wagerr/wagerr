@@ -229,10 +229,9 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case cgBetTxType:
             {
-                if (height >= sporkManager.GetSporkValue(SPORK_21_QUICKGAMES_MAINTENANCE_MODE)) {
-                    return error("CheckBettingTX : Quick games transactions are temporarily disabled for maintenance");
+                if (height >= Params().QuickGamesEndHeight()) {
+                    return error("CheckBettingTX : Chain games transactions are disabled");
                 }
-
                 CChainGamesBetTx* cgBetTx = (CChainGamesBetTx*) bettingTx.get();
 
                 CChainGamesEventDB cgEvent;
@@ -252,6 +251,10 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case qgBetTxType:
             {
+                if (height >= Params().QuickGamesEndHeight()) {
+                    return error("CheckBettingTX : Quick games transactions are disabled");
+                }
+
                 CQuickGamesBetTx* qgBetTx = (CQuickGamesBetTx*) bettingTx.get();
                 if (!(qgBetTx->gameType == QuickGamesType::qgDice)) {
                     return error("CheckBettingTX: Invalid game type (%d)", qgBetTx->gameType);
@@ -346,6 +349,9 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case cgEventTxType:
             {
+                if (height >= Params().QuickGamesEndHeight()) {
+                    return error("CheckBettingTX : Chain games transactions are disabled");
+                }
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
@@ -357,6 +363,9 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case cgResultTxType:
             {
+                if (height >= Params().QuickGamesEndHeight()) {
+                    return error("CheckBettingTX : Chain games transactions are disabled");
+                }
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
@@ -622,6 +631,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             case cgBetTxType:
             {
                 if (!wagerrProtocolV3) break;
+                if (height >= Params().QuickGamesEndHeight()) {
+                    LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
+                    break;
+                }
 
                 CChainGamesBetTx* cgBetTx = (CChainGamesBetTx*) bettingTx.get();
 
@@ -642,6 +655,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             case qgBetTxType:
             {
                 if (!wagerrProtocolV3) break;
+                if (height >= Params().QuickGamesEndHeight()) {
+                    LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
+                    break;
+                }
 
                 CQuickGamesBetTx* qgBetTx = (CQuickGamesBetTx*) bettingTx.get();
 
@@ -794,7 +811,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             case cgEventTxType:
             {
                 if (!wagerrProtocolV3) break;
-
+                if (height >= Params().QuickGamesEndHeight()) {
+                    LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
+                    break;
+                }
                 CChainGamesEventTx* cgEventTx = (CChainGamesEventTx*) bettingTx.get();
 
                 LogPrint("wagerr", "CChainGamesEventTx: nEventId: %d, nEntryFee: %d\n", cgEventTx->nEventId, cgEventTx->nEntryFee);
@@ -811,6 +831,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             case cgResultTxType:
             {
                 if (!wagerrProtocolV3) break;
+                if (height >= Params().QuickGamesEndHeight()) {
+                    LogPrintf("ProcessBettingTx : Chain games transactions are disabled\n");
+                    break;
+                }
 
                 CChainGamesResultTx* cgResultTx = (CChainGamesResultTx*) bettingTx.get();
 

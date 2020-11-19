@@ -272,6 +272,10 @@ void GetQuickGamesBetPayouts(CBettingsView& bettingsViewCache, const int nNewBlo
 
     const int nLastBlockHeight = nNewBlockHeight - 1;
 
+    if (nLastBlockHeight >= Params().QuickGamesEndHeight()){
+        return;
+    }
+
     LogPrint("wagerr", "Start generating quick games bets payouts...\n");
 
     CBlockIndex *blockIndex = chainActive[nLastBlockHeight];
