@@ -247,6 +247,7 @@ public:
         nWagerrProtocolV1StartHeight = 298386;                          // Betting protocol v1 activation block
         nWagerrProtocolV2StartHeight = 763350;                          // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = std::numeric_limits<int>::max(); // Betting protocol v3 activation block
+        nQuickGamesEndHeight = nWagerrProtocolV3StartHeight;
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
 
         nKeysRotateHeight = std::numeric_limits<int>::max();            // Rotate spork key, oracle keys and fee payout keys
@@ -439,6 +440,7 @@ public:
         nWagerrProtocolV1StartHeight = 1100;                            // Betting protocol v1 activation block
         nWagerrProtocolV2StartHeight = 1100;                            // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = 2000;                            // Betting protocol v3 activation block
+        nQuickGamesEndHeight = 101650;
         nMaturityV2StartHeight = 38000;                                 // Reduced block maturity required for spending coinstakes and betting payouts
 
         nKeysRotateHeight = 102000;                                     // Rotate spork key, oracle keys and fee payout keys
@@ -596,6 +598,7 @@ public:
         nWagerrProtocolV1StartHeight = 251;                             // Betting protocol v1 activation block
         nWagerrProtocolV2StartHeight = 251;                             // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = 300;                             // Betting protocol v3 activation block
+        nQuickGamesEndHeight = nWagerrProtocolV3StartHeight;
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
 
         nKeysRotateHeight = 270;                                        // Rotate spork key, oracle keys and fee payout keys
