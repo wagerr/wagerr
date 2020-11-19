@@ -42,6 +42,7 @@ bool CMasternodeSync::IsMasternodeListSynced()
 
 bool CMasternodeSync::NotCompleted()
 {
+    if (GetBoolArg("-devnet", false)) return false;
     return (!IsSynced() && (
             !IsSporkListSynced() ||
             sporkManager.IsSporkActive(SPORK_8_MASTERNODE_PAYMENT_ENFORCEMENT) ||
