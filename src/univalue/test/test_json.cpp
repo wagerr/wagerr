@@ -11,9 +11,9 @@
 int main (int argc, char *argv[])
 {
     UniValue val;
-    if (val.read(std::string(std::istreambuf_iterator<char>(cin),
+    if (val.read(std::string(std::istreambuf_iterator<char>(std::cin),
                         std::istreambuf_iterator<char>()))) {
-        std::cout << val.write(1 /* prettyIndent */, 4 /* indentLevel */) << endl;
+        std::cout << val.write(1 /* prettyIndent */, 4 /* indentLevel */) << std::endl;
         return 0;
     } else {
         std::cerr << "JSON Parse Error." << std::endl;
