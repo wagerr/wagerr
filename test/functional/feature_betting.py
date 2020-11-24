@@ -536,7 +536,7 @@ class BettingTest(BitcoinTestFramework):
 
     def check_ml_bet(self):
         self.log.info("Check Money Line Bets...")
-        
+
         global player1_total_bet
         player1_total_bet = 0
         global player2_total_bet
@@ -759,7 +759,7 @@ class BettingTest(BitcoinTestFramework):
 
         assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 4, outcome_spread_away, 24)
         assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.", self.nodes[2].placebet, 4, outcome_spread_away, 10001)
-        
+
         # place spread bet to event 4: EPICENTER Major, expect that event result will be 2:0 for away team
         # current spread event is: points=-250, homeOdds=27000, awayOdds=13000
         # player 1 bet to spread away, mean that away will not lose with diff more then 1 score
@@ -1272,7 +1272,7 @@ class BettingTest(BitcoinTestFramework):
 
         #events_before=self.nodes[0].listevents()
         #pprint.pprint(events_before[10])
-       
+
         # Place Bet to ML Home Win
         player1_bet = 100
         player1_total_bet = player1_total_bet + player1_bet
@@ -1314,7 +1314,7 @@ class BettingTest(BitcoinTestFramework):
                                                 self.odds_events[0]['awayOdds'],
                                                 self.odds_events[0]['drawOdds'])
         post_opcode(self.nodes[1], update_odds_opcode, WGR_WALLET_EVENT['addr'])
-        
+
         #self.odds_events.append({'homeOdds': 14000, 'awayOdds': 25000, 'drawOdds': 31000})
         self.sync_all()
         self.nodes[0].generate(1)
@@ -1371,7 +1371,7 @@ class BettingTest(BitcoinTestFramework):
         # Change spread event odds
         spread_event_opcode = make_spread_event(10, -22, 15000, 22000)
         post_opcode(self.nodes[1], spread_event_opcode, WGR_WALLET_EVENT['addr'])
-        
+
         self.sync_all()
         self.nodes[0].generate(1)
         self.sync_all()
@@ -1382,7 +1382,7 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[3].placebet(10, outcome_total_over, player2_bet)
         winnings = Decimal(player2_bet * 26000)
         player2_expected_win = player2_expected_win + ((winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR)
-        
+
         # Place Bet to ML Home Win
         player1_bet = 225
         player1_total_bet = player1_total_bet + player1_bet
