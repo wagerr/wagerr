@@ -57,8 +57,11 @@ jobs:
             update-alternatives --install /usr/bin/${HOST}-g++ ${HOST}-g++ /usr/bin/${HOST}-g++-8 100
             make -j${JOBS} -C depends HOST=${HOST}
             ./autogen.sh
-            ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
+            ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++  --disable-option-checking --disable-ccache --disable-maintainer-mode --disable-dependency-tracking --enable-bench --enable-gui-tests CFLAGS="-O2 -g" CXXFLAGS="-O2 -g" --disable-shared --with-pic --with-bignum=no --enable-module-recovery --disable-jni --cache-file=/dev/null --srcdir=.
             make -j${JOBS}
+            make -j${JOBS} check
+            src/test/test_wagerr
+            src/qt/test_wagerr-qt
             test/functional/test_runner.py
   i686_bionic:
     docker:
