@@ -61,7 +61,7 @@ jobs:
             make -j${JOBS}
             make -j${JOBS} check
             src/test/test_wagerr
-            src/qt/test_wagerr-qt
+            src/qt/test/test_wagerr-qt
             test/functional/test_runner.py
   i686_bionic:
     docker:
@@ -83,6 +83,9 @@ jobs:
             ./autogen.sh
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
             make -j${JOBS}
+            make -j${JOBS} check
+            src/test/test_wagerr
+            src/qt/test/test_wagerr-qt
   x86_64_focal:
     docker:
       - image: circleci/buildpack-deps:20.04
@@ -105,6 +108,9 @@ jobs:
             ./autogen.sh
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
             make -j${JOBS}
+            make -j${JOBS} check
+            src/test/test_wagerr
+            src/qt/test/test_wagerr-qt
   x86_64_xenial:
     docker:
       - image: circleci/buildpack-deps:16.04
@@ -123,6 +129,9 @@ jobs:
             ./autogen.sh
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
             make -j${JOBS}
+            make -j${JOBS} check
+            src/test/test_wagerr
+            src/qt/test/test_wagerr-qt
   arm32_bionic:
     docker:
       - image: circleci/buildpack-deps:18.04
