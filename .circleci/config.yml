@@ -279,6 +279,6 @@ workflows:
       - mac_bionic:
           requires:
             - lint_all
-      - snapcraft_build:
-          requires:
-            - lint_all
+      #- snapcraft_build:
+      #    requires:
+      #      - lint_all
