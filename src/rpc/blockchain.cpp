@@ -146,7 +146,7 @@ UniValue blockToJSON(const CBlock& block, const CBlockIndex* blockindex, bool tx
 
     UniValue zwgrObj(UniValue::VOBJ);
     for (auto denom : libzerocoin::zerocoinDenomList) {
-        zwgrObj.push_back(Pair(std::to_string(denom), ValueFromAmount(blockindex->mapZerocoinSupply.at(denom) * (denom*COIN))));
+        zwgrObj.push_back(Pair(std::to_string(denom), ValueFromAmount((denom*COIN) * blockindex->mapZerocoinSupply.at(denom))));
     }
     zwgrObj.push_back(Pair("total", ValueFromAmount(blockindex->GetZerocoinSupply())));
     result.push_back(Pair("zWGRsupply", zwgrObj));
