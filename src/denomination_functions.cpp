@@ -145,7 +145,7 @@ std::vector<CMintMeta> getSpends(
 // -------------------------------------------------------------------------------------------------------
 void listSpends(const std::vector<CZerocoinMint>& vSelectedMints)
 {
-    std::map<libzerocoin::CoinDenomination, int64_t> mapZerocoinSupply;
+    std::map<libzerocoin::CoinDenomination, int16_t> mapZerocoinSupply;
     for (auto& denom : libzerocoin::zerocoinDenomList)
         mapZerocoinSupply.insert(std::make_pair(denom, 0));
 
