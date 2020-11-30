@@ -759,7 +759,10 @@ bool CMasternodePing::CheckAndUpdate(int& nDos, bool fRequireEnabled, bool fChec
     LogPrint("masternode", "CMasternodePing::CheckAndUpdate - New Ping - %s - %s - %lli\n", GetHash().ToString(), blockHash.ToString(), sigTime);
 
     if (isMasternodeFound && pmn->protocolVersion >= masternodePayments.GetMinMasternodePaymentsProto()) {
-        if (fRequireEnabled && !pmn->IsEnabled()) return false;
+        // Update ping only if the masternode is active/enabled
+        if (fRequireEnabled && (!pmn->IsEnabled() && !pmn->IsPreEnabled())) {
+            return false;
+        }
 
         // LogPrint("masternode","mnping - Found corresponding mn for vin: %s\n", vin.ToString());
         // update only if there is no known ping for this masternode or
