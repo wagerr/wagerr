@@ -186,7 +186,7 @@ public:
     uint32_t nSequenceId;
 
     //! zerocoin specific fields
-    std::map<libzerocoin::CoinDenomination, int64_t> mapZerocoinSupply;
+    std::map<libzerocoin::CoinDenomination, int16_t> mapZerocoinSupply;
     std::vector<libzerocoin::CoinDenomination> vMintDenominationsInBlock;
 
     void SetNull()
@@ -299,7 +299,7 @@ public:
      * @param denom
      * @return
      */
-    int64_t GetZcMints(libzerocoin::CoinDenomination denom) const
+    int16_t GetZcMints(libzerocoin::CoinDenomination denom) const
     {
         return mapZerocoinSupply.at(denom);
     }
