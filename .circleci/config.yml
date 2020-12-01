@@ -14,7 +14,7 @@ jobs:
         command: |
             apt-get -y update
             apt-get -y install python-pip
-            git clone --depth 1 https://github.com/wagerr/wagerr .
+            git clone --depth 1 https://github.com/ckti-master-wagerr/wagerr .
             source .circleci/lint_04_install.sh
             source .circleci/lint_05_before_script.sh
             # LevelDB
