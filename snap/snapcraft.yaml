@@ -115,9 +115,9 @@ apps:
     plugs: [home]
 parts:
   wagerr:
-    source: https://github.com/ckti-master-wagerr/wagerr
+    source: https://github.com/wagerr/wagerr
     source-type: git
-    source-tag: snap-version
+    source-tag: master
     plugin: nil
     override-build: |
       echo "+++++++++++++++++++++++++++++++++++++++++++++++"
