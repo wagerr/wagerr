@@ -65,7 +65,7 @@ WalletFrame {
     }
     
     QToolBar {
-    background-color: qlineargradient(y1:0, y2: 1, stop: 0 #500000, stop: 0.75 #500000, stop: 0.99 #ffffff, stop: 1 #ffffff);
+    background-color: qlineargradient(y1:0, y2: 1, stop: 0 #212121, stop: 0.75 #212121, stop: 0.99 #212121, stop: 1 #212121);
     border:0px solid #330;
     padding:1;
     margin:0;
@@ -74,7 +74,7 @@ WalletFrame {
     
     QToolBar > QToolButton {
     Alignment: left;
-    background-color: #500000;
+    background-color: #212121;
     selection-background-color:transparent;
     border:0.5px solid #888;
     border-left: 0px;
@@ -89,13 +89,13 @@ WalletFrame {
     }
     
     QToolBar > QToolButton:checked {
-    background-color: qlineargradient(x1:0, x2: 1, stop: 0 #ffffff, stop: 0.07 #ffffff, stop: 0.0701 #500000, stop: 1 #500000);
+    background-color: qlineargradient(x1:0, x2: 1, stop: 0 #ffffff, stop: 0.07 #ffffff, stop: 0.0701 #f60000, stop: 1 #f60000);
     color:#fff;
     }
     
     /* QToolBar > QToolButton:hover:!selected { */
     QToolBar > QToolButton:hover {
-    background-color: qlineargradient(x1:0, x2: 1, stop: 0 #ffffff, stop: 0.07 #ffffff, stop: 0.0701 #500000, stop: 1 #500000);
+    background-color: qlineargradient(x1:0, x2: 1, stop: 0 #ffffff, stop: 0.07 #ffffff, stop: 0.0701 #f60000, stop: 1 #f60000);
     color:#fff;
     }
     
@@ -104,7 +104,7 @@ WalletFrame {
     }
     
     QToolBar > QToolButton:pressed {
-    background-color: qlineargradient(x1:0, x2: 1, stop: 0 #00a300, stop: 0.07 #00a300, stop: 0.0701 #500000, stop: 1 #500000);
+    background-color: qlineargradient(x1:0, x2: 1, stop: 0 #f60000, stop: 0.07 #f60000, stop: 0.0701 #f60000, stop: 1 #f60000);
     color:#fff;
     }
     
