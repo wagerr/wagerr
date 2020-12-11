@@ -3258,7 +3258,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
             ProcessBettingTx(bettingsViewCache, tx, pindex->nHeight, block.GetBlockTime(), pindex->nHeight >= Params().WagerrProtocolV3StartHeight());
         }
         if (!(pindex->nHeight % Params().MaxReorganizationDepth())) {
-            int heightLimit = pindex->nHeight - Params().MaxReorganizationDepth();
+            int heightLimit = pindex->nHeight - Params().MaxBettingUndoDepth();
             bettingsViewCache.PruneOlderUndos((uint32_t)heightLimit);
         }
     }
