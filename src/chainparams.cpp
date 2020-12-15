@@ -414,7 +414,7 @@ public:
 
         nBlockStakeModifierV2 = 92500;
         // Activation height for TimeProtocolV2, Blocks V7 and newMessageSignatures
-        nBlockTimeProtocolV2 = std::numeric_limits<int>::max();
+        nBlockTimeProtocolV2 = 139550;
 
         // Public coin spend enforcement
         nPublicZCSpends = 600;
