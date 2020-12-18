@@ -429,10 +429,18 @@ std::vector<TransactionRecord> TransactionRecord::decomposeTransaction(const CWa
 
                         auto bettingTx = ParseBettingTx(txout);
 
-                        if (bettingTx && bettingTx->GetTxType() == plBetTxType) {
-                            isBettingEntry = true;
-                        } else if (bettingTx && bettingTx->GetTxType() == cgBetTxType) {
-                            isChainGameEntry = true;
+                        if (bettingTx) {
+                            switch(bettingTx->GetTxType()) {
+                                case plBetTxType:
+                                case plParlayBetTxType:
+                                    isBettingEntry = true;
+                                    break;
+                                case cgBetTxType:
+                                    isChainGameEntry = true;
+                                    break;
+                                default:
+                                    break;
+                            }
                         }
                     }
                     if (isBettingEntry) {
