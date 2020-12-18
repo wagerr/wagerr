@@ -125,7 +125,7 @@ Andrew Chow (3):
 Ben Woosley (1):
 * [`a712a131`](https://github.com/wagerr/wagerr/commit/a712a131) Fix that CWallet::AbandonTransaction would only traverse one level
 
-CkTi (12):
+CkTi (18):
 * [`fb327b9b`](https://github.com/wagerr/wagerr/commit/fb327b9b) Change chainparams to 152000
 * [`ac37a9b1`](https://github.com/wagerr/wagerr/commit/ac37a9b1) Update help for getmappingname and getmappingid
 * [`1afd9508`](https://github.com/wagerr/wagerr/commit/1afd9508) Update travis to not run binary tests
@@ -138,6 +138,12 @@ CkTi (12):
 * [`f0af3dd7`](https://github.com/wagerr/wagerr/commit/f0af3dd7) Uncomment snapcraft
 * [`54f121cb`](https://github.com/wagerr/wagerr/commit/54f121cb) Re-comment snapcraft
 * [`38cb3717`](https://github.com/wagerr/wagerr/commit/38cb3717) Revert "Fix AA_EnableHighDpiScaling warning"
+* [`0d0032ab`](https://github.com/wagerr/wagerr/commit/0d0032ab) Update snapcraft version to 4.0.99
+* [`b0886fa8`](https://github.com/wagerr/wagerr/commit/b0886fa8) Update snapcraft to build ckti-master-wagerr
+* [`c034bf0a`](https://github.com/wagerr/wagerr/commit/c034bf0a) Update snapcraft to build snap-version
+* [`bc398347`](https://github.com/wagerr/wagerr/commit/bc398347) Revert "Update snapcraft to build ckti-master-wagerr"
+* [`3888c89a`](https://github.com/wagerr/wagerr/commit/3888c89a) Revert "Update snapcraft to build snap-version"
+* [`74afef97`](https://github.com/wagerr/wagerr/commit/74afef97) Update timestamps in tests to 1902871341
 
 Cory Fields (2):
 * [`1d7f7c03`](https://github.com/wagerr/wagerr/commit/1d7f7c03) random: only use getentropy on openbsd
@@ -173,7 +179,7 @@ Jonas Schnelli (2):
 * [`1aafdf9f`](https://github.com/wagerr/wagerr/commit/1aafdf9f) Remove openssl info from init/log and from Qt debug window
 * [`e206f097`](https://github.com/wagerr/wagerr/commit/e206f097) Call notification signal when a transaction is abandoned
 
-Kokary (59):
+Kokary (68):
 * [`8f5363e7`](https://github.com/wagerr/wagerr/commit/8f5363e7) Spreads event update
 * [`51f4ef4a`](https://github.com/wagerr/wagerr/commit/51f4ef4a) Allow databased code to run on the existing chain
 * [`473faac5`](https://github.com/wagerr/wagerr/commit/473faac5) Account for blocks without MN payment when extracting bet payments
@@ -234,6 +240,14 @@ Kokary (59):
 * [`166ebc4a`](https://github.com/wagerr/wagerr/commit/166ebc4a) Remove trailing whitespace
 * [`f5f4ee66`](https://github.com/wagerr/wagerr/commit/f5f4ee66) Reduce memory footprint from zerocoin supply map
 * [`95424b5c`](https://github.com/wagerr/wagerr/commit/95424b5c) [RPC] Remove commands to place chaingame and quickgame bets
+* [`df7b573a`](https://github.com/wagerr/wagerr/commit/df7b573a) Update release notes
+* [`5964e414`](https://github.com/wagerr/wagerr/commit/5964e414) [FIX] Flush betting cache after each block during block verification
+* [`a6235ed5`](https://github.com/wagerr/wagerr/commit/a6235ed5) Proper parametrization of pruning betting data
+* [`93f0e921`](https://github.com/wagerr/wagerr/commit/93f0e921) Add parlay to listtransactionrecords
+* [`e5548d07`](https://github.com/wagerr/wagerr/commit/e5548d07) Update testnet fork params
+* [`a271b778`](https://github.com/wagerr/wagerr/commit/a271b778) Update mainnet spork key
+* [`07bd817f`](https://github.com/wagerr/wagerr/commit/07bd817f) Update mainnet fork params
+* [`de01dacd`](https://github.com/wagerr/wagerr/commit/de01dacd) Add rest endpoints
 
 MarcoFalke (1):
 * [`02ade790`](https://github.com/wagerr/wagerr/commit/02ade790) build: use full version string in setup.exe
@@ -468,7 +482,7 @@ random-zebra (111):
 * [`99d65310`](https://github.com/wagerr/wagerr/commit/99d65310) Set '-staking' disabled by default on RegTest
 * [`ce1502f8`](https://github.com/wagerr/wagerr/commit/ce1502f8) Align GetBlockValue calls to CreateCoinStake: current height + 1
 
-wagerrdeveloper (86):
+wagerrdeveloper (87):
 * [`0eb153e9`](https://github.com/wagerr/wagerr/commit/0eb153e9) added flushable storage model
 * [`78f68d43`](https://github.com/wagerr/wagerr/commit/78f68d43) Betting DB with flushable storage was implemented. Also added undo.
 * [`8a2f245d`](https://github.com/wagerr/wagerr/commit/8a2f245d) added unit-tests for Betting DB
@@ -555,6 +569,7 @@ wagerrdeveloper (86):
 * [`274d8128`](https://github.com/wagerr/wagerr/commit/274d8128) Update Splash Screen
 * [`e3148333`](https://github.com/wagerr/wagerr/commit/e3148333) Update About Logo
 * [`cc0234e1`](https://github.com/wagerr/wagerr/commit/cc0234e1) Update Horizontal Logo
+* [`7dd4ccdd`](https://github.com/wagerr/wagerr/commit/7dd4ccdd) Update QT Sidebar Colors
 
 warrows (23):
 * [`c82c9af9`](https://github.com/wagerr/wagerr/commit/c82c9af9) Fix compilation
