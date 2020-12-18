@@ -219,7 +219,7 @@ public:
 
         nBlockStakeModifierV2 = 891276;
         // Activation height for TimeProtocolV2, Blocks V7 and newMessageSignatures
-        nBlockTimeProtocolV2 = std::numeric_limits<int>::max(); // !TODO: change me
+        nBlockTimeProtocolV2 = 1501000; // 7 January 2021
 
         // Public coin spend enforcement
         nPublicZCSpends = 752800;
@@ -246,15 +246,15 @@ public:
         nMaxParlayLegs = 5;                                             // Minimizes maximum legs in parlay bet
         nWagerrProtocolV1StartHeight = 298386;                          // Betting protocol v1 activation block
         nWagerrProtocolV2StartHeight = 763350;                          // Betting protocol v2 activation block
-        nWagerrProtocolV3StartHeight = std::numeric_limits<int>::max(); // Betting protocol v3 activation block
+        nWagerrProtocolV3StartHeight = nBlockTimeProtocolV2;            // Betting protocol v3 activation block
         nQuickGamesEndHeight = nWagerrProtocolV3StartHeight;
         nMaturityV2StartHeight = nWagerrProtocolV3StartHeight;          // Reduced block maturity required for spending coinstakes and betting payouts
 
-        nKeysRotateHeight = std::numeric_limits<int>::max();            // Rotate spork key, oracle keys and fee payout keys
-        nEnforceNewSporkKey = 4070908800;       //!> Sporks signed after must use the new spork key (GMT): Thursday, September 13, 2018 6:00:00 PM
-        nRejectOldSporkKey = 4070908800;        //!> Fully reject old spork key after (GMT): Sunday, September 16, 2018 8:00:00 PM
+        nKeysRotateHeight = nBlockTimeProtocolV2;   // Rotate spork key, oracle keys and fee payout keys
+        nEnforceNewSporkKey = 1610150400;           //!> Sporks signed after must use the new spork key: Saturday, 09-Jan-21 00:00:00 UTC
+        nRejectOldSporkKey = 1611360000;            //!> Fully reject old spork key after: Saturday, 23-Jan-21 00:00:00 UTC
 
-        strSporkPubKey = "04a2f260ba521255f30cdd92dc5e3f53b753f2fcd04fb5510c4b7529843a535d05fabf9029bdfa40c5e0bed030f5f9c00766d6c510391ceb537016728cc44ddaef";
+        strSporkPubKey = "043432137728fb0f6ea29315e3e65d76f976b5d88710a8921437e1aabf1adc98ddb55035c17ffa581243db4bc7b6b3e5d0bdd968a28be906098c0b6cb8c6936b80";
         strSporkPubKeyOld = "043cb569d89fb78fc61df67617012e6c33c1ba306f4620bbb89424279a4931adf4a9e238db60aa7f78cd10ef780f21f1fd3b881f014fd0f656db4b6a6a98f0cff2";
 
         strDevPayoutAddrOld = "Wm5om9hBJTyKqv5FkMSfZ2FDMeGp12fkTe";     // Development fund payout address (old).
@@ -414,7 +414,7 @@ public:
 
         nBlockStakeModifierV2 = 92500;
         // Activation height for TimeProtocolV2, Blocks V7 and newMessageSignatures
-        nBlockTimeProtocolV2 = std::numeric_limits<int>::max();
+        nBlockTimeProtocolV2 = 139550;
 
         // Public coin spend enforcement
         nPublicZCSpends = 600;
