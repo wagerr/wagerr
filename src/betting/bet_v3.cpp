@@ -80,12 +80,13 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
 
         // look bets during the bet interval
         uint32_t startHeight = GetBetSearchStartHeight(nLastBlockHeight);
-        bool legHalfLose = false;
-        bool legHalfWin = false;
-        bool legRefund = false;
         auto it = bettingsViewCache.bets->NewIterator();
         std::vector<std::pair<PeerlessBetKey, CPeerlessBetDB>> vEntriesToUpdate;
         for (it->Seek(CBettingDB::DbTypeToBytes(PeerlessBetKey{static_cast<uint32_t>(startHeight), COutPoint()})); it->Valid(); it->Next()) {
+            bool legHalfLose = false;
+            bool legHalfWin = false;
+            bool legRefund = false;
+
             PeerlessBetKey uniBetKey;
             CPeerlessBetDB uniBet;
             CBettingDB::BytesToDbType(it->Key(), uniBetKey);
