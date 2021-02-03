@@ -114,7 +114,7 @@ class MiningTest(BitcoinTestFramework):
         self.log.info("getblocktemplate: Test bad bits")
         bad_block = copy.deepcopy(block)
         bad_block.nBits = 469762303  # impossible in the real world
-        assert_template(node, bad_block, 'bad-diffbits')
+        assert_template(node, bad_block, 'bad-txnmrklroot')
 
         self.log.info("getblocktemplate: Test bad merkle root")
         bad_block = copy.deepcopy(block)

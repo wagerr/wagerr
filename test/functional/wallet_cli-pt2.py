@@ -27,7 +27,8 @@ class SendFromTest (BitcoinTestFramework):
     def set_test_params(self):
         self.setup_clean_chain = True
         self.num_nodes = 2
-        #self.extra_args = [["-debug"],["-debug"]]
+        #self.extra_args = [["-debug=all"],["-debug=all"]]
+        #self.extra_args = [["-staking=1", "-debug=all"],["-staking=1", "-debug=all"]]
 
     def run_test(self):
         connect_nodes_bi(self.nodes,0,1)
@@ -73,6 +74,19 @@ class SendFromTest (BitcoinTestFramework):
         self.nodes[1].generate(1)
         self.sync_all()
         self.log.info("Balance of address %s %s" % (addressix, self.nodes[0].getbalance('Addressix')))
-
+        ###
+        # Stake thresholds
+        ###
+        self.nodes[1].generate(146)
+        self.sync_all()
+        self.log.info("Stake split threshold %s" % self.nodes[0].getstakesplitthreshold())
+        assert_equal(2000, self.nodes[0].getstakesplitthreshold())
+        self.nodes[0].setstakesplitthreshold(50)
+        assert_equal(50, self.nodes[0].getstakesplitthreshold())
+        self.log.info("Stake split threshold %s" % self.nodes[0].getstakesplitthreshold())
+        self.nodes[0].generate(1)
+        self.sync_all()
+        self.nodes[1].generate(60)
+        self.sync_all()
 if __name__ == '__main__':
     SendFromTest().main()

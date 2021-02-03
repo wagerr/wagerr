@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # Copyright (c) 2014-2017 The Bitcoin Core developers
+# Copyright (c) 2019-2021 The Wagerr Developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
 """Test the functionality of all CLI commands.
@@ -16,6 +17,8 @@ from test_framework.util import (
     p2p_port,
 )
 from time import sleep
+
+import pprint
 
 from decimal import Decimal
 
@@ -228,13 +231,19 @@ class WalletCLITest (BitcoinTestFramework):
         # addnode/getaddednodeinfo
         ###
         self.log.info("Node info %s" % self.nodes[0].getconnectioncount())
+        self.log.info("Node info %s" % self.nodes[0].getconnectioncount())
         ip_port = "127.0.0.1:{}".format(p2p_port(2))
         self.nodes[0].addnode(ip_port, 'add')
         # check that the node has indeed been added
         added_nodes = self.nodes[0].getaddednodeinfo(True, ip_port)
         self.log.info("Added Node %s" % added_nodes)
-
-        self.log.info("Added Node Info %s" % self.nodes[1].getaddednodeinfo(True)) # needs to be with addnode -- TODO
+        self.log.info("Added Node Info %s" % self.nodes[1].getaddednodeinfo(True))
+        self.nodes[0].addnode(ip_port, 'remove')
+        assert_raises_rpc_error(-24, "Error: Node has not been added", self.nodes[0].getaddednodeinfo, True, ip_port)
+        self.log.info("Added Node Info %s" % self.nodes[1].getaddednodeinfo(True))
+        self.nodes[0].addnode(ip_port, 'add')
+        added_nodes = self.nodes[0].getaddednodeinfo(True, ip_port)
+        self.log.info("Added Node %s" % added_nodes)
         ###
         # Get Connection Count
         ###
@@ -351,18 +360,18 @@ class WalletCLITest (BitcoinTestFramework):
         self.log.info("Block Count Node 0 %s" % self.nodes[0].getblockcount())
         self.log.info("Block Count Node 1 %s" % self.nodes[1].getblockcount())
         ###
-        # estimate priority Not working -- TODO -- Fix it
+        # estimate priority -- always -1 as far as i've found so far
         ###
         #priest=-1
         #while priest==-1:
-        #    priaddr=self.nodes[0].getnewaddress()
-        #    self.nodes[1].sendtoaddress(priaddr, 1000)
-        #    self.nodes[0].generate(1)
-        #    priest=self.nodes[0].estimatepriority(10)
-        #self.log.info("Priority Estimate Node 0 %s" % self.nodes[0].estimatepriority(10))
-        #self.log.info("Priority Estimate Node 1 %s" % self.nodes[1].estimatepriority(10))
-        #self.log.info("Block Count Node 0 %s" % self.nodes[0].getblockcount())
-        #self.log.info("Block Count Node 1 %s" % self.nodes[1].getblockcount())
+        priaddr=self.nodes[0].getnewaddress()
+        self.nodes[1].sendtoaddress(priaddr, 1000)
+        self.nodes[0].generate(1)
+            #priest=self.nodes[0].estimatepriority(10)
+        self.log.info("Priority Estimate Node 0 %s" % self.nodes[0].estimatepriority(10))
+        self.log.info("Priority Estimate Node 1 %s" % self.nodes[1].estimatepriority(10))
+        self.log.info("Block Count Node 0 %s" % self.nodes[0].getblockcount())
+        self.log.info("Block Count Node 1 %s" % self.nodes[1].getblockcount())
         ###
         # sign and verify message
         ###
@@ -433,11 +442,12 @@ class WalletCLITest (BitcoinTestFramework):
         ###
         # encrypt wallet set up staking
         ###
-        self.log.info("Wallet Encryption %s" % self.nodes[0].encryptwallet("abc123"))
+        self.log.info("Wallet Encryption %s" % self.nodes[0].encryptwallet("123abc"))
         self.log.info("Restarting node 0")
         self.stop_node(0)
         sleep(10)
         self.start_node(0)
+        self.log.info("Wallet Passphrase Change %s" % self.nodes[0].walletpassphrasechange("123abc", "abc123"))
         self.log.info("Blocks %s" % self.nodes[0].getblockcount())
         #self.log.info("Generating 150 Blocks") # <-- will work once staking is fixed
         #for i in range(150):
@@ -451,6 +461,7 @@ class WalletCLITest (BitcoinTestFramework):
         self.nodes[0].walletpassphrase("abc123", 0, True)
         self.nodes[0].generate(4)
         self.log.info("Staking Status %s" % self.nodes[0].getstakingstatus())
+        self.log.info("Lock Wallet %s" % self.nodes[0].walletlock())
         self.log.info("Un-Encrypt Wallet")
         self.nodes[0].walletpassphrase("abc123", 10)
         self.nodes[0].dumpwallet(tmpdir + "/node0/regtest/wallet.backup")

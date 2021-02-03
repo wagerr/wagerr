@@ -61,6 +61,8 @@ BASE_SCRIPTS= [
 
     # vv Tests less than 5m vv
     'rpc_rawtransaction.py',
+    'wallet_cli-pt1.py',
+    'wallet_cli-pt2.py',
     'wallet_zapwallettxes.py',
     'wallet_keypool_topup.py',
     #'p2p_pos_doublespend.py', # Not working -- TODO fix it
@@ -86,7 +88,7 @@ BASE_SCRIPTS= [
     # vv Tests less than 60s vv
     #'wallet_importmulti.py', # Not Applicable no importmulti
     #'mempool_limit.py', # We currently don't limit our mempool
-    #'wallet_abandonconflict.py', # Not Applicable "Not Implemented Error
+    'wallet_abandonconflict.py',
     'feature_reindex.py',
     'rpc_bip38.py',
 
@@ -116,7 +118,7 @@ BASE_SCRIPTS= [
     #'p2p_invalid_tx.py', # Not Working -- TODO Fix it
     'rpc_signmessage.py',
     #'wallet_import_rescan.py', # Not Working -- TODO Fix it
-    #'mining_basic.py',
+    'mining_basic.py',
     #'wallet_bumpfee.py', # Not Applicable no "send_to_witness"
     #'wallet_listsinceblock.py', # Not Working -- TODO Fix it
     #'p2p_leak.py',
@@ -136,10 +138,10 @@ EXTENDED_SCRIPTS = [
     # These tests are not run by the travis build process.
     # Longest test should go first, to favor running tests in parallel
     # vv Tests less than 20m vv
-    #'feature_fee_estimation.py', # Not Working -- TODO Fix it
+    #'feature_fee_estimation.py', # computed priority ignored TODO Fix it
+    'rpc_masternodes.py',
     # vv Tests less than 5m vv
-    'wallet_cli-pt1.py',
-    #'wallet_multisend.py', # fails on travis bionic
+     'wallet_multisend.py',
     # vv Tests less than 2m vv
     #'p2p_timeouts.py', # p2p peer does not timeout
     # vv Tests less than 60s vv
@@ -147,7 +149,7 @@ EXTENDED_SCRIPTS = [
     'rpc_bind.py',
     # vv Tests less than 30s vv
     # 'example_test.py',
-    'feature_notifications.py', # Not Working -- TODO Fix it
+    'feature_notifications.py',
     'rpc_invalidateblock.py'
 ]
 
