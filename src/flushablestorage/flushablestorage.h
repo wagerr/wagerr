@@ -10,8 +10,6 @@
 #include "leveldbwrapper.h"
 #include <boost/optional.hpp>
 
-extern CCriticalSection cs_bettingdb;
-
 using MapKV = std::map<std::vector<unsigned char>, boost::optional<std::vector<unsigned char>>>;
 
 // Key-Value storage iterator interface
