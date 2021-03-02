@@ -55,6 +55,8 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
 
     bool mappingFound{false};
 
+    LOCK(cs_main);
+
     // Check the map for the string name.
     auto it = bettingsView->mappings->NewIterator();
     MappingKey key;
@@ -115,6 +117,8 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
     if (CMappingDB::ToTypeName(type) != mIndex) {
         throw std::runtime_error("No mapping exist for the mapping index you provided.");
     }
+
+    LOCK(cs_main);
 
     CMappingDB map{};
     if (bettingsView->mappings->Read(MappingKey{type, id}, map)) {
@@ -216,6 +220,8 @@ UniValue getpayoutinfo(const UniValue& params, bool fHelp)
     UniValue paramsArr = params[0].get_array();
     std::vector<std::pair<bool, CPayoutInfoDB>> vPayoutsInfo;
 
+    LOCK(cs_main);
+
     // parse payout params
     for (uint32_t i = 0; i < paramsArr.size(); i++) {
         const UniValue obj = paramsArr[i].get_obj();
@@ -285,6 +291,8 @@ UniValue getpayoutinfosince(const UniValue& params, bool fHelp)
         if (nLastBlocks < 1)
             throw std::runtime_error("Invalid number of last blocks.");
     }
+
+    LOCK(cs_main);
 
     int nCurrentHeight = chainActive.Height();
 

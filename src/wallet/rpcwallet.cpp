@@ -82,6 +82,8 @@ UniValue listevents(const UniValue& params, bool fHelp)
         sportFilter = params[0].get_str();
     }
 
+    LOCK(cs_main);
+
     auto it = bettingsView->events->NewIterator();
     for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
         CPeerlessExtendedEventDB plEvent;
@@ -182,6 +184,8 @@ UniValue listeventsdebug(const UniValue& params, bool fHelp)
 
     auto time = std::time(0);
 
+    LOCK(cs_main);
+
     auto it = bettingsView->events->NewIterator();
     for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
         CPeerlessExtendedEventDB plEvent;
@@ -241,6 +245,8 @@ UniValue listchaingamesevents(const UniValue& params, bool fHelp)
     UniValue ret(UniValue::VARR);
 
     CBlockIndex *BlocksIndex = NULL;
+
+    LOCK(cs_main);
 
     int height = (Params().NetworkID() == CBaseChainParams::MAIN) ? chainActive.Height() - 10500 : chainActive.Height() - 1500;
     BlocksIndex = chainActive[height];
@@ -331,6 +337,8 @@ UniValue listbets(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative from");
 
     UniValue result{UniValue::VARR};
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     const CWallet::TxItems & txOrdered{pwalletMain->wtxOrdered};
 
@@ -630,6 +638,8 @@ UniValue listbetsdb(const UniValue& params, bool fHelp)
     if (params.size() > 0) {
         includeHandled = params[0].get_bool();
     }
+
+    LOCK(cs_main);
 
     auto it = bettingsView->bets->NewIterator();
     for(it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
@@ -943,6 +953,8 @@ UniValue getallbets(const UniValue& params, bool fHelp)
     if (params.size() == 2)
         from = params[1].get_int();
 
+    LOCK(cs_main);
+
     return GetBets(count, from, NULL, boost::optional<std::string>{}, false);
 }
 
@@ -1023,6 +1035,8 @@ UniValue getmybets(const UniValue& params, bool fHelp)
     bool includeWatchonly = false;
     if (params.size() == 4)
         includeWatchonly = params[3].get_bool();
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     return GetBets(count, from, pwalletMain, accountName, includeWatchonly);
 }
@@ -1167,6 +1181,8 @@ UniValue getallqgbets(const UniValue& params, bool fHelp)
     if (params.size()  == 2)
         from = params[1].get_int();
 
+    LOCK(cs_main);
+
     return GetQuickGamesBets(count, from, NULL, boost::optional<std::string>{}, false);
 }
 
@@ -1220,6 +1236,8 @@ UniValue getmyqgbets(const UniValue& params, bool fHelp)
     bool includeWatchonly = false;
     if (params.size() == 4)
         includeWatchonly = params[3].get_bool();
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     return GetQuickGamesBets(count, from, pwalletMain, accountName, includeWatchonly);
 }
@@ -1283,6 +1301,8 @@ UniValue getbetbytxid(const UniValue& params, bool fHelp)
 
     uint256 txHash;
     txHash.SetHex(params[0].get_str());
+
+    LOCK(cs_main);
 
     CTransaction tx;
     uint256 hashBlock;
@@ -1391,6 +1411,8 @@ UniValue listchaingamesbets(const UniValue& params, bool fHelp)
         throw JSONRPCError(RPC_INVALID_PARAMETER, "Negative from");
 
     UniValue ret(UniValue::VARR);
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
 
     const CWallet::TxItems & txOrdered = pwalletMain->wtxOrdered;
 
@@ -1806,6 +1828,8 @@ UniValue placebet(const UniValue& params, bool fHelp)
             HelpExampleCli("placebet", "\"000\" \"1\" 25\"donation\" \"seans outpost\"") +
             HelpExampleRpc("placebet", "\"000\", \"1\", 25, \"donation\", \"seans outpost\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     CAmount nAmount = AmountFromValue(params[2]);
 
     // Validate bet amount so its between 25 - 10000 WGR inclusive.
@@ -1891,6 +1915,8 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
             HelpExampleCli("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\" 25 \"Parlay bet\" \"seans outpost\"") +
             HelpExampleRpc("placeparlaybet", "\"[{\"eventId\": 228, \"outcome\": 1}, {\"eventId\": 322, \"outcome\": 2}]\", 25, \"Parlay bet\", \"seans outpost\""));
 
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
     CPeerlessParlayBetTx parlayBetTx;
     UniValue legsArr = params[0].get_array();
     for (uint32_t i = 0; i < legsArr.size(); i++) {
@@ -1957,6 +1983,8 @@ UniValue getchaingamesinfo(const UniValue& params, bool fHelp)
             "\nArguments:\n"
             "1. eventID          (numeric) The event ID.\n"
             "2. showWinner       (bool, optional, default=false) Include a scan for the winner.\n");
+
+    LOCK(cs_main);
 
     UniValue ret(UniValue::VARR);
     UniValue obj(UniValue::VOBJ);
@@ -2104,6 +2132,8 @@ UniValue getalleventliabilities(const UniValue& params, bool fHelp)
             "\nExamples:\n" +
             HelpExampleCli("getalleventliabilities", "") + HelpExampleRpc("getalleventliabilities", ""));
 
+    LOCK(cs_main);
+
     UniValue result{UniValue::VARR};
 
     auto it = bettingsView->events->NewIterator();
@@ -2198,6 +2228,8 @@ UniValue geteventliability(const UniValue& params, bool fHelp)
 
             "\nExamples:\n" +
             HelpExampleCli("geteventliability", "10") + HelpExampleRpc("geteventliability", "10"));
+
+    LOCK(cs_main);
 
     uint32_t eventId = static_cast<uint32_t>(params[0].get_int());
 
