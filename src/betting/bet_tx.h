@@ -15,19 +15,20 @@ class CTxOut;
 
 // The supported betting TX types.
 typedef enum BetTxTypes{
-    mappingTxType        = 0x01,  // Mapping transaction type identifier.
-    plEventTxType        = 0x02,  // Peerless event transaction type identifier.
-    plBetTxType          = 0x03,  // Peerless Bet transaction type identifier.
-    plResultTxType       = 0x04,  // Peerless Result transaction type identifier.
-    plUpdateOddsTxType   = 0x05,  // Peerless update odds transaction type identifier.
-    cgEventTxType        = 0x06,  // Chain games event transaction type identifier.
-    cgBetTxType          = 0x07,  // Chain games bet transaction type identifier.
-    cgResultTxType       = 0x08,  // Chain games result transaction type identifier.
-    plSpreadsEventTxType = 0x09,  // Spread odds transaction type identifier.
-    plTotalsEventTxType  = 0x0a,  // Totals odds transaction type identifier.
-    plEventPatchTxType   = 0x0b,  // Peerless event patch transaction type identifier.
-    plParlayBetTxType    = 0x0c,  // Peerless Parlay Bet transaction type identifier.
-    qgBetTxType          = 0x0d,  // Quick Games Bet transaction type identifier.
+    mappingTxType            = 0x01,  // Mapping transaction type identifier.
+    plEventTxType            = 0x02,  // Peerless event transaction type identifier.
+    plBetTxType              = 0x03,  // Peerless Bet transaction type identifier.
+    plResultTxType           = 0x04,  // Peerless Result transaction type identifier.
+    plUpdateOddsTxType       = 0x05,  // Peerless update odds transaction type identifier.
+    cgEventTxType            = 0x06,  // Chain games event transaction type identifier.
+    cgBetTxType              = 0x07,  // Chain games bet transaction type identifier.
+    cgResultTxType           = 0x08,  // Chain games result transaction type identifier.
+    plSpreadsEventTxType     = 0x09,  // Spread odds transaction type identifier.
+    plTotalsEventTxType      = 0x0a,  // Totals odds transaction type identifier.
+    plEventPatchTxType       = 0x0b,  // Peerless event patch transaction type identifier.
+    plParlayBetTxType        = 0x0c,  // Peerless Parlay Bet transaction type identifier.
+    qgBetTxType              = 0x0d,  // Quick Games Bet transaction type identifier.
+    plEventZeroingOddsTxType = 0x0e,
 } BetTxTypes;
 
 // class for serialization common betting header from opcode
@@ -400,6 +401,23 @@ public:
     }
 };
 
+class CPeerlessEventZeroingOddsTx : public CBettingTx
+{
+public:
+    std::vector<uint32_t> vEventIds;
+
+    // Default Constructor.
+    CPeerlessEventZeroingOddsTx() {}
+
+    BetTxTypes GetTxType() const override { return plEventZeroingOddsTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(vEventIds);
+    }
+};
 
 std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut);
 

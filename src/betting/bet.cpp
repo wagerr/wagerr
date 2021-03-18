@@ -427,6 +427,19 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 break;
             }
+            case plEventZeroingOddsTxType:
+            {
+                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
+
+                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                    if (!bettingsViewCache.events->Exists(EventKey{eventId}))
+                        return error("CheckBettingTX: trying to update not existed event id %lu!", eventId);
+                }
+
+                break;
+            }
             default:
                 continue;
         }
@@ -940,6 +953,45 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 }
                 break;
             }
+            case plEventZeroingOddsTxType:
+            {
+                if (!validOracleTx) break;
+
+                CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
+
+                std::stringstream eventIdsStream;
+                std::vector<CBettingUndoDB> vUndos;
+                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                    eventIdsStream << eventId << " ";
+                    EventKey eventKey{eventId};
+                    CPeerlessExtendedEventDB plEvent;
+                    // Check a peerless event exists in DB.
+                    if (bettingsViewCache.events->Read(eventKey, plEvent)) {
+                        // save prev event state to undo
+                        vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
+
+                        plEvent.nHomeOdds = 0;
+                        plEvent.nAwayOdds = 0;
+                        plEvent.nDrawOdds = 0;
+                        plEvent.nSpreadHomeOdds = 0;
+                        plEvent.nSpreadAwayOdds = 0;
+                        plEvent.nTotalOverOdds  = 0;
+                        plEvent.nTotalUnderOdds = 0;
+
+                        // Update the event in the DB.
+                        if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                            LogPrintf("Failed to update event!\n");
+                    }
+                }
+
+                LogPrint("wagerr", "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
+
+                if (!vUndos.empty()) {
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
+                }
+
+                break;
+            }
             default:
                 break;
         }
@@ -1325,6 +1377,32 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 else {
                     LogPrintf("Failed to find event!\n");
                 }
+                break;
+            }
+            case plEventZeroingOddsTxType:
+            {
+                if (!validOracleTx) break;
+
+                CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
+
+                std::stringstream eventIdsStream;
+                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                    eventIdsStream << eventId << " ";
+                }
+                LogPrint("wagerr", "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
+
+                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                    if (bettingsViewCache.events->Exists(EventKey{eventId})) {
+                        if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                            LogPrintf("Revert failed!\n");
+                            return false;
+                        }
+                    }
+                    else {
+                        LogPrintf("Failed to find event!\n");
+                    }
+                }
+
                 break;
             }
             default:

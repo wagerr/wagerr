@@ -76,6 +76,8 @@ std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut)
             return DeserializeBettingTx<CPeerlessParlayBetTx>(ss);
         case qgBetTxType:
             return DeserializeBettingTx<CQuickGamesBetTx>(ss);
+        case plEventZeroingOddsTxType:
+            return DeserializeBettingTx<CPeerlessEventZeroingOddsTx>(ss);
         default:
             return nullptr;
     }
