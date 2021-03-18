@@ -1496,7 +1496,8 @@ class BettingTest(BitcoinTestFramework):
         self.log.info("Check Bets Success")
 
     def check_zeroing_odds(self):
-        self.log.info("Check zeroing odds")
+        self.log.info("Check zeroing odds...")
+
         event_ids = []
         for event in self.nodes[0].listevents():
             event_ids.append(event['event_id'])
@@ -1514,6 +1515,12 @@ class BettingTest(BitcoinTestFramework):
                 assert_equal(event['odds'][0]['mlHome'], 0)
                 assert_equal(event['odds'][0]['mlAway'], 0)
                 assert_equal(event['odds'][0]['mlDraw'], 0)
+                # 1 mean spreads odds in odds array
+                assert_equal(event['odds'][1]['spreadHome'], 0)
+                assert_equal(event['odds'][1]['spreadAway'], 0)
+                # 2 mean totals odds in odds array
+                assert_equal(event['odds'][2]['totalsOver'], 0)
+                assert_equal(event['odds'][2]['totalsUnder'], 0)
 
         self.log.info("Check zeroing odds Success")
 
