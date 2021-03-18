@@ -1592,6 +1592,28 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Check Bets Success")
 
+    def check_zeroing_odds(self):
+        self.log.info("Check zeroing odds")
+        event_ids = []
+        for event in self.nodes[0].listevents():
+            event_ids.append(event['event_id'])
+
+        zeroing_odds_opcode = make_zeroing_odds(event_ids)
+        post_opcode(self.nodes[1], zeroing_odds_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        for node in self.nodes:
+            for event in node.listevents():
+                # 0 mean ml odds in odds array
+                assert_equal(event['odds'][0]['mlHome'], 0)
+                assert_equal(event['odds'][0]['mlAway'], 0)
+                assert_equal(event['odds'][0]['mlDraw'], 0)
+
+        self.log.info("Check zeroing odds Success")
+
     def run_test(self):
         self.check_minting()
         self.check_mapping()
@@ -1617,6 +1639,7 @@ class BettingTest(BitcoinTestFramework):
         self.check_timecut_refund()
         self.check_asian_spreads_bet()
         self.check_bets()
+        self.check_zeroing_odds()
 
 if __name__ == '__main__':
     BettingTest().main()
