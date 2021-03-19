@@ -1391,16 +1391,21 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 }
                 LogPrint("wagerr", "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
 
+                bool isEventsExists = true;
                 for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
-                    if (bettingsViewCache.events->Exists(EventKey{eventId})) {
-                        if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                            LogPrintf("Revert failed!\n");
-                            return false;
-                        }
+                    if (!bettingsViewCache.events->Exists(EventKey{eventId})) {
+                        isEventsExists = false;
                     }
-                    else {
-                        LogPrintf("Failed to find event!\n");
+                }
+
+                if (isEventsExists) {
+                    if(!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
                     }
+                }
+                else {
+                    LogPrintf("Not all events exists\n");
                 }
 
                 break;

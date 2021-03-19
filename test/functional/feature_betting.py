@@ -12,7 +12,7 @@
 from test_framework.betting_opcode import *
 from test_framework.authproxy import JSONRPCException
 from test_framework.test_framework import BitcoinTestFramework
-from test_framework.util import wait_until, rpc_port, assert_equal, assert_raises_rpc_error
+from test_framework.util import wait_until, rpc_port, assert_equal, assert_raises_rpc_error, connect_nodes_bi, sync_blocks
 from distutils.dir_util import copy_tree, remove_tree
 from decimal import *
 import pprint
@@ -101,6 +101,14 @@ class BettingTest(BitcoinTestFramework):
             idx_l = n
             idx_r = n + 1 if n + 1 < self.num_nodes else 0
             assert_equal(self.nodes[idx_l].getblockcount(), self.nodes[idx_r].getblockcount())
+
+    def connect_and_sync(self):
+        for pair in [[n, n + 1 if n + 1 < self.num_nodes else 0] for n in range(self.num_nodes)]:
+            for i in range(len(pair)):
+                assert i < 2
+                self.nodes[pair[i]].addnode(self.get_local_peer(pair[1 - i]), "onetry")
+                wait_until(lambda:  all(peer['version'] != 0 for peer in self.nodes[pair[i]].getpeerinfo()))
+        sync_blocks(self.nodes)
 
     def setup_network(self):
         self.log.info("Setup Network")
@@ -1497,6 +1505,27 @@ class BettingTest(BitcoinTestFramework):
 
     def check_zeroing_odds(self):
         self.log.info("Check zeroing odds...")
+        saved_events = {}
+        for i, node in enumerate(self.nodes):
+            saved_events[i] = {}
+            for event in node.listevents():
+                saved_events[i][event['event_id']] = event
+
+        self.nodes[3].stop_node()
+        self.nodes[3].wait_until_stopped()
+        
+        for i, node in enumerate(self.nodes[:3]):
+            for event in node.listevents():
+                # 0 mean ml odds in odds array
+                assert_equal(event['odds'][0]['mlHome'], saved_events[i][event['event_id']]['odds'][0]['mlHome'])
+                assert_equal(event['odds'][0]['mlAway'], saved_events[i][event['event_id']]['odds'][0]['mlAway'])
+                assert_equal(event['odds'][0]['mlDraw'], saved_events[i][event['event_id']]['odds'][0]['mlDraw'])
+                # 1 mean spreads odds in odds array
+                assert_equal(event['odds'][1]['spreadHome'], saved_events[i][event['event_id']]['odds'][1]['spreadHome'])
+                assert_equal(event['odds'][1]['spreadAway'], saved_events[i][event['event_id']]['odds'][1]['spreadAway'])
+                # 2 mean totals odds in odds array
+                assert_equal(event['odds'][2]['totalsOver'],  saved_events[i][event['event_id']]['odds'][2]['totalsOver'])
+                assert_equal(event['odds'][2]['totalsUnder'], saved_events[i][event['event_id']]['odds'][2]['totalsUnder'])
 
         event_ids = []
         for event in self.nodes[0].listevents():
@@ -1505,11 +1534,11 @@ class BettingTest(BitcoinTestFramework):
         zeroing_odds_opcode = make_zeroing_odds(event_ids)
         post_opcode(self.nodes[1], zeroing_odds_opcode, WGR_WALLET_EVENT['addr'])
 
-        self.sync_all()
+        self.sync_all([ self.nodes[:3] ])
         self.nodes[0].generate(1)
-        self.sync_all()
+        self.sync_all([ self.nodes[:3] ])
 
-        for node in self.nodes:
+        for node in self.nodes[:3]:
             for event in node.listevents():
                 # 0 mean ml odds in odds array
                 assert_equal(event['odds'][0]['mlHome'], 0)
@@ -1521,6 +1550,42 @@ class BettingTest(BitcoinTestFramework):
                 # 2 mean totals odds in odds array
                 assert_equal(event['odds'][2]['totalsOver'], 0)
                 assert_equal(event['odds'][2]['totalsUnder'], 0)
+
+        self.log.info("Reverting...")
+        self.nodes[3].rpchost = self.get_local_peer(3, True)
+        self.nodes[3].start()
+        self.nodes[3].wait_for_rpc_connection()
+
+        self.log.info("Generate blocks...")
+        for i in range(5):
+            self.nodes[3].generate(1)
+
+        for event in self.nodes[3].listevents():
+            # 0 mean ml odds in odds array
+            assert_equal(event['odds'][0]['mlHome'], saved_events[3][event['event_id']]['odds'][0]['mlHome'])
+            assert_equal(event['odds'][0]['mlAway'], saved_events[3][event['event_id']]['odds'][0]['mlAway'])
+            assert_equal(event['odds'][0]['mlDraw'], saved_events[3][event['event_id']]['odds'][0]['mlDraw'])
+            # 1 mean spreads odds in odds array
+            assert_equal(event['odds'][1]['spreadHome'], saved_events[3][event['event_id']]['odds'][1]['spreadHome'])
+            assert_equal(event['odds'][1]['spreadAway'], saved_events[3][event['event_id']]['odds'][1]['spreadAway'])
+            # 2 mean totals odds in odds array
+            assert_equal(event['odds'][2]['totalsOver'],  saved_events[3][event['event_id']]['odds'][2]['totalsOver'])
+            assert_equal(event['odds'][2]['totalsUnder'], saved_events[3][event['event_id']]['odds'][2]['totalsUnder'])
+
+        self.log.info("Connect and sync nodes...")
+        self.connect_and_sync()
+
+        for i, node in enumerate(self.nodes):
+            for event in node.listevents():
+                assert_equal(event['odds'][0]['mlHome'], saved_events[i][event['event_id']]['odds'][0]['mlHome'])
+                assert_equal(event['odds'][0]['mlAway'], saved_events[i][event['event_id']]['odds'][0]['mlAway'])
+                assert_equal(event['odds'][0]['mlDraw'], saved_events[i][event['event_id']]['odds'][0]['mlDraw'])
+                # 1 mean spreads odds in odds array
+                assert_equal(event['odds'][1]['spreadHome'], saved_events[i][event['event_id']]['odds'][1]['spreadHome'])
+                assert_equal(event['odds'][1]['spreadAway'], saved_events[i][event['event_id']]['odds'][1]['spreadAway'])
+                # 2 mean totals odds in odds array
+                assert_equal(event['odds'][2]['totalsOver'],  saved_events[i][event['event_id']]['odds'][2]['totalsOver'])
+                assert_equal(event['odds'][2]['totalsUnder'], saved_events[i][event['event_id']]['odds'][2]['totalsUnder'])
 
         self.log.info("Check zeroing odds Success")
 
