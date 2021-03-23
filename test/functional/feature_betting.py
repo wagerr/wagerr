@@ -577,6 +577,12 @@ class BettingTest(BitcoinTestFramework):
         winnings = Decimal(player2_bet * self.odds_events[3]['awayOdds'])
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
+        #self.log.info("Event Liability")
+        #pprint.pprint(self.nodes[0].geteventliability(3))
+        liability=self.nodes[0].geteventliability(3)
+        gotliability=liability["moneyline-away-liability"]
+        #self.log.info("Monyline Away %s" % liability["moneyline-away-liability"])
+        assert_equal(gotliability, Decimal(165))
         # place result for event 3: Team Liquid wins.
         result_opcode = make_result(3, STANDARD_RESULT, 0, 1)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
@@ -637,6 +643,17 @@ class BettingTest(BitcoinTestFramework):
         #self.log.info("Winnings %d" % winnings)
         #self.log.info("Expected Win %s" % player2_expected_win)
 
+        self.nodes[3].generate(1)
+        self.sync_all()
+
+        #self.log.info("Event Liability")
+        #pprint.pprint(self.nodes[0].geteventliability(1))
+        liability=self.nodes[0].geteventliability(1)
+        gotliability=liability["moneyline-draw-liability"]
+        assert_equal(gotliability, Decimal(1137))
+        gotliability=liability["moneyline-home-liability"]
+        assert_equal(gotliability, Decimal(312))
+
         # close event 1
         result_opcode = make_result(1, STANDARD_RESULT, 1, 1)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
@@ -683,7 +700,7 @@ class BettingTest(BitcoinTestFramework):
         self.log.info("Money Line Bets Success")
 
     def check_spreads_bet(self):
-        self.log.info("Check Spreads Bets...")
+        self.log.info("Check Spread Bets...")
 
         global player1_total_bet
         global player2_total_bet
@@ -715,6 +732,15 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[3].placebet(0, outcome_spread_home, player2_bet)
         winnings = Decimal(player2_bet * ODDS_DIVISOR)
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        #self.log.info("Event Liability")
+        #pprint.pprint(self.nodes[0].geteventliability(0))
+        liability=self.nodes[0].geteventliability(0)
+        gotliability=liability["moneyline-draw-liability"]
+        assert_equal(gotliability, Decimal(1137))
+        gotliability=liability["moneyline-home-liability"]
+        assert_equal(gotliability, Decimal(312))
+
 
         # place result for event 0: RM wins BARC with 2:0.
         result_opcode = make_result(0, STANDARD_RESULT, 2, 0)
@@ -749,10 +775,10 @@ class BettingTest(BitcoinTestFramework):
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
 
-        self.log.info("Spreads Bets Success")
+        self.log.info("Spread Bets Success")
 
     def check_spreads_bet_v2(self):
-        self.log.info("Check Spreads Bets v2...")
+        self.log.info("Check Spread Bets v2...")
 
         global player1_total_bet
         global player2_total_bet
@@ -787,6 +813,20 @@ class BettingTest(BitcoinTestFramework):
         winnings = Decimal(player2_bet * ODDS_DIVISOR)
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        #self.log.info("Event Liability")
+        #pprint.pprint(self.nodes[0].geteventliability(4))
+        liability=self.nodes[0].geteventliability(4)
+        gotliability=liability["spread-away-liability"]
+        assert_equal(gotliability, Decimal(384))
+        gotliability=liability["spread-home-liability"]
+        assert_equal(gotliability, Decimal(557))
+        gotliability=liability["spread-push-liability"]
+        assert_equal(gotliability, Decimal(500))
+ 
         # place result for event 4:
         result_opcode = make_result(4, STANDARD_RESULT, 200, 0)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
@@ -848,10 +888,10 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        self.log.info("Spreads Bets v2 Success")
+        self.log.info("Spread Bets v2 Success")
 
     def check_totals_bet(self):
-        self.log.info("Check Totals Bets...")
+        self.log.info("Check Total Bets...")
 
         global player1_total_bet
         global player2_total_bet
@@ -882,6 +922,14 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[3].placebet(2, outcome_total_under, player2_bet)
         winnings = Decimal(player2_bet * 17000)
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
+
+        #self.log.info("Event Liability")
+        #pprint.pprint(self.nodes[0].geteventliability(2))
+        liability=self.nodes[0].geteventliability(2)
+        gotliability=liability["total-over-liability"]
+        assert_equal(gotliability, Decimal(406))
+        gotliability=liability["total-push-liability"]
+        assert_equal(gotliability, Decimal(200))
 
         # place result for event 2: Gambit wins with score 11:16
         result_opcode = make_result(2, STANDARD_RESULT, 11, 16)
@@ -915,7 +963,7 @@ class BettingTest(BitcoinTestFramework):
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
 
-        self.log.info("Totals Bets Success")
+        self.log.info("Total Bets Success")
 
     def check_parlays_bet(self):
         self.log.info("Check Parlay Bets...")
@@ -987,6 +1035,22 @@ class BettingTest(BitcoinTestFramework):
         self.sync_all()
         self.nodes[0].generate(1)
         self.sync_all()
+
+        #self.log.info("Event Liability")
+        #pprint.pprint(self.nodes[0].geteventliability(5))
+        liability=self.nodes[0].geteventliability(5)
+        gotliability=liability["moneyline-home-bets"]
+        assert_equal(gotliability, Decimal(2))
+        #self.log.info("Event Liability")
+        #pprint.pprint(self.nodes[0].geteventliability(6))
+        liability=self.nodes[0].geteventliability(6)
+        gotliability=liability["moneyline-home-bets"]
+        assert_equal(gotliability, Decimal(2))
+        #pprint.pprint(self.nodes[0].geteventliability(7))
+        liability=self.nodes[0].geteventliability(7)
+        gotliability=liability["moneyline-home-bets"]
+        assert_equal(gotliability, Decimal(2))
+
 
         # place result for event 4: Astralis wins with score 16:9
         result_opcode = make_result(5, STANDARD_RESULT, 16, 9)
@@ -1086,7 +1150,6 @@ class BettingTest(BitcoinTestFramework):
         self.sync_all()
         self.nodes[0].generate(1)
         self.sync_all()
-
         # player 1 bet to Team Gambit with odds 34000 but bet will be refunded
         player1_bet = 1000
         player1_total_bet = player1_total_bet + player1_bet
@@ -1133,7 +1196,7 @@ class BettingTest(BitcoinTestFramework):
         self.log.info("Timecut Refund Success")
 
     def check_asian_spreads_bet(self):
-        self.log.info("Check Asian Spreads Bets...")
+        self.log.info("Check Asian Spread Bets...")
 
         global player1_total_bet
         global player2_total_bet
@@ -1188,6 +1251,14 @@ class BettingTest(BitcoinTestFramework):
         winnings = Decimal(player2_bet * 0.5 * ODDS_DIVISOR)
         player2_expected_win = winnings / ODDS_DIVISOR
 
+        #self.log.info("Event Liability")
+        #pprint.pprint(self.nodes[0].geteventliability(9))
+        liability=self.nodes[0].geteventliability(9)
+        gotliability=liability["spread-home-liability"]
+        assert_equal(gotliability, Decimal(550))
+        gotliability=liability["spread-push-liability"]
+        assert_equal(gotliability, Decimal(400))
+
         # place result for event 9:
         result_opcode = make_result(9, STANDARD_RESULT, 100, 0)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
@@ -1223,7 +1294,7 @@ class BettingTest(BitcoinTestFramework):
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
 
-        self.log.info("Asian Spreads Bets Success")
+        self.log.info("Asian Spread Bets Success")
 
 
     #
@@ -1492,6 +1563,32 @@ class BettingTest(BitcoinTestFramework):
         assert_equal(betam2, player2_total_bet)
         #self.log.info("Total Amount Won Player 2 %s" % betpay2)
         assert_equal(round(Decimal(betpay2), 8), round(Decimal(3546.35000000), 8))
+
+        self.log.info("Debug Events")
+        pprint.pprint(self.nodes[0].listeventsdebug())
+
+        self.log.info("All Bets")
+        allbets=self.nodes[0].getallbets()
+        #pprint.pprint(len(allbets))
+        bettxid=allbets[0]["betTxHash"]
+
+        self.log.info("Bet 0 by getbet")
+        bet0=self.nodes[0].getbet(bettxid, True)
+        pprint.pprint(bet0)
+        self.log.info("Bet 0 by getbetbytxid")
+        bet1=self.nodes[0].getbetbytxid(bettxid)
+        pprint.pprint(bet1)
+        assert_equal(bet0["amount"], bet1[0]["amount"])
+        assert_equal(bet0["result"], bet1[0]["betResultType"])
+        assert_equal(bet0["tx-id"], bet1[0]["betTxHash"])
+
+        #time.sleep(2000)
+        ###
+        ## Not wroking TODO Fix it
+        ###
+        #self.log.info("Get Payout Info")
+        #payinfo={"txhash":bettxid, "nOut":1}
+        #pprint.pprint(self.nodes[0].getpayoutinfo([payinfo]))
 
         self.log.info("Check Bets Success")
 
