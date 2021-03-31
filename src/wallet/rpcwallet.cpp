@@ -1854,11 +1854,16 @@ UniValue placebet(const UniValue& params, bool fHelp)
     if (outcome < moneyLineHomeWin || outcome > totalUnder)
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
 
-    CPeerlessBetTx plBet(eventId, outcome);
+    CPeerlessExtendedEventDB plEvent;
+    if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
+    }
 
-    // TODO Retrieve the `CPeerlessEvent` currently associated with `eventId`
-    // and confirm that the submitted `team` is available; `throw` an
-    // `RPC_BET_DETAILS_ERROR` in the case of a mismatch.
+    if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (OutcomeType)outcome}, plEvent) == 0) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: potential odds is zero for event: " + std::to_string(eventId) + " outcome: " + std::to_string(outcome));
+    }
+
+    CPeerlessBetTx plBet(eventId, outcome);
 
     // TODO `address` isn't used when adding the following transaction to the
     // blockchain, so ideally it would not need to be supplied to `SendMoney`.
@@ -1923,12 +1928,21 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
         RPCTypeCheckObj(obj, boost::assign::map_list_of("eventId", UniValue::VNUM)("outcome", UniValue::VNUM));
 
         uint32_t eventId = static_cast<uint32_t>(find_value(obj, "eventId").get_int64());
-        uint8_t outcomeType = (uint8_t) find_value(obj, "outcome").get_int();
+        uint8_t outcome = (uint8_t) find_value(obj, "outcome").get_int();
 
-        if (outcomeType < moneyLineHomeWin || outcomeType > totalUnder)
+        if (outcome < moneyLineHomeWin || outcome > totalUnder)
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
 
-        parlayBetTx.legs.emplace_back(eventId, outcomeType);
+        CPeerlessExtendedEventDB plEvent;
+        if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
+        }
+
+        if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (OutcomeType)outcome}, plEvent) == 0) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: potential odds is zero for event: " + std::to_string(eventId) + " outcome: " + std::to_string(outcome));
+        }
+
+        parlayBetTx.legs.emplace_back(eventId, outcome);
     }
 
     CDataStream ss(SER_NETWORK, CLIENT_VERSION);
