@@ -84,7 +84,11 @@ class BettingTest(BitcoinTestFramework):
         node.wait_for_rpc_connection()
 
     def set_test_params(self):
-        self.extra_args = None
+        self.mocktime = 4070908801 # SPORK_14_NEW_PROTOCOL_ENFORCEMENT + 1
+        self.extra_args = [ ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'] ]
         #self.extra_args = [["-debug"], ["-debug"], ["-debug"], ["-debug"]]
         self.setup_clean_chain = True
         self.num_nodes = 4
@@ -1602,6 +1606,13 @@ class BettingTest(BitcoinTestFramework):
 
     def check_zeroing_odds(self):
         self.log.info("Check zeroing odds...")
+        # activate SPORK_14_NEW_PROTOCOL_ENFORCEMENT
+        sporks = self.nodes[0].spork("show")
+        SPORK_14_NEW_PROTOCOL_ENFORCEMENT_saved = sporks['SPORK_14_NEW_PROTOCOL_ENFORCEMENT']
+        for node in self.nodes:
+            res = node.spork("SPORK_14_NEW_PROTOCOL_ENFORCEMENT", 1)
+            assert(res == "success")
+
         saved_events = {}
         for i, node in enumerate(self.nodes):
             saved_events[i] = {}
@@ -1610,7 +1621,7 @@ class BettingTest(BitcoinTestFramework):
 
         self.nodes[3].stop_node()
         self.nodes[3].wait_until_stopped()
-        
+
         for i, node in enumerate(self.nodes[:3]):
             for event in node.listevents():
                 # 0 mean ml odds in odds array
@@ -1683,6 +1694,11 @@ class BettingTest(BitcoinTestFramework):
                 # 2 mean totals odds in odds array
                 assert_equal(event['odds'][2]['totalsOver'],  saved_events[i][event['event_id']]['odds'][2]['totalsOver'])
                 assert_equal(event['odds'][2]['totalsUnder'], saved_events[i][event['event_id']]['odds'][2]['totalsUnder'])
+
+        # deactivate SPORK_14_NEW_PROTOCOL_ENFORCEMENT
+        for node in self.nodes:
+            res = node.spork("SPORK_14_NEW_PROTOCOL_ENFORCEMENT", SPORK_14_NEW_PROTOCOL_ENFORCEMENT_saved)
+            assert(res == "success")
 
         self.log.info("Check zeroing odds Success")
 

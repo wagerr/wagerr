@@ -430,6 +430,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             case plEventZeroingOddsTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+                if (!sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
 
                 CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
 
