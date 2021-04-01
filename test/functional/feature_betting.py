@@ -84,7 +84,11 @@ class BettingTest(BitcoinTestFramework):
         node.wait_for_rpc_connection()
 
     def set_test_params(self):
-        self.extra_args = None
+        self.mocktime = 4070908801 # SPORK_14_NEW_PROTOCOL_ENFORCEMENT + 1
+        self.extra_args = [ ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'] ]
         #self.extra_args = [["-debug"], ["-debug"], ["-debug"], ["-debug"]]
         self.setup_clean_chain = True
         self.num_nodes = 4
@@ -1097,8 +1101,8 @@ class BettingTest(BitcoinTestFramework):
         # bets to resulted events shouldn't accepted to memory pool after parlay starting height
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[2].placebet, 3, outcome_away_win, 1000)
         # bets to nonexistent events shouldn't accepted to memory pool
-        # assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
-        assert_raises_rpc_error(-31, "Error: there is no such Event: {}".format(8), self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
+        assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
+        # assert_raises_rpc_error(-31, "Error: there is no such Event: {}".format(8), self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
 
         # creating existed mapping
         mapping_opcode = make_mapping(TEAM_MAPPING, 0, "anotherTeamName")
@@ -1595,6 +1599,13 @@ class BettingTest(BitcoinTestFramework):
 
     def check_zero_odds_bet(self):
         self.log.info("Check Zero Odds Bets...")
+        # activate SPORK_14_NEW_PROTOCOL_ENFORCEMENT
+        sporks = self.nodes[0].spork("show")
+        SPORK_14_NEW_PROTOCOL_ENFORCEMENT_saved = sporks['SPORK_14_NEW_PROTOCOL_ENFORCEMENT']
+        for node in self.nodes:
+            res = node.spork("SPORK_14_NEW_PROTOCOL_ENFORCEMENT", 1)
+            assert(res == "success")
+
         event_id = 12
         mlevent = make_event(12, # Event ID
                     int(time.time()) + 60*60, # start time = current + hour
@@ -1655,6 +1666,11 @@ class BettingTest(BitcoinTestFramework):
             self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_home_win}], 100)
         assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_draw),
             self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_draw}], 100)
+
+        # deactivate SPORK_14_NEW_PROTOCOL_ENFORCEMENT
+        for node in self.nodes:
+            res = node.spork("SPORK_14_NEW_PROTOCOL_ENFORCEMENT", SPORK_14_NEW_PROTOCOL_ENFORCEMENT_saved)
+            assert(res == "success")
 
         self.log.info("Check Zero Odds Bets Success")
 
