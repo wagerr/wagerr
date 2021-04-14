@@ -86,6 +86,11 @@ class BettingTest(BitcoinTestFramework):
     def set_test_params(self):
         self.extra_args = None
         #self.extra_args = [["-debug"], ["-debug"], ["-debug"], ["-debug"]]
+        self.extra_args = [ ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'] ]
+
         self.setup_clean_chain = True
         self.num_nodes = 4
         self.players = []
@@ -130,6 +135,21 @@ class BettingTest(BitcoinTestFramework):
             self.connect_network()
             return True
         return False
+
+    def is_spork_active(self, spork_name):
+        sporks = self.nodes[0].spork("active")
+        return sporks[spork_name]
+
+    def activate_spork(self, spork_name):
+        for node in self.nodes:
+            res = node.spork(spork_name, 1)
+            assert(res == "success")
+
+    def deactivate_spork(self, spork_name):
+        for node in self.nodes:
+            res = node.spork(spork_name, 4070908800)
+            assert(res == "success")
+
 
     def check_minting(self, block_count=250):
         self.log.info("Check Minting...")
@@ -826,7 +846,7 @@ class BettingTest(BitcoinTestFramework):
         assert_equal(gotliability, Decimal(557))
         gotliability=liability["spread-push-liability"]
         assert_equal(gotliability, Decimal(500))
- 
+
         # place result for event 4:
         result_opcode = make_result(4, STANDARD_RESULT, 200, 0)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
@@ -972,7 +992,7 @@ class BettingTest(BitcoinTestFramework):
         global player2_total_bet
 
         # add new events
-        # 4: CSGO - PGL Major Krakow - Astralis vs Gambit round2
+        # 5: CSGO - PGL Major Krakow - Astralis vs Gambit round2
         mlevent = make_event(5, # Event ID
                             self.start_time, # start time = current + hour
                             sport_names.index("CSGO"), # Sport ID
@@ -986,7 +1006,7 @@ class BettingTest(BitcoinTestFramework):
         self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
         post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
 
-        # 5: CSGO - PGL Major Krakow - Astralis vs Gambit round3
+        # 6: CSGO - PGL Major Krakow - Astralis vs Gambit round3
         mlevent = make_event(6, # Event ID
                             self.start_time, # start time = current + hour
                             sport_names.index("CSGO"), # Sport ID
@@ -1000,7 +1020,7 @@ class BettingTest(BitcoinTestFramework):
         self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
         post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
 
-        # 6: Football - UEFA Champions League - Barcelona vs Real Madrid round2
+        # 7: Football - UEFA Champions League - Barcelona vs Real Madrid round2
         mlevent = make_event(7, # Event ID
                             self.start_time, # start time = current + hour
                             sport_names.index("Football"), # Sport ID
@@ -1018,14 +1038,14 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        # player 1 make express to events 4, 5, 6 - home win
+        # player 1 make express to events 5, 6, 7 - home win
         player1_bet = 200
         player1_total_bet = player1_total_bet + player1_bet
         # 26051 - it is early calculated effective odds for this parlay bet
         player1_expected_win = Decimal(player1_bet * 26051) / ODDS_DIVISOR
         self.nodes[2].placeparlaybet([{'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}, {'eventId': 7, 'outcome': outcome_home_win}], player1_bet)
 
-        # player 2 make express to events 4, 5, 6 - home win
+        # player 2 make express to events 5, 6, 7 - home win
         player2_bet = 500
         player2_total_bet = player2_total_bet + player2_bet
         # 26051 - it is early calculated effective odds for this parlay bet
@@ -1592,7 +1612,125 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Check Bets Success")
 
+    def check_parlays_bet_spork14(self):
+        self.log.info("Check parlay bets spork14...")
+
+        # add new events
+        # 21: CSGO - PGL Major Krakow - Virtus Pro vs Team Liquid round2
+        mlevent = make_event(21, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("CSGO"), # Sport ID
+                            tournament_names.index("PGL Major Krakow"), # Tournament ID
+                            round_names.index("round2"), # Round ID
+                            team_names.index("Virtus Pro"), # Home Team
+                            team_names.index("Team Liquid"), # Away Team
+                            14000, # home odds
+                            33000, # away odds
+                            0) # draw odds
+        self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        # 22: CSGO - PGL Major Krakow - Astralis vs Gambit round1
+        mlevent = make_event(22, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("CSGO"), # Sport ID
+                            tournament_names.index("PGL Major Krakow"), # Tournament ID
+                            round_names.index("round1"), # Round ID
+                            team_names.index("Astralis"), # Home Team
+                            team_names.index("Gambit"), # Away Team
+                            14000, # home odds
+                            33000, # away odds
+                            0) # draw odds
+        self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        # 23: Football - UEFA Champions League - Barcelona vs Real Madrid round1
+        mlevent = make_event(23, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("Football"), # Sport ID
+                            tournament_names.index("UEFA Champions League"), # Tournament ID
+                            round_names.index("round1"), # Round ID
+                            team_names.index("Barcelona"), # Home Team
+                            team_names.index("Real Madrid"), # Away Team
+                            14000, # home odds
+                            33000, # away odds
+                            0) # draw odds
+        self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # player 1 make express to nonexistent events
+        assert_raises_rpc_error(-31, "Error: there is no such Event: 501", self.nodes[2].placeparlaybet,
+            [
+                {'eventId': 22, 'outcome': outcome_home_win},
+                {'eventId': 23, 'outcome': outcome_home_win},
+                {'eventId': 501, 'outcome': outcome_home_win} # failed
+            ], 100)
+
+        # player 1 make express to events 21, 22, 34 - home win
+        player1_bet = 200
+        assert_raises_rpc_error(-31, "Error: detected round 1 in event: 21", self.nodes[2].placeparlaybet,
+            [
+                {'eventId': 21, 'outcome': outcome_home_win}, # failed
+                {'eventId': 22, 'outcome': outcome_home_win},
+                {'eventId': 23, 'outcome': outcome_home_win}
+            ], player1_bet)
+
+        # player 1 make express to events 22, 23 - home win
+        player1_bet = 200
+        global player1_total_bet
+        player1_total_bet = player1_total_bet + player1_bet
+        # 18933 - it is early calculated effective odds for this parlay bet
+        player1_expected_win = Decimal(player1_bet * 18933) / ODDS_DIVISOR
+        self.nodes[2].placeparlaybet([
+                {'eventId': 22, 'outcome': outcome_home_win},
+                {'eventId': 23, 'outcome': outcome_home_win}
+            ],
+        player1_bet)
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        # place result for event 22: Astralis wins with score 16:14
+        result_opcode = make_result(22, STANDARD_RESULT, 16, 14)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+        # place result for event 23: Barcelona wins with score 3:2
+        result_opcode = make_result(23, STANDARD_RESULT, 3, 2)
+        post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        player1_balance_before = Decimal(self.nodes[2].getbalance())
+
+        listbets = self.nodes[0].listbetsdb(False)
+
+        # generate block with payouts
+        blockhash = self.nodes[0].generate(1)[0]
+        block = self.nodes[0].getblock(blockhash)
+        height = block['height']
+
+        self.sync_all()
+
+        payoutsInfo = self.nodes[0].getpayoutinfosince(1)
+        check_bet_payouts_info(listbets, payoutsInfo)
+
+        player1_balance_after = Decimal(self.nodes[2].getbalance())
+
+        assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
+
+        self.log.info("Check parlay bets spork14 Success")
+
     def run_test(self):
+        # Tests for old spork
+        if self.is_spork_active("SPORK_14_NEW_PROTOCOL_ENFORCEMENT"):
+            self.deactivate_spork("SPORK_14_NEW_PROTOCOL_ENFORCEMENT")
+
         self.check_minting()
         self.check_mapping()
         self.check_event()
@@ -1617,6 +1755,12 @@ class BettingTest(BitcoinTestFramework):
         self.check_timecut_refund()
         self.check_asian_spreads_bet()
         self.check_bets()
+
+        # Tests for new spork
+        if not self.is_spork_active("SPORK_14_NEW_PROTOCOL_ENFORCEMENT"):
+            self.activate_spork("SPORK_14_NEW_PROTOCOL_ENFORCEMENT")
+
+        self.check_parlays_bet_spork14()
 
 if __name__ == '__main__':
     BettingTest().main()
