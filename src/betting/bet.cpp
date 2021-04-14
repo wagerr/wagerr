@@ -220,6 +220,12 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         if (bettingsViewCache.results->Exists(ResultKey{leg.nEventId})) {
                             return error("CheckBettingTX: Bet placed to resulted event %lu!", leg.nEventId);
                         }
+
+                        if (sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) {
+                            if (plEvent.nStage == 1) {
+                                return error("CheckBettingTX: detected round 1 in event: %lu!", leg.nEventId);
+                            }
+                        }
                     }
                     else {
                         return error("CheckBettingTX: Failed to find event %lu!", leg.nEventId);

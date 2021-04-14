@@ -1928,6 +1928,17 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
         if (outcomeType < moneyLineHomeWin || outcomeType > totalUnder)
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
 
+        if (sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) {
+            CPeerlessExtendedEventDB plEvent;
+            if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
+                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
+            }
+
+            if (plEvent.nStage == 1) {
+                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: detected round 1 in event: " + std::to_string(eventId));
+            }
+        }
+
         parlayBetTx.legs.emplace_back(eventId, outcomeType);
     }
 
