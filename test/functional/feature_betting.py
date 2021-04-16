@@ -1672,7 +1672,7 @@ class BettingTest(BitcoinTestFramework):
 
         # player 1 make express to events 21, 22, 34 - home win
         player1_bet = 200
-        assert_raises_rpc_error(-31, "Error: detected round 1 in event: 21", self.nodes[2].placeparlaybet,
+        assert_raises_rpc_error(-31, "Error: event 21 cannot be part of parlay bet", self.nodes[2].placeparlaybet,
             [
                 {'eventId': 21, 'outcome': outcome_home_win}, # failed
                 {'eventId': 22, 'outcome': outcome_home_win},

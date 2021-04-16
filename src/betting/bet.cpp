@@ -222,8 +222,8 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         }
 
                         if (sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) {
-                            if (plEvent.nStage == 1) {
-                                return error("CheckBettingTX: detected round 1 in event: %lu!", leg.nEventId);
+                            if (plEvent.nStage != 0) {
+                                return error("CheckBettingTX: event %lu cannot be part of parlay bet!", leg.nEventId);
                             }
                         }
                     }

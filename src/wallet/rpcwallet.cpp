@@ -1934,8 +1934,8 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
                 throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
             }
 
-            if (plEvent.nStage == 1) {
-                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: detected round 1 in event: " + std::to_string(eventId));
+            if (plEvent.nStage != 0) {
+                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: event " + std::to_string(eventId) + " cannot be part of parlay bet");
             }
         }
 
