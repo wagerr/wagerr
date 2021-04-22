@@ -838,7 +838,7 @@ class BettingTest(BitcoinTestFramework):
         assert_equal(gotliability, Decimal(557))
         gotliability=liability["spread-push-liability"]
         assert_equal(gotliability, Decimal(500))
- 
+
         # place result for event 4:
         result_opcode = make_result(4, STANDARD_RESULT, 200, 0)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
@@ -1110,6 +1110,7 @@ class BettingTest(BitcoinTestFramework):
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[2].placebet, 3, outcome_away_win, 1000)
         # bets to nonexistent events shouldn't accepted to memory pool
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
+        # assert_raises_rpc_error(-31, "Error: there is no such Event: {}".format(8), self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
 
         # creating existed mapping
         mapping_opcode = make_mapping(TEAM_MAPPING, 0, "anotherTeamName")
@@ -1604,7 +1605,7 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Check Bets Success")
 
-    def check_zeroing_odds(self):
+     def check_zeroing_odds(self):
         self.log.info("Check zeroing odds...")
         # activate SPORK_14_NEW_PROTOCOL_ENFORCEMENT
         sporks = self.nodes[0].spork("show")
@@ -1702,6 +1703,83 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Check zeroing odds Success")
 
+    def check_zero_odds_bet(self):
+        self.log.info("Check Zero Odds Bets...")
+        # activate SPORK_14_NEW_PROTOCOL_ENFORCEMENT
+        sporks = self.nodes[0].spork("show")
+        SPORK_14_NEW_PROTOCOL_ENFORCEMENT_saved = sporks['SPORK_14_NEW_PROTOCOL_ENFORCEMENT']
+        for node in self.nodes:
+            res = node.spork("SPORK_14_NEW_PROTOCOL_ENFORCEMENT", 1)
+            assert(res == "success")
+
+        event_id = 12
+        mlevent = make_event(12, # Event ID
+                    int(time.time()) + 60*60, # start time = current + hour
+                    sport_names.index("V2-V3 Sport"), # Sport ID
+                    tournament_names.index("V2-V3 Tournament"), # Tournament ID
+                    round_names.index("round1"), # Round ID
+                    team_names.index("V2-V3 Team1"), # Home Team
+                    team_names.index("V2-V3 Team2"), # Away Team
+                    16000, # home odds
+                    0, # away odds
+                    80000) # draw odds
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placebet, event_id, outcome_away_win, 100)
+
+        self.nodes[2].placebet(event_id, outcome_home_win, 25)
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placeparlaybet, [{'eventId':event_id, 'outcome': outcome_away_win}], 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_away_win}], 100)
+
+        self.nodes[2].placeparlaybet([{'eventId':event_id, 'outcome': outcome_home_win}], 25)
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        homeOdds = 0
+        awayOdds = 0
+        drawOdds = 0
+        update_odds_opcode = make_update_ml_odds(event_id,
+                                                homeOdds,
+                                                awayOdds,
+                                                drawOdds)
+        post_opcode(self.nodes[1], update_odds_opcode, WGR_WALLET_EVENT['addr'])
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placebet, event_id, outcome_away_win, 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_home_win),
+            self.nodes[1].placebet, event_id, outcome_home_win, 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_draw),
+            self.nodes[1].placebet, event_id, outcome_draw, 100)
+
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_away_win}], 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_home_win),
+            self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_home_win}], 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_draw),
+            self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_draw}], 100)
+
+        # deactivate SPORK_14_NEW_PROTOCOL_ENFORCEMENT
+        for node in self.nodes:
+            res = node.spork("SPORK_14_NEW_PROTOCOL_ENFORCEMENT", SPORK_14_NEW_PROTOCOL_ENFORCEMENT_saved)
+            assert(res == "success")
+
+        self.log.info("Check Zero Odds Bets Success")
+
     def run_test(self):
         self.check_minting()
         self.check_mapping()
@@ -1728,6 +1806,7 @@ class BettingTest(BitcoinTestFramework):
         self.check_asian_spreads_bet()
         self.check_bets()
         self.check_zeroing_odds()
+        self.check_zero_odds_bet()
 
 if __name__ == '__main__':
     BettingTest().main()

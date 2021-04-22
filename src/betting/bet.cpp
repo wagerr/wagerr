@@ -184,6 +184,12 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     if (bettingsViewCache.results->Exists(ResultKey{plBet.nEventId})) {
                         return error("CheckBettingTX: Bet placed to resulted event %lu!", plBet.nEventId);
                     }
+
+                    if (sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) {
+                        if (GetBetPotentialOdds(plBet, plEvent) == 0) {
+                            return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", plBet.nEventId, plBet.nOutcome);
+                        }
+                    }
                 }
                 else {
                     return error("CheckBettingTX: Failed to find event %lu!", plBet.nEventId);
@@ -219,6 +225,12 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     if (bettingsViewCache.events->Read(EventKey{leg.nEventId}, plEvent)) {
                         if (bettingsViewCache.results->Exists(ResultKey{leg.nEventId})) {
                             return error("CheckBettingTX: Bet placed to resulted event %lu!", leg.nEventId);
+                        }
+
+                        if (sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) {
+                            if (GetBetPotentialOdds(CPeerlessLegDB{leg.nEventId, (OutcomeType)leg.nOutcome}, plEvent) == 0) {
+                                return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", leg.nEventId, leg.nOutcome);
+                            }
                         }
                     }
                     else {
