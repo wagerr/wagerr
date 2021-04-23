@@ -183,6 +183,7 @@ public:
     int WagerrProtocolV1StartHeight() const { return nWagerrProtocolV1StartHeight; }
     int WagerrProtocolV2StartHeight() const { return nWagerrProtocolV2StartHeight; }
     int WagerrProtocolV3StartHeight() const { return nWagerrProtocolV3StartHeight; }
+    int WagerrProtocolV4StartHeight() const { return nWagerrProtocolV4StartHeight; }
     int QuickGamesEndHeight() const { return nQuickGamesEndHeight; }
     const std::vector<CQuickGamesView>& QuickGamesArr() const { return quickGamesArr; }
 
@@ -301,6 +302,7 @@ protected:
     int nWagerrProtocolV1StartHeight;
     int nWagerrProtocolV2StartHeight;
     int nWagerrProtocolV3StartHeight;
+    int nWagerrProtocolV4StartHeight;
     int nQuickGamesEndHeight;
     int nMaturityV2StartHeight;
     int nKeysRotateHeight;

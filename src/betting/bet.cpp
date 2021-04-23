@@ -185,7 +185,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         return error("CheckBettingTX: Bet placed to resulted event %lu!", plBet.nEventId);
                     }
 
-                    if (sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) {
+                    if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
                         if (GetBetPotentialOdds(plBet, plEvent) == 0) {
                             return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", plBet.nEventId, plBet.nOutcome);
                         }
@@ -227,9 +227,12 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                             return error("CheckBettingTX: Bet placed to resulted event %lu!", leg.nEventId);
                         }
 
-                        if (sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) {
+                        if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
                             if (GetBetPotentialOdds(CPeerlessLegDB{leg.nEventId, (OutcomeType)leg.nOutcome}, plEvent) == 0) {
                                 return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", leg.nEventId, leg.nOutcome);
+                            }
+                            if (plEvent.nStage != 0) {
+                                return error("CheckBettingTX: event %lu cannot be part of parlay bet!", leg.nEventId);
                             }
                         }
                     }
@@ -441,7 +444,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case plEventZeroingOddsTxType:
             {
-                if (!sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
@@ -968,7 +971,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             }
             case plEventZeroingOddsTxType:
             {
-                if (!sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) break;
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
@@ -1395,7 +1398,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case plEventZeroingOddsTxType:
             {
-                if (!sporkManager.IsSporkActive(SPORK_14_NEW_PROTOCOL_ENFORCEMENT)) break;
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
                 if (!validOracleTx) break;
 
                 CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
