@@ -30,6 +30,8 @@ SPORT_MAPPING      = 0x01
 ROUND_MAPPING      = 0x02
 TEAM_MAPPING       = 0x03
 TOURNAMENT_MAPPING = 0x04
+INDIVIDUAL_SPORT_MAPPING    = 0x05
+CONTENDER_MAPPING           = 0x06
 
 STANDARD_RESULT = 0x01
 EVENT_REFUND    = 0x02
@@ -124,7 +126,7 @@ def make_update_ml_odds(event_id, home_odds, away_odds, draw_odds):
     result = result + encode_int_little_endian(away_odds, 4)
     result = result + encode_int_little_endian(draw_odds, 4)
     return result
-    
+
 def make_zeroing_odds(event_ids):
     result = make_common_header(OPCODE_BTX_ZERO_ODDS)
     result = result + encode_int_little_endian(int(len(event_ids)), 1) # vector size

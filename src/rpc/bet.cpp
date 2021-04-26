@@ -93,7 +93,7 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
         throw std::runtime_error(
                 "getmappingname\n"
                 "\nGet a mapping string name from the specified map index.\n"
-                "1. Mapping type  (string, requied) Type of mapping (\"sports\", \"rounds\", \"teams\", \"tournaments\").\n"
+                "1. Mapping type  (string, requied) Type of mapping (\"sports\", \"rounds\", \"teams\", \"tournaments\", \"individualSports\", \"contenders\").\n"
                 "2. Mapping id    (numeric, requied) Mapping id.\n"
                 "\nResult:\n"
                 "[\n"

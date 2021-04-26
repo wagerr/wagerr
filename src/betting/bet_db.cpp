@@ -16,9 +16,9 @@ std::string CMappingDB::ToTypeName(MappingType type)
     case tournamentMapping:
         return "tournaments";
     case individualSportMapping:
-        return "individualSport";
+        return "individualSports";
     case contenderMapping:
-        return "contender";
+        return "contenders";
     }
     return "";
 }

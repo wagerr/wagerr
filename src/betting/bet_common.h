@@ -73,7 +73,7 @@ typedef enum MappingType {
 // The supported subgroups for Field Events
 typedef enum FieldEventGroupType {
     other        = 0x01,
-    animalRacing = 0x01
+    animalRacing = 0x02
 } FieldEventGroupType;
 
 //

@@ -291,14 +291,25 @@ class CFieldEventDB
 public:
     uint32_t nEventId      = 0;
     uint64_t nStartTime    = 0;
-    uint32_t nSportId      = 0;
-    uint32_t nEventGroupId = 0;
+    uint32_t nGroupType = 0;
+    uint32_t nSport        = 0;
     uint32_t nTournament = 0;
     uint32_t nStage      = 0;
-    std::map<uint32_t, uint32_t> contendersWinOdds;
+    // contenderId : wind odds
+    std::map<uint32_t, uint32_t> nContendersWinOdds;
 
     // Default Constructor.
     explicit CFieldEventDB() {}
+
+    inline void ExtractDataFromTx(const CFieldEventTx& tx) {
+        nEventId = tx.nEventId;
+        nStartTime = tx.nStartTime;
+        nGroupType = tx.nGroupType;
+        nSport = tx.nSport;
+        nTournament = tx.nTournament;
+        nStage = tx.nStage;
+        nContendersWinOdds = tx.nContendersWinOdds;
+    }
 
     ADD_SERIALIZE_METHODS;
 
@@ -306,11 +317,11 @@ public:
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nEventId);
         READWRITE(nStartTime);
-        READWRITE(nSportId);
-        READWRITE(nEventGroupId);
+        READWRITE(nGroupType);
+        READWRITE(nSport);
         READWRITE(nTournament);
         READWRITE(nStage);
-        READWRITE(contendersWinOdds);
+        READWRITE(nContendersWinOdds);
     }
 };
 
