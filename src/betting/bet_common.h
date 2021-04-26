@@ -42,6 +42,17 @@ typedef enum ResultType {
     totalsRefund   = 0x05,
 } ResultType;
 
+typedef enum SpecialContenderResult {
+    didNotFinished = -2,
+    didNotRace     = -1,
+} SpecialContenderResult;
+
+typedef enum FieldBetMarketType {
+    outright = 0x01,
+    place    = 0x02,
+    show     = 0x03
+} FieldBetMarketType;
+
 // The supported result types
 typedef enum WinnerType {
     homeWin = 0x01,
@@ -51,11 +62,19 @@ typedef enum WinnerType {
 
 // The supported mapping TX types.
 typedef enum MappingType {
-    sportMapping      = 0x01,
-    roundMapping      = 0x02,
-    teamMapping       = 0x03,
-    tournamentMapping = 0x04
+    sportMapping            = 0x01,
+    roundMapping            = 0x02,
+    teamMapping             = 0x03,
+    tournamentMapping       = 0x04,
+    individualSportMapping  = 0x05,
+    contenderMapping        = 0x06
 } MappingType;
+
+// The supported subgroups for Field Events
+typedef enum FieldEventGroupType {
+    other        = 0x01,
+    animalRacing = 0x01
+} FieldEventGroupType;
 
 //
 typedef enum PayoutType {

@@ -1484,6 +1484,15 @@ bool AppInit2()
                 bettingsView->betsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("bets"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
                 bettingsView->bets = MakeUnique<CBettingDB>(*bettingsView->betsStorage.get());
 
+                bettingsView->fieldEventsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("fieldevents"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->fieldEvents = MakeUnique<CBettingDB>(*bettingsView->eventsStorage.get());
+
+                bettingsView->fieldResultsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("fieldresults"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->fieldResults = MakeUnique<CBettingDB>(*bettingsView->resultsStorage.get());
+
+                bettingsView->fieldBetsStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("fieldbets"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
+                bettingsView->fieldBets = MakeUnique<CBettingDB>(*bettingsView->betsStorage.get());
+
                 bettingsView->undosStorage = MakeUnique<CStorageLevelDB>(CBettingDB::MakeDbPath("undos"), CBettingDB::dbWrapperCacheSize(), false, fReindex);
                 bettingsView->undos = MakeUnique<CBettingDB>(*bettingsView->undosStorage.get());
 

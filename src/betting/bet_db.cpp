@@ -15,6 +15,10 @@ std::string CMappingDB::ToTypeName(MappingType type)
         return "teamnames";
     case tournamentMapping:
         return "tournaments";
+    case individualSportMapping:
+        return "individualSport";
+    case contenderMapping:
+        return "contender";
     }
     return "";
 }
@@ -32,6 +36,12 @@ MappingType CMappingDB::FromTypeName(const std::string& name)
     }
     if (name == ToTypeName(tournamentMapping)) {
         return tournamentMapping;
+    }
+    if (name == ToTypeName(individualSportMapping)) {
+        return individualSportMapping;
+    }
+    if (name == ToTypeName(contenderMapping)) {
+        return contenderMapping;
     }
     return static_cast<MappingType>(-1);
 }
@@ -99,6 +109,9 @@ CBettingsView::CBettingsView(CBettingsView* phr) {
     results = MakeUnique<CBettingDB>(*phr->results.get());
     events = MakeUnique<CBettingDB>(*phr->events.get());
     bets = MakeUnique<CBettingDB>(*phr->bets.get());
+    fieldEvents = MakeUnique<CBettingDB>(*phr->fieldEvents.get());
+    fieldResults = MakeUnique<CBettingDB>(*phr->fieldResults.get());
+    fieldBets = MakeUnique<CBettingDB>(*phr->fieldBets.get());
     undos = MakeUnique<CBettingDB>(*phr->undos.get());
     payoutsInfo = MakeUnique<CBettingDB>(*phr->payoutsInfo.get());
     quickGamesBets = MakeUnique<CBettingDB>(*phr->quickGamesBets.get());
@@ -113,6 +126,9 @@ bool CBettingsView::Flush() {
             results->Flush() &&
             events->Flush() &&
             bets->Flush() &&
+            fieldEvents->Flush() &&
+            fieldResults->Flush() &&
+            fieldBets->Flush() &&
             undos->Flush() &&
             payoutsInfo->Flush() &&
             quickGamesBets->Flush() &&
@@ -127,6 +143,9 @@ unsigned int CBettingsView::GetCacheSize() {
             results->GetCacheSize() +
             events->GetCacheSize() +
             bets->GetCacheSize() +
+            fieldEvents->GetCacheSize() +
+            fieldResults->GetCacheSize() +
+            fieldBets->GetCacheSize() +
             undos->GetCacheSize() +
             payoutsInfo->GetCacheSize() +
             quickGamesBets->GetCacheSize() +
@@ -141,6 +160,9 @@ unsigned int CBettingsView::GetCacheSizeBytesToWrite() {
             results->GetCacheSizeBytesToWrite() +
             events->GetCacheSizeBytesToWrite() +
             bets->GetCacheSizeBytesToWrite() +
+            fieldEvents->GetCacheSizeBytesToWrite() +
+            fieldResults->GetCacheSizeBytesToWrite() +
+            fieldBets->GetCacheSizeBytesToWrite() +
             undos->GetCacheSizeBytesToWrite() +
             payoutsInfo->GetCacheSizeBytesToWrite() +
             quickGamesBets->GetCacheSizeBytesToWrite() +

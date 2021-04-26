@@ -283,6 +283,61 @@ public:
     }
 };
 
+// Field event key (individual sport)
+using FieldEventKey = EventKey;
+
+class CFieldEventDB
+{
+public:
+    uint32_t nEventId      = 0;
+    uint64_t nStartTime    = 0;
+    uint32_t nSportId      = 0;
+    uint32_t nEventGroupId = 0;
+    uint32_t nTournament = 0;
+    uint32_t nStage      = 0;
+    std::map<uint32_t, uint32_t> contendersWinOdds;
+
+    // Default Constructor.
+    explicit CFieldEventDB() {}
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(nStartTime);
+        READWRITE(nSportId);
+        READWRITE(nEventGroupId);
+        READWRITE(nTournament);
+        READWRITE(nStage);
+        READWRITE(contendersWinOdds);
+    }
+};
+
+// Field event Result key
+using FieldEventResultKey = EventKey;
+
+class CFieldEventResultDB
+{
+public:
+    uint32_t nEventId;
+    uint32_t nResultType;
+    // contenderId : result (place or SpecialContenderResult)
+    std::map<uint32_t, int32_t> nContendersResults;
+
+    // Default Constructor.
+    explicit CFieldEventResultDB() {}
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(nResultType);
+        READWRITE(nContendersResults);
+    }
+};
+
 // PeerlessBetKey
 typedef struct PeerlessBetKey {
     uint32_t blockHeight;
@@ -371,6 +426,94 @@ public:
         payout = bet.payout;
         payoutHeight = bet.payoutHeight;
     }
+
+    bool IsCompleted() const { return completed; }
+    void SetCompleted() { completed = true; }
+    // for undo
+    void SetUncompleted() { completed = false; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        std::string addrStr;
+        READWRITE(betAmount);
+        if (ser_action.ForRead()) {
+            READWRITE(addrStr);
+            playerAddress.SetString(addrStr);
+        }
+        else {
+            addrStr = playerAddress.ToString();
+            READWRITE(addrStr);
+        }
+        READWRITE(legs);
+        READWRITE(lockedEvents);
+        READWRITE(betTime);
+        READWRITE(completed);
+        uint8_t resType;
+        if (ser_action.ForRead()) {
+            READWRITE(resType);
+            resultType = (BetResultType) resType;
+        }
+        else {
+            resType = (uint8_t) resultType;
+            READWRITE(resType);
+        }
+        READWRITE(payout);
+        READWRITE(payoutHeight);
+    }
+
+private:
+    bool completed = false;
+};
+
+// Field Bet Key
+using FieldBetKey = PeerlessBetKey;
+
+class CFieldLegDB
+{
+public:
+    uint32_t nEventId;
+    FieldBetMarketType nMarketType;
+    uint32_t nWinnerId;
+
+    // Default constructor.
+    explicit CFieldLegDB() {}
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t market;
+        READWRITE(nEventId);
+        if (ser_action.ForRead()) {
+            READWRITE(market);
+            nMarketType = (FieldBetMarketType) market;
+        }
+        else {
+            market = (uint8_t) nMarketType;
+            READWRITE(market);
+        }
+        READWRITE(nWinnerId);
+    }
+};
+
+class CFieldBetDB
+{
+public:
+    CAmount betAmount;
+    CBitcoinAddress playerAddress;
+    // one elem means single bet, else it is parlay bet, max size = 5
+    std::vector<CFieldLegDB> legs;
+    // vector for member event condition
+    std::vector<CFieldEventDB> lockedEvents;
+    int64_t betTime;
+    BetResultType resultType = BetResultType::betResultUnknown;
+    CAmount payout = 0;
+    uint32_t payoutHeight = 0;
+
+    // Default Constructor.
+    explicit CFieldBetDB() { }
 
     bool IsCompleted() const { return completed; }
     void SetCompleted() { completed = true; }
@@ -579,10 +722,11 @@ private:
 
 using BettingUndoKey = uint256;
 
-using BettingUndoVariant = boost::variant<CPeerlessExtendedEventDB>;
+using BettingUndoVariant = boost::variant<CPeerlessExtendedEventDB, CFieldEventDB>;
 
 typedef enum BettingUndoTypes {
-    UndoPeerlessEvent
+    UndoPeerlessEvent = 0,
+    UndoFieldEvent    = 1
 } BettingUndoTypes;
 
 class CBettingUndoDB
@@ -619,6 +763,13 @@ public:
                     undoVariant = event;
                     break;
                 }
+                case UndoFieldEvent:
+                {
+                    CFieldEventDB event{};
+                    READWRITE(event);
+                    undoVariant = event;
+                    break;
+                }
                 default:
                     std::runtime_error("Undefined undo type");
             }
@@ -633,6 +784,11 @@ public:
                     CPeerlessExtendedEventDB event = boost::get<CPeerlessExtendedEventDB>(undoVariant);
                     READWRITE(event);
                     break;
+                }
+                case UndoFieldEvent:
+                {
+                    CFieldEventDB event = boost::get<CFieldEventDB>(undoVariant);
+                    READWRITE(event);
                 }
                 default:
                     std::runtime_error("Undefined undo type");
@@ -826,6 +982,13 @@ public:
     // it needed to avoid undo issues, when we try undo not affected tx
     std::unique_ptr<CBettingDB> failedBettingTxs; // "failedtxs"
     std::unique_ptr<CStorageKV> failedBettingTxsStorage;
+    // field betting
+    std::unique_ptr<CBettingDB> fieldEvents; // "events"
+    std::unique_ptr<CStorageKV> fieldEventsStorage;
+    std::unique_ptr<CBettingDB> fieldResults; // "results"
+    std::unique_ptr<CStorageKV> fieldResultsStorage;
+    std::unique_ptr<CBettingDB> fieldBets; // "bets"
+    std::unique_ptr<CStorageKV> fieldBetsStorage;
 
     // default constructor
     explicit CBettingsView() { }
