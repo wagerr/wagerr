@@ -30,7 +30,8 @@ typedef enum BetTxTypes{
     qgBetTxType              = 0x0d,  // Quick Games Bet transaction type identifier.
     plEventZeroingOddsTxType = 0x0e,  // Zeroing odds for event ids transaction type identifier.
     fEventTxType             = 0x0f,  // Field event transaction type identifier.
-    fUpdateOddsTxType        = 0x10   // Field event update odds transaction type identifier.
+    fUpdateOddsTxType        = 0x10,  // Field event update odds transaction type identifier.
+    fZeroingOddsTxType       = 0x11   // Field event zeroing odds transaction type identifier.
 } BetTxTypes;
 
 // class for serialization common betting header from opcode
@@ -205,6 +206,24 @@ public:
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nEventId);
         READWRITE(contendersWinOdds);
+    }
+};
+
+class CFieldZeroingOddsTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+
+    // Default Constructor.
+    CFieldZeroingOddsTx() {}
+
+    BetTxTypes GetTxType() const override { return fZeroingOddsTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
     }
 };
 

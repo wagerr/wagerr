@@ -433,6 +433,90 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Field Event Odds Success")
 
+    def check_event_zeroing_odds(self):
+        self.log.info("Check Field Zeroing Odds...")
+        start_time = int(time.time() + 60 * 60)
+
+        field_event_opcode = make_field_event(
+            1,
+            start_time,
+            animal_racing_group,
+            sport_names.index("Sport1"),
+            tournament_names.index("Tournament1"),
+            round_names.index("round0"),
+            {
+                contender_names.index("cont1")  : 15000,
+                contender_names.index("cont2")  : 16000,
+                contender_names.index("horse1") : 17000,
+                contender_names.index("horse2") : 18000,
+                contender_names.index("horse3") : 19000,
+            }
+        )
+        post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes)
+
+        # For revert test
+        self.stop_node(4)
+
+        field_zeroing_opcode = make_field_zeroing_odds(100) # bad event_id
+        assert_raises_rpc_error(-25, "",
+            post_opcode, self.nodes[1], field_zeroing_opcode, WGR_WALLET_ORACLE['addr'])
+
+        field_zeroing_opcode = make_field_zeroing_odds(1)
+        post_opcode(self.nodes[1], field_zeroing_opcode, WGR_WALLET_ORACLE['addr'])
+
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes[0:4])
+
+        for node in self.nodes[0:4]:
+            list_events = node.listfieldevents()
+            for event in list_events:
+                if event['event_id'] != 1:
+                    continue
+                assert_equal(len(event['contenders']), 5)
+                assert_equal(event['contenders'][0]['name'], "cont1")
+                assert_equal(event['contenders'][0]['odds'], 0)
+                assert_equal(event['contenders'][1]['name'], "cont2")
+                assert_equal(event['contenders'][1]['odds'], 0)
+                assert_equal(event['contenders'][2]['name'], "horse1")
+                assert_equal(event['contenders'][2]['odds'], 0)
+                assert_equal(event['contenders'][3]['name'], "horse2")
+                assert_equal(event['contenders'][3]['odds'], 0)
+                assert_equal(event['contenders'][4]['name'], "horse3")
+                assert_equal(event['contenders'][4]['odds'], 0)
+
+        self.log.info("Revering...")
+        self.nodes[4].rpchost = self.get_local_peer(4, True)
+        self.nodes[4].start()
+        self.nodes[4].wait_for_rpc_connection()
+        self.log.info("Generate blocks...")
+        for i in range(5):
+            self.nodes[4].generate(1)
+
+        self.log.info("Connect and sync nodes...")
+        self.connect_and_sync_blocks()
+
+        for node in self.nodes:
+            list_events = node.listfieldevents()
+            for event in list_events:
+                if event['event_id'] != 1:
+                    continue
+                assert_equal(len(event['contenders']), 5)
+                assert_equal(event['contenders'][0]['name'], "cont1")
+                assert_equal(event['contenders'][0]['odds'], 15000)
+                assert_equal(event['contenders'][1]['name'], "cont2")
+                assert_equal(event['contenders'][1]['odds'], 16000)
+                assert_equal(event['contenders'][2]['name'], "horse1")
+                assert_equal(event['contenders'][2]['odds'], 17000)
+                assert_equal(event['contenders'][3]['name'], "horse2")
+                assert_equal(event['contenders'][3]['odds'], 18000)
+                assert_equal(event['contenders'][4]['name'], "horse3")
+                assert_equal(event['contenders'][4]['odds'], 19000)
+
+        self.log.info("Field Event Odds Success")
+
     def check_field_bet(self):
         self.log.info("Check Field Bets...")
         start_time = int(time.time() + 60 * 60)
@@ -495,6 +579,8 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         sync_blocks(self.nodes[0:4])
 
+        # TODO: test bets to zero odds event
+        # TODO: test round=1 event
         # TODO: field bets tests
 
         self.log.info("Field Bets Success")
@@ -525,6 +611,7 @@ class BettingTest(BitcoinTestFramework):
         self.check_mapping()
         self.check_event()
         self.check_event_update_odds()
+        self.check_event_zeroing_odds()
         # self.check_field_bet()
         # self.check_parlays_field_bet()
         # self.check_timecut_refund()

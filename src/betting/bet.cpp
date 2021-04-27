@@ -373,6 +373,18 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 break;
             }
+            case fZeroingOddsTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
+
+                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fZeroingOddsTx->nEventId}))
+                    return error("CheckBettingTX: trying to zeroing odds for not existed field event id %lu!", fZeroingOddsTx->nEventId);
+
+                break;
+            }
             case plResultTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
@@ -868,6 +880,33 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                     for (const auto& contender : fUpdateOddsTx->contendersWinOdds) {
                         fEvent.contendersWinOdds[contender.first] = contender.second;
+                    }
+
+                    if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
+                        LogPrintf("Failed to update field event!\n");
+                }
+                else {
+                    LogPrintf("Failed to find field event!\n");
+                }
+
+                break;
+            }
+            case fZeroingOddsTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
+                LogPrint("wagerr", "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
+
+                FieldEventKey fEventKey{fZeroingOddsTx->nEventId};
+                CFieldEventDB fEvent;
+                if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
+                    // save prev event state to undo
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
+
+                    for (auto& contender : fEvent.contendersWinOdds) {
+                        contender.second = 0;
                     }
 
                     if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
@@ -1434,6 +1473,26 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 }
 
                 if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateOddsTx->nEventId})) {
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                }
+                else {
+                    LogPrintf("Failed to find field event!\n");
+                }
+
+                break;
+            }
+            case fZeroingOddsTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
+                LogPrint("wagerr", "CFieldZeroingOddsTx: id: %lu\n", fZeroingOddsTx->nEventId);
+
+                if (bettingsViewCache.fieldEvents->Exists(EventKey{fZeroingOddsTx->nEventId})) {
                     if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;

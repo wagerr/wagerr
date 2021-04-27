@@ -25,6 +25,7 @@ OPCODE_BTX_QG_BET = 0x0d
 OPCODE_BTX_ZERO_ODDS = 0x0e
 OPCODE_BTX_FIELD_EVENT = 0x0f
 OPCODE_BTX_FIELD_UPDATE_ODDS = 0x10
+OPCODE_BTX_FIELD_ZEROING_ODDS = 0x11
 
 OPCODE_QG_DICE = 0x00
 
@@ -143,6 +144,12 @@ def make_field_update_odds(event_id, contenders_win_odds):
     for contender_id, contender_odds in contenders_win_odds.items():
         result = result + encode_int_little_endian(int(contender_id), 4)
         result = result + encode_int_little_endian(int(contender_odds), 4)
+    return result
+
+# Create an zeroing odds for field event opcode
+def make_field_zeroing_odds(event_id):
+    result = make_common_header(OPCODE_BTX_FIELD_ZEROING_ODDS)
+    result = result + encode_int_little_endian(event_id, 4)
     return result
 
 # Create a moneyline odds update opcode.
