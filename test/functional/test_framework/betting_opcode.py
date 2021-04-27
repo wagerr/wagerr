@@ -24,6 +24,7 @@ OPCODE_BTX_PARLAY_BET = 0x0c
 OPCODE_BTX_QG_BET = 0x0d
 OPCODE_BTX_ZERO_ODDS = 0x0e
 OPCODE_BTX_FIELD_EVENT = 0x0f
+OPCODE_BTX_FIELD_UPDATE_ODDS = 0x10
 
 OPCODE_QG_DICE = 0x00
 
@@ -128,6 +129,16 @@ def make_field_event(event_id, timestamp, group, sport, tournament, round, conte
     result = result + encode_int_little_endian(tournament, 2)
     result = result + encode_int_little_endian(round, 2)
     result = result + encode_int_little_endian(group, 2)
+    result = result + encode_int_little_endian(int(len(contenders_win_odds)), 1) # map size
+    for contender_id, contender_odds in contenders_win_odds.items():
+        result = result + encode_int_little_endian(int(contender_id), 4)
+        result = result + encode_int_little_endian(int(contender_odds), 4)
+    return result
+
+# Create an update odds for field event opcode
+def make_field_update_odds(event_id, contenders_win_odds):
+    result = make_common_header(OPCODE_BTX_FIELD_UPDATE_ODDS)
+    result = result + encode_int_little_endian(event_id, 4)
     result = result + encode_int_little_endian(int(len(contenders_win_odds)), 1) # map size
     for contender_id, contender_odds in contenders_win_odds.items():
         result = result + encode_int_little_endian(int(contender_id), 4)

@@ -294,18 +294,149 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Event creation Success")
 
-    def check_event_update(self):
-        self.log.info("Check Event Update...")
+    def check_event_update_odds(self):
+        self.log.info("Check Event Update Odds...")
+        start_time = int(time.time() + 60 * 60)
 
-        # TODO: update odds for event
-        # TODO: add new conteder
+        for node in self.nodes:
+            assert_equal(len(node.listfieldevents()), 0)
 
-        self.log.info("Event Patch Success")
+        # Create event
+        field_event_opcode = make_field_event(
+            0,
+            start_time,
+            other_group,
+            sport_names.index("Sport1"),
+            tournament_names.index("Tournament1"),
+            round_names.index("round0"),
+            {
+                contender_names.index("cont1") : 15000
+            }
+        )
+        post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes)
+
+        for node in self.nodes:
+            list_events = node.listfieldevents()
+            assert_equal(len(list_events), 1)
+
+        saved_event = self.nodes[0].listfieldevents()[0]
+        assert_equal(saved_event['event_id'], 0)
+        assert_equal(len(saved_event['contenders']), 1)
+        assert_equal(saved_event['contenders'][0]['name'], "cont1")
+        assert_equal(saved_event['contenders'][0]['odds'], 15000)
+
+        # For revert test
+        self.stop_node(4)
+
+        field_update_odds_opcode = make_field_update_odds(
+            0,
+            {
+                contender_names.index("cont1") : 18000,
+                100 : 15000 # bad contender_id
+            }
+        )
+        assert_raises_rpc_error(-25, "",
+            post_opcode, self.nodes[1], field_update_odds_opcode, WGR_WALLET_ORACLE['addr'])
+
+        field_update_odds_opcode = make_field_update_odds(
+            100, # bad event_id
+            {
+                contender_names.index("cont1") : 18000
+            }
+        )
+        assert_raises_rpc_error(-25, "",
+            post_opcode, self.nodes[1], field_update_odds_opcode, WGR_WALLET_ORACLE['addr'])
+
+        # Update odds for event
+        field_update_odds_opcode = make_field_update_odds(
+            0,
+            {
+                contender_names.index("cont1") : 18000
+            }
+        )
+        post_opcode(self.nodes[1], field_update_odds_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes[0:4])
+
+        for node in self.nodes[0:4]:
+            list_events = node.listfieldevents()
+            assert_equal(len(list_events), 1)
+            assert_equal(len(list_events[0]['contenders']), 1)
+            assert_equal(list_events[0]['contenders'][0]['name'], "cont1")
+            assert_equal(list_events[0]['contenders'][0]['odds'], 18000)
+
+        field_update_odds_opcode = make_field_update_odds(
+            0,
+            {
+                contender_names.index("cont2") : 13000 # Add new conteder
+            }
+        )
+        post_opcode(self.nodes[1], field_update_odds_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes[0:4])
+
+        for node in self.nodes[0:4]:
+            list_events = node.listfieldevents()
+            assert_equal(len(list_events), 1)
+            assert_equal(len(list_events[0]['contenders']), 2)
+            assert_equal(list_events[0]['contenders'][0]['name'], "cont1")
+            assert_equal(list_events[0]['contenders'][0]['odds'], 18000)
+            assert_equal(list_events[0]['contenders'][1]['name'], "cont2")
+            assert_equal(list_events[0]['contenders'][1]['odds'], 13000)
+
+        field_update_odds_opcode = make_field_update_odds(
+            0,
+            {
+                contender_names.index("cont2") : 19000,
+                contender_names.index("horse1") : 12000 # Add new conteder
+            }
+        )
+        post_opcode(self.nodes[1], field_update_odds_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes[0:4])
+
+        for node in self.nodes[0:4]:
+            list_events = node.listfieldevents()
+            assert_equal(len(list_events), 1)
+            assert_equal(len(list_events[0]['contenders']), 3)
+            assert_equal(list_events[0]['contenders'][0]['name'], "cont1")
+            assert_equal(list_events[0]['contenders'][0]['odds'], 18000)
+            assert_equal(list_events[0]['contenders'][1]['name'], "cont2")
+            assert_equal(list_events[0]['contenders'][1]['odds'], 19000)
+            assert_equal(list_events[0]['contenders'][2]['name'], "horse1")
+            assert_equal(list_events[0]['contenders'][2]['odds'], 12000)
+
+        self.log.info("Revering...")
+        self.nodes[4].rpchost = self.get_local_peer(4, True)
+        self.nodes[4].start()
+        self.nodes[4].wait_for_rpc_connection()
+        self.log.info("Generate blocks...")
+        for i in range(5):
+            self.nodes[4].generate(1)
+
+        self.log.info("Connect and sync nodes...")
+        self.connect_and_sync_blocks()
+
+        # Check event not updated
+        for node in self.nodes:
+            list_events = node.listfieldevents()
+            assert_equal(len(list_events), 1)
+            assert_equal(len(list_events[0]['contenders']), 1)
+            assert_equal(saved_event['contenders'][0]['name'], list_events[0]['contenders'][0]['name'])
+            assert_equal(saved_event['contenders'][0]['odds'], list_events[0]['contenders'][0]['odds'])
+
+        self.log.info("Field Event Odds Success")
 
     def check_field_bet(self):
         self.log.info("Check Field Bets...")
         start_time = int(time.time() + 60 * 60)
-        
+
         global player1_total_bet
         global player2_total_bet
 
@@ -317,7 +448,7 @@ class BettingTest(BitcoinTestFramework):
         self.odds_events = {}
 
         field_event_opcode = make_field_event(
-            0,
+            1,
             start_time,
             other_group,
             sport_names.index("Sport1"),
@@ -328,13 +459,17 @@ class BettingTest(BitcoinTestFramework):
                 contender_names.index("cont2") : 18000
             }
         )
+        odds_events[1] = {
+            contender_names.index("cont1") : 15000,
+            contender_names.index("cont2") : 18000
+        }
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.nodes[0].generate(1)
         sync_blocks(self.nodes[0:4])
 
         field_event_opcode = make_field_event(
-            1,
+            2,
             start_time,
             animal_racing_group,
             sport_names.index("Horse racing"),
@@ -348,6 +483,13 @@ class BettingTest(BitcoinTestFramework):
                 contender_names.index("horse5") : 19000
             }
         )
+        odds_events[2] = {
+            contender_names.index("horse1") : 15000,
+            contender_names.index("horse2") : 18000,
+            contender_names.index("horse3") : 14000,
+            contender_names.index("horse4") : 13000,
+            contender_names.index("horse5") : 19000
+        }
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.nodes[0].generate(1)
@@ -382,10 +524,10 @@ class BettingTest(BitcoinTestFramework):
         # Chain height = 300 after minting -> v4 protocol active
         self.check_mapping()
         self.check_event()
-        self.check_event_update()
-        self.check_field_bet()
-        self.check_parlays_field_bet()
-        self.check_timecut_refund()
+        self.check_event_update_odds()
+        # self.check_field_bet()
+        # self.check_parlays_field_bet()
+        # self.check_timecut_refund()
 
 if __name__ == '__main__':
     BettingTest().main()

@@ -296,7 +296,7 @@ public:
     uint32_t nTournament = 0;
     uint32_t nStage      = 0;
     // contenderId : wind odds
-    std::map<uint32_t, uint32_t> nContendersWinOdds;
+    std::map<uint32_t, uint32_t> contendersWinOdds;
 
     // Default Constructor.
     explicit CFieldEventDB() {}
@@ -308,7 +308,7 @@ public:
         nSport = tx.nSport;
         nTournament = tx.nTournament;
         nStage = tx.nStage;
-        nContendersWinOdds = tx.nContendersWinOdds;
+        contendersWinOdds = tx.contendersWinOdds;
     }
 
     ADD_SERIALIZE_METHODS;
@@ -321,7 +321,7 @@ public:
         READWRITE(nSport);
         READWRITE(nTournament);
         READWRITE(nStage);
-        READWRITE(nContendersWinOdds);
+        READWRITE(contendersWinOdds);
     }
 };
 
@@ -334,7 +334,7 @@ public:
     uint32_t nEventId;
     uint32_t nResultType;
     // contenderId : result (place or SpecialContenderResult)
-    std::map<uint32_t, int32_t> nContendersResults;
+    std::map<uint32_t, int32_t> contendersResults;
 
     // Default Constructor.
     explicit CFieldEventResultDB() {}
@@ -345,7 +345,7 @@ public:
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nEventId);
         READWRITE(nResultType);
-        READWRITE(nContendersResults);
+        READWRITE(contendersResults);
     }
 };
 

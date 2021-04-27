@@ -227,7 +227,7 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
         evt.push_back(Pair("round", mapping.sName));
 
         UniValue contenders(UniValue::VARR);
-        for (const auto& contender_it : fEvent.nContendersWinOdds) {
+        for (const auto& contender_it : fEvent.contendersWinOdds) {
             UniValue contender(UniValue::VOBJ);
             if (!bettingsView->mappings->Read(MappingKey{contenderMapping, contender_it.first}, mapping))
                 continue;
@@ -236,7 +236,7 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
             contenders.push_back(contender);
         }
         evt.push_back(Pair("contenders", contenders));
-        
+
         result.push_back(evt);
     }
 
