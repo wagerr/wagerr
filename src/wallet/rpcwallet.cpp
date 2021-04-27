@@ -168,6 +168,81 @@ UniValue listevents(const UniValue& params, bool fHelp)
     return result;
 }
 
+UniValue listfieldevents(const UniValue& params, bool fHelp)
+{
+    if (fHelp || (params.size() > 1))
+        throw std::runtime_error(
+            "listefieldvents\n"
+            "\nGet live Wagerr field events.\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"id\": \"xxx\",         (string) The event ID\n"
+            "    \"name\": \"xxx\",       (string) The name of the event\n"
+            "    \"round\": \"xxx\",      (string) The round of the event\n"
+            "    \"starting\": n,         (numeric) When the event will start\n"
+            "    \"contenders\": [\n"
+            "      {\n"
+            "        \"name\": \"xxxx\",  (string) Conteder name\n"
+            "        \"odds\": n          (numeric) Conteder win Odds\n"
+            "      }\n"
+            "      ,...\n"
+            "    ]\n"
+            "  }\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("listfieldevents", "") + HelpExampleRpc("listfieldevents", ""));
+
+    UniValue result{UniValue::VARR};
+
+    LOCK(cs_main);
+
+    auto it = bettingsView->fieldEvents->NewIterator();
+    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        CFieldEventDB fEvent;
+        CMappingDB mapping;
+        CBettingDB::BytesToDbType(it->Value(), fEvent);
+
+        // Only list active events.
+        if ((time_t)fEvent.nStartTime < std::time(0)) {
+            continue;
+        }
+
+        UniValue evt(UniValue::VOBJ);
+        evt.push_back(Pair("event_id", (uint64_t) fEvent.nEventId));
+        evt.push_back(Pair("starting", (uint64_t) fEvent.nStartTime));
+
+        if (!bettingsView->mappings->Read(MappingKey{individualSportMapping, fEvent.nSport}, mapping))
+            continue;
+        evt.push_back(Pair("sport", mapping.sName));
+
+        if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, fEvent.nTournament}, mapping))
+            continue;
+        evt.push_back(Pair("tournament", mapping.sName));
+
+        if (!bettingsView->mappings->Read(MappingKey{roundMapping, fEvent.nStage}, mapping))
+            continue;
+        evt.push_back(Pair("round", mapping.sName));
+
+        UniValue contenders(UniValue::VARR);
+        for (const auto& contender_it : fEvent.nContendersWinOdds) {
+            UniValue contender(UniValue::VOBJ);
+            if (!bettingsView->mappings->Read(MappingKey{contenderMapping, contender_it.first}, mapping))
+                continue;
+            contender.push_back(Pair("name", mapping.sName));
+            contender.push_back(Pair("odds", (uint64_t) contender_it.second));
+            contenders.push_back(contender);
+        }
+        evt.push_back(Pair("contenders", contenders));
+        
+        result.push_back(evt);
+    }
+
+    return result;
+}
+
 UniValue listeventsdebug(const UniValue& params, bool fHelp)
 {
     if (fHelp || (params.size() > 0))

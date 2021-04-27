@@ -278,6 +278,7 @@ extern UniValue createautomintaddress(const UniValue& params, bool fHelp);
 /** Betting related RPC methods **/
 extern UniValue listevents(const UniValue& params, bool fHelp);
 extern UniValue listeventsdebug(const UniValue& params, bool fHelp);
+extern UniValue listfieldevents(const UniValue& params, bool fHelp);
 extern UniValue listchaingamesevents(const UniValue& params, bool fHelp);
 extern UniValue listchaingamesbets(const UniValue& params, bool fHelp);
 extern UniValue getchaingamesinfo(const UniValue& params, bool fHelp);

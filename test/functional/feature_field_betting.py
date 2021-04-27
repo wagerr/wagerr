@@ -21,7 +21,7 @@ WGR_WALLET_OMNO = { "addr": "THofaueWReDjeZQZEECiySqV9GP4byP3qr", "key": "TDJnwR
 
 sport_names = ["Sport1", "Horse racing", "F1 racing"]
 round_names = ["round0", "round1",]
-tournament_names = ["Tournament1", "Tournament2", "The BMW stakes", "F1 Cup"]
+tournament_names = ["Tournament1", "The BMW stakes", "F1 Cup"]
 contender_names = ["cont1", "cont2", "horse1", "horse2", "horse3", "horse4", "horse5", "Alexander Albon", "Daniil Kvyat", "Pierre Gasly", "Romain Grosjean", "Antonio Maria Giovinazzi"]
 
 other_group = 1
@@ -55,17 +55,23 @@ class BettingTest(BitcoinTestFramework):
         return "127.0.0.1:" + str(rpc_port(node_index) if port is None else port)
 
     def set_test_params(self):
-        self.num_nodes = 4
+        # 0 - main node
+        # 1 - oracle
+        # 2 - player1
+        # 3 - player2
+        # 4 - revert testing
+        self.num_nodes = 5
         self.extra_args = [[] for n in range(self.num_nodes)]
         self.setup_clean_chain = True
         self.players = []
 
     def connect_network(self):
-        for pair in [[n, n + 1 if n + 1 < self.num_nodes else 0] for n in range(self.num_nodes)]:
-            for i in range(len(pair)):
-                assert i < 2
-                self.nodes[pair[i]].addnode(self.get_local_peer(pair[1 - i]), "onetry")
-                wait_until(lambda:  all(peer['version'] != 0 for peer in self.nodes[pair[i]].getpeerinfo()))
+        for i in range(len(self.nodes)):
+            for j in range(len(self.nodes)):
+                if i == j:
+                    continue
+                self.nodes[i].addnode(self.get_local_peer(j), "onetry")
+                wait_until(lambda:  all(peer['version'] != 0 for peer in self.nodes[i].getpeerinfo()))
         self.sync_all()
         for n in range(self.num_nodes):
             idx_l = n
@@ -73,11 +79,12 @@ class BettingTest(BitcoinTestFramework):
             assert_equal(self.nodes[idx_l].getblockcount(), self.nodes[idx_r].getblockcount())
 
     def connect_and_sync_blocks(self):
-        for pair in [[n, n + 1 if n + 1 < self.num_nodes else 0] for n in range(self.num_nodes)]:
-            for i in range(len(pair)):
-                assert i < 2
-                self.nodes[pair[i]].addnode(self.get_local_peer(pair[1 - i]), "onetry")
-                wait_until(lambda:  all(peer['version'] != 0 for peer in self.nodes[pair[i]].getpeerinfo()))
+        for i in range(len(self.nodes)):
+            for j in range(len(self.nodes)):
+                if i == j:
+                    continue
+                self.nodes[i].addnode(self.get_local_peer(j), "onetry")
+                wait_until(lambda:  all(peer['version'] != 0 for peer in self.nodes[i].getpeerinfo()))
         sync_blocks(self.nodes)
 
     def setup_network(self):
@@ -95,6 +102,7 @@ class BettingTest(BitcoinTestFramework):
 
         self.players.append(self.nodes[2].getnewaddress('Node2Addr'))
         self.players.append(self.nodes[3].getnewaddress('Node3Addr'))
+        node4Addr = self.nodes[4].getnewaddress('Node4Addr')
 
         for i in range(block_count - 1):
             blocks = self.nodes[0].generate(1)
@@ -113,19 +121,18 @@ class BettingTest(BitcoinTestFramework):
             self.nodes[0].sendtoaddress(WGR_WALLET_EVENT['addr'], 2000)
             self.nodes[0].sendtoaddress(self.players[0], 2000)
             self.nodes[0].sendtoaddress(self.players[1], 2000)
+            self.nodes[0].sendtoaddress(node4Addr, 2000)
 
         self.nodes[0].generate(51)
-
         self.sync_all()
 
         for n in range(self.num_nodes):
             assert_equal( self.nodes[n].getblockcount(), 300)
 
-        # check oracle balance
-        assert_equal(self.nodes[1].getbalance(), 80000)
-        # check players balance
-        assert_equal(self.nodes[2].getbalance(), 40000)
-        assert_equal(self.nodes[3].getbalance(), 40000)
+        assert_equal(self.nodes[1].getbalance(), 80000) # oracle
+        assert_equal(self.nodes[2].getbalance(), 40000) # player1
+        assert_equal(self.nodes[3].getbalance(), 40000) # player2
+        assert_equal(self.nodes[4].getbalance(), 40000) # revert node
 
         self.log.info("Minting Success")
 
@@ -133,7 +140,7 @@ class BettingTest(BitcoinTestFramework):
         self.log.info("Check Mapping...")
 
         self.nodes[0].generate(1)
-        self.sync_all()
+        sync_blocks(self.nodes)
 
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingid, "", "")
         assert_raises_rpc_error(-1, "No mapping exist for the mapping index you provided.", self.nodes[0].getmappingname, "abc123", 0)
@@ -142,25 +149,25 @@ class BettingTest(BitcoinTestFramework):
             mapping_opcode = make_mapping(INDIVIDUAL_SPORT_MAPPING, id, sport_names[id])
             post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
         self.nodes[0].generate(1)
-        self.sync_all()
+        sync_blocks(self.nodes)
 
         for id in range(len(round_names)):
             mapping_opcode = make_mapping(ROUND_MAPPING, id, round_names[id])
             post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
         self.nodes[0].generate(1)
-        self.sync_all()
+        sync_blocks(self.nodes)
 
         for id in range(len(contender_names)):
             mapping_opcode = make_mapping(CONTENDER_MAPPING, id, contender_names[id])
             post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
         self.nodes[0].generate(1)
-        self.sync_all()
+        sync_blocks(self.nodes)
 
         for id in range(len(tournament_names)):
             mapping_opcode = make_mapping(TOURNAMENT_MAPPING, id, tournament_names[id])
             post_opcode(self.nodes[1], mapping_opcode, WGR_WALLET_ORACLE['addr'])
         self.nodes[0].generate(1)
-        self.sync_all()
+        sync_blocks(self.nodes)
 
         for node in self.nodes:
             # Check sports mapping
@@ -215,12 +222,75 @@ class BettingTest(BitcoinTestFramework):
 
     def check_event(self):
         self.log.info("Check Event creation...")
+        start_time = int(time.time() + 60 * 60)
 
-        self.start_time = int(time.time() + 60 * 60)
-        # array for odds of events
-        self.odds_events = []
+        # Bad case
+        field_event_opcode = make_field_event(
+            0,
+            start_time,
+            100, # bad group
+            sport_names.index("Sport1"),
+            tournament_names.index("Tournament1"),
+            round_names.index("round0"),
+            {
+                contender_names.index("cont1") : 15000,
+                contender_names.index("cont2") : 18000,
+            }
+        )
+        assert_raises_rpc_error(-25, "",
+            post_opcode, self.nodes[1], field_event_opcode, WGR_WALLET_ORACLE['addr'])
 
-        # TODO: make field events
+        # Test revert
+        self.stop_node(4)
+
+        field_event_opcode = make_field_event(
+            0,
+            start_time,
+            other_group,
+            sport_names.index("Sport1"),
+            tournament_names.index("Tournament1"),
+            round_names.index("round0"),
+            {
+                contender_names.index("cont1") : 15000,
+                contender_names.index("cont2") : 18000,
+            }
+        )
+        post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes[0:4])
+
+        assert_raises_rpc_error(-25, "",
+            post_opcode, self.nodes[1], field_event_opcode, WGR_WALLET_ORACLE['addr'])
+
+        for node in self.nodes[0:4]:
+            list_events = node.listfieldevents()
+            assert_equal(len(list_events), 1)
+            event_id = list_events[0]['event_id']
+            assert_equal(list_events[0]['sport'], "Sport1")
+            assert_equal(list_events[0]['tournament'], "Tournament1")
+            assert_equal(list_events[0]['round'], "round0")
+            assert_equal(len(list_events[0]['contenders']), 2)
+            assert_equal(list_events[0]['contenders'][0]['name'], "cont1")
+            assert_equal(list_events[0]['contenders'][0]['odds'], 15000)
+            assert_equal(list_events[0]['contenders'][1]['name'], "cont2")
+            assert_equal(list_events[0]['contenders'][1]['odds'], 18000)
+
+        self.log.info("Revering...")
+        self.nodes[4].rpchost = self.get_local_peer(4, True)
+        self.nodes[4].start()
+        self.nodes[4].wait_for_rpc_connection()
+        self.log.info("Generate blocks...")
+        for i in range(5):
+            self.nodes[4].generate(1)
+
+        assert_equal(len(self.nodes[4].listfieldevents()), 0)
+
+        self.log.info("Connect and sync nodes...")
+        self.connect_and_sync_blocks() # TODO: fix sync_mempools
+
+        for node in self.nodes:
+            assert_equal(len(node.listfieldevents()), 0)
 
         self.log.info("Event creation Success")
 
@@ -234,11 +304,54 @@ class BettingTest(BitcoinTestFramework):
 
     def check_field_bet(self):
         self.log.info("Check Field Bets...")
-
+        start_time = int(time.time() + 60 * 60)
+        
         global player1_total_bet
-        player1_total_bet = 0
         global player2_total_bet
+
+        player1_total_bet = 0
         player2_total_bet = 0
+
+        # Create events for bet tests
+        # { event_id : { contender_id : odds, ... } }
+        self.odds_events = {}
+
+        field_event_opcode = make_field_event(
+            0,
+            start_time,
+            other_group,
+            sport_names.index("Sport1"),
+            tournament_names.index("Tournament1"),
+            round_names.index("round0"),
+            {
+                contender_names.index("cont1") : 15000,
+                contender_names.index("cont2") : 18000
+            }
+        )
+        post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes[0:4])
+
+        field_event_opcode = make_field_event(
+            1,
+            start_time,
+            animal_racing_group,
+            sport_names.index("Horse racing"),
+            tournament_names.index("The BMW stakes"),
+            round_names.index("round0"),
+            {
+                contender_names.index("horse1") : 15000,
+                contender_names.index("horse2") : 18000,
+                contender_names.index("horse3") : 14000,
+                contender_names.index("horse4") : 13000,
+                contender_names.index("horse5") : 19000
+            }
+        )
+        post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes[0:4])
 
         # TODO: field bets tests
 

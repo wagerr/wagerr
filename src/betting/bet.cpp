@@ -327,6 +327,35 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 break;
             }
+            case fEventTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldEventTx!");
+                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
+
+                if (bettingsViewCache.fieldEvents->Exists(FieldEventKey{fEventTx->nEventId}))
+                    return error("CheckBettingTX: trying to create existed field event id %lu!", fEventTx->nEventId);
+
+                if (fEventTx->nGroupType < FieldEventGroupType::other || fEventTx->nGroupType > FieldEventGroupType::animalRacing)
+                    return error("CheckBettingTx: trying to create field event with bad group type %lu!", fEventTx->nGroupType);
+
+                if (!bettingsViewCache.mappings->Exists(MappingKey{individualSportMapping, (uint32_t) fEventTx->nSport}))
+                    return error("CheckBettingTX: trying to create field event with unknown individual sport id %lu!", fEventTx->nSport);
+
+                if (!bettingsViewCache.mappings->Exists(MappingKey{tournamentMapping, (uint32_t) fEventTx->nTournament}))
+                    return error("CheckBettingTX: trying to create field event with unknown tournament id %lu!", fEventTx->nTournament);
+
+                if (!bettingsViewCache.mappings->Exists(MappingKey{roundMapping, (uint32_t) fEventTx->nStage}))
+                    return error("CheckBettingTX: trying to create field event with unknown round id %lu!", fEventTx->nStage);
+
+                for (auto& contender : fEventTx->nContendersWinOdds) {
+                    if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, (uint32_t) contender.first}))
+                        return error("CheckBettingTx: trying to create field event with unknown contender %lu!", contender.first);
+                }
+
+                break;
+            }
             case plResultTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
@@ -777,6 +806,32 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 }
                 break;
             }
+            case fEventTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
+                LogPrint("wagerr", "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu\n",
+                    fEventTx->nEventId,
+                    fEventTx->nSport,
+                    fEventTx->nTournament,
+                    fEventTx->nStage,
+                    fEventTx->nGroupType
+                );
+                for (auto& contender : fEventTx->nContendersWinOdds) {
+                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                }
+
+                CFieldEventDB fEvent;
+                fEvent.ExtractDataFromTx(*fEventTx);
+
+                FieldEventKey eventKey{fEvent.nEventId};
+                if (!bettingsViewCache.fieldEvents->Write(eventKey, fEvent))
+                    LogPrintf("Failed to write new event!\n");
+
+                break;
+            }
             case plResultTxType:
             {
                 if (!validOracleTx) break;
@@ -1066,6 +1121,7 @@ bool UndoEventChanges(CBettingsView& bettingsViewCache, const BettingUndoKey& un
         if (!undo.Inited() || undo.Get().which() != UndoPeerlessEvent || undo.height != height) {
             std::runtime_error("Invalid undo state!");
         }
+        // todok: undo proccess for FieldEvent
         else {
             CPeerlessExtendedEventDB event = boost::get<CPeerlessExtendedEventDB>(undo.Get());
             LogPrintf("UndoEventChanges: CPeerlessEvent: id: %lu, sport: %lu, tournament: %lu, stage: %lu,\n\t\t\thome: %lu, away: %lu, homeOdds: %lu, awayOdds: %lu, drawOdds: %lu favorite: %s\n",
@@ -1255,6 +1311,35 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                         }
                     }
                     else if (!bettingsViewCache.events->Erase(EventKey{plEventTx->nEventId})) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                }
+                else {
+                    LogPrintf("Failed to find event!\n");
+                }
+
+                break;
+            }
+            case fEventTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
+                LogPrint("wagerr", "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu\n",
+                    fEventTx->nEventId,
+                    fEventTx->nSport,
+                    fEventTx->nTournament,
+                    fEventTx->nStage,
+                    fEventTx->nGroupType
+                );
+                for (auto& contender : fEventTx->nContendersWinOdds) {
+                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                }
+
+                if (bettingsViewCache.fieldEvents->Exists(FieldEventKey{fEventTx->nEventId})) {
+                    if (!bettingsViewCache.fieldEvents->Erase(FieldEventKey{fEventTx->nEventId})) {
                         LogPrintf("Revert failed!\n");
                         return false;
                     }

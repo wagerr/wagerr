@@ -23,6 +23,7 @@ OPCODE_BTX_EVENT_PATCH = 0x0b
 OPCODE_BTX_PARLAY_BET = 0x0c
 OPCODE_BTX_QG_BET = 0x0d
 OPCODE_BTX_ZERO_ODDS = 0x0e
+OPCODE_BTX_FIELD_EVENT = 0x0f
 
 OPCODE_QG_DICE = 0x00
 
@@ -116,6 +117,21 @@ def make_event(event_id, timestamp, sport, tournament, round, home_team, away_te
     result = result + encode_int_little_endian(home_odds, 4)
     result = result + encode_int_little_endian(away_odds, 4)
     result = result + encode_int_little_endian(draw_odds, 4)
+    return result
+
+# Create a field event opcode
+def make_field_event(event_id, timestamp, group, sport, tournament, round, contenders_win_odds):
+    result = make_common_header(OPCODE_BTX_FIELD_EVENT)
+    result = result + encode_int_little_endian(event_id, 4)
+    result = result + encode_int_little_endian(timestamp, 4)
+    result = result + encode_int_little_endian(sport, 2)
+    result = result + encode_int_little_endian(tournament, 2)
+    result = result + encode_int_little_endian(round, 2)
+    result = result + encode_int_little_endian(group, 2)
+    result = result + encode_int_little_endian(int(len(contenders_win_odds)), 1) # map size
+    for contender_id, contender_odds in contenders_win_odds.items():
+        result = result + encode_int_little_endian(int(contender_id), 4)
+        result = result + encode_int_little_endian(int(contender_odds), 4)
     return result
 
 # Create a moneyline odds update opcode.
