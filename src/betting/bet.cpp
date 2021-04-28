@@ -385,6 +385,43 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 break;
             }
+            case fResultTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
+
+                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
+                    return error("CheckBettingTX: trying to result not existed field event id %lu!", fResultTx->nEventId);
+
+                if (bettingsViewCache.fieldResults->Exists(FieldEventResultKey{fResultTx->nEventId}))
+                    return error("CheckBettingTX: trying to result already resulted field event id %lu!", fResultTx->nEventId);
+
+                CFieldEventDB fEvent;
+                if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{fResultTx->nEventId}, fEvent)) {
+                    return error("CheckBettingTX: cannot read event %lu!", fResultTx->nEventId);
+                }
+
+                for (const auto& result : fResultTx->contendersResults) {
+                    if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, (uint32_t) result.first}))
+                        return error("CheckBettingTx: trying to create result for field event with unknown contender %lu!", result.first);
+
+                    if (fEvent.contendersWinOdds.find(result.first) == fEvent.contendersWinOdds.end())
+                        return error("CheckBettingTx: there is no contender %lu in event %lu!", result.first, fResultTx->nEventId);
+
+                    if (result.second != ContenderResult::place1 ||
+                        result.second != ContenderResult::place2 ||
+                        result.second != ContenderResult::place3 ||
+                        result.second != ContenderResult::DNF    ||
+                        result.second != ContenderResult::DNR )
+                    {
+                        return error("CheckBettingTx: trying to create result for field event with unknown result %lu!", result.second);
+                    }
+                }
+
+                break;
+            }
             case plResultTxType:
             {
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
@@ -914,6 +951,40 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 }
                 else {
                     LogPrintf("Failed to find field event!\n");
+                }
+
+                break;
+            }
+            case fResultTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
+
+                LogPrint("wagerr", "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
+                for (auto& contender : fResultTx->contendersResults) {
+                    LogPrint("wagerr", "id %lu : place %lu\n", contender.first, contender.second);
+                }
+
+                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId})) {
+                    LogPrintf("Failed to find field event!\n");
+                    break;
+                }
+
+                CFieldEventResultDB fEventResult{fResultTx->nEventId, fResultTx->nResultType};
+                for (auto& contender : fEventResult.contendersResults) {
+                    if (fResultTx->contendersResults.find(contender.first) != fResultTx->contendersResults.end()) {
+                        contender.second = fResultTx->contendersResults[contender.first];
+                    }
+                    else {
+                        contender.second = ContenderResult::DNF;
+                    }
+                }
+
+                if (!bettingsViewCache.fieldResults->Write(FieldEventResultKey{fEventResult.nEventId}, fEventResult)) {
+                    LogPrintf("Failed to write field result!\n");
+                    break;
                 }
 
                 break;
@@ -1500,6 +1571,30 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 }
                 else {
                     LogPrintf("Failed to find field event!\n");
+                }
+
+                break;
+            }
+            case fResultTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
+
+                LogPrint("wagerr", "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
+                for (auto& contender : fResultTx->contendersResults) {
+                    LogPrint("wagerr", "id %lu : place %lu\n", contender.first, contender.second);
+                }
+
+                if (bettingsViewCache.fieldResults->Exists(FieldEventResultKey{fResultTx->nEventId})) {
+                    if (!bettingsViewCache.fieldResults->Erase(FieldEventResultKey{fResultTx->nEventId})) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                }
+                else {
+                    LogPrintf("Failed to find result!\n");
                 }
 
                 break;

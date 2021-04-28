@@ -27,6 +27,13 @@ contender_names = ["cont1", "cont2", "horse1", "horse2", "horse3", "horse4", "ho
 other_group = 1
 animal_racing_group = 2
 
+# Contender result types
+DNF    = 0
+place1 = 1
+place2 = 2
+place3 = 3
+DNR    = 101
+
 ODDS_DIVISOR = 10000
 BETX_PERMILLE = 60
 

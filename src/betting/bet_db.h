@@ -291,7 +291,7 @@ class CFieldEventDB
 public:
     uint32_t nEventId      = 0;
     uint64_t nStartTime    = 0;
-    uint32_t nGroupType = 0;
+    uint32_t nGroupType    = 0;
     uint32_t nSport        = 0;
     uint32_t nTournament = 0;
     uint32_t nStage      = 0;
@@ -332,12 +332,16 @@ class CFieldEventResultDB
 {
 public:
     uint32_t nEventId;
-    uint32_t nResultType;
-    // contenderId : result (place or SpecialContenderResult)
-    std::map<uint32_t, int32_t> contendersResults;
+    uint8_t nResultType;
+    // contenderId : ContenderResult
+    std::map<uint32_t, uint8_t> contendersResults;
 
     // Default Constructor.
     explicit CFieldEventResultDB() {}
+    explicit CFieldEventResultDB(const uint32_t eventId, const uint8_t resultType)
+        : nEventId(eventId)
+        , nResultType(resultType)
+    {}
 
     ADD_SERIALIZE_METHODS;
 

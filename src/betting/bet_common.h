@@ -42,10 +42,13 @@ typedef enum ResultType {
     totalsRefund   = 0x05,
 } ResultType;
 
-typedef enum SpecialContenderResult {
-    didNotFinished = -2,
-    didNotRace     = -1,
-} SpecialContenderResult;
+typedef enum ContenderResult {
+    DNF    = 0, // Dod not finished (lose)
+    place1 = 1,
+    place2 = 2,
+    place3 = 3,
+    DNR    = 101, // Did not race
+} ContenderResult;
 
 typedef enum FieldBetMarketType {
     outright = 0x01,
