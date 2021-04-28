@@ -286,7 +286,14 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
 
-                if (bettingsViewCache.mappings->Exists(MappingKey{MappingType(mapTx->nMType), mapTx->nId}))
+                auto mappingType = MappingType(mapTx->nMType);
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight() &&
+                   (mappingType == individualSportMapping || mappingType == contenderMapping ) )
+                {
+                    return error("CheckBettingTX: Spork is not active for mapping type %lu!", mappingType);
+                }
+
+                if (bettingsViewCache.mappings->Exists(MappingKey{mappingType, mapTx->nId}))
                     return error("CheckBettingTX: trying to create existed mapping!");
                 break;
             }
@@ -803,8 +810,15 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
 
+                auto mappingType = MappingType(mapTx->nMType);
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight() &&
+                   (mappingType == individualSportMapping || mappingType == contenderMapping ) )
+                {
+                    break;
+                }
+
                 LogPrint("wagerr", "CMapping: type: %lu, id: %lu, name: %s\n", mapTx->nMType, mapTx->nId, mapTx->sName);
-                if (!bettingsViewCache.mappings->Write(MappingKey{MappingType(mapTx->nMType), mapTx->nId}, CMappingDB{mapTx->sName})) {
+                if (!bettingsViewCache.mappings->Write(MappingKey{mappingType, mapTx->nId}, CMappingDB{mapTx->sName})) {
                     if (!wagerrProtocolV3) {
                         // save failed tx to db, for avoiding undo issues
                         bettingsViewCache.SaveFailedTx(bettingTxId);
@@ -1454,11 +1468,16 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 if (!validOracleTx) break;
 
                 CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
+                auto mappingType = MappingType(mapTx->nMType);
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight() &&
+                   (mappingType == individualSportMapping || mappingType == contenderMapping ) )
+                {
+                    return error("CheckBettingTX: Spork is not active for mapping type %lu!", mappingType);
+                }
 
                 LogPrintf("CMapping: type: %lu, id: %lu, name: %s\n", mapTx->nMType, mapTx->nId, mapTx->sName);
 
-                MappingKey key{(MappingType)mapTx->nMType, mapTx->nId};
-
+                MappingKey key{mappingType, mapTx->nId};
                 if (bettingsViewCache.mappings->Exists(key)) {
                     if (!bettingsViewCache.mappings->Erase(key)) {
                         LogPrintf("Revert failed!\n");
