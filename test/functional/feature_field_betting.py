@@ -619,6 +619,7 @@ class BettingTest(BitcoinTestFramework):
         self.check_event()
         self.check_event_update_odds()
         self.check_event_zeroing_odds()
+        # TODO: check big size transactions (lots of contenders)
         # self.check_field_bet()
         # self.check_parlays_field_bet()
         # self.check_timecut_refund()

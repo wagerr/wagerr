@@ -242,6 +242,95 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 }
                 break;
             }
+            case fBetTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldBetTx");
+
+                // Validate bet amount so its between 25 - 10000 WGR inclusive.
+                if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                    return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
+                }
+
+                CFieldBetTx* betTx = (CFieldBetTx*) bettingTx.get();
+                CFieldEventDB fEvent;
+                if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{betTx->nEventId}, fEvent)) {
+                    return error("CheckBettingTX: Failed to find field event %lu!", betTx->nEventId);
+                }
+
+                if (bettingsViewCache.fieldResults->Exists(FieldEventResultKey{betTx->nEventId})) {
+                    return error("CheckBettingTX: Bet placed to resulted field event %lu!", betTx->nEventId);
+                }
+
+                if (!fEvent.IsMarketOpen((FieldBetMarketType)betTx->nMarketType)) {
+                    return error("CheckBettingTX: market %lu is closed for event %lu!", betTx->nMarketType, betTx->nEventId);
+                }
+
+                if (fEvent.contendersWinOdds.find(betTx->nContenderId) == fEvent.contendersWinOdds.end()) {
+                    return error("CheckBettingTX: Unknown contenderId %lu for event %lu!", betTx->nContenderId, betTx->nEventId);
+                }
+
+                if (fEvent.contendersWinOdds[betTx->nContenderId] == 0) {
+                    return error("CheckBettingTX: Bet odds is zero for Event %lu contenderId %d!", betTx->nEventId, betTx->nContenderId);
+                }
+
+                break;
+            }
+            case fParlayBetTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldParlayBetTx");
+
+                // Validate bet amount so its between 25 - 10000 WGR inclusive.
+                if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                    return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
+                }
+
+                CFieldParlayBetTx* betTx = (CFieldParlayBetTx*) bettingTx.get();
+                std::vector<CFieldBetTx> &legs = betTx->legs;
+
+                if (legs.size() > Params().MaxParlayLegs()) {
+                    return error("CheckBettingTX: The invalid field parlay bet count of legs!");
+                }
+
+                // check event ids in legs and deny if some is equal
+                {
+                    std::set<uint32_t> ids;
+                    for (const auto& leg : legs) {
+                        if (ids.find(leg.nEventId) != ids.end())
+                            return error("CheckBettingTX: Parlay bet has some legs with same event id!");
+                        else
+                            ids.insert(leg.nEventId);
+                    }
+                }
+
+                for (const auto& leg : legs) {
+                    CFieldEventDB fEvent;
+                    if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{leg.nEventId}, fEvent)) {
+                        return error("CheckBettingTX: Failed to find field event %lu!", leg.nEventId);
+                    }
+
+                    if (bettingsViewCache.fieldResults->Exists(FieldEventResultKey{leg.nEventId})) {
+                        return error("CheckBettingTX: Bet placed to resulted field event %lu!", leg.nEventId);
+                    }
+
+                    if (!fEvent.IsMarketOpen((FieldBetMarketType)leg.nMarketType)) {
+                        return error("CheckBettingTX: market %lu is closed for event %lu!", leg.nMarketType, leg.nEventId);
+                    }
+
+                    if (fEvent.contendersWinOdds.find(leg.nContenderId) == fEvent.contendersWinOdds.end()) {
+                        return error("CheckBettingTX: Unknown contenderId %lu for event %lu!", leg.nContenderId, leg.nEventId);
+                    }
+
+                    if (fEvent.contendersWinOdds[leg.nContenderId] == 0) {
+                        return error("CheckBettingTX: Bet odds is zero for Event %lu contenderId %d!", leg.nEventId, leg.nContenderId);
+                    }
+
+                    if (fEvent.nStage != 0) {
+                        return error("CheckBettingTX: event %lu cannot be part of parlay bet!", leg.nEventId);
+                    }
+                }
+
+                break;
+            }
             case cgBetTxType:
             {
                 if (height >= Params().QuickGamesEndHeight()) {
@@ -382,7 +471,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldZeroingOddsTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
@@ -394,7 +483,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             }
             case fResultTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldResultTx!");
                 if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
@@ -757,6 +846,105 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
                     bettingsViewCache.bets->Write(PeerlessBetKey{static_cast<uint32_t>(height), outPoint}, CPeerlessBetDB(betAmount, address, legs, lockedEvents, blockTime));
                 }
+                break;
+            }
+            case fBetTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+
+                CFieldBetTx* fBetTx = (CFieldBetTx*) bettingTx.get();
+                LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
+                    fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nMarketType);
+
+                CFieldEventDB fEvent, fCachedEvent;
+                FieldEventKey fEventKey{fBetTx->nEventId};
+                // get locked event from upper level cache for getting correct odds
+                if (bettingsView->fieldEvents->Read(fEventKey, fCachedEvent) ||
+                    bettingsViewCache.fieldEvents->Read(fEventKey, fEvent))
+                {
+                    LogPrintf("Failed to find event!\n");
+                    break;
+                }
+
+                LogPrint("wagerr", "fCachedEvent:\n");
+                for (const auto& contender : fCachedEvent.contendersWinOdds) {
+                    LogPrint("wagerr", "contenderId %lu : odds %lu\n", contender.first, contender.second);
+                }
+
+                // todok: need this potential liability stats (cachedEvent dont needed than)?
+                // save prev event state to undo
+                // bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
+                // Если апдейта не будет, то андушки тоже не нужны (ждем ответ заказчика)
+                // if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
+                //     // should not happen ever
+                //     LogPrintf("Failed to update event!\n");
+                //     break;
+                // }
+
+                CFieldLegDB fLeg{fBetTx->nEventId, (FieldBetMarketType)fBetTx->nMarketType, fBetTx->nContenderId};
+                if (!bettingsViewCache.fieldBets->Write(
+                    FieldBetKey{static_cast<uint32_t>(height), outPoint},
+                    CFieldBetDB(betAmount, address, {fLeg}, {fCachedEvent}, blockTime)))
+                {
+                    LogPrintf("Failed to write bet!\n");
+                    break;
+                }
+
+                break;
+            }
+            case fParlayBetTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+
+                CFieldParlayBetTx* fParlayBetTx = (CFieldParlayBetTx*) bettingTx.get();
+                std::vector<CFieldEventDB> lockedEvents;
+                std::vector<CFieldLegDB> legs;
+
+                // convert tx legs format to db
+                LogPrint("wagerr", "FieldParlayBet: legs: ");
+                for (const auto& leg : fParlayBetTx->legs) {
+                    LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
+                        leg.nEventId, leg.nContenderId, leg.nMarketType);
+                    legs.emplace_back(leg.nEventId, (FieldBetMarketType)leg.nMarketType, leg.nContenderId);
+                }
+
+                // std::vector<CBettingUndoDB> vUndos;
+                for (const auto& leg : legs) {
+                    CFieldEventDB fEvent, fCachedEvent;
+                    FieldEventKey fEventKey{leg.nEventId};
+                    // get locked event from upper level cache for getting correct odds
+                    if (bettingsView->fieldEvents->Read(fEventKey, fCachedEvent) ||
+                        bettingsViewCache.fieldEvents->Read(fEventKey, fEvent))
+                    {
+                        LogPrintf("Failed to find event!\n");
+                        break;
+                    }
+
+                    LogPrint("wagerr", "fCachedEvent:\n");
+                    for (const auto& contender : fCachedEvent.contendersWinOdds) {
+                        LogPrint("wagerr", "contenderId %lu : odds %lu\n", contender.first, contender.second);
+                    }
+
+                    lockedEvents.emplace_back(fCachedEvent);
+
+                    // todok: need this potential liability stats (cachedEvent dont needed than)?
+                    // vUndos.emplace_back(BettingUndoVariant{fEvent}, (uint32_t)height);
+                    // if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
+                    //     // should not happen ever
+                    //     LogPrintf("Failed to update event!\n");
+                    //     break;
+                    // }
+                }
+
+                if (!legs.empty()) {
+                    // save prev event state to undo
+                    // bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
+                    bettingsViewCache.fieldBets->Write(
+                        FieldBetKey{static_cast<uint32_t>(height), outPoint},
+                        CFieldBetDB(betAmount, address, legs, lockedEvents, blockTime)
+                    );
+                }
+
                 break;
             }
             case cgBetTxType:
@@ -1276,7 +1464,6 @@ CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockH
     }
 
     return expectedMint;
-
 }
 
 /*
@@ -1423,6 +1610,63 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     // erase bet from db
                     PeerlessBetKey key{static_cast<uint32_t>(height), outPoint};
                     bettingsViewCache.bets->Erase(key);
+                }
+
+                break;
+            }
+            case fBetTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+
+                CFieldBetTx* fBetTx = (CFieldBetTx*) bettingTx.get();
+                LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
+                    fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nMarketType);
+
+                if (bettingsViewCache.fieldEvents->Exists(FieldEventKey{fBetTx->nEventId})) {
+                    LogPrintf("Failed to find event!\n");
+                    break;
+                }
+
+                // todok: need this? (if liability stats)
+                // if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                //     LogPrintf("Revert failed!\n");
+                //     return false;
+                // }
+
+                bettingsViewCache.fieldBets->Erase(FieldBetKey{static_cast<uint32_t>(height), outPoint});
+
+                break;
+            }
+            case fParlayBetTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+
+                CFieldParlayBetTx* fParlayBetTx = (CFieldParlayBetTx*) bettingTx.get();
+                std::vector<CFieldLegDB> legs;
+
+                LogPrint("wagerr", "FieldParlayBet: legs: ");
+                for (const auto& leg : fParlayBetTx->legs) {
+                    LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
+                        leg.nEventId, leg.nContenderId, leg.nMarketType);
+                    legs.emplace_back(leg.nEventId, (FieldBetMarketType)leg.nMarketType, leg.nContenderId);
+                }
+
+                bool allEventsExist = true;
+                for (const auto& leg : legs) {
+                    if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{leg.nEventId})) {
+                        LogPrint("wagerr", "Failed to find event %lu!\n", leg.nEventId);
+                        allEventsExist = false;
+                        break;
+                    }
+                }
+
+                if (!legs.empty() && allEventsExist) {
+                    // todok: need this? (if liability stats needed)
+                    // if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                    //     LogPrintf("Revert failed!\n");
+                    //     return false;
+                    // }
+                    bettingsViewCache.fieldBets->Erase(FieldBetKey{static_cast<uint32_t>(height), outPoint});
                 }
 
                 break;

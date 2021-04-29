@@ -311,6 +311,8 @@ public:
         contendersWinOdds = tx.contendersWinOdds;
     }
 
+    bool IsMarketOpen(const FieldBetMarketType marketType);
+
     ADD_SERIALIZE_METHODS;
 
     template <typename Stream, typename Operation>
@@ -341,6 +343,11 @@ public:
     explicit CFieldEventResultDB(const uint32_t eventId, const uint8_t resultType)
         : nEventId(eventId)
         , nResultType(resultType)
+    {}
+    explicit CFieldEventResultDB(const uint32_t eventId, const uint8_t resultType, const std::map<uint32_t, uint8_t> mContendersResults)
+        : nEventId(eventId)
+        , nResultType(resultType)
+        , contendersResults(mContendersResults)
     {}
 
     ADD_SERIALIZE_METHODS;
@@ -490,10 +497,15 @@ class CFieldLegDB
 public:
     uint32_t nEventId;
     FieldBetMarketType nMarketType;
-    uint32_t nWinnerId;
+    uint32_t nContenderId;
 
     // Default constructor.
     explicit CFieldLegDB() {}
+    explicit CFieldLegDB(const uint32_t eventId, const FieldBetMarketType marketType, const uint32_t contenderId)
+        : nEventId(eventId)
+        , nMarketType(marketType)
+        , nContenderId(contenderId)
+    {}
 
     ADD_SERIALIZE_METHODS;
 
@@ -509,7 +521,7 @@ public:
             market = (uint8_t) nMarketType;
             READWRITE(market);
         }
-        READWRITE(nWinnerId);
+        READWRITE(nContenderId);
     }
 };
 
@@ -520,7 +532,7 @@ public:
     CBitcoinAddress playerAddress;
     // one elem means single bet, else it is parlay bet, max size = 5
     std::vector<CFieldLegDB> legs;
-    // vector for member event condition
+    // vector for member event condition, max size = 5
     std::vector<CFieldEventDB> lockedEvents;
     int64_t betTime;
     BetResultType resultType = BetResultType::betResultUnknown;
@@ -528,7 +540,18 @@ public:
     uint32_t payoutHeight = 0;
 
     // Default Constructor.
-    explicit CFieldBetDB() { }
+    explicit CFieldBetDB() {}
+    explicit CFieldBetDB(const CAmount amount,
+                         const CBitcoinAddress address,
+                         const std::vector<CFieldLegDB> vLegs,
+                         const std::vector<CFieldEventDB> vEvents,
+                         const int64_t time
+    )   : betAmount(amount)
+        , playerAddress(address)
+        , legs(vLegs)
+        , lockedEvents(vEvents)
+        , betTime(time)
+    {}
 
     bool IsCompleted() const { return completed; }
     void SetCompleted() { completed = true; }
