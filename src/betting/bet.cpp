@@ -265,11 +265,11 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     return error("CheckBettingTX: market %lu is closed for event %lu!", betTx->nMarketType, betTx->nEventId);
                 }
 
-                if (fEvent.contendersWinOdds.find(betTx->nContenderId) == fEvent.contendersWinOdds.end()) {
+                if (fEvent.contenders.find(betTx->nContenderId) == fEvent.contenders.end()) {
                     return error("CheckBettingTX: Unknown contenderId %lu for event %lu!", betTx->nContenderId, betTx->nEventId);
                 }
 
-                if (fEvent.contendersWinOdds[betTx->nContenderId] == 0) {
+                if (fEvent.contenders[betTx->nContenderId].nOutrightOdds == 0) {
                     return error("CheckBettingTX: Bet odds is zero for Event %lu contenderId %d!", betTx->nEventId, betTx->nContenderId);
                 }
 
@@ -316,11 +316,11 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         return error("CheckBettingTX: market %lu is closed for event %lu!", leg.nMarketType, leg.nEventId);
                     }
 
-                    if (fEvent.contendersWinOdds.find(leg.nContenderId) == fEvent.contendersWinOdds.end()) {
+                    if (fEvent.contenders.find(leg.nContenderId) == fEvent.contenders.end()) {
                         return error("CheckBettingTX: Unknown contenderId %lu for event %lu!", leg.nContenderId, leg.nEventId);
                     }
 
-                    if (fEvent.contendersWinOdds[leg.nContenderId] == 0) {
+                    if (fEvent.contenders[leg.nContenderId].nOutrightOdds == 0) {
                         return error("CheckBettingTX: Bet odds is zero for Event %lu contenderId %d!", leg.nEventId, leg.nContenderId);
                     }
 
@@ -503,7 +503,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, (uint32_t) result.first}))
                         return error("CheckBettingTx: trying to create result for field event with unknown contender %lu!", result.first);
 
-                    if (fEvent.contendersWinOdds.find(result.first) == fEvent.contendersWinOdds.end())
+                    if (fEvent.contenders.find(result.first) == fEvent.contenders.end())
                         return error("CheckBettingTx: there is no contender %lu in event %lu!", result.first, fResultTx->nEventId);
 
                     if (result.second != ContenderResult::place1 ||
@@ -867,19 +867,21 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 }
 
                 LogPrint("wagerr", "fCachedEvent:\n");
-                for (const auto& contender : fCachedEvent.contendersWinOdds) {
-                    LogPrint("wagerr", "contenderId %lu : odds %lu\n", contender.first, contender.second);
+                for (const auto& contender : fCachedEvent.contenders) {
+                    LogPrint("wagerr", "contenderId %lu : odds %lu\n", contender.first, contender.second.nOutrightOdds);
                 }
 
-                // todok: need this potential liability stats (cachedEvent dont needed than)?
                 // save prev event state to undo
-                // bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
-                // Если апдейта не будет, то андушки тоже не нужны (ждем ответ заказчика)
-                // if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
-                //     // should not happen ever
-                //     LogPrintf("Failed to update event!\n");
-                //     break;
-                // }
+                bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
+
+                // todok: need switch by marketType (different bets count?)
+                fEvent.contenders[fBetTx->nContenderId].nBets += 1;
+
+                if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
+                    // should not happen ever
+                    LogPrintf("Failed to update field event!\n");
+                    break;
+                }
 
                 CFieldLegDB fLeg{fBetTx->nEventId, (FieldBetMarketType)fBetTx->nMarketType, fBetTx->nContenderId};
                 if (!bettingsViewCache.fieldBets->Write(
@@ -908,7 +910,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     legs.emplace_back(leg.nEventId, (FieldBetMarketType)leg.nMarketType, leg.nContenderId);
                 }
 
-                // std::vector<CBettingUndoDB> vUndos;
+                std::vector<CBettingUndoDB> vUndos;
                 for (const auto& leg : legs) {
                     CFieldEventDB fEvent, fCachedEvent;
                     FieldEventKey fEventKey{leg.nEventId};
@@ -921,24 +923,28 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     }
 
                     LogPrint("wagerr", "fCachedEvent:\n");
-                    for (const auto& contender : fCachedEvent.contendersWinOdds) {
-                        LogPrint("wagerr", "contenderId %lu : odds %lu\n", contender.first, contender.second);
+                    for (const auto& contender : fCachedEvent.contenders) {
+                        LogPrint("wagerr", "contenderId %lu : odds %lu\n", contender.first, contender.second.nOutrightOdds);
                     }
 
                     lockedEvents.emplace_back(fCachedEvent);
+                    vUndos.emplace_back(BettingUndoVariant{fEvent}, (uint32_t)height);
+                    // todok: need switch by marketType (different odds)
+                    CAmount payout, burn;
+                    CalculatePayoutBurnAmounts(betAmount, fCachedEvent.contenders[leg.nContenderId].nOutrightOdds, payout, burn);
+                    fEvent.contenders[leg.nContenderId].nPotentialLiability += payout / COIN;
+                    fEvent.contenders[leg.nContenderId].nBets += 1;
 
-                    // todok: need this potential liability stats (cachedEvent dont needed than)?
-                    // vUndos.emplace_back(BettingUndoVariant{fEvent}, (uint32_t)height);
-                    // if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
-                    //     // should not happen ever
-                    //     LogPrintf("Failed to update event!\n");
-                    //     break;
-                    // }
+                    if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
+                        // should not happen ever
+                        LogPrintf("Failed to update field event!\n");
+                        break;
+                    }
                 }
 
                 if (!legs.empty()) {
                     // save prev event state to undo
-                    // bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
                     bettingsViewCache.fieldBets->Write(
                         FieldBetKey{static_cast<uint32_t>(height), outPoint},
                         CFieldBetDB(betAmount, address, legs, lockedEvents, blockTime)
@@ -1118,7 +1124,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
 
                     for (const auto& contender : fUpdateOddsTx->contendersWinOdds) {
-                        fEvent.contendersWinOdds[contender.first] = contender.second;
+                        fEvent.contenders[contender.first].nOutrightOdds = contender.second;
                     }
 
                     if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
@@ -1144,8 +1150,8 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     // save prev event state to undo
                     bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
 
-                    for (auto& contender : fEvent.contendersWinOdds) {
-                        contender.second = 0;
+                    for (auto& contender : fEvent.contenders) {
+                        contender.second.nOutrightOdds = 0;
                     }
 
                     if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
@@ -1627,11 +1633,10 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     break;
                 }
 
-                // todok: need this? (if liability stats)
-                // if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                //     LogPrintf("Revert failed!\n");
-                //     return false;
-                // }
+                if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                    LogPrintf("Revert failed!\n");
+                    return false;
+                }
 
                 bettingsViewCache.fieldBets->Erase(FieldBetKey{static_cast<uint32_t>(height), outPoint});
 
@@ -1661,11 +1666,11 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 }
 
                 if (!legs.empty() && allEventsExist) {
-                    // todok: need this? (if liability stats needed)
-                    // if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                    //     LogPrintf("Revert failed!\n");
-                    //     return false;
-                    // }
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+
                     bettingsViewCache.fieldBets->Erase(FieldBetKey{static_cast<uint32_t>(height), outPoint});
                 }
 

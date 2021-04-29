@@ -47,7 +47,7 @@ MappingType CMappingDB::FromTypeName(const std::string& name)
 }
 
 bool CFieldEventDB::IsMarketOpen(const FieldBetMarketType type) {
-    size_t contendersCount = this->contendersWinOdds.size();
+    size_t contendersCount = this->contenders.size();
     switch(type) {
         case outright:
             break; // always open

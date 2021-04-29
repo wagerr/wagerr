@@ -227,12 +227,12 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
         evt.push_back(Pair("round", mapping.sName));
 
         UniValue contenders(UniValue::VARR);
-        for (const auto& contender_it : fEvent.contendersWinOdds) {
+        for (const auto& contender_it : fEvent.contenders) {
             UniValue contender(UniValue::VOBJ);
             if (!bettingsView->mappings->Read(MappingKey{contenderMapping, contender_it.first}, mapping))
                 continue;
             contender.push_back(Pair("name", mapping.sName));
-            contender.push_back(Pair("odds", (uint64_t) contender_it.second));
+            contender.push_back(Pair("odds", (uint64_t) contender_it.second.nOutrightOdds));
             contenders.push_back(contender);
         }
         evt.push_back(Pair("contenders", contenders));
@@ -2050,6 +2050,208 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
 
     EnsureWalletIsUnlocked();
     EnsureEnoughWagerr(nAmount);
+
+    CBitcoinAddress address("");
+
+    // Unhex the validated bet opcode
+    std::vector<unsigned char> vectorValue;
+    std::string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
+UniValue placefieldbet(const UniValue& params, bool fHelp) {
+    if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
+    }
+
+    if (fHelp || params.size() < 4 || params.size() > 6) {
+        throw std::runtime_error(
+            "placefieldbet event_id market_type contender_id amount ( \"comment\" \"comment-to\" )\n"
+            "\nWARNING - Betting closes 20 minutes before field event start time.\n"
+            "Any bets placed after this time will be invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on an field event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. event_id        (numeric, required) The field event id to bet on.\n"
+            "2. market_type     (numeric, required) 1 means outright,\n"
+            "                                       2 means place,\n"
+            "                                       3 means show."
+            "3. contender_id    (numeric, required) The field event participant identifier."
+            "4. amount          (numeric, required) The amount in wgr to send.\n"
+            "5. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "6. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
+            "                             to which you're sending the transaction. This is not part of the \n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placefieldbet", "1 1 100 25 \"donation\" \"seans outpost\"") +
+            HelpExampleRpc("placefieldbet", "1 1 100 25 \"donation\" \"seans outpost\""));
+    }
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    CAmount nAmount = AmountFromValue(params[2]);
+    // Validate bet amount so its between 25 - 10000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.");
+    }
+
+    // Wallet comments
+    CWalletTx wtx;
+    if (params.size() > 4 && !params[4].isNull() && !params[4].get_str().empty())
+        wtx.mapValue["comment"] = params[4].get_str();
+    if (params.size() > 5 && !params[5].isNull() && !params[5].get_str().empty())
+        wtx.mapValue["to"] = params[5].get_str();
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    uint32_t eventId = static_cast<uint32_t>(params[0].get_int64());
+    FieldBetMarketType marketType = static_cast<FieldBetMarketType>(params[1].get_int());
+    uint32_t contenderId = static_cast<uint32_t>(params[2].get_int64());
+
+    if (marketType < outright || marketType > show) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet market type for FieldEvent: " + std::to_string(eventId));
+    }
+
+    CFieldEventDB fEvent;
+    if (!bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
+    }
+
+    const auto& contender_it = fEvent.contenders.find(contenderId);
+    if (contender_it == fEvent.contenders.end()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
+    }
+
+    if (contender_it->second.nOutrightOdds == 0) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
+    }
+
+    CFieldBetTx fBetTx{eventId, marketType, contenderId};
+
+    // TODO `address` isn't used when adding the following transaction to the
+    // blockchain, so ideally it would not need to be supplied to `SendMoney`.
+    // Ideally an alternative function, such as `BurnMoney`, would be developed
+    // and used, which would take the `OP_RETURN` value in place of the address
+    // value.
+    // Note that, during testing, the `opReturn` value is added to the
+    // blockchain incorrectly if its length is less than 5. This behaviour would
+    // ideally be investigated and corrected/justified when time allows.
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) fBetTxType << fBetTx;
+    std::string opCode = HexStr(ss.begin(), ss.end());
+
+    CBitcoinAddress address("");
+    // Unhex the validated bet opcode
+    std::vector<unsigned char> vectorValue;
+    std::string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
+UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
+    if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
+    }
+
+    if (fHelp || params.size() < 2 || params.size() > 4) {
+        throw std::runtime_error(
+            "placefieldparlaybet [{\"eventId\": event_id, \"marketType\": market_type, \"contenderId\": contender_id}, ...] amount ( \"comment\" \"comment-to\" )\n"
+            "\nWARNING - Betting closes 20 minutes before field event start time.\n"
+            "Any bets placed after this time will be invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on an field event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. Legs array     (array of json objects, required) The list of field bets.\n"
+            "  [\n"
+            "    {\n"
+            "      \"eventId\": id               (numeric, required) The field event id to bet on.\n"
+            "      \"marketType\": market_type   (numeric, required) 1 means outright,\n"
+            "                                                        2 means place,\n"
+            "                                                        3 means show."
+            "      \"contenderId\": contender_id (numeric, required) The field event participant identifier."
+            "    }\n"
+            "  ]\n"
+            "2. amount          (numeric, required) The amount in wgr to send. Min: 25, max: 4000.\n"
+            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for.\n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization\n"
+            "                             to which you're sending the transaction. This is not part of the\n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placefieldparlaybet", "\"[{\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}, {\"eventId\": 2, \"marketType\": 2, \"contenderId\": 200}]\" 25 \"Parlay bet\" \"seans outpost\"") +
+            HelpExampleRpc("placefieldparlaybet", "\"[{\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}, {\"eventId\": 322,\"marketType\": 2, \"contenderId\": 200}]\", 25, \"Parlay bet\", \"seans outpost\""));
+    }
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    CAmount nAmount = AmountFromValue(params[1]);
+    // Validate bet amount so its between 25 - 10000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.");
+    }
+
+    // Wallet comments
+    CWalletTx wtx;
+    if (params.size() > 2 && !params[2].isNull() && !params[2].get_str().empty())
+        wtx.mapValue["comment"] = params[2].get_str();
+    if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
+        wtx.mapValue["to"] = params[3].get_str();
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    CFieldParlayBetTx fParlayBetTx;
+    UniValue legsArr = params[0].get_array();
+    for (uint32_t i = 0; i < legsArr.size(); i++) {
+        const UniValue obj = legsArr[i].get_obj();
+
+        uint32_t eventId = static_cast<uint32_t>(find_value(obj, "eventId").get_int64());
+        FieldBetMarketType marketType = static_cast<FieldBetMarketType>(find_value(obj, "marketType").get_int());
+        uint32_t contenderId = static_cast<uint32_t>(find_value(obj, "contenderId").get_int64());
+
+        if (marketType < outright || marketType > show) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet market type for FieldEvent: " + std::to_string(eventId));
+        }
+
+        CFieldEventDB fEvent;
+        if (!bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
+        }
+
+        const auto& contender_it = fEvent.contenders.find(contenderId);
+        if (contender_it == fEvent.contenders.end()) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
+        }
+
+        if (contender_it->second.nOutrightOdds == 0) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
+        }
+
+        if (fEvent.nStage != 0) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: event " + std::to_string(eventId) + " cannot be part of parlay bet");
+        }
+
+        fParlayBetTx.legs.emplace_back(eventId, marketType, contenderId);
+    }
+
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) fParlayBetTxType << fParlayBetTx;
+    std::string opCode = HexStr(ss.begin(), ss.end());
 
     CBitcoinAddress address("");
 

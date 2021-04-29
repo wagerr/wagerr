@@ -264,7 +264,6 @@ public:
     uint32_t nHomeScore;
     uint32_t nAwayScore;
 
-
     // Default Constructor.
     explicit CPeerlessResultDB() {}
 
@@ -286,6 +285,28 @@ public:
 // Field event key (individual sport)
 using FieldEventKey = EventKey;
 
+typedef struct ContenderInfo {
+    uint32_t nOutrightOdds = 0;
+    uint32_t nBets = 0;
+    uint32_t nPotentialLiability = 0;
+
+    explicit ContenderInfo() {}
+    explicit ContenderInfo(const uint32_t outrightOdds)
+        : nOutrightOdds(outrightOdds)
+        , nBets(0)
+        , nPotentialLiability(0)
+    {}
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nOutrightOdds);
+        READWRITE(nBets);
+        READWRITE(nPotentialLiability);
+    }
+} ContenderInfo;
+
 class CFieldEventDB
 {
 public:
@@ -295,8 +316,8 @@ public:
     uint32_t nSport        = 0;
     uint32_t nTournament = 0;
     uint32_t nStage      = 0;
-    // contenderId : wind odds
-    std::map<uint32_t, uint32_t> contendersWinOdds;
+    // contenderId : ContenderInfo
+    std::map<uint32_t, ContenderInfo> contenders;
 
     // Default Constructor.
     explicit CFieldEventDB() {}
@@ -308,7 +329,9 @@ public:
         nSport = tx.nSport;
         nTournament = tx.nTournament;
         nStage = tx.nStage;
-        contendersWinOdds = tx.contendersWinOdds;
+        for (const auto& contenderOdds : tx.contendersWinOdds) {
+            contenders[contenderOdds.first] = ContenderInfo{contenderOdds.second};
+        }
     }
 
     bool IsMarketOpen(const FieldBetMarketType marketType);
@@ -323,7 +346,7 @@ public:
         READWRITE(nSport);
         READWRITE(nTournament);
         READWRITE(nStage);
-        READWRITE(contendersWinOdds);
+        READWRITE(contenders);
     }
 };
 

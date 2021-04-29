@@ -262,6 +262,11 @@ public:
 
     // Default constructor.
     CFieldBetTx() {}
+    CFieldBetTx(const uint32_t eventId, const uint8_t marketType, const uint32_t contenderId)
+        : nEventId(eventId)
+        , nMarketType(marketType)
+        , nContenderId(contenderId)
+    {}
 
     BetTxTypes GetTxType() const override { return fBetTxType; }
 
@@ -270,6 +275,7 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nEventId);
+        READWRITE(nMarketType);
         READWRITE(nContenderId);
     }
 };
