@@ -2097,7 +2097,7 @@ UniValue placefieldbet(const UniValue& params, bool fHelp) {
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
 
-    CAmount nAmount = AmountFromValue(params[2]);
+    CAmount nAmount = AmountFromValue(params[3]);
     // Validate bet amount so its between 25 - 10000 WGR inclusive.
     if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.");
@@ -2567,6 +2567,66 @@ UniValue geteventliability(const UniValue& params, bool fHelp)
     }
 
     return event;
+}
+
+/**
+ * Get total liability for each field event that is currently active.
+ *
+ * @param params The RPC params consisting of the field event id.
+ * @param fHelp  Help text
+ * @return
+ */
+UniValue getfieldeventliability(const UniValue& params, bool fHelp)
+{
+  if (fHelp || (params.size() != 1))
+        throw std::runtime_error(
+            "getfieldeventliability\n"
+            "Return the payout of each field event.\n"
+            "\nArguments:\n"
+            "1. FieldEvent id (numeric, required) The field event id required for get liability.\n"
+
+            "\nResult:\n"
+            "  {\n"
+            "    \"event-id\": \"xxx\", (numeric) The id of the field event.\n"
+            "    \"event-status\": \"status\", (string) The status of the event (running | resulted).\n"
+            "    \"contenders\":\n"
+            "      [\n"
+            "         {\n"
+            "           \"contender-id\" : xxx (numeric) contender id,\n"
+            "           \"outright-bets\": \"xxx\", (numeric) The number of bets to outright market (parlays included).\n"
+            "           \"outright-liability\": \"xxx\", (numeric) The outright market potentional liability (without parlays).\n"
+            "         }\n"
+            "      ]\n"
+            "  }\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getfieldeventliability", "10") + HelpExampleRpc("getfieldeventliability", "10"));
+
+    LOCK(cs_main);
+
+    uint32_t eventId = static_cast<uint32_t>(params[0].get_int());
+    UniValue vEvent(UniValue::VOBJ);
+    CFieldEventDB fEvent;
+    if (bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
+        vEvent.push_back(Pair("event-id", (uint64_t) fEvent.nEventId));
+        if (!bettingsView->fieldResults->Exists(FieldEventResultKey{eventId})) {
+            vEvent.push_back(Pair("event-status", "running"));
+            UniValue vContenders(UniValue::VARR);
+            for (const auto& contender : fEvent.contenders) {
+                UniValue vContender(UniValue::VOBJ);
+                vContender.push_back(Pair("contender-id", (uint64_t) contender.first));
+                vContender.push_back(Pair("outright-bets", (uint64_t) contender.second.nBets));
+                vContender.push_back(Pair("outright-liability", (uint64_t) contender.second.nPotentialLiability));
+                vContenders.push_back(vContender);
+            }
+            vEvent.push_back(Pair("contenders", vContenders));
+        }
+        else {
+            vEvent.push_back(Pair("event-status", "resulted"));
+        }
+    }
+
+    return vEvent;
 }
 
 UniValue sendtoaddress(const UniValue& params, bool fHelp)

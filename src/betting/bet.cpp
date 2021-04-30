@@ -506,10 +506,10 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     if (fEvent.contenders.find(result.first) == fEvent.contenders.end())
                         return error("CheckBettingTx: there is no contender %lu in event %lu!", result.first, fResultTx->nEventId);
 
-                    if (result.second != ContenderResult::place1 ||
-                        result.second != ContenderResult::place2 ||
-                        result.second != ContenderResult::place3 ||
-                        result.second != ContenderResult::DNF    ||
+                    if (result.second != ContenderResult::place1 &&
+                        result.second != ContenderResult::place2 &&
+                        result.second != ContenderResult::place3 &&
+                        result.second != ContenderResult::DNF    &&
                         result.second != ContenderResult::DNR )
                     {
                         return error("CheckBettingTx: trying to create result for field event with unknown result %lu!", result.second);
@@ -859,10 +859,13 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 CFieldEventDB fEvent, fCachedEvent;
                 FieldEventKey fEventKey{fBetTx->nEventId};
                 // get locked event from upper level cache for getting correct odds
-                if (bettingsView->fieldEvents->Read(fEventKey, fCachedEvent) ||
-                    bettingsViewCache.fieldEvents->Read(fEventKey, fEvent))
-                {
-                    LogPrintf("Failed to find event!\n");
+                if (!bettingsView->fieldEvents->Read(fEventKey, fCachedEvent)) {
+                    LogPrint("wagerr", "Failed to find field event %lu in upper level cache!", fBetTx->nEventId);
+                    break;
+                }
+
+                if (!bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
+                    LogPrint("wagerr", "Failed to find field event %lu!", fBetTx->nEventId);
                     break;
                 }
 
@@ -874,7 +877,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 // save prev event state to undo
                 bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
 
-                // todok: need switch by marketType (different bets count?)
+                // todok: need switch by marketType and calcualting odds
+                CAmount payout, burn;
+                CalculatePayoutBurnAmounts(betAmount, fCachedEvent.contenders[fBetTx->nContenderId].nOutrightOdds, payout, burn);
+                fEvent.contenders[fBetTx->nContenderId].nPotentialLiability += payout / COIN;
                 fEvent.contenders[fBetTx->nContenderId].nBets += 1;
 
                 if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
@@ -915,11 +921,14 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     CFieldEventDB fEvent, fCachedEvent;
                     FieldEventKey fEventKey{leg.nEventId};
                     // get locked event from upper level cache for getting correct odds
-                    if (bettingsView->fieldEvents->Read(fEventKey, fCachedEvent) ||
-                        bettingsViewCache.fieldEvents->Read(fEventKey, fEvent))
-                    {
-                        LogPrintf("Failed to find event!\n");
-                        break;
+                    if (!bettingsView->fieldEvents->Read(fEventKey, fCachedEvent)) {
+                        LogPrint("wagerr", "Failed to find field event %lu in upper level cache!", leg.nEventId);
+                        continue;
+                    }
+
+                    if (!bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
+                        LogPrint("wagerr", "Failed to find field event %lu!", leg.nEventId);
+                        continue;
                     }
 
                     LogPrint("wagerr", "fCachedEvent:\n");
@@ -929,17 +938,10 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                     lockedEvents.emplace_back(fCachedEvent);
                     vUndos.emplace_back(BettingUndoVariant{fEvent}, (uint32_t)height);
-                    // todok: need switch by marketType (different odds)
-                    CAmount payout, burn;
-                    CalculatePayoutBurnAmounts(betAmount, fCachedEvent.contenders[leg.nContenderId].nOutrightOdds, payout, burn);
-                    fEvent.contenders[leg.nContenderId].nPotentialLiability += payout / COIN;
+                    // todok: need switch by marketType and calcualting odds
                     fEvent.contenders[leg.nContenderId].nBets += 1;
 
-                    if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
-                        // should not happen ever
-                        LogPrintf("Failed to update field event!\n");
-                        break;
-                    }
+                    bettingsViewCache.fieldEvents->Update(fEventKey, fEvent);
                 }
 
                 if (!legs.empty()) {
@@ -1628,7 +1630,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
                     fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nMarketType);
 
-                if (bettingsViewCache.fieldEvents->Exists(FieldEventKey{fBetTx->nEventId})) {
+                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fBetTx->nEventId})) {
                     LogPrintf("Failed to find event!\n");
                     break;
                 }

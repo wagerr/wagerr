@@ -62,6 +62,10 @@ std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut)
             return DeserializeBettingTx<CFieldZeroingOddsTx>(ss);
         case fResultTxType:
             return DeserializeBettingTx<CFieldResultTx>(ss);
+        case fBetTxType:
+            return DeserializeBettingTx<CFieldBetTx>(ss);
+        case fParlayBetTxType:
+            return DeserializeBettingTx<CFieldParlayBetTx>(ss);
         case plBetTxType:
             return DeserializeBettingTx<CPeerlessBetTx>(ss);
         case plResultTxType:

@@ -26,6 +26,7 @@ OPCODE_BTX_ZERO_ODDS = 0x0e
 OPCODE_BTX_FIELD_EVENT = 0x0f
 OPCODE_BTX_FIELD_UPDATE_ODDS = 0x10
 OPCODE_BTX_FIELD_ZEROING_ODDS = 0x11
+OPCODE_BTX_FIELD_RESULT = 0x12
 
 OPCODE_QG_DICE = 0x00
 
@@ -150,6 +151,17 @@ def make_field_update_odds(event_id, contenders_win_odds):
 def make_field_zeroing_odds(event_id):
     result = make_common_header(OPCODE_BTX_FIELD_ZEROING_ODDS)
     result = result + encode_int_little_endian(event_id, 4)
+    return result
+
+# Create a result for field event opcode
+def make_field_result(event_id, result_type, contenders_results):
+    result = make_common_header(OPCODE_BTX_FIELD_RESULT)
+    result = result + encode_int_little_endian(event_id, 4)
+    result = result + encode_int_little_endian(result_type, 1)
+    result = result + encode_int_little_endian(int(len(contenders_results)), 1) # map size
+    for contender_id, contender_result in contenders_results.items():
+        result = result + encode_int_little_endian(int(contender_id), 4)
+        result = result + encode_int_little_endian(int(contender_result), 1)
     return result
 
 # Create a moneyline odds update opcode.
