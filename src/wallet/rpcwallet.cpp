@@ -232,7 +232,9 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
             if (!bettingsView->mappings->Read(MappingKey{contenderMapping, contender_it.first}, mapping))
                 continue;
             contender.push_back(Pair("name", mapping.sName));
-            contender.push_back(Pair("odds", (uint64_t) contender_it.second.nOutrightOdds));
+            contender.push_back(Pair("outright-odds", (uint64_t) contender_it.second.nOutrightOdds));
+            contender.push_back(Pair("place-odds", (uint64_t) contender_it.second.nPlaceOdds));
+            contender.push_back(Pair("show-odds", (uint64_t) contender_it.second.nShowOdds));
             contenders.push_back(contender);
         }
         evt.push_back(Pair("contenders", contenders));
@@ -2131,7 +2133,7 @@ UniValue placefieldbet(const UniValue& params, bool fHelp) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
     }
 
-    if (contender_it->second.nOutrightOdds == 0) {
+    if (GetFieldBetPotentionalOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
     }
 
@@ -2233,12 +2235,16 @@ UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
         }
 
+        if (!fEvent.IsMarketOpen(marketType)) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: market " + std::to_string((uint8_t)marketType) + " is closed for event " + std::to_string(eventId));
+        }
+
         const auto& contender_it = fEvent.contenders.find(contenderId);
         if (contender_it == fEvent.contenders.end()) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
         }
 
-        if (contender_it->second.nOutrightOdds == 0) {
+        if (GetFieldBetPotentionalOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
         }
 
@@ -2615,8 +2621,12 @@ UniValue getfieldeventliability(const UniValue& params, bool fHelp)
             for (const auto& contender : fEvent.contenders) {
                 UniValue vContender(UniValue::VOBJ);
                 vContender.push_back(Pair("contender-id", (uint64_t) contender.first));
-                vContender.push_back(Pair("outright-bets", (uint64_t) contender.second.nBets));
-                vContender.push_back(Pair("outright-liability", (uint64_t) contender.second.nPotentialLiability));
+                vContender.push_back(Pair("outright-bets", (uint64_t) contender.second.nOutrightBets));
+                vContender.push_back(Pair("outright-liability", (uint64_t) contender.second.nOutrightPotentialLiability));
+                vContender.push_back(Pair("place-bets", (uint64_t) contender.second.nPlaceBets));
+                vContender.push_back(Pair("place-liability", (uint64_t) contender.second.nPlacePotentialLiability));
+                vContender.push_back(Pair("show-bets", (uint64_t) contender.second.nShowBets));
+                vContender.push_back(Pair("show-liability", (uint64_t) contender.second.nShowPotentialLiability));
                 vContenders.push_back(vContender);
             }
             vEvent.push_back(Pair("contenders", vContenders));

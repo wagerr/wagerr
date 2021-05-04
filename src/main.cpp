@@ -3148,7 +3148,7 @@ bool ConnectBlock(const CBlock& block, CValidationState& state, CBlockIndex* pin
         nExpectedMint += nExpectedBetMint;
     }
     if (pindex->nHeight >= Params().WagerrProtocolV1StartHeight()) {
-        // Protocol V1 has been retired 
+        // Protocol V1 has been retired
     } else {
         if (!IsBlockValueValid(block, nExpectedMint, nMint)) {
             return state.DoS(100, error("ConnectBlock() : reward pays too much (actual=%s vs limit=%s)",

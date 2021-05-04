@@ -15,6 +15,8 @@ class CChainGamesResultDB;
 class CPeerlessLegDB;
 class CPeerlessBaseEventDB;
 class CPayoutInfoDB;
+class CFieldLegDB;
+class CFieldEventDB;
 
 #define BET_ODDSDIVISOR 10000   // Odds divisor, Facilitates calculations with floating integers.
 #define BET_BURNXPERMILLE 60    // Burn promillage
@@ -199,5 +201,9 @@ bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesR
 std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent, const CPeerlessResultDB &result, const bool fWagerrProtocolV3);
 
 uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent);
+uint32_t GetFieldBetPotentionalOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent);
+
+uint32_t CalculatePlaceMarketOdds(const uint32_t eventGroupType, const uint32_t nOutrightOdds);
+uint32_t CalculateShowMarketOdds(const uint32_t eventGroupType, const uint32_t nOutrightOdds);
 
 #endif

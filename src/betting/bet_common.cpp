@@ -325,3 +325,59 @@ uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEvent
     }
     return 0;
 }
+
+uint32_t GetFieldBetPotentionalOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent)
+{
+    auto contender_it = lockedEvent.contenders.find(bet.nContenderId);
+    if (contender_it == lockedEvent.contenders.end()) {
+        return 0;
+    }
+
+    switch (bet.nMarketType)
+    {
+    case outright:
+        return contender_it->second.nOutrightOdds;
+    case place:
+        return contender_it->second.nPlaceOdds;
+    case show:
+        return contender_it->second.nShowOdds;
+    default:
+        return 0;
+    }
+}
+
+uint32_t CalculatePlaceMarketOdds(const uint32_t eventGroupType, const uint32_t nOutrightOdds)
+{
+    if (nOutrightOdds == 0) {
+        return 0;
+    }
+
+    // todo: calculate
+    switch (eventGroupType)
+    {
+    case FieldEventGroupType::animalRacing:
+        return nOutrightOdds;
+    case FieldEventGroupType::other:
+        return nOutrightOdds;
+    default:
+        return 0;
+    }
+}
+
+uint32_t CalculateShowMarketOdds(const uint32_t eventGroupType, const uint32_t nOutrightOdds)
+{
+    if (nOutrightOdds == 0) {
+        return 0;
+    }
+
+    // todo: calculate
+    switch (eventGroupType)
+    {
+    case FieldEventGroupType::animalRacing:
+        return nOutrightOdds;
+    case FieldEventGroupType::other:
+        return nOutrightOdds;
+    default:
+        return 0;
+    }
+}

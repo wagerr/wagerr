@@ -287,14 +287,28 @@ using FieldEventKey = EventKey;
 
 typedef struct ContenderInfo {
     uint32_t nOutrightOdds = 0;
-    uint32_t nBets = 0;
-    uint32_t nPotentialLiability = 0;
+    uint32_t nOutrightBets = 0;
+    uint32_t nOutrightPotentialLiability = 0;
+
+    uint32_t nPlaceOdds = 0;
+    uint32_t nPlaceBets = 0;
+    uint32_t nPlacePotentialLiability = 0;
+
+    uint32_t nShowOdds = 0;
+    uint32_t nShowBets = 0;
+    uint32_t nShowPotentialLiability = 0;
 
     explicit ContenderInfo() {}
-    explicit ContenderInfo(const uint32_t outrightOdds)
+    explicit ContenderInfo(const uint32_t outrightOdds, const uint32_t placeOdds, const uint32_t showOdds)
         : nOutrightOdds(outrightOdds)
-        , nBets(0)
-        , nPotentialLiability(0)
+        , nOutrightBets(0)
+        , nOutrightPotentialLiability(0)
+        , nPlaceOdds(placeOdds)
+        , nPlaceBets(0)
+        , nPlacePotentialLiability(0)
+        , nShowOdds(showOdds)
+        , nShowBets(0)
+        , nShowPotentialLiability(0)
     {}
 
     ADD_SERIALIZE_METHODS;
@@ -302,8 +316,16 @@ typedef struct ContenderInfo {
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nOutrightOdds);
-        READWRITE(nBets);
-        READWRITE(nPotentialLiability);
+        READWRITE(nOutrightBets);
+        READWRITE(nOutrightPotentialLiability);
+
+        READWRITE(nPlaceOdds);
+        READWRITE(nPlaceBets);
+        READWRITE(nPlacePotentialLiability);
+
+        READWRITE(nShowOdds);
+        READWRITE(nShowBets);
+        READWRITE(nShowPotentialLiability);
     }
 } ContenderInfo;
 
@@ -329,8 +351,19 @@ public:
         nSport = tx.nSport;
         nTournament = tx.nTournament;
         nStage = tx.nStage;
-        for (const auto& contenderOdds : tx.contendersWinOdds) {
-            contenders[contenderOdds.first] = ContenderInfo{contenderOdds.second};
+        for (const auto& tx_contender : tx.contendersWinOdds) {
+            uint32_t outrightOdds = tx_contender.second;
+            uint32_t placeOdds = CalculatePlaceMarketOdds(nGroupType, outrightOdds);
+            uint32_t showOdds = CalculateShowMarketOdds(nGroupType, outrightOdds);
+            contenders[tx_contender.first] = ContenderInfo{outrightOdds, placeOdds, showOdds};
+        }
+    }
+
+    inline void ExtractDataFromTx(const CFieldUpdateOddsTx& tx) {
+        for (const auto& tx_contender : tx.contendersWinOdds) {
+            contenders[tx_contender.first].nOutrightOdds = tx_contender.second;
+            contenders[tx_contender.first].nPlaceOdds = CalculatePlaceMarketOdds(nGroupType, tx_contender.second);
+            contenders[tx_contender.first].nShowOdds = CalculateShowMarketOdds(nGroupType, tx_contender.second);
         }
     }
 

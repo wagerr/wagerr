@@ -51,11 +51,11 @@ bool CFieldEventDB::IsMarketOpen(const FieldBetMarketType type) {
     switch(type) {
         case outright:
             break; // always open
-        case place:
+        case show:
             if (contendersCount < 8)
                 return false;
             break;
-        case show:
+        case place:
             if (contendersCount < 5)
                 return false;
             break;
