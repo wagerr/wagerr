@@ -47,6 +47,134 @@ DNR    = 101
 ODDS_DIVISOR = 10000
 BETX_PERMILLE = 60
 
+
+def calculate_odds(odds_type, contenders, mrg_in_percent):
+    N = len(contenders)
+    if odds_type == "place":
+        if N < 5:
+            for contender in contenders.values():
+                contender[odds_type] = 0
+            return
+        multiplier = 2
+    elif odds_type == "show":
+        if N < 8:
+            for contender in contenders.values():
+                contender[odds_type] = 0
+            return
+        multiplier = 3
+    else:
+        raise Exception("Wrong odds type")
+
+    contenders_p = {}
+    for k, v in contenders.items():
+        contenders_p[k] = 1 / (v["outright"] / ODDS_DIVISOR)
+
+    h = 0.000001
+
+    real_mrg_in = (mrg_in_percent / 100) * multiplier
+
+    # calc m
+    m = 1
+    md = m + h
+    ms = m - h
+    for i in range(1, N):
+        f = 0
+        for cont_k in contenders_p.keys():
+            f += contenders_p[cont_k] ** (m + contenders[cont_k]["mod"])
+        f -= real_mrg_in
+
+        fd = 0
+        for cont_k in contenders_p.keys():
+            fd += contenders_p[cont_k] ** (md + contenders[cont_k]["mod"])
+        fd -= real_mrg_in
+
+        fs = 0
+        for cont_k in contenders_p.keys():
+            fs += contenders_p[cont_k] ** (ms + contenders[cont_k]["mod"])
+        fs -= real_mrg_in
+
+        der = (fd - fs) / h
+
+        m = m - (f / der)
+        md = m + h
+        ms = m - h
+
+    # calc X
+    X = 1
+    Xd = X + h
+    Xs = X - h
+    for i in range(1, N):
+        f = 0
+        for cont_k in contenders.keys():
+            f += 1 / (1 + (X + contenders[cont_k]["mod"]) * (contenders[cont_k]["outright"] / ODDS_DIVISOR - 1))
+        f -= real_mrg_in
+
+        fd = 0
+        for cont_k in contenders.keys():
+            fd += 1 / (1 + (Xd + contenders[cont_k]["mod"]) * (contenders[cont_k]["outright"] / ODDS_DIVISOR - 1))
+        fd -= real_mrg_in
+
+        fs = 0
+        for cont_k in contenders.keys():
+            fs += 1 / (1 + (Xs + contenders[cont_k]["mod"]) * (contenders[cont_k]["outright"] / ODDS_DIVISOR - 1))
+        fs -= real_mrg_in
+
+        der = (fd - fs) / h
+
+        X = X - (f / der)
+        Xd = X + h
+        Xs = X - h
+
+    # print("odds_type = ", odds_type)
+    # print("N = ", N)
+    # print("real_mrg_in = ", real_mrg_in)
+    # print("m = ", m)
+    # print("X = ", X)
+
+    for cont_k in contenders.keys():
+        odds_x = 1 + (X + contenders[cont_k]["mod"]) * (contenders[cont_k]["outright"] / ODDS_DIVISOR - 1)
+        odds_m = contenders_p[cont_k] ** (-m - contenders[cont_k]["mod"])
+        contenders[cont_k][odds_type] = int(((odds_x + odds_m) / 2) * ODDS_DIVISOR)
+
+def check_calculate_odds():
+    contenders = {
+        1 : { "outright" : 36699, "mod" : 0 },
+        2 : { "outright" : 26152, "mod" : 0 },
+        3 : { "outright" : 17617, "mod" : 0 },
+        4 : { "outright" : 158265, "mod" : 0 },
+        5 : { "outright" : 93296, "mod" : 0 },
+        6 : { "outright" : 93296, "mod" : 0 },
+        7 : { "outright" : 158265, "mod" : 0 },
+        8 : { "outright" : 60873, "mod" : 0 },
+        9 : { "outright" : 36699, "mod" : 0 },
+    }
+    mrg_in_percent = 115
+
+    calculate_odds("place", contenders, mrg_in_percent)
+    for k in contenders.keys():
+        print(contenders[k])
+
+    calculate_odds("show", contenders, mrg_in_percent)
+    for k in contenders.keys():
+        print(contenders[k])
+
+    contenders = {
+        1 : { "outright" : 66667, "mod" : 0 },
+        2 : { "outright" : 66667, "mod" : 0 },
+        3 : { "outright" : 50000, "mod" : 0 },
+        4 : { "outright" : 40000, "mod" : 0 },
+        5 : { "outright" : 40000, "mod" : 0 },
+    }
+    mrg_in_percent = 115
+    calculate_odds("place", contenders, mrg_in_percent)
+    for k in contenders.keys():
+        print(contenders[k])
+
+    calculate_odds("show", contenders, mrg_in_percent)
+    for k in contenders.keys():
+        print(contenders[k])
+
+
 def check_bet_payouts_info(listbets, listpayoutsinfo):
     for bet in listbets:
         info_found = False
@@ -1204,3 +1332,4 @@ class BettingTest(BitcoinTestFramework):
 
 if __name__ == '__main__':
     BettingTest().main()
+    # check_calculate_odds()
