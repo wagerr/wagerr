@@ -345,39 +345,3 @@ uint32_t GetFieldBetPotentionalOdds(const CFieldLegDB &bet, const CFieldEventDB 
         return 0;
     }
 }
-
-uint32_t CalculatePlaceMarketOdds(const uint32_t eventGroupType, const uint32_t nOutrightOdds)
-{
-    if (nOutrightOdds == 0) {
-        return 0;
-    }
-
-    // todo: calculate
-    switch (eventGroupType)
-    {
-    case FieldEventGroupType::animalRacing:
-        return nOutrightOdds;
-    case FieldEventGroupType::other:
-        return nOutrightOdds;
-    default:
-        return 0;
-    }
-}
-
-uint32_t CalculateShowMarketOdds(const uint32_t eventGroupType, const uint32_t nOutrightOdds)
-{
-    if (nOutrightOdds == 0) {
-        return 0;
-    }
-
-    // todo: calculate
-    switch (eventGroupType)
-    {
-    case FieldEventGroupType::animalRacing:
-        return nOutrightOdds;
-    case FieldEventGroupType::other:
-        return nOutrightOdds;
-    default:
-        return 0;
-    }
-}

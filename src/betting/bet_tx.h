@@ -169,8 +169,9 @@ public:
     uint16_t nTournament;
     uint16_t nStage;
     uint16_t nGroupType;
-    // contenderId : win odds
-    std::map<uint32_t, uint32_t> contendersWinOdds;
+    uint16_t nMarginPercent;
+    // contenderId : outrightOdds
+    std::map<uint32_t, uint32_t> mContendersOutrightOdds;
 
     // Default Constructor.
     CFieldEventTx() {}
@@ -187,7 +188,8 @@ public:
         READWRITE(nTournament);
         READWRITE(nStage);
         READWRITE(nGroupType);
-        READWRITE(contendersWinOdds);
+        READWRITE(nMarginPercent);
+        READWRITE(mContendersOutrightOdds);
     }
 };
 
@@ -195,8 +197,8 @@ class CFieldUpdateOddsTx : public CBettingTx
 {
 public:
     uint32_t nEventId;
-    // contenderId : win odds
-    std::map<uint32_t, uint32_t> contendersWinOdds;
+    // contenderId : outrightOdds
+    std::map<uint32_t, uint32_t> mContendersOutrightOdds;
 
     // Default Constructor.
     CFieldUpdateOddsTx() {}
@@ -208,7 +210,7 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nEventId);
-        READWRITE(contendersWinOdds);
+        READWRITE(mContendersOutrightOdds);
     }
 };
 

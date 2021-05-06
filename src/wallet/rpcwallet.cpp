@@ -213,6 +213,7 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
         UniValue evt(UniValue::VOBJ);
         evt.push_back(Pair("event_id", (uint64_t) fEvent.nEventId));
         evt.push_back(Pair("starting", (uint64_t) fEvent.nStartTime));
+        evt.push_back(Pair("mrg-in"), (uint64_t) fEvent.nMarginPercent));
 
         if (!bettingsView->mappings->Read(MappingKey{individualSportMapping, fEvent.nSport}, mapping))
             continue;
@@ -2235,7 +2236,7 @@ UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
         }
 
-        if (!fEvent.IsMarketOpen(marketType)) {
+        if (!CFieldEventDB::IsMarketOpen(marketType, fEvent.contenders.size())) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: market " + std::to_string((uint8_t)marketType) + " is closed for event " + std::to_string(eventId));
         }
 

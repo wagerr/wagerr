@@ -123,7 +123,7 @@ def make_event(event_id, timestamp, sport, tournament, round, home_team, away_te
     return result
 
 # Create a field event opcode
-def make_field_event(event_id, timestamp, group, sport, tournament, round, contenders_win_odds):
+def make_field_event(event_id, timestamp, group, sport, tournament, round, mrg_in_percent, contenders_win_odds):
     result = make_common_header(OPCODE_BTX_FIELD_EVENT)
     result = result + encode_int_little_endian(event_id, 4)
     result = result + encode_int_little_endian(timestamp, 4)
@@ -131,6 +131,7 @@ def make_field_event(event_id, timestamp, group, sport, tournament, round, conte
     result = result + encode_int_little_endian(tournament, 2)
     result = result + encode_int_little_endian(round, 2)
     result = result + encode_int_little_endian(group, 2)
+    result = result + encode_int_little_endian(mrg_in_percent, 2)
     result = result + encode_int_little_endian(int(len(contenders_win_odds)), 1) # map size
     for contender_id, contender_odds in contenders_win_odds.items():
         result = result + encode_int_little_endian(int(contender_id), 4)

@@ -19,6 +19,7 @@ class CFieldLegDB;
 class CFieldEventDB;
 
 #define BET_ODDSDIVISOR 10000   // Odds divisor, Facilitates calculations with floating integers.
+#define MODIFIER_DIVISOR 100
 #define BET_BURNXPERMILLE 60    // Burn promillage
 #define BET_MAXODDS (99 * BET_ODDSDIVISOR)
 #define BET_MINODDS BET_ODDSDIVISOR
@@ -202,8 +203,5 @@ std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerl
 
 uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent);
 uint32_t GetFieldBetPotentionalOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent);
-
-uint32_t CalculatePlaceMarketOdds(const uint32_t eventGroupType, const uint32_t nOutrightOdds);
-uint32_t CalculateShowMarketOdds(const uint32_t eventGroupType, const uint32_t nOutrightOdds);
 
 #endif
