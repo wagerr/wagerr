@@ -350,91 +350,8 @@ public:
     // Default Constructor.
     explicit CFieldEventDB() {}
 
-    inline void ExtractDataFromTx(const CFieldEventTx& tx) {
-        nEventId = tx.nEventId;
-        nStartTime = tx.nStartTime;
-        nSport = tx.nSport;
-        nTournament = tx.nTournament;
-        nStage = tx.nStage;
-        nGroupType = tx.nGroupType;
-        nMarginPercent = tx.nMarginPercent;
-
-        // Calculate Market specific Odds
-        bool isPlaceOpen = CFieldEventDB::IsMarketOpen(place, tx.mContendersOutrightOdds.size());
-        bool isShowOpen = CFieldEventDB::IsMarketOpen(show, tx.mContendersOutrightOdds.size());
-
-        double mPlace = 0.0, mShow = 0.0;
-        double XPlace = 0.0, XShow = 0.0;
-
-        if (isPlaceOpen || isShowOpen) {
-            std::vector<std::pair<uint32_t, uint32_t>> vContendersOddsMods;
-            for (const auto& contender : tx.mContendersOutrightOdds) {
-                vContendersOddsMods.emplace_back(contender.second, 0);
-            }
-
-            if (isPlaceOpen) {
-                double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 2.0;
-                mPlace = CalculateM(vContendersOddsMods, realMarginIn);
-                XPlace = CalculateX(vContendersOddsMods, realMarginIn);
-            }
-
-            if (isShowOpen) {
-                double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 3.0;
-                mShow = CalculateM(vContendersOddsMods, realMarginIn);
-                XShow = CalculateX(vContendersOddsMods, realMarginIn);
-            }
-        }
-
-        for (const auto& tx_contender : tx.mContendersOutrightOdds) {
-            uint32_t nOutrightOdds = tx_contender.second;
-            uint16_t modifier = 0;
-            uint32_t placeOdds = isPlaceOpen ? CalculateMarketOdds(XPlace, mPlace, nOutrightOdds, modifier) : 0;
-            uint32_t showOdds = isShowOpen ? CalculateMarketOdds(XShow, mShow, nOutrightOdds, modifier) : 0;
-            contenders[tx_contender.first] = ContenderInfo{nOutrightOdds, placeOdds, showOdds, modifier};
-        }
-    }
-
-    inline void ExtractDataFromTx(const CFieldUpdateOddsTx& tx) {
-        // Add new contenders
-        for (const auto& tx_contender : tx.mContendersOutrightOdds) {
-            contenders[tx_contender.first].nOutrightOdds = tx_contender.second;
-            contenders[tx_contender.first].nModifier = 0;
-        }
-
-        // ReCalculate Market specific Odds
-        bool isPlaceOpen = CFieldEventDB::IsMarketOpen(place, contenders.size());
-        bool isShowOpen = CFieldEventDB::IsMarketOpen(show, contenders.size());
-
-        double mPlace = 0.0, mShow = 0.0;
-        double XPlace = 0.0, XShow = 0.0;
-
-        if (isPlaceOpen || isShowOpen) {
-            std::vector<std::pair<uint32_t, uint32_t>> vContendersOddsMods;
-            for (const auto& contender : contenders) {
-                vContendersOddsMods.emplace_back(contender.second.nOutrightOdds, contender.second.nModifier);
-            }
-
-            if (isPlaceOpen) {
-                double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 2.0;
-                mPlace = CalculateM(vContendersOddsMods, realMarginIn);
-                XPlace = CalculateX(vContendersOddsMods, realMarginIn);
-            }
-
-            if (isShowOpen) {
-                double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 3.0;
-                mShow = CalculateM(vContendersOddsMods, realMarginIn);
-                XShow = CalculateX(vContendersOddsMods, realMarginIn);
-            }
-        }
-
-        // Update old contenders
-        for (auto& contender : contenders) {
-            uint32_t outrightOdds = contender.second.nOutrightOdds;
-            uint32_t modifier = contender.second.nModifier;
-            contender.second.nPlaceOdds = isPlaceOpen ? CalculateMarketOdds(XPlace, mPlace, outrightOdds, modifier) : 0;
-            contender.second.nShowOdds = isShowOpen ? CalculateMarketOdds(XShow, mShow, outrightOdds, modifier) : 0;
-        }
-    }
+    void ExtractAndCalcOdds(const CFieldEventTx& tx);
+    void ExtractAndCalcOdds(const CFieldUpdateOddsTx& tx);
 
     static bool IsMarketOpen(const FieldBetMarketType type, const size_t contendersCount);
 
@@ -453,6 +370,11 @@ public:
     }
 
 private:
+    void Permutations2(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
+    void Permutations3(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
+
+    uint32_t CalculateOddsInFirstN(const uint32_t idx, const std::vector<std::vector<uint32_t>>& permutations, const std::map<uint32_t, uint32_t>& mContendersOutrightOdds);
+
     double CalculateX(const std::vector<std::pair<uint32_t, uint32_t>>& vContendersOddsMods, const double realMarginIn);
     double CalculateM(const std::vector<std::pair<uint32_t, uint32_t>>& vContendersOddsMods, const double realMarginIn);
 

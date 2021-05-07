@@ -1139,7 +1139,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 }
 
                 CFieldEventDB fEvent;
-                fEvent.ExtractDataFromTx(*fEventTx);
+                fEvent.ExtractAndCalcOdds(*fEventTx);
 
                 FieldEventKey eventKey{fEvent.nEventId};
                 if (!bettingsViewCache.fieldEvents->Write(eventKey, fEvent))
@@ -1164,7 +1164,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     // save prev event state to undo
                     bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
 
-                    fEvent.ExtractDataFromTx(*fUpdateOddsTx);
+                    fEvent.ExtractAndCalcOdds(*fUpdateOddsTx);
 
                     if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
                         LogPrintf("Failed to update field event!\n");

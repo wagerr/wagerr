@@ -213,7 +213,7 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
         UniValue evt(UniValue::VOBJ);
         evt.push_back(Pair("event_id", (uint64_t) fEvent.nEventId));
         evt.push_back(Pair("starting", (uint64_t) fEvent.nStartTime));
-        evt.push_back(Pair("mrg-in"), (uint64_t) fEvent.nMarginPercent));
+        evt.push_back(Pair("mrg-in", (uint64_t) fEvent.nMarginPercent));
 
         if (!bettingsView->mappings->Read(MappingKey{individualSportMapping, fEvent.nSport}, mapping))
             continue;
