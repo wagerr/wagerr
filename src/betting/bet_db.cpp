@@ -81,7 +81,6 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldEventTx& tx) {
     double XPlace = 0.0, XShow = 0.0;
 
     std::vector<std::pair<uint32_t, uint32_t>> vContendersPlaceOddsMods;
-    std::vector<std::pair<uint32_t, uint32_t>> vContendersShowOddsMods;
     if (isPlaceOpen) {
         // Evaluates the probability of the provided player - with index cont.first - arriving amongst the first 2
         std::vector<std::vector<uint32_t>> vIdsPermutations;
@@ -101,6 +100,7 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldEventTx& tx) {
         LogPrint("wagerr", "Place m = %f X = %f\n", mPlace, XPlace);
     }
 
+    std::vector<std::pair<uint32_t, uint32_t>> vContendersShowOddsMods;
     if (isShowOpen) {
         // Evaluates the probability of the provided player - with index idx - arriving amongst the first 3
         std::vector<std::vector<uint32_t>> vIdsPermutations;
@@ -132,7 +132,7 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldEventTx& tx) {
 }
 
 void CFieldEventDB::ExtractAndCalcOdds(const CFieldUpdateOddsTx& tx) {
-    // Add new contenders
+    // Add new contenders and update current OutRight odds
     for (const auto& tx_contender : tx.mContendersOutrightOdds) {
         contenders[tx_contender.first].nOutrightOdds = tx_contender.second;
         contenders[tx_contender.first].nModifier = 0;
@@ -145,40 +145,51 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldUpdateOddsTx& tx) {
     double mPlace = 0.0, mShow = 0.0;
     double XPlace = 0.0, XShow = 0.0;
 
+    std::map<uint32_t, uint32_t> mContendersIdsOdds;
+    if (isPlaceOpen || isShowOpen) {
+        for (const auto& contender : contenders) {
+            mContendersIdsOdds[contender.first] = contender.second.nOutrightOdds;
+        }
+    }
+
     std::vector<std::pair<uint32_t, uint32_t>> vContendersPlaceOddsMods;
-    std::vector<std::pair<uint32_t, uint32_t>> vContendersShowOddsMods;
     if (isPlaceOpen) {
         // Evaluates the probability of the provided player - with index idx - arriving amongst the first 3
         std::vector<std::vector<uint32_t>> vIdsPermutations;
-        Permutations2(tx.mContendersOutrightOdds, vIdsPermutations);
+        Permutations2(mContendersIdsOdds, vIdsPermutations);
 
-        for (const auto& cont : tx.mContendersOutrightOdds) {
+        for (const auto& cont : mContendersIdsOdds) {
             if (cont.second == 0)
                 vContendersPlaceOddsMods.emplace_back(0, 0);
             else
-                vContendersPlaceOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, tx.mContendersOutrightOdds), 0);
+                vContendersPlaceOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, mContendersIdsOdds), 0);
         }
 
         double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 2.0;
         mPlace = CalculateM(vContendersPlaceOddsMods, realMarginIn);
         XPlace = CalculateX(vContendersPlaceOddsMods, realMarginIn);
+
+        LogPrint("wagerr", "Place m = %f X = %f\n", mShow, XShow);
     }
 
+    std::vector<std::pair<uint32_t, uint32_t>> vContendersShowOddsMods;
     if (isShowOpen) {
         // Evaluates the probability of the provided player - with index idx - arriving amongst the first 3
         std::vector<std::vector<uint32_t>> vIdsPermutations;
-        Permutations3(tx.mContendersOutrightOdds, vIdsPermutations);
+        Permutations3(mContendersIdsOdds, vIdsPermutations);
 
-        for (const auto& cont : tx.mContendersOutrightOdds) {
+        for (const auto& cont : mContendersIdsOdds) {
             if (cont.second == 0)
                 vContendersShowOddsMods.emplace_back(0, 0);
             else
-                vContendersShowOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, tx.mContendersOutrightOdds), 0);
+                vContendersShowOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, mContendersIdsOdds), 0);
         }
 
         double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 3.0;
         mShow = CalculateM(vContendersShowOddsMods, realMarginIn);
         XShow = CalculateX(vContendersShowOddsMods, realMarginIn);
+
+        LogPrint("wagerr", "Show m = %f X = %f\n", mShow, XShow);
     }
 
     // Update old contenders

@@ -577,6 +577,9 @@ class BettingTest(BitcoinTestFramework):
         for node in self.nodes:
             assert_equal(len(node.listfieldevents()), 0)
 
+        self.nodes[0].generate(1)
+        sync_blocks(self.nodes)
+
         self.log.info("Event creation Success")
 
     def check_event_update_odds(self):
@@ -584,18 +587,19 @@ class BettingTest(BitcoinTestFramework):
         start_time = int(time.time() + 60 * 60)
 
         for node in self.nodes:
-            assert_equal(len(node.listfieldevents()), 0)
+            assert_equal(len(node.listfieldevents()), 1)
 
         # Create event
         field_event_opcode = make_field_event(
-            0,
+            1,
             start_time,
             other_group,
             sport_names.index("Sport1"),
             tournament_names.index("Tournament1"),
             round_names.index("round0"),
+            self.mrg_in_percent,
             {
-                contender_names.index("cont1") : 15000
+                contender_names.index("cont1") : make_odds(50)
             }
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -605,23 +609,27 @@ class BettingTest(BitcoinTestFramework):
 
         for node in self.nodes:
             list_events = node.listfieldevents()
-            assert_equal(len(list_events), 1)
+            assert_equal(len(list_events), 2)
+            assert_equal(list_events[1]['contenders'][0]['name'], "cont1")
+            assert_equal(list_events[1]['contenders'][0]['outright-odds'], make_odds(50))
+            assert_equal(list_events[1]['contenders'][0]['place-odds'], 0)
+            assert_equal(list_events[1]['contenders'][0]['show-odds'], 0)
 
-        saved_event = self.nodes[0].listfieldevents()[0]
-        assert_equal(saved_event['event_id'], 0)
+        saved_event = self.nodes[0].listfieldevents()[1]
+        assert_equal(saved_event['event_id'], 1)
         assert_equal(len(saved_event['contenders']), 1)
         assert_equal(saved_event['contenders'][0]['name'], "cont1")
-        assert_equal(saved_event['contenders'][0]['outright-odds'], 15000)
-        assert_equal(saved_event['contenders'][0]['place-odds'], 15000)
-        assert_equal(saved_event['contenders'][0]['show-odds'], 15000)
+        assert_equal(saved_event['contenders'][0]['outright-odds'], make_odds(50))
+        assert_equal(saved_event['contenders'][0]['place-odds'], 0)
+        assert_equal(saved_event['contenders'][0]['show-odds'], 0)
 
         # For revert test
         self.stop_node(4)
 
         field_update_odds_opcode = make_field_update_odds(
-            0,
+            1,
             {
-                contender_names.index("cont1") : 18000,
+                contender_names.index("cont1") : make_odds(50),
                 100 : 15000 # bad contender_id
             }
         )
@@ -631,7 +639,7 @@ class BettingTest(BitcoinTestFramework):
         field_update_odds_opcode = make_field_update_odds(
             100, # bad event_id
             {
-                contender_names.index("cont1") : 18000
+                contender_names.index("cont1") : make_odds(50)
             }
         )
         assert_raises_rpc_error(-25, "",
@@ -639,9 +647,9 @@ class BettingTest(BitcoinTestFramework):
 
         # Update odds for event
         field_update_odds_opcode = make_field_update_odds(
-            0,
+            1,
             {
-                contender_names.index("cont1") : 18000
+                contender_names.index("cont1") : make_odds(51)
             }
         )
         post_opcode(self.nodes[1], field_update_odds_opcode, WGR_WALLET_EVENT['addr'])
@@ -651,15 +659,15 @@ class BettingTest(BitcoinTestFramework):
 
         for node in self.nodes[0:4]:
             list_events = node.listfieldevents()
-            assert_equal(len(list_events), 1)
-            assert_equal(len(list_events[0]['contenders']), 1)
-            assert_equal(list_events[0]['contenders'][0]['name'], "cont1")
-            assert_equal(list_events[0]['contenders'][0]['outright-odds'], 18000)
-            assert_equal(list_events[0]['contenders'][0]['place-odds'], 18000)
-            assert_equal(list_events[0]['contenders'][0]['show-odds'], 18000)
+            assert_equal(len(list_events), 2)
+            assert_equal(len(list_events[1]['contenders']), 1)
+            assert_equal(list_events[1]['contenders'][0]['name'], "cont1")
+            assert_equal(list_events[1]['contenders'][0]['outright-odds'], make_odds(51))
+            assert_equal(list_events[1]['contenders'][0]['place-odds'], 0)
+            assert_equal(list_events[1]['contenders'][0]['show-odds'], 0)
 
-        field_update_odds_opcode = make_field_update_odds(0, {
-                contender_names.index("cont2") : 13000 # Add new conteder
+        field_update_odds_opcode = make_field_update_odds(1, {
+                contender_names.index("cont2") : make_odds(49) # Add new conteder
             }
         )
         post_opcode(self.nodes[1], field_update_odds_opcode, WGR_WALLET_EVENT['addr'])
@@ -669,20 +677,26 @@ class BettingTest(BitcoinTestFramework):
 
         for node in self.nodes[0:4]:
             list_events = node.listfieldevents()
-            assert_equal(len(list_events), 1)
-            assert_equal(len(list_events[0]['contenders']), 2)
-            assert_equal(list_events[0]['contenders'][0]['name'], "cont1")
-            assert_equal(list_events[0]['contenders'][0]['outright-odds'], 18000)
-            assert_equal(list_events[0]['contenders'][0]['place-odds'], 18000)
-            assert_equal(list_events[0]['contenders'][0]['show-odds'], 18000)
-            assert_equal(list_events[0]['contenders'][1]['name'], "cont2")
-            assert_equal(list_events[0]['contenders'][1]['outright-odds'], 13000)
-            assert_equal(list_events[0]['contenders'][1]['place-odds'], 13000)
-            assert_equal(list_events[0]['contenders'][1]['show-odds'], 13000)
+            assert_equal(len(list_events), 2)
+            assert_equal(len(list_events[1]['contenders']), 2)
+            assert_equal(list_events[1]['contenders'][0]['name'], "cont1")
+            assert_equal(list_events[1]['contenders'][0]['outright-odds'], make_odds(51))
+            assert_equal(list_events[1]['contenders'][0]['place-odds'], 0)
+            assert_equal(list_events[1]['contenders'][0]['show-odds'], 0)
+            assert_equal(list_events[1]['contenders'][1]['name'], "cont2")
+            assert_equal(list_events[1]['contenders'][1]['outright-odds'], make_odds(49))
+            assert_equal(list_events[1]['contenders'][1]['place-odds'], 0)
+            assert_equal(list_events[1]['contenders'][1]['show-odds'], 0)
 
-        field_update_odds_opcode = make_field_update_odds(0, {
-                contender_names.index("cont2") : 19000,
-                contender_names.index("horse1") : 12000 # Add new conteder
+        field_update_odds_opcode = make_field_update_odds(1, {
+                contender_names.index("cont2") : make_odds(10),
+                # Add new conteders
+                contender_names.index("horse1") : make_odds(4),
+                contender_names.index("horse2") : make_odds(5),
+                contender_names.index("horse3") : make_odds(5),
+                contender_names.index("horse4") : make_odds(10),
+                contender_names.index("horse5") : make_odds(10),
+                contender_names.index("horse6") : make_odds(5)
             }
         )
         post_opcode(self.nodes[1], field_update_odds_opcode, WGR_WALLET_EVENT['addr'])
@@ -690,22 +704,25 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         sync_blocks(self.nodes[0:4])
 
+        # print(self.nodes[0].listfieldevents()[1]['contenders'])
+
         for node in self.nodes[0:4]:
             list_events = node.listfieldevents()
-            assert_equal(len(list_events), 1)
-            assert_equal(len(list_events[0]['contenders']), 3)
-            assert_equal(list_events[0]['contenders'][0]['name'], "cont1")
-            assert_equal(list_events[0]['contenders'][0]['outright-odds'], 18000)
-            assert_equal(list_events[0]['contenders'][0]['place-odds'], 18000)
-            assert_equal(list_events[0]['contenders'][0]['show-odds'], 18000)
-            assert_equal(list_events[0]['contenders'][1]['name'], "cont2")
-            assert_equal(list_events[0]['contenders'][1]['outright-odds'], 19000)
-            assert_equal(list_events[0]['contenders'][1]['place-odds'], 19000)
-            assert_equal(list_events[0]['contenders'][1]['show-odds'], 19000)
-            assert_equal(list_events[0]['contenders'][2]['name'], "horse1")
-            assert_equal(list_events[0]['contenders'][2]['outright-odds'], 12000)
-            assert_equal(list_events[0]['contenders'][2]['place-odds'], 12000)
-            assert_equal(list_events[0]['contenders'][2]['show-odds'], 12000)
+            assert_equal(len(list_events), 2)
+            assert_equal(len(list_events[1]['contenders']), 8)
+            event_contenders = list_events[1]['contenders']
+            assert_equal(event_contenders[0]['name'], "cont1")
+            assert_equal(event_contenders[0]['outright-odds'], make_odds(51))
+            assert_equal(event_contenders[0]['place-odds'], 12298)
+            assert_equal(event_contenders[0]['show-odds'], 10740)
+            assert_equal(event_contenders[2]['name'], "horse1")
+            assert_equal(event_contenders[2]['outright-odds'], make_odds(4))
+            assert_equal(event_contenders[2]['place-odds'], 77131)
+            assert_equal(event_contenders[2]['show-odds'], 42834)
+            assert_equal(event_contenders[7]['name'], "horse6")
+            assert_equal(event_contenders[7]['outright-odds'], make_odds(5))
+            assert_equal(event_contenders[7]['place-odds'], 62992)
+            assert_equal(event_contenders[7]['show-odds'], 35564)
 
         self.log.info("Revering...")
         self.nodes[4].rpchost = self.get_local_peer(4, True)
@@ -722,32 +739,33 @@ class BettingTest(BitcoinTestFramework):
         # Check event not updated
         for node in self.nodes:
             list_events = node.listfieldevents()
-            assert_equal(len(list_events), 1)
-            assert_equal(len(list_events[0]['contenders']), 1)
-            assert_equal(saved_event['contenders'][0]['name'], list_events[0]['contenders'][0]['name'])
-            assert_equal(saved_event['contenders'][0]['outright-odds'], list_events[0]['contenders'][0]['outright-odds'])
-            assert_equal(saved_event['contenders'][0]['place-odds'], list_events[0]['contenders'][0]['place-odds'])
-            assert_equal(saved_event['contenders'][0]['show-odds'], list_events[0]['contenders'][0]['show-odds'])
+            assert_equal(len(list_events), 2)
+            assert_equal(len(list_events[1]['contenders']), 1)
+            assert_equal(saved_event['contenders'][0]['name'], list_events[1]['contenders'][0]['name'])
+            assert_equal(saved_event['contenders'][0]['outright-odds'], list_events[1]['contenders'][0]['outright-odds'])
+            assert_equal(saved_event['contenders'][0]['place-odds'], list_events[1]['contenders'][0]['place-odds'])
+            assert_equal(saved_event['contenders'][0]['show-odds'], list_events[1]['contenders'][0]['show-odds'])
 
-        self.log.info("Field Event Odds Success")
+        self.log.info("Field Event Update Odds Success")
 
     def check_event_zeroing_odds(self):
         self.log.info("Check Field Zeroing Odds...")
         start_time = int(time.time() + 60 * 60)
 
         field_event_opcode = make_field_event(
-            1,
+            2,
             start_time,
             animal_racing_group,
             sport_names.index("Sport1"),
             tournament_names.index("Tournament1"),
             round_names.index("round0"),
+            self.mrg_in_percent,
             {
-                contender_names.index("cont1")  : 15000,
-                contender_names.index("cont2")  : 16000,
-                contender_names.index("horse1") : 17000,
-                contender_names.index("horse2") : 18000,
-                contender_names.index("horse3") : 19000,
+                contender_names.index("cont1")  : make_odds(20),
+                contender_names.index("cont2")  : make_odds(20),
+                contender_names.index("horse1") : make_odds(20),
+                contender_names.index("horse2") : make_odds(20),
+                contender_names.index("horse3") : make_odds(20),
             }
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -762,7 +780,7 @@ class BettingTest(BitcoinTestFramework):
         assert_raises_rpc_error(-25, "",
             post_opcode, self.nodes[1], field_zeroing_opcode, WGR_WALLET_ORACLE['addr'])
 
-        field_zeroing_opcode = make_field_zeroing_odds(1)
+        field_zeroing_opcode = make_field_zeroing_odds(2)
         post_opcode(self.nodes[1], field_zeroing_opcode, WGR_WALLET_ORACLE['addr'])
 
         self.nodes[0].generate(1)
@@ -771,7 +789,7 @@ class BettingTest(BitcoinTestFramework):
         for node in self.nodes[0:4]:
             list_events = node.listfieldevents()
             for event in list_events:
-                if event['event_id'] != 1:
+                if event['event_id'] != 2:
                     continue
                 assert_equal(len(event['contenders']), 5)
                 assert_equal(event['contenders'][0]['name'], "cont1")
@@ -807,32 +825,34 @@ class BettingTest(BitcoinTestFramework):
         self.log.info("Connect and sync nodes...")
         self.connect_and_sync_blocks()
 
+        # print(self.nodes[0].listfieldevents()[2]['contenders'])
+
         for node in self.nodes:
             list_events = node.listfieldevents()
             for event in list_events:
-                if event['event_id'] != 1:
+                if event['event_id'] != 2:
                     continue
                 assert_equal(len(event['contenders']), 5)
                 assert_equal(event['contenders'][0]['name'], "cont1")
-                assert_equal(event['contenders'][0]['outright-odds'], 15000)
-                assert_equal(event['contenders'][0]['place-odds'], 15000)
-                assert_equal(event['contenders'][0]['show-odds'], 15000)
+                assert_equal(event['contenders'][0]['outright-odds'], make_odds(20))
+                assert_equal(event['contenders'][0]['place-odds'], 21819)
+                assert_equal(event['contenders'][0]['show-odds'], 0)
                 assert_equal(event['contenders'][1]['name'], "cont2")
-                assert_equal(event['contenders'][1]['outright-odds'], 16000)
-                assert_equal(event['contenders'][1]['place-odds'], 16000)
-                assert_equal(event['contenders'][1]['show-odds'], 16000)
+                assert_equal(event['contenders'][1]['outright-odds'], make_odds(20))
+                assert_equal(event['contenders'][1]['place-odds'], 21819)
+                assert_equal(event['contenders'][1]['show-odds'], 0)
                 assert_equal(event['contenders'][2]['name'], "horse1")
-                assert_equal(event['contenders'][2]['outright-odds'], 17000)
-                assert_equal(event['contenders'][2]['place-odds'], 17000)
-                assert_equal(event['contenders'][2]['show-odds'], 17000)
+                assert_equal(event['contenders'][2]['outright-odds'], make_odds(20))
+                assert_equal(event['contenders'][2]['place-odds'], 21819)
+                assert_equal(event['contenders'][2]['show-odds'], 0)
                 assert_equal(event['contenders'][3]['name'], "horse2")
-                assert_equal(event['contenders'][3]['outright-odds'], 18000)
-                assert_equal(event['contenders'][3]['place-odds'], 18000)
-                assert_equal(event['contenders'][3]['show-odds'], 18000)
+                assert_equal(event['contenders'][3]['outright-odds'], make_odds(20))
+                assert_equal(event['contenders'][3]['place-odds'], 21819)
+                assert_equal(event['contenders'][3]['show-odds'], 0)
                 assert_equal(event['contenders'][4]['name'], "horse3")
-                assert_equal(event['contenders'][4]['outright-odds'], 19000)
-                assert_equal(event['contenders'][4]['place-odds'], 19000)
-                assert_equal(event['contenders'][4]['show-odds'], 19000)
+                assert_equal(event['contenders'][4]['outright-odds'], make_odds(20))
+                assert_equal(event['contenders'][4]['place-odds'], 21819)
+                assert_equal(event['contenders'][4]['show-odds'], 0)
 
         self.log.info("Field Event Zeroing Odds Success")
 
@@ -847,11 +867,12 @@ class BettingTest(BitcoinTestFramework):
             sport_names.index("F1 racing"),
             tournament_names.index("F1 Cup"),
             round_names.index("round0"),
+            self.mrg_in_percent,
             {
-                contender_names.index("Alexander Albon") : 15000,
-                contender_names.index("Pierre Gasly")    : 18000,
-                contender_names.index("Romain Grosjean") : 15000,
-                contender_names.index("Antonio Maria Giovinazzi")   : 19000,
+                contender_names.index("Alexander Albon") : make_odds(25),
+                contender_names.index("Pierre Gasly")    : make_odds(25),
+                contender_names.index("Romain Grosjean") : make_odds(15),
+                contender_names.index("Antonio Maria Giovinazzi")   : make_odds(35),
                 contender_names.index("cont1") : 0
             }
         )
@@ -865,7 +886,7 @@ class BettingTest(BitcoinTestFramework):
 
         player1_bet = 30
         self.nodes[2].placefieldbet(221, market_outright, contender_names.index("Alexander Albon"), player1_bet)
-        winnings = Decimal(player1_bet * 15000)
+        winnings = Decimal(player1_bet * make_odds(25))
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
         self.nodes[0].generate(1)
@@ -935,50 +956,34 @@ class BettingTest(BitcoinTestFramework):
         player2_total_bet = 0
 
         # Create events for bet tests
-        self.odds_events[2] = {
-            contender_names.index("Alexander Albon") : 15000,
-            contender_names.index("Pierre Gasly")    : 18000,
-            contender_names.index("Romain Grosjean") : 15000,
-            contender_names.index("Antonio Maria Giovinazzi")   : 19000,
+        self.odds_events[3] = {
+            contender_names.index("Alexander Albon") : make_odds(25),
+            contender_names.index("Pierre Gasly")    : make_odds(25),
+            contender_names.index("Romain Grosjean") : make_odds(15),
+            contender_names.index("Antonio Maria Giovinazzi")   : make_odds(35),
             contender_names.index("cont1") : 0
         }
         field_event_opcode = make_field_event(
-            2,
+            3,
             start_time,
             other_group,
             sport_names.index("F1 racing"),
             tournament_names.index("F1 Cup"),
             round_names.index("round0"),
-            self.odds_events[2]
+            self.mrg_in_percent,
+            self.odds_events[3]
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
 
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        self.odds_events[3] = {
-            contender_names.index("horse1") : 15000,
-            contender_names.index("horse2") : 18000,
-            contender_names.index("horse3") : 14000,
-            contender_names.index("horse4") : 13000,
-            contender_names.index("horse5") : 19000
-        }
-        field_event_opcode = make_field_event(
-            3,
-            start_time,
-            animal_racing_group,
-            sport_names.index("Horse racing"),
-            tournament_names.index("The BMW stakes"),
-            round_names.index("round0"),
-            self.odds_events[3]
-        )
-
-        post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
-
         self.odds_events[4] = {
-            contender_names.index("horse1") : 15000,
-            contender_names.index("horse2") : 18000,
-            contender_names.index("horse3") : 14000
+            contender_names.index("horse1") : make_odds(20),
+            contender_names.index("horse2") : make_odds(19),
+            contender_names.index("horse3") : make_odds(21),
+            contender_names.index("horse4") : make_odds(15),
+            contender_names.index("horse5") : make_odds(25)
         }
         field_event_opcode = make_field_event(
             4,
@@ -986,7 +991,26 @@ class BettingTest(BitcoinTestFramework):
             animal_racing_group,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
+            round_names.index("round0"),
+            self.mrg_in_percent,
+            self.odds_events[4]
+        )
+
+        post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.odds_events[5] = {
+            contender_names.index("horse1") : make_odds(33.3),
+            contender_names.index("horse2") : make_odds(33.3),
+            contender_names.index("horse3") : make_odds(33.3)
+        }
+        field_event_opcode = make_field_event(
+            5,
+            start_time,
+            animal_racing_group,
+            sport_names.index("Horse racing"),
+            tournament_names.index("The BMW stakes"),
             round_names.index("round1"),
+            self.mrg_in_percent,
             self.odds_events[4]
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -995,51 +1019,51 @@ class BettingTest(BitcoinTestFramework):
         sync_blocks(self.nodes)
 
         assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.",
-            self.nodes[2].placefieldbet, 2, market_outright, contender_names.index("Alexander Albon"), 24)
+            self.nodes[2].placefieldbet, 3, market_outright, contender_names.index("Alexander Albon"), 24)
         assert_raises_rpc_error(-31, "Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.",
-            self.nodes[2].placefieldbet, 2, market_outright, contender_names.index("Alexander Albon"), 10001)
+            self.nodes[2].placefieldbet, 3, market_outright, contender_names.index("Alexander Albon"), 10001)
         assert_raises_rpc_error(-31, "Error: there is no such FieldEvent: {}".format(202),
             self.nodes[2].placefieldbet, 202, market_outright, contender_names.index("Alexander Albon"), 30)
-        assert_raises_rpc_error(-31, "Error: Incorrect bet market type for FieldEvent: {}".format(2),
-            self.nodes[2].placefieldbet, 2, 100, contender_names.index("Alexander Albon"), 30)
-        assert_raises_rpc_error(-31, "Error: there is no such contenderId {} in event {}".format(1050, 2),
-            self.nodes[2].placefieldbet, 2, market_outright, 1050, 30)
-        assert_raises_rpc_error(-31, "Error: contender odds is zero for event: {} contenderId: {}".format(2, contender_names.index("cont1")),
-            self.nodes[2].placefieldbet, 2, market_outright, contender_names.index("cont1"), 30)
+        assert_raises_rpc_error(-31, "Error: Incorrect bet market type for FieldEvent: {}".format(3),
+            self.nodes[2].placefieldbet, 3, 100, contender_names.index("Alexander Albon"), 30)
+        assert_raises_rpc_error(-31, "Error: there is no such contenderId {} in event {}".format(1050, 3),
+            self.nodes[2].placefieldbet, 3, market_outright, 1050, 30)
+        assert_raises_rpc_error(-31, "Error: contender odds is zero for event: {} contenderId: {}".format(3, contender_names.index("cont1")),
+            self.nodes[2].placefieldbet, 3, market_outright, contender_names.index("cont1"), 30)
 
-        # player1 makes win bet to event2
+        # player1 makes win bet to event3
         player1_bet = 30
         player1_total_bet += player1_bet
-        self.nodes[2].placefieldbet(2, market_outright, contender_names.index("Romain Grosjean"), player1_bet)
-        winnings = Decimal(player1_bet * self.odds_events[2][contender_names.index("Romain Grosjean")])
+        self.nodes[2].placefieldbet(3, market_outright, contender_names.index("Romain Grosjean"), player1_bet)
+        winnings = Decimal(player1_bet * self.odds_events[3][contender_names.index("Romain Grosjean")])
         player1_expected_win = (winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        field_update_odds_opcode = make_field_update_odds(2, {
+        field_update_odds_opcode = make_field_update_odds(3, {
                 contender_names.index("Romain Grosjean") : 14000,
                 contender_names.index("cont2") : 11000 # Add new conteder
             }
         )
-        self.odds_events[2][contender_names.index("Romain Grosjean")] = 14000
-        self.odds_events[2][contender_names.index("cont2")] = 11000
+        self.odds_events[3][contender_names.index("Romain Grosjean")] = 14000
+        self.odds_events[3][contender_names.index("cont2")] = 11000
         post_opcode(self.nodes[1], field_update_odds_opcode, WGR_WALLET_EVENT['addr'])
 
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        # player2 makes win bet to event2 after changed odds
+        # player2 makes win bet to event3 after changed odds
         player2_bet = 30
         player2_total_bet += player2_bet
-        self.nodes[3].placefieldbet(2, market_outright, contender_names.index("Romain Grosjean"), player2_bet)
-        winnings = Decimal(player2_bet * self.odds_events[2][contender_names.index("Romain Grosjean")])
+        self.nodes[3].placefieldbet(3, market_outright, contender_names.index("Romain Grosjean"), player2_bet)
+        winnings = Decimal(player2_bet * self.odds_events[3][contender_names.index("Romain Grosjean")])
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        field_result_opcode = make_field_result(2, STANDARD_RESULT, {
+        field_result_opcode = make_field_result(3, STANDARD_RESULT, {
             contender_names.index("Romain Grosjean") : place1,
             contender_names.index("Pierre Gasly") : place2,
             contender_names.index("cont2") : place3
@@ -1050,45 +1074,45 @@ class BettingTest(BitcoinTestFramework):
         sync_blocks(self.nodes)
 
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.",
-            self.nodes[2].placefieldbet, 2, market_outright, contender_names.index("Alexander Albon"), 30)
+            self.nodes[2].placefieldbet, 3, market_outright, contender_names.index("Alexander Albon"), 30)
 
-        # TODO: for event2 calculate wins and check payouts/balances
+        # TODO: for event3 calculate wins and check payouts/balances
 
-        # player1 makes lose bet to event3
+        # player1 makes lose bet to event4
         player1_bet = 40
         player1_total_bet += player1_bet
-        self.nodes[2].placefieldbet(3, market_outright, contender_names.index("horse2"), player1_bet)
+        self.nodes[2].placefieldbet(4, market_outright, contender_names.index("horse2"), player1_bet)
         player1_expected_loss = player1_bet
 
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        field_update_odds_opcode = make_field_update_odds(3, {
-                contender_names.index("horse1") : 14500,
-                contender_names.index("horse3") : 9000,
-                contender_names.index("horse6") : 17500 # Add new conteder
+        field_update_odds_opcode = make_field_update_odds(4, {
+                contender_names.index("horse1") : make_odds(25),
+                contender_names.index("horse3") : make_odds(25),
+                contender_names.index("horse6") : make_odds(16) # Add new conteder
             }
         )
-        self.odds_events[3][contender_names.index("horse1")] = 14500
-        self.odds_events[3][contender_names.index("horse3")] = 9000
-        self.odds_events[3][contender_names.index("horse6")] = 17500
+        self.odds_events[4][contender_names.index("horse1")] = make_odds(25)
+        self.odds_events[4][contender_names.index("horse3")] = make_odds(25)
+        self.odds_events[4][contender_names.index("horse6")] = make_odds(16)
         post_opcode(self.nodes[1], field_update_odds_opcode, WGR_WALLET_EVENT['addr'])
 
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        # player2 makes win bet to event3
+        # player2 makes win bet to event4
         player2_bet = 40
         player2_total_bet += player2_bet
-        self.nodes[3].placefieldbet(3, market_outright, contender_names.index("horse6"), player2_bet)
-        winnings = Decimal(player1_bet * self.odds_events[3][contender_names.index("horse6")])
+        self.nodes[3].placefieldbet(4, market_outright, contender_names.index("horse6"), player2_bet)
+        winnings = Decimal(player1_bet * self.odds_events[4][contender_names.index("horse6")])
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
 
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
         # make result for event3 and check payouts and players balances
-        field_result_opcode = make_field_result(3, STANDARD_RESULT, {
+        field_result_opcode = make_field_result(4, STANDARD_RESULT, {
             contender_names.index("horse6") : place1,
             contender_names.index("horse3") : place2,
             contender_names.index("horse5") : place3,
@@ -1098,7 +1122,7 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        # TODO: for event3 calculate wins and check payouts/balances
+        # TODO: for event4 calculate wins and check payouts/balances
 
         self.log.info("Field Bets outright market Success")
 
@@ -1131,12 +1155,13 @@ class BettingTest(BitcoinTestFramework):
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
+            self.mrg_in_percent,
             {
-                contender_names.index("horse1") : 15000,
-                contender_names.index("horse2") : 18000,
-                contender_names.index("horse3") : 14000,
-                contender_names.index("horse4") : 13000,
-                contender_names.index("horse5") : 19000
+                contender_names.index("horse1") : make_odds(20),
+                contender_names.index("horse2") : make_odds(20),
+                contender_names.index("horse3") : make_odds(20),
+                contender_names.index("horse4") : make_odds(20),
+                contender_names.index("horse5") : make_odds(20)
             }
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -1151,11 +1176,12 @@ class BettingTest(BitcoinTestFramework):
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
+            self.mrg_in_percent,
             {
-                contender_names.index("horse1") : 15000,
-                contender_names.index("horse2") : 18000,
-                contender_names.index("horse3") : 14000,
-                contender_names.index("horse4") : 19000,
+                contender_names.index("horse1") : make_odds(25),
+                contender_names.index("horse2") : make_odds(25),
+                contender_names.index("horse3") : make_odds(25),
+                contender_names.index("horse4") : make_odds(25),
             }
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -1257,16 +1283,18 @@ class BettingTest(BitcoinTestFramework):
 
         # For round1 tests
         field_event_opcode = make_field_event(
-            5,
+            6,
             start_time,
             animal_racing_group,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round1"),
+            self.mrg_in_percent,
             {
-                contender_names.index("horse1") : 11000,
-                contender_names.index("horse2") : 12000,
-                contender_names.index("horse3") : 13000,
+                contender_names.index("horse1") : make_odds(25),
+                contender_names.index("horse2") : make_odds(25),
+                contender_names.index("horse3") : make_odds(25),
+                contender_names.index("horse4") : make_odds(25),
             }
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -1274,15 +1302,15 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        show_market_event_id = 6
+        show_market_event_id = 7
         self.odds_events[show_market_event_id] = {
-            contender_names.index("horse1") : 11000,
-            contender_names.index("horse2") : 12000,
-            contender_names.index("horse3") : 13000,
-            contender_names.index("horse4") : 14000,
-            contender_names.index("horse5") : 15000,
-            contender_names.index("horse6") : 16000,
-            contender_names.index("horse7") : 17000,
+            contender_names.index("horse1") : make_odds(10),
+            contender_names.index("horse2") : make_odds(11),
+            contender_names.index("horse3") : make_odds(12),
+            contender_names.index("horse4") : make_odds(13),
+            contender_names.index("horse5") : make_odds(14),
+            contender_names.index("horse6") : make_odds(20),
+            contender_names.index("horse7") : make_odds(20),
             contender_names.index("horse8") : 0 # for zero odds test
         }
         field_event_opcode = make_field_event(
@@ -1292,6 +1320,7 @@ class BettingTest(BitcoinTestFramework):
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
+            self.mrg_in_percent,
             self.odds_events[show_market_event_id]
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -1299,14 +1328,14 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        place_market_event_id = 7
+        place_market_event_id = 8
         self.odds_events[place_market_event_id] = {
-            contender_names.index("horse1") : 11000,
-            contender_names.index("horse2") : 12000,
-            contender_names.index("horse3") : 13000,
-            contender_names.index("horse4") : 14000,
-            contender_names.index("horse5") : 15000,
-            contender_names.index("horse6") : 16000
+            contender_names.index("horse1") : make_odds(30),
+            contender_names.index("horse2") : make_odds(11),
+            contender_names.index("horse3") : make_odds(12),
+            contender_names.index("horse4") : make_odds(13),
+            contender_names.index("horse5") : make_odds(14),
+            contender_names.index("horse6") : make_odds(20),
         }
         field_event_opcode = make_field_event(
             place_market_event_id,
@@ -1315,6 +1344,7 @@ class BettingTest(BitcoinTestFramework):
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
+            self.mrg_in_percent,
             self.odds_events[place_market_event_id]
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -1322,12 +1352,12 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
 
-        outright_market_event_id = 8
+        outright_market_event_id = 9
         self.odds_events[outright_market_event_id] = {
-            contender_names.index("horse1") : 11000,
-            contender_names.index("horse2") : 12000,
-            contender_names.index("horse3") : 13000,
-            contender_names.index("horse4") : 14000
+            contender_names.index("horse1") : make_odds(30),
+            contender_names.index("horse2") : make_odds(20),
+            contender_names.index("horse3") : make_odds(25),
+            contender_names.index("horse4") : make_odds(25)
         }
         field_event_opcode = make_field_event(
             outright_market_event_id,
@@ -1336,6 +1366,7 @@ class BettingTest(BitcoinTestFramework):
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
+            self.mrg_in_percent,
             self.odds_events[outright_market_event_id]
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -1438,15 +1469,15 @@ class BettingTest(BitcoinTestFramework):
         # Chain height = 300 after minting -> v4 protocol active
         self.check_mapping()
         self.check_event()
-        # self.check_event_update_odds()
-        # self.check_event_zeroing_odds()
+        self.check_event_update_odds()
+        self.check_event_zeroing_odds()
         # TODO: check big size transactions (lots of contenders)
-        # self.check_field_bet_undo()
-        # self.check_field_bet_outright()
+        self.check_field_bet_undo()
+        self.check_field_bet_outright()
         # self.check_field_bet_place() # TODO
         # self.check_field_bet_show() # TODO
-        # self.check_parlays_field_bet_undo()
-        # self.check_parlays_field_bet()
+        self.check_parlays_field_bet_undo()
+        self.check_parlays_field_bet()
         # self.check_timecut_refund() # TODO
 
 if __name__ == '__main__':
