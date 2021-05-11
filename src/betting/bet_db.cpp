@@ -74,23 +74,47 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldEventTx& tx) {
     nMarginPercent = tx.nMarginPercent;
 
     // Calculate Market specific Odds
-    bool isPlaceOpen = CFieldEventDB::IsMarketOpen(place, tx.mContendersOutrightOdds.size());
-    bool isShowOpen = CFieldEventDB::IsMarketOpen(show, tx.mContendersOutrightOdds.size());
+    size_t noneZeroCount = 0;
+    for (const auto& contender : tx.mContendersOutrightOdds) {
+        if (contender.second != 0) noneZeroCount++;
+    }
+
+    bool isPlaceOpen = CFieldEventDB::IsMarketOpen(place, noneZeroCount);
+    bool isShowOpen = CFieldEventDB::IsMarketOpen(show, noneZeroCount);
 
     double mPlace = 0.0, mShow = 0.0;
     double XPlace = 0.0, XShow = 0.0;
 
     std::vector<std::pair<uint32_t, uint32_t>> vContendersPlaceOddsMods;
     if (isPlaceOpen) {
-        // Evaluates the probability of the provided player - with index cont.first - arriving amongst the first 2
-        std::vector<std::vector<uint32_t>> vIdsPermutations;
-        Permutations2(tx.mContendersOutrightOdds, vIdsPermutations);
+        switch (nGroupType) {
+        case FieldEventGroupType::animalRacing:
+        {
+            const double lambda = GetLambda(noneZeroCount);
+            for (const auto& cont : tx.mContendersOutrightOdds) {
+                if (cont.second == 0)
+                    vContendersPlaceOddsMods.emplace_back(0, 0);
+                else
+                    vContendersPlaceOddsMods.emplace_back(CalculateAnimalPlaceOdds(cont.first, lambda, tx.mContendersOutrightOdds), 0);
+            }
+            break;
+        }
+        case FieldEventGroupType::other:
+        {
+            // Evaluates the probability of the provided player - with index cont.first - arriving amongst the first 2
+            std::vector<std::vector<uint32_t>> vIdsPermutations;
+            Permutations2(tx.mContendersOutrightOdds, vIdsPermutations);
+            for (const auto& cont : tx.mContendersOutrightOdds) {
+                if (cont.second == 0)
+                    vContendersPlaceOddsMods.emplace_back(0, 0);
+                else
+                    vContendersPlaceOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, tx.mContendersOutrightOdds), 0);
+            }
 
-        for (const auto& cont : tx.mContendersOutrightOdds) {
-            if (cont.second == 0)
-                vContendersPlaceOddsMods.emplace_back(0, 0);
-            else
-                vContendersPlaceOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, tx.mContendersOutrightOdds), 0);
+            break;
+        }
+        default:
+            break;
         }
 
         double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 2.0;
@@ -102,15 +126,36 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldEventTx& tx) {
 
     std::vector<std::pair<uint32_t, uint32_t>> vContendersShowOddsMods;
     if (isShowOpen) {
-        // Evaluates the probability of the provided player - with index idx - arriving amongst the first 3
-        std::vector<std::vector<uint32_t>> vIdsPermutations;
-        Permutations3(tx.mContendersOutrightOdds, vIdsPermutations);
+        switch (nGroupType) {
+        case FieldEventGroupType::animalRacing:
+        {
+            const double lambda = GetLambda(noneZeroCount);
+            const double rho = GetRHO(noneZeroCount);
+            for (const auto& cont : tx.mContendersOutrightOdds) {
+                if (cont.second == 0)
+                    vContendersShowOddsMods.emplace_back(0, 0);
+                else
+                    vContendersShowOddsMods.emplace_back(CalculateAnimalShowOdds(cont.first, lambda, rho, tx.mContendersOutrightOdds), 0);
+            }
 
-        for (const auto& cont : tx.mContendersOutrightOdds) {
-            if (cont.second == 0)
-                vContendersShowOddsMods.emplace_back(0, 0);
-            else
-                vContendersShowOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, tx.mContendersOutrightOdds), 0);
+            break;
+        }
+        case FieldEventGroupType::other:
+        {
+            // Evaluates the probability of the provided player - with index idx - arriving amongst the first 3
+            std::vector<std::vector<uint32_t>> vIdsPermutations;
+            Permutations3(tx.mContendersOutrightOdds, vIdsPermutations);
+            for (const auto& cont : tx.mContendersOutrightOdds) {
+                if (cont.second == 0)
+                    vContendersShowOddsMods.emplace_back(0, 0);
+                else
+                    vContendersShowOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, tx.mContendersOutrightOdds), 0);
+            }
+
+            break;
+        }
+        default:
+            break;
         }
 
         double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 3.0;
@@ -139,8 +184,13 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldUpdateOddsTx& tx) {
     }
 
     // ReCalculate Market specific Odds
-    bool isPlaceOpen = CFieldEventDB::IsMarketOpen(place, contenders.size());
-    bool isShowOpen = CFieldEventDB::IsMarketOpen(show, contenders.size());
+    size_t noneZeroCount = 0;
+    for (const auto& contender : contenders) {
+        if (contender.second.nOutrightOdds != 0) noneZeroCount++;
+    }
+
+    bool isPlaceOpen = CFieldEventDB::IsMarketOpen(place, noneZeroCount);
+    bool isShowOpen = CFieldEventDB::IsMarketOpen(show, noneZeroCount);
 
     double mPlace = 0.0, mShow = 0.0;
     double XPlace = 0.0, XShow = 0.0;
@@ -154,15 +204,35 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldUpdateOddsTx& tx) {
 
     std::vector<std::pair<uint32_t, uint32_t>> vContendersPlaceOddsMods;
     if (isPlaceOpen) {
-        // Evaluates the probability of the provided player - with index idx - arriving amongst the first 3
-        std::vector<std::vector<uint32_t>> vIdsPermutations;
-        Permutations2(mContendersIdsOdds, vIdsPermutations);
+        switch (nGroupType) {
+        case FieldEventGroupType::animalRacing:
+        {
+            const double lambda = GetLambda(noneZeroCount);
+            for (const auto& cont : mContendersIdsOdds) {
+                if (cont.second == 0)
+                    vContendersPlaceOddsMods.emplace_back(0, 0);
+                else
+                    vContendersPlaceOddsMods.emplace_back(CalculateAnimalPlaceOdds(cont.first, lambda, mContendersIdsOdds), 0);
+            }
 
-        for (const auto& cont : mContendersIdsOdds) {
-            if (cont.second == 0)
-                vContendersPlaceOddsMods.emplace_back(0, 0);
-            else
-                vContendersPlaceOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, mContendersIdsOdds), 0);
+            break;
+        }
+        case FieldEventGroupType::other:
+        {
+            // Evaluates the probability of the provided player - with index idx - arriving amongst the first 3
+            std::vector<std::vector<uint32_t>> vIdsPermutations;
+            Permutations2(mContendersIdsOdds, vIdsPermutations);
+            for (const auto& cont : mContendersIdsOdds) {
+                if (cont.second == 0)
+                    vContendersPlaceOddsMods.emplace_back(0, 0);
+                else
+                    vContendersPlaceOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, mContendersIdsOdds), 0);
+            }
+
+            break;
+        }
+        default:
+            break;
         }
 
         double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 2.0;
@@ -174,15 +244,36 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldUpdateOddsTx& tx) {
 
     std::vector<std::pair<uint32_t, uint32_t>> vContendersShowOddsMods;
     if (isShowOpen) {
-        // Evaluates the probability of the provided player - with index idx - arriving amongst the first 3
-        std::vector<std::vector<uint32_t>> vIdsPermutations;
-        Permutations3(mContendersIdsOdds, vIdsPermutations);
+        switch (nGroupType) {
+        case FieldEventGroupType::animalRacing:
+        {
+            const double lambda = GetLambda(noneZeroCount);
+            const double rho = GetRHO(noneZeroCount);
+            for (const auto& cont : mContendersIdsOdds) {
+                if (cont.second == 0)
+                    vContendersShowOddsMods.emplace_back(0, 0);
+                else
+                    vContendersShowOddsMods.emplace_back(CalculateAnimalShowOdds(cont.first, lambda, rho, mContendersIdsOdds), 0);
+            }
 
-        for (const auto& cont : mContendersIdsOdds) {
-            if (cont.second == 0)
-                vContendersShowOddsMods.emplace_back(0, 0);
-            else
-                vContendersShowOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, mContendersIdsOdds), 0);
+            break;
+        }
+        case FieldEventGroupType::other:
+        {
+            // Evaluates the probability of the provided player - with index idx - arriving amongst the first 3
+            std::vector<std::vector<uint32_t>> vIdsPermutations;
+            Permutations3(mContendersIdsOdds, vIdsPermutations);
+            for (const auto& cont : mContendersIdsOdds) {
+                if (cont.second == 0)
+                    vContendersShowOddsMods.emplace_back(0, 0);
+                else
+                    vContendersShowOddsMods.emplace_back(CalculateOddsInFirstN(cont.first, vIdsPermutations, mContendersIdsOdds), 0);
+            }
+
+            break;
+        }
+        default:
+            break;
         }
 
         double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 3.0;
@@ -200,6 +291,113 @@ void CFieldEventDB::ExtractAndCalcOdds(const CFieldUpdateOddsTx& tx) {
         contender.second.nShowOdds = isShowOpen ? CalculateMarketOdds(XShow, mShow, vContendersShowOddsMods[i].first, modifier) : 0;
         i++;
     }
+}
+
+double CFieldEventDB::GetLambda(const size_t ContendersSize) {
+    switch (ContendersSize) {
+        case 3: return 0.6667;
+        case 4:	return 0.6996;
+        case 5:	return 0.7207;
+        case 6:	return 0.7359;
+        case 7:	return 0.7475;
+        case 8:	return 0.7569;
+        case 9:	return 0.7648;
+        case 10: return 0.7714;
+        case 11: return 0.7771;
+        case 12: return 0.7822;
+        case 13: return 0.7867;
+        case 14: return 0.7907;
+        default: return 0.76;
+    }
+}
+
+double CFieldEventDB::GetRHO(const size_t ContendersSize) {
+    switch (ContendersSize) {
+        case 4: return 0.5336;
+        case 5: return 0.5703;
+        case 6: return 0.5952;
+        case 7: return 0.6138;
+        case 8: return 0.6285;
+        case 9: return 0.6406;
+        case 10: return 0.6508;
+        case 11: return 0.6596;
+        case 12: return 0.6672;
+        case 13: return 0.6741;
+        case 14: return 0.6802;
+        default: return 0.62;
+    }
+}
+
+uint32_t CFieldEventDB::CalculateAnimalPlaceOdds(const uint32_t idx, const double lambda, const std::map<uint32_t, uint32_t>& mContendersOutrightOdds)
+{
+    // First place
+    double resultProb = 1.0 / (static_cast<double>(mContendersOutrightOdds.at(idx)) / BET_ODDSDIVISOR);
+    // Second place
+    for (auto& contender : mContendersOutrightOdds) {
+        if (contender.second == 0) continue;
+        if (contender.first == idx) continue;
+
+        const auto idx1 = contender.first;
+        const auto idx2 = idx;
+
+        double den = 0.0;
+        for (auto it = mContendersOutrightOdds.begin(); it != mContendersOutrightOdds.end(); it++) {
+            if (it->second == 0) continue;
+            if (it->first == contender.first) continue;
+            const double prob = 1.0 / (static_cast<double>(it->second) / BET_ODDSDIVISOR);
+            den += pow(prob, lambda);
+        }
+
+        const double probIdx1 = 1.0 / (static_cast<double>(mContendersOutrightOdds.at(idx1)) / BET_ODDSDIVISOR);
+        const double probIdx2 = 1.0 / (static_cast<double>(mContendersOutrightOdds.at(idx2)) / BET_ODDSDIVISOR);
+        resultProb += probIdx1 * pow(probIdx2, lambda) / den;
+    }
+
+    return static_cast<uint32_t>((1.0 / resultProb) * BET_ODDSDIVISOR);
+}
+
+uint32_t CFieldEventDB::CalculateAnimalShowOdds(const uint32_t idx, const double lambda, const double rho, const std::map<uint32_t, uint32_t>& mContendersOutrightOdds)
+{
+    // First two places
+    double resultProb = 1.0 / (static_cast<double>(CalculateAnimalPlaceOdds(idx, lambda, mContendersOutrightOdds)) / BET_ODDSDIVISOR);
+    // Third place
+    for (auto it_i = mContendersOutrightOdds.begin(); it_i != mContendersOutrightOdds.end(); it_i++) {
+        if (it_i->second == 0) continue;
+        if (it_i->first == idx) continue;
+        for (auto it_j = mContendersOutrightOdds.begin(); it_j != mContendersOutrightOdds.end(); it_j++) {
+            if (it_j->second == 0) continue;
+            if (it_j->first == idx) continue;
+            if (it_j->first == it_i->first) continue;
+
+            const auto idx1 = it_i->first;
+            const auto idx2 = it_j->first;
+            const auto idx3 = idx;
+
+            double den1 = 0.0;
+            for (auto it_k = mContendersOutrightOdds.begin(); it_k != mContendersOutrightOdds.end(); it_k++) {
+                if (it_k->second == 0) continue;
+                if (it_k->first == idx1) continue;
+                double prob = 1.0 / (static_cast<double>(it_k->second) / BET_ODDSDIVISOR);
+                den1 += pow(prob, lambda);
+            }
+
+            double den2 = 0.0;
+            for (auto it_k = mContendersOutrightOdds.begin(); it_k != mContendersOutrightOdds.end(); it_k++) {
+                if (it_k->second == 0) continue;
+                if (it_k->first == idx1) continue;
+                if (it_k->first == idx2) continue;
+                double prob = 1.0 / (static_cast<double>(it_k->second) / BET_ODDSDIVISOR);
+                den2 += pow(prob, rho);
+            }
+
+            double probIdx1 = 1.0 / (static_cast<double>(mContendersOutrightOdds.at(idx1)) / BET_ODDSDIVISOR);
+            double probIdx2 = 1.0 / (static_cast<double>(mContendersOutrightOdds.at(idx2)) / BET_ODDSDIVISOR);
+            double probIdx3 = 1.0 / (static_cast<double>(mContendersOutrightOdds.at(idx3)) / BET_ODDSDIVISOR);
+            resultProb += probIdx1 * pow(probIdx2, lambda) * pow(probIdx3, rho) / (den1 * den2);
+        }
+    }
+
+    return static_cast<uint32_t>((1.0 / resultProb) * BET_ODDSDIVISOR);
 }
 
 void CFieldEventDB::Permutations2(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms)
