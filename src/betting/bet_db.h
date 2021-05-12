@@ -350,8 +350,10 @@ public:
     // Default Constructor.
     explicit CFieldEventDB() {}
 
-    void ExtractAndCalcOdds(const CFieldEventTx& tx);
-    void ExtractAndCalcOdds(const CFieldUpdateOddsTx& tx);
+    void ExtractDataFromTx(const CFieldEventTx& tx);
+    void ExtractDataFromTx(const CFieldUpdateOddsTx& tx);
+
+    void CalcOdds();
 
     static bool IsMarketOpen(const FieldBetMarketType type, const size_t contendersCount);
 
