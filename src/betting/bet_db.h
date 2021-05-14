@@ -357,6 +357,7 @@ public:
 
     void ExtractDataFromTx(const CFieldEventTx& tx);
     void ExtractDataFromTx(const CFieldUpdateOddsTx& tx);
+    void ExtractDataFromTx(const CFieldUpdateMarginTx& tx);
 
     void CalcOdds();
 

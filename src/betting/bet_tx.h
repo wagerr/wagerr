@@ -35,6 +35,7 @@ typedef enum BetTxTypes{
     fResultTxType            = 0x12,  // Field event result transaction type identifier.
     fBetTxType               = 0x13,  // Field bet transaction type indetifier.
     fParlayBetTxType         = 0x14,  // Field parlay bet transaction type identifier.
+    fUpdateMarginTxType      = 0x15,  // Field event update margin
 } BetTxTypes;
 
 // class for serialization common betting header from opcode
@@ -211,6 +212,26 @@ public:
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nEventId);
         READWRITE(mContendersInputOdds);
+    }
+};
+
+class CFieldUpdateMarginTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+    uint16_t nMarginPercent;
+
+    // Default Constructor.
+    CFieldUpdateMarginTx() {}
+
+    BetTxTypes GetTxType() const override { return fUpdateMarginTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(nMarginPercent);
     }
 };
 

@@ -91,6 +91,12 @@ void CFieldEventDB::ExtractDataFromTx(const CFieldUpdateOddsTx& tx)
     }
 }
 
+void CFieldEventDB::ExtractDataFromTx(const CFieldUpdateMarginTx& tx)
+{
+    // Update margin percent
+    nMarginPercent = tx.nMarginPercent;
+}
+
 // ReCalculate Market specific Odds
 void CFieldEventDB::CalcOdds()
 {
