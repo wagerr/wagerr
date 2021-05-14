@@ -447,7 +447,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 if (!bettingsViewCache.mappings->Exists(MappingKey{roundMapping, (uint32_t) fEventTx->nStage}))
                     return error("CheckBettingTX: trying to create field event with unknown round id %lu!", fEventTx->nStage);
 
-                for (const auto& contender : fEventTx->mContendersOutrightOdds) {
+                for (const auto& contender : fEventTx->mContendersInputOdds) {
                     if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, contender.first}))
                         return error("CheckBettingTx: trying to create field event with unknown contender %lu!", contender.first);
                 }
@@ -464,7 +464,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fUpdateOddsTx->nEventId}))
                     return error("CheckBettingTX: trying to update not existed field event id %lu!", fUpdateOddsTx->nEventId);
 
-                for (const auto& contender : fUpdateOddsTx->mContendersOutrightOdds) {
+                for (const auto& contender : fUpdateOddsTx->mContendersInputOdds) {
                     if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, contender.first}))
                         return error("CheckBettingTx: trying to update odds for unknown contender %lu!", contender.first);
                 }
@@ -1134,7 +1134,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     fEventTx->nStage,
                     fEventTx->nGroupType
                 );
-                for (auto& contender : fEventTx->mContendersOutrightOdds) {
+                for (auto& contender : fEventTx->mContendersInputOdds) {
                     LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
                 }
 
@@ -1155,7 +1155,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
                 LogPrint("wagerr", "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
-                for (auto& contender : fUpdateOddsTx->mContendersOutrightOdds) {
+                for (auto& contender : fUpdateOddsTx->mContendersInputOdds) {
                     LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
                 }
 
@@ -1827,7 +1827,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     fEventTx->nStage,
                     fEventTx->nGroupType
                 );
-                for (auto& contender : fEventTx->mContendersOutrightOdds) {
+                for (auto& contender : fEventTx->mContendersInputOdds) {
                     LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
                 }
 
@@ -1850,7 +1850,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
                 LogPrint("wagerr", "CFieldUpdateOddsTx: id: %lu\n", fUpdateOddsTx->nEventId);
-                for (auto& contender : fUpdateOddsTx->mContendersOutrightOdds) {
+                for (auto& contender : fUpdateOddsTx->mContendersInputOdds) {
                     LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
                 }
 

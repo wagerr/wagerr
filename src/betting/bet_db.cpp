@@ -74,32 +74,32 @@ void CFieldEventDB::ExtractDataFromTx(const CFieldEventTx& tx)
     nGroupType = tx.nGroupType;
     nMarginPercent = tx.nMarginPercent;
 
-    for (const auto& tx_contender : tx.mContendersOutrightOdds) {
-        uint32_t nOutrightOdds = tx_contender.second;
-        uint32_t placeOdds = 0;
-        uint32_t showOdds = 0;
-        uint32_t modifier = 0;
-        contenders[tx_contender.first] = ContenderInfo{nOutrightOdds, placeOdds, showOdds, modifier};
+    for (const auto& tx_contender : tx.mContendersInputOdds) {
+        contenders[tx_contender.first] = ContenderInfo{tx_contender.second, 0, 0, 0, 0};
     }
 }
 
 void CFieldEventDB::ExtractDataFromTx(const CFieldUpdateOddsTx& tx)
 {
-    // Add new contenders and update current Outright odds
-    for (const auto& tx_contender : tx.mContendersOutrightOdds) {
-        contenders[tx_contender.first].nOutrightOdds = tx_contender.second;
+    // Add new contenders and update current input odds
+    for (const auto& tx_contender : tx.mContendersInputOdds) {
+        contenders[tx_contender.first].nInputOdds = tx_contender.second;
+        contenders[tx_contender.first].nOutrightOdds = 0;
+        contenders[tx_contender.first].nPlaceOdds = 0;
+        contenders[tx_contender.first].nShowOdds = 0;
         contenders[tx_contender.first].nModifier = 0;
     }
 }
 
+// ReCalculate Market specific Odds
 void CFieldEventDB::CalcOdds()
 {
-    // ReCalculate Market specific Odds
+
     size_t noneZeroCount = 0;
     std::map<uint32_t, uint32_t> mContendersIdsOdds;
     for (const auto& contender : contenders) {
-        if (contender.second.nOutrightOdds != 0) noneZeroCount++;
-        mContendersIdsOdds[contender.first] = contender.second.nOutrightOdds;
+        if (contender.second.nInputOdds != 0) noneZeroCount++;
+        mContendersIdsOdds[contender.first] = contender.second.nInputOdds;
     }
 
     bool isPlaceOpen = CFieldEventDB::IsMarketOpen(place, noneZeroCount);

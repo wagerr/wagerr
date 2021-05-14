@@ -286,6 +286,9 @@ public:
 using FieldEventKey = EventKey;
 
 typedef struct ContenderInfo {
+
+    uint32_t nInputOdds = 0;
+
     uint32_t nOutrightOdds = 0;
     uint32_t nOutrightBets = 0;
     uint32_t nOutrightPotentialLiability = 0;
@@ -301,8 +304,9 @@ typedef struct ContenderInfo {
     uint32_t nModifier = 0;
 
     explicit ContenderInfo() {}
-    explicit ContenderInfo(const uint32_t outrightOdds, const uint32_t placeOdds, const uint32_t showOdds, const uint32_t modifier)
-        : nOutrightOdds(outrightOdds)
+    explicit ContenderInfo(const uint32_t inputOdds, const uint32_t outrightOdds, const uint32_t placeOdds, const uint32_t showOdds, const uint32_t modifier)
+        : nInputOdds(inputOdds)
+        , nOutrightOdds(outrightOdds)
         , nOutrightBets(0)
         , nOutrightPotentialLiability(0)
         , nPlaceOdds(placeOdds)
@@ -318,6 +322,7 @@ typedef struct ContenderInfo {
 
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nInputOdds);
         READWRITE(nOutrightOdds);
         READWRITE(nOutrightBets);
         READWRITE(nOutrightPotentialLiability);
