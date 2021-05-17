@@ -323,6 +323,7 @@ typedef struct ContenderInfo {
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nInputOdds);
+
         READWRITE(nOutrightOdds);
         READWRITE(nOutrightBets);
         READWRITE(nOutrightPotentialLiability);
@@ -358,6 +359,7 @@ public:
     void ExtractDataFromTx(const CFieldEventTx& tx);
     void ExtractDataFromTx(const CFieldUpdateOddsTx& tx);
     void ExtractDataFromTx(const CFieldUpdateMarginTx& tx);
+    void ExtractDataFromTx(const CFieldUpdateModifiersTx& tx);
 
     void CalcOdds();
 
@@ -384,6 +386,7 @@ private:
     void Permutations2(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
     void Permutations3(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
 
+    void CalculateFairOdds(std::map<uint32_t, uint32_t>& fairOdds);
     uint32_t CalculateAnimalPlaceOdds(const uint32_t idx, const double lambda, const std::map<uint32_t, uint32_t>& mContendersOutrightOdds);
     uint32_t CalculateAnimalShowOdds(const uint32_t idx, const double lambda, const double rho, const std::map<uint32_t, uint32_t>& mContendersOutrightOdds);
     uint32_t CalculateOddsInFirstN(const uint32_t idx, const std::vector<std::vector<uint32_t>>& permutations, const std::map<uint32_t, uint32_t>& mContendersOutrightOdds);

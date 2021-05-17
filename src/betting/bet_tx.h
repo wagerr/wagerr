@@ -35,7 +35,8 @@ typedef enum BetTxTypes{
     fResultTxType            = 0x12,  // Field event result transaction type identifier.
     fBetTxType               = 0x13,  // Field bet transaction type indetifier.
     fParlayBetTxType         = 0x14,  // Field parlay bet transaction type identifier.
-    fUpdateMarginTxType      = 0x15,  // Field event update margin
+    fUpdateMarginTxType      = 0x15,  // Field event update margin transaction type identifier
+    fUpdateModifiersTxType   = 0x16,  // Field event update modifiers transaction type identifier.
 } BetTxTypes;
 
 // class for serialization common betting header from opcode
@@ -198,7 +199,7 @@ class CFieldUpdateOddsTx : public CBettingTx
 {
 public:
     uint32_t nEventId;
-    // contenderId : outrightOdds
+    // contenderId : inputOdds
     std::map<uint32_t, uint32_t> mContendersInputOdds;
 
     // Default Constructor.
@@ -212,6 +213,27 @@ public:
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nEventId);
         READWRITE(mContendersInputOdds);
+    }
+};
+
+class CFieldUpdateModifiersTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+    // contenderId : modifiers
+    std::map<uint32_t, uint32_t> mContendersModifires;
+
+    // Default Constructor.
+    CFieldUpdateModifiersTx() {}
+
+    BetTxTypes GetTxType() const override { return fUpdateModifiersTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(mContendersModifires);
     }
 };
 

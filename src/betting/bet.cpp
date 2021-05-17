@@ -471,6 +471,23 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 break;
             }
+            case fUpdateModifiersTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateOddsTx!");
+                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CFieldUpdateModifiersTx* fUpdateOddsTx = (CFieldUpdateModifiersTx*) bettingTx.get();
+
+                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fUpdateOddsTx->nEventId}))
+                    return error("CheckBettingTX: trying to update not existed field event id %lu!", fUpdateOddsTx->nEventId);
+
+                for (const auto& contender : fUpdateOddsTx->mContendersModifires) {
+                    if (!bettingsViewCache.mappings->Exists(MappingKey{contenderMapping, contender.first}))
+                        return error("CheckBettingTx: trying to update modifier for unknown contender %lu!", contender.first);
+                }
+
+                break;
+            }
             case fUpdateMarginTxType:
             {
                 if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for FieldUpdateMarginTx!");
@@ -1189,6 +1206,35 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 break;
             }
+            case fUpdateModifiersTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
+                LogPrint("wagerr", "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
+                for (auto& contender : fUpdateModifiersTx->mContendersModifires) {
+                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                }
+
+                FieldEventKey fEventKey{fUpdateModifiersTx->nEventId};
+                CFieldEventDB fEvent;
+                if (bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
+                    // save prev event state to undo
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
+
+                    fEvent.ExtractDataFromTx(*fUpdateModifiersTx);
+                    fEvent.CalcOdds();
+
+                    if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent))
+                        LogPrintf("Failed to update field event!\n");
+                }
+                else {
+                    LogPrintf("Failed to find field event!\n");
+                }
+
+                break;
+            }
             case fUpdateMarginTxType:
             {
                 if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
@@ -1892,6 +1938,29 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 }
 
                 if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateOddsTx->nEventId})) {
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                }
+                else {
+                    LogPrintf("Failed to find field event!\n");
+                }
+
+                break;
+            }
+            case fUpdateModifiersTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
+                LogPrint("wagerr", "CFieldUpdateModifiersTx: id: %lu\n", fUpdateModifiersTx->nEventId);
+                for (auto& contender : fUpdateModifiersTx->mContendersModifires) {
+                    LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);
+                }
+
+                if (bettingsViewCache.fieldEvents->Exists(EventKey{fUpdateModifiersTx->nEventId})) {
                     if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;
