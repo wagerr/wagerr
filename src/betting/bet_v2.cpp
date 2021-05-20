@@ -91,7 +91,7 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
     int nLastBlockHeight = chainActive.Height();
 
     // Get all the results posted in the latest block.
-    std::vector<CPeerlessResultDB> results = GetEventResults(nNewBlockHeight - 1);
+    std::vector<CPeerlessResultDB> results = GetPLResults(nNewBlockHeight - 1);
 
     // Traverse the blockchain for an event to match a result and all the bets on a result.
     for (const auto& result : results) {

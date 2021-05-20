@@ -54,7 +54,7 @@ uint32_t GetBetSearchStartHeight(int nHeight) {
 }
 
 /**
- * Creates the bet payout vector for all winning CUniversalBet bets.
+ * Creates the bet payout vector for all winning CPeerlessBetDB bets.
  *
  * @return payout vector, payouts info vector.
  */
@@ -65,7 +65,7 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
     uint64_t refundOdds{BET_ODDSDIVISOR};
 
     // Get all the results posted in the prev block.
-    std::vector<CPeerlessResultDB> results = GetEventResults(nLastBlockHeight);
+    std::vector<CPeerlessResultDB> results = GetPLResults(nLastBlockHeight);
 
     bool fWagerrProtocolV3 = nLastBlockHeight >= Params().WagerrProtocolV3StartHeight();
 

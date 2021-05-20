@@ -7,6 +7,7 @@
 #include <betting/bet_db.h>
 #include <betting/bet_v2.h>
 #include <betting/bet_v3.h>
+#include <betting/bet_v4.h>
 
 #include "spork.h"
 #include "uint256.h"
@@ -1306,7 +1307,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     break;
                 }
 
-                CFieldEventResultDB fEventResult{fResultTx->nEventId, fResultTx->nResultType};
+                CFieldResultDB fEventResult{fResultTx->nEventId, fResultTx->nResultType};
                 for (auto& contender : fEventResult.contendersResults) {
                     if (fResultTx->contendersResults.find(contender.first) != fResultTx->contendersResults.end()) {
                         contender.second = fResultTx->contendersResults[contender.first];
@@ -1578,6 +1579,11 @@ CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockH
         GetCGLottoBetPayoutsV3(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
 
         GetQuickGamesBetPayouts(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+
+        if (nNewBlockHeight >= Params().WagerrProtocolV4StartHeight()) {
+            // collect field bets payouts
+            GetFeildBetPayoutsV4(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+        }
     }
     else {
 
@@ -2215,7 +2221,7 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
 {
     int nCurrentHeight = chainActive.Height();
     // Get all the results posted in the previous block.
-    std::vector<CPeerlessResultDB> results = GetEventResults(height - 1);
+    std::vector<CPeerlessResultDB> results = GetPLResults(height - 1);
 
     LogPrintf("Start undo payouts...\n");
 

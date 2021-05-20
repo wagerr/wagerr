@@ -75,7 +75,7 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
  *
  * @return results vector.
  */
-std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight)
+std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight)
 {
     std::vector<CPeerlessResultDB> results;
 
@@ -107,6 +107,51 @@ std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight)
 
                 // Store the result if its a valid result OP CODE.
                 results.emplace_back(resultTx->nEventId, resultTx->nResultType, resultTx->nHomeScore, resultTx->nAwayScore);
+                if (!fMultipleResultsAllowed) return results;
+            }
+        }
+    }
+
+    return results;
+}
+
+/**
+ * Check a given block to see if it contains a Field result TX.
+ *
+ * @return results vector.
+ */
+std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight)
+{
+    std::vector<CFieldResultDB> results;
+
+    bool fMultipleResultsAllowed = (nLastBlockHeight >= Params().WagerrProtocolV3StartHeight());
+
+    // Get the current block so we can look for any results in it.
+    CBlockIndex *resultsBocksIndex = NULL;
+    resultsBocksIndex = chainActive[nLastBlockHeight];
+
+    CBlock block;
+    ReadBlockFromDisk(block, resultsBocksIndex);
+
+    for (CTransaction& tx : block.vtx) {
+        // Ensure the result TX has been posted by Oracle wallet.
+        const CTxIn &txin  = tx.vin[0];
+        bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
+
+        if (validResultTx) {
+            // Look for result OP RETURN code in the tx vouts.
+            for (const CTxOut &txOut : tx.vout) {
+
+                auto bettingTx = ParseBettingTx(txOut);
+
+                if (bettingTx == nullptr || bettingTx->GetTxType() != fResultTxType) continue;
+
+                CFieldResultTx* resultTx = (CFieldResultTx *)bettingTx.get();
+
+                LogPrint("wagerr", "Result for field event %lu was found...\n", resultTx->nEventId);
+
+                // Store the result if its a valid result OP CODE.
+                results.emplace_back(resultTx->nEventId, resultTx->nResultType, resultTx->contendersResults);
                 if (!fMultipleResultsAllowed) return results;
             }
         }

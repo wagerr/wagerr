@@ -17,6 +17,7 @@ class CPeerlessBaseEventDB;
 class CPayoutInfoDB;
 class CFieldLegDB;
 class CFieldEventDB;
+class CFieldResultDB;
 
 #define BET_ODDSDIVISOR 10000   // Odds divisor, Facilitates calculations with floating integers.
 #define MODIFIER_DIVISOR 100
@@ -188,8 +189,13 @@ bool IsValidOracleTx(const CTxIn &txin, int nHeight);
 //* Calculates the amount of coins paid out to bettors and the amount of coins to burn, based on bet amount and odds **/
 bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CAmount& nPayout, CAmount& nBurn);
 
-/** Find peerless events. **/
-std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight);
+/** Check a given block to see if it contains a Peerless result TX. **/
+std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight);
+
+/**
+ * Check a given block to see if it contains a Field result TX.
+ */
+std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight);
 
 /** Find chain games lotto result. **/
 bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults);

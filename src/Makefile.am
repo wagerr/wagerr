@@ -88,6 +88,7 @@ BITCOIN_CORE_H = \
   betting/bet_db.h \
   betting/bet_v2.h \
   betting/bet_v3.h \
+  betting/bet_v4.h \
   betting/oracles.h \
   betting/quickgames/dice.h \
   betting/quickgames/qgview.h \
@@ -224,6 +225,7 @@ libbitcoin_server_a_SOURCES = \
   betting/bet.cpp \
   betting/bet_v2.cpp \
   betting/bet_v3.cpp \
+  betting/bet_v4.cpp \
   betting/oracles.cpp \
   bloom.cpp \
   blocksignature.cpp \
