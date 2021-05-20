@@ -4,6 +4,9 @@
 
 #include <betting/bet_db.h>
 
+#define DOUBLE_ODDS(odds) (static_cast<double>(odds) / BET_ODDSDIVISOR)
+#define DOUBLE_MODIFIER(mod) (static_cast<double>(mod) / MODIFIER_DIVISOR)
+
 std::string CMappingDB::ToTypeName(MappingType type)
 {
     switch (type) {
@@ -104,9 +107,8 @@ void CFieldEventDB::ExtractDataFromTx(const CFieldUpdateModifiersTx& tx)
     }
 }
 
-void CFieldEventDB::CalculateFairOdds(std::map<uint32_t, uint32_t>& vFairOdds)
+void CFieldEventDB::CalculateFairOdds(std::map<uint32_t, uint32_t>& mContendersFairOdds)
 {
-#define DOUBLE_ODDS(odds) (static_cast<double>(odds) / BET_ODDSDIVISOR)
     double X = 1.0;
     uint32_t it = 1;
     double delta = 0.0;
@@ -116,7 +118,9 @@ void CFieldEventDB::CalculateFairOdds(std::map<uint32_t, uint32_t>& vFairOdds)
         double stepMargin = 0.0;
         for (const auto& contender : contenders) {
             if (contender.second.nInputOdds == 0) continue;
-            stepMargin += X / (DOUBLE_ODDS(contender.second.nInputOdds) - 1 + X);
+            double delim = (DOUBLE_ODDS(contender.second.nInputOdds) - 1 + X);
+            if (delim != 0)
+                stepMargin += X / delim;
         }
         delta = (stepMargin - 1.0) > 0 ?
             (-0.99 / static_cast<double>(it)) :
@@ -133,11 +137,63 @@ void CFieldEventDB::CalculateFairOdds(std::map<uint32_t, uint32_t>& vFairOdds)
     // create map of fair odds
     for (const auto& contender : contenders) {
         if (contender.second.nInputOdds == 0) {
-            vFairOdds.emplace(contender.first, 0);
+            mContendersFairOdds.emplace(contender.first, 0);
         }
         else {
             double fairOdds = (1.0 / (X / (X + DOUBLE_ODDS(contender.second.nInputOdds) - 1)));
-            vFairOdds.emplace(contender.first, static_cast<uint32_t>(round(fairOdds * BET_ODDSDIVISOR)));
+            mContendersFairOdds.emplace(contender.first, static_cast<uint32_t>(round(fairOdds * BET_ODDSDIVISOR)));
+        }
+    }
+}
+
+void CFieldEventDB::CalculateOutrightOdds(const std::map<uint32_t, uint32_t>& mContendersFairOdds, std::map<uint32_t, uint32_t>& mContendersOutrightOdds)
+{
+    double X = 1.0;
+    uint32_t it = 1;
+    double delta = 0.0;
+    double margin = static_cast<double>(nMarginPercent) / 100;
+    double debugStepMargin = 0.0;
+
+    // calc X
+    do {
+        double stepMargin = 0.0;
+        for (const auto& contender : contenders) {
+            if (contender.second.nInputOdds == 0) continue;
+            double modifier = DOUBLE_MODIFIER(contender.second.nModifier);
+            double fairOdds = DOUBLE_ODDS(mContendersFairOdds.at(contender.first));
+            double delim = 1 + (fairOdds - 1) * (X + modifier);
+            if (delim != 0) {
+                // 1 / (1 + (fairOdds(i) - 1) * (X + modifier(i)))
+                stepMargin += 1.0 / delim;
+            }
+        }
+
+        double dIt = static_cast<double>(it);
+
+        delta = (stepMargin - margin) > 0 ?
+            (0.99 / dIt) :
+            (round((stepMargin - margin) * 100000) / 100000) == 0 ?
+                0.0 :
+                (-0.99 / dIt);
+        X = (X + delta) < 0 ? 0 : (X + delta);
+        debugStepMargin = stepMargin;
+        it++;
+
+    } while (delta != 0 && it < 200);
+
+    LogPrint("wagerr", "CalcFairOdds: X = %f, lastMargin = %f, delta = %f, it = %d\n", X, debugStepMargin, delta, it);
+
+    // create map of outrights odds
+    for (const auto& contender : contenders) {
+        if (contender.second.nInputOdds == 0) {
+            mContendersOutrightOdds.emplace(contender.first, 0);
+        }
+        else {
+            double modifier = DOUBLE_MODIFIER(contender.second.nModifier);
+            double fairOdds = DOUBLE_ODDS(mContendersFairOdds.at(contender.first));
+            // 1 + (fairOdds(i) - 1) * (X + modifier(i))
+            double outrightOdds = 1 + (fairOdds - 1) * (X + modifier);
+            mContendersOutrightOdds.emplace(contender.first, static_cast<uint32_t>(round(outrightOdds * BET_ODDSDIVISOR)));
         }
     }
 }
@@ -146,14 +202,18 @@ void CFieldEventDB::CalculateFairOdds(std::map<uint32_t, uint32_t>& vFairOdds)
 void CFieldEventDB::CalcOdds()
 {
 
+    // calc fair odds (without margin)
+    std::map<uint32_t, uint32_t> mContendersFairOdds;
+    CalculateFairOdds(mContendersFairOdds);
+
+    // calc outright odds (with margin)
+    std::map<uint32_t, uint32_t> mContendersOutrightOdds;
+    CalculateOutrightOdds(mContendersFairOdds, mContendersOutrightOdds);
+
     size_t noneZeroCount = 0;
     for (const auto& contender : contenders) {
         if (contender.second.nInputOdds != 0) noneZeroCount++;
     }
-
-    // calc fair odds (without margin)
-    std::map<uint32_t, uint32_t> mContendersFairOdds;
-    CalculateFairOdds(mContendersFairOdds);
 
     bool isPlaceOpen = CFieldEventDB::IsMarketOpen(place, noneZeroCount);
     bool isShowOpen = CFieldEventDB::IsMarketOpen(show, noneZeroCount);
@@ -258,6 +318,7 @@ void CFieldEventDB::CalcOdds()
     size_t i = 0;
     for (auto& contender : contenders) {
         uint32_t modifier = contender.second.nModifier;
+        contender.second.nOutrightOdds = mContendersOutrightOdds.at(contender.first);
         contender.second.nPlaceOdds = isPlaceOpen ? CalculateMarketOdds(XPlace, mPlace, vContendersPlaceOddsMods[i].first, modifier) : 0;
         contender.second.nShowOdds = isShowOpen ? CalculateMarketOdds(XShow, mShow, vContendersShowOddsMods[i].first, modifier) : 0;
         i++;
@@ -302,7 +363,7 @@ double CFieldEventDB::GetRHO(const size_t ContendersSize) {
 uint32_t CFieldEventDB::CalculateAnimalPlaceOdds(const uint32_t idx, const double lambda, const std::map<uint32_t, uint32_t>& mContendersFairOdds)
 {
     // First place
-    double resultProb = 1.0 / (static_cast<double>(mContendersFairOdds.at(idx)) / BET_ODDSDIVISOR);
+    double resultProb = 1.0 / DOUBLE_ODDS(mContendersFairOdds.at(idx));
     // Second place
     for (auto& contender : mContendersFairOdds) {
         if (contender.second == 0) continue;
@@ -315,12 +376,12 @@ uint32_t CFieldEventDB::CalculateAnimalPlaceOdds(const uint32_t idx, const doubl
         for (auto it = mContendersFairOdds.begin(); it != mContendersFairOdds.end(); it++) {
             if (it->second == 0) continue;
             if (it->first == contender.first) continue;
-            const double prob = 1.0 / (static_cast<double>(it->second) / BET_ODDSDIVISOR);
+            const double prob = 1.0 / DOUBLE_ODDS(it->second);
             den += pow(prob, lambda);
         }
 
-        const double probIdx1 = 1.0 / (static_cast<double>(mContendersFairOdds.at(idx1)) / BET_ODDSDIVISOR);
-        const double probIdx2 = 1.0 / (static_cast<double>(mContendersFairOdds.at(idx2)) / BET_ODDSDIVISOR);
+        const double probIdx1 = 1.0 / DOUBLE_ODDS(mContendersFairOdds.at(idx1));
+        const double probIdx2 = 1.0 / DOUBLE_ODDS(mContendersFairOdds.at(idx2));
         resultProb += probIdx1 * pow(probIdx2, lambda) / den;
     }
 
@@ -330,7 +391,7 @@ uint32_t CFieldEventDB::CalculateAnimalPlaceOdds(const uint32_t idx, const doubl
 uint32_t CFieldEventDB::CalculateAnimalShowOdds(const uint32_t idx, const double lambda, const double rho, const std::map<uint32_t, uint32_t>& mContendersFairOdds)
 {
     // First two places
-    double resultProb = 1.0 / (static_cast<double>(CalculateAnimalPlaceOdds(idx, lambda, mContendersFairOdds)) / BET_ODDSDIVISOR);
+    double resultProb = 1.0 / DOUBLE_ODDS(CalculateAnimalPlaceOdds(idx, lambda, mContendersFairOdds));
     // Third place
     for (auto it_i = mContendersFairOdds.begin(); it_i != mContendersFairOdds.end(); it_i++) {
         if (it_i->second == 0) continue;
@@ -348,7 +409,7 @@ uint32_t CFieldEventDB::CalculateAnimalShowOdds(const uint32_t idx, const double
             for (auto it_k = mContendersFairOdds.begin(); it_k != mContendersFairOdds.end(); it_k++) {
                 if (it_k->second == 0) continue;
                 if (it_k->first == idx1) continue;
-                double prob = 1.0 / (static_cast<double>(it_k->second) / BET_ODDSDIVISOR);
+                double prob = 1.0 / DOUBLE_ODDS(it_k->second);
                 den1 += pow(prob, lambda);
             }
 
@@ -357,13 +418,13 @@ uint32_t CFieldEventDB::CalculateAnimalShowOdds(const uint32_t idx, const double
                 if (it_k->second == 0) continue;
                 if (it_k->first == idx1) continue;
                 if (it_k->first == idx2) continue;
-                double prob = 1.0 / (static_cast<double>(it_k->second) / BET_ODDSDIVISOR);
+                double prob = 1.0 / DOUBLE_ODDS(it_k->second);
                 den2 += pow(prob, rho);
             }
 
-            double probIdx1 = 1.0 / (static_cast<double>(mContendersFairOdds.at(idx1)) / BET_ODDSDIVISOR);
-            double probIdx2 = 1.0 / (static_cast<double>(mContendersFairOdds.at(idx2)) / BET_ODDSDIVISOR);
-            double probIdx3 = 1.0 / (static_cast<double>(mContendersFairOdds.at(idx3)) / BET_ODDSDIVISOR);
+            double probIdx1 = 1.0 / DOUBLE_ODDS(mContendersFairOdds.at(idx1));
+            double probIdx2 = 1.0 / DOUBLE_ODDS(mContendersFairOdds.at(idx2));
+            double probIdx3 = 1.0 / DOUBLE_ODDS(mContendersFairOdds.at(idx3));
             resultProb += probIdx1 * pow(probIdx2, lambda) * pow(probIdx3, rho) / (den1 * den2);
         }
     }
@@ -417,7 +478,7 @@ uint32_t CFieldEventDB::CalculateOddsInFirstN(const uint32_t idx, const std::vec
 
         std::vector<double> currentProbs;
         for (uint32_t cont_id : perm) {
-            currentProbs.push_back(1.0 / (static_cast<double>(mContendersFairOdds.at(cont_id)) / BET_ODDSDIVISOR));
+            currentProbs.push_back(1.0 / DOUBLE_ODDS(mContendersFairOdds.at(cont_id)));
         }
 
         double evalExactOrder = 1.0;
@@ -452,8 +513,8 @@ double CFieldEventDB::CalculateX(const std::vector<std::pair<uint32_t, uint32_t>
 
         double f = 0.0, fd = 0.0, fs = 0.0;
         for (const auto& cont : vContendersOddsMods) {
-            const auto& fairOdds = static_cast<double>(cont.first) / BET_ODDSDIVISOR;
-            const auto& modifier = static_cast<double>(cont.second) / MODIFIER_DIVISOR;
+            const auto& fairOdds =  DOUBLE_ODDS(cont.first);
+            const auto& modifier = DOUBLE_MODIFIER(cont.second);
 
             if (fairOdds == 0.0) continue;
 
@@ -487,8 +548,8 @@ double CFieldEventDB::CalculateM(const std::vector<std::pair<uint32_t, uint32_t>
 
         double f = 0.0, fd = 0.0, fs = 0.0;
         for (const auto& cont : vContendersOddsMods) {
-            const auto& fairOdds = static_cast<double>(cont.first) / BET_ODDSDIVISOR;
-            const auto& modifier = static_cast<double>(cont.second) / MODIFIER_DIVISOR;
+            const auto& fairOdds = DOUBLE_ODDS(cont.first);
+            const auto& modifier = DOUBLE_MODIFIER(cont.second);
 
             if (fairOdds == 0.0) continue;
 
@@ -511,14 +572,14 @@ double CFieldEventDB::CalculateM(const std::vector<std::pair<uint32_t, uint32_t>
     return m;
 }
 
-uint32_t CFieldEventDB::CalculateMarketOdds(const double X, const double m, const uint32_t fairOdds, const uint16_t modifier)
+uint32_t CFieldEventDB::CalculateMarketOdds(const double X, const double m, const uint32_t oddsMods, const uint16_t modifier)
 {
     uint32_t outputOdds = 0;
-    if (fairOdds == 0) {
+    if (oddsMods == 0) {
         return outputOdds;
     }
 
-    const double o = static_cast<double>(fairOdds) / BET_ODDSDIVISOR;
+    const double o = DOUBLE_ODDS(oddsMods);
     double oddsX = 1.0 + (X + modifier) * (o - 1.0);
 
     const double p = 1.0 / o;

@@ -386,21 +386,22 @@ private:
     void Permutations2(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
     void Permutations3(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
 
-    void CalculateFairOdds(std::map<uint32_t, uint32_t>& fairOdds);
-    uint32_t CalculateAnimalPlaceOdds(const uint32_t idx, const double lambda, const std::map<uint32_t, uint32_t>& mContendersOutrightOdds);
-    uint32_t CalculateAnimalShowOdds(const uint32_t idx, const double lambda, const double rho, const std::map<uint32_t, uint32_t>& mContendersOutrightOdds);
-    uint32_t CalculateOddsInFirstN(const uint32_t idx, const std::vector<std::vector<uint32_t>>& permutations, const std::map<uint32_t, uint32_t>& mContendersOutrightOdds);
+    void CalculateFairOdds(std::map<uint32_t, uint32_t>& mContendersFairOdds);
+    void CalculateOutrightOdds(const std::map<uint32_t, uint32_t>& mContendersFairOdds, std::map<uint32_t, uint32_t>& mContendersOutrightOdds);
+    uint32_t CalculateAnimalPlaceOdds(const uint32_t idx, const double lambda, const std::map<uint32_t, uint32_t>& mContendersFairOdds);
+    uint32_t CalculateAnimalShowOdds(const uint32_t idx, const double lambda, const double rho, const std::map<uint32_t, uint32_t>& mContendersFairOdds);
+    uint32_t CalculateOddsInFirstN(const uint32_t idx, const std::vector<std::vector<uint32_t>>& permutations, const std::map<uint32_t, uint32_t>& mContendersFairOdds);
 
     double CalculateX(const std::vector<std::pair<uint32_t, uint32_t>>& vContendersOddsMods, const double realMarginIn);
     double CalculateM(const std::vector<std::pair<uint32_t, uint32_t>>& vContendersOddsMods, const double realMarginIn);
 
-    uint32_t CalculateMarketOdds(const double X, const double m, const uint32_t outrightOdds, const uint16_t modifier);
+    uint32_t CalculateMarketOdds(const double X, const double m, const uint32_t oddsMods, const uint16_t modifier);
 };
 
 // Field event Result key
 using FieldEventResultKey = EventKey;
 
-class CFieldEventResultDB
+class CFieldResultDB
 {
 public:
     uint32_t nEventId;
@@ -409,12 +410,12 @@ public:
     std::map<uint32_t, uint8_t> contendersResults;
 
     // Default Constructor.
-    explicit CFieldEventResultDB() {}
-    explicit CFieldEventResultDB(const uint32_t eventId, const uint8_t resultType)
+    explicit CFieldResultDB() {}
+    explicit CFieldResultDB(const uint32_t eventId, const uint8_t resultType)
         : nEventId(eventId)
         , nResultType(resultType)
     {}
-    explicit CFieldEventResultDB(const uint32_t eventId, const uint8_t resultType, const std::map<uint32_t, uint8_t> mContendersResults)
+    explicit CFieldResultDB(const uint32_t eventId, const uint8_t resultType, const std::map<uint32_t, uint8_t> mContendersResults)
         : nEventId(eventId)
         , nResultType(resultType)
         , contendersResults(mContendersResults)
