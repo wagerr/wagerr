@@ -258,20 +258,20 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     return error("CheckBettingTX: Failed to find field event %lu!", betTx->nEventId);
                 }
 
-                if (bettingsViewCache.fieldResults->Exists(FieldEventResultKey{betTx->nEventId})) {
+                if (bettingsViewCache.fieldResults->Exists(FieldResultKey{betTx->nEventId})) {
                     return error("CheckBettingTX: Bet placed to resulted field event %lu!", betTx->nEventId);
                 }
 
-                if (!CFieldEventDB::IsMarketOpen((FieldBetMarketType)betTx->nMarketType, fEvent.contenders.size())) {
-                    return error("CheckBettingTX: market %lu is closed for event %lu!", betTx->nMarketType, betTx->nEventId);
+                if (!CFieldEventDB::IsMarketOpen((FieldBetOutcomeType)betTx->nOutcome, fEvent.contenders.size())) {
+                    return error("CheckBettingTX: market %lu is closed for event %lu!", betTx->nOutcome, betTx->nEventId);
                 }
 
                 if (fEvent.contenders.find(betTx->nContenderId) == fEvent.contenders.end()) {
                     return error("CheckBettingTX: Unknown contenderId %lu for event %lu!", betTx->nContenderId, betTx->nEventId);
                 }
 
-                CFieldLegDB legDB{betTx->nEventId, (FieldBetMarketType)betTx->nMarketType, betTx->nContenderId};
-                if (GetFieldBetPotentionalOdds(legDB, fEvent) == 0) {
+                CFieldLegDB legDB{betTx->nEventId, (FieldBetOutcomeType)betTx->nOutcome, betTx->nContenderId};
+                if (GetBetPotentialOdds(legDB, fEvent) == 0) {
                     return error("CheckBettingTX: Bet odds is zero for Event %lu contenderId %d!", betTx->nEventId, betTx->nContenderId);
                 }
 
@@ -310,20 +310,20 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         return error("CheckBettingTX: Failed to find field event %lu!", leg.nEventId);
                     }
 
-                    if (bettingsViewCache.fieldResults->Exists(FieldEventResultKey{leg.nEventId})) {
+                    if (bettingsViewCache.fieldResults->Exists(FieldResultKey{leg.nEventId})) {
                         return error("CheckBettingTX: Bet placed to resulted field event %lu!", leg.nEventId);
                     }
 
-                    if (!CFieldEventDB::IsMarketOpen((FieldBetMarketType)leg.nMarketType, fEvent.contenders.size())) {
-                        return error("CheckBettingTX: market %lu is closed for event %lu!", leg.nMarketType, leg.nEventId);
+                    if (!CFieldEventDB::IsMarketOpen((FieldBetOutcomeType)leg.nOutcome, fEvent.contenders.size())) {
+                        return error("CheckBettingTX: market %lu is closed for event %lu!", leg.nOutcome, leg.nEventId);
                     }
 
                     if (fEvent.contenders.find(leg.nContenderId) == fEvent.contenders.end()) {
                         return error("CheckBettingTX: Unknown contenderId %lu for event %lu!", leg.nContenderId, leg.nEventId);
                     }
 
-                    CFieldLegDB legDB{leg.nEventId, (FieldBetMarketType)leg.nMarketType, leg.nContenderId};
-                    if (GetFieldBetPotentionalOdds(legDB, fEvent) == 0) {
+                    CFieldLegDB legDB{leg.nEventId, (FieldBetOutcomeType)leg.nOutcome, leg.nContenderId};
+                    if (GetBetPotentialOdds(legDB, fEvent) == 0) {
                         return error("CheckBettingTX: Bet odds is zero for Event %lu contenderId %d!", leg.nEventId, leg.nContenderId);
                     }
 
@@ -520,10 +520,13 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
 
+                if (fResultTx->nResultType != standardResult || fResultTx->nResultType != eventRefund)
+                    return error("CheckBettingTX: unsuported result type for field event: %d!", fResultTx->nResultType);
+
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
                     return error("CheckBettingTX: trying to result not existed field event id %lu!", fResultTx->nEventId);
 
-                if (bettingsViewCache.fieldResults->Exists(FieldEventResultKey{fResultTx->nEventId}))
+                if (bettingsViewCache.fieldResults->Exists(FieldResultKey{fResultTx->nEventId}))
                     return error("CheckBettingTX: trying to result already resulted field event id %lu!", fResultTx->nEventId);
 
                 CFieldEventDB fEvent;
@@ -886,7 +889,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
 
                 CFieldBetTx* fBetTx = (CFieldBetTx*) bettingTx.get();
                 LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
-                    fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nMarketType);
+                    fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nOutcome);
 
                 CFieldEventDB fEvent, fCachedEvent;
                 FieldEventKey fEventKey{fBetTx->nEventId};
@@ -911,7 +914,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
 
                 CAmount payout, burn;
-                switch (fBetTx->nMarketType) {
+                switch (fBetTx->nOutcome) {
                     case outright:
                     {
                         CalculatePayoutBurnAmounts(betAmount, fCachedEvent.contenders[fBetTx->nContenderId].nOutrightOdds, payout, burn);
@@ -941,7 +944,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     break;
                 }
 
-                CFieldLegDB fLeg{fBetTx->nEventId, (FieldBetMarketType)fBetTx->nMarketType, fBetTx->nContenderId};
+                CFieldLegDB fLeg{fBetTx->nEventId, (FieldBetOutcomeType)fBetTx->nOutcome, fBetTx->nContenderId};
                 if (!bettingsViewCache.fieldBets->Write(
                     FieldBetKey{static_cast<uint32_t>(height), outPoint},
                     CFieldBetDB(betAmount, address, {fLeg}, {fCachedEvent}, blockTime)))
@@ -964,8 +967,8 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 LogPrint("wagerr", "FieldParlayBet: legs: ");
                 for (const auto& leg : fParlayBetTx->legs) {
                     LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
-                        leg.nEventId, leg.nContenderId, leg.nMarketType);
-                    legs.emplace_back(leg.nEventId, (FieldBetMarketType)leg.nMarketType, leg.nContenderId);
+                        leg.nEventId, leg.nContenderId, leg.nOutcome);
+                    legs.emplace_back(leg.nEventId, (FieldBetOutcomeType)leg.nOutcome, leg.nContenderId);
                 }
 
                 std::vector<CBettingUndoDB> vUndos;
@@ -992,7 +995,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     lockedEvents.emplace_back(fCachedEvent);
                     vUndos.emplace_back(BettingUndoVariant{fEvent}, (uint32_t)height);
 
-                    switch (leg.nMarketType) {
+                    switch (leg.nOutcome) {
                         case outright:
                         {
                             fEvent.contenders[leg.nContenderId].nOutrightBets += 1;
@@ -1302,22 +1305,23 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     LogPrint("wagerr", "id %lu : place %lu\n", contender.first, contender.second);
                 }
 
-                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId})) {
+                CFieldEventDB fieldEvent;
+                if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{fResultTx->nEventId}, fieldEvent)) {
                     LogPrintf("Failed to find field event!\n");
                     break;
                 }
 
                 CFieldResultDB fEventResult{fResultTx->nEventId, fResultTx->nResultType};
-                for (auto& contender : fEventResult.contendersResults) {
+                for (auto& contender : fieldEvent.contenders) {
                     if (fResultTx->contendersResults.find(contender.first) != fResultTx->contendersResults.end()) {
-                        contender.second = fResultTx->contendersResults[contender.first];
+                        fEventResult.contendersResults.emplace(contender.first, fResultTx->contendersResults[contender.first]);
                     }
                     else {
-                        contender.second = ContenderResult::DNF;
+                        fEventResult.contendersResults.emplace(contender.first, ContenderResult::DNF);
                     }
                 }
 
-                if (!bettingsViewCache.fieldResults->Write(FieldEventResultKey{fEventResult.nEventId}, fEventResult)) {
+                if (!bettingsViewCache.fieldResults->Write(FieldResultKey{fEventResult.nEventId}, fEventResult)) {
                     LogPrintf("Failed to write field result!\n");
                     break;
                 }
@@ -1758,7 +1762,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 CFieldBetTx* fBetTx = (CFieldBetTx*) bettingTx.get();
                 LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
-                    fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nMarketType);
+                    fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nOutcome);
 
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fBetTx->nEventId})) {
                     LogPrintf("Failed to find event!\n");
@@ -1784,8 +1788,8 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 LogPrint("wagerr", "FieldParlayBet: legs: ");
                 for (const auto& leg : fParlayBetTx->legs) {
                     LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
-                        leg.nEventId, leg.nContenderId, leg.nMarketType);
-                    legs.emplace_back(leg.nEventId, (FieldBetMarketType)leg.nMarketType, leg.nContenderId);
+                        leg.nEventId, leg.nContenderId, leg.nOutcome);
+                    legs.emplace_back(leg.nEventId, (FieldBetOutcomeType)leg.nOutcome, leg.nContenderId);
                 }
 
                 bool allEventsExist = true;
@@ -2023,13 +2027,18 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
 
+                if (fResultTx->nResultType != standardResult || fResultTx->nResultType != eventRefund)
+                    break;
+                if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
+                    break;
+
                 LogPrint("wagerr", "CFieldResultTx: id: %lu, resultType: %lu\n", fResultTx->nEventId, fResultTx->nResultType);
                 for (auto& contender : fResultTx->contendersResults) {
                     LogPrint("wagerr", "id %lu : place %lu\n", contender.first, contender.second);
                 }
 
-                if (bettingsViewCache.fieldResults->Exists(FieldEventResultKey{fResultTx->nEventId})) {
-                    if (!bettingsViewCache.fieldResults->Erase(FieldEventResultKey{fResultTx->nEventId})) {
+                if (bettingsViewCache.fieldResults->Exists(FieldResultKey{fResultTx->nEventId})) {
+                    if (!bettingsViewCache.fieldResults->Erase(FieldResultKey{fResultTx->nEventId})) {
                         LogPrintf("Revert failed!\n");
                         return false;
                     }

@@ -348,6 +348,47 @@ std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerl
     return {0, 0};
 }
 
+/**
+ * Check winning condition for current bet considering locked event and event result.
+ *
+ * @return pair of {on_chain_odds, effective_odds}, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
+ */
+std::pair<uint32_t, uint32_t> GetBetOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent, const CFieldResultDB &result, const bool fWagerrProtocolV4)
+{
+    if (result.nResultType == ResultType::eventRefund) {
+        return {BET_ODDSDIVISOR, BET_ODDSDIVISOR};
+    }
+    uint8_t contederResult = result.contendersResults.find(bet.nContenderId) != result.contendersResults.end() ?
+        result.contendersResults.at(bet.nContenderId) : (uint8_t)ContenderResult::DNF;
+    ContenderInfo contenderInfo = lockedEvent.contenders.find(bet.nContenderId) != lockedEvent.contenders.end() ?
+        lockedEvent.contenders.at(bet.nContenderId) : ContenderInfo{};
+    switch (bet.nOutcome)
+    {
+        case FieldBetOutcomeType::outright:
+            if (contederResult == ContenderResult::place1) {
+                return {contenderInfo.nOutrightOdds, CalculateEffectiveOdds(contenderInfo.nOutrightOdds)};
+            }
+            break;
+        case FieldBetOutcomeType::place:
+            if (contederResult == ContenderResult::place1 ||
+                    contederResult == ContenderResult::place2) {
+                return {contenderInfo.nPlaceOdds, CalculateEffectiveOdds(contenderInfo.nPlaceOdds)};
+            }
+            break;
+        case FieldBetOutcomeType::show:
+            if (contederResult == ContenderResult::place1 ||
+                    contederResult == ContenderResult::place2 ||
+                    contederResult == ContenderResult::place3) {
+                return {contenderInfo.nShowOdds, CalculateEffectiveOdds(contenderInfo.nShowOdds)};
+            }
+            break;
+        default:
+            break;
+    }
+    // bet lose
+    return {0, 0};
+}
+
 uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent)
 {
     switch(bet.nOutcome) {
@@ -371,14 +412,14 @@ uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEvent
     return 0;
 }
 
-uint32_t GetFieldBetPotentionalOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent)
+uint32_t GetBetPotentialOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent)
 {
     auto contender_it = lockedEvent.contenders.find(bet.nContenderId);
     if (contender_it == lockedEvent.contenders.end()) {
         return 0;
     }
 
-    switch (bet.nMarketType)
+    switch (bet.nOutcome)
     {
     case outright:
         return contender_it->second.nOutrightOdds;

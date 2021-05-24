@@ -171,7 +171,7 @@ public:
     uint16_t nTournament;
     uint16_t nStage;
     uint16_t nGroupType;
-    uint16_t nMarginPercent;
+    uint32_t nMarginPercent;
     // contenderId : input odds
     std::map<uint32_t, uint32_t> mContendersInputOdds;
 
@@ -241,7 +241,7 @@ class CFieldUpdateMarginTx : public CBettingTx
 {
 public:
     uint32_t nEventId;
-    uint16_t nMarginPercent;
+    uint32_t nMarginPercent;
 
     // Default Constructor.
     CFieldUpdateMarginTx() {}
@@ -302,14 +302,14 @@ class CFieldBetTx : public CBettingTx
 {
 public:
     uint32_t nEventId;
-    uint8_t nMarketType;
+    uint8_t nOutcome;
     uint32_t nContenderId;
 
     // Default constructor.
     CFieldBetTx() {}
     CFieldBetTx(const uint32_t eventId, const uint8_t marketType, const uint32_t contenderId)
         : nEventId(eventId)
-        , nMarketType(marketType)
+        , nOutcome(marketType)
         , nContenderId(contenderId)
     {}
 
@@ -320,7 +320,7 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nEventId);
-        READWRITE(nMarketType);
+        READWRITE(nOutcome);
         READWRITE(nContenderId);
     }
 };

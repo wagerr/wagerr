@@ -15,19 +15,184 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
 {
     const int nLastBlockHeight = nNewBlockHeight - 1;
 
+    bool fWagerrProtocolV4 = nLastBlockHeight >= Params().WagerrProtocolV4StartHeight();
+
+    if (!fWagerrProtocolV4)
+        return;
+
     uint64_t refundOdds{BET_ODDSDIVISOR};
 
     // Get all the results posted in the prev block.
     std::vector<CFieldResultDB> results = GetFieldResults(nLastBlockHeight);
 
-    bool fWagerrProtocolV3 = nLastBlockHeight >= Params().WagerrProtocolV3StartHeight();
-
     CAmount effectivePayoutsSum, grossPayoutsSum = effectivePayoutsSum = 0;
 
-    LogPrint("wagerr", "Start generating peerless bets payouts...\n");
+    LogPrint("wagerr", "Start generating field bets payouts...\n");
 
     for (auto result : results) {
 
         LogPrint("wagerr", "Looking for bets of eventId: %lu\n", result.nEventId);
+
+        // look bets during the bet interval
+        uint32_t startHeight = GetBetSearchStartHeight(nLastBlockHeight);
+        auto it = bettingsViewCache.fieldBets->NewIterator();
+        std::vector<std::pair<FieldBetKey, CFieldBetDB>> vEntriesToUpdate;
+        for (it->Seek(CBettingDB::DbTypeToBytes(FieldBetKey{static_cast<uint32_t>(startHeight), COutPoint()})); it->Valid(); it->Next()) {
+            bool legHalfLose = false;
+            bool legHalfWin = false;
+            bool legRefund = false;
+
+            FieldBetKey uniBetKey;
+            CFieldBetDB uniBet;
+            CBettingDB::BytesToDbType(it->Key(), uniBetKey);
+            CBettingDB::BytesToDbType(it->Value(), uniBet);
+            // skip if bet is already handled
+            if (uniBet.IsCompleted()) continue;
+
+            bool completedBet = false;
+            // {onchainOdds, effectiveOdds}
+            std::pair<uint32_t, uint32_t> finalOdds{0, 0};
+
+            // parlay bet
+            if (uniBet.legs.size() > 1) {
+                bool resultFound = false;
+                for (auto leg : uniBet.legs) {
+                    // if we found one result for parlay - check win condition for this and each other legs
+                    if (leg.nEventId == result.nEventId) {
+                        resultFound = true;
+                        break;
+                    }
+                }
+                if (resultFound) {
+                    // make assumption that parlay is completed and this result is last
+                    completedBet = true;
+                    // find all results for all legs
+                    bool firstOddMultiply = true;
+                    for (uint32_t idx = 0; idx < uniBet.legs.size(); idx++) {
+                        CFieldLegDB &leg = uniBet.legs[idx];
+                        CFieldEventDB &lockedEvent = uniBet.lockedEvents[idx];
+                        // skip this bet if incompleted (can't find one result)
+                        CFieldResultDB res;
+                        if (bettingsViewCache.fieldResults->Read(FieldResultKey{leg.nEventId}, res)) {
+                            // {onchainOdds, effectiveOdds}
+                            std::pair<uint32_t, uint32_t> betOdds;
+                            // if bet placed before 2 mins of event started - refund this bet
+                            if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                                betOdds = std::pair<uint32_t, uint32_t>{refundOdds, refundOdds};
+                            }
+                            else {
+                                betOdds = GetBetOdds(leg, lockedEvent, res, fWagerrProtocolV4);
+                            }
+
+                            if (betOdds.first == 0) { }
+                            else if (betOdds.first == refundOdds) {
+                                legRefund = true;
+                            }
+                            else if (betOdds.first == refundOdds / 2) {
+                                legHalfLose = true;
+                            }
+                            else if (betOdds.first < GetBetPotentialOdds(leg, lockedEvent)) {
+                                legHalfWin = true;
+                            }
+                            // multiply odds
+                            if (firstOddMultiply) {
+                                finalOdds.first = betOdds.first;
+                                finalOdds.second = betOdds.second ;
+                                firstOddMultiply = false;
+                            }
+                            else {
+                                finalOdds.first = static_cast<uint32_t>(((uint64_t) finalOdds.first * betOdds.first) / BET_ODDSDIVISOR);
+                                finalOdds.second = static_cast<uint32_t>(((uint64_t) finalOdds.second * betOdds.second) / BET_ODDSDIVISOR);
+                            }
+                        }
+                        else {
+                            completedBet = false;
+                            break;
+                        }
+                    }
+                }
+            }
+            // single bet
+            else if (uniBet.legs.size() == 1) {
+                CFieldLegDB &singleBet = uniBet.legs[0];
+                CFieldEventDB &lockedEvent = uniBet.lockedEvents[0];
+
+                if (singleBet.nEventId == result.nEventId) {
+                    completedBet = true;
+
+                    // if bet placed before 2 mins of event started - refund this bet
+                    if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+
+                        finalOdds = std::pair<uint32_t, uint32_t>{refundOdds, refundOdds};
+                    }
+                    else {
+                        finalOdds = GetBetOdds(singleBet, lockedEvent, result, fWagerrProtocolV4);
+                    }
+
+                    if (finalOdds.first == 0) { }
+                    else if (finalOdds.first == refundOdds) {
+                        legRefund = true;
+                    }
+                    else if (finalOdds.first == refundOdds / 2) {
+                        legHalfLose = true;
+                    }
+                    else if (finalOdds.first < GetBetPotentialOdds(singleBet, lockedEvent)) {
+                        legHalfWin = true;
+                    }
+                }
+            }
+
+            if (completedBet) {
+                if (uniBet.betAmount < (Params().MinBetPayoutRange() * COIN) || uniBet.betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                    finalOdds = std::pair<uint32_t, uint32_t>{refundOdds, refundOdds};
+                }
+
+                CAmount effectivePayout, grossPayout;
+
+                effectivePayout = uniBet.betAmount * finalOdds.second / BET_ODDSDIVISOR;
+                grossPayout = uniBet.betAmount * finalOdds.first / BET_ODDSDIVISOR;
+                effectivePayoutsSum += effectivePayout;
+                grossPayoutsSum += grossPayout;
+
+                if (effectivePayout > 0) {
+                    // Add winning payout to the payouts vector.
+                    CPayoutInfoDB payoutInfo(uniBetKey, finalOdds.second <= refundOdds ? PayoutType::bettingRefund : PayoutType::bettingPayout);
+                    vExpectedPayouts.emplace_back(effectivePayout, GetScriptForDestination(uniBet.playerAddress.Get()), uniBet.betAmount);
+                    vPayoutsInfo.emplace_back(payoutInfo);
+
+                    if (effectivePayout < uniBet.betAmount) {
+                        uniBet.resultType = BetResultType::betResultPartialLose;
+                    }
+                    else if (finalOdds.first == refundOdds) {
+                        uniBet.resultType = BetResultType::betResultRefund;
+                    }
+                    else if ((uniBet.legs.size() == 1 && legHalfWin) ||
+                            (uniBet.legs.size() > 1 && (legHalfWin || legHalfLose || legRefund))) {
+                        uniBet.resultType = BetResultType::betResultPartialWin;
+                    }
+                    else {
+                        uniBet.resultType = BetResultType::betResultWin;
+                    }
+                    // write payout height: result height + 1
+                    uniBet.payoutHeight = (uint32_t) nNewBlockHeight;
+                }
+                else {
+                    uniBet.resultType = BetResultType::betResultLose;
+                }
+                uniBet.payout = effectivePayout;
+                LogPrint("wagerr", "\nField bet %s is handled!\nPlayer address: %s\nFinal onchain odds: %lu, effective odds: %lu\nPayout: %lu\n",
+                    uniBetKey.outPoint.ToStringShort(), uniBet.playerAddress.ToString(), finalOdds.first, finalOdds.second, effectivePayout);
+                LogPrint("wagerr", "Legs:");
+                for (auto &leg : uniBet.legs) {
+                    LogPrint("wagerr", " (eventId: %lu, OutcomeType: %lu, contenderId: %lu)\n", leg.nEventId, leg.nOutcome, leg.nContenderId);
+                }
+                // if handling bet is completed - mark it
+                uniBet.SetCompleted();
+                vEntriesToUpdate.emplace_back(std::pair<FieldBetKey, CFieldBetDB>{uniBetKey, uniBet});
+            }
+        }
+        for (auto pair : vEntriesToUpdate) {
+            bettingsViewCache.bets->Update(pair.first, pair.second);
+        }
     }
 }

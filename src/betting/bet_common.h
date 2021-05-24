@@ -21,6 +21,7 @@ class CFieldResultDB;
 
 #define BET_ODDSDIVISOR 10000   // Odds divisor, Facilitates calculations with floating integers.
 #define MODIFIER_DIVISOR 100
+#define MARGIN_DIVISOR 100
 #define BET_BURNXPERMILLE 60    // Burn promillage
 #define BET_MAXODDS (99 * BET_ODDSDIVISOR)
 #define BET_MINODDS BET_ODDSDIVISOR
@@ -54,11 +55,11 @@ typedef enum ContenderResult {
     DNR    = 101, // Did not race
 } ContenderResult;
 
-typedef enum FieldBetMarketType {
+typedef enum FieldBetOutcomeType {
     outright = 0x01,
     place    = 0x02,
     show     = 0x03
-} FieldBetMarketType;
+} FieldBetOutcomeType;
 
 // The supported result types
 typedef enum WinnerType {
@@ -206,8 +207,9 @@ bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesR
  * @return Odds, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
  */
 std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent, const CPeerlessResultDB &result, const bool fWagerrProtocolV3);
+std::pair<uint32_t, uint32_t> GetBetOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent, const CFieldResultDB &result, const bool fWagerrProtocolV4);
 
 uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent);
-uint32_t GetFieldBetPotentionalOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent);
+uint32_t GetBetPotentialOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent);
 
 #endif

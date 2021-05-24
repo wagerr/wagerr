@@ -349,7 +349,7 @@ public:
     uint32_t nSport        = 0;
     uint32_t nTournament = 0;
     uint32_t nStage      = 0;
-    uint16_t nMarginPercent = 0;
+    uint32_t nMarginPercent = 0;
     // contenderId : ContenderInfo
     std::map<uint32_t, ContenderInfo> contenders;
 
@@ -363,7 +363,7 @@ public:
 
     void CalcOdds();
 
-    static bool IsMarketOpen(const FieldBetMarketType type, const size_t contendersCount);
+    static bool IsMarketOpen(const FieldBetOutcomeType type, const size_t contendersCount);
 
     ADD_SERIALIZE_METHODS;
 
@@ -399,7 +399,7 @@ private:
 };
 
 // Field event Result key
-using FieldEventResultKey = EventKey;
+using FieldResultKey = EventKey;
 
 class CFieldResultDB
 {
@@ -567,14 +567,14 @@ class CFieldLegDB
 {
 public:
     uint32_t nEventId;
-    FieldBetMarketType nMarketType;
+    FieldBetOutcomeType nOutcome;
     uint32_t nContenderId;
 
     // Default constructor.
     explicit CFieldLegDB() {}
-    explicit CFieldLegDB(const uint32_t eventId, const FieldBetMarketType marketType, const uint32_t contenderId)
+    explicit CFieldLegDB(const uint32_t eventId, const FieldBetOutcomeType outcome, const uint32_t contenderId)
         : nEventId(eventId)
-        , nMarketType(marketType)
+        , nOutcome(outcome)
         , nContenderId(contenderId)
     {}
 
@@ -586,10 +586,10 @@ public:
         READWRITE(nEventId);
         if (ser_action.ForRead()) {
             READWRITE(market);
-            nMarketType = (FieldBetMarketType) market;
+            nOutcome = (FieldBetOutcomeType) market;
         }
         else {
-            market = (uint8_t) nMarketType;
+            market = (uint8_t) nOutcome;
             READWRITE(market);
         }
         READWRITE(nContenderId);

@@ -2117,7 +2117,7 @@ UniValue placefieldbet(const UniValue& params, bool fHelp) {
     EnsureEnoughWagerr(nAmount);
 
     uint32_t eventId = static_cast<uint32_t>(params[0].get_int64());
-    FieldBetMarketType marketType = static_cast<FieldBetMarketType>(params[1].get_int());
+    FieldBetOutcomeType marketType = static_cast<FieldBetOutcomeType>(params[1].get_int());
     uint32_t contenderId = static_cast<uint32_t>(params[2].get_int64());
 
     if (marketType < outright || marketType > show) {
@@ -2134,7 +2134,7 @@ UniValue placefieldbet(const UniValue& params, bool fHelp) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
     }
 
-    if (GetFieldBetPotentionalOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
+    if (GetBetPotentialOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
     }
 
@@ -2224,7 +2224,7 @@ UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
         const UniValue obj = legsArr[i].get_obj();
 
         uint32_t eventId = static_cast<uint32_t>(find_value(obj, "eventId").get_int64());
-        FieldBetMarketType marketType = static_cast<FieldBetMarketType>(find_value(obj, "marketType").get_int());
+        FieldBetOutcomeType marketType = static_cast<FieldBetOutcomeType>(find_value(obj, "marketType").get_int());
         uint32_t contenderId = static_cast<uint32_t>(find_value(obj, "contenderId").get_int64());
 
         if (marketType < outright || marketType > show) {
@@ -2245,7 +2245,7 @@ UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
         }
 
-        if (GetFieldBetPotentionalOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
+        if (GetBetPotentialOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
         }
 
@@ -2616,7 +2616,7 @@ UniValue getfieldeventliability(const UniValue& params, bool fHelp)
     CFieldEventDB fEvent;
     if (bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
         vEvent.push_back(Pair("event-id", (uint64_t) fEvent.nEventId));
-        if (!bettingsView->fieldResults->Exists(FieldEventResultKey{eventId})) {
+        if (!bettingsView->fieldResults->Exists(FieldResultKey{eventId})) {
             vEvent.push_back(Pair("event-status", "running"));
             UniValue vContenders(UniValue::VARR);
             for (const auto& contender : fEvent.contenders) {
@@ -4823,7 +4823,7 @@ UniValue getstakesplitthreshold(const UniValue& params, bool fHelp)
 
 UniValue autocombinerewards(const UniValue& params, bool fHelp)
 {
-    bool fEnable;
+    bool fEnable = false;
     if (params.size() >= 1)
         fEnable = params[0].get_bool();
 

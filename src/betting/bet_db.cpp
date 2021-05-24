@@ -6,6 +6,7 @@
 
 #define DOUBLE_ODDS(odds) (static_cast<double>(odds) / BET_ODDSDIVISOR)
 #define DOUBLE_MODIFIER(mod) (static_cast<double>(mod) / MODIFIER_DIVISOR)
+#define DOUBLE_MARGIN(mrg) (static_cast<double>(mrg) / MARGIN_DIVISOR / 100)
 
 std::string CMappingDB::ToTypeName(MappingType type)
 {
@@ -49,7 +50,7 @@ MappingType CMappingDB::FromTypeName(const std::string& name)
     return static_cast<MappingType>(-1);
 }
 
-bool CFieldEventDB::IsMarketOpen(const FieldBetMarketType type, const size_t contendersCount) {
+bool CFieldEventDB::IsMarketOpen(const FieldBetOutcomeType type, const size_t contendersCount) {
     switch(type) {
         case outright:
             break; // always open
@@ -151,7 +152,7 @@ void CFieldEventDB::CalculateOutrightOdds(const std::map<uint32_t, uint32_t>& mC
     double X = 1.0;
     uint32_t it = 1;
     double delta = 0.0;
-    double margin = static_cast<double>(nMarginPercent) / 100;
+    double margin = DOUBLE_MARGIN(nMarginPercent);
     double debugStepMargin = 0.0;
 
     // calc X
@@ -260,7 +261,7 @@ void CFieldEventDB::CalcOdds()
             break;
         }
 
-        double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 2.0;
+        double realMarginIn = DOUBLE_MARGIN(nMarginPercent) * 2.0;
         mPlace = CalculateM(vContendersPlaceOddsMods, realMarginIn);
         XPlace = CalculateX(vContendersPlaceOddsMods, realMarginIn);
 
@@ -307,7 +308,7 @@ void CFieldEventDB::CalcOdds()
             break;
         }
 
-        double realMarginIn = (static_cast<double>(nMarginPercent) / 100.0) * 3.0;
+        double realMarginIn = DOUBLE_MARGIN(nMarginPercent) * 3.0;
         mShow = CalculateM(vContendersShowOddsMods, realMarginIn);
         XShow = CalculateX(vContendersShowOddsMods, realMarginIn);
 
