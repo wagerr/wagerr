@@ -1279,6 +1279,7 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                     bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
 
                     for (auto& contender : fEvent.contenders) {
+                        contender.second.nInputOdds = 0;
                         contender.second.nOutrightOdds = 0;
                         contender.second.nPlaceOdds = 0;
                         contender.second.nShowOdds = 0;

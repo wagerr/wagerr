@@ -15,17 +15,24 @@ BOOST_AUTO_TEST_CASE(FieldEventOddsCalc)
     CFieldEventDB fEvent;
     fEvent.nMarginPercent = 11100; // 111.00 %
     std::map<uint32_t, ContenderInfo> mContenders {
-        {1, ContenderInfo{650000, 0, 0, 0, 0}}, // 6.5
-        {2, ContenderInfo{450000, 0, 0, 0, 0}}, // 4.5
-        {3, ContenderInfo{275000, 0, 0, 0, 0}}, // 2.75
-        {4, ContenderInfo{2900000, 0, 0, 0, 0}}, // 29
-        {5, ContenderInfo{1700000, 0, 0, 0, 0}}, // 17
-        {6, ContenderInfo{1700000, 0, 0, 0, 0}}, // 17
-        {7, ContenderInfo{2900000, 0, 0, 0, 0}}, // 29
-        {8, ContenderInfo{1100000, 0, 0, 0, 0}}, // 11
-        {9, ContenderInfo{650000, 0, 0, 0, 0}} // 6.5
+        {1, ContenderInfo{65000, 0, 0, 0, 0}}, // 6.5
+        {2, ContenderInfo{45000, 0, 0, 0, 0}}, // 4.5
+        {3, ContenderInfo{27500, 0, 0, 0, 0}}, // 2.75
+        {4, ContenderInfo{290000, 0, 0, 0, 0}}, // 29
+        {5, ContenderInfo{170000, 0, 0, 0, 0}}, // 17
+        {6, ContenderInfo{170000, 0, 0, 0, 0}}, // 17
+        {7, ContenderInfo{290000, 0, 0, 0, 0}}, // 29
+        {8, ContenderInfo{110000, 0, 0, 0, 0}}, // 11
+        {9, ContenderInfo{65000, 0, 0, 0, 0}} // 6.5
     };
     fEvent.contenders = mContenders;
+    fEvent.nGroupType = FieldEventGroupType::animalRacing;
+    printf("Field Event State:\n%s", fEvent.ToString().c_str());
+    fEvent.CalcOdds();
+    printf("Field Event State after Calc Odds for animals:\n%s", fEvent.ToString().c_str());
+    fEvent.nGroupType = FieldEventGroupType::other;
+    fEvent.CalcOdds();
+    printf("Field Event State after Calc Odds for others:\n%s", fEvent.ToString().c_str());
 }
 
 BOOST_AUTO_TEST_SUITE_END()

@@ -170,7 +170,7 @@ public:
     uint16_t nSport;
     uint16_t nTournament;
     uint16_t nStage;
-    uint16_t nGroupType;
+    uint8_t nGroupType;
     uint32_t nMarginPercent;
     // contenderId : input odds
     std::map<uint32_t, uint32_t> mContendersInputOdds;

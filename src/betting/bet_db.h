@@ -345,7 +345,7 @@ class CFieldEventDB
 public:
     uint32_t nEventId      = 0;
     uint64_t nStartTime    = 0;
-    uint32_t nGroupType    = 0;
+    uint8_t nGroupType    = 0;
     uint32_t nSport        = 0;
     uint32_t nTournament = 0;
     uint32_t nStage      = 0;
@@ -364,6 +364,9 @@ public:
     void CalcOdds();
 
     static bool IsMarketOpen(const FieldBetOutcomeType type, const size_t contendersCount);
+
+    std::string ToString();
+    std::string ContendersToString();
 
     ADD_SERIALIZE_METHODS;
 

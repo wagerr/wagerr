@@ -233,6 +233,8 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
             if (!bettingsView->mappings->Read(MappingKey{contenderMapping, contender_it.first}, mapping))
                 continue;
             contender.push_back(Pair("name", mapping.sName));
+            contender.push_back(Pair("modifier", (uint64_t) contender_it.second.nModifier));
+            contender.push_back(Pair("input-odds", (uint64_t) contender_it.second.nInputOdds));
             contender.push_back(Pair("outright-odds", (uint64_t) contender_it.second.nOutrightOdds));
             contender.push_back(Pair("place-odds", (uint64_t) contender_it.second.nPlaceOdds));
             contender.push_back(Pair("show-odds", (uint64_t) contender_it.second.nShowOdds));

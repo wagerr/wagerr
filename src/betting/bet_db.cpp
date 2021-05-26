@@ -3,6 +3,7 @@
 // file COPYING or http://www.opensource.org/licenses/mit-license.php.
 
 #include <betting/bet_db.h>
+#include <boost/format.hpp>
 
 #define DOUBLE_ODDS(odds) (static_cast<double>(odds) / BET_ODDSDIVISOR)
 #define DOUBLE_MODIFIER(mod) (static_cast<double>(mod) / MODIFIER_DIVISOR)
@@ -590,6 +591,30 @@ uint32_t CFieldEventDB::CalculateMarketOdds(const double X, const double m, cons
     return outputOdds;
 }
 
+std::string CFieldEventDB::ToString()
+{
+    boost::format fmt =
+        boost::format(
+        "Event id: %lu, startTime: %llu, groupType: %d, sport: %lu, tournament: %lu, stage: %lu, margin: %lu\n"
+        "Contenders info:\n%s")
+        % nEventId % nStartTime % nGroupType % nSport % nTournament % nStage % nMarginPercent % ContendersToString();
+
+    return fmt.str();
+}
+
+std::string CFieldEventDB::ContendersToString()
+{
+    std::string str;
+    for (auto &contender : contenders) {
+        ContenderInfo &info = contender.second;
+        boost::format fmt =
+            boost::format("Contender id: %lu, modifier: %lu, inputOdds: %lu, outrightOdds: %lu, placeOdds: %lu, showOdds: %lu\n") %
+            contender.first % info.nModifier % info.nInputOdds % info.nOutrightOdds % info.nPlaceOdds % info.nShowOdds;
+        str.append(fmt.str());
+    }
+
+    return str;
+}
 /*
  * CBettingDB methods
  */
