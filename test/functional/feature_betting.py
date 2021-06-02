@@ -32,9 +32,6 @@ outcome_spread_away = 5
 outcome_total_over = 6
 outcome_total_under = 7
 
-ODDS_DIVISOR = 10000
-BETX_PERMILLE = 60
-
 def check_bet_payouts_info(listbets, listpayoutsinfo):
     for bet in listbets:
         info_found = False
@@ -660,8 +657,6 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[3].placebet(1, outcome_draw, player2_bet)
         winnings = Decimal(player2_bet * self.odds_events[1]['drawOdds'])
         player2_expected_win = (winnings - ((winnings - player2_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR
-        #self.log.info("Winnings %d" % winnings)
-        #self.log.info("Expected Win %s" % player2_expected_win)
 
         self.nodes[3].generate(1)
         self.sync_all()
@@ -692,27 +687,11 @@ class BettingTest(BitcoinTestFramework):
         height = block['height']
 
         self.sync_all()
-        #print("Player 1 Total Bet", player1_total_bet)
-        #print("Player 2 Total Bet", player2_total_bet)
-
 
         payoutsInfo = self.nodes[0].getpayoutinfosince(1)
 
-        #self.log.info("Listbets")
-        #pprint.pprint(listbets)
-        #self.log.info("Payouts Info")
-        #pprint.pprint(payoutsInfo)
-        # no payout info for losing bet
-        # check_bet_payouts_info(listbets, payoutsInfo)
-
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
-
-        #self.log.info("Player 1 Balance Before %s" % player1_balance_before)
-        #self.log.info("Player 1 Balance After %s" % player1_balance_after)
-        #self.log.info("Player 2 Balance Before %s" % player2_balance_before)
-        #self.log.info("Player 2 Balance After %s" % player2_balance_after)
-        #self.log.info("Player 2 Expected Win %d" % player2_balance_before + player2_expected_win)
 
         assert_equal((player1_balance_before - player1_expected_loss + player1_bet_cost), player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
@@ -837,8 +816,6 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        #self.log.info("Event Liability")
-        #pprint.pprint(self.nodes[0].geteventliability(4))
         liability=self.nodes[0].geteventliability(4)
         gotliability=liability["spread-away-liability"]
         assert_equal(gotliability, Decimal(384))
@@ -858,26 +835,14 @@ class BettingTest(BitcoinTestFramework):
         player1_balance_before = Decimal(self.nodes[2].getbalance())
         player2_balance_before = Decimal(self.nodes[3].getbalance())
 
-        # print("player1 balance before: ", player1_balance_before)
-        # print("player1 exp win: ", player1_expected_win)
-        # print("player2 balance before: ", player2_balance_before)
-        # print("player2 exp win: ", player2_expected_win)
-
         # generate block with payouts
         blockhash = self.nodes[0].generate(1)[0]
         block = self.nodes[0].getblock(blockhash)
 
         self.sync_all()
-        #print("Player 1 Total Bet", player1_total_bet)
-        #print("Player 2 Total Bet", player2_total_bet)
-
-        # print(pprint.pformat(block))
 
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
-
-        # print("player1 balance after: ", player1_balance_after)
-        # print("player2 balance after: ", player2_balance_after)
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
@@ -1321,26 +1286,14 @@ class BettingTest(BitcoinTestFramework):
         player1_balance_before = Decimal(self.nodes[2].getbalance())
         player2_balance_before = Decimal(self.nodes[3].getbalance())
 
-        # print("player1 balance before: ", player1_balance_before)
-        # print("player1 exp win: ", player1_expected_win)
-        # print("player2 balance before: ", player2_balance_before)
-        # print("player2 exp win: ", player2_expected_win)
-
         # generate block with payouts
         blockhash = self.nodes[0].generate(1)[0]
         block = self.nodes[0].getblock(blockhash)
 
         self.sync_all()
-        #print("Player 1 Total Bet", player1_total_bet)
-        #print("Player 2 Total Bet", player2_total_bet)
-
-        # print(pprint.pformat(block))
 
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
-
-        # print("player1 balance after: ", player1_balance_after)
-        # print("player2 balance after: ", player2_balance_after)
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)
@@ -1442,15 +1395,13 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
         self.log.info("Events after updating")
-        pprint.pprint(self.nodes[0].listevents())
 
         # Place Bet to ML Home Win
         player1_bet = 150
         player1_total_bet = player1_total_bet + player1_bet
         self.nodes[2].placebet(10, outcome_home_win, player1_bet)
         winnings = Decimal(player1_bet * self.odds_events[0]['homeOdds'])
-        pprint.pprint(winnings)
-        pprint.pprint(player1_expected_win)
+
         player1_expected_win = player1_expected_win + ((winnings - ((winnings - player1_bet * ODDS_DIVISOR) / 1000 * BETX_PERMILLE)) / ODDS_DIVISOR)
 
         self.sync_all()
@@ -1535,32 +1486,14 @@ class BettingTest(BitcoinTestFramework):
         player1_balance_before = Decimal(self.nodes[2].getbalance())
         player2_balance_before = Decimal(self.nodes[3].getbalance())
 
-        #print("player1 balance before: ", player1_balance_before)
-        #print("player1 exp win: ", player1_expected_win)
-        #print("player2 balance before: ", player2_balance_before)
-        #print("player2 exp win: ", player2_expected_win)
-
         # generate block with payouts
         blockhash = self.nodes[0].generate(1)[0]
         block = self.nodes[0].getblock(blockhash)
-        #should be block height 304
-        #self.log.info("Block Height %s " % self.nodes[0].getblockcount())
 
         self.sync_all()
-        #time.sleep(2000)
-        #print("Player 1 Total Bet", player1_total_bet)
-        #print("Player 2 Total Bet", player2_total_bet)
-
-        # print(pprint.pformat(block))
 
         player1_balance_after = Decimal(self.nodes[2].getbalance())
         player2_balance_after = Decimal(self.nodes[3].getbalance())
-
-        #print("player1 balance after: ", player1_balance_after)
-        #print("Player 1 total bet: ", player1_total_bet)
-        #print("player2 balance after: ", player2_balance_after)
-        #print("Player 2 total bet: ", player2_total_bet)
-
 
         assert_equal(player1_balance_before + player1_expected_win, player1_balance_after)
         assert_equal(player2_balance_before + player2_expected_win, player2_balance_after)

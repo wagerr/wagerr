@@ -52,6 +52,9 @@ QG_DICE_TOTAL_UNDER = 0x03
 QG_DICE_EVEN = 0x04
 QG_DICE_ODD = 0x05
 
+ODDS_DIVISOR = 10000
+BETX_PERMILLE = 60
+
 # Encode an unsigned int in hexadecimal and little endian byte order. The function expects the value and the size in
 # bytes as parameters.
 def encode_int_little_endian(value: int, size: int):
@@ -130,8 +133,8 @@ def make_field_event(event_id, timestamp, group, sport, tournament, round, mrg_i
     result = result + encode_int_little_endian(sport, 2)
     result = result + encode_int_little_endian(tournament, 2)
     result = result + encode_int_little_endian(round, 2)
-    result = result + encode_int_little_endian(group, 2)
-    result = result + encode_int_little_endian(mrg_in_percent, 2)
+    result = result + encode_int_little_endian(group, 1)
+    result = result + encode_int_little_endian(mrg_in_percent, 4)
     result = result + encode_int_little_endian(int(len(contenders_win_odds)), 1) # map size
     for contender_id, contender_odds in contenders_win_odds.items():
         result = result + encode_int_little_endian(int(contender_id), 4)
@@ -275,3 +278,6 @@ def make_dice_bet(dice_type, number = 1):
         result = result + encode_int_little_endian(1, 1) # vector size
         result = result + encode_int_little_endian(dice_type, 1)
     return result
+
+def calc_effective_odds(onchain_odds):
+    return ((onchain_odds - ODDS_DIVISOR) * 9400) // ODDS_DIVISOR + ODDS_DIVISOR

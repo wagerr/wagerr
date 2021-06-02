@@ -2070,10 +2070,6 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
 }
 
 UniValue placefieldbet(const UniValue& params, bool fHelp) {
-    if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
-    }
-
     if (fHelp || params.size() < 4 || params.size() > 6) {
         throw std::runtime_error(
             "placefieldbet event_id market_type contender_id amount ( \"comment\" \"comment-to\" )\n"
@@ -2098,6 +2094,10 @@ UniValue placefieldbet(const UniValue& params, bool fHelp) {
             "\nExamples:\n" +
             HelpExampleCli("placefieldbet", "1 1 100 25 \"donation\" \"seans outpost\"") +
             HelpExampleRpc("placefieldbet", "1 1 100 25 \"donation\" \"seans outpost\""));
+    }
+
+    if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
     }
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -2171,10 +2171,6 @@ UniValue placefieldbet(const UniValue& params, bool fHelp) {
 }
 
 UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
-    if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
-    }
-
     if (fHelp || params.size() < 2 || params.size() > 4) {
         throw std::runtime_error(
             "placefieldparlaybet [{\"eventId\": event_id, \"marketType\": market_type, \"contenderId\": contender_id}, ...] amount ( \"comment\" \"comment-to\" )\n"
@@ -2204,6 +2200,10 @@ UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
             "\nExamples:\n" +
             HelpExampleCli("placefieldparlaybet", "\"[{\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}, {\"eventId\": 2, \"marketType\": 2, \"contenderId\": 200}]\" 25 \"Parlay bet\" \"seans outpost\"") +
             HelpExampleRpc("placefieldparlaybet", "\"[{\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}, {\"eventId\": 322,\"marketType\": 2, \"contenderId\": 200}]\", 25, \"Parlay bet\", \"seans outpost\""));
+    }
+
+    if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
     }
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
