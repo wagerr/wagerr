@@ -2136,6 +2136,10 @@ UniValue placefieldbet(const UniValue& params, bool fHelp) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
     }
 
+    if (bettingsView->fieldResults->Exists(FieldResultKey{eventId})) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: FieldEvent " + std::to_string(eventId) + " was been resulted");
+    }
+
     if (GetBetPotentialOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
     }

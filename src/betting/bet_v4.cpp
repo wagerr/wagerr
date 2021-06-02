@@ -97,7 +97,7 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
                             // multiply odds
                             if (firstOddMultiply) {
                                 finalOdds.first = betOdds.first;
-                                finalOdds.second = betOdds.second ;
+                                finalOdds.second = betOdds.second;
                                 firstOddMultiply = false;
                             }
                             else {
@@ -192,7 +192,82 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
             }
         }
         for (auto pair : vEntriesToUpdate) {
-            bettingsViewCache.bets->Update(pair.first, pair.second);
+            bettingsViewCache.fieldBets->Update(pair.first, pair.second);
         }
     }
+}
+
+/**
+ * Undo only bet payout mark as completed in DB.
+ * But coin tx outs were undid early in native bitcoin core.
+ * @return
+ */
+bool UndoFieldBetPayouts(CBettingsView &bettingsViewCache, int height)
+{
+    int nCurrentHeight = chainActive.Height();
+    // Get all the results posted in the previous block.
+    std::vector<CFieldResultDB> results = GetFieldResults(height - 1);
+
+    LogPrintf("Start undo payouts...\n");
+
+    for (auto result : results) {
+
+        // look bets at last 14 days
+        uint32_t startHeight = GetBetSearchStartHeight(nCurrentHeight);
+
+        auto it = bettingsViewCache.bets->NewIterator();
+        std::vector<std::pair<FieldBetKey, CFieldBetDB>> vEntriesToUpdate;
+        for (it->Seek(CBettingDB::DbTypeToBytes(FieldBetKey{startHeight, COutPoint()})); it->Valid(); it->Next()) {
+            FieldBetKey uniBetKey;
+            CFieldBetDB uniBet;
+            CBettingDB::BytesToDbType(it->Key(), uniBetKey);
+            CBettingDB::BytesToDbType(it->Value(), uniBet);
+            // skip if bet is uncompleted
+            if (!uniBet.IsCompleted()) continue;
+
+            bool needUndo = false;
+
+            // parlay bet
+            if (uniBet.legs.size() > 1) {
+                bool resultFound = false;
+                for (auto leg : uniBet.legs) {
+                    // if we found one result for parlay - check each other legs
+                    if (leg.nEventId == result.nEventId) {
+                        resultFound = true;
+                    }
+                }
+                if (resultFound) {
+                    // make assumption that parlay is handled
+                    needUndo = true;
+                    // find all results for all legs
+                    for (uint32_t idx = 0; idx < uniBet.legs.size(); idx++) {
+                        CFieldLegDB &leg = uniBet.legs[idx];
+                        // skip this bet if incompleted (can't find one result)
+                        CFieldResultDB res;
+                        if (!bettingsViewCache.results->Read(ResultKey{leg.nEventId}, res)) {
+                            needUndo = false;
+                        }
+                    }
+                }
+            }
+            // single bet
+            else if (uniBet.legs.size() == 1) {
+                CFieldLegDB &singleBet = uniBet.legs[0];
+                if (singleBet.nEventId == result.nEventId) {
+                    needUndo = true;
+                }
+            }
+
+            if (needUndo) {
+                uniBet.SetUncompleted();
+                uniBet.resultType = BetResultType::betResultUnknown;
+                uniBet.payout = 0;
+                vEntriesToUpdate.emplace_back(std::pair<FieldBetKey, CFieldBetDB>{uniBetKey, uniBet});
+            }
+        }
+        for (auto pair : vEntriesToUpdate) {
+            bettingsViewCache.fieldBets->Update(pair.first, pair.second);
+        }
+    }
+    return true;
 }

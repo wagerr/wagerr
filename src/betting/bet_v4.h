@@ -16,4 +16,11 @@ class CPayoutInfoDB;
  */
 void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
 
+/**
+ * Undo only bet payout mark as completed in DB.
+ * But coin tx outs were undid early in native bitcoin core.
+ * @return
+ */
+bool UndoFieldBetPayouts(CBettingsView &bettingsViewCache, int height);
+
 #endif

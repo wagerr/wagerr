@@ -520,8 +520,8 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
 
-                if (fResultTx->nResultType != standardResult || fResultTx->nResultType != eventRefund)
-                    return error("CheckBettingTX: unsuported result type for field event: %d!", fResultTx->nResultType);
+                if (fResultTx->nResultType != standardResult && fResultTx->nResultType != eventRefund)
+                    return error("CheckBettingTX: unsupported result type for field event: %d!", fResultTx->nResultType);
 
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
                     return error("CheckBettingTX: trying to result not existed field event id %lu!", fResultTx->nEventId);
@@ -913,25 +913,28 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 // save prev event state to undo
                 bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
 
-                CAmount payout, burn;
+                CAmount payout;
                 switch (fBetTx->nOutcome) {
                     case outright:
                     {
-                        CalculatePayoutBurnAmounts(betAmount, fCachedEvent.contenders[fBetTx->nContenderId].nOutrightOdds, payout, burn);
+                        uint32_t effectiveOdds = CalculateEffectiveOdds(fCachedEvent.contenders[fBetTx->nContenderId].nOutrightOdds);
+                        payout = betAmount * effectiveOdds / BET_ODDSDIVISOR;
                         fEvent.contenders[fBetTx->nContenderId].nOutrightPotentialLiability += payout / COIN;
                         fEvent.contenders[fBetTx->nContenderId].nOutrightBets += 1;
                         break;
                     }
                     case place:
                     {
-                        CalculatePayoutBurnAmounts(betAmount, fCachedEvent.contenders[fBetTx->nContenderId].nPlaceOdds, payout, burn);
+                        uint32_t effectiveOdds = CalculateEffectiveOdds(fCachedEvent.contenders[fBetTx->nContenderId].nPlaceOdds);
+                        payout = betAmount * effectiveOdds / BET_ODDSDIVISOR;
                         fEvent.contenders[fBetTx->nContenderId].nPlacePotentialLiability += payout / COIN;
                         fEvent.contenders[fBetTx->nContenderId].nPlaceBets += 1;
                         break;
                     }
                     case show:
                     {
-                        CalculatePayoutBurnAmounts(betAmount, fCachedEvent.contenders[fBetTx->nContenderId].nShowOdds, payout, burn);
+                        uint32_t effectiveOdds = CalculateEffectiveOdds(fCachedEvent.contenders[fBetTx->nContenderId].nShowOdds);
+                        payout = betAmount * effectiveOdds / BET_ODDSDIVISOR;
                         fEvent.contenders[fBetTx->nContenderId].nShowPotentialLiability += payout / COIN;
                         fEvent.contenders[fBetTx->nContenderId].nShowBets += 1;
                         break;
@@ -1679,6 +1682,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
     LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
 
     bool wagerrProtocolV3 = height >= (uint32_t)Params().WagerrProtocolV3StartHeight();
+    bool wagerrProtocolV4 = height >= (uint32_t)Params().WagerrProtocolV4StartHeight();
 
     // undo changes in back order
     for (int i = tx.vout.size() - 1; i >= 0 ; i--) {
@@ -1759,7 +1763,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case fBetTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!wagerrProtocolV4) break;
 
                 CFieldBetTx* fBetTx = (CFieldBetTx*) bettingTx.get();
                 LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
@@ -1781,7 +1785,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case fParlayBetTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!wagerrProtocolV4) break;
 
                 CFieldParlayBetTx* fParlayBetTx = (CFieldParlayBetTx*) bettingTx.get();
                 std::vector<CFieldLegDB> legs;
@@ -1855,8 +1859,8 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 CMappingTx* mapTx = (CMappingTx*) bettingTx.get();
                 auto mappingType = MappingType(mapTx->nMType);
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight() &&
-                   (mappingType == individualSportMapping || mappingType == contenderMapping ) )
+                if ((mappingType == individualSportMapping || mappingType == contenderMapping ) &&
+                    !wagerrProtocolV4)
                 {
                     return error("CheckBettingTX: Spork is not active for mapping type %lu!", mappingType);
                 }
@@ -1910,7 +1914,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case fEventTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!wagerrProtocolV4) break;
                 if (!validOracleTx) break;
 
                 CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
@@ -1939,7 +1943,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case fUpdateOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!wagerrProtocolV4) break;
                 if (!validOracleTx) break;
 
                 CFieldUpdateOddsTx* fUpdateOddsTx = (CFieldUpdateOddsTx*) bettingTx.get();
@@ -1962,7 +1966,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case fUpdateModifiersTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!wagerrProtocolV4) break;
                 if (!validOracleTx) break;
 
                 CFieldUpdateModifiersTx* fUpdateModifiersTx = (CFieldUpdateModifiersTx*) bettingTx.get();
@@ -1985,7 +1989,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case fUpdateMarginTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!wagerrProtocolV4) break;
                 if (!validOracleTx) break;
 
                 CFieldUpdateMarginTx* fUpdateMarginTx = (CFieldUpdateMarginTx*) bettingTx.get();
@@ -2003,7 +2007,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case fZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!wagerrProtocolV4) break;
                 if (!validOracleTx) break;
 
                 CFieldZeroingOddsTx* fZeroingOddsTx = (CFieldZeroingOddsTx*) bettingTx.get();
@@ -2023,12 +2027,12 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case fResultTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!wagerrProtocolV4) break;
                 if (!validOracleTx) break;
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
 
-                if (fResultTx->nResultType != standardResult || fResultTx->nResultType != eventRefund)
+                if (fResultTx->nResultType != standardResult && fResultTx->nResultType != eventRefund)
                     break;
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
                     break;
@@ -2183,7 +2187,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             }
             case plEventZeroingOddsTxType:
             {
-                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!wagerrProtocolV4) break;
                 if (!validOracleTx) break;
 
                 CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
@@ -2222,81 +2226,6 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
     return true;
 }
 
-/**
- * Undo only bet payout mark as completed in DB.
- * But coin tx outs were undid early in native bitcoin core.
- * @return
- */
-bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
-{
-    int nCurrentHeight = chainActive.Height();
-    // Get all the results posted in the previous block.
-    std::vector<CPeerlessResultDB> results = GetPLResults(height - 1);
-
-    LogPrintf("Start undo payouts...\n");
-
-    for (auto result : results) {
-
-        // look bets at last 14 days
-        uint32_t startHeight = GetBetSearchStartHeight(nCurrentHeight);
-
-        auto it = bettingsViewCache.bets->NewIterator();
-        std::vector<std::pair<PeerlessBetKey, CPeerlessBetDB>> vEntriesToUpdate;
-        for (it->Seek(CBettingDB::DbTypeToBytes(PeerlessBetKey{startHeight, COutPoint()})); it->Valid(); it->Next()) {
-            PeerlessBetKey uniBetKey;
-            CPeerlessBetDB uniBet;
-            CBettingDB::BytesToDbType(it->Key(), uniBetKey);
-            CBettingDB::BytesToDbType(it->Value(), uniBet);
-            // skip if bet is uncompleted
-            if (!uniBet.IsCompleted()) continue;
-
-            bool needUndo = false;
-
-            // parlay bet
-            if (uniBet.legs.size() > 1) {
-                bool resultFound = false;
-                for (auto leg : uniBet.legs) {
-                    // if we found one result for parlay - check each other legs
-                    if (leg.nEventId == result.nEventId) {
-                        resultFound = true;
-                    }
-                }
-                if (resultFound) {
-                    // make assumption that parlay is handled
-                    needUndo = true;
-                    // find all results for all legs
-                    for (uint32_t idx = 0; idx < uniBet.legs.size(); idx++) {
-                        CPeerlessLegDB &leg = uniBet.legs[idx];
-                        // skip this bet if incompleted (can't find one result)
-                        CPeerlessResultDB res;
-                        if (!bettingsViewCache.results->Read(ResultKey{leg.nEventId}, res)) {
-                            needUndo = false;
-                        }
-                    }
-                }
-            }
-            // single bet
-            else if (uniBet.legs.size() == 1) {
-                CPeerlessLegDB &singleBet = uniBet.legs[0];
-                if (singleBet.nEventId == result.nEventId) {
-                    needUndo = true;
-                }
-            }
-
-            if (needUndo) {
-                uniBet.SetUncompleted();
-                uniBet.resultType = BetResultType::betResultUnknown;
-                uniBet.payout = 0;
-                vEntriesToUpdate.emplace_back(std::pair<PeerlessBetKey, CPeerlessBetDB>{uniBetKey, uniBet});
-            }
-        }
-        for (auto pair : vEntriesToUpdate) {
-            bettingsViewCache.bets->Update(pair.first, pair.second);
-        }
-    }
-    return true;
-}
-
 /* Revert payouts info from DB */
 bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
 {
@@ -2322,50 +2251,24 @@ bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
     return true;
 }
 
-/**
- * Undo only quick games bet payout mark as completed in DB.
- * But coin tx outs were undid early in native bitcoin core.
- * @return
- */
-bool UndoQuickGamesBetPayouts(CBettingsView &bettingsViewCache, int height)
-{
-    uint32_t blockHeight = static_cast<uint32_t>(height);
-
-    LogPrintf("Start undo quick games payouts...\n");
-
-    auto it = bettingsViewCache.quickGamesBets->NewIterator();
-    std::vector<std::pair<QuickGamesBetKey, CQuickGamesBetDB>> vEntriesToUpdate;
-    for (it->Seek(CBettingDB::DbTypeToBytes(QuickGamesBetKey{blockHeight, COutPoint()})); it->Valid(); it->Next()) {
-        QuickGamesBetKey qgBetKey;
-        CQuickGamesBetDB qgBet;
-        CBettingDB::BytesToDbType(it->Key(), qgBetKey);
-        CBettingDB::BytesToDbType(it->Value(), qgBet);
-        // skip if bet is uncompleted
-        if (!qgBet.IsCompleted()) continue;
-
-        qgBet.SetUncompleted();
-        qgBet.resultType = BetResultType::betResultUnknown;
-        qgBet.payout = 0;
-        vEntriesToUpdate.emplace_back(std::pair<QuickGamesBetKey, CQuickGamesBetDB>{qgBetKey, qgBet});
-    }
-    for (auto pair : vEntriesToUpdate) {
-        bettingsViewCache.quickGamesBets->Update(pair.first, pair.second);
-    }
-    return true;
-}
-
 bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector<CTransaction>& vtx)
 {
         // Revert betting dats
     if (height > Params().WagerrProtocolV2StartHeight()) {
         // revert complete bet payouts marker
-        if (!UndoBetPayouts(bettingsViewCache, height)) {
+        if (!UndoPLBetPayouts(bettingsViewCache, height)) {
             error("DisconnectBlock(): undo payout data is inconsistent");
             return false;
         }
-        if (!UndoQuickGamesBetPayouts(bettingsViewCache, height)) {
+        if (!UndoQGBetPayouts(bettingsViewCache, height)) {
             error("DisconnectBlock(): undo payout data for quick games bets is inconsistent");
             return false;
+        }
+        if (height > Params().WagerrProtocolV4StartHeight()) {
+            if (!UndoFieldBetPayouts(bettingsViewCache, height)) {
+                error("DisconnectBlock(): undo payout data for field bets is inconsistent");
+                return false;
+            }
         }
         if (!UndoPayoutsInfo(bettingsViewCache, height)) {
             error("DisconnectBlock(): undo payouts info failed");

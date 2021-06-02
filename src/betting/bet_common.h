@@ -212,4 +212,6 @@ std::pair<uint32_t, uint32_t> GetBetOdds(const CFieldLegDB &bet, const CFieldEve
 uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent);
 uint32_t GetBetPotentialOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent);
 
+uint32_t CalculateEffectiveOdds(uint32_t onChainOdds);
+
 #endif

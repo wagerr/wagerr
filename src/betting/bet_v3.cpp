@@ -477,3 +477,110 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
 
     LogPrint("wagerr", "Finished generating payouts...\n");
 }
+
+/**
+ * Undo only bet payout mark as completed in DB.
+ * But coin tx outs were undid early in native bitcoin core.
+ * @return
+ */
+bool UndoPLBetPayouts(CBettingsView &bettingsViewCache, int height)
+{
+    int nCurrentHeight = chainActive.Height();
+    // Get all the results posted in the previous block.
+    std::vector<CPeerlessResultDB> results = GetPLResults(height - 1);
+
+    LogPrintf("Start undo payouts...\n");
+
+    for (auto result : results) {
+
+        // look bets at last 14 days
+        uint32_t startHeight = GetBetSearchStartHeight(nCurrentHeight);
+
+        auto it = bettingsViewCache.bets->NewIterator();
+        std::vector<std::pair<PeerlessBetKey, CPeerlessBetDB>> vEntriesToUpdate;
+        for (it->Seek(CBettingDB::DbTypeToBytes(PeerlessBetKey{startHeight, COutPoint()})); it->Valid(); it->Next()) {
+            PeerlessBetKey uniBetKey;
+            CPeerlessBetDB uniBet;
+            CBettingDB::BytesToDbType(it->Key(), uniBetKey);
+            CBettingDB::BytesToDbType(it->Value(), uniBet);
+            // skip if bet is uncompleted
+            if (!uniBet.IsCompleted()) continue;
+
+            bool needUndo = false;
+
+            // parlay bet
+            if (uniBet.legs.size() > 1) {
+                bool resultFound = false;
+                for (auto leg : uniBet.legs) {
+                    // if we found one result for parlay - check each other legs
+                    if (leg.nEventId == result.nEventId) {
+                        resultFound = true;
+                    }
+                }
+                if (resultFound) {
+                    // make assumption that parlay is handled
+                    needUndo = true;
+                    // find all results for all legs
+                    for (uint32_t idx = 0; idx < uniBet.legs.size(); idx++) {
+                        CPeerlessLegDB &leg = uniBet.legs[idx];
+                        // skip this bet if incompleted (can't find one result)
+                        CPeerlessResultDB res;
+                        if (!bettingsViewCache.results->Read(ResultKey{leg.nEventId}, res)) {
+                            needUndo = false;
+                        }
+                    }
+                }
+            }
+            // single bet
+            else if (uniBet.legs.size() == 1) {
+                CPeerlessLegDB &singleBet = uniBet.legs[0];
+                if (singleBet.nEventId == result.nEventId) {
+                    needUndo = true;
+                }
+            }
+
+            if (needUndo) {
+                uniBet.SetUncompleted();
+                uniBet.resultType = BetResultType::betResultUnknown;
+                uniBet.payout = 0;
+                vEntriesToUpdate.emplace_back(std::pair<PeerlessBetKey, CPeerlessBetDB>{uniBetKey, uniBet});
+            }
+        }
+        for (auto pair : vEntriesToUpdate) {
+            bettingsViewCache.bets->Update(pair.first, pair.second);
+        }
+    }
+    return true;
+}
+
+/**
+ * Undo only quick games bet payout mark as completed in DB.
+ * But coin tx outs were undid early in native bitcoin core.
+ * @return
+ */
+bool UndoQGBetPayouts(CBettingsView &bettingsViewCache, int height)
+{
+    uint32_t blockHeight = static_cast<uint32_t>(height);
+
+    LogPrintf("Start undo quick games payouts...\n");
+
+    auto it = bettingsViewCache.quickGamesBets->NewIterator();
+    std::vector<std::pair<QuickGamesBetKey, CQuickGamesBetDB>> vEntriesToUpdate;
+    for (it->Seek(CBettingDB::DbTypeToBytes(QuickGamesBetKey{blockHeight, COutPoint()})); it->Valid(); it->Next()) {
+        QuickGamesBetKey qgBetKey;
+        CQuickGamesBetDB qgBet;
+        CBettingDB::BytesToDbType(it->Key(), qgBetKey);
+        CBettingDB::BytesToDbType(it->Value(), qgBet);
+        // skip if bet is uncompleted
+        if (!qgBet.IsCompleted()) continue;
+
+        qgBet.SetUncompleted();
+        qgBet.resultType = BetResultType::betResultUnknown;
+        qgBet.payout = 0;
+        vEntriesToUpdate.emplace_back(std::pair<QuickGamesBetKey, CQuickGamesBetDB>{qgBetKey, qgBet});
+    }
+    for (auto pair : vEntriesToUpdate) {
+        bettingsViewCache.quickGamesBets->Update(pair.first, pair.second);
+    }
+    return true;
+}
