@@ -95,7 +95,7 @@ def make_common_header(btx_type, version = 1):
 
 # Create a mapping opcode.
 def make_mapping(namespace_id, mapping_id, mapping_name):
-    mapping_id_size = 2 if namespace_id != 3 else 4
+    mapping_id_size = 2 if namespace_id != 3 and namespace_id != 6 else 4
     result = make_common_header(OPCODE_BTX_MAPPING)
     result = result + encode_int_little_endian(namespace_id, 1)
     result = result + encode_int_little_endian(mapping_id, mapping_id_size)

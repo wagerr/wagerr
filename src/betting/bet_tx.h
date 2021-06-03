@@ -81,8 +81,8 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nMType);
-        // if mapping type is teamMapping (0x03) nId is 4 bytes, else - 2 bytes
-        if (nMType == 0x03) {
+        // if mapping type is teamMapping (0x03) or contenderMapping (0x06) nId is 4 bytes, else - 2 bytes
+        if (nMType == 0x03 || nMType == 0x06) {
             uint32_t nId32;
             if (ser_action.ForRead()) {
                 READWRITE(nId32);
