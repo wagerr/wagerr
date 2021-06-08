@@ -1728,6 +1728,69 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Check zeroing odds Success")
 
+    def check_closing_event(self):
+
+        self.log.info("Check closing event opcode...")
+
+        event_id = 13
+        mlevent = make_event(event_id, # Event ID
+                    int(time.time()) + 60*60, # start time = current + hour
+                    sport_names.index("V2-V3 Sport"), # Sport ID
+                    tournament_names.index("V2-V3 Tournament"), # Tournament ID
+                    round_names.index("round1"), # Round ID
+                    team_names.index("V2-V3 Team1"), # Home Team
+                    team_names.index("V2-V3 Team2"), # Away Team
+                    16000, # home odds
+                    20000, # away odds
+                    80000) # draw odds
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        self.nodes[2].placebet(event_id, outcome_home_win, 25)
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        player1_balance = self.nodes[2].getbalance()
+
+        # get opened events only
+        opened_events = self.nodes[0].listevents(True)
+
+        start_height = self.nodes[3].getblockcount()
+
+        # stop node fo reventing
+        self.stop_node(3)
+
+        # close all events
+        for event in opened_events:
+            result_opcode = make_result(event['event_id'], EVENT_CLOSED, 0, 0)
+            post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.nodes[0].generate(1)
+        self.sync_all([ self.nodes[:3] ])
+        self.nodes[0].generate(1)
+        self.sync_all([ self.nodes[:3] ])
+
+        assert_equal(len(self.nodes[0].listevents(True)), 0)
+        assert_equal(player1_balance, self.nodes[2].getbalance())
+
+        blocks = self.nodes[1].getblockcount() - start_height + 1
+
+        self.nodes[3].rpchost = self.get_local_peer(3, True)
+        self.nodes[3].start()
+        self.nodes[3].wait_for_rpc_connection()
+
+        self.log.info("Generate blocks...")
+        self.nodes[3].generate(blocks)
+        self.connect_and_sync_blocks()
+
+        assert_equal(self.nodes[0].listevents(True), opened_events)
+
+        self.log.info("Check closing event Success")
+
     def run_test(self):
         self.check_minting()
         # Chain height = 300 after minting -> v4 protocol active
@@ -1756,6 +1819,7 @@ class BettingTest(BitcoinTestFramework):
         self.check_bets()
         self.check_zero_odds_bet()
         self.check_zeroing_odds()
+        self.check_closing_event()
 
 if __name__ == '__main__':
     BettingTest().main()

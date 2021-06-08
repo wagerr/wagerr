@@ -49,11 +49,13 @@
 // allows.
 UniValue listevents(const UniValue& params, bool fHelp)
 {
-    if (fHelp || (params.size() > 1))
+    if (fHelp || (params.size() > 2))
         throw std::runtime_error(
             "listevents\n"
             "\nGet live Wagerr events.\n"
-
+            "\nArguments:\n"
+            "1. \"openedOnly\" (bool, optional) Default - false. Gets only events which has no result.\n"
+            "2. \"sportFilter\" (string, optional) Gets only events with input sport name.\n"
             "\nResult:\n"
             "[\n"
             "  {\n"
@@ -72,13 +74,19 @@ UniValue listevents(const UniValue& params, bool fHelp)
             "]\n"
 
             "\nExamples:\n" +
-            HelpExampleCli("listevents", "") + HelpExampleRpc("listevents", ""));
+            HelpExampleCli("listevents", "") +
+            HelpExampleCli("listevents", "true" "football") +
+            HelpExampleRpc("listevents", "false" "tennis"));
 
     UniValue result{UniValue::VARR};
 
     std::string sportFilter = "";
+    bool openedOnly = false;
 
     if (params.size() > 0) {
+        openedOnly = params[0].get_bool();
+    }
+    if (params.size() > 1) {
         sportFilter = params[0].get_str();
     }
 
@@ -96,14 +104,19 @@ UniValue listevents(const UniValue& params, bool fHelp)
         std::string sport = mapping.sName;
 
         // if event filter is set the don't list event if it doesn't match the filter.
-        if (params.size() > 0 && sportFilter != sport) {
+        if (!sportFilter.empty() && sportFilter != sport)
             continue;
-        }
 
+        /*
         // Only list active events.
         if ((time_t) plEvent.nStartTime < std::time(0)) {
             continue;
         }
+        */
+
+        // list only unresulted events
+        if (openedOnly && bettingsView->results->Exists(ResultKey{plEvent.nEventId}))
+            continue;
 
         //std::string round    = roundsIndex.find(plEvent.nStage)->second.sName;
         if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping))
@@ -168,13 +181,43 @@ UniValue listevents(const UniValue& params, bool fHelp)
     return result;
 }
 
+std::string GetContenderNameById(uint32_t contenderId)
+{
+    CMappingDB mapping;
+    if (!bettingsView->mappings->Read(MappingKey{contenderMapping, contenderId}, mapping)) {
+        return "undefined";
+    }
+    else {
+        return mapping.sName;
+    }
+}
+
+UniValue GetContendersInfo(const std::map<uint32_t, ContenderInfo> mContenders)
+{
+    UniValue uContenders(UniValue::VARR);
+    for (const auto& contender_it : mContenders) {
+        UniValue uContender(UniValue::VOBJ);
+        uContender.push_back(Pair("id", (uint64_t) contender_it.first));
+        uContender.push_back(Pair("name", GetContenderNameById(contender_it.first)));
+        uContender.push_back(Pair("modifier", (uint64_t) contender_it.second.nModifier));
+        uContender.push_back(Pair("input-odds", (uint64_t) contender_it.second.nInputOdds));
+        uContender.push_back(Pair("outright-odds", (uint64_t) contender_it.second.nOutrightOdds));
+        uContender.push_back(Pair("place-odds", (uint64_t) contender_it.second.nPlaceOdds));
+        uContender.push_back(Pair("show-odds", (uint64_t) contender_it.second.nShowOdds));
+        uContenders.push_back(uContender);
+    }
+    return uContenders;
+}
+
 UniValue listfieldevents(const UniValue& params, bool fHelp)
 {
-    if (fHelp || (params.size() > 1))
+    if (fHelp || (params.size() > 2))
         throw std::runtime_error(
-            "listefieldvents\n"
+            "listfieldevents\n"
             "\nGet live Wagerr field events.\n"
-
+            "\nArguments:\n"
+            "1. \"openedOnly\" (bool, optional) Default - false. Gets only events which has no result.\n"
+            "2. \"sportFilter\" (string, optional) Gets only events with input sport name.\n"
             "\nResult:\n"
             "[\n"
             "  {\n"
@@ -193,9 +236,21 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
             "]\n"
 
             "\nExamples:\n" +
-            HelpExampleCli("listfieldevents", "") + HelpExampleRpc("listfieldevents", ""));
+            HelpExampleCli("listfieldevents", "") +
+            HelpExampleCli("listfieldevents", "true" "horse racing") +
+            HelpExampleRpc("listfieldevents", ""));
 
     UniValue result{UniValue::VARR};
+
+    std::string sportFilter = "";
+    bool openedOnly = false;
+
+    if (params.size() > 0) {
+        openedOnly = params[0].get_bool();
+    }
+    if (params.size() > 1) {
+        sportFilter = params[0].get_str();
+    }
 
     LOCK(cs_main);
 
@@ -211,13 +266,24 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
         }
 
         UniValue evt(UniValue::VOBJ);
+
+        if (!bettingsView->mappings->Read(MappingKey{individualSportMapping, fEvent.nSport}, mapping))
+            continue;
+
+        std::string sport = mapping.sName;
+
+        if (!sportFilter.empty() && sportFilter != sport)
+            continue;
+
+        // list only unresulted events
+        if (openedOnly && bettingsView->fieldResults->Exists(ResultKey{fEvent.nEventId}))
+            continue;
+
         evt.push_back(Pair("event_id", (uint64_t) fEvent.nEventId));
         evt.push_back(Pair("starting", (uint64_t) fEvent.nStartTime));
         evt.push_back(Pair("mrg-in", (uint64_t) fEvent.nMarginPercent));
 
-        if (!bettingsView->mappings->Read(MappingKey{individualSportMapping, fEvent.nSport}, mapping))
-            continue;
-        evt.push_back(Pair("sport", mapping.sName));
+        evt.push_back(Pair("sport", sport));
 
         if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, fEvent.nTournament}, mapping))
             continue;
@@ -227,20 +293,8 @@ UniValue listfieldevents(const UniValue& params, bool fHelp)
             continue;
         evt.push_back(Pair("round", mapping.sName));
 
-        UniValue contenders(UniValue::VARR);
-        for (const auto& contender_it : fEvent.contenders) {
-            UniValue contender(UniValue::VOBJ);
-            if (!bettingsView->mappings->Read(MappingKey{contenderMapping, contender_it.first}, mapping))
-                continue;
-            contender.push_back(Pair("name", mapping.sName));
-            contender.push_back(Pair("modifier", (uint64_t) contender_it.second.nModifier));
-            contender.push_back(Pair("input-odds", (uint64_t) contender_it.second.nInputOdds));
-            contender.push_back(Pair("outright-odds", (uint64_t) contender_it.second.nOutrightOdds));
-            contender.push_back(Pair("place-odds", (uint64_t) contender_it.second.nPlaceOdds));
-            contender.push_back(Pair("show-odds", (uint64_t) contender_it.second.nShowOdds));
-            contenders.push_back(contender);
-        }
-        evt.push_back(Pair("contenders", contenders));
+        
+        evt.push_back(Pair("contenders", GetContendersInfo(fEvent.contenders)));
 
         result.push_back(evt);
     }
@@ -917,6 +971,125 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
     }
 }
 
+std::string ContenderResultToString(uint8_t result) {
+    switch(result) {
+        case ContenderResult::DNF:
+            return "DNF";
+        case ContenderResult::place1:
+            return "Place1";
+        case ContenderResult::place2:
+            return "Place2";
+        case ContenderResult::place3:
+            return "Place3";
+        case ContenderResult::DNR:
+            return "DNR";
+        default:
+            return "undefined";
+    }
+}
+
+void CollectFieldBetData(UniValue& uValue, const FieldBetKey& betKey, const CFieldBetDB& fieldBet, bool requiredPayoutInfo = false) {
+
+    UniValue uLegs(UniValue::VARR);
+
+    uValue.push_back(Pair("type", "field"));
+
+    for (uint32_t i = 0; i < fieldBet.legs.size(); i++) {
+        auto &leg = fieldBet.legs[i];
+        auto &lockedEvent = fieldBet.lockedEvents[i];
+        UniValue uLeg(UniValue::VOBJ);
+        UniValue uLockedEvent(UniValue::VOBJ);
+        uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
+        uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+
+        uLockedEvent.push_back(Pair("contenders", GetContendersInfo(lockedEvent.contenders)));
+        uLockedEvent.push_back(Pair("starting", lockedEvent.nStartTime));
+        CMappingDB mapping;
+        if (bettingsView->mappings->Read(MappingKey{tournamentMapping, lockedEvent.nTournament}, mapping)) {
+            uLockedEvent.push_back(Pair("tournament", mapping.sName));
+        }
+        else {
+            uLockedEvent.push_back(Pair("tournament", "undefined"));
+        }
+        CFieldResultDB fResult;
+        uint32_t legOdds = 0;
+        if (bettingsView->fieldResults->Read(FieldResultKey{leg.nEventId}, fResult)) {
+            uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) fResult.nResultType)));
+            UniValue results(UniValue::VARR);
+            for (auto &contenderResult : fResult.contendersResults) {
+                UniValue result(UniValue::VOBJ);
+                result.push_back(Pair("contenderId", (int64_t) (contenderResult.first)));
+                result.push_back(Pair("name", GetContenderNameById(contenderResult.first)));
+                result.push_back(Pair("result", ContenderResultToString(contenderResult.second)));
+                results.push_back(result);
+            }
+            uLockedEvent.push_back(Pair("contenderResults", results));
+            if (lockedEvent.nStartTime > 0 && fieldBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+                uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
+            }
+            else {
+                legOdds = GetBetOdds(leg, lockedEvent, fResult, (int64_t)betKey.blockHeight >= Params().WagerrProtocolV4StartHeight()).first;
+                std::string legResultTypeStr;
+                if (legOdds == 0) {
+                    legResultTypeStr = std::string("lose");
+                }
+                else if (legOdds == BET_ODDSDIVISOR) {
+                    legResultTypeStr = std::string("refund");
+                }
+                else {
+                    legResultTypeStr = std::string("win");
+                }
+                uLeg.push_back(Pair("legResultType", legResultTypeStr));
+            }
+        }
+        else {
+            uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
+            uLeg.push_back(Pair("legResultType", "pending"));
+        }
+        uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+        uLegs.push_back(uLeg);
+    }
+
+    uValue.push_back(Pair("betBlockHeight", (uint64_t) betKey.blockHeight));
+    uValue.push_back(Pair("betTxHash", betKey.outPoint.hash.GetHex()));
+    uValue.push_back(Pair("betTxOut", (uint64_t) betKey.outPoint.n));
+    uValue.push_back(Pair("legs", uLegs));
+    uValue.push_back(Pair("address", fieldBet.playerAddress.ToString()));
+    uValue.push_back(Pair("amount", ValueFromAmount(fieldBet.betAmount)));
+    uValue.push_back(Pair("time", (uint64_t) fieldBet.betTime));
+    uValue.push_back(Pair("completed", fieldBet.IsCompleted() ? "yes" : "no"));
+    uValue.push_back(Pair("betResultType", BetResultTypeToStr(fieldBet.resultType)));
+    uValue.push_back(Pair("payout", fieldBet.IsCompleted() ? ValueFromAmount(fieldBet.payout) : "pending"));
+
+    if (requiredPayoutInfo) {
+        if (fieldBet.IsCompleted()) {
+            if (fieldBet.payoutHeight > 0) {
+                auto it = bettingsView->payoutsInfo->NewIterator();
+                for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{fieldBet.payoutHeight, COutPoint{}})); it->Valid(); it->Next()) {
+                    PayoutInfoKey payoutKey;
+                    CPayoutInfoDB payoutInfo;
+                    CBettingDB::BytesToDbType(it->Key(), payoutKey);
+                    CBettingDB::BytesToDbType(it->Value(), payoutInfo);
+                    if (fieldBet.payoutHeight != payoutKey.blockHeight) break;
+                    if (payoutInfo.betKey == betKey) {
+                        uValue.push_back(Pair("payoutTxHash", payoutKey.outPoint.hash.GetHex()));
+                        uValue.push_back(Pair("payoutTxOut", (uint64_t) payoutKey.outPoint.n));
+                        break;
+                    }
+                }
+            }
+            else {
+                uValue.push_back(Pair("payoutTxHash", "no"));
+                uValue.push_back(Pair("payoutTxOut", "no"));
+            }
+        }
+        else {
+            uValue.push_back(Pair("payoutTxHash", "pending"));
+            uValue.push_back(Pair("payoutTxOut", "pending"));
+        }
+    }
+}
+
 UniValue GetBets(uint32_t count, uint32_t from, CWallet *_pwalletMain, boost::optional<std::string> accountName, bool includeWatchonly) {
     UniValue ret(UniValue::VARR);
 
@@ -1435,6 +1608,24 @@ UniValue getbetbytxid(const UniValue& params, bool fHelp)
             UniValue uValue(UniValue::VOBJ);
 
             CollectQGBetData(uValue, key, qgBet, hash, true);
+
+            ret.push_back(uValue);
+        }
+    }
+
+    {
+        auto it = bettingsView->fieldBets->NewIterator();
+        for (it->Seek(CBettingDB::DbTypeToBytes(FieldBetKey{static_cast<uint32_t>(blockindex->nHeight), COutPoint{txHash, 0}})); it->Valid(); it->Next()) {
+            FieldBetKey key;
+            CFieldBetDB fBet;
+            CBettingDB::BytesToDbType(it->Value(), fBet);
+            CBettingDB::BytesToDbType(it->Key(), key);
+
+            if (key.outPoint.hash != txHash) break;
+
+            UniValue uValue(UniValue::VOBJ);
+
+            CollectFieldBetData(uValue, key, fBet, true);
 
             ret.push_back(uValue);
         }

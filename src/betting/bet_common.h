@@ -45,6 +45,7 @@ typedef enum ResultType {
     mlRefund       = 0x03,
     spreadsRefund  = 0x04,
     totalsRefund   = 0x05,
+    eventClosed    = 0x06
 } ResultType;
 
 typedef enum ContenderResult {
