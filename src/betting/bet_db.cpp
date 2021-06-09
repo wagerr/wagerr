@@ -51,16 +51,27 @@ MappingType CMappingDB::FromTypeName(const std::string& name)
     return static_cast<MappingType>(-1);
 }
 
-bool CFieldEventDB::IsMarketOpen(const FieldBetOutcomeType type, const size_t contendersCount) {
+uint32_t CFieldEventDB::NoneZeroOddsContendersCount()
+{
+    uint32_t noneZeroCount = 0;
+    for (const auto& contender : contenders) {
+        if (contender.second.nInputOdds != 0) noneZeroCount++;
+    }
+
+    return noneZeroCount;
+}
+
+bool CFieldEventDB::IsMarketOpen(const FieldBetOutcomeType type) {
+    uint32_t contendersCount = NoneZeroOddsContendersCount();
     switch(type) {
         case outright:
             break; // always open
         case show:
-            if (contendersCount < 8)
+            if (nMarketType == FieldEventMarketType::outrightOnly || contendersCount < 8)
                 return false;
             break;
         case place:
-            if (contendersCount < 5)
+            if (nMarketType == FieldEventMarketType::outrightOnly || contendersCount < 5)
                 return false;
             break;
         default:
@@ -77,6 +88,7 @@ void CFieldEventDB::ExtractDataFromTx(const CFieldEventTx& tx)
     nTournament = tx.nTournament;
     nStage = tx.nStage;
     nGroupType = tx.nGroupType;
+    nMarketType = tx.nMarketType;
     nMarginPercent = tx.nMarginPercent;
 
     for (const auto& tx_contender : tx.mContendersInputOdds) {
@@ -212,13 +224,10 @@ void CFieldEventDB::CalcOdds()
     std::map<uint32_t, uint32_t> mContendersOutrightOdds;
     CalculateOutrightOdds(mContendersFairOdds, mContendersOutrightOdds);
 
-    size_t noneZeroCount = 0;
-    for (const auto& contender : contenders) {
-        if (contender.second.nInputOdds != 0) noneZeroCount++;
-    }
+    uint32_t noneZeroCount = NoneZeroOddsContendersCount();
 
-    bool isPlaceOpen = CFieldEventDB::IsMarketOpen(place, noneZeroCount);
-    bool isShowOpen = CFieldEventDB::IsMarketOpen(show, noneZeroCount);
+    bool isPlaceOpen = IsMarketOpen(place);
+    bool isShowOpen = IsMarketOpen(show);
 
     double mPlace = 0.0, mShow = 0.0;
     double XPlace = 0.0, XShow = 0.0;
@@ -327,7 +336,7 @@ void CFieldEventDB::CalcOdds()
     }
 }
 
-double CFieldEventDB::GetLambda(const size_t ContendersSize) {
+double CFieldEventDB::GetLambda(const uint32_t ContendersSize) {
     switch (ContendersSize) {
         case 3: return 0.6667;
         case 4:	return 0.6996;
@@ -345,7 +354,7 @@ double CFieldEventDB::GetLambda(const size_t ContendersSize) {
     }
 }
 
-double CFieldEventDB::GetRHO(const size_t ContendersSize) {
+double CFieldEventDB::GetRHO(const uint32_t ContendersSize) {
     switch (ContendersSize) {
         case 4: return 0.5336;
         case 5: return 0.5703;

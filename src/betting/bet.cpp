@@ -262,7 +262,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     return error("CheckBettingTX: Bet placed to resulted field event %lu!", betTx->nEventId);
                 }
 
-                if (!CFieldEventDB::IsMarketOpen((FieldBetOutcomeType)betTx->nOutcome, fEvent.contenders.size())) {
+                if (!fEvent.IsMarketOpen((FieldBetOutcomeType)betTx->nOutcome)) {
                     return error("CheckBettingTX: market %lu is closed for event %lu!", betTx->nOutcome, betTx->nEventId);
                 }
 
@@ -314,7 +314,7 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                         return error("CheckBettingTX: Bet placed to resulted field event %lu!", leg.nEventId);
                     }
 
-                    if (!CFieldEventDB::IsMarketOpen((FieldBetOutcomeType)leg.nOutcome, fEvent.contenders.size())) {
+                    if (!fEvent.IsMarketOpen((FieldBetOutcomeType)leg.nOutcome)) {
                         return error("CheckBettingTX: market %lu is closed for event %lu!", leg.nOutcome, leg.nEventId);
                     }
 
@@ -438,6 +438,9 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 if (fEventTx->nGroupType < FieldEventGroupType::other || fEventTx->nGroupType > FieldEventGroupType::animalRacing)
                     return error("CheckBettingTx: trying to create field event with bad group type %lu!", fEventTx->nGroupType);
+
+                if (fEventTx->nMarketType < FieldEventMarketType::all_markets || fEventTx->nMarketType > FieldEventMarketType::outrightOnly)
+                    return error("CheckBettingTx: trying to create field event with bad market type %lu!", fEventTx->nMarketType);
 
                 if (!bettingsViewCache.mappings->Exists(MappingKey{individualSportMapping, (uint32_t) fEventTx->nSport}))
                     return error("CheckBettingTX: trying to create field event with unknown individual sport id %lu!", fEventTx->nSport);
@@ -1165,12 +1168,13 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 if (!validOracleTx) break;
 
                 CFieldEventTx* fEventTx = (CFieldEventTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu\n",
+                LogPrint("wagerr", "CFieldEventTx: id: %lu, sport: %lu, tournament: %lu, stage: %lu, subgroup: %lu, marketType: %lu\n",
                     fEventTx->nEventId,
                     fEventTx->nSport,
                     fEventTx->nTournament,
                     fEventTx->nStage,
-                    fEventTx->nGroupType
+                    fEventTx->nGroupType,
+                    fEventTx->nMarketType
                 );
                 for (auto& contender : fEventTx->mContendersInputOdds) {
                     LogPrint("wagerr", "%lu : %lu\n", contender.first, contender.second);

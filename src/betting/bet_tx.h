@@ -171,6 +171,7 @@ public:
     uint16_t nTournament;
     uint16_t nStage;
     uint8_t nGroupType;
+    uint8_t nMarketType;
     uint32_t nMarginPercent;
     // contenderId : input odds
     std::map<uint32_t, uint32_t> mContendersInputOdds;
@@ -190,6 +191,7 @@ public:
         READWRITE(nTournament);
         READWRITE(nStage);
         READWRITE(nGroupType);
+        READWRITE(nMarketType);
         READWRITE(nMarginPercent);
         READWRITE(mContendersInputOdds);
     }

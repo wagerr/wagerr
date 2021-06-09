@@ -346,6 +346,7 @@ public:
     uint32_t nEventId      = 0;
     uint64_t nStartTime    = 0;
     uint8_t nGroupType    = 0;
+    uint8_t nMarketType   = 0;
     uint32_t nSport        = 0;
     uint32_t nTournament = 0;
     uint32_t nStage      = 0;
@@ -362,8 +363,8 @@ public:
     void ExtractDataFromTx(const CFieldUpdateModifiersTx& tx);
 
     void CalcOdds();
-
-    static bool IsMarketOpen(const FieldBetOutcomeType type, const size_t contendersCount);
+    uint32_t NoneZeroOddsContendersCount();
+    bool IsMarketOpen(const FieldBetOutcomeType type);
 
     std::string ToString();
     std::string ContendersToString();
@@ -375,6 +376,7 @@ public:
         READWRITE(nEventId);
         READWRITE(nStartTime);
         READWRITE(nGroupType);
+        READWRITE(nMarketType);
         READWRITE(nSport);
         READWRITE(nTournament);
         READWRITE(nStage);
@@ -383,8 +385,8 @@ public:
     }
 
 private:
-    double GetLambda(const size_t ContendersSize);
-    double GetRHO(const size_t ContendersSize);
+    double GetLambda(const uint32_t ContendersSize);
+    double GetRHO(const uint32_t ContendersSize);
 
     void Permutations2(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
     void Permutations3(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
