@@ -33,6 +33,10 @@ contender_names = ["cont1", "cont2",
 other_group = 1
 animal_racing_group = 2
 
+# Field event market type
+all_markets = 1
+outright_only = 2
+
 # Field bet market types
 market_outright = 1
 market_place    = 2
@@ -474,6 +478,7 @@ class BettingTest(BitcoinTestFramework):
             0,
             start_time,
             100, # bad group
+            all_markets,
             sport_names.index("Sport1"),
             tournament_names.index("Tournament1"),
             round_names.index("round0"),
@@ -502,6 +507,7 @@ class BettingTest(BitcoinTestFramework):
             0,
             start_time,
             other_group,
+            all_markets,
             sport_names.index("Sport1"),
             tournament_names.index("Tournament1"),
             round_names.index("round0"),
@@ -567,6 +573,7 @@ class BettingTest(BitcoinTestFramework):
             101,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Sport1"),
             tournament_names.index("Tournament1"),
             round_names.index("round0"),
@@ -658,6 +665,7 @@ class BettingTest(BitcoinTestFramework):
             1,
             start_time,
             other_group,
+            all_markets,
             sport_names.index("Sport1"),
             tournament_names.index("Tournament1"),
             round_names.index("round0"),
@@ -672,6 +680,7 @@ class BettingTest(BitcoinTestFramework):
             301,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Sport1"),
             tournament_names.index("Tournament1"),
             round_names.index("round0"),
@@ -1044,6 +1053,7 @@ class BettingTest(BitcoinTestFramework):
             2,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Sport1"),
             tournament_names.index("Tournament1"),
             round_names.index("round0"),
@@ -1166,6 +1176,7 @@ class BettingTest(BitcoinTestFramework):
             221,
             start_time,
             other_group,
+            all_markets,
             sport_names.index("F1 racing"),
             tournament_names.index("F1 Cup"),
             round_names.index("round0"),
@@ -1271,10 +1282,12 @@ class BettingTest(BitcoinTestFramework):
         player2_total_bet = 0
 
         # Create events for bet tests
+        # event have 9 contenders, but only outright market available
         field_event_opcode = make_field_event(
             3,
             start_time,
             other_group,
+            outright_only,
             sport_names.index("F1 racing"),
             tournament_names.index("F1 Cup"),
             round_names.index("round0"),
@@ -1284,7 +1297,11 @@ class BettingTest(BitcoinTestFramework):
                 contender_names.index("Pierre Gasly")    : make_odds(25),
                 contender_names.index("Romain Grosjean") : make_odds(15),
                 contender_names.index("Antonio Maria Giovinazzi")   : make_odds(35),
-                contender_names.index("cont1") : 0
+                contender_names.index("cont1") : 0,
+                contender_names.index("cont2") : make_odds(20),
+                contender_names.index("cont3") : make_odds(20),
+                contender_names.index("cont4") : make_odds(20),
+                contender_names.index("cont5") : make_odds(20),
             }
         )
         post_opcode(self.nodes[1], field_event_opcode, WGR_WALLET_EVENT['addr'])
@@ -1296,6 +1313,7 @@ class BettingTest(BitcoinTestFramework):
             4,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
@@ -1315,6 +1333,7 @@ class BettingTest(BitcoinTestFramework):
             5,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round1"),
@@ -1342,6 +1361,11 @@ class BettingTest(BitcoinTestFramework):
             self.nodes[2].placefieldbet, 3, market_outright, 1050, 30)
         assert_raises_rpc_error(-31, "Error: contender odds is zero for event: {} contenderId: {}".format(3, contender_names.index("cont1")),
             self.nodes[2].placefieldbet, 3, market_outright, contender_names.index("cont1"), 30)
+        # try to place bet at closed market type
+        assert_raises_rpc_error(-31, "Error: market {} is closed for event {}".format(market_place, 3),
+            self.nodes[2].placefieldbet, 3, market_place, contender_names.index("cont2"), 30)
+        assert_raises_rpc_error(-31, "Error: market {} is closed for event {}".format(market_show, 3),
+            self.nodes[2].placefieldbet, 3, market_show, contender_names.index("cont3"), 30)
 
         events = self.nodes[2].listfieldevents()
         bet_contender_info = {}
@@ -1492,6 +1516,7 @@ class BettingTest(BitcoinTestFramework):
             231,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
@@ -1513,6 +1538,7 @@ class BettingTest(BitcoinTestFramework):
             232,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
@@ -1629,6 +1655,7 @@ class BettingTest(BitcoinTestFramework):
             6,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round1"),
@@ -1650,6 +1677,7 @@ class BettingTest(BitcoinTestFramework):
             show_market_event_id,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
@@ -1676,6 +1704,7 @@ class BettingTest(BitcoinTestFramework):
             place_market_event_id,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),
@@ -1699,6 +1728,7 @@ class BettingTest(BitcoinTestFramework):
             outright_market_event_id,
             start_time,
             animal_racing_group,
+            all_markets,
             sport_names.index("Horse racing"),
             tournament_names.index("The BMW stakes"),
             round_names.index("round0"),

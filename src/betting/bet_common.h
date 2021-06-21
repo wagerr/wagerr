@@ -85,6 +85,11 @@ typedef enum FieldEventGroupType {
     animalRacing = 0x02
 } FieldEventGroupType;
 
+typedef enum FieldEventMarketType {
+    all_markets     = 0x01,
+    outrightOnly   = 0x02
+} FieldEventMarketType;
+
 //
 typedef enum PayoutType {
     bettingPayout    = 0x01,

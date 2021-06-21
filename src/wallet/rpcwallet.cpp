@@ -2322,6 +2322,11 @@ UniValue placefieldbet(const UniValue& params, bool fHelp) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
     }
 
+    if (!fEvent.IsMarketOpen(marketType)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: market " + std::to_string((uint8_t)marketType) + " is closed for event " + std::to_string(eventId));
+    }
+
+
     const auto& contender_it = fEvent.contenders.find(contenderId);
     if (contender_it == fEvent.contenders.end()) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
@@ -2433,7 +2438,7 @@ UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
         }
 
-        if (!CFieldEventDB::IsMarketOpen(marketType, fEvent.contenders.size())) {
+        if (!fEvent.IsMarketOpen(marketType)) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: market " + std::to_string((uint8_t)marketType) + " is closed for event " + std::to_string(eventId));
         }
 
