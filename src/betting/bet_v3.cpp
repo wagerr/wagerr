@@ -75,6 +75,9 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
 
     for (auto result : results) {
 
+        if (result.nResultType == ResultType::eventClosed)
+            continue;
+
         LogPrint("wagerr", "Looking for bets of eventId: %lu\n", result.nEventId);
 
         // look bets during the bet interval
@@ -492,6 +495,9 @@ bool UndoPLBetPayouts(CBettingsView &bettingsViewCache, int height)
     LogPrintf("Start undo payouts...\n");
 
     for (auto result : results) {
+
+        if (result.nResultType == ResultType::eventClosed)
+            continue;
 
         // look bets at last 14 days
         uint32_t startHeight = GetBetSearchStartHeight(nCurrentHeight);

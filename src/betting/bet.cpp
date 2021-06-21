@@ -520,7 +520,9 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
 
-                if (fResultTx->nResultType != standardResult && fResultTx->nResultType != eventRefund)
+                if (fResultTx->nResultType != ResultType::standardResult &&
+                        fResultTx->nResultType != ResultType::eventRefund &&
+                        fResultTx->nResultType != ResultType::eventClosed)
                     return error("CheckBettingTX: unsupported result type for field event: %d!", fResultTx->nResultType);
 
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
@@ -2032,7 +2034,9 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
 
                 CFieldResultTx* fResultTx = (CFieldResultTx*) bettingTx.get();
 
-                if (fResultTx->nResultType != standardResult && fResultTx->nResultType != eventRefund)
+                if (fResultTx->nResultType != ResultType::standardResult &&
+                        fResultTx->nResultType != ResultType::eventRefund &&
+                        fResultTx->nResultType != ResultType::eventClosed)
                     break;
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fResultTx->nEventId}))
                     break;

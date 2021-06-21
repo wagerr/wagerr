@@ -1763,7 +1763,7 @@ class BettingTest(BitcoinTestFramework):
 
         # Player1 place win parlay bet
         player1_bet = 40
-        self.nodes[2].placefieldparlaybet(
+        parlay_bet_tx = self.nodes[2].placefieldparlaybet(
             [
                 {"eventId": outright_market_event_id, "marketType": market_outright,  "contenderId": contender_names.index("horse1")},
                 {"eventId": place_market_event_id, "marketType": market_place, "contenderId": contender_names.index("horse5")},
@@ -1800,6 +1800,8 @@ class BettingTest(BitcoinTestFramework):
 
         self.nodes[0].generate(1)
         sync_blocks(self.nodes)
+
+        parlay_bet = self.nodes[0].getbetbytxid(parlay_bet_tx)
 
         for event_id in [outright_market_event_id, place_market_event_id, show_market_event_id]:
             # for node in self.nodes:
@@ -1859,6 +1861,8 @@ class BettingTest(BitcoinTestFramework):
 
         # calculated odds in test and in chain have small difference due accuracy
         # assert_equal(player1_balance_after, player1_balance_before + player1_expected_win)
+
+        parlay_bet = self.nodes[0].getbetbytxid(parlay_bet_tx)
 
         self.log.info("Parlay Field Bets Success")
 
