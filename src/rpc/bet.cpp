@@ -63,7 +63,7 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
     for (it->Seek(CBettingDB::DbTypeToBytes(MappingKey{type, 0})); it->Valid() && (CBettingDB::BytesToDbType(it->Key(), key), key.nMType == type); it->Next()) {
         CMappingDB mapping{};
         CBettingDB::BytesToDbType(it->Value(), mapping);
-        LogPrintf("wagerr", "%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
+        LogPrint("wagerr", "%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
         if (!mappingFound) {
             if (mapping.sName == name) {
                 mappings.push_back(Pair("mapping-id", (uint64_t) key.nId));
@@ -93,7 +93,7 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
         throw std::runtime_error(
                 "getmappingname\n"
                 "\nGet a mapping string name from the specified map index.\n"
-                "1. Mapping type  (string, requied) Type of mapping (\"sports\", \"rounds\", \"teams\", \"tournaments\").\n"
+                "1. Mapping type  (string, requied) Type of mapping (\"sports\", \"rounds\", \"teams\", \"tournaments\", \"individualSports\", \"contenders\").\n"
                 "2. Mapping id    (numeric, requied) Mapping id.\n"
                 "\nResult:\n"
                 "[\n"

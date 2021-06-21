@@ -15,8 +15,13 @@ class CChainGamesResultDB;
 class CPeerlessLegDB;
 class CPeerlessBaseEventDB;
 class CPayoutInfoDB;
+class CFieldLegDB;
+class CFieldEventDB;
+class CFieldResultDB;
 
 #define BET_ODDSDIVISOR 10000   // Odds divisor, Facilitates calculations with floating integers.
+#define MODIFIER_DIVISOR 100
+#define MARGIN_DIVISOR 100
 #define BET_BURNXPERMILLE 60    // Burn promillage
 #define BET_MAXODDS (99 * BET_ODDSDIVISOR)
 #define BET_MINODDS BET_ODDSDIVISOR
@@ -42,6 +47,20 @@ typedef enum ResultType {
     totalsRefund   = 0x05,
 } ResultType;
 
+typedef enum ContenderResult {
+    DNF    = 0, // Dod not finished (lose)
+    place1 = 1,
+    place2 = 2,
+    place3 = 3,
+    DNR    = 101, // Did not race
+} ContenderResult;
+
+typedef enum FieldBetOutcomeType {
+    outright = 0x01,
+    place    = 0x02,
+    show     = 0x03
+} FieldBetOutcomeType;
+
 // The supported result types
 typedef enum WinnerType {
     homeWin = 0x01,
@@ -51,11 +70,19 @@ typedef enum WinnerType {
 
 // The supported mapping TX types.
 typedef enum MappingType {
-    sportMapping      = 0x01,
-    roundMapping      = 0x02,
-    teamMapping       = 0x03,
-    tournamentMapping = 0x04
+    sportMapping            = 0x01,
+    roundMapping            = 0x02,
+    teamMapping             = 0x03,
+    tournamentMapping       = 0x04,
+    individualSportMapping  = 0x05,
+    contenderMapping        = 0x06
 } MappingType;
+
+// The supported subgroups for Field Events
+typedef enum FieldEventGroupType {
+    other        = 0x01,
+    animalRacing = 0x02
+} FieldEventGroupType;
 
 //
 typedef enum PayoutType {
@@ -163,8 +190,13 @@ bool IsValidOracleTx(const CTxIn &txin, int nHeight);
 //* Calculates the amount of coins paid out to bettors and the amount of coins to burn, based on bet amount and odds **/
 bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CAmount& nPayout, CAmount& nBurn);
 
-/** Find peerless events. **/
-std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight);
+/** Check a given block to see if it contains a Peerless result TX. **/
+std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight);
+
+/**
+ * Check a given block to see if it contains a Field result TX.
+ */
+std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight);
 
 /** Find chain games lotto result. **/
 bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesResultDB>& chainGameResults);
@@ -175,7 +207,11 @@ bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesR
  * @return Odds, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
  */
 std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent, const CPeerlessResultDB &result, const bool fWagerrProtocolV3);
+std::pair<uint32_t, uint32_t> GetBetOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent, const CFieldResultDB &result, const bool fWagerrProtocolV4);
 
 uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent);
+uint32_t GetBetPotentialOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent);
+
+uint32_t CalculateEffectiveOdds(uint32_t onChainOdds);
 
 #endif

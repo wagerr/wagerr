@@ -264,7 +264,6 @@ public:
     uint32_t nHomeScore;
     uint32_t nAwayScore;
 
-
     // Default Constructor.
     explicit CPeerlessResultDB() {}
 
@@ -280,6 +279,158 @@ public:
         READWRITE(nResultType);
         READWRITE(nHomeScore);
         READWRITE(nAwayScore);
+    }
+};
+
+// Field event key (individual sport)
+using FieldEventKey = EventKey;
+
+typedef struct ContenderInfo {
+
+    uint32_t nInputOdds = 0;
+
+    uint32_t nOutrightOdds = 0;
+    uint32_t nOutrightBets = 0;
+    uint32_t nOutrightPotentialLiability = 0;
+
+    uint32_t nPlaceOdds = 0;
+    uint32_t nPlaceBets = 0;
+    uint32_t nPlacePotentialLiability = 0;
+
+    uint32_t nShowOdds = 0;
+    uint32_t nShowBets = 0;
+    uint32_t nShowPotentialLiability = 0;
+
+    uint32_t nModifier = 0;
+
+    explicit ContenderInfo() {}
+    explicit ContenderInfo(const uint32_t inputOdds, const uint32_t outrightOdds, const uint32_t placeOdds, const uint32_t showOdds, const uint32_t modifier)
+        : nInputOdds(inputOdds)
+        , nOutrightOdds(outrightOdds)
+        , nOutrightBets(0)
+        , nOutrightPotentialLiability(0)
+        , nPlaceOdds(placeOdds)
+        , nPlaceBets(0)
+        , nPlacePotentialLiability(0)
+        , nShowOdds(showOdds)
+        , nShowBets(0)
+        , nShowPotentialLiability(0)
+        , nModifier(modifier)
+    {}
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nInputOdds);
+
+        READWRITE(nOutrightOdds);
+        READWRITE(nOutrightBets);
+        READWRITE(nOutrightPotentialLiability);
+
+        READWRITE(nPlaceOdds);
+        READWRITE(nPlaceBets);
+        READWRITE(nPlacePotentialLiability);
+
+        READWRITE(nShowOdds);
+        READWRITE(nShowBets);
+        READWRITE(nShowPotentialLiability);
+
+        READWRITE(nModifier);
+    }
+} ContenderInfo;
+
+class CFieldEventDB
+{
+public:
+    uint32_t nEventId      = 0;
+    uint64_t nStartTime    = 0;
+    uint8_t nGroupType    = 0;
+    uint32_t nSport        = 0;
+    uint32_t nTournament = 0;
+    uint32_t nStage      = 0;
+    uint32_t nMarginPercent = 0;
+    // contenderId : ContenderInfo
+    std::map<uint32_t, ContenderInfo> contenders;
+
+    // Default Constructor.
+    explicit CFieldEventDB() {}
+
+    void ExtractDataFromTx(const CFieldEventTx& tx);
+    void ExtractDataFromTx(const CFieldUpdateOddsTx& tx);
+    void ExtractDataFromTx(const CFieldUpdateMarginTx& tx);
+    void ExtractDataFromTx(const CFieldUpdateModifiersTx& tx);
+
+    void CalcOdds();
+
+    static bool IsMarketOpen(const FieldBetOutcomeType type, const size_t contendersCount);
+
+    std::string ToString();
+    std::string ContendersToString();
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(nStartTime);
+        READWRITE(nGroupType);
+        READWRITE(nSport);
+        READWRITE(nTournament);
+        READWRITE(nStage);
+        READWRITE(nMarginPercent);
+        READWRITE(contenders);
+    }
+
+private:
+    double GetLambda(const size_t ContendersSize);
+    double GetRHO(const size_t ContendersSize);
+
+    void Permutations2(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
+    void Permutations3(const std::map<uint32_t, uint32_t>& mContendersOdds, std::vector<std::vector<uint32_t>>& perms);
+
+    void CalculateFairOdds(std::map<uint32_t, uint32_t>& mContendersFairOdds);
+    void CalculateOutrightOdds(const std::map<uint32_t, uint32_t>& mContendersFairOdds, std::map<uint32_t, uint32_t>& mContendersOutrightOdds);
+    uint32_t CalculateAnimalPlaceOdds(const uint32_t idx, const double lambda, const std::map<uint32_t, uint32_t>& mContendersFairOdds);
+    uint32_t CalculateAnimalShowOdds(const uint32_t idx, const double lambda, const double rho, const std::map<uint32_t, uint32_t>& mContendersFairOdds);
+    uint32_t CalculateOddsInFirstN(const uint32_t idx, const std::vector<std::vector<uint32_t>>& permutations, const std::map<uint32_t, uint32_t>& mContendersFairOdds);
+
+    double CalculateX(const std::vector<std::pair<uint32_t, uint32_t>>& vContendersOddsMods, const double realMarginIn);
+    double CalculateM(const std::vector<std::pair<uint32_t, uint32_t>>& vContendersOddsMods, const double realMarginIn);
+
+    uint32_t CalculateMarketOdds(const double X, const double m, const uint32_t oddsMods, const uint16_t modifier);
+};
+
+// Field event Result key
+using FieldResultKey = EventKey;
+
+class CFieldResultDB
+{
+public:
+    uint32_t nEventId;
+    uint8_t nResultType;
+    // contenderId : ContenderResult
+    std::map<uint32_t, uint8_t> contendersResults;
+
+    // Default Constructor.
+    explicit CFieldResultDB() {}
+    explicit CFieldResultDB(const uint32_t eventId, const uint8_t resultType)
+        : nEventId(eventId)
+        , nResultType(resultType)
+    {}
+    explicit CFieldResultDB(const uint32_t eventId, const uint8_t resultType, const std::map<uint32_t, uint8_t> mContendersResults)
+        : nEventId(eventId)
+        , nResultType(resultType)
+        , contendersResults(mContendersResults)
+    {}
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(nResultType);
+        READWRITE(contendersResults);
     }
 };
 
@@ -371,6 +522,110 @@ public:
         payout = bet.payout;
         payoutHeight = bet.payoutHeight;
     }
+
+    bool IsCompleted() const { return completed; }
+    void SetCompleted() { completed = true; }
+    // for undo
+    void SetUncompleted() { completed = false; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        std::string addrStr;
+        READWRITE(betAmount);
+        if (ser_action.ForRead()) {
+            READWRITE(addrStr);
+            playerAddress.SetString(addrStr);
+        }
+        else {
+            addrStr = playerAddress.ToString();
+            READWRITE(addrStr);
+        }
+        READWRITE(legs);
+        READWRITE(lockedEvents);
+        READWRITE(betTime);
+        READWRITE(completed);
+        uint8_t resType;
+        if (ser_action.ForRead()) {
+            READWRITE(resType);
+            resultType = (BetResultType) resType;
+        }
+        else {
+            resType = (uint8_t) resultType;
+            READWRITE(resType);
+        }
+        READWRITE(payout);
+        READWRITE(payoutHeight);
+    }
+
+private:
+    bool completed = false;
+};
+
+// Field Bet Key
+using FieldBetKey = PeerlessBetKey;
+
+class CFieldLegDB
+{
+public:
+    uint32_t nEventId;
+    FieldBetOutcomeType nOutcome;
+    uint32_t nContenderId;
+
+    // Default constructor.
+    explicit CFieldLegDB() {}
+    explicit CFieldLegDB(const uint32_t eventId, const FieldBetOutcomeType outcome, const uint32_t contenderId)
+        : nEventId(eventId)
+        , nOutcome(outcome)
+        , nContenderId(contenderId)
+    {}
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t market;
+        READWRITE(nEventId);
+        if (ser_action.ForRead()) {
+            READWRITE(market);
+            nOutcome = (FieldBetOutcomeType) market;
+        }
+        else {
+            market = (uint8_t) nOutcome;
+            READWRITE(market);
+        }
+        READWRITE(nContenderId);
+    }
+};
+
+class CFieldBetDB
+{
+public:
+    CAmount betAmount;
+    CBitcoinAddress playerAddress;
+    // one elem means single bet, else it is parlay bet, max size = 5
+    std::vector<CFieldLegDB> legs;
+    // vector for member event condition, max size = 5
+    std::vector<CFieldEventDB> lockedEvents;
+    int64_t betTime;
+    BetResultType resultType = BetResultType::betResultUnknown;
+    CAmount payout = 0;
+    uint32_t payoutHeight = 0;
+
+    // Default Constructor.
+    explicit CFieldBetDB() {}
+    explicit CFieldBetDB(const CAmount amount,
+                         const CBitcoinAddress address,
+                         const std::vector<CFieldLegDB> vLegs,
+                         const std::vector<CFieldEventDB> vEvents,
+                         const int64_t time
+    )   : betAmount(amount)
+        , playerAddress(address)
+        , legs(vLegs)
+        , lockedEvents(vEvents)
+        , betTime(time)
+    {}
 
     bool IsCompleted() const { return completed; }
     void SetCompleted() { completed = true; }
@@ -579,10 +834,11 @@ private:
 
 using BettingUndoKey = uint256;
 
-using BettingUndoVariant = boost::variant<CPeerlessExtendedEventDB>;
+using BettingUndoVariant = boost::variant<CPeerlessExtendedEventDB, CFieldEventDB>;
 
 typedef enum BettingUndoTypes {
-    UndoPeerlessEvent
+    UndoPeerlessEvent = 0,
+    UndoFieldEvent    = 1
 } BettingUndoTypes;
 
 class CBettingUndoDB
@@ -619,6 +875,13 @@ public:
                     undoVariant = event;
                     break;
                 }
+                case UndoFieldEvent:
+                {
+                    CFieldEventDB event{};
+                    READWRITE(event);
+                    undoVariant = event;
+                    break;
+                }
                 default:
                     std::runtime_error("Undefined undo type");
             }
@@ -633,6 +896,11 @@ public:
                     CPeerlessExtendedEventDB event = boost::get<CPeerlessExtendedEventDB>(undoVariant);
                     READWRITE(event);
                     break;
+                }
+                case UndoFieldEvent:
+                {
+                    CFieldEventDB event = boost::get<CFieldEventDB>(undoVariant);
+                    READWRITE(event);
                 }
                 default:
                     std::runtime_error("Undefined undo type");
@@ -826,6 +1094,13 @@ public:
     // it needed to avoid undo issues, when we try undo not affected tx
     std::unique_ptr<CBettingDB> failedBettingTxs; // "failedtxs"
     std::unique_ptr<CStorageKV> failedBettingTxsStorage;
+    // field betting
+    std::unique_ptr<CBettingDB> fieldEvents; // "events"
+    std::unique_ptr<CStorageKV> fieldEventsStorage;
+    std::unique_ptr<CBettingDB> fieldResults; // "results"
+    std::unique_ptr<CStorageKV> fieldResultsStorage;
+    std::unique_ptr<CBettingDB> fieldBets; // "bets"
+    std::unique_ptr<CStorageKV> fieldBetsStorage;
 
     // default constructor
     explicit CBettingsView() { }

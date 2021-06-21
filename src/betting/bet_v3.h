@@ -31,4 +31,7 @@ void GetCGLottoBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBloc
 
 uint32_t GetBetSearchStartHeight(int nHeight);
 
+bool UndoPLBetPayouts(CBettingsView &bettingsViewCache, int height);
+bool UndoQGBetPayouts(CBettingsView &bettingsViewCache, int height);
+
 #endif // WAGERR_V3_BET_H

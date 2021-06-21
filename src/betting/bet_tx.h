@@ -28,7 +28,15 @@ typedef enum BetTxTypes{
     plEventPatchTxType       = 0x0b,  // Peerless event patch transaction type identifier.
     plParlayBetTxType        = 0x0c,  // Peerless Parlay Bet transaction type identifier.
     qgBetTxType              = 0x0d,  // Quick Games Bet transaction type identifier.
-    plEventZeroingOddsTxType = 0x0e,
+    plEventZeroingOddsTxType = 0x0e,  // Zeroing odds for event ids transaction type identifier.
+    fEventTxType             = 0x0f,  // Field event transaction type identifier.
+    fUpdateOddsTxType        = 0x10,  // Field event update odds transaction type identifier.
+    fZeroingOddsTxType       = 0x11,  // Field event zeroing odds transaction type identifier.
+    fResultTxType            = 0x12,  // Field event result transaction type identifier.
+    fBetTxType               = 0x13,  // Field bet transaction type indetifier.
+    fParlayBetTxType         = 0x14,  // Field parlay bet transaction type identifier.
+    fUpdateMarginTxType      = 0x15,  // Field event update margin transaction type identifier
+    fUpdateModifiersTxType   = 0x16,  // Field event update modifiers transaction type identifier.
 } BetTxTypes;
 
 // class for serialization common betting header from opcode
@@ -73,8 +81,8 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(nMType);
-        // if mapping type is teamMapping (0x03) nId is 4 bytes, else - 2 bytes
-        if (nMType == 0x03) {
+        // if mapping type is teamMapping (0x03) or contenderMapping (0x06) nId is 4 bytes, else - 2 bytes
+        if (nMType == 0x03 || nMType == 0x06) {
             uint32_t nId32;
             if (ser_action.ForRead()) {
                 READWRITE(nId32);
@@ -151,6 +159,187 @@ public:
         READWRITE(nHomeOdds);
         READWRITE(nAwayOdds);
         READWRITE(nDrawOdds);
+    }
+};
+
+class CFieldEventTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+    uint32_t nStartTime;
+    uint16_t nSport;
+    uint16_t nTournament;
+    uint16_t nStage;
+    uint8_t nGroupType;
+    uint32_t nMarginPercent;
+    // contenderId : input odds
+    std::map<uint32_t, uint32_t> mContendersInputOdds;
+
+    // Default Constructor.
+    CFieldEventTx() {}
+
+    BetTxTypes GetTxType() const override { return fEventTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(nStartTime);
+        READWRITE(nSport);
+        READWRITE(nTournament);
+        READWRITE(nStage);
+        READWRITE(nGroupType);
+        READWRITE(nMarginPercent);
+        READWRITE(mContendersInputOdds);
+    }
+};
+
+class CFieldUpdateOddsTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+    // contenderId : inputOdds
+    std::map<uint32_t, uint32_t> mContendersInputOdds;
+
+    // Default Constructor.
+    CFieldUpdateOddsTx() {}
+
+    BetTxTypes GetTxType() const override { return fUpdateOddsTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(mContendersInputOdds);
+    }
+};
+
+class CFieldUpdateModifiersTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+    // contenderId : modifiers
+    std::map<uint32_t, uint32_t> mContendersModifires;
+
+    // Default Constructor.
+    CFieldUpdateModifiersTx() {}
+
+    BetTxTypes GetTxType() const override { return fUpdateModifiersTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(mContendersModifires);
+    }
+};
+
+class CFieldUpdateMarginTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+    uint32_t nMarginPercent;
+
+    // Default Constructor.
+    CFieldUpdateMarginTx() {}
+
+    BetTxTypes GetTxType() const override { return fUpdateMarginTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(nMarginPercent);
+    }
+};
+
+class CFieldZeroingOddsTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+
+    // Default Constructor.
+    CFieldZeroingOddsTx() {}
+
+    BetTxTypes GetTxType() const override { return fZeroingOddsTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+    }
+};
+
+class CFieldResultTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+    uint8_t nResultType;
+    // contenderId : ContenderResult
+    std::map<uint32_t, uint8_t> contendersResults;
+
+    // Default Constructor.
+    CFieldResultTx() {}
+
+    BetTxTypes GetTxType() const override { return fResultTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(nResultType);
+        READWRITE(contendersResults);
+    }
+};
+
+class CFieldBetTx : public CBettingTx
+{
+public:
+    uint32_t nEventId;
+    uint8_t nOutcome;
+    uint32_t nContenderId;
+
+    // Default constructor.
+    CFieldBetTx() {}
+    CFieldBetTx(const uint32_t eventId, const uint8_t marketType, const uint32_t contenderId)
+        : nEventId(eventId)
+        , nOutcome(marketType)
+        , nContenderId(contenderId)
+    {}
+
+    BetTxTypes GetTxType() const override { return fBetTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(nEventId);
+        READWRITE(nOutcome);
+        READWRITE(nContenderId);
+    }
+};
+
+class CFieldParlayBetTx : public CBettingTx
+{
+public:
+    std::vector<CFieldBetTx> legs;
+
+    // Default constructor.
+    CFieldParlayBetTx() {}
+
+    BetTxTypes GetTxType() const override { return fParlayBetTxType; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(legs);
     }
 };
 

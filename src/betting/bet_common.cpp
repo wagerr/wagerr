@@ -75,7 +75,7 @@ bool CalculatePayoutBurnAmounts(const CAmount betAmount, const uint32_t odds, CA
  *
  * @return results vector.
  */
-std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight)
+std::vector<CPeerlessResultDB> GetPLResults(int nLastBlockHeight)
 {
     std::vector<CPeerlessResultDB> results;
 
@@ -107,6 +107,51 @@ std::vector<CPeerlessResultDB> GetEventResults(int nLastBlockHeight)
 
                 // Store the result if its a valid result OP CODE.
                 results.emplace_back(resultTx->nEventId, resultTx->nResultType, resultTx->nHomeScore, resultTx->nAwayScore);
+                if (!fMultipleResultsAllowed) return results;
+            }
+        }
+    }
+
+    return results;
+}
+
+/**
+ * Check a given block to see if it contains a Field result TX.
+ *
+ * @return results vector.
+ */
+std::vector<CFieldResultDB> GetFieldResults(int nLastBlockHeight)
+{
+    std::vector<CFieldResultDB> results;
+
+    bool fMultipleResultsAllowed = (nLastBlockHeight >= Params().WagerrProtocolV3StartHeight());
+
+    // Get the current block so we can look for any results in it.
+    CBlockIndex *resultsBocksIndex = NULL;
+    resultsBocksIndex = chainActive[nLastBlockHeight];
+
+    CBlock block;
+    ReadBlockFromDisk(block, resultsBocksIndex);
+
+    for (CTransaction& tx : block.vtx) {
+        // Ensure the result TX has been posted by Oracle wallet.
+        const CTxIn &txin  = tx.vin[0];
+        bool validResultTx = IsValidOracleTx(txin, nLastBlockHeight);
+
+        if (validResultTx) {
+            // Look for result OP RETURN code in the tx vouts.
+            for (const CTxOut &txOut : tx.vout) {
+
+                auto bettingTx = ParseBettingTx(txOut);
+
+                if (bettingTx == nullptr || bettingTx->GetTxType() != fResultTxType) continue;
+
+                CFieldResultTx* resultTx = (CFieldResultTx *)bettingTx.get();
+
+                LogPrint("wagerr", "Result for field event %lu was found...\n", resultTx->nEventId);
+
+                // Store the result if its a valid result OP CODE.
+                results.emplace_back(resultTx->nEventId, resultTx->nResultType, resultTx->contendersResults);
                 if (!fMultipleResultsAllowed) return results;
             }
         }
@@ -303,6 +348,47 @@ std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerl
     return {0, 0};
 }
 
+/**
+ * Check winning condition for current bet considering locked event and event result.
+ *
+ * @return pair of {on_chain_odds, effective_odds}, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
+ */
+std::pair<uint32_t, uint32_t> GetBetOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent, const CFieldResultDB &result, const bool fWagerrProtocolV4)
+{
+    if (result.nResultType == ResultType::eventRefund) {
+        return {BET_ODDSDIVISOR, BET_ODDSDIVISOR};
+    }
+    uint8_t contederResult = result.contendersResults.find(bet.nContenderId) != result.contendersResults.end() ?
+        result.contendersResults.at(bet.nContenderId) : (uint8_t)ContenderResult::DNF;
+    ContenderInfo contenderInfo = lockedEvent.contenders.find(bet.nContenderId) != lockedEvent.contenders.end() ?
+        lockedEvent.contenders.at(bet.nContenderId) : ContenderInfo{};
+    switch (bet.nOutcome)
+    {
+        case FieldBetOutcomeType::outright:
+            if (contederResult == ContenderResult::place1) {
+                return {contenderInfo.nOutrightOdds, CalculateEffectiveOdds(contenderInfo.nOutrightOdds)};
+            }
+            break;
+        case FieldBetOutcomeType::place:
+            if (contederResult == ContenderResult::place1 ||
+                    contederResult == ContenderResult::place2) {
+                return {contenderInfo.nPlaceOdds, CalculateEffectiveOdds(contenderInfo.nPlaceOdds)};
+            }
+            break;
+        case FieldBetOutcomeType::show:
+            if (contederResult == ContenderResult::place1 ||
+                    contederResult == ContenderResult::place2 ||
+                    contederResult == ContenderResult::place3) {
+                return {contenderInfo.nShowOdds, CalculateEffectiveOdds(contenderInfo.nShowOdds)};
+            }
+            break;
+        default:
+            break;
+    }
+    // bet lose
+    return {0, 0};
+}
+
 uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent)
 {
     switch(bet.nOutcome) {
@@ -324,4 +410,24 @@ uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEvent
             std::runtime_error("Unknown bet outcome type!");
     }
     return 0;
+}
+
+uint32_t GetBetPotentialOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent)
+{
+    auto contender_it = lockedEvent.contenders.find(bet.nContenderId);
+    if (contender_it == lockedEvent.contenders.end()) {
+        return 0;
+    }
+
+    switch (bet.nOutcome)
+    {
+    case outright:
+        return contender_it->second.nOutrightOdds;
+    case place:
+        return contender_it->second.nPlaceOdds;
+    case show:
+        return contender_it->second.nShowOdds;
+    default:
+        return 0;
+    }
 }

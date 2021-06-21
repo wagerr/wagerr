@@ -168,6 +168,86 @@ UniValue listevents(const UniValue& params, bool fHelp)
     return result;
 }
 
+UniValue listfieldevents(const UniValue& params, bool fHelp)
+{
+    if (fHelp || (params.size() > 1))
+        throw std::runtime_error(
+            "listefieldvents\n"
+            "\nGet live Wagerr field events.\n"
+
+            "\nResult:\n"
+            "[\n"
+            "  {\n"
+            "    \"id\": \"xxx\",         (string) The event ID\n"
+            "    \"name\": \"xxx\",       (string) The name of the event\n"
+            "    \"round\": \"xxx\",      (string) The round of the event\n"
+            "    \"starting\": n,         (numeric) When the event will start\n"
+            "    \"contenders\": [\n"
+            "      {\n"
+            "        \"name\": \"xxxx\",  (string) Conteder name\n"
+            "        \"odds\": n          (numeric) Conteder win Odds\n"
+            "      }\n"
+            "      ,...\n"
+            "    ]\n"
+            "  }\n"
+            "]\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("listfieldevents", "") + HelpExampleRpc("listfieldevents", ""));
+
+    UniValue result{UniValue::VARR};
+
+    LOCK(cs_main);
+
+    auto it = bettingsView->fieldEvents->NewIterator();
+    for (it->Seek(std::vector<unsigned char>{}); it->Valid(); it->Next()) {
+        CFieldEventDB fEvent;
+        CMappingDB mapping;
+        CBettingDB::BytesToDbType(it->Value(), fEvent);
+
+        // Only list active events.
+        if ((time_t)fEvent.nStartTime < std::time(0)) {
+            continue;
+        }
+
+        UniValue evt(UniValue::VOBJ);
+        evt.push_back(Pair("event_id", (uint64_t) fEvent.nEventId));
+        evt.push_back(Pair("starting", (uint64_t) fEvent.nStartTime));
+        evt.push_back(Pair("mrg-in", (uint64_t) fEvent.nMarginPercent));
+
+        if (!bettingsView->mappings->Read(MappingKey{individualSportMapping, fEvent.nSport}, mapping))
+            continue;
+        evt.push_back(Pair("sport", mapping.sName));
+
+        if (!bettingsView->mappings->Read(MappingKey{tournamentMapping, fEvent.nTournament}, mapping))
+            continue;
+        evt.push_back(Pair("tournament", mapping.sName));
+
+        if (!bettingsView->mappings->Read(MappingKey{roundMapping, fEvent.nStage}, mapping))
+            continue;
+        evt.push_back(Pair("round", mapping.sName));
+
+        UniValue contenders(UniValue::VARR);
+        for (const auto& contender_it : fEvent.contenders) {
+            UniValue contender(UniValue::VOBJ);
+            if (!bettingsView->mappings->Read(MappingKey{contenderMapping, contender_it.first}, mapping))
+                continue;
+            contender.push_back(Pair("name", mapping.sName));
+            contender.push_back(Pair("modifier", (uint64_t) contender_it.second.nModifier));
+            contender.push_back(Pair("input-odds", (uint64_t) contender_it.second.nInputOdds));
+            contender.push_back(Pair("outright-odds", (uint64_t) contender_it.second.nOutrightOdds));
+            contender.push_back(Pair("place-odds", (uint64_t) contender_it.second.nPlaceOdds));
+            contender.push_back(Pair("show-odds", (uint64_t) contender_it.second.nShowOdds));
+            contenders.push_back(contender);
+        }
+        evt.push_back(Pair("contenders", contenders));
+
+        result.push_back(evt);
+    }
+
+    return result;
+}
+
 UniValue listeventsdebug(const UniValue& params, bool fHelp)
 {
     if (fHelp || (params.size() > 0))
@@ -1989,6 +2069,216 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
     return wtx.GetHash().GetHex();
 }
 
+UniValue placefieldbet(const UniValue& params, bool fHelp) {
+    if (fHelp || params.size() < 4 || params.size() > 6) {
+        throw std::runtime_error(
+            "placefieldbet event_id market_type contender_id amount ( \"comment\" \"comment-to\" )\n"
+            "\nWARNING - Betting closes 20 minutes before field event start time.\n"
+            "Any bets placed after this time will be invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on an field event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. event_id        (numeric, required) The field event id to bet on.\n"
+            "2. market_type     (numeric, required) 1 means outright,\n"
+            "                                       2 means place,\n"
+            "                                       3 means show."
+            "3. contender_id    (numeric, required) The field event participant identifier."
+            "4. amount          (numeric, required) The amount in wgr to send.\n"
+            "5. \"comment\"     (string, optional) A comment used to store what the transaction is for. \n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "6. \"comment-to\"  (string, optional) A comment to store the name of the person or organization \n"
+            "                             to which you're sending the transaction. This is not part of the \n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placefieldbet", "1 1 100 25 \"donation\" \"seans outpost\"") +
+            HelpExampleRpc("placefieldbet", "1 1 100 25 \"donation\" \"seans outpost\""));
+    }
+
+    if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
+    }
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    CAmount nAmount = AmountFromValue(params[3]);
+    // Validate bet amount so its between 25 - 10000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.");
+    }
+
+    // Wallet comments
+    CWalletTx wtx;
+    if (params.size() > 4 && !params[4].isNull() && !params[4].get_str().empty())
+        wtx.mapValue["comment"] = params[4].get_str();
+    if (params.size() > 5 && !params[5].isNull() && !params[5].get_str().empty())
+        wtx.mapValue["to"] = params[5].get_str();
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    uint32_t eventId = static_cast<uint32_t>(params[0].get_int64());
+    FieldBetOutcomeType marketType = static_cast<FieldBetOutcomeType>(params[1].get_int());
+    uint32_t contenderId = static_cast<uint32_t>(params[2].get_int64());
+
+    if (marketType < outright || marketType > show) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet market type for FieldEvent: " + std::to_string(eventId));
+    }
+
+    CFieldEventDB fEvent;
+    if (!bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
+    }
+
+    const auto& contender_it = fEvent.contenders.find(contenderId);
+    if (contender_it == fEvent.contenders.end()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
+    }
+
+    if (bettingsView->fieldResults->Exists(FieldResultKey{eventId})) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: FieldEvent " + std::to_string(eventId) + " was been resulted");
+    }
+
+    if (GetBetPotentialOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
+    }
+
+    CFieldBetTx fBetTx{eventId, marketType, contenderId};
+
+    // TODO `address` isn't used when adding the following transaction to the
+    // blockchain, so ideally it would not need to be supplied to `SendMoney`.
+    // Ideally an alternative function, such as `BurnMoney`, would be developed
+    // and used, which would take the `OP_RETURN` value in place of the address
+    // value.
+    // Note that, during testing, the `opReturn` value is added to the
+    // blockchain incorrectly if its length is less than 5. This behaviour would
+    // ideally be investigated and corrected/justified when time allows.
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) fBetTxType << fBetTx;
+    std::string opCode = HexStr(ss.begin(), ss.end());
+
+    CBitcoinAddress address("");
+    // Unhex the validated bet opcode
+    std::vector<unsigned char> vectorValue;
+    std::string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
+UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
+    if (fHelp || params.size() < 2 || params.size() > 4) {
+        throw std::runtime_error(
+            "placefieldparlaybet [{\"eventId\": event_id, \"marketType\": market_type, \"contenderId\": contender_id}, ...] amount ( \"comment\" \"comment-to\" )\n"
+            "\nWARNING - Betting closes 20 minutes before field event start time.\n"
+            "Any bets placed after this time will be invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on an field event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "\nArguments:\n"
+            "1. Legs array     (array of json objects, required) The list of field bets.\n"
+            "  [\n"
+            "    {\n"
+            "      \"eventId\": id               (numeric, required) The field event id to bet on.\n"
+            "      \"marketType\": market_type   (numeric, required) 1 means outright,\n"
+            "                                                        2 means place,\n"
+            "                                                        3 means show."
+            "      \"contenderId\": contender_id (numeric, required) The field event participant identifier."
+            "    }\n"
+            "  ]\n"
+            "2. amount          (numeric, required) The amount in wgr to send. Min: 25, max: 4000.\n"
+            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for.\n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization\n"
+            "                             to which you're sending the transaction. This is not part of the\n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placefieldparlaybet", "\"[{\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}, {\"eventId\": 2, \"marketType\": 2, \"contenderId\": 200}]\" 25 \"Parlay bet\" \"seans outpost\"") +
+            HelpExampleRpc("placefieldparlaybet", "\"[{\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}, {\"eventId\": 322,\"marketType\": 2, \"contenderId\": 200}]\", 25, \"Parlay bet\", \"seans outpost\""));
+    }
+
+    if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
+    }
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    CAmount nAmount = AmountFromValue(params[1]);
+    // Validate bet amount so its between 25 - 10000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.");
+    }
+
+    // Wallet comments
+    CWalletTx wtx;
+    if (params.size() > 2 && !params[2].isNull() && !params[2].get_str().empty())
+        wtx.mapValue["comment"] = params[2].get_str();
+    if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
+        wtx.mapValue["to"] = params[3].get_str();
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    CFieldParlayBetTx fParlayBetTx;
+    UniValue legsArr = params[0].get_array();
+    for (uint32_t i = 0; i < legsArr.size(); i++) {
+        const UniValue obj = legsArr[i].get_obj();
+
+        uint32_t eventId = static_cast<uint32_t>(find_value(obj, "eventId").get_int64());
+        FieldBetOutcomeType marketType = static_cast<FieldBetOutcomeType>(find_value(obj, "marketType").get_int());
+        uint32_t contenderId = static_cast<uint32_t>(find_value(obj, "contenderId").get_int64());
+
+        if (marketType < outright || marketType > show) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet market type for FieldEvent: " + std::to_string(eventId));
+        }
+
+        CFieldEventDB fEvent;
+        if (!bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
+        }
+
+        if (!CFieldEventDB::IsMarketOpen(marketType, fEvent.contenders.size())) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: market " + std::to_string((uint8_t)marketType) + " is closed for event " + std::to_string(eventId));
+        }
+
+        const auto& contender_it = fEvent.contenders.find(contenderId);
+        if (contender_it == fEvent.contenders.end()) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
+        }
+
+        if (GetBetPotentialOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
+        }
+
+        if (fEvent.nStage != 0) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: event " + std::to_string(eventId) + " cannot be part of parlay bet");
+        }
+
+        fParlayBetTx.legs.emplace_back(eventId, marketType, contenderId);
+    }
+
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) fParlayBetTxType << fParlayBetTx;
+    std::string opCode = HexStr(ss.begin(), ss.end());
+
+    CBitcoinAddress address("");
+
+    // Unhex the validated bet opcode
+    std::vector<unsigned char> vectorValue;
+    std::string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
 /**
  * Looks up a chain game info for a given ID.
  *
@@ -2290,6 +2580,70 @@ UniValue geteventliability(const UniValue& params, bool fHelp)
     }
 
     return event;
+}
+
+/**
+ * Get total liability for each field event that is currently active.
+ *
+ * @param params The RPC params consisting of the field event id.
+ * @param fHelp  Help text
+ * @return
+ */
+UniValue getfieldeventliability(const UniValue& params, bool fHelp)
+{
+  if (fHelp || (params.size() != 1))
+        throw std::runtime_error(
+            "getfieldeventliability\n"
+            "Return the payout of each field event.\n"
+            "\nArguments:\n"
+            "1. FieldEvent id (numeric, required) The field event id required for get liability.\n"
+
+            "\nResult:\n"
+            "  {\n"
+            "    \"event-id\": \"xxx\", (numeric) The id of the field event.\n"
+            "    \"event-status\": \"status\", (string) The status of the event (running | resulted).\n"
+            "    \"contenders\":\n"
+            "      [\n"
+            "         {\n"
+            "           \"contender-id\" : xxx (numeric) contender id,\n"
+            "           \"outright-bets\": \"xxx\", (numeric) The number of bets to outright market (parlays included).\n"
+            "           \"outright-liability\": \"xxx\", (numeric) The outright market potentional liability (without parlays).\n"
+            "         }\n"
+            "      ]\n"
+            "  }\n"
+
+            "\nExamples:\n" +
+            HelpExampleCli("getfieldeventliability", "10") + HelpExampleRpc("getfieldeventliability", "10"));
+
+    LOCK(cs_main);
+
+    uint32_t eventId = static_cast<uint32_t>(params[0].get_int());
+    UniValue vEvent(UniValue::VOBJ);
+    CFieldEventDB fEvent;
+    if (bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
+        vEvent.push_back(Pair("event-id", (uint64_t) fEvent.nEventId));
+        if (!bettingsView->fieldResults->Exists(FieldResultKey{eventId})) {
+            vEvent.push_back(Pair("event-status", "running"));
+            UniValue vContenders(UniValue::VARR);
+            for (const auto& contender : fEvent.contenders) {
+                UniValue vContender(UniValue::VOBJ);
+                vContender.push_back(Pair("contender-id", (uint64_t) contender.first));
+                vContender.push_back(Pair("outright-bets", (uint64_t) contender.second.nOutrightBets));
+                vContender.push_back(Pair("outright-liability", (uint64_t) contender.second.nOutrightPotentialLiability));
+                vContender.push_back(Pair("place-bets", (uint64_t) contender.second.nPlaceBets));
+                vContender.push_back(Pair("place-liability", (uint64_t) contender.second.nPlacePotentialLiability));
+                vContender.push_back(Pair("show-bets", (uint64_t) contender.second.nShowBets));
+                vContender.push_back(Pair("show-liability", (uint64_t) contender.second.nShowPotentialLiability));
+                vContenders.push_back(vContender);
+            }
+            vEvent.push_back(Pair("contenders", vContenders));
+        }
+        else {
+            vEvent.push_back(Pair("event-status", "resulted"));
+        }
+    }
+
+    return vEvent;
 }
 
 UniValue sendtoaddress(const UniValue& params, bool fHelp)
@@ -4475,7 +4829,7 @@ UniValue getstakesplitthreshold(const UniValue& params, bool fHelp)
 
 UniValue autocombinerewards(const UniValue& params, bool fHelp)
 {
-    bool fEnable;
+    bool fEnable = false;
     if (params.size() >= 1)
         fEnable = params[0].get_bool();
 

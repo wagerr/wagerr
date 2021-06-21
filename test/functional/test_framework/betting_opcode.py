@@ -23,6 +23,10 @@ OPCODE_BTX_EVENT_PATCH = 0x0b
 OPCODE_BTX_PARLAY_BET = 0x0c
 OPCODE_BTX_QG_BET = 0x0d
 OPCODE_BTX_ZERO_ODDS = 0x0e
+OPCODE_BTX_FIELD_EVENT = 0x0f
+OPCODE_BTX_FIELD_UPDATE_ODDS = 0x10
+OPCODE_BTX_FIELD_ZEROING_ODDS = 0x11
+OPCODE_BTX_FIELD_RESULT = 0x12
 
 OPCODE_QG_DICE = 0x00
 
@@ -30,6 +34,8 @@ SPORT_MAPPING      = 0x01
 ROUND_MAPPING      = 0x02
 TEAM_MAPPING       = 0x03
 TOURNAMENT_MAPPING = 0x04
+INDIVIDUAL_SPORT_MAPPING    = 0x05
+CONTENDER_MAPPING           = 0x06
 
 STANDARD_RESULT = 0x01
 EVENT_REFUND    = 0x02
@@ -45,6 +51,9 @@ QG_DICE_TOTAL_OVER = 0x02
 QG_DICE_TOTAL_UNDER = 0x03
 QG_DICE_EVEN = 0x04
 QG_DICE_ODD = 0x05
+
+ODDS_DIVISOR = 10000
+BETX_PERMILLE = 60
 
 # Encode an unsigned int in hexadecimal and little endian byte order. The function expects the value and the size in
 # bytes as parameters.
@@ -86,7 +95,7 @@ def make_common_header(btx_type, version = 1):
 
 # Create a mapping opcode.
 def make_mapping(namespace_id, mapping_id, mapping_name):
-    mapping_id_size = 2 if namespace_id != 3 else 4
+    mapping_id_size = 2 if namespace_id != 3 and namespace_id != 6 else 4
     result = make_common_header(OPCODE_BTX_MAPPING)
     result = result + encode_int_little_endian(namespace_id, 1)
     result = result + encode_int_little_endian(mapping_id, mapping_id_size)
@@ -116,6 +125,49 @@ def make_event(event_id, timestamp, sport, tournament, round, home_team, away_te
     result = result + encode_int_little_endian(draw_odds, 4)
     return result
 
+# Create a field event opcode
+def make_field_event(event_id, timestamp, group, sport, tournament, round, mrg_in_percent, contenders_win_odds):
+    result = make_common_header(OPCODE_BTX_FIELD_EVENT)
+    result = result + encode_int_little_endian(event_id, 4)
+    result = result + encode_int_little_endian(timestamp, 4)
+    result = result + encode_int_little_endian(sport, 2)
+    result = result + encode_int_little_endian(tournament, 2)
+    result = result + encode_int_little_endian(round, 2)
+    result = result + encode_int_little_endian(group, 1)
+    result = result + encode_int_little_endian(mrg_in_percent, 4)
+    result = result + encode_int_little_endian(int(len(contenders_win_odds)), 1) # map size
+    for contender_id, contender_odds in contenders_win_odds.items():
+        result = result + encode_int_little_endian(int(contender_id), 4)
+        result = result + encode_int_little_endian(int(contender_odds), 4)
+    return result
+
+# Create an update odds for field event opcode
+def make_field_update_odds(event_id, contenders_win_odds):
+    result = make_common_header(OPCODE_BTX_FIELD_UPDATE_ODDS)
+    result = result + encode_int_little_endian(event_id, 4)
+    result = result + encode_int_little_endian(int(len(contenders_win_odds)), 1) # map size
+    for contender_id, contender_odds in contenders_win_odds.items():
+        result = result + encode_int_little_endian(int(contender_id), 4)
+        result = result + encode_int_little_endian(int(contender_odds), 4)
+    return result
+
+# Create an zeroing odds for field event opcode
+def make_field_zeroing_odds(event_id):
+    result = make_common_header(OPCODE_BTX_FIELD_ZEROING_ODDS)
+    result = result + encode_int_little_endian(event_id, 4)
+    return result
+
+# Create a result for field event opcode
+def make_field_result(event_id, result_type, contenders_results):
+    result = make_common_header(OPCODE_BTX_FIELD_RESULT)
+    result = result + encode_int_little_endian(event_id, 4)
+    result = result + encode_int_little_endian(result_type, 1)
+    result = result + encode_int_little_endian(int(len(contenders_results)), 1) # map size
+    for contender_id, contender_result in contenders_results.items():
+        result = result + encode_int_little_endian(int(contender_id), 4)
+        result = result + encode_int_little_endian(int(contender_result), 1)
+    return result
+
 # Create a moneyline odds update opcode.
 def make_update_ml_odds(event_id, home_odds, away_odds, draw_odds):
     result = make_common_header(OPCODE_BTX_UPDATE_ODDS)
@@ -124,7 +176,7 @@ def make_update_ml_odds(event_id, home_odds, away_odds, draw_odds):
     result = result + encode_int_little_endian(away_odds, 4)
     result = result + encode_int_little_endian(draw_odds, 4)
     return result
-    
+
 def make_zeroing_odds(event_ids):
     result = make_common_header(OPCODE_BTX_ZERO_ODDS)
     result = result + encode_int_little_endian(int(len(event_ids)), 1) # vector size
@@ -226,3 +278,6 @@ def make_dice_bet(dice_type, number = 1):
         result = result + encode_int_little_endian(1, 1) # vector size
         result = result + encode_int_little_endian(dice_type, 1)
     return result
+
+def calc_effective_odds(onchain_odds):
+    return ((onchain_odds - ODDS_DIVISOR) * 9400) // ODDS_DIVISOR + ODDS_DIVISOR
