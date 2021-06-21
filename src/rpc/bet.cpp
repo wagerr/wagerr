@@ -55,23 +55,21 @@ UniValue getmappingid(const UniValue& params, bool fHelp)
 
     bool mappingFound{false};
 
-    {
-        LOCK(cs_bettingdb);
+    LOCK(cs_main);
 
-        // Check the map for the string name.
-        auto it = bettingsView->mappings->NewIterator();
-        MappingKey key;
-        for (it->Seek(CBettingDB::DbTypeToBytes(MappingKey{type, 0})); it->Valid() && (CBettingDB::BytesToDbType(it->Key(), key), key.nMType == type); it->Next()) {
-            CMappingDB mapping{};
-            CBettingDB::BytesToDbType(it->Value(), mapping);
-            LogPrintf("wagerr", "%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
-            if (!mappingFound) {
-                if (mapping.sName == name) {
-                    mappings.push_back(Pair("mapping-id", (uint64_t) key.nId));
-                    mappings.push_back(Pair("exists", true));
-                    mappings.push_back(Pair("mapping-index", mIndex));
-                    mappingFound = true;
-                }
+    // Check the map for the string name.
+    auto it = bettingsView->mappings->NewIterator();
+    MappingKey key;
+    for (it->Seek(CBettingDB::DbTypeToBytes(MappingKey{type, 0})); it->Valid() && (CBettingDB::BytesToDbType(it->Key(), key), key.nMType == type); it->Next()) {
+        CMappingDB mapping{};
+        CBettingDB::BytesToDbType(it->Value(), mapping);
+        LogPrintf("wagerr", "%s - mapping - it=[%d,%d] nId=[%d] nMType=[%s] [%s]\n", __func__, key.nMType, key.nId, key.nId, CMappingDB::ToTypeName(key.nMType), mapping.sName);
+        if (!mappingFound) {
+            if (mapping.sName == name) {
+                mappings.push_back(Pair("mapping-id", (uint64_t) key.nId));
+                mappings.push_back(Pair("exists", true));
+                mappings.push_back(Pair("mapping-index", mIndex));
+                mappingFound = true;
             }
         }
     }
@@ -119,6 +117,8 @@ UniValue getmappingname(const UniValue& params, bool fHelp)
     if (CMappingDB::ToTypeName(type) != mIndex) {
         throw std::runtime_error("No mapping exist for the mapping index you provided.");
     }
+
+    LOCK(cs_main);
 
     CMappingDB map{};
     if (bettingsView->mappings->Read(MappingKey{type, id}, map)) {
@@ -220,6 +220,8 @@ UniValue getpayoutinfo(const UniValue& params, bool fHelp)
     UniValue paramsArr = params[0].get_array();
     std::vector<std::pair<bool, CPayoutInfoDB>> vPayoutsInfo;
 
+    LOCK(cs_main);
+
     // parse payout params
     for (uint32_t i = 0; i < paramsArr.size(); i++) {
         const UniValue obj = paramsArr[i].get_obj();
@@ -290,21 +292,20 @@ UniValue getpayoutinfosince(const UniValue& params, bool fHelp)
             throw std::runtime_error("Invalid number of last blocks.");
     }
 
+    LOCK(cs_main);
+
     int nCurrentHeight = chainActive.Height();
 
     uint32_t startBlockHeight = static_cast<uint32_t>(nCurrentHeight) - nLastBlocks + 1;
 
-    {
-        LOCK(cs_bettingdb);
-
-        auto it = bettingsView->payoutsInfo->NewIterator();
-        for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{startBlockHeight, COutPoint()})); it->Valid(); it->Next()) {
-            PayoutInfoKey key;
-            CPayoutInfoDB payoutInfo;
-            CBettingDB::BytesToDbType(it->Key(), key);
-            CBettingDB::BytesToDbType(it->Value(), payoutInfo);
-            vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{true, payoutInfo});
-        }
+    auto it = bettingsView->payoutsInfo->NewIterator();
+    for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{startBlockHeight, COutPoint()})); it->Valid(); it->Next()) {
+        PayoutInfoKey key;
+        CPayoutInfoDB payoutInfo;
+        CBettingDB::BytesToDbType(it->Key(), key);
+        CBettingDB::BytesToDbType(it->Value(), payoutInfo);
+        vPayoutsInfo.emplace_back(std::pair<bool, CPayoutInfoDB>{true, payoutInfo});
     }
+
     return CreatePayoutInfoResponse(vPayoutsInfo);
 }

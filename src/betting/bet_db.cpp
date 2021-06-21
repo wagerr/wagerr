@@ -4,8 +4,6 @@
 
 #include <betting/bet_db.h>
 
-CCriticalSection cs_bettingdb;
-
 std::string CMappingDB::ToTypeName(MappingType type)
 {
     switch (type) {
@@ -111,8 +109,6 @@ CBettingsView::CBettingsView(CBettingsView* phr) {
 }
 
 bool CBettingsView::Flush() {
-    LOCK(cs_bettingdb);
-
     return mappings->Flush() &&
             results->Flush() &&
             events->Flush() &&
@@ -127,8 +123,6 @@ bool CBettingsView::Flush() {
 }
 
 unsigned int CBettingsView::GetCacheSize() {
-    LOCK(cs_bettingdb);
-
     return mappings->GetCacheSize() +
             results->GetCacheSize() +
             events->GetCacheSize() +
@@ -143,8 +137,6 @@ unsigned int CBettingsView::GetCacheSize() {
 }
 
 unsigned int CBettingsView::GetCacheSizeBytesToWrite() {
-    LOCK(cs_bettingdb);
-
     return mappings->GetCacheSizeBytesToWrite() +
             results->GetCacheSizeBytesToWrite() +
             events->GetCacheSizeBytesToWrite() +
@@ -159,8 +151,6 @@ unsigned int CBettingsView::GetCacheSizeBytesToWrite() {
 }
 
 void CBettingsView::SetLastHeight(uint32_t height) {
-    LOCK(cs_bettingdb);
-
     if (!undos->Exists(std::string("LastHeight"))) {
         undos->Write(std::string("LastHeight"), height);
     }
@@ -170,8 +160,6 @@ void CBettingsView::SetLastHeight(uint32_t height) {
 }
 
 uint32_t CBettingsView::GetLastHeight() {
-    LOCK(cs_bettingdb);
-
     uint32_t height;
     if (!undos->Read(std::string("LastHeight"), height))
         return 0;
@@ -179,21 +167,15 @@ uint32_t CBettingsView::GetLastHeight() {
 }
 
 bool CBettingsView::SaveBettingUndo(const BettingUndoKey& key, std::vector<CBettingUndoDB> vUndos) {
-    LOCK(cs_bettingdb);
-
     assert(!undos->Exists(key));
     return undos->Write(key, vUndos);
 }
 
 bool CBettingsView::EraseBettingUndo(const BettingUndoKey& key) {
-    LOCK(cs_bettingdb);
-
     return undos->Erase(key);
 }
 
 std::vector<CBettingUndoDB> CBettingsView::GetBettingUndo(const BettingUndoKey& key) {
-    LOCK(cs_bettingdb);
-
     std::vector<CBettingUndoDB> vUndos;
     if (undos->Read(key, vUndos))
         return vUndos;
@@ -202,14 +184,10 @@ std::vector<CBettingUndoDB> CBettingsView::GetBettingUndo(const BettingUndoKey& 
 }
 
 bool CBettingsView::ExistsBettingUndo(const BettingUndoKey& key) {
-    LOCK(cs_bettingdb);
-
     return undos->Exists(key);
 }
 
 void CBettingsView::PruneOlderUndos(const uint32_t height) {
-    LOCK(cs_bettingdb);
-
     static std::vector<unsigned char> lastHeightKey = CBettingDB::DbTypeToBytes(std::string("LastHeight"));
     std::vector<CBettingUndoDB> vUndos;
     BettingUndoKey key;
@@ -233,20 +211,14 @@ void CBettingsView::PruneOlderUndos(const uint32_t height) {
 }
 
 bool CBettingsView::SaveFailedTx(const FailedTxKey& key) {
-    LOCK(cs_bettingdb);
-
     assert(!failedBettingTxs->Exists(key));
     return failedBettingTxs->Write(key, 0);
 }
 
 bool CBettingsView::ExistFailedTx(const FailedTxKey& key) {
-    LOCK(cs_bettingdb);
-
     return failedBettingTxs->Exists(key);
 }
 
 bool CBettingsView::EraseFailedTx(const FailedTxKey& key) {
-    LOCK(cs_bettingdb);
-
     return failedBettingTxs->Erase(key);
 }

@@ -2,17 +2,11 @@
 # Copyright (c) 2014-2017 The Bitcoin Core developers
 # Distributed under the MIT software license, see the accompanying
 # file COPYING or http://www.opensource.org/licenses/mit-license.php.
-"""Test running bitcoind with -reindex and -reindex-chainstate options.
-
-- Start a single node and generate 3 blocks.
-- Stop the node and restart it with -reindex. Verify that the node has reindexed up to block 3.
-- Stop the node and restart it with -reindex-chainstate. Verify that the node has reindexed up to block 3.
-"""
 
 from test_framework.betting_opcode import *
 from test_framework.authproxy import JSONRPCException
 from test_framework.test_framework import BitcoinTestFramework
-from test_framework.util import wait_until, rpc_port, assert_equal, assert_raises_rpc_error
+from test_framework.util import wait_until, rpc_port, assert_equal, assert_raises_rpc_error, sync_blocks
 from distutils.dir_util import copy_tree, remove_tree
 from decimal import *
 import pprint
@@ -84,8 +78,11 @@ class BettingTest(BitcoinTestFramework):
         node.wait_for_rpc_connection()
 
     def set_test_params(self):
-        self.extra_args = None
-        #self.extra_args = [["-debug"], ["-debug"], ["-debug"], ["-debug"]]
+        self.extra_args = [ ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'],
+                            ['-sporkkey=6xLZdACFRA53uyxz8gKDLcgVrm5kUUEu2B3BUzWUxHqa2W7irbH'] ]
+
         self.setup_clean_chain = True
         self.num_nodes = 4
         self.players = []
@@ -101,6 +98,14 @@ class BettingTest(BitcoinTestFramework):
             idx_l = n
             idx_r = n + 1 if n + 1 < self.num_nodes else 0
             assert_equal(self.nodes[idx_l].getblockcount(), self.nodes[idx_r].getblockcount())
+
+    def connect_and_sync_blocks(self):
+        for pair in [[n, n + 1 if n + 1 < self.num_nodes else 0] for n in range(self.num_nodes)]:
+            for i in range(len(pair)):
+                assert i < 2
+                self.nodes[pair[i]].addnode(self.get_local_peer(pair[1 - i]), "onetry")
+                wait_until(lambda:  all(peer['version'] != 0 for peer in self.nodes[pair[i]].getpeerinfo()))
+        sync_blocks(self.nodes)
 
     def setup_network(self):
         self.log.info("Setup Network")
@@ -130,6 +135,21 @@ class BettingTest(BitcoinTestFramework):
             self.connect_network()
             return True
         return False
+
+    def is_spork_active(self, spork_name):
+        sporks = self.nodes[0].spork("active")
+        return sporks[spork_name]
+
+    def activate_spork(self, spork_name):
+        for node in self.nodes:
+            res = node.spork(spork_name, 1)
+            assert(res == "success")
+
+    def deactivate_spork(self, spork_name):
+        for node in self.nodes:
+            res = node.spork(spork_name, 4070908800)
+            assert(res == "success")
+
 
     def check_minting(self, block_count=250):
         self.log.info("Check Minting...")
@@ -826,7 +846,7 @@ class BettingTest(BitcoinTestFramework):
         assert_equal(gotliability, Decimal(557))
         gotliability=liability["spread-push-liability"]
         assert_equal(gotliability, Decimal(500))
- 
+
         # place result for event 4:
         result_opcode = make_result(4, STANDARD_RESULT, 200, 0)
         post_opcode(self.nodes[1], result_opcode, WGR_WALLET_EVENT['addr'])
@@ -972,12 +992,12 @@ class BettingTest(BitcoinTestFramework):
         global player2_total_bet
 
         # add new events
-        # 4: CSGO - PGL Major Krakow - Astralis vs Gambit round2
+        # 5: CSGO - PGL Major Krakow - Astralis vs Gambit round1
         mlevent = make_event(5, # Event ID
                             self.start_time, # start time = current + hour
                             sport_names.index("CSGO"), # Sport ID
                             tournament_names.index("PGL Major Krakow"), # Tournament ID
-                            round_names.index("round2"), # Round ID
+                            round_names.index("round1"), # Round ID
                             team_names.index("Astralis"), # Home Team
                             team_names.index("Gambit"), # Away Team
                             14000, # home odds
@@ -986,12 +1006,12 @@ class BettingTest(BitcoinTestFramework):
         self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
         post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
 
-        # 5: CSGO - PGL Major Krakow - Astralis vs Gambit round3
+        # 6: CSGO - PGL Major Krakow - Astralis vs Gambit round1
         mlevent = make_event(6, # Event ID
                             self.start_time, # start time = current + hour
                             sport_names.index("CSGO"), # Sport ID
                             tournament_names.index("PGL Major Krakow"), # Tournament ID
-                            round_names.index("round3"), # Round ID
+                            round_names.index("round1"), # Round ID
                             team_names.index("Astralis"), # Home Team
                             team_names.index("Gambit"), # Away Team
                             14000, # home odds
@@ -1000,8 +1020,22 @@ class BettingTest(BitcoinTestFramework):
         self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
         post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
 
-        # 6: Football - UEFA Champions League - Barcelona vs Real Madrid round2
+        # 7: Football - UEFA Champions League - Barcelona vs Real Madrid round1
         mlevent = make_event(7, # Event ID
+                            self.start_time, # start time = current + hour
+                            sport_names.index("Football"), # Sport ID
+                            tournament_names.index("UEFA Champions League"), # Tournament ID
+                            round_names.index("round1"), # Round ID
+                            team_names.index("Barcelona"), # Home Team
+                            team_names.index("Real Madrid"), # Away Team
+                            14000, # home odds
+                            33000, # away odds
+                            0) # draw odds
+        self.odds_events.append({'homeOdds': 14000, 'awayOdds': 33000, 'drawOdds': 0})
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        # 81: Football - UEFA Champions League - Barcelona vs Real Madrid round2
+        mlevent = make_event(81, # Event ID
                             self.start_time, # start time = current + hour
                             sport_names.index("Football"), # Sport ID
                             tournament_names.index("UEFA Champions League"), # Tournament ID
@@ -1018,14 +1052,31 @@ class BettingTest(BitcoinTestFramework):
         self.nodes[0].generate(1)
         self.sync_all()
 
-        # player 1 make express to events 4, 5, 6 - home win
+         # player 1 make express to nonexistent events
+        assert_raises_rpc_error(-31, "Error: there is no such Event: 501", self.nodes[2].placeparlaybet,
+            [
+                {'eventId': 5, 'outcome': outcome_home_win},
+                {'eventId': 6, 'outcome': outcome_home_win},
+                {'eventId': 501, 'outcome': outcome_home_win} # failed
+            ], 100)
+
+        # player 1 make express to events 6, 7, 81 - home win
+        player1_bet = 200
+        assert_raises_rpc_error(-31, "Error: event 81 cannot be part of parlay bet", self.nodes[2].placeparlaybet,
+            [
+                {'eventId': 6, 'outcome': outcome_home_win},
+                {'eventId': 7, 'outcome': outcome_home_win},
+                {'eventId': 81, 'outcome': outcome_home_win} # failed (round == 1 detected)
+            ], player1_bet)
+
+        # player 1 make express to events 5, 6, 7 - home win
         player1_bet = 200
         player1_total_bet = player1_total_bet + player1_bet
         # 26051 - it is early calculated effective odds for this parlay bet
         player1_expected_win = Decimal(player1_bet * 26051) / ODDS_DIVISOR
         self.nodes[2].placeparlaybet([{'eventId': 5, 'outcome': outcome_home_win}, {'eventId': 6, 'outcome': outcome_home_win}, {'eventId': 7, 'outcome': outcome_home_win}], player1_bet)
 
-        # player 2 make express to events 4, 5, 6 - home win
+        # player 2 make express to events 5, 6, 7 - home win
         player2_bet = 500
         player2_total_bet = player2_total_bet + player2_bet
         # 26051 - it is early calculated effective odds for this parlay bet
@@ -1097,7 +1148,7 @@ class BettingTest(BitcoinTestFramework):
         # bets to resulted events shouldn't accepted to memory pool after parlay starting height
         assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[2].placebet, 3, outcome_away_win, 1000)
         # bets to nonexistent events shouldn't accepted to memory pool
-        assert_raises_rpc_error(-4, "Error: The transaction was rejected! This might happen if some of the coins in your wallet were already spent, such as if you used a copy of wallet.dat and coins were spent in the copy but not marked as spent here.", self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 8, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
+        assert_raises_rpc_error(-31, "Error: there is no such Event: {}".format(800), self.nodes[3].placeparlaybet, [{'eventId': 7, 'outcome': outcome_home_win}, {'eventId': 800, 'outcome': outcome_home_win}, {'eventId': 9, 'outcome': outcome_home_win}], 5000)
 
         # creating existed mapping
         mapping_opcode = make_mapping(TEAM_MAPPING, 0, "anotherTeamName")
@@ -1134,7 +1185,7 @@ class BettingTest(BitcoinTestFramework):
 
         # add new event with time = 2 mins to go
         self.start_time = int(time.time() + 60 * 2)
-        # 7: CSGO - PGL Major Krakow - Astralis vs Gambit round3
+        # 8: CSGO - PGL Major Krakow - Astralis vs Gambit round3
         mlevent = make_event(8, # Event ID
                             self.start_time, # start time = current + 2 mins
                             sport_names.index("CSGO"), # Sport ID
@@ -1592,8 +1643,161 @@ class BettingTest(BitcoinTestFramework):
 
         self.log.info("Check Bets Success")
 
+    def check_zero_odds_bet(self):
+        self.log.info("Check Zero Odds Bets...")
+
+        event_id = 12
+        mlevent = make_event(12, # Event ID
+                    int(time.time()) + 60*60, # start time = current + hour
+                    sport_names.index("V2-V3 Sport"), # Sport ID
+                    tournament_names.index("V2-V3 Tournament"), # Tournament ID
+                    round_names.index("round1"), # Round ID
+                    team_names.index("V2-V3 Team1"), # Home Team
+                    team_names.index("V2-V3 Team2"), # Away Team
+                    16000, # home odds
+                    0, # away odds
+                    80000) # draw odds
+        post_opcode(self.nodes[1], mlevent, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placebet, event_id, outcome_away_win, 100)
+
+        self.nodes[2].placebet(event_id, outcome_home_win, 25)
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placeparlaybet, [{'eventId':event_id, 'outcome': outcome_away_win}], 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_away_win}], 100)
+
+        self.nodes[2].placeparlaybet([{'eventId':event_id, 'outcome': outcome_home_win}], 25)
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        homeOdds = 0
+        awayOdds = 0
+        drawOdds = 0
+        update_odds_opcode = make_update_ml_odds(event_id,
+                                                homeOdds,
+                                                awayOdds,
+                                                drawOdds)
+        post_opcode(self.nodes[1], update_odds_opcode, WGR_WALLET_EVENT['addr'])
+        self.sync_all()
+        self.nodes[0].generate(1)
+        self.sync_all()
+
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placebet, event_id, outcome_away_win, 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_home_win),
+            self.nodes[1].placebet, event_id, outcome_home_win, 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_draw),
+            self.nodes[1].placebet, event_id, outcome_draw, 100)
+
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_away_win),
+            self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_away_win}], 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_home_win),
+            self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_home_win}], 100)
+        assert_raises_rpc_error(-31, "Error: potential odds is zero for event: {} outcome: {}".format(event_id, outcome_draw),
+            self.nodes[1].placeparlaybet, [{'eventId': 2, 'outcome': outcome_home_win}, {'eventId':event_id, 'outcome': outcome_draw}], 100)
+
+        self.log.info("Check Zero Odds Bets Success")
+
+    def check_zeroing_odds(self):
+        self.log.info("Check zeroing odds...")
+
+        saved_events = {}
+        for i, node in enumerate(self.nodes):
+            saved_events[i] = {}
+            for event in node.listevents():
+                saved_events[i][event['event_id']] = event
+
+        self.stop_node(3)
+
+        for i, node in enumerate(self.nodes[:3]):
+            for event in node.listevents():
+                # 0 mean ml odds in odds array
+                assert_equal(event['odds'][0]['mlHome'], saved_events[i][event['event_id']]['odds'][0]['mlHome'])
+                assert_equal(event['odds'][0]['mlAway'], saved_events[i][event['event_id']]['odds'][0]['mlAway'])
+                assert_equal(event['odds'][0]['mlDraw'], saved_events[i][event['event_id']]['odds'][0]['mlDraw'])
+                # 1 mean spreads odds in odds array
+                assert_equal(event['odds'][1]['spreadHome'], saved_events[i][event['event_id']]['odds'][1]['spreadHome'])
+                assert_equal(event['odds'][1]['spreadAway'], saved_events[i][event['event_id']]['odds'][1]['spreadAway'])
+                # 2 mean totals odds in odds array
+                assert_equal(event['odds'][2]['totalsOver'],  saved_events[i][event['event_id']]['odds'][2]['totalsOver'])
+                assert_equal(event['odds'][2]['totalsUnder'], saved_events[i][event['event_id']]['odds'][2]['totalsUnder'])
+
+        event_ids = []
+        for event in self.nodes[0].listevents():
+            event_ids.append(event['event_id'])
+
+        zeroing_odds_opcode = make_zeroing_odds(event_ids)
+        post_opcode(self.nodes[1], zeroing_odds_opcode, WGR_WALLET_EVENT['addr'])
+
+        self.sync_all([ self.nodes[:3] ])
+        self.nodes[0].generate(1)
+        self.sync_all([ self.nodes[:3] ])
+
+        for node in self.nodes[:3]:
+            for event in node.listevents():
+                # 0 mean ml odds in odds array
+                assert_equal(event['odds'][0]['mlHome'], 0)
+                assert_equal(event['odds'][0]['mlAway'], 0)
+                assert_equal(event['odds'][0]['mlDraw'], 0)
+                # 1 mean spreads odds in odds array
+                assert_equal(event['odds'][1]['spreadHome'], 0)
+                assert_equal(event['odds'][1]['spreadAway'], 0)
+                # 2 mean totals odds in odds array
+                assert_equal(event['odds'][2]['totalsOver'], 0)
+                assert_equal(event['odds'][2]['totalsUnder'], 0)
+
+        self.log.info("Reverting...")
+        self.nodes[3].rpchost = self.get_local_peer(3, True)
+        self.nodes[3].start()
+        self.nodes[3].wait_for_rpc_connection()
+
+        self.log.info("Generate blocks...")
+        for i in range(5):
+            self.nodes[3].generate(1)
+
+        for event in self.nodes[3].listevents():
+            # 0 mean ml odds in odds array
+            assert_equal(event['odds'][0]['mlHome'], saved_events[3][event['event_id']]['odds'][0]['mlHome'])
+            assert_equal(event['odds'][0]['mlAway'], saved_events[3][event['event_id']]['odds'][0]['mlAway'])
+            assert_equal(event['odds'][0]['mlDraw'], saved_events[3][event['event_id']]['odds'][0]['mlDraw'])
+            # 1 mean spreads odds in odds array
+            assert_equal(event['odds'][1]['spreadHome'], saved_events[3][event['event_id']]['odds'][1]['spreadHome'])
+            assert_equal(event['odds'][1]['spreadAway'], saved_events[3][event['event_id']]['odds'][1]['spreadAway'])
+            # 2 mean totals odds in odds array
+            assert_equal(event['odds'][2]['totalsOver'],  saved_events[3][event['event_id']]['odds'][2]['totalsOver'])
+            assert_equal(event['odds'][2]['totalsUnder'], saved_events[3][event['event_id']]['odds'][2]['totalsUnder'])
+
+        self.log.info("Connect and sync nodes...")
+        self.connect_and_sync_blocks()
+
+        for i, node in enumerate(self.nodes):
+            for event in node.listevents():
+                assert_equal(event['odds'][0]['mlHome'], saved_events[i][event['event_id']]['odds'][0]['mlHome'])
+                assert_equal(event['odds'][0]['mlAway'], saved_events[i][event['event_id']]['odds'][0]['mlAway'])
+                assert_equal(event['odds'][0]['mlDraw'], saved_events[i][event['event_id']]['odds'][0]['mlDraw'])
+                # 1 mean spreads odds in odds array
+                assert_equal(event['odds'][1]['spreadHome'], saved_events[i][event['event_id']]['odds'][1]['spreadHome'])
+                assert_equal(event['odds'][1]['spreadAway'], saved_events[i][event['event_id']]['odds'][1]['spreadAway'])
+                # 2 mean totals odds in odds array
+                assert_equal(event['odds'][2]['totalsOver'],  saved_events[i][event['event_id']]['odds'][2]['totalsOver'])
+                assert_equal(event['odds'][2]['totalsUnder'], saved_events[i][event['event_id']]['odds'][2]['totalsUnder'])
+
+        self.log.info("Check zeroing odds Success")
+
     def run_test(self):
         self.check_minting()
+        # Chain height = 300 after minting -> v4 protocol active
         self.check_mapping()
         self.check_event()
         self.check_event_patch()
@@ -1617,6 +1821,8 @@ class BettingTest(BitcoinTestFramework):
         self.check_timecut_refund()
         self.check_asian_spreads_bet()
         self.check_bets()
+        self.check_zero_odds_bet()
+        self.check_zeroing_odds()
 
 if __name__ == '__main__':
     BettingTest().main()

@@ -184,6 +184,12 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     if (bettingsViewCache.results->Exists(ResultKey{plBet.nEventId})) {
                         return error("CheckBettingTX: Bet placed to resulted event %lu!", plBet.nEventId);
                     }
+
+                    if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
+                        if (GetBetPotentialOdds(plBet, plEvent) == 0) {
+                            return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", plBet.nEventId, plBet.nOutcome);
+                        }
+                    }
                 }
                 else {
                     return error("CheckBettingTX: Failed to find event %lu!", plBet.nEventId);
@@ -219,6 +225,15 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                     if (bettingsViewCache.events->Read(EventKey{leg.nEventId}, plEvent)) {
                         if (bettingsViewCache.results->Exists(ResultKey{leg.nEventId})) {
                             return error("CheckBettingTX: Bet placed to resulted event %lu!", leg.nEventId);
+                        }
+
+                        if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
+                            if (GetBetPotentialOdds(CPeerlessLegDB{leg.nEventId, (OutcomeType)leg.nOutcome}, plEvent) == 0) {
+                                return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", leg.nEventId, leg.nOutcome);
+                            }
+                            if (plEvent.nStage != 0) {
+                                return error("CheckBettingTX: event %lu cannot be part of parlay bet!", leg.nEventId);
+                            }
                         }
                     }
                     else {
@@ -424,6 +439,20 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
 
                 if (!bettingsViewCache.events->Exists(EventKey{plEventPatchTx->nEventId}))
                     return error("CheckBettingTX: trying to patch not existed event id %lu!", plEventPatchTx->nEventId);
+
+                break;
+            }
+            case plEventZeroingOddsTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for EventZeroingOddsTx!");
+                if (!validOracleTx) return error("CheckBettingTX: Oracle tx from not oracle address!");
+
+                CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
+
+                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                    if (!bettingsViewCache.events->Exists(EventKey{eventId}))
+                        return error("CheckBettingTX: trying to update not existed event id %lu!", eventId);
+                }
 
                 break;
             }
@@ -940,6 +969,46 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 }
                 break;
             }
+            case plEventZeroingOddsTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
+
+                std::stringstream eventIdsStream;
+                std::vector<CBettingUndoDB> vUndos;
+                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                    eventIdsStream << eventId << " ";
+                    EventKey eventKey{eventId};
+                    CPeerlessExtendedEventDB plEvent;
+                    // Check a peerless event exists in DB.
+                    if (bettingsViewCache.events->Read(eventKey, plEvent)) {
+                        // save prev event state to undo
+                        vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
+
+                        plEvent.nHomeOdds = 0;
+                        plEvent.nAwayOdds = 0;
+                        plEvent.nDrawOdds = 0;
+                        plEvent.nSpreadHomeOdds = 0;
+                        plEvent.nSpreadAwayOdds = 0;
+                        plEvent.nTotalOverOdds  = 0;
+                        plEvent.nTotalUnderOdds = 0;
+
+                        // Update the event in the DB.
+                        if (!bettingsViewCache.events->Update(eventKey, plEvent))
+                            LogPrintf("Failed to update event!\n");
+                    }
+                }
+
+                LogPrint("wagerr", "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
+
+                if (!vUndos.empty()) {
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
+                }
+
+                break;
+            }
             default:
                 break;
         }
@@ -1327,6 +1396,38 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 }
                 break;
             }
+            case plEventZeroingOddsTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+                if (!validOracleTx) break;
+
+                CPeerlessEventZeroingOddsTx* plEventZeroingOddsTx = (CPeerlessEventZeroingOddsTx*) bettingTx.get();
+
+                std::stringstream eventIdsStream;
+                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                    eventIdsStream << eventId << " ";
+                }
+                LogPrint("wagerr", "CPeerlessEventZeroingOddsTx: ids: %s,\n", eventIdsStream.str());
+
+                bool isEventsExists = true;
+                for (uint32_t eventId : plEventZeroingOddsTx->vEventIds) {
+                    if (!bettingsViewCache.events->Exists(EventKey{eventId})) {
+                        isEventsExists = false;
+                    }
+                }
+
+                if (isEventsExists) {
+                    if(!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                        LogPrintf("Revert failed!\n");
+                        return false;
+                    }
+                }
+                else {
+                    LogPrintf("Not all events exists\n");
+                }
+
+                break;
+            }
             default:
                 break;
         }
@@ -1350,7 +1451,6 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
     LogPrintf("Start undo payouts...\n");
 
     for (auto result : results) {
-        LOCK(cs_bettingdb);
 
         // look bets at last 14 days
         uint32_t startHeight = GetBetSearchStartHeight(nCurrentHeight);
@@ -1415,8 +1515,6 @@ bool UndoBetPayouts(CBettingsView &bettingsViewCache, int height)
 /* Revert payouts info from DB */
 bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
 {
-    LOCK(cs_bettingdb);
-
     // we should save array of entries to delete because
     // changing (add/delete) of flushable DB when iterating is not allowed
     std::vector<PayoutInfoKey> entriesToDelete;
@@ -1446,8 +1544,6 @@ bool UndoPayoutsInfo(CBettingsView &bettingsViewCache, int height)
  */
 bool UndoQuickGamesBetPayouts(CBettingsView &bettingsViewCache, int height)
 {
-    LOCK(cs_bettingdb);
-
     uint32_t blockHeight = static_cast<uint32_t>(height);
 
     LogPrintf("Start undo quick games payouts...\n");

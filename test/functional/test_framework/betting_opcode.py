@@ -22,6 +22,7 @@ OPCODE_BTX_TOTALS_EVENT = 0x0a
 OPCODE_BTX_EVENT_PATCH = 0x0b
 OPCODE_BTX_PARLAY_BET = 0x0c
 OPCODE_BTX_QG_BET = 0x0d
+OPCODE_BTX_ZERO_ODDS = 0x0e
 
 OPCODE_QG_DICE = 0x00
 
@@ -122,6 +123,13 @@ def make_update_ml_odds(event_id, home_odds, away_odds, draw_odds):
     result = result + encode_int_little_endian(home_odds, 4)
     result = result + encode_int_little_endian(away_odds, 4)
     result = result + encode_int_little_endian(draw_odds, 4)
+    return result
+    
+def make_zeroing_odds(event_ids):
+    result = make_common_header(OPCODE_BTX_ZERO_ODDS)
+    result = result + encode_int_little_endian(int(len(event_ids)), 1) # vector size
+    for event_id in event_ids:
+        result = result + encode_int_little_endian(int(event_id), 4)
     return result
 
 # Create a spread event
