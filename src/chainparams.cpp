@@ -441,7 +441,7 @@ public:
         nWagerrProtocolV1StartHeight = 1100;                            // Betting protocol v1 activation block
         nWagerrProtocolV2StartHeight = 1100;                            // Betting protocol v2 activation block
         nWagerrProtocolV3StartHeight = 2000;                            // Betting protocol v3 activation block
-        nWagerrProtocolV4StartHeight = std::numeric_limits<int>::max(); // Betting protocol v4 activation block
+        nWagerrProtocolV4StartHeight = 405000;                          // Betting protocol v4 activation block
         nQuickGamesEndHeight = 101650;
         nMaturityV2StartHeight = 38000;                                 // Reduced block maturity required for spending coinstakes and betting payouts
 
