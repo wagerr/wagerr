@@ -471,11 +471,11 @@ class CPeerlessLegDB
 {
 public:
     uint32_t nEventId;
-    OutcomeType nOutcome;
+    PeerlessBetOutcomeType nOutcome;
 
     // Default constructor.
     explicit CPeerlessLegDB() {}
-    explicit CPeerlessLegDB(uint32_t eventId, OutcomeType outcome) : nEventId(eventId), nOutcome(outcome) {}
+    explicit CPeerlessLegDB(uint32_t eventId, PeerlessBetOutcomeType outcome) : nEventId(eventId), nOutcome(outcome) {}
 
     ADD_SERIALIZE_METHODS;
 
@@ -485,7 +485,7 @@ public:
         READWRITE(nEventId);
         if (ser_action.ForRead()) {
             READWRITE(outcome);
-            nOutcome = (OutcomeType) outcome;
+            nOutcome = (PeerlessBetOutcomeType) outcome;
         }
         else {
             outcome = (uint8_t) nOutcome;
@@ -621,6 +621,204 @@ public:
                          const CBitcoinAddress address,
                          const std::vector<CFieldLegDB> vLegs,
                          const std::vector<CFieldEventDB> vEvents,
+                         const int64_t time
+    )   : betAmount(amount)
+        , playerAddress(address)
+        , legs(vLegs)
+        , lockedEvents(vEvents)
+        , betTime(time)
+    {}
+
+    bool IsCompleted() const { return completed; }
+    void SetCompleted() { completed = true; }
+    // for undo
+    void SetUncompleted() { completed = false; }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        std::string addrStr;
+        READWRITE(betAmount);
+        if (ser_action.ForRead()) {
+            READWRITE(addrStr);
+            playerAddress.SetString(addrStr);
+        }
+        else {
+            addrStr = playerAddress.ToString();
+            READWRITE(addrStr);
+        }
+        READWRITE(legs);
+        READWRITE(lockedEvents);
+        READWRITE(betTime);
+        READWRITE(completed);
+        uint8_t resType;
+        if (ser_action.ForRead()) {
+            READWRITE(resType);
+            resultType = (BetResultType) resType;
+        }
+        else {
+            resType = (uint8_t) resultType;
+            READWRITE(resType);
+        }
+        READWRITE(payout);
+        READWRITE(payoutHeight);
+    }
+
+private:
+    bool completed = false;
+};
+
+using HybridBetKey = PeerlessBetKey;
+
+using HybridEventVariant = boost::variant<CPeerlessBaseEventDB, CFieldEventDB>;
+using HybridLegVariant = boost::variant<CPeerlessLegDB, CFieldLegDB>;
+
+enum class HybridVariantType {
+    PeerlessVariant = 0x0,
+    FieldVariant    = 0x01
+};
+
+class CHybridEventDB
+{
+public:
+    HybridEventVariant variant;
+
+    explicit CHybridEventDB() { }
+    explicit CHybridEventDB(const HybridEventVariant& var) : variant(var) { }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t type;
+        // read
+        if (ser_action.ForRead()) {
+            READWRITE(type);
+            switch ((HybridVariantType)type)
+            {
+                case HybridVariantType::PeerlessVariant:
+                {
+                    CPeerlessBaseEventDB event{};
+                    READWRITE(event);
+                    variant = event;
+                    break;
+                }
+                case HybridVariantType::FieldVariant:
+                {
+                    CFieldEventDB event{};
+                    READWRITE(event);
+                    variant = event;
+                    break;
+                }
+                default:
+                    std::runtime_error("CHybridEventDB: Undefined variant type");
+            }
+        }
+        // write
+        else {
+            type = (uint8_t) variant.which();
+            READWRITE(type);
+            switch ((HybridVariantType) type)
+            {
+                case HybridVariantType::PeerlessVariant:
+                {
+                    auto& event = boost::get<CPeerlessBaseEventDB>(variant);
+                    READWRITE(event);
+                    break;
+                }
+                case HybridVariantType::FieldVariant:
+                {
+                    auto& event = boost::get<CFieldEventDB>(variant);
+                    READWRITE(event);
+                }
+                default:
+                    std::runtime_error("CHybridEventDB: Undefined leg type");
+            }
+        }
+    }
+};
+
+class CHybridLegDB
+{
+public:
+    HybridLegVariant variant;
+
+    explicit CHybridLegDB() { }
+    explicit CHybridLegDB(const HybridLegVariant& var) : variant(var) { }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t type;
+        // read
+        if (ser_action.ForRead()) {
+            READWRITE(type);
+            switch ((HybridVariantType)type)
+            {
+                case HybridVariantType::PeerlessVariant:
+                {
+                    CPeerlessLegDB leg{};
+                    READWRITE(leg);
+                    variant = leg;
+                    break;
+                }
+                case HybridVariantType::FieldVariant:
+                {
+                    CFieldLegDB leg{};
+                    READWRITE(leg);
+                    variant = leg;
+                    break;
+                }
+                default:
+                    std::runtime_error("CHybridLegDB: Undefined variant type");
+            }
+        }
+        // write
+        else {
+            type = (uint8_t) variant.which();
+            READWRITE(type);
+            switch ((HybridVariantType) type)
+            {
+                case HybridVariantType::PeerlessVariant:
+                {
+                    auto& leg = boost::get<CPeerlessLegDB>(variant);
+                    READWRITE(leg);
+                    break;
+                }
+                case HybridVariantType::FieldVariant:
+                {
+                    auto& leg = boost::get<CFieldLegDB>(variant);
+                    READWRITE(leg);
+                }
+                default:
+                    std::runtime_error("CHybridLegDB: Undefined leg type");
+            }
+        }
+    }
+};
+
+class CHybridBetDB
+{
+public:
+    CAmount betAmount;
+    CBitcoinAddress playerAddress;
+    // one elem means single bet, else it is parlay bet, max size = 5
+    std::vector<CHybridLegDB> legs;
+    // vector for member event condition, max size = 5
+    std::vector<CHybridEventDB> lockedEvents;
+    int64_t betTime;
+    BetResultType resultType = BetResultType::betResultUnknown;
+    CAmount payout = 0;
+    uint32_t payoutHeight = 0;
+
+    // Default Constructor.
+    explicit CHybridBetDB() {}
+    explicit CHybridBetDB(const CAmount amount,
+                         const CBitcoinAddress address,
+                         const std::vector<CHybridLegDB> vLegs,
+                         const std::vector<CHybridEventDB> vEvents,
                          const int64_t time
     )   : betAmount(amount)
         , playerAddress(address)
@@ -895,13 +1093,13 @@ public:
             {
                 case UndoPeerlessEvent:
                 {
-                    CPeerlessExtendedEventDB event = boost::get<CPeerlessExtendedEventDB>(undoVariant);
+                    auto& event = boost::get<CPeerlessExtendedEventDB>(undoVariant);
                     READWRITE(event);
                     break;
                 }
                 case UndoFieldEvent:
                 {
-                    CFieldEventDB event = boost::get<CFieldEventDB>(undoVariant);
+                    auto& event = boost::get<CFieldEventDB>(undoVariant);
                     READWRITE(event);
                 }
                 default:
@@ -1101,8 +1299,10 @@ public:
     std::unique_ptr<CStorageKV> fieldEventsStorage;
     std::unique_ptr<CBettingDB> fieldResults; // "results"
     std::unique_ptr<CStorageKV> fieldResultsStorage;
-    std::unique_ptr<CBettingDB> fieldBets; // "bets"
+    std::unique_ptr<CBettingDB> fieldBets; // "fieldbets"
     std::unique_ptr<CStorageKV> fieldBetsStorage;
+    std::unique_ptr<CBettingDB> hybridBets; // "hybridbets"
+    std::unique_ptr<CStorageKV> hybridBetsStorage;
 
     // default constructor
     explicit CBettingsView() { }

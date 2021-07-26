@@ -18,6 +18,8 @@ class CPayoutInfoDB;
 class CFieldLegDB;
 class CFieldEventDB;
 class CFieldResultDB;
+class CHybridLegDB;
+class CHybridEventDB;
 
 #define BET_ODDSDIVISOR 10000   // Odds divisor, Facilitates calculations with floating integers.
 #define MODIFIER_DIVISOR 100
@@ -28,7 +30,7 @@ class CFieldResultDB;
 #define CHECK_ODDS(odds) (odds > BET_MINODDS && odds <= BET_MAXODDS)
 
 // The supported bet outcome types.
-typedef enum OutcomeType {
+typedef enum PeerlessBetOutcomeType {
     moneyLineHomeWin  = 0x01,
     moneyLineAwayWin = 0x02,
     moneyLineDraw = 0x03,
@@ -36,7 +38,7 @@ typedef enum OutcomeType {
     spreadAway    = 0x05,
     totalOver     = 0x06,
     totalUnder    = 0x07
-} OutcomeType;
+} PeerlessBetOutcomeType;
 
 // The supported result types
 typedef enum ResultType {
@@ -213,10 +215,11 @@ bool GetCGLottoEventResults(const int nLastBlockHeight, std::vector<CChainGamesR
  * @return Odds, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
  */
 std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent, const CPeerlessResultDB &result, const bool fWagerrProtocolV3);
-std::pair<uint32_t, uint32_t> GetBetOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent, const CFieldResultDB &result, const bool fWagerrProtocolV4);
+std::pair<uint32_t, uint32_t> GetBetOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent, const CFieldResultDB &result);
 
 uint32_t GetBetPotentialOdds(const CPeerlessLegDB &bet, const CPeerlessBaseEventDB &lockedEvent);
 uint32_t GetBetPotentialOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent);
+uint32_t GetBetPotentialOdds(const CHybridLegDB &bet, const CHybridEventDB &lockedEvent);
 
 uint32_t CalculateEffectiveOdds(uint32_t onChainOdds);
 
