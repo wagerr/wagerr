@@ -76,6 +76,8 @@ BASE_SCRIPTS= [
     #'feature_block.py',
     #'rpc_fundrawtransaction.py',
     'feature_betting.py',
+    'feature_field_betting.py',
+    'feature_hybrid_betting.py',
     #'feature_quickgame_dice.py',
 
     # vv Tests less than 2m vv
