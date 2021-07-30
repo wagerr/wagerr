@@ -54,19 +54,17 @@ CPeerlessBetTx CheckAndGetPeerlessLegObj(const UniValue& legObj) {
     if (outcome < moneyLineHomeWin || outcome > totalUnder)
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect peerless leg outcome.");
 
-    if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
-        CPeerlessExtendedEventDB plEvent;
-        if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
-        }
+    CPeerlessExtendedEventDB plEvent;
+    if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
+    }
 
-        if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (PeerlessBetOutcomeType)outcome}, plEvent) == 0) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: potential odds is zero for event: " + std::to_string(eventId) + " outcome: " + std::to_string(outcome));
-        }
+    if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (PeerlessBetOutcomeType)outcome}, plEvent) == 0) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: potential odds is zero for event: " + std::to_string(eventId) + " outcome: " + std::to_string(outcome));
+    }
 
-        if (plEvent.nStage != 0) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: event " + std::to_string(eventId) + " cannot be part of parlay bet");
-        }
+    if (plEvent.nStage != 0) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: event " + std::to_string(eventId) + " cannot be part of parlay bet");
     }
 
     return CPeerlessBetTx{eventId, outcome};
@@ -2250,15 +2248,13 @@ UniValue placebet(const UniValue& params, bool fHelp)
     if (outcome < moneyLineHomeWin || outcome > totalUnder)
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
 
-    if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
-        CPeerlessExtendedEventDB plEvent;
-        if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
-        }
+    CPeerlessExtendedEventDB plEvent;
+    if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
+    }
 
-        if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (PeerlessBetOutcomeType)outcome}, plEvent) == 0) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: potential odds is zero for event: " + std::to_string(eventId) + " outcome: " + std::to_string(outcome));
-        }
+    if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (PeerlessBetOutcomeType)outcome}, plEvent) == 0) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: potential odds is zero for event: " + std::to_string(eventId) + " outcome: " + std::to_string(outcome));
     }
 
     CPeerlessBetTx plBet(eventId, outcome);
