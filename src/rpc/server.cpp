@@ -460,6 +460,7 @@ static const CRPCCommand vRPCCommands[] =
         {"wallet", "placeparlaybet", &placeparlaybet, false, false, true},
         {"wallet", "placefieldbet", &placefieldbet, false, false, true},
         {"wallet", "placefieldparlaybet", &placefieldparlaybet, false, false, true},
+        {"wallet", "placehybridparlaybet", &placehybridparlaybet, false, false, true},
         {"wallet", "sendfrom", &sendfrom, false, false, true},
         {"wallet", "sendmany", &sendmany, false, false, true},
         {"wallet", "sendtoaddress", &sendtoaddress, false, false, true},

@@ -7,6 +7,7 @@
 
 #include <util.h>
 #include <serialize.h>
+#include <boost/variant.hpp>
 
 class CTxOut;
 
@@ -37,6 +38,7 @@ typedef enum BetTxTypes{
     fParlayBetTxType         = 0x14,  // Field parlay bet transaction type identifier.
     fUpdateMarginTxType      = 0x15,  // Field event update margin transaction type identifier
     fUpdateModifiersTxType   = 0x16,  // Field event update modifiers transaction type identifier.
+    hParlayBetTxType         = 0x17,  // Hybrid parlay bet transaction type identifier.
 } BetTxTypes;
 
 // class for serialization common betting header from opcode
@@ -607,6 +609,92 @@ public:
     template <typename Stream, typename Operation>
     inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
         READWRITE(vEventIds);
+    }
+};
+
+// Hybrid parlay TX
+
+using HybridBetTxVariant = boost::variant<CPeerlessBetTx, CFieldBetTx>;
+
+class CHybridBetTx
+{
+public:
+    enum class HybridLegTypes {
+        PeerlessLeg = 0,
+        FieldLeg   = 1
+    };
+
+    HybridBetTxVariant variant;
+
+    explicit CHybridBetTx() { }
+    explicit CHybridBetTx(const HybridBetTxVariant& var) : variant(var) { }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        uint8_t legType;
+        // read
+        if (ser_action.ForRead()) {
+            READWRITE(legType);
+            switch ((HybridLegTypes)legType)
+            {
+                case HybridLegTypes::PeerlessLeg:
+                {
+                    CPeerlessBetTx leg{};
+                    READWRITE(leg);
+                    variant = leg;
+                    break;
+                }
+                case HybridLegTypes::FieldLeg:
+                {
+                    CFieldBetTx leg{};
+                    READWRITE(leg);
+                    variant = leg;
+                    break;
+                }
+                default:
+                    std::runtime_error("CHybridBetTx: Undefined leg type");
+            }
+        }
+        // write
+        else {
+            legType = (uint8_t) variant.which();
+            READWRITE(legType);
+            switch ((HybridLegTypes) legType)
+            {
+                case HybridLegTypes::PeerlessLeg:
+                {
+                    auto& leg = boost::get<CPeerlessBetTx>(variant);
+                    READWRITE(leg);
+                    break;
+                }
+                case HybridLegTypes::FieldLeg:
+                {
+                    auto& leg = boost::get<CFieldBetTx>(variant);
+                    READWRITE(leg);
+                }
+                default:
+                    std::runtime_error("CHybridBetTx: Undefined leg type");
+            }
+        }
+    }
+};
+
+class CHybridParlayBetTx : public CBettingTx
+{
+public:
+    std::vector<CHybridBetTx> legs;
+
+    BetTxTypes GetTxType() const override { return hParlayBetTxType; }
+
+    explicit CHybridParlayBetTx() { }
+
+    ADD_SERIALIZE_METHODS;
+
+    template <typename Stream, typename Operation>
+    inline void SerializationOp (Stream& s, Operation ser_action, int nType, int nVersion) {
+        READWRITE(legs);
     }
 };
 

@@ -23,4 +23,18 @@ void GetFeildBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockH
  */
 bool UndoFieldBetPayouts(CBettingsView &bettingsViewCache, int height);
 
+/**
+ * Creates the bet payout vector for all winning CHybridBetDB bets.
+ *
+ * @return payout vector, payouts info vector.
+ */
+void GetHybridBetPayoutsV4(CBettingsView &bettingsViewCache, const int nNewBlockHeight, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo);
+
+/**
+ * Undo only bet payout mark as completed in DB.
+ * But coin tx outs were undid early in native bitcoin core.
+ * @return
+ */
+bool UndoHybridBetPayoutsV4(CBettingsView &bettingsViewCache, const int height);
+
 #endif

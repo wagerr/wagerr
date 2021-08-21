@@ -44,6 +44,71 @@
 #include <iostream>
 
 
+CPeerlessBetTx CheckAndGetPeerlessLegObj(const UniValue& legObj) {
+
+    RPCTypeCheckObj(legObj, boost::assign::map_list_of("eventId", UniValue::VNUM)("outcome", UniValue::VNUM));
+
+    uint32_t eventId = static_cast<uint32_t>(find_value(legObj, "eventId").get_int64());
+    uint8_t outcome = (uint8_t) find_value(legObj, "outcome").get_int();
+
+    if (outcome < moneyLineHomeWin || outcome > totalUnder)
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect peerless leg outcome.");
+
+    if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
+        CPeerlessExtendedEventDB plEvent;
+        if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
+        }
+
+        if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (PeerlessBetOutcomeType)outcome}, plEvent) == 0) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: potential odds is zero for event: " + std::to_string(eventId) + " outcome: " + std::to_string(outcome));
+        }
+
+        if (plEvent.nStage != 0) {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: event " + std::to_string(eventId) + " cannot be part of parlay bet");
+        }
+    }
+
+    return CPeerlessBetTx{eventId, outcome};
+}
+
+CFieldBetTx CheckAndGetFieldLegObj(const UniValue& legObj) {
+
+    RPCTypeCheckObj(legObj, boost::assign::map_list_of("eventId", UniValue::VNUM)("marketType", UniValue::VNUM)("contenderId", UniValue::VNUM));
+
+    uint32_t eventId = static_cast<uint32_t>(find_value(legObj, "eventId").get_int64());
+    FieldBetOutcomeType marketType = static_cast<FieldBetOutcomeType>(find_value(legObj, "marketType").get_int());
+    uint32_t contenderId = static_cast<uint32_t>(find_value(legObj, "contenderId").get_int64());
+
+    if (marketType < outright || marketType > show) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet market type for FieldEvent: " + std::to_string(eventId));
+    }
+
+    CFieldEventDB fEvent;
+    if (!bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
+    }
+
+    if (!fEvent.IsMarketOpen(marketType)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: market " + std::to_string((uint8_t)marketType) + " is closed for event " + std::to_string(eventId));
+    }
+
+    const auto& contender_it = fEvent.contenders.find(contenderId);
+    if (contender_it == fEvent.contenders.end()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
+    }
+
+    if (GetBetPotentialOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
+    }
+
+    if (fEvent.nStage != 0) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: event " + std::to_string(eventId) + " cannot be part of parlay bet");
+    }
+
+    return CFieldBetTx{eventId, (uint8_t) marketType, contenderId};
+}
+
 // TODO The Wagerr functions in this file are being placed here for speed of
 // implementation, but should be moved to more appropriate locations once time
 // allows.
@@ -522,31 +587,31 @@ UniValue listbets(const UniValue& params, bool fHelp)
                     if (bettingsView->results->Read(ResultKey{plBet->nEventId}, plResult)) {
 
                         switch (plBet->nOutcome) {
-                            case OutcomeType::moneyLineHomeWin:
+                            case PeerlessBetOutcomeType::moneyLineHomeWin:
                                 betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
 
                                 break;
-                            case OutcomeType::moneyLineAwayWin:
+                            case PeerlessBetOutcomeType::moneyLineAwayWin:
                                 betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
 
                                 break;
-                            case OutcomeType::moneyLineDraw :
+                            case PeerlessBetOutcomeType::moneyLineDraw :
                                 betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
 
                                 break;
-                            case OutcomeType::spreadHome:
+                            case PeerlessBetOutcomeType::spreadHome:
                                 betResult = "Check block explorer for result.";
 
                                 break;
-                            case OutcomeType::spreadAway:
+                            case PeerlessBetOutcomeType::spreadAway:
                                 betResult = "Check block explorer for result.";
 
                                 break;
-                            case OutcomeType::totalOver:
+                            case PeerlessBetOutcomeType::totalOver:
                                 betResult = "Check block explorer for result.";
 
                                 break;
-                            case OutcomeType::totalUnder:
+                            case PeerlessBetOutcomeType::totalUnder:
                                 betResult = "Check block explorer for result.";
 
                                 break;
@@ -682,31 +747,31 @@ UniValue getbet(const UniValue& params, bool fHelp)
             if (bettingsView->results->Read(ResultKey{plBet->nEventId}, plResult)) {
 
                 switch (plBet->nOutcome) {
-                case OutcomeType::moneyLineHomeWin:
+                case PeerlessBetOutcomeType::moneyLineHomeWin:
                     betResult = plResult.nHomeScore > plResult.nAwayScore ? "win" : "lose";
 
                     break;
-                case OutcomeType::moneyLineAwayWin:
+                case PeerlessBetOutcomeType::moneyLineAwayWin:
                     betResult = plResult.nAwayScore > plResult.nHomeScore ? "win" : "lose";
 
                     break;
-                case OutcomeType::moneyLineDraw:
+                case PeerlessBetOutcomeType::moneyLineDraw:
                     betResult = plResult.nHomeScore == plResult.nAwayScore ? "win" : "lose";
 
                     break;
-                case OutcomeType::spreadHome:
+                case PeerlessBetOutcomeType::spreadHome:
                     betResult = "Check block explorer for result.";
 
                     break;
-                case OutcomeType::spreadAway:
+                case PeerlessBetOutcomeType::spreadAway:
                     betResult = "Check block explorer for result.";
 
                     break;
-                case OutcomeType::totalOver:
+                case PeerlessBetOutcomeType::totalOver:
                     betResult = "Check block explorer for result.";
 
                     break;
-                case OutcomeType::totalUnder:
+                case PeerlessBetOutcomeType::totalUnder:
                     betResult = "Check block explorer for result.";
 
                     break;
@@ -844,6 +909,119 @@ std::string EventResultTypeToStr(ResultType resType)
     }
 }
 
+template<class UniBetKeyDBType, class UniBetDBType>
+void CollectPayoutInfo(UniValue& uValue, const UniBetKeyDBType& uniBetKey, const UniBetDBType& uniBet)
+{
+    if (uniBet.IsCompleted()) {
+        if (uniBet.payoutHeight > 0) {
+            auto it = bettingsView->payoutsInfo->NewIterator();
+            for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{uniBet.payoutHeight, COutPoint{}})); it->Valid(); it->Next()) {
+                PayoutInfoKey payoutKey;
+                CPayoutInfoDB payoutInfo;
+                CBettingDB::BytesToDbType(it->Key(), payoutKey);
+                CBettingDB::BytesToDbType(it->Value(), payoutInfo);
+                if (uniBet.payoutHeight != payoutKey.blockHeight) break;
+                if (payoutInfo.betKey == uniBetKey) {
+                    uValue.push_back(Pair("payoutTxHash", payoutKey.outPoint.hash.GetHex()));
+                    uValue.push_back(Pair("payoutTxOut", (uint64_t) payoutKey.outPoint.n));
+                    break;
+                }
+            }
+        }
+        else {
+            uValue.push_back(Pair("payoutTxHash", "no"));
+            uValue.push_back(Pair("payoutTxOut", "no"));
+        }
+    }
+    else {
+        uValue.push_back(Pair("payoutTxHash", "pending"));
+        uValue.push_back(Pair("payoutTxOut", "pending"));
+    }
+}
+
+UniValue CollectPLLegData(const CPeerlessLegDB& leg, const CPeerlessBaseEventDB& lockedEvent, const int64_t betTime, uint32_t betBlockHeight)
+{
+    UniValue uLeg(UniValue::VOBJ);
+    UniValue uLockedEvent(UniValue::VOBJ);
+    uLeg.push_back(Pair("leg-type", "peerless"));
+    uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
+    uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+
+    uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
+    uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
+    uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
+    uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
+    uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
+    uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
+    uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
+    uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
+    uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
+
+    // Retrieve the event details
+    CPeerlessExtendedEventDB plEvent;
+    if (bettingsView->events->Read(EventKey{leg.nEventId}, plEvent)) {
+        uLockedEvent.push_back(Pair("starting", plEvent.nStartTime));
+        CMappingDB mapping;
+        if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
+            uLockedEvent.push_back(Pair("home", mapping.sName));
+        }
+        else {
+            uLockedEvent.push_back(Pair("home", "undefined"));
+        }
+        if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
+            uLockedEvent.push_back(Pair("away", mapping.sName));
+        }
+        else {
+            uLockedEvent.push_back(Pair("away", "undefined"));
+        }
+        if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
+            uLockedEvent.push_back(Pair("tournament", mapping.sName));
+        }
+        else {
+            uLockedEvent.push_back(Pair("tournament", "undefined"));
+        }
+    }
+    CPeerlessResultDB plResult;
+    uint32_t legOdds = 0;
+    if (bettingsView->results->Read(EventKey{leg.nEventId}, plResult)) {
+        uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) plResult.nResultType)));
+        uLockedEvent.push_back(Pair("homeScore", (uint64_t) plResult.nHomeScore));
+        uLockedEvent.push_back(Pair("awayScore", (uint64_t) plResult.nAwayScore));
+        if (lockedEvent.nStartTime > 0 && betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+            uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
+        }
+        else {
+            legOdds = GetBetOdds(leg, lockedEvent, plResult, (int64_t)betBlockHeight >= Params().WagerrProtocolV3StartHeight()).first;
+            std::string legResultTypeStr;
+            if (legOdds == 0) {
+                legResultTypeStr = std::string("lose");
+            }
+            else if (legOdds == BET_ODDSDIVISOR / 2) {
+                legResultTypeStr = std::string("half-lose");
+            }
+            else if (legOdds == BET_ODDSDIVISOR) {
+                legResultTypeStr = std::string("refund");
+            }
+            else if (legOdds < GetBetPotentialOdds(leg, lockedEvent)) {
+                legResultTypeStr = std::string("half-win");
+            }
+            else {
+                legResultTypeStr = std::string("win");
+            }
+            uLeg.push_back(Pair("legResultType", legResultTypeStr));
+        }
+    }
+    else {
+        uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
+        uLockedEvent.push_back(Pair("homeScore", "undefined"));
+        uLockedEvent.push_back(Pair("awayScore", "undefined"));
+        uLeg.push_back(Pair("legResultType", "pending"));
+    }
+    uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+
+    return uLeg;
+}
+
 void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPeerlessBetDB& uniBet, bool requiredPayoutInfo = false) {
 
     UniValue uLegs(UniValue::VARR);
@@ -853,83 +1031,7 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
     for (uint32_t i = 0; i < uniBet.legs.size(); i++) {
         auto &leg = uniBet.legs[i];
         auto &lockedEvent = uniBet.lockedEvents[i];
-        UniValue uLeg(UniValue::VOBJ);
-        UniValue uLockedEvent(UniValue::VOBJ);
-        uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
-        uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
-
-        uLockedEvent.push_back(Pair("homeOdds", (uint64_t) lockedEvent.nHomeOdds));
-        uLockedEvent.push_back(Pair("awayOdds", (uint64_t) lockedEvent.nAwayOdds));
-        uLockedEvent.push_back(Pair("drawOdds", (uint64_t) lockedEvent.nDrawOdds));
-        uLockedEvent.push_back(Pair("spreadPoints", (int64_t) lockedEvent.nSpreadPoints));
-        uLockedEvent.push_back(Pair("spreadHomeOdds", (uint64_t) lockedEvent.nSpreadHomeOdds));
-        uLockedEvent.push_back(Pair("spreadAwayOdds", (uint64_t) lockedEvent.nSpreadAwayOdds));
-        uLockedEvent.push_back(Pair("totalPoints", (uint64_t) lockedEvent.nTotalPoints));
-        uLockedEvent.push_back(Pair("totalOverOdds", (uint64_t) lockedEvent.nTotalOverOdds));
-        uLockedEvent.push_back(Pair("totalUnderOdds", (uint64_t) lockedEvent.nTotalUnderOdds));
-
-        // Retrieve the event details
-        CPeerlessExtendedEventDB plEvent;
-        if (bettingsView->events->Read(EventKey{leg.nEventId}, plEvent)) {
-            uLockedEvent.push_back(Pair("starting", plEvent.nStartTime));
-            CMappingDB mapping;
-            if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nHomeTeam}, mapping)) {
-                uLockedEvent.push_back(Pair("home", mapping.sName));
-            }
-            else {
-                uLockedEvent.push_back(Pair("home", "undefined"));
-            }
-            if (bettingsView->mappings->Read(MappingKey{teamMapping, plEvent.nAwayTeam}, mapping)) {
-                uLockedEvent.push_back(Pair("away", mapping.sName));
-            }
-            else {
-                uLockedEvent.push_back(Pair("away", "undefined"));
-            }
-            if (bettingsView->mappings->Read(MappingKey{tournamentMapping, plEvent.nTournament}, mapping)) {
-                uLockedEvent.push_back(Pair("tournament", mapping.sName));
-            }
-            else {
-                uLockedEvent.push_back(Pair("tournament", "undefined"));
-            }
-        }
-        CPeerlessResultDB plResult;
-        uint32_t legOdds = 0;
-        if (bettingsView->results->Read(EventKey{leg.nEventId}, plResult)) {
-            uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) plResult.nResultType)));
-            uLockedEvent.push_back(Pair("homeScore", (uint64_t) plResult.nHomeScore));
-            uLockedEvent.push_back(Pair("awayScore", (uint64_t) plResult.nAwayScore));
-            if (lockedEvent.nStartTime > 0 && uniBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
-                uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
-            }
-            else {
-                legOdds = GetBetOdds(leg, lockedEvent, plResult, (int64_t)betKey.blockHeight >= Params().WagerrProtocolV3StartHeight()).first;
-                std::string legResultTypeStr;
-                if (legOdds == 0) {
-                    legResultTypeStr = std::string("lose");
-                }
-                else if (legOdds == BET_ODDSDIVISOR / 2) {
-                    legResultTypeStr = std::string("half-lose");
-                }
-                else if (legOdds == BET_ODDSDIVISOR) {
-                    legResultTypeStr = std::string("refund");
-                }
-                else if (legOdds < GetBetPotentialOdds(leg, lockedEvent)) {
-                    legResultTypeStr = std::string("half-win");
-                }
-                else {
-                    legResultTypeStr = std::string("win");
-                }
-                uLeg.push_back(Pair("legResultType", legResultTypeStr));
-            }
-        }
-        else {
-            uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
-            uLockedEvent.push_back(Pair("homeScore", "undefined"));
-            uLockedEvent.push_back(Pair("awayScore", "undefined"));
-            uLeg.push_back(Pair("legResultType", "pending"));
-        }
-        uLeg.push_back(Pair("lockedEvent", uLockedEvent));
-        uLegs.push_back(uLeg);
+        uLegs.push_back(CollectPLLegData(leg, lockedEvent, uniBet.betTime, betKey.blockHeight));
     }
     uValue.push_back(Pair("betBlockHeight", (uint64_t) betKey.blockHeight));
     uValue.push_back(Pair("betTxHash", betKey.outPoint.hash.GetHex()));
@@ -943,31 +1045,7 @@ void CollectPLBetData(UniValue& uValue, const PeerlessBetKey& betKey, const CPee
     uValue.push_back(Pair("payout", uniBet.IsCompleted() ? ValueFromAmount(uniBet.payout) : "pending"));
 
     if (requiredPayoutInfo) {
-        if (uniBet.IsCompleted()) {
-            if (uniBet.payoutHeight > 0) {
-                auto it = bettingsView->payoutsInfo->NewIterator();
-                for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{uniBet.payoutHeight, COutPoint{}})); it->Valid(); it->Next()) {
-                    PayoutInfoKey payoutKey;
-                    CPayoutInfoDB payoutInfo;
-                    CBettingDB::BytesToDbType(it->Key(), payoutKey);
-                    CBettingDB::BytesToDbType(it->Value(), payoutInfo);
-                    if (uniBet.payoutHeight != payoutKey.blockHeight) break;
-                    if (payoutInfo.betKey == betKey) {
-                        uValue.push_back(Pair("payoutTxHash", payoutKey.outPoint.hash.GetHex()));
-                        uValue.push_back(Pair("payoutTxOut", (uint64_t) payoutKey.outPoint.n));
-                        break;
-                    }
-                }
-            }
-            else {
-                uValue.push_back(Pair("payoutTxHash", "no"));
-                uValue.push_back(Pair("payoutTxOut", "no"));
-            }
-        }
-        else {
-            uValue.push_back(Pair("payoutTxHash", "pending"));
-            uValue.push_back(Pair("payoutTxOut", "pending"));
-        }
+        CollectPayoutInfo(uValue, betKey, uniBet);
     }
 }
 
@@ -988,6 +1066,63 @@ std::string ContenderResultToString(uint8_t result) {
     }
 }
 
+UniValue CollectFieldLegData(const CFieldLegDB& leg, const CFieldEventDB& lockedEvent, const int64_t betTime)
+{
+    UniValue uLeg(UniValue::VOBJ);
+    UniValue uLockedEvent(UniValue::VOBJ);
+    uLeg.push_back(Pair("leg-type", "field"));
+    uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
+    uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
+
+    uLockedEvent.push_back(Pair("contenders", GetContendersInfo(lockedEvent.contenders)));
+    uLockedEvent.push_back(Pair("starting", lockedEvent.nStartTime));
+    CMappingDB mapping;
+    if (bettingsView->mappings->Read(MappingKey{tournamentMapping, lockedEvent.nTournament}, mapping)) {
+        uLockedEvent.push_back(Pair("tournament", mapping.sName));
+    }
+    else {
+        uLockedEvent.push_back(Pair("tournament", "undefined"));
+    }
+    CFieldResultDB fResult;
+    uint32_t legOdds = 0;
+    if (bettingsView->fieldResults->Read(FieldResultKey{leg.nEventId}, fResult)) {
+        uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) fResult.nResultType)));
+        UniValue results(UniValue::VARR);
+        for (auto &contenderResult : fResult.contendersResults) {
+            UniValue result(UniValue::VOBJ);
+            result.push_back(Pair("contenderId", (int64_t) (contenderResult.first)));
+            result.push_back(Pair("name", GetContenderNameById(contenderResult.first)));
+            result.push_back(Pair("result", ContenderResultToString(contenderResult.second)));
+            results.push_back(result);
+        }
+        uLockedEvent.push_back(Pair("contenderResults", results));
+        if (lockedEvent.nStartTime > 0 && betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
+            uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
+        }
+        else {
+            legOdds = GetBetOdds(leg, lockedEvent, fResult).first;
+            std::string legResultTypeStr;
+            if (legOdds == 0) {
+                legResultTypeStr = std::string("lose");
+            }
+            else if (legOdds == BET_ODDSDIVISOR) {
+                legResultTypeStr = std::string("refund");
+            }
+            else {
+                legResultTypeStr = std::string("win");
+            }
+            uLeg.push_back(Pair("legResultType", legResultTypeStr));
+        }
+    }
+    else {
+        uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
+        uLeg.push_back(Pair("legResultType", "pending"));
+    }
+    uLeg.push_back(Pair("lockedEvent", uLockedEvent));
+
+    return uLeg;
+}
+
 void CollectFieldBetData(UniValue& uValue, const FieldBetKey& betKey, const CFieldBetDB& fieldBet, bool requiredPayoutInfo = false) {
 
     UniValue uLegs(UniValue::VARR);
@@ -997,57 +1132,8 @@ void CollectFieldBetData(UniValue& uValue, const FieldBetKey& betKey, const CFie
     for (uint32_t i = 0; i < fieldBet.legs.size(); i++) {
         auto &leg = fieldBet.legs[i];
         auto &lockedEvent = fieldBet.lockedEvents[i];
-        UniValue uLeg(UniValue::VOBJ);
-        UniValue uLockedEvent(UniValue::VOBJ);
-        uLeg.push_back(Pair("event-id", (uint64_t) leg.nEventId));
-        uLeg.push_back(Pair("outcome", (uint64_t) leg.nOutcome));
 
-        uLockedEvent.push_back(Pair("contenders", GetContendersInfo(lockedEvent.contenders)));
-        uLockedEvent.push_back(Pair("starting", lockedEvent.nStartTime));
-        CMappingDB mapping;
-        if (bettingsView->mappings->Read(MappingKey{tournamentMapping, lockedEvent.nTournament}, mapping)) {
-            uLockedEvent.push_back(Pair("tournament", mapping.sName));
-        }
-        else {
-            uLockedEvent.push_back(Pair("tournament", "undefined"));
-        }
-        CFieldResultDB fResult;
-        uint32_t legOdds = 0;
-        if (bettingsView->fieldResults->Read(FieldResultKey{leg.nEventId}, fResult)) {
-            uLockedEvent.push_back(Pair("eventResultType", EventResultTypeToStr((ResultType) fResult.nResultType)));
-            UniValue results(UniValue::VARR);
-            for (auto &contenderResult : fResult.contendersResults) {
-                UniValue result(UniValue::VOBJ);
-                result.push_back(Pair("contenderId", (int64_t) (contenderResult.first)));
-                result.push_back(Pair("name", GetContenderNameById(contenderResult.first)));
-                result.push_back(Pair("result", ContenderResultToString(contenderResult.second)));
-                results.push_back(result);
-            }
-            uLockedEvent.push_back(Pair("contenderResults", results));
-            if (lockedEvent.nStartTime > 0 && fieldBet.betTime > ((int64_t)lockedEvent.nStartTime - Params().BetPlaceTimeoutBlocks())) {
-                uLeg.push_back(Pair("legResultType", "refund - invalid bet"));
-            }
-            else {
-                legOdds = GetBetOdds(leg, lockedEvent, fResult, (int64_t)betKey.blockHeight >= Params().WagerrProtocolV4StartHeight()).first;
-                std::string legResultTypeStr;
-                if (legOdds == 0) {
-                    legResultTypeStr = std::string("lose");
-                }
-                else if (legOdds == BET_ODDSDIVISOR) {
-                    legResultTypeStr = std::string("refund");
-                }
-                else {
-                    legResultTypeStr = std::string("win");
-                }
-                uLeg.push_back(Pair("legResultType", legResultTypeStr));
-            }
-        }
-        else {
-            uLockedEvent.push_back(Pair("eventResultType", "event result not found"));
-            uLeg.push_back(Pair("legResultType", "pending"));
-        }
-        uLeg.push_back(Pair("lockedEvent", uLockedEvent));
-        uLegs.push_back(uLeg);
+        uLegs.push_back(CollectFieldLegData(leg, lockedEvent, fieldBet.betTime));
     }
 
     uValue.push_back(Pair("betBlockHeight", (uint64_t) betKey.blockHeight));
@@ -1062,31 +1148,52 @@ void CollectFieldBetData(UniValue& uValue, const FieldBetKey& betKey, const CFie
     uValue.push_back(Pair("payout", fieldBet.IsCompleted() ? ValueFromAmount(fieldBet.payout) : "pending"));
 
     if (requiredPayoutInfo) {
-        if (fieldBet.IsCompleted()) {
-            if (fieldBet.payoutHeight > 0) {
-                auto it = bettingsView->payoutsInfo->NewIterator();
-                for (it->Seek(CBettingDB::DbTypeToBytes(PayoutInfoKey{fieldBet.payoutHeight, COutPoint{}})); it->Valid(); it->Next()) {
-                    PayoutInfoKey payoutKey;
-                    CPayoutInfoDB payoutInfo;
-                    CBettingDB::BytesToDbType(it->Key(), payoutKey);
-                    CBettingDB::BytesToDbType(it->Value(), payoutInfo);
-                    if (fieldBet.payoutHeight != payoutKey.blockHeight) break;
-                    if (payoutInfo.betKey == betKey) {
-                        uValue.push_back(Pair("payoutTxHash", payoutKey.outPoint.hash.GetHex()));
-                        uValue.push_back(Pair("payoutTxOut", (uint64_t) payoutKey.outPoint.n));
-                        break;
-                    }
-                }
+        CollectPayoutInfo(uValue, betKey, fieldBet);
+    }
+}
+
+void CollectHybridBetData(UniValue& uValue, const HybridBetKey& betKey, const CHybridBetDB& hybridBet, bool requiredPayoutInfo = false) {
+
+    UniValue uLegs(UniValue::VARR);
+
+    uValue.push_back(Pair("type", "hybrid"));
+
+    for (uint32_t i = 0; i < hybridBet.legs.size(); i++) {
+        auto &leg = hybridBet.legs[i];
+        auto &lockedEvent = hybridBet.lockedEvents[i];
+        switch ((HybridVariantType) leg.variant.which()) {
+            case HybridVariantType::PeerlessVariant:
+            {
+                const CPeerlessLegDB& plLeg = boost::get<CPeerlessLegDB>(leg.variant);
+                const CPeerlessBaseEventDB& plEvent = boost::get<CPeerlessBaseEventDB>(lockedEvent.variant);
+                uLegs.push_back(CollectPLLegData(plLeg, plEvent, hybridBet.betTime, betKey.blockHeight));
+                break;
             }
-            else {
-                uValue.push_back(Pair("payoutTxHash", "no"));
-                uValue.push_back(Pair("payoutTxOut", "no"));
+            case HybridVariantType::FieldVariant:
+            {
+                const CFieldLegDB& fLeg = boost::get<CFieldLegDB>(leg.variant);
+                const CFieldEventDB fEvent = boost::get<CFieldEventDB>(lockedEvent.variant);
+                uLegs.push_back(CollectFieldLegData(fLeg, fEvent, hybridBet.betTime));
+                break;
             }
+            default:
+                std::runtime_error("HybridBet: Undefined leg type");
         }
-        else {
-            uValue.push_back(Pair("payoutTxHash", "pending"));
-            uValue.push_back(Pair("payoutTxOut", "pending"));
-        }
+    }
+
+    uValue.push_back(Pair("betBlockHeight", (uint64_t) betKey.blockHeight));
+    uValue.push_back(Pair("betTxHash", betKey.outPoint.hash.GetHex()));
+    uValue.push_back(Pair("betTxOut", (uint64_t) betKey.outPoint.n));
+    uValue.push_back(Pair("legs", uLegs));
+    uValue.push_back(Pair("address", hybridBet.playerAddress.ToString()));
+    uValue.push_back(Pair("amount", ValueFromAmount(hybridBet.betAmount)));
+    uValue.push_back(Pair("time", (uint64_t) hybridBet.betTime));
+    uValue.push_back(Pair("completed", hybridBet.IsCompleted() ? "yes" : "no"));
+    uValue.push_back(Pair("betResultType", BetResultTypeToStr(hybridBet.resultType)));
+    uValue.push_back(Pair("payout", hybridBet.IsCompleted() ? ValueFromAmount(hybridBet.payout) : "pending"));
+
+    if (requiredPayoutInfo) {
+        CollectPayoutInfo(uValue, betKey, hybridBet);
     }
 }
 
@@ -1560,13 +1667,13 @@ UniValue getbetbytxid(const UniValue& params, bool fHelp)
     CTransaction tx;
     uint256 hashBlock;
     if (!GetTransaction(txHash, tx, hashBlock, true)) {
-        throw std::runtime_error("Invalid bet's transaction id");
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Invalid bet's transaction id: " + params[0].get_str());
     }
 
     CBlockIndex* blockindex = mapBlockIndex[hashBlock];
 
     if (!blockindex) {
-        throw std::runtime_error("Invalid block index");
+        throw JSONRPCError(RPC_INVALID_PARAMETER, "Can't find bet's transaction id: " + params[0].get_str() + " in chain.");
     }
 
     UniValue ret{UniValue::VARR};
@@ -1626,6 +1733,24 @@ UniValue getbetbytxid(const UniValue& params, bool fHelp)
             UniValue uValue(UniValue::VOBJ);
 
             CollectFieldBetData(uValue, key, fBet, true);
+
+            ret.push_back(uValue);
+        }
+    }
+
+    {
+        auto it = bettingsView->hybridBets->NewIterator();
+        for (it->Seek(CBettingDB::DbTypeToBytes(HybridBetKey{static_cast<uint32_t>(blockindex->nHeight), COutPoint{txHash, 0}})); it->Valid(); it->Next()) {
+            HybridBetKey key;
+            CHybridBetDB hBet;
+            CBettingDB::BytesToDbType(it->Value(), hBet);
+            CBettingDB::BytesToDbType(it->Key(), key);
+
+            if (key.outPoint.hash != txHash) break;
+
+            UniValue uValue(UniValue::VOBJ);
+
+            CollectHybridBetData(uValue, key, hBet, true);
 
             ret.push_back(uValue);
         }
@@ -2131,7 +2256,7 @@ UniValue placebet(const UniValue& params, bool fHelp)
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
         }
 
-        if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (OutcomeType)outcome}, plEvent) == 0) {
+        if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (PeerlessBetOutcomeType)outcome}, plEvent) == 0) {
             throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: potential odds is zero for event: " + std::to_string(eventId) + " outcome: " + std::to_string(outcome));
         }
     }
@@ -2200,30 +2325,9 @@ UniValue placeparlaybet(const UniValue& params, bool fHelp)
     for (uint32_t i = 0; i < legsArr.size(); i++) {
         const UniValue obj = legsArr[i].get_obj();
 
-        RPCTypeCheckObj(obj, boost::assign::map_list_of("eventId", UniValue::VNUM)("outcome", UniValue::VNUM));
+        CPeerlessBetTx pBetTx = CheckAndGetPeerlessLegObj(obj);
 
-        uint32_t eventId = static_cast<uint32_t>(find_value(obj, "eventId").get_int64());
-        uint8_t outcome = (uint8_t) find_value(obj, "outcome").get_int();
-
-        if (outcome < moneyLineHomeWin || outcome > totalUnder)
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet outcome type.");
-
-        if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
-            CPeerlessExtendedEventDB plEvent;
-            if (!bettingsView->events->Read(EventKey{eventId}, plEvent)) {
-                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such Event: " + std::to_string(eventId));
-            }
-
-            if (GetBetPotentialOdds(CPeerlessLegDB{eventId, (OutcomeType)outcome}, plEvent) == 0) {
-                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: potential odds is zero for event: " + std::to_string(eventId) + " outcome: " + std::to_string(outcome));
-            }
-
-            if (plEvent.nStage != 0) {
-                throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: event " + std::to_string(eventId) + " cannot be part of parlay bet");
-            }
-        }
-
-        parlayBetTx.legs.emplace_back(eventId, outcome);
+        parlayBetTx.legs.emplace_back(pBetTx);
     }
 
     CDataStream ss(SER_NETWORK, CLIENT_VERSION);
@@ -2340,7 +2444,7 @@ UniValue placefieldbet(const UniValue& params, bool fHelp) {
         throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
     }
 
-    CFieldBetTx fBetTx{eventId, marketType, contenderId};
+    CFieldBetTx fBetTx{eventId, (uint8_t) marketType, contenderId};
 
     // TODO `address` isn't used when adding the following transaction to the
     // blockchain, so ideally it would not need to be supplied to `SendMoney`.
@@ -2399,7 +2503,7 @@ UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
     }
 
     if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
-        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldbet deactived for now");
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placefieldparlaybet deactived for now");
     }
 
     LOCK2(cs_main, pwalletMain->cs_wallet);
@@ -2425,41 +2529,125 @@ UniValue placefieldparlaybet(const UniValue& params, bool fHelp) {
     for (uint32_t i = 0; i < legsArr.size(); i++) {
         const UniValue obj = legsArr[i].get_obj();
 
-        uint32_t eventId = static_cast<uint32_t>(find_value(obj, "eventId").get_int64());
-        FieldBetOutcomeType marketType = static_cast<FieldBetOutcomeType>(find_value(obj, "marketType").get_int());
-        uint32_t contenderId = static_cast<uint32_t>(find_value(obj, "contenderId").get_int64());
+        CFieldBetTx fBetTx = CheckAndGetFieldLegObj(obj);
 
-        if (marketType < outright || marketType > show) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet market type for FieldEvent: " + std::to_string(eventId));
-        }
-
-        CFieldEventDB fEvent;
-        if (!bettingsView->fieldEvents->Read(FieldEventKey{eventId}, fEvent)) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such FieldEvent: " + std::to_string(eventId));
-        }
-
-        if (!fEvent.IsMarketOpen(marketType)) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: market " + std::to_string((uint8_t)marketType) + " is closed for event " + std::to_string(eventId));
-        }
-
-        const auto& contender_it = fEvent.contenders.find(contenderId);
-        if (contender_it == fEvent.contenders.end()) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: there is no such contenderId " + std::to_string(contenderId) + " in event " + std::to_string(eventId));
-        }
-
-        if (GetBetPotentialOdds(CFieldLegDB{eventId, marketType, contenderId}, fEvent) == 0) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: contender odds is zero for event: " + std::to_string(eventId) + " contenderId: " + std::to_string(contenderId));
-        }
-
-        if (fEvent.nStage != 0) {
-            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: event " + std::to_string(eventId) + " cannot be part of parlay bet");
-        }
-
-        fParlayBetTx.legs.emplace_back(eventId, marketType, contenderId);
+        fParlayBetTx.legs.emplace_back(fBetTx);
     }
 
     CDataStream ss(SER_NETWORK, CLIENT_VERSION);
     ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) fParlayBetTxType << fParlayBetTx;
+    std::string opCode = HexStr(ss.begin(), ss.end());
+
+    CBitcoinAddress address("");
+
+    // Unhex the validated bet opcode
+    std::vector<unsigned char> vectorValue;
+    std::string stringValue(opCode);
+    boost::algorithm::unhex(stringValue, back_inserter(vectorValue));
+    std::string unHexedOpCode(vectorValue.begin(), vectorValue.end());
+
+    SendMoney(address.Get(), nAmount, wtx, false, unHexedOpCode);
+
+    return wtx.GetHash().GetHex();
+}
+
+UniValue placehybridparlaybet(const UniValue& params, bool fHelp) {
+    if (fHelp || params.size() < 2 || params.size() > 4) {
+        throw std::runtime_error(
+            "placehybridparlaybet\n"
+            "\nWARNING - Betting closes 20 minutes before field event start time.\n"
+            "Any bets placed after this time will be invalid and will not be paid out! \n"
+            "\nPlace an amount as a bet on an field event. The amount is rounded to the nearest 0.00000001\n" +
+            HelpRequiringPassphrase() +
+            "Arguments:\n"
+            "1. Hybrid legs array (array of json objects, required) The list of field bets.\n"
+            "[\n"
+            "    {\n"
+            "        legType: \"type\" (string, required) The leg type, can be \"peerless\" or \"field\";\n"
+            "        leg: legObj (object, required) The leg object. Can be a PeerlessLegObject or FieldLegObject.\n"
+            "    }\n"
+            "].\n"
+            "The PeerlessLegObject must have following structure:\n"
+            "{\n"
+            "    eventId: id (numeric, required) The peerless event id to bet on;\n"
+            "    outcome: outcomeType (numeric, required) 1 - home win, 2 - away win, 3 - draw,\n"
+            "                                                4 - spread home, 5 - spread away,\n"
+            "                                                6 - total over, 7 - total under;\n"
+            "}.\n"
+            "The FieldLegObject must have following structure:\n"
+            "{\n"
+            "    eventId: id (numeric, required) The field event id to bet on;\n"
+            "    marketType: market_type (numeric, required) 1 means outright, 2 means place, 3 means show;\n"
+            "    contenderId: contender_id (numeric, required) The field event participant identifier;\n"
+            "}.\n"
+            "2. amount          (numeric, required) The amount in wgr to send. Min: 25, max: 4000.\n"
+            "3. \"comment\"     (string, optional) A comment used to store what the transaction is for.\n"
+            "                             This is not part of the transaction, just kept in your wallet.\n"
+            "4. \"comment-to\"  (string, optional) A comment to store the name of the person or organization\n"
+            "                             to which you're sending the transaction. This is not part of the\n"
+            "                             transaction, just kept in your wallet.\n"
+            "\nResult:\n"
+            "\"transactionid\"  (string) The transaction id.\n"
+            "\nExamples:\n" +
+            HelpExampleCli("placehybridparlaybet", "\"[{ legType: \"field\", leg: {\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}}, {legType: \"peerless\" , leg: {\"eventId\": 2, \"marketType\": 2}}]\" 25 \"Hybrid parlay bet\" \"seans outpost\"") +
+            HelpExampleRpc("placehybridparlaybet", "\"[{ legType: \"field\", leg: {\"eventId\": 1, \"marketType\": 1, \"contenderId\": 100}}, {legType: \"peerless\" , leg: {\"eventId\": 2, \"marketType\": 2}}]\" 25 \"Hybrid parlay bet\" \"seans outpost\""));
+    }
+
+    if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: placehybridparlaybet deactived for now");
+    }
+
+    LOCK2(cs_main, pwalletMain->cs_wallet);
+
+    CAmount nAmount = AmountFromValue(params[1]);
+    // Validate bet amount so its between 25 - 10000 WGR inclusive.
+    if (nAmount < (Params().MinBetPayoutRange()  * COIN ) || nAmount > (Params().MaxBetPayoutRange() * COIN)) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect bet amount. Please ensure your bet is between 25 - 10000 WGR inclusive.");
+    }
+
+    // Wallet comments
+    CWalletTx wtx;
+    if (params.size() > 2 && !params[2].isNull() && !params[2].get_str().empty())
+        wtx.mapValue["comment"] = params[2].get_str();
+    if (params.size() > 3 && !params[3].isNull() && !params[3].get_str().empty())
+        wtx.mapValue["to"] = params[3].get_str();
+
+    EnsureWalletIsUnlocked();
+    EnsureEnoughWagerr(nAmount);
+
+    CHybridParlayBetTx hParlayBetTx;
+    UniValue legsArr = params[0].get_array();
+    for (uint32_t i = 0; i < legsArr.size(); i++) {
+        const UniValue obj = legsArr[i].get_obj();
+
+        std::string legType = find_value(obj, "legType").get_str();
+
+        if (legType == "peerless") {
+
+            const UniValue legObj = find_value(obj, "legObj").get_obj();
+
+            CPeerlessBetTx pBetTx = CheckAndGetPeerlessLegObj(legObj);
+
+            hParlayBetTx.legs.emplace_back(HybridBetTxVariant{pBetTx});
+        }
+        else if (legType == "field") {
+            const UniValue legObj = find_value(obj, "legObj").get_obj();
+
+            CFieldBetTx fBetTx = CheckAndGetFieldLegObj(legObj);
+
+            hParlayBetTx.legs.emplace_back(HybridBetTxVariant{fBetTx});
+        }
+        else {
+            throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Invalid leg type: " + legType);
+        }
+    }
+
+    if (hParlayBetTx.legs.size() < 2 || hParlayBetTx.legs.size() > Params().MaxParlayLegs()) {
+        throw JSONRPCError(RPC_BET_DETAILS_ERROR, "Error: Incorrect legs count.");
+    }
+
+    CDataStream ss(SER_NETWORK, CLIENT_VERSION);
+    ss << (uint8_t) BTX_PREFIX << (uint8_t) BTX_FORMAT_VERSION << (uint8_t) hParlayBetTxType << hParlayBetTx;
     std::string opCode = HexStr(ss.begin(), ss.end());
 
     CBitcoinAddress address("");

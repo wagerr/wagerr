@@ -5,7 +5,7 @@
 #include <betting/bet_tx.h>
 #include <betting/bet_common.h>
 
-template<typename BettingTxTypeName>
+template<class BettingTxTypeName>
 std::unique_ptr<CBettingTx> DeserializeBettingTx(CDataStream &ss)
 {
     BettingTxTypeName bettingTx;
@@ -92,6 +92,8 @@ std::unique_ptr<CBettingTx> ParseBettingTx(const CTxOut& txOut)
             return DeserializeBettingTx<CQuickGamesBetTx>(ss);
         case plEventZeroingOddsTxType:
             return DeserializeBettingTx<CPeerlessEventZeroingOddsTx>(ss);
+        case hParlayBetTxType:
+            return DeserializeBettingTx<CHybridParlayBetTx>(ss);
         default:
             return nullptr;
     }

@@ -353,7 +353,7 @@ std::pair<uint32_t, uint32_t> GetBetOdds(const CPeerlessLegDB &bet, const CPeerl
  *
  * @return pair of {on_chain_odds, effective_odds}, mean if bet is win - return market Odds, if lose - return 0, if refund - return OddDivisor
  */
-std::pair<uint32_t, uint32_t> GetBetOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent, const CFieldResultDB &result, const bool fWagerrProtocolV4)
+std::pair<uint32_t, uint32_t> GetBetOdds(const CFieldLegDB &bet, const CFieldEventDB &lockedEvent, const CFieldResultDB &result)
 {
     if (result.nResultType == ResultType::eventRefund) {
         return {BET_ODDSDIVISOR, BET_ODDSDIVISOR};
@@ -430,4 +430,24 @@ uint32_t GetBetPotentialOdds(const CFieldLegDB &bet, const CFieldEventDB &locked
     default:
         return 0;
     }
+}
+
+uint32_t GetBetPotentialOdds(const CHybridLegDB &leg, const CHybridEventDB &lockedEvent)
+{
+    switch ((HybridVariantType) leg.variant.which()) {
+    case HybridVariantType::PeerlessVariant:
+    {
+        const CPeerlessLegDB& plLeg = boost::get<CPeerlessLegDB>(leg.variant);
+        const CPeerlessBaseEventDB& plEvent = boost::get<CPeerlessBaseEventDB>(lockedEvent.variant);
+        return GetBetPotentialOdds(plLeg, plEvent);
+        break;
+    }
+    case HybridVariantType::FieldVariant:
+    {
+        const CFieldLegDB& fLeg = boost::get<CFieldLegDB>(leg.variant);
+        const CFieldEventDB& fEvent = boost::get<CFieldEventDB>(lockedEvent.variant);
+        return GetBetPotentialOdds(fLeg, fEvent);
+        break;
+    }
+}
 }

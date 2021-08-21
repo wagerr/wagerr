@@ -12,7 +12,7 @@
 #include <base58.h>
 #include <kernel.h>
 
-void GetPLRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
+void GetRewardPayoutsV3(const uint32_t nNewBlockHeight, const CAmount fee, std::vector<CBetOut>& vExpectedPayouts, std::vector<CPayoutInfoDB>& vPayoutsInfo)
 {
     PeerlessBetKey zeroKey{nNewBlockHeight, COutPoint()};
 
@@ -257,10 +257,10 @@ void GetPLBetPayoutsV3(CBettingsView &bettingsViewCache, const int nNewBlockHeig
         GetPLRewardPayoutsV2(nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
     }
     else {
-        GetPLRewardPayoutsV3(nNewBlockHeight, grossPayoutsSum - effectivePayoutsSum, vExpectedPayouts, vPayoutsInfo);
+        GetRewardPayoutsV3(nNewBlockHeight, grossPayoutsSum - effectivePayoutsSum, vExpectedPayouts, vPayoutsInfo);
     }
 
-    LogPrint("wagerr", "Finished generating payouts...\n");
+    LogPrint("wagerr", "Finished generating peerless betting payouts...\n");
 
 }
 

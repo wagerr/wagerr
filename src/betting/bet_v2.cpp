@@ -101,9 +101,9 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
         startHeight = startHeight < Params().WagerrProtocolV2StartHeight() ? Params().WagerrProtocolV2StartHeight() : startHeight;
         BlocksIndex = chainActive[startHeight];
 
-        OutcomeType nMoneylineResult = (OutcomeType) 0;
-        std::vector<OutcomeType> vSpreadsResult;
-        std::vector<OutcomeType> vTotalsResult;
+        PeerlessBetOutcomeType nMoneylineResult = (PeerlessBetOutcomeType) 0;
+        std::vector<PeerlessBetOutcomeType> vSpreadsResult;
+        std::vector<PeerlessBetOutcomeType> vTotalsResult;
 
         uint64_t nMoneylineOdds     = 0;
         uint64_t nSpreadsOdds       = 0;
@@ -349,13 +349,13 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
                                 if (result.nResultType ==  ResultType::standardResult) {
 
                                     // Calculate winnings.
-                                    if ((OutcomeType) pb->nOutcome == nMoneylineResult) {
+                                    if ((PeerlessBetOutcomeType) pb->nOutcome == nMoneylineResult) {
                                         winnings = betAmount * nMoneylineOdds;
                                     }
-                                    else if (spreadsFound && ((OutcomeType) pb->nOutcome == vSpreadsResult.at(0) || (OutcomeType) pb->nOutcome == vSpreadsResult.at(1))) {
+                                    else if (spreadsFound && ((PeerlessBetOutcomeType) pb->nOutcome == vSpreadsResult.at(0) || (PeerlessBetOutcomeType) pb->nOutcome == vSpreadsResult.at(1))) {
                                         winnings = betAmount * nSpreadsOdds;
                                     }
-                                    else if (totalsFound && ((OutcomeType) pb->nOutcome == vTotalsResult.at(0) || (OutcomeType) pb->nOutcome == vTotalsResult.at(1))) {
+                                    else if (totalsFound && ((PeerlessBetOutcomeType) pb->nOutcome == vTotalsResult.at(0) || (PeerlessBetOutcomeType) pb->nOutcome == vTotalsResult.at(1))) {
                                         winnings = betAmount * nTotalsOdds;
                                     }
 
@@ -372,12 +372,12 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
                                     payout = betAmount;
                                 } else if (result.nResultType == ResultType::mlRefund){
                                     // Calculate winnings.
-                                    if ( (OutcomeType)pb->nOutcome == OutcomeType::moneyLineDraw ||
-                                            (OutcomeType) pb->nOutcome == OutcomeType::moneyLineAwayWin ||
-                                            (OutcomeType) pb->nOutcome == OutcomeType::moneyLineHomeWin) {
+                                    if ( (PeerlessBetOutcomeType)pb->nOutcome == PeerlessBetOutcomeType::moneyLineDraw ||
+                                            (PeerlessBetOutcomeType) pb->nOutcome == PeerlessBetOutcomeType::moneyLineAwayWin ||
+                                            (PeerlessBetOutcomeType) pb->nOutcome == PeerlessBetOutcomeType::moneyLineHomeWin) {
                                         payout = betAmount;
                                     }
-                                    else if (spreadsFound && ((OutcomeType) pb->nOutcome == vSpreadsResult.at(0) || (OutcomeType) pb->nOutcome == vSpreadsResult.at(1))) {
+                                    else if (spreadsFound && ((PeerlessBetOutcomeType) pb->nOutcome == vSpreadsResult.at(0) || (PeerlessBetOutcomeType) pb->nOutcome == vSpreadsResult.at(1))) {
                                         winnings = betAmount * nSpreadsOdds;
 
                                         // Calculate the bet winnings for the current bet.
@@ -388,7 +388,7 @@ void GetBetPayoutsV2(const int nNewBlockHeight, std::vector<CBetOut>& vExpectedP
                                             payout = 0;
                                         }
                                     }
-                                    else if (totalsFound && ((OutcomeType) pb->nOutcome == vTotalsResult.at(0) || (OutcomeType) pb->nOutcome == vTotalsResult.at(1))) {
+                                    else if (totalsFound && ((PeerlessBetOutcomeType) pb->nOutcome == vTotalsResult.at(0) || (PeerlessBetOutcomeType) pb->nOutcome == vTotalsResult.at(1))) {
                                         winnings = betAmount * nTotalsOdds;
 
                                         // Calculate the bet winnings for the current bet.
