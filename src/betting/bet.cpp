@@ -139,6 +139,60 @@ bool IsBlockPayoutsValid(CBettingsView &bettingsViewCache, const std::multimap<C
     return true;
 }
 
+bool CheckPeerlessLeg(CBettingsView& bettingsViewCache, const CPeerlessBetTx& pLeg, const bool parlay) {
+    CPeerlessExtendedEventDB plEvent;
+    // Find the event in DB
+    if (bettingsViewCache.events->Read(EventKey{pLeg.nEventId}, plEvent)) {
+        if (bettingsViewCache.results->Exists(ResultKey{pLeg.nEventId})) {
+            return error("CheckBettingTX: Bet placed to resulted event %lu!", pLeg.nEventId);
+        }
+
+        if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
+            if (GetBetPotentialOdds(CPeerlessLegDB{pLeg.nEventId, (PeerlessBetOutcomeType)pLeg.nOutcome}, plEvent) == 0) {
+                return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", pLeg.nEventId, pLeg.nOutcome);
+            }
+            if (parlay && plEvent.nStage != 0) {
+                return error("CheckBettingTX: event %lu cannot be part of parlay bet!", pLeg.nEventId);
+            }
+        }
+    }
+    else {
+        return error("CheckBettingTX: Failed to find event %lu!", pLeg.nEventId);
+    }
+
+    return true;
+}
+
+bool CheckFieldLeg(CBettingsView& bettingsViewCache, const CFieldBetTx& fLeg, const bool parlay) {
+    CFieldEventDB fEvent;
+    if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{fLeg.nEventId}, fEvent)) {
+        return error("CheckBettingTX: Failed to find field event %lu!", fLeg.nEventId);
+    }
+
+    if (bettingsViewCache.fieldResults->Exists(FieldResultKey{fLeg.nEventId})) {
+        return error("CheckBettingTX: Bet placed to resulted field event %lu!", fLeg.nEventId);
+    }
+
+    if (!fEvent.IsMarketOpen((FieldBetOutcomeType)fLeg.nOutcome)) {
+        return error("CheckBettingTX: market %lu is closed for event %lu!", fLeg.nOutcome, fLeg.nEventId);
+    }
+
+    if (fEvent.contenders.find(fLeg.nContenderId) == fEvent.contenders.end()) {
+        return error("CheckBettingTX: Unknown contenderId %lu for event %lu!", fLeg.nContenderId, fLeg.nEventId);
+    }
+
+    CFieldLegDB legDB{fLeg.nEventId, (FieldBetOutcomeType)fLeg.nOutcome, fLeg.nContenderId};
+    if (GetBetPotentialOdds(legDB, fEvent) == 0) {
+        return error("CheckBettingTX: Bet odds is zero for Event %lu contenderId %d!", fLeg.nEventId, fLeg.nContenderId);
+    }
+
+    if (parlay && fEvent.nStage != 0) {
+        return error("CheckBettingTX: event %lu cannot be part of parlay bet!", fLeg.nEventId);
+    }
+
+    return true;
+}
+
 bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height)
 {
     // if is not wagerr v3 - do not check tx
@@ -174,27 +228,13 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
             case plBetTxType:
             {
                 CPeerlessBetTx* betTx = (CPeerlessBetTx*) bettingTx.get();
-                CPeerlessLegDB plBet{betTx->nEventId, (OutcomeType) betTx->nOutcome};
+                CPeerlessLegDB plBet{betTx->nEventId, (PeerlessBetOutcomeType) betTx->nOutcome};
                 // Validate bet amount so its between 25 - 10000 WGR inclusive.
                 if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
                     return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
                 }
-                CPeerlessExtendedEventDB plEvent;
-                // Find the event in DB
-                if (bettingsViewCache.events->Read(EventKey{plBet.nEventId}, plEvent)) {
-                    if (bettingsViewCache.results->Exists(ResultKey{plBet.nEventId})) {
-                        return error("CheckBettingTX: Bet placed to resulted event %lu!", plBet.nEventId);
-                    }
-
-                    if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
-                        if (GetBetPotentialOdds(plBet, plEvent) == 0) {
-                            return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", plBet.nEventId, plBet.nOutcome);
-                        }
-                    }
-                }
-                else {
-                    return error("CheckBettingTX: Failed to find event %lu!", plBet.nEventId);
-                }
+                if (!CheckPeerlessLeg(bettingsViewCache, *betTx, false))
+                    return false;
                 break;
             }
             case plParlayBetTxType:
@@ -221,25 +261,8 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 }
 
                 for (const CPeerlessBetTx& leg : legs) {
-                    CPeerlessExtendedEventDB plEvent;
-                    // Find the event in DB
-                    if (bettingsViewCache.events->Read(EventKey{leg.nEventId}, plEvent)) {
-                        if (bettingsViewCache.results->Exists(ResultKey{leg.nEventId})) {
-                            return error("CheckBettingTX: Bet placed to resulted event %lu!", leg.nEventId);
-                        }
-
-                        if (chainActive.Height() >= Params().WagerrProtocolV4StartHeight()) {
-                            if (GetBetPotentialOdds(CPeerlessLegDB{leg.nEventId, (OutcomeType)leg.nOutcome}, plEvent) == 0) {
-                                return error("CheckBettingTX: Bet potential odds is zero for Event %lu outcome %d!", leg.nEventId, leg.nOutcome);
-                            }
-                            if (plEvent.nStage != 0) {
-                                return error("CheckBettingTX: event %lu cannot be part of parlay bet!", leg.nEventId);
-                            }
-                        }
-                    }
-                    else {
-                        return error("CheckBettingTX: Failed to find event %lu!", leg.nEventId);
-                    }
+                    if (!CheckPeerlessLeg(bettingsViewCache, leg, true))
+                        return false;
                 }
                 break;
             }
@@ -253,28 +276,8 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 }
 
                 CFieldBetTx* betTx = (CFieldBetTx*) bettingTx.get();
-                CFieldEventDB fEvent;
-                if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{betTx->nEventId}, fEvent)) {
-                    return error("CheckBettingTX: Failed to find field event %lu!", betTx->nEventId);
-                }
-
-                if (bettingsViewCache.fieldResults->Exists(FieldResultKey{betTx->nEventId})) {
-                    return error("CheckBettingTX: Bet placed to resulted field event %lu!", betTx->nEventId);
-                }
-
-                if (!fEvent.IsMarketOpen((FieldBetOutcomeType)betTx->nOutcome)) {
-                    return error("CheckBettingTX: market %lu is closed for event %lu!", betTx->nOutcome, betTx->nEventId);
-                }
-
-                if (fEvent.contenders.find(betTx->nContenderId) == fEvent.contenders.end()) {
-                    return error("CheckBettingTX: Unknown contenderId %lu for event %lu!", betTx->nContenderId, betTx->nEventId);
-                }
-
-                CFieldLegDB legDB{betTx->nEventId, (FieldBetOutcomeType)betTx->nOutcome, betTx->nContenderId};
-                if (GetBetPotentialOdds(legDB, fEvent) == 0) {
-                    return error("CheckBettingTX: Bet odds is zero for Event %lu contenderId %d!", betTx->nEventId, betTx->nContenderId);
-                }
-
+                if (!CheckFieldLeg(bettingsViewCache, *betTx, false))
+                    return false;
                 break;
             }
             case fParlayBetTxType:
@@ -305,33 +308,64 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
                 }
 
                 for (const auto& leg : legs) {
-                    CFieldEventDB fEvent;
-                    if (!bettingsViewCache.fieldEvents->Read(FieldEventKey{leg.nEventId}, fEvent)) {
-                        return error("CheckBettingTX: Failed to find field event %lu!", leg.nEventId);
-                    }
-
-                    if (bettingsViewCache.fieldResults->Exists(FieldResultKey{leg.nEventId})) {
-                        return error("CheckBettingTX: Bet placed to resulted field event %lu!", leg.nEventId);
-                    }
-
-                    if (!fEvent.IsMarketOpen((FieldBetOutcomeType)leg.nOutcome)) {
-                        return error("CheckBettingTX: market %lu is closed for event %lu!", leg.nOutcome, leg.nEventId);
-                    }
-
-                    if (fEvent.contenders.find(leg.nContenderId) == fEvent.contenders.end()) {
-                        return error("CheckBettingTX: Unknown contenderId %lu for event %lu!", leg.nContenderId, leg.nEventId);
-                    }
-
-                    CFieldLegDB legDB{leg.nEventId, (FieldBetOutcomeType)leg.nOutcome, leg.nContenderId};
-                    if (GetBetPotentialOdds(legDB, fEvent) == 0) {
-                        return error("CheckBettingTX: Bet odds is zero for Event %lu contenderId %d!", leg.nEventId, leg.nContenderId);
-                    }
-
-                    if (fEvent.nStage != 0) {
-                        return error("CheckBettingTX: event %lu cannot be part of parlay bet!", leg.nEventId);
-                    }
+                    if (!CheckFieldLeg(bettingsViewCache, leg, true))
+                        return false;
                 }
 
+                break;
+            }
+            case hParlayBetTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) return error("CheckBettingTX: Spork is not active for HybridParlayBetTxType!");
+
+                // Validate bet amount so its between 25 - 10000 WGR inclusive.
+                if (betAmount < (Params().MinBetPayoutRange()  * COIN ) || betAmount > (Params().MaxBetPayoutRange() * COIN)) {
+                    return error("CheckBettingTX: Bet placed with invalid amount %lu!", betAmount);
+                }
+
+                CHybridParlayBetTx* betTx = (CHybridParlayBetTx*) bettingTx.get();
+                std::vector<CHybridBetTx> &legs = betTx->legs;
+
+                if (legs.size() <= 1 || legs.size() > Params().MaxParlayLegs()) {
+                    return error("CheckBettingTX: The invalid field parlay bet count of legs!");
+                }
+
+                std::set<uint32_t> plEventIds;
+                std::set<uint32_t> fieldEventIds;
+                for (const auto& leg : legs) {
+                    switch ((CHybridBetTx::HybridLegTypes) leg.variant.which()) {
+                        case CHybridBetTx::HybridLegTypes::PeerlessLeg:
+                        {
+                            const CPeerlessBetTx& plLeg = boost::get<CPeerlessBetTx>(leg.variant);
+
+                            // check event ids in legs and deny if some is equal
+                            if (plEventIds.find(plLeg.nEventId) != plEventIds.end())
+                                return error("CheckBettingTX: Parlay bet has some legs with same event id!");
+                            else
+                                plEventIds.insert(plLeg.nEventId);
+
+                            if (!CheckPeerlessLeg(bettingsViewCache, plLeg, true))
+                                return false;
+                            break;
+                        }
+                        case CHybridBetTx::HybridLegTypes::FieldLeg:
+                        {
+                            const CFieldBetTx& fLeg = boost::get<CFieldBetTx>(leg.variant);
+
+                            // check event ids in legs and deny if some is equal
+                            if (fieldEventIds.find(fLeg.nEventId) != fieldEventIds.end())
+                                return error("CheckBettingTX: Parlay bet has some legs with same event id!");
+                            else
+                                fieldEventIds.insert(fLeg.nEventId);
+
+                            if (!CheckFieldLeg(bettingsViewCache, fLeg, true))
+                                return false;
+                            break;
+                        }
+                        default:
+                            std::runtime_error("CHybridBetTx: Undefined leg type");
+                    }
+                }
                 break;
             }
             case cgBetTxType:
@@ -694,6 +728,194 @@ bool CheckBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, co
     return true;
 }
 
+// templation for hybrid bet capability
+template<class LegType, class EventType>
+bool ProcessPeerlessLeg(
+    CBettingsView& bettingsViewCache, const CPeerlessBetTx& plBetTx,
+    const CAmount betAmount, const int height, const bool parlay,
+    std::vector<CBettingUndoDB>& vUndos,
+    std::vector<LegType>& legs,
+    std::vector<EventType>& lockedEvents)
+{
+    CPeerlessLegDB plLeg{plBetTx.nEventId, (PeerlessBetOutcomeType) plBetTx.nOutcome};
+    LogPrint("wagerr", "CPeerlessBet: id: %lu, outcome: %lu\n", plLeg.nEventId, plLeg.nOutcome);
+    CPeerlessExtendedEventDB plEvent, plCachedEvent;
+    // Find the event in DB
+    EventKey eventKey{plLeg.nEventId};
+    // get locked event from upper level cache for getting correct odds
+    if (!bettingsView->events->Read(eventKey, plCachedEvent)) {
+        LogPrint("wagerr", "Failed to find peerless event %lu in upper level cache!", plLeg.nEventId);
+        return false;
+    }
+    if (!bettingsViewCache.events->Read(eventKey, plEvent)) {
+        LogPrint("wagerr", "Failed to find peerless event %lu!", plLeg.nEventId);
+        return false;
+    }
+    CAmount payout = 0 * COIN;
+    CAmount burn = 0;
+
+    LogPrint("wagerr", "plCachedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
+        plCachedEvent.nHomeOdds, plCachedEvent.nAwayOdds, plCachedEvent.nDrawOdds, plCachedEvent.nSpreadHomeOdds, plCachedEvent.nSpreadAwayOdds, plCachedEvent.nTotalOverOdds, plCachedEvent.nTotalUnderOdds);
+
+    // save prev event state to undo
+    vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
+    // Check which outcome the bet was placed on and add to accumulators
+    switch (plLeg.nOutcome) {
+        case moneyLineHomeWin:
+            if (!parlay) {
+                CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nHomeOdds, payout, burn);
+                plEvent.nMoneyLineHomePotentialLiability += payout / COIN ;
+            }
+            plEvent.nMoneyLineHomeBets += 1;
+            break;
+        case moneyLineAwayWin:
+            if (!parlay) {
+                CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nAwayOdds, payout, burn);
+                plEvent.nMoneyLineAwayPotentialLiability += payout / COIN ;
+            }
+            plEvent.nMoneyLineAwayBets += 1;
+            break;
+        case moneyLineDraw:
+            if (!parlay) {
+                CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nDrawOdds, payout, burn);
+                plEvent.nMoneyLineDrawPotentialLiability += payout / COIN ;
+            }
+            plEvent.nMoneyLineDrawBets += 1;
+            break;
+        case spreadHome:
+            if (!parlay) {
+                CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nSpreadHomeOdds, payout, burn);
+                plEvent.nSpreadHomePotentialLiability += payout / COIN ;
+                plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
+            }
+            plEvent.nSpreadHomeBets += 1;
+            plEvent.nSpreadPushBets += 1;
+            break;
+        case spreadAway:
+            if (!parlay) {
+                CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nSpreadAwayOdds, payout, burn);
+                plEvent.nSpreadAwayPotentialLiability += payout / COIN ;
+                plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
+            }
+            plEvent.nSpreadAwayBets += 1;
+            plEvent.nSpreadPushBets += 1;
+            break;
+        case totalOver:
+            if (!parlay) {
+                CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nTotalOverOdds, payout, burn);
+                plEvent.nTotalOverPotentialLiability += payout / COIN ;
+                plEvent.nTotalPushPotentialLiability += betAmount / COIN;
+            }
+            plEvent.nTotalOverBets += 1;
+            plEvent.nTotalPushBets += 1;
+            break;
+        case totalUnder:
+            if (!parlay) {
+                CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nTotalUnderOdds, payout, burn);
+                plEvent.nTotalUnderPotentialLiability += payout / COIN;
+                plEvent.nTotalPushPotentialLiability += betAmount / COIN;
+            }
+            plEvent.nTotalUnderBets += 1;
+            plEvent.nTotalPushBets += 1;
+            break;
+        default:
+            std::runtime_error("Unknown bet outcome type!");
+            break;
+    }
+    if (!bettingsViewCache.events->Update(eventKey, plEvent)) {
+        // should not happen ever
+        LogPrintf("Failed to update event!\n");
+        return false;
+    }
+
+    legs.emplace_back(LegType{plLeg});
+    lockedEvents.emplace_back(EventType{plCachedEvent});
+
+    return true;
+}
+
+// templation for hybrid bet capability
+template<class LegType, class EventType>
+bool ProcessFieldLeg(
+    CBettingsView& bettingsViewCache, const CFieldBetTx& fBetTx,
+    const CAmount betAmount, const int height, const bool parlay,
+    std::vector<CBettingUndoDB>& vUndos,
+    std::vector<LegType>& legs,
+    std::vector<EventType>& lockedEvents)
+{
+
+    CFieldLegDB fLeg{fBetTx.nEventId, (FieldBetOutcomeType)fBetTx.nOutcome, fBetTx.nContenderId};
+    LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
+        fLeg.nEventId, fLeg.nContenderId, fLeg.nOutcome);
+
+    CFieldEventDB fEvent, fCachedEvent;
+    FieldEventKey fEventKey{fLeg.nEventId};
+    // get locked event from upper level cache for getting correct odds
+    if (!bettingsView->fieldEvents->Read(fEventKey, fCachedEvent)) {
+        LogPrint("wagerr", "Failed to find field event %lu in upper level cache!", fLeg.nEventId);
+        return false;
+    }
+
+    if (!bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
+        LogPrint("wagerr", "Failed to find field event %lu!", fLeg.nEventId);
+        return false;
+    }
+
+    LogPrint("wagerr", "fCachedEvent:\n");
+    for (const auto& contender : fCachedEvent.contenders) {
+        LogPrint("wagerr", "contenderId %lu : outright odds %lu place odds %lu show odds %lu\n",
+            contender.first, contender.second.nOutrightOdds, contender.second.nPlaceOdds, contender.second.nShowOdds);
+    }
+
+    // save prev event state to undo
+    vUndos.emplace_back(BettingUndoVariant{fEvent}, (uint32_t)height);
+
+    CAmount payout;
+    switch (fLeg.nOutcome) {
+        case outright:
+        {
+            if (!parlay) {
+                uint32_t effectiveOdds = CalculateEffectiveOdds(fCachedEvent.contenders[fLeg.nContenderId].nOutrightOdds);
+                payout = betAmount * effectiveOdds / BET_ODDSDIVISOR;
+                fEvent.contenders[fLeg.nContenderId].nOutrightPotentialLiability += payout / COIN;
+            }
+            fEvent.contenders[fLeg.nContenderId].nOutrightBets += 1;
+            break;
+        }
+        case place:
+        {
+            if (!parlay) {
+                uint32_t effectiveOdds = CalculateEffectiveOdds(fCachedEvent.contenders[fLeg.nContenderId].nPlaceOdds);
+                payout = betAmount * effectiveOdds / BET_ODDSDIVISOR;
+                fEvent.contenders[fLeg.nContenderId].nPlacePotentialLiability += payout / COIN;
+            }
+            fEvent.contenders[fLeg.nContenderId].nPlaceBets += 1;
+            break;
+        }
+        case show:
+        {
+            if (!parlay) {
+                uint32_t effectiveOdds = CalculateEffectiveOdds(fCachedEvent.contenders[fLeg.nContenderId].nShowOdds);
+                payout = betAmount * effectiveOdds / BET_ODDSDIVISOR;
+                fEvent.contenders[fLeg.nContenderId].nShowPotentialLiability += payout / COIN;
+            }
+            fEvent.contenders[fLeg.nContenderId].nShowBets += 1;
+            break;
+        }
+    }
+
+    if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
+        // should not happen ever
+        LogPrintf("Failed to update field event!\n");
+        return false;
+    }
+
+    legs.emplace_back(LegType{fLeg});
+    lockedEvents.emplace_back(EventType{fCachedEvent});
+
+    return true;
+}
+
 void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, const int height, const int64_t blockTime, const bool wagerrProtocolV3)
 {
     LogPrint("wagerr", "ProcessBettingTx: start, time: %lu, tx hash: %s\n", blockTime, tx.GetHash().GetHex());
@@ -729,90 +951,15 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
             case plBetTxType:
             {
                 CPeerlessBetTx* betTx = (CPeerlessBetTx*) bettingTx.get();
-                CPeerlessLegDB plBet{betTx->nEventId, (OutcomeType) betTx->nOutcome};
-                CPeerlessExtendedEventDB plEvent, plCachedEvent;
+                std::vector<CBettingUndoDB> vUndos;
+                std::vector<CPeerlessLegDB> legs;
+                std::vector<CPeerlessBaseEventDB> lockedEvents;
+                if (!ProcessPeerlessLeg<CPeerlessLegDB, CPeerlessBaseEventDB>(bettingsViewCache, *betTx, betAmount, height, false, vUndos, legs, lockedEvents))
+                    continue;
 
-                LogPrint("wagerr", "CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
-                // Find the event in DB
-                EventKey eventKey{plBet.nEventId};
-                // get locked event from upper level cache for getting correct odds
-                if (bettingsView->events->Read(eventKey, plCachedEvent) &&
-                        bettingsViewCache.events->Read(eventKey, plEvent)) {
-                    CAmount payout = 0 * COIN;
-                    CAmount burn = 0;
+                bettingsViewCache.bets->Write(PeerlessBetKey{static_cast<uint32_t>(height), outPoint}, CPeerlessBetDB(betAmount, address, legs, lockedEvents, blockTime));
 
-                    LogPrint("wagerr", "plCachedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
-                        plCachedEvent.nHomeOdds, plCachedEvent.nAwayOdds, plCachedEvent.nDrawOdds, plCachedEvent.nSpreadHomeOdds, plCachedEvent.nSpreadAwayOdds, plCachedEvent.nTotalOverOdds, plCachedEvent.nTotalUnderOdds);
-
-                    // save prev event state to undo
-                    bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{plEvent}, (uint32_t)height}});
-                    // Check which outcome the bet was placed on and add to accumulators
-                    switch (plBet.nOutcome) {
-                        case moneyLineHomeWin:
-                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nHomeOdds, payout, burn);
-
-                            plEvent.nMoneyLineHomePotentialLiability += payout / COIN ;
-                            plEvent.nMoneyLineHomeBets += 1;
-                            break;
-                        case moneyLineAwayWin:
-                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nAwayOdds, payout, burn);
-
-                            plEvent.nMoneyLineAwayPotentialLiability += payout / COIN ;
-                            plEvent.nMoneyLineAwayBets += 1;
-                            break;
-                        case moneyLineDraw:
-                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nDrawOdds, payout, burn);
-
-                            plEvent.nMoneyLineDrawPotentialLiability += payout / COIN ;
-                            plEvent.nMoneyLineDrawBets += 1;
-                            break;
-                        case spreadHome:
-                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nSpreadHomeOdds, payout, burn);
-
-                            plEvent.nSpreadHomePotentialLiability += payout / COIN ;
-                            plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
-                            plEvent.nSpreadHomeBets += 1;
-                            plEvent.nSpreadPushBets += 1;
-                            break;
-                        case spreadAway:
-                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nSpreadAwayOdds, payout, burn);
-
-                            plEvent.nSpreadAwayPotentialLiability += payout / COIN ;
-                            plEvent.nSpreadPushPotentialLiability += betAmount / COIN;
-                            plEvent.nSpreadAwayBets += 1;
-                            plEvent.nSpreadPushBets += 1;
-                            break;
-                        case totalOver:
-                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nTotalOverOdds, payout, burn);
-
-                            plEvent.nTotalOverPotentialLiability += payout / COIN ;
-                            plEvent.nTotalPushPotentialLiability += betAmount / COIN;
-                            plEvent.nTotalOverBets += 1;
-                            plEvent.nTotalPushBets += 1;
-                            break;
-                        case totalUnder:
-                            CalculatePayoutBurnAmounts(betAmount, plCachedEvent.nTotalUnderOdds, payout, burn);
-
-                            plEvent.nTotalUnderPotentialLiability += payout / COIN;
-                            plEvent.nTotalPushPotentialLiability += betAmount / COIN;
-                            plEvent.nTotalUnderBets += 1;
-                            plEvent.nTotalPushBets += 1;
-                            break;
-                        default:
-                            std::runtime_error("Unknown bet outcome type!");
-                            break;
-                    }
-                    if (!bettingsViewCache.events->Update(eventKey, plEvent)) {
-                        // should not happen ever
-                        LogPrintf("Failed to update event!\n");
-                        continue;
-                    }
-
-                    bettingsViewCache.bets->Write(PeerlessBetKey{static_cast<uint32_t>(height), outPoint}, CPeerlessBetDB(betAmount, address, {plBet}, {plCachedEvent}, blockTime));
-                }
-                else {
-                    LogPrintf("Failed to find event!\n");
-                }
+                bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
                 break;
             }
             case plParlayBetTxType:
@@ -820,70 +967,18 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 if (!wagerrProtocolV3) break;
 
                 CPeerlessParlayBetTx* parlayBetTx = (CPeerlessParlayBetTx*) bettingTx.get();
+                std::vector<CBettingUndoDB> vUndos;
                 std::vector<CPeerlessBaseEventDB> lockedEvents;
                 std::vector<CPeerlessLegDB> legs;
-                // convert tx legs format to db
-                LogPrint("wagerr", "ParlayBet: legs: ");
-                for (auto leg : parlayBetTx->legs) {
-                    LogPrint("wagerr", "(id: %lu, outcome: %lu), ", leg.nEventId, leg.nOutcome);
-                    legs.emplace_back(leg.nEventId, (OutcomeType) leg.nOutcome);
-                }
-                LogPrint("wagerr", "\n");
-
-                std::vector<CBettingUndoDB> vUndos;
-                for (const CPeerlessLegDB& leg : legs) {
-                    CPeerlessExtendedEventDB plEvent, plCachedEvent;
-                    EventKey eventKey{leg.nEventId};
-                    // Find the event in DB
-                    // get locked event from upper level cache of betting view for getting correct odds
-                    if (bettingsView->events->Read(eventKey, plCachedEvent) &&
-                            bettingsViewCache.events->Read(eventKey, plEvent)) {
-
-                        LogPrint("wagerr", "plCachedEvent: homeOdds: %lu, awayOdds: %lu, drawOdds: %lu, spreadHomeOdds: %lu, spreadAwayOdds: %lu, totalOverOdds: %lu, totalUnderOdds: %lu\n",
-                            plCachedEvent.nHomeOdds, plCachedEvent.nAwayOdds, plCachedEvent.nDrawOdds, plCachedEvent.nSpreadHomeOdds, plCachedEvent.nSpreadAwayOdds, plCachedEvent.nTotalOverOdds, plCachedEvent.nTotalUnderOdds);
-
-                        vUndos.emplace_back(BettingUndoVariant{plEvent}, (uint32_t)height);
-                        switch (leg.nOutcome) {
-                            case moneyLineHomeWin:
-                                plEvent.nMoneyLineHomeBets += 1;
-                                break;
-                            case moneyLineAwayWin:
-                                plEvent.nMoneyLineAwayBets += 1;
-                                break;
-                            case moneyLineDraw:
-                                plEvent.nMoneyLineDrawBets += 1;
-                                break;
-                            case spreadHome:
-                                plEvent.nSpreadHomeBets += 1;
-                                plEvent.nSpreadPushBets += 1;
-                                break;
-                            case spreadAway:
-                                plEvent.nSpreadAwayBets += 1;
-                                plEvent.nSpreadPushBets += 1;
-                                break;
-                            case totalOver:
-                                plEvent.nTotalOverBets += 1;
-                                plEvent.nTotalPushBets += 1;
-                                break;
-                            case totalUnder:
-                                plEvent.nTotalUnderBets += 1;
-                                plEvent.nTotalPushBets += 1;
-                                break;
-                            default:
-                                std::runtime_error("Unknown bet outcome type!");
-                        }
-
-                        lockedEvents.emplace_back(plCachedEvent);
-                        bettingsViewCache.events->Update(eventKey, plEvent);
-                    }
-                    else {
-                        LogPrintf("Failed to find event!\n");
+                LogPrint("wagerr", "PeerlessParlayBet legs:\n");
+                for (const auto& leg : parlayBetTx->legs) {
+                    if (!ProcessPeerlessLeg<CPeerlessLegDB, CPeerlessBaseEventDB>(bettingsViewCache, leg, betAmount, height, true, vUndos, legs, lockedEvents))
                         continue;
-                    }
                 }
                 if (!legs.empty()) {
                     // save prev event state to undo
                     bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
+                    // write bet to db
                     bettingsViewCache.bets->Write(PeerlessBetKey{static_cast<uint32_t>(height), outPoint}, CPeerlessBetDB(betAmount, address, legs, lockedEvents, blockTime));
                 }
                 break;
@@ -893,73 +988,21 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
 
                 CFieldBetTx* fBetTx = (CFieldBetTx*) bettingTx.get();
-                LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
-                    fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nOutcome);
+                std::vector<CBettingUndoDB> vUndos;
+                std::vector<CFieldEventDB> lockedEvents;
+                std::vector<CFieldLegDB> legs;
+                if (!ProcessFieldLeg<CFieldLegDB, CFieldEventDB>(bettingsViewCache, *fBetTx, betAmount, height, false, vUndos, legs, lockedEvents))
+                        continue;
 
-                CFieldEventDB fEvent, fCachedEvent;
-                FieldEventKey fEventKey{fBetTx->nEventId};
-                // get locked event from upper level cache for getting correct odds
-                if (!bettingsView->fieldEvents->Read(fEventKey, fCachedEvent)) {
-                    LogPrint("wagerr", "Failed to find field event %lu in upper level cache!", fBetTx->nEventId);
-                    break;
-                }
-
-                if (!bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
-                    LogPrint("wagerr", "Failed to find field event %lu!", fBetTx->nEventId);
-                    break;
-                }
-
-                LogPrint("wagerr", "fCachedEvent:\n");
-                for (const auto& contender : fCachedEvent.contenders) {
-                    LogPrint("wagerr", "contenderId %lu : outright odds %lu place odds %lu show odds %lu\n",
-                        contender.first, contender.second.nOutrightOdds, contender.second.nPlaceOdds, contender.second.nShowOdds);
-                }
-
-                // save prev event state to undo
-                bettingsViewCache.SaveBettingUndo(bettingTxId, {CBettingUndoDB{BettingUndoVariant{fEvent}, (uint32_t)height}});
-
-                CAmount payout;
-                switch (fBetTx->nOutcome) {
-                    case outright:
-                    {
-                        uint32_t effectiveOdds = CalculateEffectiveOdds(fCachedEvent.contenders[fBetTx->nContenderId].nOutrightOdds);
-                        payout = betAmount * effectiveOdds / BET_ODDSDIVISOR;
-                        fEvent.contenders[fBetTx->nContenderId].nOutrightPotentialLiability += payout / COIN;
-                        fEvent.contenders[fBetTx->nContenderId].nOutrightBets += 1;
-                        break;
-                    }
-                    case place:
-                    {
-                        uint32_t effectiveOdds = CalculateEffectiveOdds(fCachedEvent.contenders[fBetTx->nContenderId].nPlaceOdds);
-                        payout = betAmount * effectiveOdds / BET_ODDSDIVISOR;
-                        fEvent.contenders[fBetTx->nContenderId].nPlacePotentialLiability += payout / COIN;
-                        fEvent.contenders[fBetTx->nContenderId].nPlaceBets += 1;
-                        break;
-                    }
-                    case show:
-                    {
-                        uint32_t effectiveOdds = CalculateEffectiveOdds(fCachedEvent.contenders[fBetTx->nContenderId].nShowOdds);
-                        payout = betAmount * effectiveOdds / BET_ODDSDIVISOR;
-                        fEvent.contenders[fBetTx->nContenderId].nShowPotentialLiability += payout / COIN;
-                        fEvent.contenders[fBetTx->nContenderId].nShowBets += 1;
-                        break;
-                    }
-                }
-
-                if (!bettingsViewCache.fieldEvents->Update(fEventKey, fEvent)) {
-                    // should not happen ever
-                    LogPrintf("Failed to update field event!\n");
-                    break;
-                }
-
-                CFieldLegDB fLeg{fBetTx->nEventId, (FieldBetOutcomeType)fBetTx->nOutcome, fBetTx->nContenderId};
                 if (!bettingsViewCache.fieldBets->Write(
                     FieldBetKey{static_cast<uint32_t>(height), outPoint},
-                    CFieldBetDB(betAmount, address, {fLeg}, {fCachedEvent}, blockTime)))
+                    CFieldBetDB(betAmount, address, legs, lockedEvents, blockTime)))
                 {
                     LogPrintf("Failed to write bet!\n");
                     break;
                 }
+
+                bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
 
                 break;
             }
@@ -968,68 +1011,65 @@ void ProcessBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, 
                 if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
 
                 CFieldParlayBetTx* fParlayBetTx = (CFieldParlayBetTx*) bettingTx.get();
+                std::vector<CBettingUndoDB> vUndos;
                 std::vector<CFieldEventDB> lockedEvents;
                 std::vector<CFieldLegDB> legs;
-
-                // convert tx legs format to db
-                LogPrint("wagerr", "FieldParlayBet: legs: ");
+                LogPrint("wagerr", "FieldParlayBet legs:\n");
                 for (const auto& leg : fParlayBetTx->legs) {
-                    LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
-                        leg.nEventId, leg.nContenderId, leg.nOutcome);
-                    legs.emplace_back(leg.nEventId, (FieldBetOutcomeType)leg.nOutcome, leg.nContenderId);
-                }
-
-                std::vector<CBettingUndoDB> vUndos;
-                for (const auto& leg : legs) {
-                    CFieldEventDB fEvent, fCachedEvent;
-                    FieldEventKey fEventKey{leg.nEventId};
-                    // get locked event from upper level cache for getting correct odds
-                    if (!bettingsView->fieldEvents->Read(fEventKey, fCachedEvent)) {
-                        LogPrint("wagerr", "Failed to find field event %lu in upper level cache!", leg.nEventId);
+                    if (!ProcessFieldLeg<CFieldLegDB, CFieldEventDB>(bettingsViewCache, leg, betAmount, height, true, vUndos, legs, lockedEvents))
                         continue;
-                    }
-
-                    if (!bettingsViewCache.fieldEvents->Read(fEventKey, fEvent)) {
-                        LogPrint("wagerr", "Failed to find field event %lu!", leg.nEventId);
-                        continue;
-                    }
-
-                    LogPrint("wagerr", "fCachedEvent:\n");
-                    for (const auto& contender : fCachedEvent.contenders) {
-                        LogPrint("wagerr", "contenderId %lu : outright odds %lu place odds %lu show odds %lu\n",
-                            contender.first, contender.second.nOutrightOdds, contender.second.nPlaceOdds, contender.second.nShowOdds);
-                    }
-
-                    lockedEvents.emplace_back(fCachedEvent);
-                    vUndos.emplace_back(BettingUndoVariant{fEvent}, (uint32_t)height);
-
-                    switch (leg.nOutcome) {
-                        case outright:
-                        {
-                            fEvent.contenders[leg.nContenderId].nOutrightBets += 1;
-                            break;
-                        }
-                        case place:
-                        {
-                            fEvent.contenders[leg.nContenderId].nPlaceBets += 1;
-                            break;
-                        }
-                        case show:
-                        {
-                            fEvent.contenders[leg.nContenderId].nShowBets += 1;
-                            break;
-                        }
-                    }
-
-                    bettingsViewCache.fieldEvents->Update(fEventKey, fEvent);
                 }
 
                 if (!legs.empty()) {
                     // save prev event state to undo
                     bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
+                    // write bet to db
                     bettingsViewCache.fieldBets->Write(
                         FieldBetKey{static_cast<uint32_t>(height), outPoint},
                         CFieldBetDB(betAmount, address, legs, lockedEvents, blockTime)
+                    );
+                }
+
+                break;
+            }
+            case hParlayBetTxType:
+            {
+                if (chainActive.Height() < Params().WagerrProtocolV4StartHeight()) break;
+
+                CHybridParlayBetTx* betTx = (CHybridParlayBetTx*) bettingTx.get();
+                std::vector<CBettingUndoDB> vUndos;
+                std::vector<CHybridEventDB> lockedEvents;
+                std::vector<CHybridLegDB> legs;
+                LogPrint("wagerr", "HybridParlayBet legs:\n");
+                for (const auto& leg : betTx->legs) {
+                    switch ((CHybridBetTx::HybridLegTypes) leg.variant.which()) {
+                        case CHybridBetTx::HybridLegTypes::PeerlessLeg:
+                        {
+                            const CPeerlessBetTx& plLeg = boost::get<CPeerlessBetTx>(leg.variant);
+
+                            if (!ProcessPeerlessLeg<CHybridLegDB, CHybridEventDB>(bettingsViewCache, plLeg, betAmount, height, true, vUndos, legs, lockedEvents))
+                                continue;
+                            break;
+                        }
+                        case CHybridBetTx::HybridLegTypes::FieldLeg:
+                        {
+                            const CFieldBetTx& fLeg = boost::get<CFieldBetTx>(leg.variant);
+                            if (!ProcessFieldLeg<CHybridLegDB, CHybridEventDB>(bettingsViewCache, fLeg, betAmount, height, true, vUndos, legs, lockedEvents))
+                                continue;
+                            break;
+                        }
+                        default:
+                            std::runtime_error("CHybridBetTx: Undefined leg type");
+                    }
+                }
+
+                if (!legs.empty()) {
+                    // save prev event state to undo
+                    bettingsViewCache.SaveBettingUndo(bettingTxId, vUndos);
+                    // write bet to DB
+                    bettingsViewCache.hybridBets->Write(
+                        HybridBetKey{static_cast<uint32_t>(height), outPoint},
+                        CHybridBetDB(betAmount, address, legs, lockedEvents, blockTime)
                     );
                 }
 
@@ -1597,6 +1637,9 @@ CAmount GetBettingPayouts(CBettingsView& bettingsViewCache, const int nNewBlockH
         if (nNewBlockHeight >= Params().WagerrProtocolV4StartHeight()) {
             // collect field bets payouts
             GetFeildBetPayoutsV4(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
+
+            // collect hybrid bets payouts
+            GetHybridBetPayoutsV4(bettingsViewCache, nNewBlockHeight, vExpectedPayouts, vPayoutsInfo);
         }
     }
     else {
@@ -1685,7 +1728,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
     const CTxIn& txin{tx.vin[0]};
     const bool validOracleTx{IsValidOracleTx(txin, height)};
 
-    LogPrintf("UndoBettingTx: start undo, block heigth %lu, tx hash %s\n", height, tx.GetHash().GetHex());
+    LogPrintf("UndoBettingTx: start undo, block height %lu, tx hash %s\n", height, tx.GetHash().GetHex());
 
     bool wagerrProtocolV3 = height >= (uint32_t)Params().WagerrProtocolV3StartHeight();
     bool wagerrProtocolV4 = height >= (uint32_t)Params().WagerrProtocolV4StartHeight();
@@ -1712,23 +1755,24 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
             case plBetTxType:
             {
                 CPeerlessBetTx* betTx = (CPeerlessBetTx*) bettingTx.get();
-                CPeerlessLegDB plBet{betTx->nEventId, (OutcomeType) betTx->nOutcome};
+                CPeerlessLegDB plBet{betTx->nEventId, (PeerlessBetOutcomeType) betTx->nOutcome};
                 CPeerlessExtendedEventDB plEvent, lockedEvent;
 
                 LogPrintf("CPeerlessBet: id: %lu, outcome: %lu\n", plBet.nEventId, plBet.nOutcome);
 
-                if (bettingsViewCache.events->Exists(EventKey{plBet.nEventId})) {
-                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
-                        return false;
-                    }
-                    // erase bet from db
-                    PeerlessBetKey key{static_cast<uint32_t>(height), outPoint};
-                    bettingsViewCache.bets->Erase(key);
+                if (!bettingsViewCache.events->Exists(EventKey{plBet.nEventId})) {
+                    LogPrintf("Failed to find peerless event %lu!\n", plBet.nEventId);
+                    break;
                 }
-                else {
-                    LogPrintf("Failed to find event!\n");
+
+                if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                    LogPrintf("Revert failed!\n");
+                    return false;
                 }
+                // erase bet from db
+                PeerlessBetKey key{static_cast<uint32_t>(height), outPoint};
+                bettingsViewCache.bets->Erase(key);
+
                 break;
             }
             case plParlayBetTxType:
@@ -1736,26 +1780,18 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 if (!wagerrProtocolV3) break;
 
                 CPeerlessParlayBetTx* parlayBetTx = (CPeerlessParlayBetTx*) bettingTx.get();
-                std::vector<CPeerlessLegDB> legs;
-                // convert tx legs format to db
-                LogPrintf("ParlayBet: legs: ");
-                for (auto leg : parlayBetTx->legs) {
-                    LogPrintf("(id: %lu, outcome: %lu), ", leg.nEventId, leg.nOutcome);
-                    legs.emplace_back(leg.nEventId, (OutcomeType) leg.nOutcome);
-                }
-                LogPrintf("\n");
-
+                LogPrintf("PeerlessParlayBet legs:\n");
                 bool allEventsExist = true;
-
-                for (auto leg : legs) {
+                for (auto leg : parlayBetTx->legs) {
+                    LogPrintf("wagerr", "CPeerlessBet: id: %lu, outcome: %lu\n", leg.nEventId, leg.nOutcome);
                     if (!bettingsViewCache.events->Exists(EventKey{leg.nEventId})) {
-                        LogPrintf("Failed to find event!\n");
+                        LogPrintf("wagerr", "Failed to find peerless event!\n", leg.nEventId);
                         allEventsExist = false;
                         break;
                     }
                 }
 
-                if (!legs.empty() && allEventsExist) {
+                if (!parlayBetTx->legs.empty() && allEventsExist) {
                     if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
                         LogPrintf("Revert failed!\n");
                         return false;
@@ -1776,7 +1812,7 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                     fBetTx->nEventId, fBetTx->nContenderId, fBetTx->nOutcome);
 
                 if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fBetTx->nEventId})) {
-                    LogPrintf("Failed to find event!\n");
+                    LogPrintf("Failed to find field event %lu!\n", fBetTx->nEventId);
                     break;
                 }
 
@@ -1794,27 +1830,22 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 if (!wagerrProtocolV4) break;
 
                 CFieldParlayBetTx* fParlayBetTx = (CFieldParlayBetTx*) bettingTx.get();
-                std::vector<CFieldLegDB> legs;
 
-                LogPrint("wagerr", "FieldParlayBet: legs: ");
+                LogPrint("wagerr", "FieldParlayBet legs:\n");
+                bool allEventsExist = true;
                 for (const auto& leg : fParlayBetTx->legs) {
                     LogPrint("wagerr", "CFieldBet: eventId: %lu, contenderId: %lu marketType: %lu\n",
                         leg.nEventId, leg.nContenderId, leg.nOutcome);
-                    legs.emplace_back(leg.nEventId, (FieldBetOutcomeType)leg.nOutcome, leg.nContenderId);
-                }
-
-                bool allEventsExist = true;
-                for (const auto& leg : legs) {
                     if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{leg.nEventId})) {
-                        LogPrint("wagerr", "Failed to find event %lu!\n", leg.nEventId);
+                        LogPrint("wagerr", "Failed to find field event %lu!\n", leg.nEventId);
                         allEventsExist = false;
                         break;
                     }
                 }
 
-                if (!legs.empty() && allEventsExist) {
+                if (!fParlayBetTx->legs.empty() && allEventsExist) {
                     if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
-                        LogPrintf("Revert failed!\n");
+                        LogPrintf("wagerr", "Revert failed!\n");
                         return false;
                     }
 
@@ -1822,6 +1853,50 @@ bool UndoBettingTx(CBettingsView& bettingsViewCache, const CTransaction& tx, con
                 }
 
                 break;
+            }
+            case hParlayBetTxType:
+            {
+                if (!wagerrProtocolV4) break;
+
+                CHybridParlayBetTx* hParlayBetTx = (CHybridParlayBetTx*) bettingTx.get();
+                bool allEventsExist = true;
+                LogPrint("wagerr", "HybridParlayBet legs:\n");
+                for (const auto& leg : hParlayBetTx->legs) {
+                    switch ((CHybridBetTx::HybridLegTypes) leg.variant.which()) {
+                        case CHybridBetTx::HybridLegTypes::PeerlessLeg:
+                        {
+                            const CPeerlessBetTx& plLeg = boost::get<CPeerlessBetTx>(leg.variant);
+                            if (!bettingsViewCache.events->Exists(EventKey{plLeg.nEventId})) {
+                                LogPrintf("wagerr", "Failed to find peerless event %lu!\n", plLeg.nEventId);
+                                allEventsExist = false;
+                                break;
+                            }
+                            break;
+                        }
+                        case CHybridBetTx::HybridLegTypes::FieldLeg:
+                        {
+                            const CFieldBetTx& fLeg = boost::get<CFieldBetTx>(leg.variant);
+                            if (!bettingsViewCache.fieldEvents->Exists(FieldEventKey{fLeg.nEventId})) {
+                                LogPrint("wagerr", "Failed to find field event %lu!\n", fLeg.nEventId);
+                                allEventsExist = false;
+                            }
+                            break;
+                        }
+                        default:
+                            std::runtime_error("CHybridBetTx: Undefined leg type");
+                    }
+                    if (!allEventsExist)
+                        break;
+                }
+
+                if (!hParlayBetTx->legs.empty() && allEventsExist) {
+                    if (!UndoEventChanges(bettingsViewCache, bettingTxId, height)) {
+                        LogPrintf("wagerr", "Revert failed!\n");
+                        return false;
+                    }
+
+                    bettingsViewCache.hybridBets->Erase(HybridBetKey{static_cast<uint32_t>(height), outPoint});
+                }
             }
             case cgBetTxType:
             {
@@ -2275,6 +2350,11 @@ bool BettingUndo(CBettingsView& bettingsViewCache, int height, const std::vector
         if (height > Params().WagerrProtocolV4StartHeight()) {
             if (!UndoFieldBetPayouts(bettingsViewCache, height)) {
                 error("DisconnectBlock(): undo payout data for field bets is inconsistent");
+                return false;
+            }
+
+            if (!UndoHybridBetPayoutsV4(bettingsViewCache, height)) {
+                error("DisconnectBlock(): undo payout data for hybrid bets is inconsistent");
                 return false;
             }
         }

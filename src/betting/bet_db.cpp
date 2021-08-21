@@ -690,6 +690,7 @@ CBettingsView::CBettingsView(CBettingsView* phr) {
     fieldEvents = MakeUnique<CBettingDB>(*phr->fieldEvents.get());
     fieldResults = MakeUnique<CBettingDB>(*phr->fieldResults.get());
     fieldBets = MakeUnique<CBettingDB>(*phr->fieldBets.get());
+    hybridBets = MakeUnique<CBettingDB>(*phr->hybridBets.get());
     undos = MakeUnique<CBettingDB>(*phr->undos.get());
     payoutsInfo = MakeUnique<CBettingDB>(*phr->payoutsInfo.get());
     quickGamesBets = MakeUnique<CBettingDB>(*phr->quickGamesBets.get());
@@ -707,6 +708,7 @@ bool CBettingsView::Flush() {
             fieldEvents->Flush() &&
             fieldResults->Flush() &&
             fieldBets->Flush() &&
+            hybridBets->Flush() &&
             undos->Flush() &&
             payoutsInfo->Flush() &&
             quickGamesBets->Flush() &&
@@ -724,6 +726,7 @@ unsigned int CBettingsView::GetCacheSize() {
             fieldEvents->GetCacheSize() +
             fieldResults->GetCacheSize() +
             fieldBets->GetCacheSize() +
+            hybridBets->GetCacheSize() +
             undos->GetCacheSize() +
             payoutsInfo->GetCacheSize() +
             quickGamesBets->GetCacheSize() +
@@ -741,6 +744,7 @@ unsigned int CBettingsView::GetCacheSizeBytesToWrite() {
             fieldEvents->GetCacheSizeBytesToWrite() +
             fieldResults->GetCacheSizeBytesToWrite() +
             fieldBets->GetCacheSizeBytesToWrite() +
+            hybridBets->GetCacheSizeBytesToWrite() +
             undos->GetCacheSizeBytesToWrite() +
             payoutsInfo->GetCacheSizeBytesToWrite() +
             quickGamesBets->GetCacheSizeBytesToWrite() +
