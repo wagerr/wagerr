@@ -3,7 +3,7 @@ version: 2.1
 jobs:
   lint_all:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: x86_64-linux-gnu
@@ -38,7 +38,7 @@ jobs:
             source .circleci/lint_06_script.sh
   x86_64_bionic_depends:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: x86_64-linux-gnu
@@ -71,7 +71,7 @@ jobs:
             - /root/project/depends/work
   x86_64_bionic:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: x86_64-linux-gnu
@@ -99,7 +99,7 @@ jobs:
             test/functional/test_runner.py
   i686_bionic_depends:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: i686-linux-gnu
@@ -130,7 +130,7 @@ jobs:
             - /root/project/depends/work
   i686_bionic:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: i686-linux-gnu
@@ -155,7 +155,7 @@ jobs:
             #src/qt/test/test_wagerr-qt
   x86_64_focal_depends:
     docker:
-      - image: circleci/buildpack-deps:20.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: x86_64-linux-gnu
@@ -188,7 +188,7 @@ jobs:
             - /root/project/depends/work
   x86_64_focal:
     docker:
-      - image: circleci/buildpack-deps:20.04
+      - image: cimg/base:stable-20.04
         user: root
     environment:
       HOST: x86_64-linux-gnu
@@ -215,7 +215,7 @@ jobs:
             #src/qt/test/test_wagerr-qt
   arm32_bionic_depends:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: arm-linux-gnueabihf
@@ -245,7 +245,7 @@ jobs:
             - /root/project/depends/work
   arm32_bionic:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: arm-linux-gnueabihf
@@ -270,7 +270,7 @@ jobs:
             make -j${JOBS}
   arm64_bionic_depends:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: aarch64-linux-gnu
@@ -303,7 +303,7 @@ jobs:
             - /root/project/depends/work
   arm64_bionic:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: aarch64-linux-gnu
@@ -327,7 +327,7 @@ jobs:
             make -j${JOBS}
   win32_bionic_depends:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: i686-w64-mingw32
@@ -358,7 +358,7 @@ jobs:
             - /root/project/depends/work
   win32_bionic:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: i686-w64-mingw32
@@ -380,7 +380,7 @@ jobs:
             make -j${JOBS}
   win64_bionic_depends:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: x86_64-w64-mingw32
@@ -412,7 +412,7 @@ jobs:
             - /root/project/depends/work
   win64_bionic:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: x86_64-w64-mingw32
@@ -434,7 +434,7 @@ jobs:
             make -j${JOBS}
   mac_bionic_depends:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: x86_64-apple-darwin16
@@ -469,7 +469,7 @@ jobs:
             - /root/project/depends/work
   mac_bionic:
     docker:
-      - image: circleci/buildpack-deps:18.04
+      - image: cimg/base:stable-18.04
         user: root
     environment:
       HOST: x86_64-apple-darwin16
