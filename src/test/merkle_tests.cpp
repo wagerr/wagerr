@@ -7,7 +7,7 @@
 
 #include <boost/test/unit_test.hpp>
 
-BOOST_FIXTURE_TEST_SUITE(merkle_tests, TestingSetup)
+BOOST_AUTO_TEST_SUITE(merkle_tests)
 
 // Older version of the merkle root computation code, for comparison.
 static uint256 BlockBuildMerkleTree(const CBlock& block, bool* fMutated, std::vector<uint256>& vMerkleTree)
