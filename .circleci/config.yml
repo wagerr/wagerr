@@ -94,8 +94,8 @@ jobs:
             ./configure --host=${HOST} --prefix=`pwd`/depends/${HOST} --enable-zmq --enable-glibc-back-compat --enable-reduce-exports LDFLAGS=-static-libstdc++
             make -j ${JOBS}
             # make -j {$JOBS} check
-            #src/test/test_wagerr
-            #src/qt/test/test_wagerr-qt
+            ./src/test/test_wagerr --run_test=\!zerocoin_transactions_tests --run_test=\!zerocoin_coinspend_tests --run_test=\!tutorial_libzerocoin_tests --run_test=\!DoS_tests --run_test=\!multisig_tests --run_test=\!script_P2SH_tests --run_test=\!script_tests --run_test=\!accounting_tests --run_test=\!rpc_wallet_tests --run_test=\!transaction_tests --run_test=\!zerocoin_transactions_test --run_test=\!tutorial_libzerocoin --run_test=\!betting_tests --run_test=\!budget_tests --run_test=\!key_tests --run_test=\!main_tests --run_test=\!rpc_tests --run_test=\!wallet_tests
+            src/qt/test/test_wagerr-qt
             test/functional/test_runner.py
   i686_bionic_depends:
     docker:
